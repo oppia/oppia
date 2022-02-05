@@ -133,31 +133,31 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
 
     def test_validate_with_int_exp_id(self):
         self.exploration_stats.exp_id = 10
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected exp_id to be a string')):
             self.exploration_stats.validate()
 
     def test_validation_with_string_num_actual_starts(self):
         self.exploration_stats.num_actual_starts_v2 = '0'
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected num_actual_starts_v2 to be an int')):
             self.exploration_stats.validate()
 
     def test_validation_with_list_state_stats_mapping(self):
         self.exploration_stats.state_stats_mapping = []
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected state_stats_mapping to be a dict')):
             self.exploration_stats.validate()
 
     def test_validation_with_negative_num_completions(self):
         self.exploration_stats.num_completions_v2 = -5
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             '%s cannot have negative values' % ('num_completions_v2'))):
             self.exploration_stats.validate()
 
     def test_validate_exp_version(self):
         self.exploration_stats.exp_version = 'invalid_exp_version'
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected exp_version to be an int')):
             self.exploration_stats.validate()
 
@@ -356,7 +356,7 @@ class StateStatsTests(test_utils.GenericTestBase):
 
     def test_hash(self):
         state_stats = stats_domain.StateStats.create_default()
-        with self.assertRaisesRegexp(TypeError, 'unhashable'):
+        with self.assertRaisesRegex(TypeError, 'unhashable'):
             unused_hash = hash(state_stats)
 
     def test_aggregate_from_state_stats(self):
@@ -394,7 +394,7 @@ class StateStatsTests(test_utils.GenericTestBase):
         state_stats = stats_domain.StateStats.create_default()
         different_stats = DifferentStats()
 
-        with self.assertRaisesRegexp(TypeError, 'can not be aggregated from'):
+        with self.assertRaisesRegex(TypeError, 'can not be aggregated from'):
             state_stats.aggregate_from(different_stats)
 
     def test_to_dict(self):
@@ -419,13 +419,13 @@ class StateStatsTests(test_utils.GenericTestBase):
 
     def test_validation_for_state_stats_with_string_total_answers_count(self):
         self.state_stats.total_answers_count_v2 = '10'
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected total_answers_count_v2 to be an int')):
             self.state_stats.validate()
 
     def test_validation_for_state_stats_with_negative_total_answers_count(self):
         self.state_stats.total_answers_count_v2 = -5
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             '%s cannot have negative values' % ('total_answers_count_v2'))):
             self.state_stats.validate()
 
@@ -457,6 +457,11 @@ class StateStatsTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             state_stats.to_frontend_dict(), expected_state_stats_dict)
+
+    def test_cloned_object_replicates_original_object(self):
+        state_stats = stats_domain.StateStats(0, 10, 0, 4, 0, 18, 0, 7, 2, 0, 2)
+        expected_state_stats = state_stats.clone()
+        self.assertEqual(state_stats.to_dict(), expected_state_stats.to_dict())
 
 
 class SessionStateStatsTests(test_utils.GenericTestBase):
@@ -548,7 +553,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
 
     def test_hash(self):
         session_state_stats = stats_domain.SessionStateStats.create_default()
-        with self.assertRaisesRegexp(TypeError, 'unhashable'):
+        with self.assertRaisesRegex(TypeError, 'unhashable'):
             unused_hash = hash(session_state_stats)
 
     def test_to_dict(self):
@@ -658,21 +663,21 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
     def test_validate_with_int_exp_id(self):
         self.exp_issues.exp_id = 5
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected exp_id to be a string, received %s' % (type(5)))):
             self.exp_issues.validate()
 
     def test_validate_exp_version(self):
         self.exp_issues.exp_version = 'invalid_version'
 
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected exp_version to be an int')):
             self.exp_issues.validate()
 
     def test_validate_unresolved_issues(self):
         self.exp_issues.unresolved_issues = 0
 
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected unresolved_issues to be a list')):
             self.exp_issues.validate()
 
@@ -812,20 +817,20 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'issue_customization_args': {},
             'actions': []
         }
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'exp_id not in playthrough data dict.'):
             stats_domain.Playthrough.from_dict(playthrough_dict)
 
     def test_validate_with_string_exp_version(self):
         self.playthrough.exp_version = '1'
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected exp_version to be an int, received %s' % (type('1')))):
             self.playthrough.validate()
 
     def test_validate_with_invalid_issue_type(self):
         self.playthrough.issue_type = 'InvalidIssueType'
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Invalid issue type: %s' % self.playthrough.issue_type)):
             self.playthrough.validate()
 
@@ -840,35 +845,35 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     }
                 },
             })]
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Invalid action type: %s' % 'InvalidActionType')):
             self.playthrough.validate()
 
     def test_validate_non_str_exp_id(self):
         self.playthrough.exp_id = 0
 
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected exp_id to be a string')):
             self.playthrough.validate()
 
     def test_validate_non_str_issue_type(self):
         self.playthrough.issue_type = 0
 
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected issue_type to be a string')):
             self.playthrough.validate()
 
     def test_validate_non_list_actions(self):
         self.playthrough.actions = 0
 
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected actions to be a list')):
             self.playthrough.validate()
 
     def test_validate_non_dict_issue_customization_args(self):
         self.playthrough.issue_customization_args = 0
 
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected issue_customization_args to be a dict')):
             self.playthrough.validate()
 
@@ -963,7 +968,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         }
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'issue_type not in exploration issue dict.'):
             stats_domain.ExplorationIssue.from_dict(exp_issue_dict)
@@ -1043,7 +1048,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             'exp_id', 1)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d and unversioned issue schemas at'
             ' present.' %
@@ -1060,7 +1065,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             'exp_id', 1)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             re.escape(
                 'unsupported operand type(s) for +=: \'NoneType\' '
@@ -1071,7 +1076,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The _convert_issue_v1_dict_to_v2_dict() method is missing '
@@ -1085,31 +1090,31 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
     def test_validate_with_int_issue_type(self):
         self.exp_issue.issue_type = 5
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected issue_type to be a string, received %s' % (type(5)))):
             self.exp_issue.validate()
 
     def test_validate_with_string_schema_version(self):
         self.exp_issue.schema_version = '1'
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected schema_version to be an int, received %s' % (type('1')))):
             self.exp_issue.validate()
 
     def test_validate_issue_type(self):
         self.exp_issue.issue_type = 'invalid_issue_type'
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Invalid issue type')):
             self.exp_issue.validate()
 
     def test_validate_playthrough_ids(self):
         self.exp_issue.playthrough_ids = 'invalid_playthrough_ids'
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected playthrough_ids to be a list')):
             self.exp_issue.validate()
 
     def test_validate_playthrough_id_type(self):
         self.exp_issue.playthrough_ids = [0, 1]
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected each playthrough_id to be a string')):
             self.exp_issue.validate()
 
@@ -1273,7 +1278,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
         playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d and unversioned action schemas'
             ' at present.' %
@@ -1298,7 +1303,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
         playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             re.escape(
                 'unsupported operand type(s) for +=: \'NoneType\' '
@@ -1309,7 +1314,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
         learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 1)
         learner_action_dict = learner_action.to_dict()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The _convert_action_v1_dict_to_v2_dict() method is missing '
@@ -1323,13 +1328,13 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
     def test_validate_with_int_action_type(self):
         self.learner_action.action_type = 5
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected action_type to be a string, received %s' % (type(5)))):
             self.learner_action.validate()
 
     def test_validate_with_string_schema_version(self):
         self.learner_action.schema_version = '1'
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected schema_version to be an int, received %s' % (type('1')))):
             self.learner_action.validate()
 
@@ -1486,7 +1491,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
         })
 
     def test_requires_answer_to_be_created_from_dict(self):
-        with self.assertRaisesRegexp(KeyError, 'answer'):
+        with self.assertRaisesRegex(KeyError, 'answer'):
             stats_domain.SubmittedAnswer.from_dict({
                 'interaction_id': 'TextInput',
                 'answer_group_index': 0,
@@ -1499,7 +1504,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             })
 
     def test_requires_interaction_id_to_be_created_from_dict(self):
-        with self.assertRaisesRegexp(KeyError, 'interaction_id'):
+        with self.assertRaisesRegex(KeyError, 'interaction_id'):
             stats_domain.SubmittedAnswer.from_dict({
                 'answer': 'Text',
                 'answer_group_index': 0,
@@ -1512,7 +1517,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             })
 
     def test_requires_answer_group_index_to_be_created_from_dict(self):
-        with self.assertRaisesRegexp(KeyError, 'answer_group_index'):
+        with self.assertRaisesRegex(KeyError, 'answer_group_index'):
             stats_domain.SubmittedAnswer.from_dict({
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
@@ -1525,7 +1530,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             })
 
     def test_requires_rule_spec_index_to_be_created_from_dict(self):
-        with self.assertRaisesRegexp(KeyError, 'rule_spec_index'):
+        with self.assertRaisesRegex(KeyError, 'rule_spec_index'):
             stats_domain.SubmittedAnswer.from_dict({
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
@@ -1538,7 +1543,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             })
 
     def test_requires_classification_categ_to_be_created_from_dict(self):
-        with self.assertRaisesRegexp(KeyError, 'classification_categorization'):
+        with self.assertRaisesRegex(KeyError, 'classification_categorization'):
             stats_domain.SubmittedAnswer.from_dict({
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
@@ -1550,7 +1555,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             })
 
     def test_requires_params_to_be_created_from_dict(self):
-        with self.assertRaisesRegexp(KeyError, 'params'):
+        with self.assertRaisesRegex(KeyError, 'params'):
             stats_domain.SubmittedAnswer.from_dict({
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
@@ -1563,7 +1568,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             })
 
     def test_requires_session_id_to_be_created_from_dict(self):
-        with self.assertRaisesRegexp(KeyError, 'session_id'):
+        with self.assertRaisesRegex(KeyError, 'session_id'):
             stats_domain.SubmittedAnswer.from_dict({
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
@@ -1576,7 +1581,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             })
 
     def test_requires_time_spent_in_sec_to_be_created_from_dict(self):
-        with self.assertRaisesRegexp(KeyError, 'time_spent_in_sec'):
+        with self.assertRaisesRegex(KeyError, 'time_spent_in_sec'):
             stats_domain.SubmittedAnswer.from_dict({
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
@@ -2054,7 +2059,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
         self.assertNotEqual(
             self.learner_answer_details.accumulated_answer_info_json_size_bytes,
             0)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Learner answer info with the given id not found'):
             self.learner_answer_details.delete_learner_answer_info('id_3')
         self.assertEqual(

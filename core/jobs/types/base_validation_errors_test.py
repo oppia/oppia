@@ -95,7 +95,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             def __init__(self, model):
                 super(ErrorWithIntMessage, self).__init__(123, model)
 
-        with self.assertRaisesRegexp(TypeError, 'must be a string'):
+        with self.assertRaisesRegex(TypeError, 'must be a string'):
             ErrorWithIntMessage(self.model)
 
     def test_message_raises_value_error_if_assigned_an_empty_value(self):
@@ -105,7 +105,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             def __init__(self, model):
                 super(ErrorWithEmptyMessage, self).__init__('', model)
 
-        with self.assertRaisesRegexp(ValueError, 'must be a non-empty string'):
+        with self.assertRaisesRegex(ValueError, 'must be a non-empty string'):
             ErrorWithEmptyMessage(self.model)
 
     def test_equality_between_different_types(self):

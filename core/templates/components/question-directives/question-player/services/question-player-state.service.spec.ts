@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the question player state service.
+ * @fileoverview Unit tests for question player state service.
  */
 
 import { TestBed, waitForAsync } from '@angular/core/testing';

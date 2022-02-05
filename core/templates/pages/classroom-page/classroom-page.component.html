@@ -2,7 +2,14 @@
 <div class="oppia-classroom-viewer-container position-relative">
   <div class="oppia-classroom-header">
     <div class="classroom-header">{{ 'I18N_CLASSROOM_PAGE_HEADING' | translate }}</div>
-    <div class="classroom-name">{{ classroomDisplayName }}</div>
+    <div class="classroom-name">
+      <span *ngIf="!isHackyClassroomTranslationDisplayed()">
+        {{ classroomDisplayName }}
+      </span>
+      <span *ngIf="isHackyClassroomTranslationDisplayed()">
+        {{ classroomNameTranslationKey | translate }}
+      </span>
+    </div>
   </div>
   <div class="oppia-classroom-banner">
     <img [src]="bannerImageFileUrl" align="center" width="100%" alt="">
@@ -32,7 +39,7 @@
       <div class="classroom-page-help-text oppia-classroom-page-subheading-text">
         {{ 'I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING' | translate }}
       </div>
-      <div>
+      <div class="oppia-classroom-search-bar-container">
         <oppia-search-bar [enableDropup]="true"></oppia-search-bar>
       </div>
     </div>
@@ -128,6 +135,10 @@
   }
 
   @media(max-width: 1150px) {
+    .oppia-topic-summary-tiles {
+      margin-bottom: 55px;
+    }
+
     .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
       grid-template-columns: 180px 180px 180px;
     }
@@ -138,6 +149,7 @@
     }
 
     .oppia-classroom-search-container {
+      margin-bottom: -54px;
       margin-left: -20vw;
     }
   }
@@ -159,11 +171,18 @@
     }
 
     .oppia-classroom-search-section {
-      width: 90vw;
+      text-align: center;
+      width: 95vw;
+    }
+
+    .oppia-classroom-search-bar-container {
+      display: flex;
+      justify-content: center;
     }
 
     .oppia-classroom-search-container {
       margin-left: -10vw;
+      padding-bottom: 27px;
     }
 
     .classroom-page-help-text {
@@ -192,7 +211,7 @@
     }
 
     .oppia-classroom-search-section {
-      width: 90vw;
+      width: 95vw;
     }
 
     .oppia-classroom-details {

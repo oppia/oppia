@@ -469,15 +469,15 @@ class SuggestionEditStateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change cmd must be equal to %s' %
                 self.change.cmd)
-        elif self.change.property_name != change.property_name:
+        if self.change.property_name != change.property_name:
             raise utils.ValidationError(
                 'The new change property_name must be equal to %s' %
                 self.change.property_name)
-        elif self.change.state_name != change.state_name:
+        if self.change.state_name != change.state_name:
             raise utils.ValidationError(
                 'The new change state_name must be equal to %s' %
                 self.change.state_name)
-        elif self.change.new_value['html'] == change.new_value['html']:
+        if self.change.new_value['html'] == change.new_value['html']:
             raise utils.ValidationError(
                 'The new html must not match the old html')
 
@@ -614,15 +614,15 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change cmd must be equal to %s' %
                 self.change.cmd)
-        elif self.change.state_name != change.state_name:
+        if self.change.state_name != change.state_name:
             raise utils.ValidationError(
                 'The new change state_name must be equal to %s' %
                 self.change.state_name)
-        elif self.change.content_html != change.content_html:
+        if self.change.content_html != change.content_html:
             raise utils.ValidationError(
                 'The new change content_html must be equal to %s' %
                 self.change.content_html)
-        elif self.change.language_code != change.language_code:
+        if self.change.language_code != change.language_code:
             raise utils.ValidationError(
                 'The language code must be equal to %s' %
                 self.change.language_code)
@@ -1259,7 +1259,7 @@ class CommunityContributionStats:
                     'an integer for %s language code, received: %s.' % (
                         language_code, reviewer_count)
                 )
-            elif reviewer_count < 0:
+            if reviewer_count < 0:
                 raise utils.ValidationError(
                     'Expected the translation reviewer count to be '
                     'non-negative for %s language code, received: %s.' % (
@@ -1280,7 +1280,7 @@ class CommunityContributionStats:
                     'an integer for %s language code, received: %s.' % (
                         language_code, suggestion_count)
                 )
-            elif suggestion_count < 0:
+            if suggestion_count < 0:
                 raise utils.ValidationError(
                     'Expected the translation suggestion count to be '
                     'non-negative for %s language code, received: %s.' % (

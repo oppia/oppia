@@ -114,11 +114,11 @@
 # Collection project.
 /core/controllers/collection*.py @aks681
 /core/domain/collection*.py @aks681
-/core/templates/components/entity-creation-services/collection-creation.service*.ts @EricZLou
-/core/templates/components/entity-creation-services/collection-creation-backend-api.service*.ts @EricZLou
-/core/templates/domain/collection/ @EricZLou
-/core/templates/pages/collection-editor-page/ @EricZLou
-/core/templates/pages/collection-player-page/ @EricZLou
+/core/templates/components/entity-creation-services/collection-creation.service*.ts @kevintab95
+/core/templates/components/entity-creation-services/collection-creation-backend-api.service*.ts @kevintab95
+/core/templates/domain/collection/ @kevintab95
+/core/templates/pages/collection-editor-page/ @kevintab95
+/core/templates/pages/collection-player-page/ @kevintab95
 
 
 # Contributor Dashboard project.
@@ -186,7 +186,6 @@
 /.pylintrc @Hudda @DubeySandeep
 /.stylelintrc @Hudda @DubeySandeep
 /.yarnrc @DubeySandeep
-/core/templates/css/.stylelintrc @Hudda @DubeySandeep
 /tox.ini @Hudda @DubeySandeep
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @DubeySandeep
@@ -194,9 +193,9 @@
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/linters/ @Hudda @DubeySandeep
-/scripts/linters/codeowner_linter*.py @sajalasati @DubeySandeep
-/scripts/linters/pylint_extensions*.py @sajalasati @DubeySandeep
-/scripts/linters/python_linter*.py @sajalasati @DubeySandeep
+/scripts/linters/codeowner_linter*.py @DubeySandeep
+/scripts/linters/pylint_extensions*.py @DubeySandeep
+/scripts/linters/python_linter*.py @DubeySandeep
 /ubuntu_dockerfile @DubeySandeep
 
 
@@ -211,8 +210,8 @@
 /core/domain/state_domain*.py @aks681
 /core/domain/summary_services*.py @aks681
 /core/domain/value_generators_domain*.py @vojtechjelinek
-/core/templates/components/entity-creation-services/exploration-creation.service*.ts @EricZLou
-/core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @EricZLou
+/core/templates/components/entity-creation-services/exploration-creation.service*.ts @kevintab95
+/core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.component.html @kevintab95
 /core/templates/components/state-directives/ @kevintab95
@@ -226,27 +225,27 @@
 /core/templates/domain/state/ @kevintab95
 /core/templates/domain/summary/ @kevintab95
 /core/templates/domain/state_card/ @kevintab95
-/core/templates/pages/exploration-editor-page/ @EricZLou
-/core/templates/pages/exploration-editor-page/history-tab/ @EricZLou
-/core/templates/pages/exploration-editor-page/settings-tab/ @EricZLou
+/core/templates/pages/exploration-editor-page/ @kevintab95
+/core/templates/pages/exploration-editor-page/history-tab/ @kevintab95
+/core/templates/pages/exploration-editor-page/settings-tab/ @kevintab95
 /core/templates/pages/exploration-player-page/ @kevintab95
-/core/templates/components/state-editor/ @EricZLou
-/core/templates/services/compute-graph.service.ts @EricZLou
+/core/templates/components/state-editor/ @kevintab95
+/core/templates/services/compute-graph.service.ts @kevintab95
 /core/templates/services/context.service*.ts @kevintab95
 /core/templates/services/editability.service*.ts @kevintab95
 /core/templates/services/exploration-features*.ts @kevintab95
 /core/templates/services/exploration-html-formatter.service*.ts @kevintab95
 /core/templates/services/image-upload-helper.service*.ts @kevintab95
-/core/templates/services/validators.service*.ts @EricZLou
+/core/templates/services/validators.service*.ts @kevintab95
 
 
 # Forms pages.
-/core/templates/components/forms/ @EricZLou
+/core/templates/components/forms/ @kevintab95
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @srijanreddy98
 /core/templates/components/ck-editor-helpers/customize-rte-component-modal.template.html @DubeySandeep
-/core/templates/services/schema-default-value.service*.ts @EricZLou
-/core/templates/services/schema-form-submitted.service*.ts @EricZLou
-/core/templates/services/schema-undefined-last-element.service*.ts @EricZLou
+/core/templates/services/schema-default-value.service*.ts @kevintab95
+/core/templates/services/schema-form-submitted.service*.ts @kevintab95
+/core/templates/services/schema-undefined-last-element.service*.ts @kevintab95
 
 
 # Google-app-engine configurations
@@ -404,11 +403,11 @@
 /core/domain/classroom_services*.py @aks681
 /core/domain/question*.py @aks681
 /core/domain/rights_domain*.py @aks681
-/core/templates/components/concept-card/ @EricZLou
-/core/templates/components/score-ring/ @EricZLou
-/core/templates/components/skill-mastery/ @EricZLou
-/core/templates/components/skills-mastery-list/ @EricZLou
-/core/templates/domain/question/ @EricZLou
+/core/templates/components/concept-card/ @kevintab95
+/core/templates/components/score-ring/ @kevintab95
+/core/templates/components/skill-mastery/ @kevintab95
+/core/templates/components/skills-mastery-list/ @kevintab95
+/core/templates/domain/question/ @kevintab95
 /core/templates/domain/review_test/ @kevintab95
 /core/templates/pages/practice-session-page/ @kevintab95
 /core/templates/pages/review-test-page/ @kevintab95
@@ -437,10 +436,10 @@
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py @aks681
-/core/templates/components/entity-creation-services/story-creation.service*.ts @EricZLou
+/core/templates/components/entity-creation-services/story-creation.service*.ts @kevintab95
 /core/templates/domain/story/ @kevintab95
 /core/templates/domain/story_viewer/ @kevintab95
-/core/templates/pages/story-editor-page/ @EricZLou
+/core/templates/pages/story-editor-page/ @kevintab95
 /core/templates/pages/story-viewer-page/ @kevintab95
 
 # Topic project.
@@ -450,7 +449,7 @@
 /core/domain/subtopic_page_domain*.py @aks681
 /core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
-/core/templates/components/entity-creation-services/topic-creation.service*.ts @EricZLou
+/core/templates/components/entity-creation-services/topic-creation.service*.ts @kevintab95
 /core/templates/domain/classroom/ @aks681 @kevintab95
 /core/templates/domain/subtopic_viewer/ @aks681 @kevintab95
 /core/templates/domain/topic/ @aks681 @kevintab95

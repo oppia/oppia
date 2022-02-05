@@ -22,7 +22,6 @@ import logging
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import auth_services
 from core.domain import collection_services
@@ -102,7 +101,7 @@ def save_pending_deletion_requests(pending_deletion_requests):
             user_ids, include_deleted=True)
     )
     final_pending_deletion_request_models = []
-    for deletion_request_model, deletion_request in python_utils.ZIP(
+    for deletion_request_model, deletion_request in zip(
             pending_deletion_request_models, pending_deletion_requests):
         deletion_request.validate()
         deletion_request_dict = {

@@ -132,7 +132,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(all_question_models.count(), 1)
         question_model = all_question_models.get()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v25-v%d state schemas at present.' %
             feconf.CURRENT_STATE_SCHEMA_VERSION):

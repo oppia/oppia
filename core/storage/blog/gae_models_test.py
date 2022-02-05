@@ -56,6 +56,29 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         self.blog_post_model.update_timestamps()
         self.blog_post_model.put()
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            blog_models.BlogPostModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'title': base_models.EXPORT_POLICY.EXPORTED,
+            'content': base_models.EXPORT_POLICY.EXPORTED,
+            'url_fragment': base_models.EXPORT_POLICY.EXPORTED,
+            'tags': base_models.EXPORT_POLICY.EXPORTED,
+            'thumbnail_filename': base_models.EXPORT_POLICY.EXPORTED,
+            'published_on': base_models.EXPORT_POLICY.EXPORTED,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            blog_models.BlogPostModel.get_export_policy(),
+            expected_export_policy_dict)
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             blog_models.BlogPostModel.get_deletion_policy(),
@@ -76,7 +99,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         blog_post_model_cls = blog_models.BlogPostModel
 
         # Test create method.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'A blog post with the given blog post ID exists'
             ' already.'):
 
@@ -90,7 +113,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
                     'blog_post_id', self.USER_ID)
 
         # Test generate_new_blog_post_id method.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'New blog post id generator is producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
@@ -183,6 +206,29 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
         self.blog_post_summary_model_new.update_timestamps()
         self.blog_post_summary_model_new.put()
 
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'published_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            blog_models.BlogPostSummaryModel.get_export_policy(),
+            expected_export_policy_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            blog_models.BlogPostSummaryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             blog_models.BlogPostSummaryModel.get_deletion_policy(),
@@ -234,6 +280,33 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         )
         self.blog_post_rights_draft_model.update_timestamps()
         self.blog_post_rights_draft_model.put()
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'blog_post_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            blog_models.BlogPostRightsModel.get_export_policy(),
+            expected_export_policy_dict)
+
+    def test_get_field_name_mapping_to_takeout_keys(self) -> None:
+        self.assertEqual(
+            blog_models.BlogPostRightsModel.
+            get_field_name_mapping_to_takeout_keys(),
+            {
+                'editor_ids': 'editable_blog_post_ids'
+            })
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            blog_models.BlogPostRightsModel.
+                get_model_association_to_user(),
+            base_models.
+                MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -375,7 +448,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         blog_post_rights_model_cls = blog_models.BlogPostRightsModel
 
         # Test create method.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Blog Post ID conflict on creating new blog post rights model.'):
             #  Swap dependent method get_by_id to simulate collision every time.

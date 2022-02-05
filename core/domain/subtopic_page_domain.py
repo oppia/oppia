@@ -22,11 +22,16 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import html_validation_service
 from core.domain import state_domain
-from core.platform import models
 
+<<<<<<< HEAD
 (topic_models,) = models.Registry.import_models([models.Names.TOPIC])
+=======
+from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
+>>>>>>> upstream/develop
 
 SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML = 'page_contents_html'
 SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO = 'page_contents_audio'

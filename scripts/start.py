@@ -23,8 +23,8 @@ import argparse
 import contextlib
 import time
 
-
-from . import extend_index_yaml
+# Do not import any Oppia modules here,
+# import them below the "install_third_party_libs.main()" line.
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, python_utils).
@@ -32,6 +32,7 @@ install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order

@@ -21,14 +21,16 @@ import datetime
 
 from core import feconf
 from core import utils
-from core.platform import models
 
 from typing import Dict, List, Union
 from typing_extensions import TypedDict
 
+<<<<<<< HEAD
 (classifier_models,) = models.Registry.import_models(
     [models.Names.CLASSIFIER])
 
+=======
+>>>>>>> upstream/develop
 TrainingDataType = Union[
     Dict[str, Union[int, List[str]]], List[Dict[str, Union[int, List[str]]]]
 ]

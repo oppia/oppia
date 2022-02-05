@@ -21,7 +21,6 @@ import logging
 import types
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import config_services
@@ -192,23 +191,23 @@ class EmailRightsTest(test_utils.GenericTestBase):
                     email_manager.require_sender_id_is_valid(
                         intent, sender_id)
                 else:
-                    with self.assertRaisesRegexp(
+                    with self.assertRaisesRegex(
                         Exception, 'Invalid sender_id'
                     ):
                         email_manager.require_sender_id_is_valid(
                             intent, sender_id)
 
         # Also test null and invalid intent strings.
-        with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
+        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):
             email_manager.require_sender_id_is_valid(
                 '', feconf.SYSTEM_COMMITTER_ID)
-        with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
+        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):
             email_manager.require_sender_id_is_valid(
                 '', self.admin_id)
-        with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
+        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):
             email_manager.require_sender_id_is_valid(
                 'invalid_intent', feconf.SYSTEM_COMMITTER_ID)
-        with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
+        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):
             email_manager.require_sender_id_is_valid(
                 'invalid_intent', self.admin_id)
 
@@ -541,7 +540,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that an exception is raised when an invalid
             # role is supplied.
-            with self.assertRaisesRegexp(Exception, 'Invalid role'):
+            with self.assertRaisesRegex(Exception, 'Invalid role'):
                 email_manager.send_role_notification_email(
                     self.editor_id, self.new_user_id, rights_domain.ROLE_NONE,
                     self.exploration.id, self.exploration.title)
@@ -601,7 +600,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that no email was sent.
@@ -632,7 +632,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # However, an error should be recorded in the logs.
@@ -679,7 +680,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # However, an error should be recorded in the logs.
@@ -724,7 +726,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # However, an error should be recorded in the logs.
@@ -755,7 +758,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
@@ -786,7 +790,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that an email was sent.
@@ -797,7 +802,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that no new email was sent.
@@ -821,7 +827,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 feconf.SIGNUP_DATA_URL,
                 {
                     'agreed_to_terms': True,
-                    'username': 'BadUsername!!!'
+                    'username': 'BadUsername!!!',
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 },
                 csrf_token=csrf_token, expected_status_int=400)
 
@@ -833,7 +840,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
@@ -862,7 +870,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
@@ -970,7 +979,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
             # An error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 1)
-            self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
+            self.assertRegex(logged_errors[0], 'Duplicate email')
 
             # Check that a new email was not sent.
             messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
@@ -1030,7 +1039,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
             # An error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 1)
-            self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
+            self.assertRegex(logged_errors[0], 'Duplicate email')
 
             # Check that a new email was not sent.
             messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
@@ -2819,8 +2828,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 day ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 1 day ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -2876,8 +2885,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 5 days ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 5 days ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -2936,8 +2945,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 hour ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 1 hour ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -2996,8 +3005,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 5 hours ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 5 hours ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3056,8 +3065,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 minute ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 1 minute ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3116,8 +3125,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 5 minutes ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 5 minutes ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3176,8 +3185,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 minute ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 1 minute ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3243,8 +3252,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '<li>The following English translation suggestion was submitted '
             'for review 1 day ago:'
             '<br>Translation 1</li><br>'
-            '<li>The following French translation suggestion was submitted for '
-            'review 1 hour ago:'
+            '<li>The following français (French) translation suggestion was '
+            'submitted for review 1 hour ago:'
             '<br>Translation 2</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3325,8 +3334,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '<li>The following English translation suggestion was submitted '
             'for review 1 day ago:'
             '<br>Translation 1 for reviewer 1</li><br>'
-            '<li>The following French translation suggestion was submitted for '
-            'review 1 hour ago:'
+            '<li>The following français (French) translation suggestion was '
+            'submitted for review 1 hour ago:'
             '<br>Translation 2 for reviewer 1</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3347,11 +3356,11 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 minute ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 1 minute ago:'
             '<br>Translation 1 for reviewer 2</li><br>'
-            '<li>The following French translation suggestion was submitted for '
-            'review 1 minute ago:'
+            '<li>The following français (French) translation suggestion was '
+            'submitted for review 1 minute ago:'
             '<br>Translation 2 for reviewer 2</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3462,8 +3471,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following French translation suggestion was submitted for '
-            'review 1 minute ago:'
+            '<li>The following français (French) translation suggestion was '
+             'submitted for review 1 minute ago:'
             '<br>Translation 2</li><br>'
             '<li>The following question suggestion was submitted for '
             'review 1 minute ago:'
@@ -3976,8 +3985,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'review:'
             '<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 5 days ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 5 days ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br>'
@@ -4053,8 +4062,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>The following English translation suggestion was submitted '
             'for review 2 days ago:'
             '<br>Translation 1</li><br>'
-            '<li>The following French translation suggestion was submitted for '
-            'review 2 days ago:'
+            '<li>The following français (French) translation suggestion was '
+            'submitted for review 2 days ago:'
             '<br>Translation 2</li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br>'
@@ -4138,8 +4147,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>The following English translation suggestion was submitted '
             'for review 2 days ago:'
             '<br>Translation 1</li><br>'
-            '<li>The following French translation suggestion was submitted for '
-            'review 2 days ago:'
+            '<li>The following français (French) translation suggestion was '
+            'submitted for review 2 days ago:'
             '<br>Translation 2</li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br>'
@@ -4645,9 +4654,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
-            'There have been <b>Hindi translation suggestions</b> created on '
-            'the <a href="%s%s">Contributor Dashboard page</a> where there '
-            'are not enough reviewers.<br><br>'
+            'There have been <b>हिन्दी (Hindi) translation suggestions</b> '
+            'created on the <a href="%s%s">Contributor Dashboard page</a> where'
+            ' there are not enough reviewers.<br><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
@@ -4689,9 +4698,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
-            'There have been <b>Hindi translation suggestions</b> created on '
-            'the <a href="%s%s">Contributor Dashboard page</a> where there '
-            'are not enough reviewers.<br><br>'
+            'There have been <b>हिन्दी (Hindi) translation suggestions</b> '
+            'created on the <a href="%s%s">Contributor Dashboard page</a> where'
+            ' there are not enough reviewers.<br><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
@@ -4706,9 +4715,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
-            'There have been <b>Hindi translation suggestions</b> created on '
-            'the <a href="%s%s">Contributor Dashboard page</a> where there '
-            'are not enough reviewers.<br><br>'
+            'There have been <b>हिन्दी (Hindi) translation suggestions</b> '
+            'created on the <a href="%s%s">Contributor Dashboard page</a> where'
+            ' there are not enough reviewers.<br><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
@@ -4763,8 +4772,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'there are not enough reviewers. The languages that need more '
             'reviewers are:'
             '<br><ul>'
-            '<li><b>French</b></li><br>'
-            '<li><b>Hindi</b></li><br>'
+            '<li><b>français (French)</b></li><br>'
+            '<li><b>हिन्दी (Hindi)</b></li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
@@ -4814,8 +4823,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'there are not enough reviewers. The languages that need more '
             'reviewers are:'
             '<br><ul>'
-            '<li><b>French</b></li><br>'
-            '<li><b>Hindi</b></li><br>'
+            '<li><b>français (French)</b></li><br>'
+            '<li><b>हिन्दी (Hindi)</b></li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
@@ -4836,8 +4845,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'there are not enough reviewers. The languages that need more '
             'reviewers are:'
             '<br><ul>'
-            '<li><b>French</b></li><br>'
-            '<li><b>Hindi</b></li><br>'
+            '<li><b>français (French)</b></li><br>'
+            '<li><b>हिन्दी (Hindi)</b></li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
@@ -4897,8 +4906,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'there are not enough reviewers. The languages that need more '
             'reviewers are:'
             '<br><ul>'
-            '<li><b>French</b></li><br>'
-            '<li><b>Hindi</b></li><br>'
+            '<li><b>français (French)</b></li><br>'
+            '<li><b>हिन्दी (Hindi)</b></li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
@@ -4919,8 +4928,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'there are not enough reviewers. The languages that need more '
             'reviewers are:'
             '<br><ul>'
-            '<li><b>French</b></li><br>'
-            '<li><b>Hindi</b></li><br>'
+            '<li><b>français (French)</b></li><br>'
+            '<li><b>हिन्दी (Hindi)</b></li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
@@ -5332,6 +5341,38 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             self.APPLICANT_EMAIL)
         self.assertEqual(len(messages), 0)
 
+    def test_account_deletion_failed_email_is_sent_correctly(self):
+        dummy_admin_address = 'admin@system.com'
+
+        admin_email_ctx = self.swap(
+            feconf, 'ADMIN_EMAIL_ADDRESS', dummy_admin_address)
+
+        with self.can_send_emails_ctx, admin_email_ctx:
+            # Make sure there are no emails already sent.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(messages, [])
+
+            # Send an account deletion failed email to admin.
+            email_manager.send_account_deletion_failed_email(
+                self.applicant_id, self.APPLICANT_EMAIL
+            )
+
+            # Make sure emails are sent.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].to, ['admin@system.com'])
+            self.assertEqual(
+                messages[0].subject,
+                'WIPEOUT: Account deletion failed'
+            )
+            self.assertIn(
+                'The Wipeout process failed for the user with ID \'%s\' and '
+                'email \'%s\'.' % (self.applicant_id, self.APPLICANT_EMAIL),
+                messages[0].html
+            )
+
     def test_that_correct_account_deleted_email_is_sent(self):
         expected_email_subject = 'Account deleted'
         expected_email_html_body = (
@@ -5458,7 +5499,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
 
     def test_that_exception_is_raised_for_unauthorised_sender(self):
         with self.can_send_emails_ctx, (
-            self.assertRaisesRegexp(
+            self.assertRaisesRegex(
                 Exception, 'Invalid sender_id for email')):
             email_manager.send_user_query_email(
                 self.fake_sender_id, self.recipient_ids, 'email_subject',
@@ -5495,8 +5536,7 @@ class EmailPreferencesTests(test_utils.EmailTestBase):
         emails = ('user1@example.com', 'user2@example.com')
 
         user_ids = []
-        for user_id, username, user_email in python_utils.ZIP(
-                gae_ids, usernames, emails):
+        for user_id, username, user_email in zip(gae_ids, usernames, emails):
             user_settings = user_services.create_new_user(user_id, user_email)
             user_ids.append(user_settings.user_id)
             user_services.set_username(user_settings.user_id, username)
@@ -5584,14 +5624,14 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True)
 
     def test_exception_raised_if_email_on_moderator_action_is_false(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'For moderator emails to be sent, please ensure that '
             'REQUIRE_EMAIL_ON_MODERATOR_ACTION is set to True.'):
             email_manager.require_moderator_email_prereqs_are_satisfied()
 
     def test_exception_raised_if_can_send_emails_is_false(self):
-        with self.can_send_email_moderator_action_ctx, self.assertRaisesRegexp(
+        with self.can_send_email_moderator_action_ctx, self.assertRaisesRegex(
             Exception,
             'For moderator emails to be sent, please ensure that '
             'CAN_SEND_EMAILS is set to True.'):
@@ -5671,7 +5711,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_assign_translation_reviewer_email_for_invalid_review_category(
             self):
-        with self.assertRaisesRegexp(Exception, 'Invalid review_category'):
+        with self.assertRaisesRegex(Exception, 'Invalid review_category'):
             email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 
@@ -5697,9 +5737,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         expected_email_html_body = (
             'Hi translator,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
-            'reviewer for Hindi language translations. This allows you to '
-            'review translation suggestions made by contributors in the '
-            'Hindi language.<br><br>'
+            'reviewer for हिन्दी (hindi) language translations. This allows you'
+            ' to review translation suggestions made by contributors in the '
+            'हिन्दी (hindi) language.<br><br>'
             'You can check the translation suggestions waiting for review in '
             'the <a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
@@ -5743,9 +5783,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         expected_email_html_body = (
             'Hi voiceartist,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
-            'reviewer for Hindi language voiceovers. This allows you to '
-            'review voiceover applications made by contributors in the '
-            'Hindi language.<br><br>'
+            'reviewer for हिन्दी (hindi) language voiceovers. This allows you '
+            'to review voiceover applications made by contributors in the '
+            'हिन्दी (hindi) language.<br><br>'
             'You can check the voiceover applications waiting for review in '
             'the <a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
@@ -5840,7 +5880,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_remove_translation_reviewer_email_for_invalid_review_category(
             self):
-        with self.assertRaisesRegexp(Exception, 'Invalid review_category'):
+        with self.assertRaisesRegex(Exception, 'Invalid review_category'):
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 
@@ -5868,10 +5908,10 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         expected_email_html_body = (
             'Hi translator,<br><br>'
             'The Oppia team has removed you from the translation reviewer role '
-            'in the Hindi language. You won\'t be able to review translation '
-            'suggestions made by contributors in the Hindi language any more, '
-            'but you can still contribute translations through the '
-            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'in the हिन्दी (hindi) language. You won\'t be able to review '
+            'translation suggestions made by contributors in the हिन्दी (hindi)'
+            ' language any more, but you can still contribute translations '
+            'through the <a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
@@ -5913,10 +5953,10 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         expected_email_html_body = (
             'Hi voiceartist,<br><br>'
             'The Oppia team has removed you from the voiceover reviewer role '
-            'in the Hindi language. You won\'t be able to review voiceover '
-            'applications made by contributors in the Hindi language any more, '
-            'but you can still contribute voiceovers through the '
-            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'in the हिन्दी (hindi) language. You won\'t be able to review '
+            'voiceover applications made by contributors in the हिन्दी (hindi)'
+            ' language any more, but you can still contribute voiceovers '
+            'through the <a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
@@ -5993,3 +6033,49 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_REVIEWER)
+
+
+class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
+    """Unit test related to not mergeable change list emails sent to admin."""
+
+    dummy_admin_address = 'admin@system.com'
+
+    def setUp(self):
+        super(NotMergeableChangesEmailUnitTest, self).setUp()
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.admin_email_ctx = self.swap(
+            feconf, 'ADMIN_EMAIL_ADDRESS', self.dummy_admin_address)
+
+    def test_not_mergeable_change_list_email_is_sent_correctly(self):
+        with self.can_send_emails_ctx, self.admin_email_ctx:
+            # Make sure there are no emails already sent.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(messages, [])
+
+            # Send an account deletion failed email to admin.
+            email_manager.send_not_mergeable_change_list_to_admin_for_review(
+                'testExploration', 1, 2, {'field1': 'value1'}
+            )
+
+            # Make sure emails are sent.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].to, ['admin@system.com'])
+            self.assertEqual(
+                messages[0].subject,
+                'Some changes were rejected due to a conflict'
+            )
+            self.assertIn(
+                'Hi Admin,<br><br>'
+                'Some draft changes were rejected in exploration '
+                'testExploration because the changes were conflicting and '
+                'could not be saved. Please see the '
+                'rejected change list below:<br>'
+                'Discarded change list: {\'field1\': \'value1\'} <br><br>'
+                'Frontend Version: 1<br>'
+                'Backend Version: 2<br><br>'
+                'Thanks!',
+                messages[0].html
+            )

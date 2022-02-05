@@ -46,16 +46,12 @@ BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class VALIDATION_MODES(enum.Enum): # pylint: disable=invalid-name
+class ValidationModes(enum.Enum):
     """Enum for validation modes."""
 
-    neutral = 'neutral' # pylint: disable=invalid-name
-    strict = 'strict' # pylint: disable=invalid-name
-    non_strict = 'non_strict' # pylint: disable=invalid-name
+    NEUTRAL = 'neutral'
+    STRICT = 'strict'
+    NON_STRICT = 'non_strict'
 
 
 class ValidateDeletedModel(beam.DoFn):
@@ -274,7 +270,7 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
         Returns:
             str. The type of validation mode: neutral, strict or non strict.
         """
-        return VALIDATION_MODES.neutral
+        return ValidationModes.NEUTRAL
 
     def process(self, entity):
         """Function that defines how to process each entity in a pipeline of
@@ -291,11 +287,11 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
             validation_type = self._get_domain_object_validation_type(entity)
             if domain_object is None:
                 return
-            if validation_type == VALIDATION_MODES.neutral:
+            if validation_type == ValidationModes.NEUTRAL:
                 domain_object.validate()
-            elif validation_type == VALIDATION_MODES.strict:
+            elif validation_type == ValidationModes.STRICT:
                 domain_object.validate(strict=True)
-            elif validation_type == VALIDATION_MODES.non_strict:
+            elif validation_type == ValidationModes.NON_STRICT:
                 domain_object.validate(strict=False)
             else:
                 raise Exception(

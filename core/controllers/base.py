@@ -168,10 +168,19 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
+        # This try-catch block is intended to log cases where getting the
+        # request payload errors with ValueError: Invalid boundary in multipart
+        # form: b''. This is done to gather sufficient data to help debug the
+        # error if it arises in the future.
+        try:
+            payload_json_string = self.request.get('payload')
+        except ValueError as e:
+            logging.error('%s: request %s', e, self.request)
+            raise e
         # TODO(#13155): Remove the if-else part once all the handlers have had
         # schema validation implemented.
-        if self.request.get('payload'):
-            self.payload = json.loads(self.request.get('payload'))
+        if payload_json_string:
+            self.payload = json.loads(payload_json_string)
         else:
             self.payload = None
         self.iframed = False
@@ -326,15 +335,16 @@ class BaseHandler(webapp2.RequestHandler):
         schema_validation_succeeded = True
         try:
             self.validate_and_normalize_args()
-        except self.InvalidInputException as e:
-            self.handle_exception(e, self.app.debug)
-            schema_validation_succeeded = False
-        # TODO(#13155): Remove this clause once all the handlers have had
-        # schema validation implemented.
-        except NotImplementedError as e:
-            self.handle_exception(e, self.app.debug)
-            schema_validation_succeeded = False
 
+        # TODO(#13155): Remove NotImplementedError once all the handlers
+        # have had schema validation implemented.
+        except (
+            NotImplementedError,
+            self.InternalErrorException,
+            self.InvalidInputException
+        ) as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
         if not schema_validation_succeeded:
             return
 
@@ -349,6 +359,12 @@ class BaseHandler(webapp2.RequestHandler):
         """
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
+
+        # For HEAD requests, we use the schema of GET handler,
+        # because HEAD returns just the handlers of the GET request.
+        if request_method == 'HEAD':
+            request_method = 'GET'
+
         url_path_args = self.request.route_kwargs
 
         if (
@@ -357,6 +373,10 @@ class BaseHandler(webapp2.RequestHandler):
         ):
             # TODO(#13155): Remove this clause once all the handlers have had
             # schema validation implemented.
+            if self.URL_PATH_ARGS_SCHEMAS or self.HANDLER_ARGS_SCHEMAS:
+                raise self.InternalErrorException(
+                    'Remove handler class name from '
+                    'HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS')
             return
 
         handler_args = {}
@@ -366,7 +386,7 @@ class BaseHandler(webapp2.RequestHandler):
             if arg == 'csrf_token':
                 # 'csrf_token' has been already validated in the
                 # dispatch method.
-                continue
+                pass
             elif arg == 'source':
                 source_url = self.request.get('source')
                 regex_pattern = (
@@ -513,6 +533,12 @@ class BaseHandler(webapp2.RequestHandler):
             PageNotFoundException. Page not found error (error code 404).
         """
         raise self.PageNotFoundException
+
+    def head(self, *args, **kwargs):
+        """Method to handle HEAD requests. The webapp library automatically
+        makes sure that HEAD only returns the headers of GET request.
+        """
+        return self.get(*args, **kwargs)
 
     def render_json(self, values: Dict[Any, Any]) -> None:
         """Prepares JSON response to be sent to the client.

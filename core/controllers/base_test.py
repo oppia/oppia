@@ -110,8 +110,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def get(self):
             self.render_template('invalid_page.html')
 
-        def head(self):
-            """Do a HEAD request. This is an unrecognized request method in our
+        def options(self):
+            """Do a OPTIONS request. This is an unrecognized request method in our
             codebase.
             """
             self.render_template({'invalid_page.html'})
@@ -280,7 +280,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg)
 
         with self.swap(logging, 'warning', mock_logging_function):
-            self.testapp.head('/mock', status=500)
+            self.testapp.options('/mock', status=500)
             self.assertEqual(len(observed_log_messages), 2)
             self.assertEqual(
                 observed_log_messages[0],
@@ -311,7 +311,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_dev_mode_cannot_be_true_on_production(self):
         server_software_swap = self.swap(
             os, 'environ', {'SERVER_SOFTWARE': 'Production'})
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'DEV_MODE can\'t be true on production.')
         with assert_raises_regexp_context_manager, server_software_swap:
             # This reloads the feconf module so that all the checks in
@@ -473,6 +473,23 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(call_counter.times_called, 1)
 
+    def test_logs_request_with_invalid_payload(self):
+        with contextlib.ExitStack() as exit_stack:
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            exit_stack.enter_context(self.swap_to_always_raise(
+                webapp2.Request, 'get',
+                error=ValueError('uh-oh')))
+            self.get_custom_response(
+                '/',
+                expected_content_type='text/plain',
+                params=None,
+                expected_status_int=500)
+
+        self.assertRegexpMatches(
+            logs[0],
+            'uh-oh: request GET /')
+
 
 class MaintenanceModeTests(test_utils.GenericTestBase):
     """Tests BaseHandler behavior when maintenance mode is enabled.
@@ -581,7 +598,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.assertEqual(call_counter.times_called, 1)
 
     def test_signup_fails(self):
-        with self.assertRaisesRegexp(Exception, 'Bad response: 503'):
+        with self.assertRaisesRegex(Exception, 'Bad response: 503'):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_maintenance_mode_is_disabled(self):
@@ -620,7 +637,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-        with self.assertRaisesRegexp(Exception, 'Bad response: 503'):
+        with self.assertRaisesRegex(Exception, 'Bad response: 503'):
             self.get_json('/url_handler?current_url=/')
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
@@ -882,6 +899,17 @@ class I18nDictsTests(test_utils.GenericTestBase):
                     if not key.startswith('"I18N_'):
                         self.log_line('Bad line in file: %s' % filename)
                 self.assertEqual(sorted(key_list), key_list)
+
+    # TODO(#14645): Remove this method when translation service is extended.
+    def test_hacky_tranlsation_keys_match_constants_en(self):
+        """Tests that the hacky translation keys present in constants file
+        are also present in en.json.
+        """
+        en_key_list = self._extract_keys_from_json_file('en.json')
+        hacky_translation_keys = constants.HACKY_TRANSLATION_KEYS
+        missing_hacky_translation_keys = list(
+            set(hacky_translation_keys) - set(en_key_list))
+        self.assertEqual(missing_hacky_translation_keys, [])
 
     def test_keys_match_en_qqq(self):
         """Tests that en.json and qqq.json have the exact same set of keys."""
@@ -1217,7 +1245,8 @@ class SignUpTests(test_utils.GenericTestBase):
         response = self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
-                'agreed_to_terms': True
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             }, csrf_token=csrf_token, expected_status_int=401,
         )
 
@@ -1233,7 +1262,8 @@ class SignUpTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
-                'agreed_to_terms': True
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             }, csrf_token=csrf_token,
         )
 
@@ -1249,7 +1279,8 @@ class SignUpTests(test_utils.GenericTestBase):
         response = self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
-                'agreed_to_terms': True
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             }, csrf_token='invalid_token', expected_status_int=401,
         )
 
@@ -1830,6 +1861,86 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp4):
             self.put_json('/mock_play_exploration', {}, csrf_token=csrf_token)
         self.logout()
+
+
+class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
+        test_utils.GenericTestBase):
+    """This test ensures that, InternalServerError is raised for
+    the request with handler class which has schema but class name is still in
+    HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS.
+    """
+
+    class MockHandler(base.BaseHandler):
+        """Mock handler with schema."""
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'arg_a': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                }
+            }
+        }
+
+        def post(self):
+            return self.render_json({})
+
+    def setUp(self):
+        super().setUp()
+        user_id = user_services.get_user_id_from_username('learneruser')
+        self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
+        self.payload = {'arg_a': 'val'}
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_post_request_raise_internal_server_error(self):
+        test_app_ctx = self.swap(self, 'testapp', self.testapp)
+        handler_class_still_needs_schema_list_ctx = self.swap(
+            handler_schema_constants, 'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
+            ['MockHandler'])
+        with test_app_ctx, handler_class_still_needs_schema_list_ctx:
+            self.post_json(
+                '/mock', self.payload, csrf_token=self.csrf_token,
+                expected_status_int=500)
+
+
+class HeaderRequestsTests(test_utils.GenericTestBase):
+    """Tests to check header requests."""
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_id': {
+                'schema': {
+                    'type': 'int'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        def get(self, entity_id):
+            return self.render_json({'entity_id': entity_id})
+
+    def setUp(self):
+        super().setUp()
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route(
+                '/mock/<entity_id>', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_head_request_with_invalid_url_args_raises(self):
+        with self.swap(self, 'testapp', self.testapp):
+            self.testapp.head('/mock/not_int', status=400)
+
+    def test_valid_head_request_returns_only_headers(self):
+        with self.swap(self, 'testapp', self.testapp):
+            response = self.testapp.head('/mock/234', status=200)
+            self.assertEqual(response.body, b'')
+            self.assertIsNotNone(response.headers)
 
 
 class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(

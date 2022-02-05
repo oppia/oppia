@@ -51,14 +51,14 @@
     <strong>The answers in this group are correct</strong>
     <input class="protractor-test-editor-correctness-toggle" type="checkbox" ng-model="tmpOutcome.labelledAsCorrect">
   </div>
-  <question-misconception-editor is-editable="true"
-                                 ng-if="questionModeEnabled"
-                                 on-save-tagged-misconception="updateTaggedMisconception"
-                                 on-save-answer-group-feedback="updateAnswerGroupFeedback"
-                                 outcome="tmpOutcome"
-                                 rules="tmpRule"
-                                 tagged-skill-misconception-id="tmpTaggedSkillMisconceptionId">
-  </question-misconception-editor>
+  <oppia-question-misconception-editor ng-if="questionModeEnabled"
+                                       (save-tagged-misconception)="updateTaggedMisconception($event)"
+                                       (save-answer-group-feedback)="updateAnswerGroupFeedback($event)"
+                                       [is-editable]="true"
+                                       [outcome]="tmpOutcome"
+                                       [rules]="tmpRule"
+                                       [tagged-skill-misconception-id]="tmpTaggedSkillMisconceptionId">
+  </oppia-question-misconception-editor>
 </div>
 
 <div class="modal-footer">
@@ -95,15 +95,15 @@
       min-height: 100vh;
     }
     .add-answer-group-modal .modal-header {
-      background-color: #00609C;
+      background-color: #00609c;
     }
     .add-answer-group-modal .modal-header i {
-      color: #FFF;
+      color: #fff;
       display: block;
       font-size: 20px;
     }
     .add-answer-group-modal .modal-header h3 {
-      color: #FFF;
+      color: #fff;
     }
   }
 </style>
