@@ -16,14 +16,12 @@
     <i class="material-icons oppia-hide-card-height-warning-icon protractor-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
     <span [innerHTML]="'I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE' | translate"></span>
   </div>
-  <div class="protractor-test-edit-content"
-       [ngClass]="{'oppia-editable-section': isEditable}"
+  <div class="protractor-test-edit-content oppia-editable-section"
        (click)="openStateContentEditor()">
-    <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon protractor-test-edit-content-pencil-button"
+    <i class="material-icons oppia-editor-edit-icon protractor-test-edit-content-pencil-button"
        title="Edit Card Content">&#xE254;
     </i>
-    <div class="oppia-state-content-display oppia-transition-200"
-         [ngClass]="{'oppia-prevent-selection': isEditable}"
+    <div class="oppia-prevent-selection oppia-state-content-display oppia-transition-200"
          title="Card Content">
       <span [hidden]="!stateContentService.savedMemento.isEmpty()" class="oppia-placeholder">
         {{ stateContentPlaceholder }}
