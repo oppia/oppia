@@ -126,8 +126,6 @@ describe('Learner Dashboard Icons Component', () => {
   it('should update hover state on changes', fakeAsync(() => {
     let updateHoverStateSpy = spyOn(
       component, 'setHoverState');
-    let updateCanActivityBeAddedToLearnerPlaylist = spyOn(
-      component, 'canActivityBeAddedToLearnerPlaylist');
     const changes: SimpleChanges = {
       activityActive: {
         previousValue: false,
