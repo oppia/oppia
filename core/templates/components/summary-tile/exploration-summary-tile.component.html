@@ -24,9 +24,7 @@
           </span>
         </h3>
       </div>
-      <div *ngIf="!isPlaylistTile" class="title-section-mask"
-           (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)">
-      </div>
+      <div *ngIf="!isPlaylistTile" class="title-section-mask"></div>
       <div class="summary-section"
            section="{isWindowLarge?undefined:'right-section'}">
         <div *ngIf="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
