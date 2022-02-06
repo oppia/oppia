@@ -765,6 +765,12 @@ export class ExplorationStatesService {
     this.stateRenamedCallbacks.push(callback);
   }
 
+  registerOnStatesChangedCallback(callback: () => void): void {
+    this.stateAddedCallbacks.push(callback);
+    this.stateRenamedCallbacks.push(callback);
+    this.stateAddedCallbacks.push(callback);
+  }
+
   registerOnStateInteractionSavedCallback(callback: () => {}): void {
     this.stateInteractionSavedCallbacks.push(callback);
   }
