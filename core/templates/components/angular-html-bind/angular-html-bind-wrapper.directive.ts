@@ -38,6 +38,8 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
         '$rootScope', '$scope',
         function($rootScope, $scope) {
           var ctrl = this;
+           /* @ts-expect-error here at " let ctrl = this;" since there is it doesn't have a class defined to initialize ctlr
+          */
           ctrl.$onInit = function() {
             if (ctrl.parentScope) {
               for (let key of Object.keys(ctrl.parentScope)) {
@@ -74,8 +76,8 @@ export const ScopeProvider = {
   providers: [ScopeProvider],
 })
 export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
-  @Input() htmlData: string;
-  @Input() parentScope;
+  @Input() htmlData!: string;
+  @Input() parentScope!: string;
   @Input() classStr = '';
   constructor(elementRef: ElementRef, injector: Injector) {
     super('angularHtmlBindWrapper', elementRef, injector);

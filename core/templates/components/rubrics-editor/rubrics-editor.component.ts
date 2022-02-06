@@ -27,6 +27,14 @@ interface Explanation {
   [key: string]: string[];
 }
 
+interface explanationEditorIsOpenInterface {
+  [key: string]: boolean[];
+}
+
+interface explanationsMementoInterface {
+  [key: string]: string[];
+}
+
 interface ExplanationFormSchema {
   type: string;
   'ui_config': object;
@@ -53,22 +61,22 @@ interface SkillDescriptionStatusValuesInterface {
   templateUrl: './rubrics-editor.component.html'
 })
 export class RubricsEditorComponent {
-  @Input() rubrics: Rubric[];
-  @Input() newSkillBeingCreated: boolean;
+  @Input() rubrics!: Rubric[];
+  @Input() newSkillBeingCreated!: boolean;
   @Output() saveRubric: EventEmitter<unknown> = (
     new EventEmitter());
   skillDescriptionStatusValues: SkillDescriptionStatusValuesInterface = (
     TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);
   skillDifficultyMedium: string = (
     constants.SKILL_DIFFICULTY_MEDIUM);
-  explanationsMemento: object = {};
-  explanationEditorIsOpen: object = {};
+  explanationsMemento: explanationsMementoInterface = {};
+  explanationEditorIsOpen: explanationEditorIsOpenInterface = {};
   editableExplanations: Explanation = {};
-  selectedRubricIndex: number;
+  selectedRubricIndex!: number;
   EXPLANATION_FORM_SCHEMA: ExplanationFormSchema = {type: 'html',
     ui_config: {}};
-  rubricsOptions: RubricsOptions[];
-  rubric: Rubric;
+  rubricsOptions!: RubricsOptions[];
+  rubric!: Rubric;
 
   constructor(
     private skillCreationService: SkillCreationService,
@@ -182,7 +190,7 @@ export class RubricsEditorComponent {
         Array(explanations.length).fill(false));
       this.editableExplanations[difficulty] = [...explanations];
     }
-    this.selectedRubricIndex = null;
+    this.selectedRubricIndex;
     this.rubricsOptions = [
       {id: 0, difficulty: 'Easy'},
       {id: 1, difficulty: 'Medium'},

@@ -73,7 +73,9 @@ angular.module('oppia').directive('schemaBasedEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$rootScope', function($rootScope) {
-          let ctrl = this;
+          let ctrl = this; 
+          /* @ts-expect-error here at " let ctrl = this;" since there is it doesn't have a class defined to initialize ctlr
+          */
           ctrl.$onInit = function() {
             /**
              * $rootScope.$applyAsync() is called here to fix the change
@@ -101,15 +103,15 @@ export const ScopeProvider = {
   providers: [ScopeProvider]
 })
 export class SchemaBasedEditorDirective extends UpgradeComponent {
-  @Input() schema: () => Schema;
-  @Input() isDisabled: () => boolean;
-  @Input() localValue;
+  @Input() schema!: () => Schema;
+  @Input() isDisabled!: () => boolean;
+  @Input() localValue!: () => string;
   @Output() localValueChange: EventEmitter<unknown> = new EventEmitter();
-  @Input() labelForFocusTarget: () => string;
-  @Input() onInputBlur: () => void;
-  @Input() onInputFocus: () => void;
-  @Input() headersEnabled;
-  @Input() notRequired: () => boolean;
+  @Input() labelForFocusTarget!: () => string;
+  @Input() onInputBlur!: () => void;
+  @Input() onInputFocus!: () => void;
+  @Input() headersEnabled!: () => boolean;
+  @Input() notRequired!: () => boolean;
 
   constructor(
       elementRef: ElementRef,

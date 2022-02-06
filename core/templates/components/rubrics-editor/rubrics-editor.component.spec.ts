@@ -115,7 +115,7 @@ describe('Rubrics Editor Component', () => {
     componentInstance.skillDifficultyMedium = difficulty;
     componentInstance.ngOnInit();
     spyOn(componentInstance.saveRubric, 'emit');
-    componentInstance.explanationsMemento[difficulty] = {};
+    componentInstance.explanationsMemento[difficulty] = [];
     componentInstance.explanationsMemento[difficulty][0] = 'different';
     componentInstance
       .saveExplanation(componentInstance.skillDifficultyMedium, 0);
@@ -170,9 +170,7 @@ describe('Rubrics Editor Component', () => {
 
   it('should give status of empty explanation', () => {
     spyOn(componentInstance, 'isExplanationEmpty').and.returnValue(true);
-    componentInstance.explanationsMemento[difficulty] = {
-      idx: ''
-    };
+    componentInstance.explanationsMemento[difficulty] = [];
     expect(componentInstance.isAnyExplanationEmptyForDifficulty(difficulty))
       .toBeTrue();
   });
