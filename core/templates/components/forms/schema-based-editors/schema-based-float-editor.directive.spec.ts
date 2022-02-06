@@ -67,7 +67,7 @@ describe('Schema Based Float Editor Directive', () => {
     expect(ctrl.hasLoaded).toBe(undefined);
     expect(ctrl.isUserCurrentlyTyping).toBe(undefined);
     expect(ctrl.hasFocusedAtLeastOnce).toBe(undefined);
-    expect(ctrl.errorStringI18NKey).toBe(undefined);
+    expect(ctrl.errorStringI18nKey).toBe(undefined);
     expect(ctrl.localValue).toBe(undefined);
     expect(ctrl.checkRequireNonnegativeInputValue).toBe(undefined);
 
@@ -77,7 +77,7 @@ describe('Schema Based Float Editor Directive', () => {
     expect(ctrl.hasLoaded).toBe(true);
     expect(ctrl.isUserCurrentlyTyping).toBe(false);
     expect(ctrl.hasFocusedAtLeastOnce).toBe(false);
-    expect(ctrl.errorStringI18NKey).toBe('');
+    expect(ctrl.errorStringI18nKey).toBe('');
     expect(ctrl.localValue).toBe(0.0);
     expect(ctrl.checkRequireNonnegativeInputValue).toBe(false);
     expect(ctrl.uiConfig().checkRequireNonnegativeInput).toBe(false);
@@ -163,7 +163,7 @@ describe('Schema Based Float Editor Directive', () => {
     ctrl.localValue = null;
     ctrl.generateErrors();
 
-    expect(ctrl.errorStringI18NKey)
+    expect(ctrl.errorStringI18nKey)
       .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
   });
 });

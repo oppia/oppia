@@ -100,7 +100,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           };
 
           ctrl.generateErrors = function() {
-            ctrl.errorStringI18NKey = (
+            ctrl.errorStringI18nKey = (
               NumericInputValidationService.getErrorStringI18nKey(
                 ctrl.localValue, ctrl.checkRequireNonnegativeInputValue));
           };
@@ -123,7 +123,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             ctrl.hasLoaded = false;
             ctrl.isUserCurrentlyTyping = false;
             ctrl.hasFocusedAtLeastOnce = false;
-            ctrl.errorStringI18NKey = '';
+            ctrl.errorStringI18nKey = '';
             ctrl.labelForErrorFocusTarget =
               FocusManagerService.generateFocusLabel();
             if (ctrl.localValue === undefined) {

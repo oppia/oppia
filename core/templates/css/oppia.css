@@ -1933,6 +1933,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-rte-viewer > p:first-child {
+  margin-left: 15px;
   margin-top: 0;
 }
 .oppia-rte-viewer > p:last-child {

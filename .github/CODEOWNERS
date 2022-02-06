@@ -193,9 +193,9 @@
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/linters/ @Hudda @DubeySandeep
-/scripts/linters/codeowner_linter*.py @sajalasati @DubeySandeep
-/scripts/linters/pylint_extensions*.py @sajalasati @DubeySandeep
-/scripts/linters/python_linter*.py @sajalasati @DubeySandeep
+/scripts/linters/codeowner_linter*.py @DubeySandeep
+/scripts/linters/pylint_extensions*.py @DubeySandeep
+/scripts/linters/python_linter*.py @DubeySandeep
 /ubuntu_dockerfile @DubeySandeep
 
 

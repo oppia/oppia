@@ -131,12 +131,12 @@ describe('InteractiveFractionInputComponent', () => {
     component.answerValueChanged();
     component.answer = '12345678';
 
-    expect(component.errorMessageI18NKey).toBe('');
+    expect(component.errorMessageI18nKey).toBe('');
     expect(component.isValid).toBe(true);
     component.answerValueChanged();
     tick(150);
 
-    expect(component.errorMessageI18NKey)
+    expect(component.errorMessageI18nKey)
       .toBe(
         ObjectsDomainConstants.
           FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS_LENGTH);
@@ -149,12 +149,12 @@ describe('InteractiveFractionInputComponent', () => {
     component.answerValueChanged();
     component.answer = '??2';
 
-    expect(component.errorMessageI18NKey).toBe('');
+    expect(component.errorMessageI18nKey).toBe('');
     expect(component.isValid).toBe(true);
     component.answerValueChanged();
     tick(150);
 
-    expect(component.errorMessageI18NKey)
+    expect(component.errorMessageI18nKey)
       .toBe(
         ObjectsDomainConstants.
           FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS);
@@ -167,12 +167,12 @@ describe('InteractiveFractionInputComponent', () => {
     component.answerValueChanged();
     component.answer = '2 / 4 / 5';
 
-    expect(component.errorMessageI18NKey).toBe('');
+    expect(component.errorMessageI18nKey).toBe('');
     expect(component.isValid).toBe(true);
     component.answerValueChanged();
     tick(150);
 
-    expect(component.errorMessageI18NKey)
+    expect(component.errorMessageI18nKey)
       .toBe(
         ObjectsDomainConstants.
           FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT);
@@ -185,12 +185,12 @@ describe('InteractiveFractionInputComponent', () => {
     component.answerValueChanged();
     component.answer = '2/3';
     component.isValid = false;
-    component.errorMessageI18NKey = 'error';
+    component.errorMessageI18nKey = 'error';
 
     component.answerValueChanged();
     tick(150);
 
-    expect(component.errorMessageI18NKey).toBe('');
+    expect(component.errorMessageI18nKey).toBe('');
     expect(component.isValid).toBe(true);
   }));
 
@@ -201,7 +201,7 @@ describe('InteractiveFractionInputComponent', () => {
 
     component.submitAnswer();
 
-    expect(component.errorMessageI18NKey)
+    expect(component.errorMessageI18nKey)
       .toBe('I18N_INTERACTIONS_FRACTIONS_SIMPLEST_FORM');
     expect(component.isValid).toBe(false);
   });
@@ -213,7 +213,7 @@ describe('InteractiveFractionInputComponent', () => {
 
     component.submitAnswer();
 
-    expect(component.errorMessageI18NKey)
+    expect(component.errorMessageI18nKey)
       .toBe('I18N_INTERACTIONS_FRACTIONS_PROPER_FRACTION');
     expect(component.isValid).toBe(false);
   });
@@ -225,7 +225,7 @@ describe('InteractiveFractionInputComponent', () => {
 
     component.submitAnswer();
 
-    expect(component.errorMessageI18NKey)
+    expect(component.errorMessageI18nKey)
       .toBe('I18N_INTERACTIONS_FRACTIONS_NON_MIXED');
     expect(component.isValid).toBe(false);
   });
@@ -237,7 +237,7 @@ describe('InteractiveFractionInputComponent', () => {
 
     component.submitAnswer();
 
-    expect(component.errorMessageI18NKey).toBe('');
+    expect(component.errorMessageI18nKey).toBe('');
     expect(currentInteractionService.onSubmit).toHaveBeenCalled();
     expect(component.isValid).toBe(true);
   });

@@ -51,37 +51,37 @@ describe('RatioExpression', () => {
     component.isValidRatio('1:1:2.3');
     // For this and other warning texts, the correct translated text is fetched
     // in HTML and so, the key itself is passed around in the ts files.
-    expect(component.warningTextI18NKey)
+    expect(component.warningTextI18nKey)
       .toBe('I18N_INTERACTIONS_RATIO_NON_INTEGER_ELEMENTS');
   });
 
   it('should initialize warningText with invalid ratio', () => {
     component.isValidRatio('1:2:3:');
-    expect(component.warningTextI18NKey)
+    expect(component.warningTextI18nKey)
       .toBe('I18N_INTERACTIONS_RATIO_INVALID_FORMAT');
   });
 
   it('should initialize warningText with invalid character', () => {
     component.isValidRatio('abc');
-    expect(component.warningTextI18NKey)
+    expect(component.warningTextI18nKey)
       .toBe('I18N_INTERACTIONS_RATIO_INVALID_CHARS');
   });
 
   it('should initialize warningText with empty ratio', () => {
     component.isValidRatio('');
-    expect(component.warningTextI18NKey)
+    expect(component.warningTextI18nKey)
       .toBe('I18N_INTERACTIONS_RATIO_EMPTY_STRING');
   });
 
   it('should initialize warningText with invalid colons', () => {
     component.isValidRatio('1:2::3');
-    expect(component.warningTextI18NKey)
+    expect(component.warningTextI18nKey)
       .toBe('I18N_INTERACTIONS_RATIO_INVALID_COLONS');
   });
 
   it('should initialize warningText with invalid zero ratio', () => {
     component.isValidRatio('1:0');
-    expect(component.warningTextI18NKey)
+    expect(component.warningTextI18nKey)
       .toBe('I18N_INTERACTIONS_RATIO_INCLUDES_ZERO');
   });
 

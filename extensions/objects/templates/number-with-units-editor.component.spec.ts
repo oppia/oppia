@@ -99,13 +99,13 @@ describe('NumberWithUnitsEditorComponent', () => {
 
     expect(component.value?.real).toBe(24);
     expect(component.value?.units[0].unit).toBe('kg');
-    expect(component.errorMessageI18NKey).toBe('');
+    expect(component.errorMessageI18nKey).toBe('');
     expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
   });
 
   it('should display error message when user enters incorrect units', () => {
     component.updateValue('23 kf');
 
-    expect(component.errorMessageI18NKey).toBe('Unit "kf" not found.');
+    expect(component.errorMessageI18nKey).toBe('Unit "kf" not found.');
   });
 });
