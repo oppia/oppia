@@ -15,7 +15,6 @@
 """Controllers for the profile page."""
 
 from __future__ import annotations
-from email.policy import default
 
 import io
 import json
