@@ -7,9 +7,6 @@
   Some additional rules that can be added to the CSS files can be found here:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
-body {
-  overflow-x: visible;
-}
 
 .oppia-learner-dashboard-container {
   margin: 0 auto 30px auto;
