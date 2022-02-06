@@ -324,14 +324,6 @@ export class CollectionPlayerPageComponent implements OnInit {
     this.whitelistedCollectionIdsForGuestProgress = (
       AppConstants.WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
 
-    // Touching anywhere outside the mobile preview should hide it.
-    document.addEventListener('touchstart', () => {
-      if (this.explorationCardIsShown === true) {
-        this.explorationCardIsShown = false;
-        this.scrollToLocation(this.elementToScrollTo);
-      }
-    });
-
     this.fetchSummaryAsync(this.collectionId);
 
     // Load the collection the learner wants to view.
