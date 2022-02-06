@@ -24,6 +24,7 @@ import operator
 
 from core import feconf
 from core.domain import improvements_domain
+from core.domain import user_services
 from core.platform import models
 
 (improvements_models,) = (
@@ -212,3 +213,27 @@ def apply_changes_to_model(task_entry, task_entry_model):
         task_entry_model.resolved_on = task_entry.resolved_on
         changes_were_made_to_model = True
     return changes_were_made_to_model
+
+
+def update_task_dict_with_resolver_settings(task_entry):
+    """Makes changes to the given task dict according to resolver settings.
+
+    Args:
+        task_entry: improvements_domain.TaskEntry. The TaskEntry domain object
+            whose dict is to be changed.
+
+    Returns:
+        TaskEntryDict. Updated TaskEntry dict.
+    """
+    resolver_settings = (
+            task_entry.resolver_id and
+            user_services.get_user_settings(
+                task_entry.resolver_id, strict=True)) # type: ignore[no-untyped-call]
+
+    task_entry_dict = task_entry.to_dict()
+    task_entry_dict['resolver_username'] = (
+                resolver_settings and resolver_settings.username)
+    task_entry_dict['resolver_profile_picture_data_url'] = (
+                resolver_settings and
+                resolver_settings.profile_picture_data_url)
+    return task_entry_dict

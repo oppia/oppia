@@ -169,7 +169,10 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
         with self.login_context(self.OWNER_EMAIL):
             self.assertEqual(self.get_json(self.get_url()), {
-                'open_tasks': [t.to_dict() for t in task_entries],
+                'open_tasks': [
+                    improvements_services
+                    .update_task_dict_with_resolver_settings(
+                        t) for t in task_entries],
                 'resolved_task_types_by_state_name': {},
             })
 

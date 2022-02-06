@@ -178,7 +178,10 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
 
         self.assertEqual(resolved_task_types_by_state_name, {})
         self.assertItemsEqual(
-            [t.to_dict() for t in tasks], [t.to_dict() for t in open_tasks])
+            [improvements_services.update_task_dict_with_resolver_settings(
+                t) for t in tasks],
+            [improvements_services.update_task_dict_with_resolver_settings(
+                t) for t in open_tasks])
 
     def test_fetch_identifies_the_resolved_tasks_of_each_state(self):
         tasks = [
@@ -290,7 +293,10 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
             improvements_services.fetch_exploration_tasks(self.exp))
 
         self.assertItemsEqual(
-            [t.to_dict() for t in open_tasks], [tasks[3].to_dict()])
+            [improvements_services.update_task_dict_with_resolver_settings(
+                t) for t in open_tasks],
+            [improvements_services.update_task_dict_with_resolver_settings(
+                tasks[3])])
         self.assertEqual(
             resolved_task_types_by_state_name, {
                 'B': ['high_bounce_rate'],
@@ -359,8 +365,10 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
             improvements_services.fetch_exploration_task_history_page(self.exp))
 
         self.assertEqual(
-            [t.to_dict() for t in initial_results],
-            [t.to_dict() for t in subsequent_results])
+            [improvements_services.update_task_dict_with_resolver_settings(
+                t) for t in initial_results],
+            [improvements_services.update_task_dict_with_resolver_settings(
+                t) for t in subsequent_results])
         self.assertEqual(initial_cursor, subsequent_cursor)
         self.assertEqual(initial_more, subsequent_more)
 
@@ -383,18 +391,27 @@ class PutTasksTests(ImprovementsServicesTestBase):
         resolved_task_model = (
             improvements_models.TaskEntryModel.get_by_id(resolved_task.task_id))
 
+        open_task_entry = improvements_services.get_task_entry_from_model(
+                open_task_model)
+        obsolete_task_entry = improvements_services.get_task_entry_from_model(
+                obsolete_task_model)
+        resolved_task_entry = improvements_services.get_task_entry_from_model(
+                resolved_task_model)
         self.assertEqual(
-            open_task.to_dict(),
-            improvements_services.get_task_entry_from_model(
-                open_task_model).to_dict())
+            improvements_services.update_task_dict_with_resolver_settings(
+                open_task),
+            improvements_services.update_task_dict_with_resolver_settings(
+                open_task_entry))
         self.assertEqual(
-            obsolete_task.to_dict(),
-            improvements_services.get_task_entry_from_model(
-                obsolete_task_model).to_dict())
+            improvements_services.update_task_dict_with_resolver_settings(
+                obsolete_task),
+            improvements_services.update_task_dict_with_resolver_settings(
+                obsolete_task_entry))
         self.assertEqual(
-            resolved_task.to_dict(),
-            improvements_services.get_task_entry_from_model(
-                resolved_task_model).to_dict())
+            improvements_services.update_task_dict_with_resolver_settings(
+                resolved_task),
+            improvements_services.update_task_dict_with_resolver_settings(
+                resolved_task_entry))
 
     def test_put_for_tasks_entries_which_exist_updates_the_models(self):
         task_entry = self._new_open_task()

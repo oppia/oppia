@@ -70,7 +70,9 @@ class ExplorationImprovementsHandler(base.BaseHandler):
             improvements_services.fetch_exploration_tasks(
                 exp_fetchers.get_exploration_by_id(exploration_id)))
         self.render_json({
-            'open_tasks': [t.to_dict() for t in open_tasks],
+            'open_tasks': [
+                improvements_services.update_task_dict_with_resolver_settings(
+                    t) for t in open_tasks],
             'resolved_task_types_by_state_name': (
                 resolved_task_types_by_state_name),
         })
@@ -141,7 +143,9 @@ class ExplorationImprovementsHistoryHandler(base.BaseHandler):
                 urlsafe_start_cursor=urlsafe_start_cursor))
 
         self.render_json({
-            'results': [t.to_dict() for t in results],
+            'results': [
+                improvements_services.update_task_dict_with_resolver_settings(
+                    t) for t in results],
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })
