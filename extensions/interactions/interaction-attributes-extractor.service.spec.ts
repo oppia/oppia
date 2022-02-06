@@ -22,7 +22,6 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAttributesExtractorService } from
   'interactions/interaction-attributes-extractor.service';
 import { ContinueCustomizationArgs } from './customization-args-defs';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('Interaction attributes extractor service', () => {
   let iaes: InteractionAttributesExtractorService;
@@ -39,25 +38,17 @@ describe('Interaction attributes extractor service', () => {
 
   it('should properly extract customization arguments values from attributes',
     () => {
-      const choicesWithValue = hes.objToEscapedJson([{
-        content_id: 'ca_placeholder_0',
-        html: 'Enter here.'
-      }]);
-      const allowMultipleItemsInSamePositionWithValue = hes.objToEscapedJson(
-        true
-      );
+      const recommendedExplorationIdsWithValue = hes.objToEscapedJson(['0']);
       const attributes = {
-        choicesWithValue,
-        allowMultipleItemsInSamePositionWithValue
+        recommendedExplorationIdsWithValue
       };
 
       const caValues = iaes.getValuesFromAttributes(
-        'DragAndDropSortInput',
+        'EndExploration',
         attributes
       );
       expect(caValues).toEqual({
-        choices: [new SubtitledHtml('Enter here.', 'ca_placeholder_0')],
-        allowMultipleItemsInSamePosition: true
+        recommendedExplorationIds: ['0'],
       });
     });
 
