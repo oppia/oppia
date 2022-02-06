@@ -29,7 +29,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { OutcomeDestinationEditorComponent } from './outcome-destination-editor.component';
 
-describe('Outcome Destination Editor', () => {
+fdescribe('Outcome Destination Editor', () => {
   let component: OutcomeDestinationEditorComponent;
   let fixture: ComponentFixture<OutcomeDestinationEditorComponent>;
 
@@ -99,7 +99,8 @@ describe('Outcome Destination Editor', () => {
       .and.returnValue(computedLayout);
 
     component.ngOnInit();
-    tick(10);
+    flushMicrotasks();
+    tick();
 
     expect(component.canAddPrerequisiteSkill).toBeFalse();
     expect(component.canEditRefresherExplorationId).toBeNull();
@@ -142,7 +143,8 @@ describe('Outcome Destination Editor', () => {
       'Hola', 'Introduction');
 
     component.ngOnInit();
-    tick(10);
+    flushMicrotasks();
+    tick();
 
     onSaveOutcomeDestDetailsEmitter.emit();
 
@@ -168,7 +170,8 @@ describe('Outcome Destination Editor', () => {
     spyOn(component, 'addState');
 
     component.ngOnInit();
-    tick(10);
+    flushMicrotasks();
+    tick();
 
     onSaveOutcomeDestDetailsEmitter.emit();
 
@@ -190,7 +193,8 @@ describe('Outcome Destination Editor', () => {
     expect(component.canEditRefresherExplorationId).toBe(undefined);
 
     component.ngOnInit();
-    tick(10);
+    flushMicrotasks();
+    tick();
 
     expect(component.canEditRefresherExplorationId).toBeTrue();
   }));
@@ -222,7 +226,8 @@ describe('Outcome Destination Editor', () => {
       .and.returnValue(computedLayout);
 
     component.ngOnInit();
-    tick(10);
+    flushMicrotasks();
+    tick();
 
     expect(component.destChoices).toEqual([{
       id: null,
