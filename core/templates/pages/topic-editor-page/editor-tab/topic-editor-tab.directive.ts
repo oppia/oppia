@@ -340,7 +340,7 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.updatePracticeTabIsDisplayed = function(
               newPracticeTabIsDisplayed) {
             if (!newPracticeTabIsDisplayed ||
-              $scope.topicHasMinimumQuestionsToPractice()
+              $scope.doesTopicHaveMinimumPracticeQuestions()
             ) {
               TopicUpdateService.setPracticeTabIsDisplayed(
                 $scope.topic, newPracticeTabIsDisplayed);
@@ -348,7 +348,7 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
-          $scope.topicHasMinimumQuestionsToPractice = function() {
+          $scope.doesTopicHaveMinimumPracticeQuestions = function() {
             const skillQuestionCounts = (
               Object.values($scope.skillQuestionCountDict));
             const numberOfPracticeQuestions = (
