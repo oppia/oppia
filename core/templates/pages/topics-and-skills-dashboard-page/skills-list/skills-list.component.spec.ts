@@ -68,9 +68,14 @@ describe('Skills List Component', () => {
 
 
   class MockNgbModal {
-    modal: string;
+    modal!: string;
     success: boolean = true;
-    open(content, options: NgbModalOptions) {
+    open(
+        content: AssignSkillToTopicModalComponent |
+        DeleteSkillModalComponent |
+        MergeSkillModalComponent |
+        UnassignSkillFromTopicsModalComponent
+        , options: NgbModalOptions) {
       if (this.modal === 'delete_skill') {
         return {
           componentInstance: {
@@ -105,7 +110,10 @@ describe('Skills List Component', () => {
           },
           result: {
             then: (
-                successCallback: (result) => void,
+                successCallback: (result: {
+                skill: {};
+                supersedingSkillId: string;
+              }) => void,
                 cancelCallback: () => void
             ) => {
               if (this.success) {
