@@ -145,12 +145,18 @@ angular.module('oppia').factory('ExplorationStatesService', [
           answerGroup.rules.forEach(rule => {
             Object.keys(rule.inputs).forEach(inputName => {
               if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
-                // The above if condition also passes for DragAndDropRuleInputs
-                // but these type of inputs do not have contentId property
-                // in their rule.inputs object.
-                if (rule.inputs[inputName] !== null &&
-                  rule.inputs[inputName].hasOwnProperty('contentId')) {
-                  contentIds.add(rule.inputs[inputName].contentId);
+                // The above if condition also passes for
+                // TranslatableHtmlContentId but these type of do not
+                // have contentId property in their rule.inputs object.
+                if (rule.inputs[inputName] !== null) {
+                  if (rule.inputs[inputName].hasOwnProperty('contentId')) {
+                    contentIds.add(rule.inputs[inputName].contentId);
+                  } else {
+                    // This is TranslatableHtmlContentId case where the
+                    // rule.inputs[inputName] is an string which itself is
+                    // a contentId.
+                    contentIds.add(rule.inputs[inputName]);
+                  }
                 }
               }
             });
