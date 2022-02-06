@@ -76,7 +76,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
             constants.TASK_STATUS_RESOLVED, self.owner_id,
             self.MOCK_DATE)
         self.assertEqual(
-            improvements_services.update_task_dict_with_resolver_settings(
+            improvements_services.update_task_dict_with_resolver_settings(  # type: ignore[no-untyped-call]
                 task_entry), {
             'entity_type': 'exploration',
             'entity_id': self.exp_id,
@@ -104,7 +104,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
             constants.TASK_STATUS_RESOLVED, invalid_resolver_id,
             self.MOCK_DATE)
         with self.assertRaisesRegex(Exception, 'User not found'): # type: ignore[no-untyped-call]
-            improvements_services.update_task_dict_with_resolver_settings(
+            improvements_services.update_task_dict_with_resolver_settings( # type: ignore[no-untyped-call]
              task_entry)
 
     def test_can_create_open_task_with_corresponding_values(self) -> None:
