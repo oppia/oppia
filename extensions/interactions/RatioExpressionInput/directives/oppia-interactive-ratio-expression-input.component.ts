@@ -116,10 +116,6 @@ export class InteractiveRatioExpressionInputComponent
         this.expectedNumberOfTerms !== 0
       ) {
         throw new Error('I18N_INTERACTIONS_TERMS_LIMIT');
-        // throw new Error(
-        //   'The creator has specified the number of terms in ' +
-        //   `the answer to be ${this.expectedNumberOfTerms}.`
-        // );
       }
       this.errorMessageI18nKey = '';
       this.isValid = true;
