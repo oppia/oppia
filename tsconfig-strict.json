@@ -9,7 +9,7 @@
     "rootDir": ".",
     "target": "es6",
     "sourceMap": true,
-    "noImplicitUseStrict": true,
+    "strict": true,
     "typeRoots": ["./node_modules/@types"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
