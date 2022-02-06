@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,16 +36,18 @@ class GetExpRightsWithDuplicateUsersJob(base_jobs.JobBase):
     """Validates that no user is assigned to multiple roles for
     any exploration (owner, editor, voice artist, viewer)."""
 
-    def run(
-        self
-    ) -> beam.PCollection[job_run_result.JobRunResult]:
-        exp_ids_with_duplicate_users = (
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        exp_rights = (
             self.pipeline
             | 'Get every exploration rights model' >> (
-                ndb_io.GetModels(exp_models.ExplorationRightsModel.query()))
+                ndb_io.GetModels(exp_models.ExplorationRightsModel.get_all()))
             | 'Get exploration rights from model' >> beam.Map(
                 rights_manager.get_activity_rights_from_model,
                 constants.ACTIVITY_TYPE_EXPLORATION)
+        )
+
+        exp_ids_with_duplicate_users = (
+            exp_rights
             | 'Combine exp id and list of users with rights' >> beam.Map(
                 lambda rights: (
                     rights.id, rights.owner_ids + rights.editor_ids +
@@ -55,10 +57,19 @@ class GetExpRightsWithDuplicateUsersJob(base_jobs.JobBase):
                 lambda obj: len(obj[1]) != len(set(obj[1])))
         )
 
+        report_number_of_exps_queried = (
+            exp_rights
+            | 'Count rights models' >> beam.combiners.Count.Globally()
+            | 'Report count of rights models' >> beam.Map(
+                lambda object_count: job_run_result.JobRunResult.as_stdout(
+                    'RESULT: Queried %s exp rights in total.' % (object_count)
+                ))
+        )
+
         report_number_of_invalid_exps = (
             exp_ids_with_duplicate_users
-            | 'Count all new models' >> beam.combiners.Count.Globally()
-            | 'Save number of invalid exps' >> beam.Map(
+            | 'Count invalid rights models' >> beam.combiners.Count.Globally()
+            | 'Report count of invalid rights models' >> beam.Map(
                 lambda object_count: job_run_result.JobRunResult.as_stdout(
                     'RESULT: There are %s invalid exp rights.' % (object_count)
                 ))
@@ -66,13 +77,17 @@ class GetExpRightsWithDuplicateUsersJob(base_jobs.JobBase):
 
         report_invalid_ids_and_users = (
             exp_ids_with_duplicate_users
-            | 'Save info on invalid exps' >> beam.Map(
-                lambda objects: job_run_result.JobRunResult.as_stdout(
+            | 'Report info on each invalid exp' >> beam.Map(
+                lambda objects: job_run_result.JobRunResult.as_stderr(
                     '%s: %s' % (objects[0], objects[1])
                 ))
         )
 
         return (
-            (report_number_of_invalid_exps, report_invalid_ids_and_users)
-            | 'Combine results' >> beam.Flatten()
+            (
+                report_number_of_exps_queried,
+                report_number_of_invalid_exps,
+                report_invalid_ids_and_users,
+            )
+            | 'Combine reported results' >> beam.Flatten()
         )

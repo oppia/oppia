@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,57 +40,96 @@ class GetExpRightsWithDuplicateUsersJobTests(
     USER_ID_2 = 'id_2'
     USER_ID_3 = 'id_3'
 
-    def test_run_with_duplicate_user_rights(self) -> None:
-        exploration_rights_model_1 = self.createModel(
-            exp_models.ExplorationRightsModel,
-            id=self.EXPLORATION_ID_1,
-            owner_ids=[self.USER_ID_1],
-            # Duplicate user below.
-            editor_ids=[self.USER_ID_1],
-            voice_artist_ids=[self.USER_ID_2],
-            viewer_ids=[self.USER_ID_3],
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            viewable_if_private=False,
-            first_published_msec=0.0
-        )
-        exploration_rights_model_2 = self.createModel(
-            exp_models.ExplorationRightsModel,
-            id=self.EXPLORATION_ID_2,
-            owner_ids=[self.USER_ID_1],
-            editor_ids=[self.USER_ID_2],
-            voice_artist_ids=[self.USER_ID_3],
-            viewer_ids=[],
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            viewable_if_private=False,
-            first_published_msec=0.0
-        )
-        exploration_rights_model_3 = self.createModel(
-            exp_models.ExplorationRightsModel,
-            id=self.EXPLORATION_ID_3,
-            owner_ids=[self.USER_ID_3],
-            editor_ids=[self.USER_ID_1],
-            voice_artist_ids=[self.USER_ID_2],
-            # Duplicate user below.
-            viewer_ids=[self.USER_ID_3],
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            viewable_if_private=False,
-            first_published_msec=0.0
-        )
+    # This is an invalid model with duplicate: USER_ID_1.
+    EXP_RIGHTS_MODEL_1 = super().createModel(
+        exp_models.ExplorationRightsModel,
+        id=EXPLORATION_ID_1,
+        owner_ids=[USER_ID_1],
+        editor_ids=[USER_ID_1],
+        voice_artist_ids=[USER_ID_2],
+        viewer_ids=[USER_ID_3],
+        community_owned=False,
+        status=constants.ACTIVITY_STATUS_PUBLIC,
+        viewable_if_private=False,
+        first_published_msec=0.0
+    )
+    # This is a valid model without duplicates.
+    EXP_RIGHTS_MODEL_2 = super().createModel(
+        exp_models.ExplorationRightsModel,
+        id=EXPLORATION_ID_2,
+        owner_ids=[USER_ID_1],
+        editor_ids=[USER_ID_2],
+        voice_artist_ids=[USER_ID_3],
+        viewer_ids=[],
+        community_owned=False,
+        status=constants.ACTIVITY_STATUS_PUBLIC,
+        viewable_if_private=False,
+        first_published_msec=0.0
+    )
+    # This is an invalid model with duplicate: USER_ID_3.
+    EXP_RIGHTS_MODEL_3 = super().createModel(
+        exp_models.ExplorationRightsModel,
+        id=EXPLORATION_ID_3,
+        owner_ids=[USER_ID_3],
+        editor_ids=[USER_ID_1],
+        voice_artist_ids=[USER_ID_2],
+        viewer_ids=[USER_ID_3],
+        community_owned=False,
+        status=constants.ACTIVITY_STATUS_PUBLIC,
+        viewable_if_private=False,
+        first_published_msec=0.0
+    )
 
-        self.put_multi(
-            [
-                exploration_rights_model_1,
-                exploration_rights_model_2,
-                exploration_rights_model_3,
-            ]
-        )
-
+    def test_run_with_no_models(self) -> None:
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
+                    'RESULT: Queried 0 exp rights in total.'),
+                job_run_result.JobRunResult.as_stdout(
+                    'RESULT: There are 0 invalid exp rights.'),
+            ]
+        )
+
+    def test_run_with_single_valid_model(self) -> None:
+        self.put_multi([self.EXP_RIGHTS_MODEL_2])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'RESULT: Queried 1 exp rights in total.'),
+                job_run_result.JobRunResult.as_stdout(
+                    'RESULT: There are 0 invalid exp rights.'),
+            ]
+        )
+
+    def test_run_with_single_invalid_model(self) -> None:
+        self.put_multi([self.EXP_RIGHTS_MODEL_1])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'RESULT: Queried 1 exp rights in total.'),
+                job_run_result.JobRunResult.as_stdout(
+                    'RESULT: There are 1 invalid exp rights.'),
+                job_run_result.JobRunResult.as_stderr(
+                    f'{self.EXPLORATION_ID_1}: '
+                    f'{[self.USER_ID_1, self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]}'),
+            ]
+        )
+
+    def test_run_with_mixed_models(self) -> None:
+        self.put_multi([
+            self.EXP_RIGHTS_MODEL_1, self.EXP_RIGHTS_MODEL_2, self.EXP_RIGHTS_MODEL_3
+        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'RESULT: Queried 3 exp rights in total.'),
+                job_run_result.JobRunResult.as_stdout(
                     'RESULT: There are 2 invalid exp rights.'),
+                job_run_result.JobRunResult.as_stderr(
+                    f'{self.EXPLORATION_ID_1}: '
+                    f'{[self.USER_ID_1, self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]}'),
+                job_run_result.JobRunResult.as_stderr(
+                    f'{self.EXPLORATION_ID_3}: '
+                    f'{[self.USER_ID_3, self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]}'),
             ]
         )
