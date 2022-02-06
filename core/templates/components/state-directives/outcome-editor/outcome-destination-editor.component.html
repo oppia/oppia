@@ -18,6 +18,7 @@
              type="text"
              name="newStateNameInput"
              [(ngModel)]="outcomeNewStateName"
+             (ngModelChange)="updateChanges($event)"
              [oppiaFocusOn]="newStateNameInputField"
              [attr.maxlength]="maxLen"
              [pattern]="newStateNamePattern"

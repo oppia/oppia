@@ -41,6 +41,7 @@
     <br>
 
     <oppia-outcome-destination-editor [outcome]="tmpOutcome"
+                                      (get-changes)="getChanges()"
                                       ng-if="!questionModeEnabled"
                                       [outcome-has-feedback]="!isLinearWithNoFeedback(tmpOutcome)"
                                       (add-state)="addState($event)">

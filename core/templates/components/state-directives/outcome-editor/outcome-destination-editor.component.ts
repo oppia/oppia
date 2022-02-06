@@ -42,6 +42,8 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   @Input() outcomeHasFeedback: boolean;
   @Output() addState:
   EventEmitter<string> = new EventEmitter<string>();
+  @Output() getChanges:
+  EventEmitter<void> = new EventEmitter();
   directiveSubscriptions: Subscription = new Subscription();
   canAddPrerequisiteSkill: boolean;
   canEditRefresherExplorationId: boolean;
@@ -70,6 +72,11 @@ export class OutcomeDestinationEditorComponent implements OnInit {
 
   isSelfLoop(): boolean {
     return this.outcome.dest === this.currentStateName;
+  }
+
+  updateChanges($event: string): void {
+    this.outcomeNewStateName = $event;
+    this.getChanges.emit();
   }
 
   onDestSelectorChange(): void {
