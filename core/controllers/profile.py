@@ -602,21 +602,6 @@ class UrlHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        print('\n'*3)
-        print('------------'*3)
-        print('Request url = ',self.request.uri)
-        print('Handler class name = ','UrlHandler')
-        print('Arguments = ', self.request.arguments())
-        print('Iterating over arguments...')
-        for j in self.request.arguments():
-            print(j, self.request.get(j))
-        print('URL path elements = ', self.request.route_kwargs)
-        print('Request method = ','GET')
-        print('HANDLER_ARGS_SCHEMAS =  ', self.HANDLER_ARGS_SCHEMAS)
-        print('URL_PATH_ARGS_SCHEMAS = , ', self.URL_PATH_ARGS_SCHEMAS)
-        print('GET_HANDLER_ERROR_RETURN_TYPE', self.GET_HANDLER_ERROR_RETURN_TYPE)
-        print('------------'*3)
-        print('\n'*3)
         if self.user_id:
             self.render_json({'login_url': None})
         else:
