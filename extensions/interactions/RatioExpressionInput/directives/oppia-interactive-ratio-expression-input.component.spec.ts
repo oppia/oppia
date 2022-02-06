@@ -22,6 +22,7 @@ import { InteractiveRatioExpressionInputComponent } from './oppia-interactive-ra
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('InteractiveRatioExpressionInput', () => {
   let component: InteractiveRatioExpressionInputComponent;
@@ -53,7 +54,10 @@ describe('InteractiveRatioExpressionInput', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [InteractiveRatioExpressionInputComponent],
+      declarations: [
+        InteractiveRatioExpressionInputComponent,
+        MockTranslatePipe
+      ],
       imports: [],
       providers: [
         {
