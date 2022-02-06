@@ -30,7 +30,8 @@ def replace_user_id_with_username_in_dict(thread_dicts, user_keys):
 
     Args:
         thread_dicts: list(dict). The dictionary that will be updated.
-        keys: list(tuple). A list that contain tuples of keys(user id and username).
+        user_keys: list(tuple). A list that contain tuples of
+            keys(user id and username).
 
     Returns:
         list(dict). The updated dictionary.
@@ -86,13 +87,13 @@ class ThreadListHandler(base.BaseHandler):
 
         self.values.update({
             'feedback_thread_dicts': replace_user_id_with_username_in_dict(
-                feedback_thread_dicts,[(
+                feedback_thread_dicts, [(
                     'original_author_id',
                     'original_author_username'), (
                     'last_nonempty_message_author_id',
                     'last_nonempty_message_author')]),
             'suggestion_thread_dicts': replace_user_id_with_username_in_dict(
-                suggestion_thread_dicts,[(
+                suggestion_thread_dicts, [(
                     'original_author_id',
                     'original_author_username')])
         })
@@ -135,7 +136,7 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
             feconf.ENTITY_TYPE_TOPIC, topic_id, True)]
         self.values.update({
             'suggestion_thread_dicts': replace_user_id_with_username_in_dict(
-                thread_dicts,[(
+                thread_dicts, [(
                     'original_author_id', 'original_author_username')])
             })
         self.render_json(self.values)
