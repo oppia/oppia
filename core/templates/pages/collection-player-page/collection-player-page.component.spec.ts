@@ -18,6 +18,7 @@
 
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
+import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { UserService } from 'services/user.service';
@@ -36,6 +37,7 @@ describe('Collection player page component', () => {
   let alertsService: AlertsService;
   let component: CollectionPlayerPageComponent;
   let fixture: ComponentFixture<CollectionPlayerPageComponent>;
+  let collectionPlayerBackendApiService: CollectionPlayerBackendApiService;
   let guestCollectionProgressService:
     GuestCollectionProgressService;
   let readOnlyCollectionBackendApiService:
@@ -68,6 +70,8 @@ describe('Collection player page component', () => {
 
   beforeEach(() => {
     alertsService = TestBed.inject(AlertsService);
+    collectionPlayerBackendApiService = TestBed.inject(
+      CollectionPlayerBackendApiService);
     userService = TestBed.inject(UserService);
     urlService = TestBed.inject(UrlService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
@@ -171,6 +175,14 @@ describe('Collection player page component', () => {
     sampleCollection = Collection.create(
       sampleCollectionBackendObject);
 
+    spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
+      .and.returnValue(Promise.resolve({
+        is_admin: false,
+        is_topic_manager: false,
+        summaries: [],
+        user_email: 'tester@example.com',
+        username: false
+      }));
     spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('collectionId');
     alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue(null);
   });
@@ -234,7 +246,9 @@ describe('Collection player page component', () => {
     expect(pathIconParameters).toEqual(collectionNodesList);
   }));
 
-  it('should check whether the exploration is completed', fakeAsync(() => {
+  it('should check whether the exploration is completed when ' +
+      'collection playthrough is available',
+  fakeAsync(() => {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
     spyOn(userService, 'getUserInfoAsync')
@@ -243,9 +257,28 @@ describe('Collection player page component', () => {
     // Loading collections.
     component.ngOnInit();
     tick();
-    let result = component.isCompletedExploration('123');
+    let res = component.isCompletedExploration('123');
 
-    expect(result).toEqual(false);
+    expect(res).toBeFalse();
+  }));
+
+  it('should return false on checking whether exploration is completed ' +
+      'when collection playthrough is not available',
+  fakeAsync(() => {
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+
+    // Loading collections.
+    component.ngOnInit();
+    tick();
+
+    // This happens when collection is not loaded.
+    component.collectionPlaythrough = undefined;
+    let res = component.isCompletedExploration('123');
+
+    expect(res).toBeFalse();
   }));
 
   it('should generate empty path parameters when collection ' +
@@ -422,5 +455,44 @@ describe('Collection player page component', () => {
 
     let result = component.getNonRecommendedCollectionNodeCount();
     expect(result).toEqual(4);
+  }));
+
+  it('should close the exploration card and scroll into the' +
+      'exploration icon location on clicking outside of the exploration card',
+  fakeAsync(() => {
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+    spyOn(component, 'scrollToLocation').and.callThrough();
+    spyOn(component, 'closeOnClickingOutside').and.callThrough();
+    spyOn(component, 'updateExplorationPreview').and.callThrough();
+
+    fixture.detectChanges();
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+
+    // Opening the preview card.
+    let icons = fixture.nativeElement.querySelectorAll(
+      '.protractor-mobile-test-collection-exploration');
+    let icon = icons[0];
+    icon.dispatchEvent(new Event('click'));
+
+    expect(component.scrollToLocation).toHaveBeenCalledWith(
+      'mobile-path-anchor-0');
+    expect(component.updateExplorationPreview).toHaveBeenCalledWith('exp_id');
+    expect(component.explorationCardIsShown).toBeTrue();
+
+    fixture.detectChanges();
+
+    // Clicking outside the preview card.
+    let mask = fixture.nativeElement.querySelector(
+      '.oppia-activity-summary-tile-mobile-background-mask');
+    mask.dispatchEvent(new Event('click'));
+
+    expect(component.closeOnClickingOutside).toHaveBeenCalled();
+    expect(component.scrollToLocation).toHaveBeenCalled();
+    expect(component.explorationCardIsShown).toBeFalse();
   }));
 });
