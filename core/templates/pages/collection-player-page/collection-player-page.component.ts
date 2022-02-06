@@ -27,7 +27,6 @@ import { PageTitleService } from 'services/page-title.service';
 import { UserService } from 'services/user.service';
 import { CollectionNode } from 'domain/collection/collection-node.model';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
 import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
@@ -287,11 +286,10 @@ export class CollectionPlayerPageComponent implements OnInit {
       collectionId
     ).then((collectionSummary) => {
       summary = collectionSummary;
+      if (summary) {
+        this.collectionSummary = summary.summaries[0];
+      }
     });
-
-    if (summary) {
-      this.collectionSummary = summary.summaries[0];
-    }
   }
 
   updateCollection(collection: Collection): void {
@@ -340,27 +338,10 @@ export class CollectionPlayerPageComponent implements OnInit {
         // user is a guest, then either the defaults from the server
         // will be used or the user's local progress, if any has been
         // made and the collection is whitelisted.
-        let collectionAllowsGuestProgress = (
-          this.whitelistedCollectionIdsForGuestProgress.indexOf(
-            this.collectionId) !== -1);
         this.userService.getUserInfoAsync().then((userInfo) => {
           this.loaderService.hideLoadingScreen();
           this.isLoggedIn = userInfo.isLoggedIn();
-          if (!this.isLoggedIn && collectionAllowsGuestProgress &&
-              this.guestCollectionProgressService
-                .hasCompletedSomeExploration(this.collectionId)) {
-            let completedExplorationIds = (
-              this.guestCollectionProgressService
-                .getCompletedExplorationIds(this.collection));
-            let nextExplorationId = (
-              this.guestCollectionProgressService.getNextExplorationId(
-                this.collection, completedExplorationIds));
-            this.collectionPlaythrough = (
-              CollectionPlaythrough.create(
-                nextExplorationId, completedExplorationIds));
-          } else {
-            this.collectionPlaythrough = collection.getPlaythrough();
-          }
+          this.collectionPlaythrough = collection.getPlaythrough();
           this.nextExplorationId =
             this.collectionPlaythrough.getNextExplorationId();
         });
