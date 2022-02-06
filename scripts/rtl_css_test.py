@@ -25,6 +25,7 @@ from core.tests import test_utils
 
 from . import rtl_css
 
+
 class RtlCSSTests(test_utils.GenericTestBase):
     """Test the methods for the rtl css validation script."""
 
