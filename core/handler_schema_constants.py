@@ -87,7 +87,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'UnsentFeedbackEmailHandler',
     'UpdateQuestionSuggestionHandler',
     'UpdateTranslationSuggestionHandler',
-    'UrlHandler',
     'UserInfoHandler',
     'UserSubmittedSuggestionsHandler',
     'UsernameCheckHandler',
