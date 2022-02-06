@@ -45,6 +45,7 @@
         <span>Thumbnail Image*</span>
       </div>
       <oppia-thumbnail-uploader [filename]="editableThumbnailFilename"
+                                [use-local-storage]="false"
                                 (update-filename)="updateThumbnailFilename($event)"
                                 [bg-color]="editableThumbnailBgColor"
                                 (update-bg-color)="updateThumbnailBgColor($event)"

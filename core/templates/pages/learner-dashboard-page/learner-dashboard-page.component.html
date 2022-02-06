@@ -72,11 +72,6 @@
     <div class="col-md-8 oppia-learner-dashboard-main-content"
          [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
       <div>
-        <span class="oppia-learner-dashboard-main-content-title" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK">
-          <span [innerHTML]="activeSection | translate">
-          </span>
-        </span>
-
         <span class="sort-explorations-select oppia-learner-dashboard-sort oppia-sort-options"
               *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK && threadSummaries.length !== 0 && !feedbackThreadActive"
               [ngClass]="{'oppia-learner-dashboard-sort-mobile': windowIsNarrow}">
@@ -99,6 +94,7 @@
            [ngClass]="{'pl-5': !windowIsNarrow, 'justify-content-center': windowIsNarrow}">
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
+                          [goalTopics]="allTopics"
                           [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                           [untrackedTopics]="untrackedTopics"
                           [username]="username"
@@ -141,10 +137,16 @@
         </div>
 
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK"
-             class="oppia-learner-dashboard-feedback-section" [ngStyle]="threadSummaries.length !== 0 && {'cursor': 'pointer'}">
+             class="oppia-learner-dashboard-feedback-section oppia-feedback-section-top-margin"
+             [ngStyle]="threadSummaries.length !== 0 && {'cursor': 'pointer'}">
           <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
-                   *ngIf="threadSummaries.length === 0">
+                    *ngIf="threadSummaries.length === 0">
             <div>
+              <span class="oppia-learner-dashboard-main-content-title"
+                    *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK">
+                <span [innerHTML]="activeSection | translate">
+                </span>
+              </span>
               <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS' | translate" class="empty-feedback-threads"></p>
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
@@ -479,8 +481,6 @@
     display: inline-block;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 24px;
-    margin: 64px 0 0 0;
-    padding: 16px;
     padding-bottom: 8px;
   }
 
@@ -511,6 +511,10 @@
     background-color: white;
     margin-bottom: 10px;
     margin-left: 6px;
+  }
+
+  .oppia-feedback-section-top-margin {
+    margin-top: 64px;
   }
 
   .oppia-learner-dashboard-feedback-section .feedback-thread-message-count {
@@ -702,7 +706,7 @@
     right: 0;
   }
   .oppia-learner-dashboard-buttons.headroom--top {
-    margin-bottom: 70px;
+    margin-bottom: 5px;
   }
 
   .oppia-learner-dashboard-buttons.headroom--unfixed {
@@ -716,7 +720,7 @@
     bottom: -30px;
   }
   .oppia-learner-dashboard-buttons.headroom--pinned {
-    margin-bottom: 50px;
+    margin-bottom: 38px;
     position: fixed;
     transform: translateY(-100%);
   }
