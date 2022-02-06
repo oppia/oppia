@@ -25,26 +25,20 @@ from core.domain import suggestion_services
 from core.domain import user_services
 
 
-def get_updated_thread_dict(thread_dicts, key_id, key_username):
-    """Updates the thread dictionary by the given keys.
+def replace_user_id_with_username_in_dict(thread_dicts, user_keys):
+    """Replace user id with the corresponding username in the given dictionary.
 
     Args:
         thread_dicts: list(dict). The dictionary that will be updated.
-        key_id: str. The id of the author to be fetched.
-        key_username: str. The username of the author.
+        keys: list(tuple). A list that contain tuples of keys(user id and username).
 
     Returns:
-        list(dict). The thread dictionary with usernames inserted.
+        list(dict). The updated dictionary.
     """
-    ids = [t[key_id] for t in thread_dicts]
-    usernames = []
-
-    for i in ids:
-        usernames.append(user_services.get_username(i) if i else None)# type: ignore[no-untyped-call]
-
-    for index, t in enumerate(thread_dicts):
-        t[key_username] = usernames[index]
-
+    for t in thread_dicts:
+        for k in user_keys:
+            t[k[1]] = user_services.get_username(t[k[0]]) if t[k[0]] else None
+            t.pop(k[0])
     return thread_dicts
 
 
@@ -91,17 +85,16 @@ class ThreadListHandler(base.BaseHandler):
             feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)]
 
         self.values.update({
-            'feedback_thread_dicts': get_updated_thread_dict(
-                get_updated_thread_dict(
-                feedback_thread_dicts,
-                'original_author_id',
-                'original_author_username'),
-                'last_nonempty_message_author_id',
-                'last_nonempty_message_author'),
-            'suggestion_thread_dicts': get_updated_thread_dict(
-                suggestion_thread_dicts,
-                'original_author_id',
-                'original_author_username')
+            'feedback_thread_dicts': replace_user_id_with_username_in_dict(
+                feedback_thread_dicts,[(
+                    'original_author_id',
+                    'original_author_username'), (
+                    'last_nonempty_message_author_id',
+                    'last_nonempty_message_author')]),
+            'suggestion_thread_dicts': replace_user_id_with_username_in_dict(
+                suggestion_thread_dicts,[(
+                    'original_author_id',
+                    'original_author_username')])
         })
         self.render_json(self.values)
 
@@ -141,8 +134,9 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
         thread_dicts = [t.to_dict() for t in feedback_services.get_all_threads(
             feconf.ENTITY_TYPE_TOPIC, topic_id, True)]
         self.values.update({
-            'suggestion_thread_dicts': get_updated_thread_dict(
-                thread_dicts, 'original_author_id', 'original_author_username')
+            'suggestion_thread_dicts': replace_user_id_with_username_in_dict(
+                thread_dicts,[(
+                    'original_author_id', 'original_author_username')])
             })
         self.render_json(self.values)
 
@@ -198,8 +192,8 @@ class ThreadHandler(base.BaseHandler):
                 self.user_id, thread_id, message_ids)
 
         self.values.update({
-            'messages': get_updated_thread_dict(
-                messages, 'author_id', 'author_username'),
+            'messages': replace_user_id_with_username_in_dict(
+                messages, [('author_id', 'author_username')]),
             'suggestion': suggestion.to_dict() if suggestion else None
         })
         self.render_json(self.values)
@@ -260,8 +254,8 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
         messages_dict = [m.to_dict() for m in all_feedback_messages]
 
         self.render_json({
-            'results': get_updated_thread_dict(
-                messages_dict, 'author_id', 'author_username'),
+            'results': replace_user_id_with_username_in_dict(
+                messages_dict, [('author_id', 'author_username')]),
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })
