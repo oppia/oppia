@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -29,7 +29,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { OutcomeDestinationEditorComponent } from './outcome-destination-editor.component';
 
-fdescribe('Outcome Destination Editor', () => {
+describe('Outcome Destination Editor', () => {
   let component: OutcomeDestinationEditorComponent;
   let fixture: ComponentFixture<OutcomeDestinationEditorComponent>;
 
@@ -100,7 +100,6 @@ fdescribe('Outcome Destination Editor', () => {
 
     component.ngOnInit();
     flushMicrotasks();
-    tick();
 
     expect(component.canAddPrerequisiteSkill).toBeFalse();
     expect(component.canEditRefresherExplorationId).toBeNull();
@@ -144,7 +143,6 @@ fdescribe('Outcome Destination Editor', () => {
 
     component.ngOnInit();
     flushMicrotasks();
-    tick();
 
     onSaveOutcomeDestDetailsEmitter.emit();
 
@@ -171,7 +169,6 @@ fdescribe('Outcome Destination Editor', () => {
 
     component.ngOnInit();
     flushMicrotasks();
-    tick();
 
     onSaveOutcomeDestDetailsEmitter.emit();
 
@@ -194,7 +191,6 @@ fdescribe('Outcome Destination Editor', () => {
 
     component.ngOnInit();
     flushMicrotasks();
-    tick();
 
     expect(component.canEditRefresherExplorationId).toBeTrue();
   }));
@@ -227,7 +223,6 @@ fdescribe('Outcome Destination Editor', () => {
 
     component.ngOnInit();
     flushMicrotasks();
-    tick();
 
     expect(component.destChoices).toEqual([{
       id: null,

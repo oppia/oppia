@@ -82,6 +82,8 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   onDestSelectorChange(): void {
     if (this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST) {
       this.focusManagerService.setFocus('newStateNameInputField');
+    } else {
+      this.getChanges.emit();
     }
   }
 
