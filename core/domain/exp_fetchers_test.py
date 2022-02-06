@@ -62,6 +62,49 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertEqual(summaries[1].title, self.exploration_2.title)
         self.assertEqual(summaries[2].title, self.exploration_3.title)
 
+    def test_get_new_exploration_id(self):
+        self.assertIsNotNone(
+            exp_fetchers.get_new_exploration_id()
+        )
+
+    def test_get_exploration_summary_by_id(self):
+        fake_eid = 'fake_eid'
+        fake_exp = exp_fetchers.get_exploration_summary_by_id(
+            fake_eid
+        )
+        self.assertIsNone(fake_exp)
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(
+            self.EXP_1_ID
+        )
+        self.assertIsNotNone(exp_summary)
+        self.assertEqual(exp_summary.id, self.EXP_1_ID)
+
+    def test_get_exploration_summaries_from_models(self):
+        exp_ids = [self.EXP_1_ID, self.EXP_2_ID, self.EXP_3_ID]
+        exp_summaries = exp_fetchers.get_exploration_summaries_matching_ids(
+            exp_ids
+        )
+        exp_summary_dict = (
+            exp_fetchers.get_exploration_summaries_from_models(exp_summaries)
+        )
+        for key in exp_summary_dict:
+            self.assertIn(key,exp_ids)
+
+    def test_retrieval_of_fake_exploration(self):
+        self.assertIsNone(
+            exp_fetchers.get_exploration_by_id('fake_eid', False)
+        )
+
+    def test_get_exploration_summaries_where_user_has_role(self):
+        exp_ids = [self.EXP_1_ID, self.EXP_2_ID, self.EXP_3_ID]
+        exp_summaries = (
+            exp_fetchers.get_exploration_summaries_where_user_has_role(
+                self.owner_id
+            ))
+        self.assertEqual(len(exp_summaries), 3)
+        for exp_summary in exp_summaries:
+            self.assertIn(exp_summary.id, exp_ids)
+
     def test_retrieval_of_explorations(self):
         """Test the get_exploration_by_id() method."""
         with self.assertRaisesRegex(Exception, 'Entity .* not found'):
