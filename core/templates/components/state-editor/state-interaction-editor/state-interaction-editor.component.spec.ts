@@ -85,8 +85,7 @@ class MockNgbModal {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('State Interaction component', () => {
+describe('State Interaction component', () => {
   let component: StateInteractionEditorComponent;
   let fixture: ComponentFixture<StateInteractionEditorComponent>;
   let stateEditorService: StateEditorService;
