@@ -510,7 +510,7 @@ var ExplorationEditorMainTab = function() {
         fadeIn, 'Editor taking long to fade in');
     }
     await action.click('stateEditButton', stateEditButton);
-    var stateEditorTag = element(by.tagName('state-content-editor'));
+    var stateEditorTag = element(by.tagName('oppia-state-content-editor'));
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
     var stateContentEditor = stateEditorTag.element(stateContentEditorLocator);

@@ -16,242 +16,229 @@
  * @fileoverview Unit tests for the state content editor directive.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
-import { TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { fakeAsync, tick } from '@angular/core/testing';
+import { StateContentEditorComponent } from './state-content-editor.component';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { TestBed } from '@angular/core/testing';
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
+import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
+// import { ExplorationStatesService } from 
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
+import { EditabilityService } from 'services/editability.service';
+import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 
-require('pages/exploration-editor-page/services/change-list.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-content.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-recorded-voiceovers.service.ts');
-require('services/editability.service.ts');
-
-describe('State content editor directive', function() {
-  var outerScope, ctrlScope, shof, cls, scs, es, ess, srvos;
+describe('StateHintsEditorComponent', () => {
+  let component: StateContentEditorComponent;
+  let fixture: ComponentFixture<StateContentEditorComponent>;
+  let editabilityService: EditabilityService;
+  let stateContentService: StateContentService;
+  let explorationStatesService: ExplorationStatesService;
+  let changeListService: ChangeListService;
+  let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
 
   var _getContent = function(contentId, contentString) {
-    return shof.createFromBackendDict({
+    return SubtitledHtml.createFromBackendDict({
       content_id: contentId,
       html: contentString
     });
   };
 
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      declarations: [
+        StateContentEditorComponent
+      ],
       providers: [
         ChangeListService,
-        {
-          provide: ExplorationDataService,
-          useValue: {
-            explorationId: 0,
-            autosaveChangeListAsync() {
-              return;
-            }
-          }
-        }
-      ]
-    });
-
-    cls = TestBed.inject(ChangeListService);
-  });
-
-  beforeEach(angular.mock.module('directiveTemplates'));
-  beforeEach(function() {
-    angular.mock.module('oppia', TranslatorProviderForTests);
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+        StateContentService,
+        ExternalSaveService,
+        EditabilityService,
+        StateRecordedVoiceoversService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(
-    function($compile, $injector, $rootScope, $templateCache) {
-      srvos = $injector.get('StateRecordedVoiceoversService');
-      scs = $injector.get('StateContentService');
-      es = $injector.get('EditabilityService');
-      ess = $injector.get('ExplorationStatesService');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(StateContentEditorComponent);
+    component = fixture.componentInstance;
 
-      var rvoDict = {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+    editabilityService = TestBed.inject(EditabilityService);
+    stateContentService = TestBed.inject(StateContentService);
+    externalSaveService = TestBed.inject(ExternalSaveService);
+    changeListService = TestBed.inject(ChangeListService);
+    stateRecordedVoiceoversService = TestBed.inject(
+      StateRecordedVoiceoversService);
+
+    var recordedVoiceOversDict = {
+      voiceovers_mapping: {
+        content: {},
+        default_outcome: {},
+        feedback_1: {}
+      }
+    };
+
+    stateContentService.init('Third State', _getContent('content', 'This is some content.'));
+    stateRecordedVoiceoversService.init(
+      'Third State', RecordedVoiceovers.createFromBackendDict(recordedVoiceOversDict));
+    editabilityService.markEditable();
+    externalSaveService.init({
+      'First State': {
+        content: {
+          content_id: 'content',
+          html: 'First State Content'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        },
+        interaction: {
+          id: 'TextInput',
+          answer_groups: [{
+            rule_specs: [],
+            outcome: {
+              dest: 'unused',
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+          }],
+          default_outcome: {
+            dest: 'default',
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
+          },
+          hints: []
+        },
+        param_changes: [],
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         }
-      };
-
-      scs.init('Third State', _getContent('content', 'This is some content.'));
-      srvos.init(
-        'Third State', RecordedVoiceovers.createFromBackendDict(rvoDict));
-      es.markEditable();
-      ess.init({
-        'First State': {
-          content: {
-            content_id: 'content',
-            html: 'First State Content'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {}
-            }
-          },
-          interaction: {
-            id: 'TextInput',
-            answer_groups: [{
-              rule_specs: [],
-              outcome: {
-                dest: 'unused',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: ''
-                },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null
-              },
-            }],
-            default_outcome: {
-              dest: 'default',
-              feedback: {
-                content_id: 'default_outcome',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-            hints: []
-          },
-          param_changes: [],
-          solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {}
-            }
+      },
+      'Second State': {
+        content: {
+          content_id: 'content',
+          html: 'Second State Content'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
           }
         },
-        'Second State': {
-          content: {
-            content_id: 'content',
-            html: 'Second State Content'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {}
-            }
-          },
-          interaction: {
-            id: 'TextInput',
-            answer_groups: [{
-              rule_specs: [],
-              outcome: {
-                dest: 'unused',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: ''
-                },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null
-              }
-            }],
-            default_outcome: {
-              dest: 'default',
+        interaction: {
+          id: 'TextInput',
+          answer_groups: [{
+            rule_specs: [],
+            outcome: {
+              dest: 'unused',
               feedback: {
-                content_id: 'default_outcome',
+                content_id: 'feedback_1',
                 html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
-            },
-            hints: []
-          },
-          param_changes: [],
-          solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {}
-            }
-          }
-        },
-        'Third State': {
-          content: {
-            content_id: 'content',
-            html: 'This is some content.'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {}
-            }
-          },
-          interaction: {
-            id: 'TextInput',
-            answer_groups: [{
-              rule_specs: [],
-              outcome: {
-                dest: 'unused',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: ''
-                },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null
-              }
-            }],
-            default_outcome: {
-              dest: 'default',
-              feedback: {
-                content_id: 'default_outcome',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-            hints: []
-          },
-          param_changes: [{
-            name: 'comparison',
-            generator_id: 'Copier',
-            customization_args: {
-              value: 'something clever',
-              parse_with_jinja: false
             }
           }],
-          solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {}
-            }
+          default_outcome: {
+            dest: 'default',
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
+          },
+          hints: []
+        },
+        param_changes: [],
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
           }
         }
-      });
+      },
+      'Third State': {
+        content: {
+          content_id: 'content',
+          html: 'This is some content.'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        },
+        interaction: {
+          id: 'TextInput',
+          answer_groups: [{
+            rule_specs: [],
+            outcome: {
+              dest: 'unused',
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            }
+          }],
+          default_outcome: {
+            dest: 'default',
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
+          },
+          hints: []
+        },
+        param_changes: [{
+          name: 'comparison',
+          generator_id: 'Copier',
+          customization_args: {
+            value: 'something clever',
+            parse_with_jinja: false
+          }
+        }],
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
+      }
+    });
 
       var templateHtml = $templateCache.get(
         '/pages/exploration_editor/editor_tab/' +

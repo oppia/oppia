@@ -5,7 +5,7 @@
   <div class="oppia-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
       <angular-html-bind-wrapper classStr="oppia-rte-viewer oppia-learner-view-card-top-content"
-                                 [htmlData]="stateContentService.displayed.html">
+                                 [htmlData]="stateContentService.displayed._html">
       </angular-html-bind-wrapper>
     </div>
   </div>
@@ -41,7 +41,7 @@
 <div *ngIf="contentEditorIsOpen" class="protractor-test-state-content-editor">
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
   <schema-based-editor [schema]="getHtmlSchema.bind(this)"
-                       [localValue]="stateContentService.displayed.html"
+                       [localValue]="stateContentService.displayed._html"
                        (localValueChange)="updateHtml($event)">
   </schema-based-editor>
   <div *ngIf="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning protractor-test-card-height-limit-warning mt-2">

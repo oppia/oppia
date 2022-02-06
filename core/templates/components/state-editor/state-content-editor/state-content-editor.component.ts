@@ -140,8 +140,8 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   updateHtml($event: string): void {
-    if ($event !== this.stateContentService.displayed.html) {
-      this.stateContentService.displayed.html = $event;
+    if ($event !== this.stateContentService.displayed._html) {
+      this.stateContentService.displayed._html = $event;
       this.changeDetectorRef.detectChanges();
     }
   }
