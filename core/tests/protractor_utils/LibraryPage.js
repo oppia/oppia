@@ -53,7 +53,7 @@ var LibraryPage = function() {
   var searchButton = element(by.css('.protractor-test-search-button'));
   var addToPlayLaterListButton = element(
     by.css('.protractor-test-add-to-playlist-btn'));
-  var expHoverElement = element(by.css('.protractor-test-exp-hover'));
+  var expHoverElement = element(by.css('.protractor-test-exploration-dashboard-card'));
   var expSummaryTileObjectiveLocator = by.css(
     '.protractor-test-exp-summary-tile-objective');
   var expSummaryTileRatingLocator = by.css(
