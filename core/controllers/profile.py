@@ -595,7 +595,7 @@ class UrlHandler(base.BaseHandler):
                 'schema': {
                         'type': 'basestring'
                  },
-                 default:None
+                 'default_value': None
              }
         }
     }
