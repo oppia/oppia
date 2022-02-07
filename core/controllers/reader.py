@@ -79,6 +79,42 @@ def _does_exploration_exist(exploration_id, version, collection_id):
 class ExplorationEmbedPage(base.BaseHandler):
     """Page describing a single embedded exploration."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'v': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                },
+                'default_value': None
+            },
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'iframed': {
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': False
+            },
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests.
@@ -86,19 +122,18 @@ class ExplorationEmbedPage(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        version_str = self.request.get('v')
-        version = int(version_str) if version_str else None
+        version = self.normalized_request.get('v')
 
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
-        collection_id = self.request.get('collection_id')
+        collection_id = self.normalized_request.get('collection_id')
 
         # This check is needed in order to show the correct page when a 404
         # error is raised. The self.request.get('iframed') part of the check is
         # needed for backwards compatibility with older versions of the
         # embedding script.
         if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
-                self.request.get('iframed')):
+                self.normalized_request.get('iframed')):
             self.iframed = True
 
         if not _does_exploration_exist(exploration_id, version, collection_id):
@@ -582,8 +617,9 @@ class ExplorationStartEventHandler(base.BaseHandler):
         'POST': {
             'params': {
                 'schema': {
-                    'type': 'dict',
-                    'properties': []
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_params_dict),
                 }
             },
             'session_id': {
