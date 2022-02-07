@@ -41,7 +41,7 @@ class GetExpRightsWithDuplicateUsersJobTests(
     USER_ID_3 = 'id_3'
 
     # This is an invalid model with duplicate: USER_ID_1.
-    EXP_RIGHTS_MODEL_1 = super().createModel(
+    EXP_RIGHTS_1 = super().createModel(
         exp_models.ExplorationRightsModel,
         id=EXPLORATION_ID_1,
         owner_ids=[USER_ID_1],
@@ -53,8 +53,9 @@ class GetExpRightsWithDuplicateUsersJobTests(
         viewable_if_private=False,
         first_published_msec=0.0
     )
+    USER_LIST_1 = [USER_ID_1, USER_ID_1, USER_ID_2, USER_ID_3]
     # This is a valid model without duplicates.
-    EXP_RIGHTS_MODEL_2 = super().createModel(
+    EXP_RIGHTS_2 = super().createModel(
         exp_models.ExplorationRightsModel,
         id=EXPLORATION_ID_2,
         owner_ids=[USER_ID_1],
@@ -66,8 +67,9 @@ class GetExpRightsWithDuplicateUsersJobTests(
         viewable_if_private=False,
         first_published_msec=0.0
     )
+    USER_LIST_2 = [USER_ID_1, USER_ID_2, USER_ID_3]
     # This is an invalid model with duplicate: USER_ID_3.
-    EXP_RIGHTS_MODEL_3 = super().createModel(
+    EXP_RIGHTS_3 = super().createModel(
         exp_models.ExplorationRightsModel,
         id=EXPLORATION_ID_3,
         owner_ids=[USER_ID_3],
@@ -79,6 +81,7 @@ class GetExpRightsWithDuplicateUsersJobTests(
         viewable_if_private=False,
         first_published_msec=0.0
     )
+    USER_LIST_3 = [USER_ID_3, USER_ID_1, USER_ID_2, USER_ID_3]
 
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is(
@@ -91,7 +94,7 @@ class GetExpRightsWithDuplicateUsersJobTests(
         )
 
     def test_run_with_single_valid_model(self) -> None:
-        self.put_multi([self.EXP_RIGHTS_MODEL_2])
+        self.put_multi([self.EXP_RIGHTS_2])
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -102,7 +105,7 @@ class GetExpRightsWithDuplicateUsersJobTests(
         )
 
     def test_run_with_single_invalid_model(self) -> None:
-        self.put_multi([self.EXP_RIGHTS_MODEL_1])
+        self.put_multi([self.EXP_RIGHTS_1])
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -110,14 +113,13 @@ class GetExpRightsWithDuplicateUsersJobTests(
                 job_run_result.JobRunResult.as_stdout(
                     'RESULT: There are 1 invalid exp rights.'),
                 job_run_result.JobRunResult.as_stderr(
-                    f'{self.EXPLORATION_ID_1}: '
-                    f'{[self.USER_ID_1, self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]}'),
+                    f'{self.EXPLORATION_ID_1}: {self.USER_LIST_1}'),
             ]
         )
 
     def test_run_with_mixed_models(self) -> None:
         self.put_multi([
-            self.EXP_RIGHTS_MODEL_1, self.EXP_RIGHTS_MODEL_2, self.EXP_RIGHTS_MODEL_3
+            self.EXP_RIGHTS_1, self.EXP_RIGHTS_2, self.EXP_RIGHTS_3
         ])
         self.assert_job_output_is(
             [
@@ -126,10 +128,8 @@ class GetExpRightsWithDuplicateUsersJobTests(
                 job_run_result.JobRunResult.as_stdout(
                     'RESULT: There are 2 invalid exp rights.'),
                 job_run_result.JobRunResult.as_stderr(
-                    f'{self.EXPLORATION_ID_1}: '
-                    f'{[self.USER_ID_1, self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]}'),
+                    f'{self.EXPLORATION_ID_1}: {self.USER_LIST_1}'),
                 job_run_result.JobRunResult.as_stderr(
-                    f'{self.EXPLORATION_ID_3}: '
-                    f'{[self.USER_ID_3, self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]}'),
+                    f'{self.EXPLORATION_ID_3}: {self.USER_LIST_3}'),
             ]
         )
