@@ -52,7 +52,6 @@ from core.tests import test_utils
 
 class SuggestionUnitTests(test_utils.GenericTestBase):
 
-    IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
     ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
     EXP_ID = 'exp1'
     TRANSLATION_LANGUAGE_CODE = 'en'
@@ -696,7 +695,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         ) as f:
             raw_image = f.read()
         self.post_json(
-            '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
+            '%s/exploration/%s' % (
+                feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
             {'filename': 'img.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))
@@ -1303,7 +1303,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         ) as f:
             raw_image = f.read()
         self.post_json(
-            '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
+            '%s/exploration/%s' % (
+                feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
             {'filename': 'img.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))
@@ -1376,7 +1377,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         ) as f:
             raw_image = f.read()
         self.post_json(
-            '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
+            '%s/exploration/%s' % (
+                feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
             {'filename': 'img.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))

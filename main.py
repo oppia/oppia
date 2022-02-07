@@ -580,7 +580,8 @@ URLS = [
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),
     get_redirect_route(
-        r'/createhandler/imageupload/<entity_type>/<entity_id>',
+        r'%s/<entity_type>/<entity_id>' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX),
         editor.ImageUploadHandler),
     get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',
