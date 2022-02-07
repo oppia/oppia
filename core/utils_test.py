@@ -25,7 +25,6 @@ import os
 import urllib
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.tests import test_utils
@@ -63,19 +62,24 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_yaml_dict_conversion(self) -> None:
         """Test yaml_from_dict and dict_from_yaml methods."""
-        test_dicts = [{}, {'a': 'b'}, {'a': 2}, {'a': ['b', 2, {'c': 3.5}]}]
+        test_dicts: List[Dict[str, Any]] = [
+            {},
+            {'a': 'b'},
+            {'a': 2},
+            {'a': ['b', 2, {'c': 3.5}]}
+        ]
 
         for adict in test_dicts:
-            yaml_str = python_utils.yaml_from_dict(adict) # type: ignore[no-untyped-call]
+            yaml_str = utils.yaml_from_dict(adict)
 
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'while parsing a flow node\n'
             'expected the node content, but found \'<stream end>\'\n'):
-            yaml_str = utils.dict_from_yaml('{')
+            utils.dict_from_yaml('{')
 
     def test_recursively_remove_key_for_empty_dict(self) -> None:
         """Test recursively_remove_key method for an empty dict."""
@@ -688,17 +692,13 @@ class UtilsTests(test_utils.GenericTestBase):
         dt = datetime.datetime(2020, 6, 15)
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
-            dt,
-            datetime.datetime.fromtimestamp(
-                python_utils.divide(msecs, 1000.0))) # type: ignore[no-untyped-call]
+            dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
 
     def test_get_time_in_millisecs_with_complicated_time(self) -> None:
         dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
-            dt,
-            datetime.datetime.fromtimestamp(
-                python_utils.divide(msecs, 1000.0))) # type: ignore[no-untyped-call]
+            dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
 
     def test_grouper(self) -> None:
         self.assertEqual(

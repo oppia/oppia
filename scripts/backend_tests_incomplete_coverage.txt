@@ -12,7 +12,6 @@ core.controllers.feedback_test
 core.domain.topic_domain_test
 core.domain.question_domain_test
 core.domain.rights_manager_test
-core.domain.skill_services_test
 core.domain.story_domain_test
 core.domain.suggestion_services_test
 core.domain.stats_services_test
@@ -23,7 +22,6 @@ core.domain.skill_domain_test
 core.domain.auth_services_test
 core.domain.opportunity_services_test
 core.domain.feedback_domain_test
-core.domain.story_fetchers_test
 core.domain.playthrough_issue_registry_test
 core.domain.feedback_services_test
 core.domain.exp_services_test
@@ -37,7 +35,6 @@ core.domain.user_services_test
 core.storage.skill.gae_models_test
 core.storage.topic.gae_models_test
 core.domain.app_feedback_report_domain_test
-core.storage.question.gae_models_test
 core.domain.collection_services_test
 core.storage.collection.gae_models_test
 core.storage.email.gae_models_test
@@ -59,7 +56,6 @@ scripts.linters.pylint_extensions_test
 core.storage.suggestion.gae_models_test
 core.storage.app_feedback_report.gae_models_test
 core.jobs.job_test_utils_test
-core.jobs.job_utils_test
 core.domain.image_validation_services_test
 scripts.linters.js_ts_linter_test
 core.storage.audit.gae_models_test
