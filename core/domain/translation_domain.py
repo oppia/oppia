@@ -96,7 +96,8 @@ class BaseTranslatableObject:
             raise Exception(
                 'A translatable field is already registered with the '
                 'same content id: %s' % content_id)
-
+        if value == '':
+            return
         self._translatable_contents[content_id] = TranslatableContent(
             content_id, value, field_type)
 
