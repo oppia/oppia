@@ -20,8 +20,8 @@ from __future__ import annotations
 
 import copy
 import datetime
-import os
 import enum
+import os
 
 from core.constants import constants
 
