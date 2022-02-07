@@ -27,7 +27,7 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
+import { ExplorationChange, ExplorationChangeEditExplorationProperty } from 'domain/exploration/exploration-draft.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { InternetConnectivityService } from 'services/internet-connectivity.service';
 
@@ -37,10 +37,10 @@ import { InternetConnectivityService } from 'services/internet-connectivity.serv
 export class ChangeListService {
   // Temporary buffer for changes made to the exploration.
   explorationChangeList: ExplorationChange[] = [];
-  undoneChangeStack: ExplorationChange[] = [];
+
   // Stack for storing undone changes. The last element is the most recently
   // undone change.
-  ndoneChangeStack = [];
+  undoneChangeStack: ExplorationChange[] = [];
   loadingMessage: string = '';
   // Temporary list of the changes made to the exploration when offline.
   temporaryListOfChanges: ExplorationChange[] = [];
@@ -226,7 +226,7 @@ export class ChangeListService {
       new_value: angular.copy(newValue),
       old_value: angular.copy(oldValue),
       property_name: backendName
-    });
+    } as ExplorationChangeEditExplorationProperty);
   }
 
   /**

@@ -362,11 +362,12 @@ import { ChangeListService } from 'pages/exploration-editor-page/services/change
 import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
 import { QuestionSuggestionBackendApiService } from 'pages/contributor-dashboard-page/services/question-suggestion-backend-api.service';
 import { ModeratorPageBackendApiService } from 'pages/moderator-page/services/moderator-page-backend-api.service';
-import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import { DeleteAccountBackendApiService } from 'pages/delete-account-page/services/delete-account-backend-api.service';
 import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
-import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
+import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
+import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
 import { NavigationService } from './navigation.service';
@@ -501,6 +502,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
+  ['ExplorationParamSpecsService', ExplorationParamSpecsService],
   ['ExplorationRightsService', ExplorationRightsService],
   ['ExplorationRightsBackendApiService', ExplorationRightsBackendApiService],
   ['ExplorationPropertyService', ExplorationPropertyService],

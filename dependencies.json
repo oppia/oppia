@@ -31,6 +31,13 @@
           ]
         }
       },
+      "@oppia-angular/upgrade": {
+        "version": "11.2.10",
+        "downloadFormat": "zip",
+        "url": "https://github.com/srijanreddy98/angular/files/7470828/oppia-angular.zip",
+        "rootDir": "oppia-angular",
+        "targetDir": "@oppia-angular"
+      },
       "lamejs": {
         "version": "1.2.0",
         "downloadFormat": "zip",

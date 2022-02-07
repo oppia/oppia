@@ -16,24 +16,85 @@
  * @fileoverview Directive for a schema-based editor for custom values.
  */
 
-require('components/forms/custom-forms-directives/object-editor.directive.ts');
+import { AfterViewInit, Component, EventEmitter, forwardRef, Input, Output, ViewChild } from '@angular/core';
+import { AbstractControl, ControlValueAccessor, NgForm, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('services/nested-directives-recursion-timeout-prevention.service.ts');
+@Component({
+  selector: 'schema-based-custom-editor',
+  templateUrl: './schema-based-custom-editor.directive.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedCustomEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedCustomEditorComponent),
+    },
+  ]
+})
+export class SchemaBasedCustomEditorComponent
+implements ControlValueAccessor, Validator, AfterViewInit {
+  @ViewChild('hybridForm') frm: NgForm;
+  @Input() localValue;
+  @Output() localValueChange = new EventEmitter();
+  @Input() schema;
+  @Input() form;
+  onChange: (_: unknown) => void = () => {};
+  onTouch: () => void;
+  onValidatorChange: () => void = () => {};
 
-angular.module('oppia').directive('schemaBasedCustomEditor', [
-  'NestedDirectivesRecursionTimeoutPreventionService',
-  function(NestedDirectivesRecursionTimeoutPreventionService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        localValue: '=',
-        schema: '='
-      },
-      template: require('./schema-based-custom-editor.directive.html'),
-      controllerAs: '$ctrl',
-      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: [function() {}]
-    };
+  constructor() { }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnTouched(fn: () => void): void {
+    this.onTouch = fn;
   }
-]);
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (_: unknown) => void): void {
+    this.onChange = fn;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  writeValue(obj: unknown): void {
+    if (this.localValue === obj) {
+      return;
+    }
+    this.localValue = obj;
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
+  }
+
+  updateValue(e: unknown): void {
+    if (this.localValue === e) {
+      return;
+    }
+    this.localValueChange.emit(e);
+    this.localValue = e;
+    this.onChange(e);
+  }
+
+  ngAfterViewInit(): void {
+    this.frm.statusChanges.subscribe((x) => {
+      if (x === 'INVALID') {
+        console.log(this.frm.errors);
+      } else {
+        console.log(x);
+      }
+    });
+  }
+}
+
+angular.module('oppia').directive(
+  'schemaBasedCustomEditor',
+  downgradeComponent({
+    component: SchemaBasedCustomEditorComponent
+  })
+);

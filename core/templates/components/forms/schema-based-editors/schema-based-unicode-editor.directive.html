@@ -1,42 +1,44 @@
 <span>
-  <textarea ng-if="!$ctrl.getCodingMode() && $ctrl.getRows()"
+  <textarea *ngIf="!getCodingMode() && getRows()"
             class="form-control"
-            ng-model="$ctrl.localValue"
-            ng-disabled="$ctrl.isDisabled()"
-            ng-blur="$ctrl.onInputBlur()"
-            ng-focus="$ctrl.onInputFocus()"
-            focus-on="<[$ctrl.labelForFocusTarget()]>"
-            placeholder="<[$ctrl.getPlaceholder()]>"
-            apply-validation validators="$ctrl.validators()"
-            ng-keypress="$ctrl.onKeypress($event)"
-            rows="<[$ctrl.getRows()]>">
+            [ngModel]="localValue"
+            (ngModelChange)="updateLocalValue($event)"
+            [disabled]="disabled"
+            (blur)="inputBlur.emit()"
+            (focus)="inputFocus.emit()"
+            [oppiaFocusOn]="labelForFocusTarget"
+            attr.placeholder="{{getPlaceholder()}}"
+            applyValidation [validators]="validators"
+            (keydown)="onKeypress($event)"
+            rows="{{getRows()}}">
   </textarea>
 
-  <span ng-if="!$ctrl.getCodingMode() && !$ctrl.getRows()">
+  <span *ngIf="!getCodingMode() && !getRows()">
     <input type="text"
            class="form-control display-inline"
-           ng-model="$ctrl.localValue"
-           ng-disabled="$ctrl.isDisabled()"
-           ng-blur="$ctrl.onInputBlur()"
-           ng-focus="$ctrl.onInputFocus()"
-           focus-on="<[$ctrl.labelForFocusTarget()]>"
-           placeholder="<[$ctrl.getPlaceholder()]>"
-           apply-validation validators="$ctrl.validators()"
-           ng-keypress="$ctrl.onKeypress($event)"
+           [ngModel]="localValue"
+           (ngModelChange)="updateLocalValue($event)"
+           [disabled]="disabled"
+           (blur)="inputBlur.emit()"
+           (focus)="inputFocus.emit()"
+           [oppiaFocusOn]="labelForFocusTarget"
+           attr.placeholder="{{getPlaceholder()}}"
+           applyValidation [validators]="validators"
+           (keydown)="onKeypress($event)"
            aria-label="text input">
   </span>
 
   <!-- Note that we do not yet support ng-blur for the code editor. -->
-  <div ng-if="$ctrl.getCodingMode()" class="oppia-coding-editor">
-    <oppia-codemirror [value]="$ctrl.localValue"
-                      [options]="$ctrl.codemirrorOptions"
-                      [refresh]="$ctrl.codemirrorStatus"
-                      (value-change)="$ctrl.updateLocalValue($event)">
+  <div *ngIf="getCodingMode()" class="oppia-coding-editor">
+    <oppia-codemirror [value]="localValue"
+                      [options]="codemirrorOptions"
+                      [refresh]="codemirrorStatus"
+                      (valueChange)="updateLocalValue($event)">
     </oppia-codemirror>
   </div>
 </span>
 <style>
-  schema-based-unicode-editor .oppia-coding-editor {
+  .oppia-coding-editor {
     border: 1px solid #ccc;
   }
 </style>

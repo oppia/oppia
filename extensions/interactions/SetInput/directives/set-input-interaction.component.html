@@ -3,7 +3,7 @@
 </div>
 
 <div>
-  <schema-based-editor [schema]="getSchema.bind(this)"
+  <schema-based-editor [schema]="getSchema()"
                        [localValue]="answer"
                        (localValueChange)="updateAnswer($event)">
   </schema-based-editor>

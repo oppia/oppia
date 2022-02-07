@@ -16,6 +16,12 @@
  * @fileoverview Directive for applying validation.
  */
 
+import { Directive, Input } from '@angular/core';
+import { NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
+import { UnderscoresToCamelCasePipe } from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
+import cloneDeep from 'lodash/cloneDeep';
+import { SchemaValidators } from '../validators/schema-validators';
+
 require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 
 interface InteractionValidator {
@@ -29,6 +35,50 @@ interface ApplyValidationCustomScope extends ng.IScope {
     validators: () => InteractionValidator[];
   };
 }
+
+@Directive({
+  selector: '[applyValidation]',
+  providers: [{
+    provide: NG_VALIDATORS,
+    useExisting: ApplyValidationDirective,
+    multi: true
+  }]
+})
+export class ApplyValidationDirective implements Validator {
+  @Input() validators;
+  underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
+  validate(control: AbstractControl): ValidationErrors | null {
+    if (!this.validators || this.validators.length === 0) {
+      return null;
+    }
+    let errorsPresent = false;
+    let errors: ValidationErrors = {};
+    for (const validatorSpec of this.validators) {
+      const frontendName = this.underscoresToCamelCasePipe.transform(
+        validatorSpec.id
+      );
+      var filterArgs = {};
+      for (var key in validatorSpec) {
+        if (key !== 'id') {
+          filterArgs[this.underscoresToCamelCasePipe.transform(key)] =
+          cloneDeep(validatorSpec[key]);
+        }
+      }
+      if (SchemaValidators[frontendName]) {
+        const error = SchemaValidators[frontendName](filterArgs)(control);
+        if (error !== null) {
+          errorsPresent = true;
+          errors = {...errors, ...error};
+        }
+      }
+    }
+    if (!errorsPresent) {
+      return null;
+    }
+    return errors;
+  }
+}
+
 
 /* eslint-disable-next-line angular/directive-restrict */
 angular.module('oppia').directive('applyValidation', [

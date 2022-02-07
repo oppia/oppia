@@ -15,55 +15,89 @@
 /**
  * @fileoverview Directive for a schema-based editor for integers.
  */
+import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
-require(
-  'components/forms/custom-forms-directives/apply-validation.directive.ts');
-require('services/schema-form-submitted.service.ts');
-require('services/stateful/focus-manager.service.ts');
+@Component({
+  selector: 'schema-based-int-editor',
+  templateUrl: './schema-based-int-editor.directive.html',
+  styleUrls: [],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedIntEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedIntEditorComponent),
+    },
+  ]
+})
+export class SchemaBasedIntEditorComponent
+implements ControlValueAccessor, OnInit, Validator {
+  localValue;
+  @Input() disabled;
+  @Input() notRequired;
+  @Input() validators;
+  @Input() labelForFocusTarget;
+  @Output() inputBlur = new EventEmitter<void>();
+  @Output() inputFocus = new EventEmitter<void>();
+  onChange: (val: unknown) => void = () => {};
+  constructor(
+    private focusManagerService: FocusManagerService,
+    private schemaFormSubmittedService: SchemaFormSubmittedService
+  ) { }
 
-angular.module('oppia').directive('schemaBasedIntEditor', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {
-        labelForFocusTarget: '&'
-      },
-      bindToController: {
-        localValue: '=',
-        isDisabled: '&',
-        notRequired: '&',
-        validators: '&',
-        labelForFocusTarget: '&',
-        onInputBlur: '=',
-        onInputFocus: '='
-      },
-      template: require('./schema-based-int-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$scope', '$timeout', 'FocusManagerService',
-        'SchemaFormSubmittedService',
-        function(
-            $scope, $timeout, FocusManagerService,
-            SchemaFormSubmittedService) {
-          var ctrl = this;
-          var labelForFocus = $scope.labelForFocusTarget();
-          ctrl.onKeypress = function(evt) {
-            if (evt.keyCode === 13) {
-              SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
-            }
-          };
+  // Implemented as a part of ControlValueAccessor interface.
+  writeValue(value: unknown): void {
+    this.localValue = value;
+  }
 
-          ctrl.$onInit = function() {
-            if (ctrl.localValue === undefined) {
-              ctrl.localValue = 0;
-            }
-            // So that focus is applied after all the functions in
-            // main thread have executed.
-            $timeout(function() {
-              FocusManagerService.setFocusWithoutScroll(labelForFocus);
-            }, 50);
-          };
-        }
-      ]
-    };
-  }]);
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (val: unknown) => void): void {
+    this.onChange = fn;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnTouched(): void {
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
+  }
+
+  onKeypress(evt: KeyboardEvent): void {
+    if (evt.keyCode === 13) {
+      this.schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
+    }
+  }
+
+  ngOnInit(): void {
+    if (this.localValue === undefined) {
+      this.localValue = 0;
+    }
+    // So that focus is applied after all the functions in
+    // main thread have executed.
+    setTimeout(() => {
+      this.focusManagerService.setFocusWithoutScroll(this.labelForFocusTarget);
+    }, 50);
+  }
+
+  updateValue(val: boolean): void {
+    if (this.localValue === val) {
+      return;
+    }
+    this.localValue = val;
+    this.onChange(val);
+  }
+}
+
+angular.module('oppia').directive('schemaBasedIntEditor', downgradeComponent({
+  component: SchemaBasedIntEditorComponent
+}) as angular.IDirectiveFactory);
