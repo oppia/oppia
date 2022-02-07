@@ -41,6 +41,8 @@ class GetExpRightsWithDuplicateUsersJobTests(
     USER_ID_3 = 'id_3'
 
     def __init__(self):
+        super().__init__()
+        
         # This is an invalid model with duplicate: USER_ID_1.
         self.EXP_RIGHTS_1 = self.create_model(
             exp_models.ExplorationRightsModel,
