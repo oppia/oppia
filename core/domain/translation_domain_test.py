@@ -195,7 +195,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         }
         entity_translations = translation_domain.EntityTranslation(
             'exp_id',
-            translation_domain.PossibleEntityTypesSupportingNewTranslationArch
+            translation_domain.EntityTypesSupportingNewTranslationArch
             .ENTITY_TYPE_EXPLORATION, 1, 'en', translation_dict)
 
         translatable_object = DummyTranslatableObjectWithFourParams(
@@ -228,7 +228,7 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
         }
         entity_translations = translation_domain.EntityTranslation(
             'exp_id',
-            translation_domain.PossibleEntityTypesSupportingNewTranslationArch
+            translation_domain.EntityTypesSupportingNewTranslationArch
             .ENTITY_TYPE_EXPLORATION, 1, 'en', translation_dict)
 
         self.assertEqual(entity_translations.entity_id, 'exp_id')

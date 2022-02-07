@@ -37,9 +37,7 @@ class TranslatableContentPossibleDataTypes(enum.Enum):
     TRANSLATABLE_CONTENT_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
 
 
-# Change the name of the class appropriately once all other entities apart from
-# exploration & question would support new translation architecture.
-class PossibleEntityTypesSupportingNewTranslationArch(enum.Enum):
+class EntityTypesSupportingNewTranslationArch(enum.Enum):
     """Represents all possible entity types which support new translations
     architecture.
     """
@@ -178,7 +176,7 @@ class EntityTranslation:
 
     Args:
         entity_id: str. The id of the corresponding entity.
-        entity_type: PossibleEntityTypesSupportingNewTranslationArch. The type
+        entity_type: EntityTypesSupportingNewTranslationArch. The type
             of the corresponding entity.
         entity_version: str. The version of the corresponding entity.
         language_code: str. The language code for the corresponding entity.
@@ -188,7 +186,7 @@ class EntityTranslation:
     def __init__(
         self,
         entity_id: str,
-        entity_type: PossibleEntityTypesSupportingNewTranslationArch,
+        entity_type: EntityTypesSupportingNewTranslationArch,
         entity_version: int,
         language_code: str,
         translations: Dict[str, TranslatedContent]

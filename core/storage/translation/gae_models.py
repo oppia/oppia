@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import enum
+
 from core import feconf
 from core import utils
 from core.platform import models
@@ -43,6 +45,15 @@ class TranslatedContentDict(TypedDict):
 
     content: Union[str, List[str]]
     needs_update: bool
+
+
+class EntityTypesSupportingNewTranslationArch(enum.Enum):
+    """Represents all possible entity types which support new translations
+    architecture.
+    """
+
+    ENTITY_TYPE_EXPLORATION = 'exploration'
+    ENTITY_TYPE_QUESTION = 'question'
 
 
 class EntityTranslationsModel(base_models.BaseModel):
@@ -90,7 +101,7 @@ class EntityTranslationsModel(base_models.BaseModel):
 
     @staticmethod
     def _generate_id(
-        entity_type: str,
+        entity_type: EntityTypesSupportingNewTranslationArch,
         entity_id: str,
         entity_version: int,
         language_code: str
@@ -98,7 +109,8 @@ class EntityTranslationsModel(base_models.BaseModel):
         """The method use to generate unique id for entity translations model.
 
         Args:
-            entity_type: str. Type of an entity.
+            entity_type: EntityTypesSupportingNewTranslationArch. Type
+                of the entity to fetch.
             entity_id: str. Id of an entity.
             entity_version: int. Version of an entity.
             language_code: str. Language code for a given entity.
@@ -113,7 +125,7 @@ class EntityTranslationsModel(base_models.BaseModel):
     @classmethod
     def get_model(
         cls,
-        entity_type: str,
+        entity_type: EntityTypesSupportingNewTranslationArch,
         entity_id: str,
         entity_version: int,
         language_code: str
@@ -122,7 +134,8 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_version and language_code.
 
         Args:
-            entity_type: str. Type of the entity to fetch.
+            entity_type: EntityTypesSupportingNewTranslationArch. Type
+                of the entity to fetch.
             entity_id: str. Id of an entity.
             entity_version: int. Version of an entity.
             language_code: str. Language code for a given entity.
@@ -139,7 +152,7 @@ class EntityTranslationsModel(base_models.BaseModel):
     @classmethod
     def get_all_for_entity(
         cls,
-        entity_type: str,
+        entity_type: EntityTypesSupportingNewTranslationArch,
         entity_id: str,
         entity_version: int
     ) -> Sequence[Optional[EntityTranslationsModel]]:
@@ -147,7 +160,8 @@ class EntityTranslationsModel(base_models.BaseModel):
         all languages in which such models exist.
 
         Args:
-            entity_type: str. Type of an entity.
+            entity_type: EntityTypesSupportingNewTranslationArch. Type
+                of an entity to fetch.
             entity_id: str. Id of an entity.
             entity_version: int. Version of an entity.
 
@@ -165,7 +179,7 @@ class EntityTranslationsModel(base_models.BaseModel):
     @classmethod
     def create_new(
         cls,
-        entity_type: str,
+        entity_type: EntityTypesSupportingNewTranslationArch,
         entity_id: str,
         entity_version: int,
         language_code: str,
@@ -174,7 +188,8 @@ class EntityTranslationsModel(base_models.BaseModel):
         """Creates and returns a new EntityTranslationsModel instance.
 
         Args:
-            entity_type: str. Type of an entity.
+            entity_type: EntityTypesSupportingNewTranslationArch. Type
+                of an entity to fetch.
             entity_id: str. Id of an entity.
             entity_version: int. Version of an entity.
             language_code: str. Language code for a given entity.
