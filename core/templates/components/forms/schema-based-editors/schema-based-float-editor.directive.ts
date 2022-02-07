@@ -51,7 +51,7 @@ implements ControlValueAccessor, OnInit, Validator {
   @ViewChild('floatform', {'static': true}) floatForm: NgForm;
   hasFocusedAtLeastOnce: boolean;
   isUserCurrentlyTyping: boolean;
-  errorString: string;
+  errorString: string = '';
   labelForErrorFocusTarget: string;
   hasLoaded: boolean;
   onChange: (value: number) => void = () => {};

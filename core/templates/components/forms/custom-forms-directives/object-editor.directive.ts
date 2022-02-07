@@ -149,6 +149,7 @@ ControlValueAccessor, Validator {
   @Input() objType: string;
   @Input() schema;
   @Input() form;
+  @Output() validityChange: EventEmitter<void> = new EventEmitter();
   get value(): unknown {
     return this._value;
   }
@@ -160,6 +161,7 @@ ControlValueAccessor, Validator {
     if (this.ref) {
       this.ref.instance.value = this._value;
       this.onChange(this._value);
+      this.valueChange.emit(this._value);
     }
   }
   @Output() valueChange = new EventEmitter();
@@ -185,7 +187,10 @@ ControlValueAccessor, Validator {
   }
 
   writeValue(obj: string | number): void {
-    this._updateValue(obj);
+    if (obj === null || obj === undefined) {
+      return;
+    }
+    this.value = obj;
   }
 
   registerOnChange(fn: (_: unknown) => void): void {
@@ -196,13 +201,6 @@ ControlValueAccessor, Validator {
     private componentFactoryResolver: ComponentFactoryResolver,
     private viewContainerRef: ViewContainerRef
   ) { }
-
-  private _updateValue(e) {
-    if (this.value !== e) {
-      this.value = e;
-      this.valueChange.emit(e);
-    }
-  }
 
   ngAfterViewInit(): void {
     const editorName = this.objType.replace(
@@ -227,7 +225,18 @@ ControlValueAccessor, Validator {
       if (ref.instance.valueChanged) {
         this.componentSubscriptions.add(
           ref.instance.valueChanged.subscribe((e) => {
-            this._updateValue(e);
+            if (Array.isArray(e)) {
+              this.value = [...e];
+              return;
+            }
+            if (typeof e === 'object') {
+              this.value = (
+                Object.assign(Object.create(Object.getPrototypeOf(e)), e));
+              return;
+              // The return statement is intentionally omitted.
+            }
+            // setTimeout(() => this.value = e, 0);
+            this.value = e;
           })
         );
       }
@@ -243,6 +252,10 @@ ControlValueAccessor, Validator {
                 if (this.componentValidationState[key] !== undefined) {
                   delete this.componentValidationState[key];
                 }
+              }
+              if (this.form) {
+                this.form.$setValidity(key, e[key]);
+                this.validityChange.emit();
               }
             }
             this.onValidatorChange();

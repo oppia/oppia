@@ -78,7 +78,9 @@ implements OnInit, ControlValueAccessor, Validator {
     private schemaUndefinedLastElementService: SchemaUndefinedLastElementService
   ) {}
   writeValue(value: SchemaDefaultValue[]): void {
-    this.localValue = value;
+    if (Array.isArray(value)) {
+      this.localValue = value;
+    }
   }
   registerOnChange(fn: (value: unknown) => void): void {
     this.onChange = fn;
@@ -189,10 +191,13 @@ implements OnInit, ControlValueAccessor, Validator {
     this.localValue.splice(index, 1);
   }
 
-  setValue(val: SubtitledHtml, index: number): void {
-    if (val instanceof SubtitledHtml) {
-      this.localValue[index] = val;
+  setValue(val: SchemaDefaultValue, index: number): void {
+    if (val === null) {
+      return;
     }
+    this.localValue[index] = val;
+    this.localValue = [...this.localValue];
+    this.onChange(this.localValue);
   }
 
   ngOnInit(): void {

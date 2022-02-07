@@ -22,6 +22,7 @@
                            [init-args]="{choices: $ctrl.ruleDescriptionChoices}"
                            [form]="$ctrl.ruleEditForm.form"
                            ng-model="$ctrl.rule.inputs[item.varName]"
+                           (validity-change)="$applyAsync()"
                            ng-change="$ctrl.updateValue($event, item.varName)">
             </object-editor>
           </span>
@@ -30,6 +31,7 @@
                            [obj-type]="'ListOfSetsOfTranslatableHtmlContentIds'"
                            [init-args]="{choices: $ctrl.ruleDescriptionChoices}"
                            [form]="$ctrl.ruleEditForm.form"
+                           (validity-change)="$applyAsync()"
                            ng-model="$ctrl.rule.inputs[item.varName]"
                            ng-change="$ctrl.updateValue($event, item.varName)">
             </object-editor>
@@ -39,6 +41,7 @@
                            [obj-type]="'TranslatableHtmlContentId'"
                            [init-args]="{choices: $ctrl.ruleDescriptionChoices}"
                            [form]="$ctrl.ruleEditForm.form"
+                           (validity-change)="$applyAsync()"
                            ng-model="$ctrl.rule.inputs[item.varName]"
                            ng-change="$ctrl.updateValue($event, item.varName)">
             </object-editor>
@@ -48,6 +51,7 @@
                            [obj-type]="'DragAndDropPositiveInt'"
                            [init-args]="{choices: $ctrl.ruleDescriptionChoices}"
                            [form]="$ctrl.ruleEditForm.form"
+                           (validity-change)="$applyAsync()"
                            ng-model="$ctrl.rule.inputs[item.varName]"
                            ng-change="$ctrl.updateValue($event, item.varName)">
             </object-editor>
@@ -63,6 +67,7 @@
                            [is-editable]="$ctrl.isEditable"
                            [always-editable]="true"
                            [form]="$ctrl.ruleEditForm.form"
+                           (validity-change)="$applyAsync()"
                            ng-model="$ctrl.rule.inputs[item.varName]"
                            ng-change="$ctrl.updateValue($event, item.varName)"
                            class="text-dark">
