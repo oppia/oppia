@@ -39,7 +39,7 @@ MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
     feconf.NAMES.app_feedback_report, feconf.NAMES.blog,
     feconf.NAMES.collection, feconf.NAMES.config, feconf.NAMES.exploration,
     feconf.NAMES.feedback, feconf.NAMES.question, feconf.NAMES.skill,
-    feconf.NAMES.story,feconf.NAMES.subtopic, feconf.NAMES.suggestion,
+    feconf.NAMES.story, feconf.NAMES.subtopic, feconf.NAMES.suggestion,
     feconf.NAMES.topic
 )
 
@@ -73,7 +73,9 @@ class _Gae(Platform):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def import_models(cls, model_names: List[feconf.NAMES]) -> Tuple[ModuleType, ...]:
+    def import_models(
+            cls, model_names: List[feconf.NAMES]
+    ) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
@@ -404,8 +406,9 @@ class Registry:
         return klass
 
     @classmethod
-    def import_models(cls,
-            model_names: List[feconf.NAMES]) -> Tuple[ModuleType, ...]:
+    def import_models(
+            cls, model_names: List[feconf.NAMES]
+    ) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
