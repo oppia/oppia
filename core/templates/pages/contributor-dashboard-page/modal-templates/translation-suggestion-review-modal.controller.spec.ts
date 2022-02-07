@@ -178,7 +178,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       spyOn(
         SiteAnalyticsService,
         'registerContributorDashboardAcceptSuggestion');
-      spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+      spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
             targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
@@ -201,7 +201,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
-      expect(contributionAndReviewService.resolveSuggestionToExploration)
+      expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'accept', 'Review message example: ' +
           'This suggestion was submitted with reviewer edits.',
@@ -216,7 +216,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
 
-      expect(contributionAndReviewService.resolveSuggestionToExploration)
+      expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
           '2', 'suggestion_2', 'accept', 'Review message example 2',
           'hint section of "StateName" card', $scope.showNextItemToReview,
@@ -233,7 +233,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         expect($scope.reviewable).toBe(reviewable);
         expect($scope.reviewMessage).toBe('');
 
-        spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+        spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
           .and.callFake((
               targetId, suggestionId, action, reviewMessage, commitMessage,
               callback) => {
@@ -253,7 +253,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         expect(
           SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
           .toHaveBeenCalledWith('Translation');
-        expect(contributionAndReviewService.resolveSuggestionToExploration)
+        expect(contributionAndReviewService.reviewExplorationSuggestion)
           .toHaveBeenCalledWith(
             '1', 'suggestion_1', 'reject', 'Review message example',
             'hint section of "StateName" card', $scope.showNextItemToReview);
@@ -264,7 +264,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         expect(
           SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
           .toHaveBeenCalledWith('Translation');
-        expect(contributionAndReviewService.resolveSuggestionToExploration)
+        expect(contributionAndReviewService.reviewExplorationSuggestion)
           .toHaveBeenCalledWith(
             '2', 'suggestion_2', 'reject', 'Review message example 2',
             'hint section of "StateName" card', $scope.showNextItemToReview);
@@ -281,7 +281,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       spyOn(
         SiteAnalyticsService,
         'registerContributorDashboardAcceptSuggestion');
-      spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+      spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
             targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
@@ -300,7 +300,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
-      expect(contributionAndReviewService.resolveSuggestionToExploration)
+      expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'accept', 'Review message example',
           'hint section of "StateName" card', $scope.showNextItemToReview,
@@ -572,7 +572,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect($scope.reviewable).toBe(reviewable);
       expect($scope.reviewMessage).toBe('');
 
-      spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+      spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
             targetId, suggestionId, action, reviewMessage, commitMessage,
             callback) => {
@@ -588,7 +588,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect(
         SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
-      expect(contributionAndReviewService.resolveSuggestionToExploration)
+      expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'reject', 'Review message example',
           'hint section of "StateName" card', $scope.showNextItemToReview);

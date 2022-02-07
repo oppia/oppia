@@ -221,7 +221,7 @@ angular.module('oppia').controller(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion(
           'Translation');
 
-        ContributionAndReviewService.resolveSuggestionToExploration(
+        ContributionAndReviewService.reviewExplorationSuggestion(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
           ACTION_ACCEPT_SUGGESTION,
           $scope.reviewMessage, $scope.finalCommitMessage,
@@ -239,7 +239,7 @@ angular.module('oppia').controller(
           SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
             'Translation');
 
-          ContributionAndReviewService.resolveSuggestionToExploration(
+          ContributionAndReviewService.reviewExplorationSuggestion(
             $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
             ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
             generateCommitMessage(), $scope.showNextItemToReview);
