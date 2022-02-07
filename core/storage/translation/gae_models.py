@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core import utils
 from core.platform import models
 
@@ -50,7 +51,11 @@ class EntityTranslationsModel(base_models.BaseModel):
     # The id of the corresponding entity.
     entity_id = datastore_services.StringProperty(required=True, indexed=True)
     # The type of the corresponding entity.
-    entity_type = datastore_services.StringProperty(required=True, indexed=True)
+    entity_type = datastore_services.StringProperty(
+        required=True, indexed=True, choices=[
+            feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.ENTITY_TYPE_QUESTION
+            ])
     # The version of the corresponding entity.
     entity_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
