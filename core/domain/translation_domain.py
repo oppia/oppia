@@ -87,7 +87,8 @@ class BaseTranslatableObject:
         """Method to register a translatable field in a translatable object.
 
         Args:
-            field_type: str. The type of the corresponding translatable content.
+            field_type: TranslatableContentPossibleDataTypes. The type of the
+                corresponding translatable content.
             content_id: str. The id of the corresponding translatable content.
             value: ContentInTranslatableContent. Value of the content which is
                 translatable.
@@ -195,7 +196,8 @@ class TranslatableContent:
         content_id: str. The id of the corresponding content.
         content: ContentInTranslatableContent. The content which can be
             translated.
-        content_type: str. The type of the corresponding content.
+        content_type: TranslatableContentPossibleDataTypes. The type of the
+            corresponding content.
     """
 
     def __init__(
