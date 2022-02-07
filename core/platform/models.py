@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import enum
 import inspect
 from types import ModuleType  # pylint: disable=import-only-modules
 
