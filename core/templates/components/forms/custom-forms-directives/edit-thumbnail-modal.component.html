@@ -80,7 +80,7 @@
     <button class="btn btn-secondary" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></button>
     <button class="btn btn-success protractor-test-photo-upload-submit"
             (click)="confirm()"
-            [disabled]="!uploadedImage">
+            [disabled]="!uploadedImage || !thumbnailHasChanged">
       Add Thumbnail
     </button>
   </div>

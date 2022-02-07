@@ -37,6 +37,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { I18nService } from 'i18n/i18n.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 interface LanguageInfo {
   id: string;
@@ -48,29 +50,36 @@ interface LanguageInfo {
   templateUrl: './top-navigation-bar.component.html',
 })
 export class TopNavigationBarComponent implements OnInit, OnDestroy {
-  @Input() headerText: string;
-  @Input() subheaderText: string;
+  // The properties below are initialized in Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() headerText!: string;
+  @Input() subheaderText!: string;
 
-  url: URL;
-  currentLanguageCode: string;
-  currentLanguageText: string;
-  isModerator: boolean;
-  isCurriculumAdmin: boolean;
-  isTopicManager: boolean;
-  isSuperAdmin: boolean;
-  isBlogAdmin: boolean;
-  isBlogPostEditor: boolean;
-  userIsLoggedIn: boolean;
-  username: string;
-  currentUrl: string;
-  userMenuIsShown: boolean;
-  inClassroomPage: boolean;
-  showLanguageSelector: boolean;
-  standardNavIsShown: boolean;
-  supportedSiteLanguages: LanguageInfo[];
-  ACTION_OPEN: string;
-  ACTION_CLOSE: string;
-  KEYBOARD_EVENT_TO_KEY_CODES: {
+  DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
+  url!: URL;
+  currentLanguageCode!: string;
+  supportedSiteLanguages!: LanguageInfo[];
+  currentLanguageText!: string;
+  classroomData: CreatorTopicSummary[] = [];
+  learnDropdownOffset: number = 0;
+  isModerator: boolean = false;
+  isCurriculumAdmin: boolean = false;
+  isTopicManager: boolean = false;
+  isSuperAdmin: boolean = false;
+  isBlogAdmin: boolean = false;
+  isBlogPostEditor: boolean = false;
+  userIsLoggedIn: boolean = false;
+  currentUrl!: string;
+  userMenuIsShown: boolean = false;
+  inClassroomPage: boolean = false;
+  showLanguageSelector: boolean = false;
+  standardNavIsShown: boolean = false;
+  getInvolvedMenuOffset: number = 0;
+  donateMenuOffset: number = 0;
+  ACTION_OPEN!: string;
+  ACTION_CLOSE!: string;
+  KEYBOARD_EVENT_TO_KEY_CODES!: {
     enter: {
         shiftKeyIsPressed: boolean;
         keyCode: number;
@@ -84,12 +93,25 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       keyCode: number;
       };
     };
+  labelForClearingFocus!: string;
+  sidebarIsShown: boolean = false;
   windowIsNarrow: boolean = false;
-  activeMenuName: string;
-  profilePageUrl: string;
-  labelForClearingFocus: string;
-  profilePictureDataUrl: string;
-  sidebarIsShown: boolean;
+
+  // The 'username', 'profilePageUrl' and 'profilePictureDataUrl' properties
+  // are set using the asynchronous method getUserInfoAsync()
+  // which sends a HTTP request to the backend.
+  // Until the response object is received and the method returns,
+  // these properties remain undefined.
+  username: string | undefined;
+  profilePageUrl: string | undefined;
+  profilePictureDataUrl: string | undefined;
+
+  // The 'activeMenuName' property is not initialized in the constructor
+  // or in a lifecycle hook, and is set based on certain
+  // optional user input (see the onMenuKeypress() method further below).
+  // Until that input is received the property remains undefined.
+  activeMenuName: string | undefined;
+
   directiveSubscriptions = new Subscription();
   NAV_MODE_SIGNUP = 'signup';
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
@@ -100,17 +122,20 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // The order of the elements in this array specifies the order in
   // which they will be hidden. Earlier elements will be hidden first.
   NAV_ELEMENTS_ORDER = [
-    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
-    'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
+    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_LEARN',
+    'I18N_TOPNAV_ABOUT', 'I18N_TOPNAV_LIBRARY',
+    'I18N_TOPNAV_HOME'];
 
   CLASSROOM_PROMOS_ARE_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg');
-  navElementsVisibilityStatus ={};
+  navElementsVisibilityStatus: Record<string, boolean> = {};
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
+    private accessValidationBackendApiService:
+      AccessValidationBackendApiService,
     private changeDetectorRef: ChangeDetectorRef,
     private classroomBackendApiService: ClassroomBackendApiService,
     private contextService: ContextService,
@@ -143,7 +168,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         return languageInfo;
       }
     );
-
     this.showLanguageSelector = (
       !this.contextService.getPageContext().endsWith('editor'));
 
@@ -162,12 +186,32 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     service.fetchClassroomPromosAreEnabledStatusAsync().then(
       (classroomPromosAreEnabled) => {
         this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
+        if (classroomPromosAreEnabled) {
+          this.accessValidationBackendApiService.validateAccessToClassroomPage(
+            this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
+            this.classroomBackendApiService.fetchClassroomDataAsync(
+              this.DEFAULT_CLASSROOM_URL_FRAGMENT)
+              .then((classroomData) => {
+                this.classroomData = classroomData.getTopicSummaries();
+                this.classroomBackendApiService.onInitializeTranslation.emit();
+                this.siteAnalyticsService.registerClassroomPageViewed();
+              });
+          });
+        }
       });
+
+    // Inside a setTimeout function call, 'this' points to the global object.
+    // To access the context in which the setTimeout call is made, we need to
+    // first save a reference to that context in a variable, and then use that
+    // variable in place of the 'this' keyword.
+    let that = this;
 
     this.directiveSubscriptions.add(
       this.searchService.onSearchBarLoaded.subscribe(
         () => {
-          setTimeout(this.truncateNavbar, 100);
+          setTimeout(function() {
+            that.truncateNavbar();
+          }, 100);
         }
       )
     );
@@ -182,8 +226,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.isBlogAdmin = userInfo.isBlogAdmin();
       this.isBlogPostEditor = userInfo.isBlogPostEditor();
       this.userIsLoggedIn = userInfo.isLoggedIn();
-      this.username = userInfo.getUsername();
-      if (this.username) {
+      let usernameFromUserInfo = userInfo.getUsername();
+      if (usernameFromUserInfo) {
+        this.username = usernameFromUserInfo;
         this.profilePageUrl = this.urlInterpolationService.interpolateUrl(
           '/profile/<username>', {
             username: this.username
@@ -234,12 +279,53 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           }
         })
     );
+
+    let langCode = this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
+
+    if (this.currentLanguageCode !== langCode) {
+      this.currentLanguageCode = langCode;
+      this.supportedSiteLanguages.forEach(element => {
+        if (element.id === this.currentLanguageCode) {
+          this.currentLanguageText = element.text;
+        }
+      });
+      this.changeDetectorRef.detectChanges();
+    }
+
     // The function needs to be run after i18n. A timeout of 0 appears
     // to run after i18n in Chrome, but not other browsers. The
     // will check if i18n is complete and set a new timeout if it is
     // not. Since a timeout of 0 works for at least one browser,
     // it is used here.
-    setTimeout(this.truncateNavbar, 0);
+    setTimeout(function() {
+      that.truncateNavbar();
+    }, 0);
+  }
+
+  ngAfterViewChecked(): void {
+    this.getInvolvedMenuOffset = this
+      .getDropdownOffset('.get-involved', 574);
+    this.donateMenuOffset = this
+      .getDropdownOffset('.donate-tab', 286);
+    this.learnDropdownOffset = this.getDropdownOffset(
+      '.learn-tab', (this.CLASSROOM_PROMOS_ARE_ENABLED) ? 688 : 300);
+    // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
+    this.changeDetectorRef.detectChanges();
+  }
+
+  // This function is required to shift the dropdown towards left if
+  // there isn't enough space on the right to fit the entire dropdown.
+  // This function compares the width of the dropdown with the space
+  // available on the right to calculate the offset. It returns zero if
+  // there is enough space to fit the content.
+  getDropdownOffset(cssClass: string, width: number): number {
+    let learnTab: HTMLElement | null = document.querySelector(cssClass);
+    if (learnTab) {
+      let leftOffset = learnTab.getBoundingClientRect().left;
+      let space = window.innerWidth - leftOffset;
+      return (space < width) ? (Math.round(space - width)) : 0;
+    }
+    return 0;
   }
 
   async getProfileImageDataAsync(): Promise<void> {
@@ -324,8 +410,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.sidebarStatusService.isSidebarShown();
   }
 
-  toggleSidebar(): void {
+  toggleSidebar(event: Event): void {
     this.sidebarStatusService.toggleSidebar();
+    this.sidebarStatusService.toggleHamburgerIconStatus(event);
   }
 
   navigateToClassroomPage(classroomUrl: string): void {
@@ -333,6 +420,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = classroomUrl;
     }, 150);
+  }
+
+  navigateToPage(url: string): void {
+    this.windowRef.nativeWindow.location.href = url;
   }
 
   /**
@@ -364,9 +455,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       return;
     }
 
+    let that = this;
     // If i18n hasn't completed, retry after 100ms.
-    if (!this.checkIfI18NCompleted) {
-      setTimeout(this.truncateNavbar, 100);
+    if (!this.checkIfI18NCompleted()) {
+      setTimeout(function() {
+        that.truncateNavbar();
+      }, 100);
       return;
     }
 
@@ -374,8 +468,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     // height of the navbar (56px) in Chrome's inspector and rounding
     // up. If the height of the navbar is changed in the future this
     // will need to be updated.
-    if (document.querySelector('div.collapse.navbar-collapse')
-      .clientHeight > 60) {
+    let navbar = document.querySelector('div.collapse.navbar-collapse');
+    if (navbar && navbar.clientHeight > 60) {
       for (var i = 0; i < this.NAV_ELEMENTS_ORDER.length; i++) {
         if (
           this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]]) {
@@ -387,7 +481,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           // Force a digest cycle to hide element immediately.
           // Otherwise it would be hidden after the next call.
           // This is due to setTimeout use in debounce.
-          setTimeout(this.truncateNavbar, 50);
+          setTimeout(function() {
+            that.truncateNavbar();
+          }, 50);
           return;
         }
       }

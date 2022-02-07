@@ -34,18 +34,20 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.MatchesExactlyWith(
       '((x)^(2)-x)/(z)-4*y', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '((x)^(2)-x)/(z)-(8*y)/(2)', {x: inputString})).toBeTrue();
-    expect(algebraicRulesService.MatchesExactlyWith(
-      '-4*y+((x)^(2)-x)/(z)', {x: inputString})).toBeTrue();
-    expect(algebraicRulesService.MatchesExactlyWith(
-      '((x)^(2)-x)*(z)^(-1)-4*y', {x: inputString})).toBeTrue();
+      '((x)^(2) - x)/(z) - 4*y', {x: inputString})).toBeTrue();
 
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '((x)^(2)-x)*z^(-1)-4*y', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '((x)^(2)-x)/(z)-(8*y)/2', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '-4*y+((x)^(2)-x)/(z)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
       '(x*(x-1))/(z)-4*y', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '((x)^(2))/(z)-(x)/(z)-4*y', {x: inputString})).toBeFalse();
+      '((x)^(2))/(z)-x/(z)-4*y', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '((x)^(2))/(z)-((x)/(z)+4*y)', {x: inputString})).toBeFalse();
+      '((x)^(2))/(z)-(x/(z)+4*y)', {x: inputString})).toBeFalse();
 
 
     inputString = '(a)^(2)+(b)^(2)+(c)^(2)+2*a*b+2*b*c+2*a*c';
@@ -54,39 +56,44 @@ describe('Algebraic expression input rules service', () => {
       '(a)^(2)+(b)^(2)+(c)^(2)+2*a*b+2*b*c+2*a*c',
       {x: inputString})).toBeTrue();
     expect(algebraicRulesService.MatchesExactlyWith(
+      '(a)^(2) + (b)^(2) + (c)^(2) + 2*a*b + 2*b*c + 2*a*c',
+      {x: inputString})).toBeTrue();
+
+    expect(algebraicRulesService.MatchesExactlyWith(
       '2*a*b+2*b*c+2*a*c+(a)^(2)+(b)^(2)+(c)^(2)',
-      {x: inputString})).toBeTrue();
+      {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
-      'a*a+b*b+((c)^(3))/(c)+2*a*b+2*b*c+2*c*a', {x: inputString})).toBeTrue();
+      'a*a+b*b+(c^3)/c+2*a*b+2*b*c+2*c*a', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '(a)^(2)+(b)^(2)+(c)^(2)+2*(a*b+b*c+a*c)', {x: inputString})).toBeTrue();
+      '(a)^(2)+(b)^(2)+(c)^(2)+2*(a*b+b*c+a*c)', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '(a+b)^2+c^2+2*b*c+2*a*c', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '(a+b+c)^2', {x: inputString})).toBeFalse();
+
+
+    inputString = 'x^(2*t+3)+x^4';
 
     expect(algebraicRulesService.MatchesExactlyWith(
-      '(a+b)^(2)+(c)^(2)+2*b*c+2*a*c', {x: inputString})).toBeFalse();
+      'x^(2*t+3)+x^4', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '(a+b+c)^(2)', {x: inputString})).toBeFalse();
-
-
-    inputString = '(x)^(2*t+3)+(x)^(4)';
+      'x^(2*t + 3) + x^4', {x: inputString})).toBeTrue();
 
     expect(algebraicRulesService.MatchesExactlyWith(
-      '(x)^(2*t+3)+(x)^(4)', {x: inputString})).toBeTrue();
+      'x^(2*t)*x^3+((x)^(2))^2', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '(x)^(2*t)*(x)^(3)+((x)^(2))^(2)', {x: inputString})).toBeTrue();
+      '(x^(2*t))/(x^(-3))+(x^8)/(x^4)',
+      {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '((x)^(2*t))/((x)^(-3))+((x)^(8))/((x)^(4))',
-      {x: inputString})).toBeTrue();
+      '(x^(2*t+5))/((x)^(2))-(-x^4)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '((x)^(2*t+5))/((x)^(2))-(-(x)^(4))', {x: inputString})).toBeTrue();
-
+      '(x)^(3*t+3)+(x)^4', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '(x)^(3*t+3)+(x)^(4)', {x: inputString})).toBeFalse();
+      '(x)^3*((x)^(2*t)+x)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '(x)^(3)*((x)^(2*t)+x)', {x: inputString})).toBeFalse();
+      '(x)^4*((x)^(2*t-1)+1)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '(x)^(4)*((x)^(2*t-1)+1)', {x: inputString})).toBeFalse();
-    expect(algebraicRulesService.MatchesExactlyWith(
-      '((x)^(2*t+4)+(x)^(5))/(x)', {x: inputString})).toBeFalse();
+      '((x)^(2*t+4)+(x)^5)/(x)', {x: inputString})).toBeFalse();
 
 
     inputString = '9*(x)^(2)-6*x+1';
@@ -94,12 +101,14 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.MatchesExactlyWith(
       '9*(x)^(2)-6*x+1', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '3*(3*(x)^(2)-2*x)+1', {x: inputString})).toBeTrue();
-    expect(algebraicRulesService.MatchesExactlyWith(
-      '(3*x)^(2)-6*x+1', {x: inputString})).toBeTrue();
+      '9*(x)^(2) - 6*x + 1', {x: inputString})).toBeTrue();
 
     expect(algebraicRulesService.MatchesExactlyWith(
-      '((3*x-1))^(2)', {x: inputString})).toBeFalse();
+      '3*(3*(x)^(2)-2*x)+1', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '(3*x)^2-6*x+1', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '((3*x-1))^2', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
       '3*x(3*x-2)+1', {x: inputString})).toBeFalse();
 
@@ -109,14 +118,46 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.MatchesExactlyWith(
       '9*(x)^(2)-6*x+1', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.MatchesExactlyWith(
-      '3*(3*(x)^(2)-2*x)+1', {x: inputString})).toBeTrue();
-    expect(algebraicRulesService.MatchesExactlyWith(
-      '(3*x)^(2)-6*x+1', {x: inputString})).toBeTrue();
+      '9*(x)^(2) - 6*x + 1', {x: inputString})).toBeTrue();
 
     expect(algebraicRulesService.MatchesExactlyWith(
-      '((3*x-1))^(2)', {x: inputString})).toBeFalse();
+      '3*(3*(x)^(2)-2*x)+1', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '(3*x)^2-6*x+1', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '((3*x-1))^2', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
       '3*x(3*x-2)+1', {x: inputString})).toBeFalse();
+
+
+    inputString = '6-(-4)';
+
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '6-(-4)', {x: inputString})).toBeTrue();
+
+
+    inputString = 'z-a-z';
+
+    expect(algebraicRulesService.MatchesExactlyWith(
+      'z-a-z', {x: inputString})).toBeTrue();
+
+    expect(algebraicRulesService.MatchesExactlyWith(
+      'a', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      'a+z-z', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      'z+(a-z)', {x: inputString})).toBeFalse();
+
+
+    inputString = '5*z-w';
+
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '5*z-w', {x: inputString})).toBeTrue();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '5z-w', {x: inputString})).toBeTrue();
+
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '-w+5z', {x: inputString})).toBeFalse();
   });
 
   it('should have a correct IsEquivalentTo rule', () => {
@@ -127,20 +168,20 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.IsEquivalentTo(
       '-4*y+((x)^(2)-x)/(z)', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '((x)^(2)-x)*(z)^(-1)-4*y', {x: inputString})).toBeTrue();
+      '((x)^(2)-x)*z^(-1)-4*y', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
       '(x*(x-1))/(z)-4*y', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '((x)^(2))/(z)-(x)/(z)-4*y', {x: inputString})).toBeTrue();
+      '((x)^(2))/(z)-x/(z)-4*y', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '((x)^(2))/(z)-((x)/(z)+4*y)', {x: inputString})).toBeTrue();
+      '((x)^(2))/(z)-(x/(z)+4*y)', {x: inputString})).toBeTrue();
 
     expect(algebraicRulesService.IsEquivalentTo(
       '((x)^(2)-x)/(z)-40*y', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.IsEquivalentTo(
       '((x)^(2)+x)/(z)-4*y', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.IsEquivalentTo(
-      '((x)^(2.00000000000001)+x)/(z)+4*y', {x: inputString})).toBeFalse();
+      '(x^(2.00000000000001)+x)/(z)+4*y', {x: inputString})).toBeFalse();
 
 
     inputString = '(a)^(2)+(b)^(2)+(c)^(2)+2*a*b+2*b*c+2*a*c';
@@ -152,44 +193,44 @@ describe('Algebraic expression input rules service', () => {
       '2*a*b+2*b*c+2*a*c+(a)^(2)+(b)^(2)+(c)^(2)',
       {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      'a*a+b*b+((c)^(3))/(c)+2*a*b+2*b*c+2*c*a', {x: inputString})).toBeTrue();
+      'a*a+b*b+(c^3)/c+2*a*b+2*b*c+2*c*a', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
       '(a)^(2)+(b)^(2)+(c)^(2)+2*(a*b+b*c+a*c)', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '(a+b)^(2)+(c)^(2)+2*b*c+2*a*c', {x: inputString})).toBeTrue();
+      '(a+b)^2+c^2+2*b*c+2*a*c', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '(a+b+c)^(2)', {x: inputString})).toBeTrue();
+      '(a+b+c)^2', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '(((a+b+c))^(3))/(a+b+c)', {x: inputString})).toBeTrue();
+      '(((a+b+c))^3)/(a+b+c)', {x: inputString})).toBeTrue();
 
     expect(algebraicRulesService.IsEquivalentTo(
       '(a)^(2)+(b)^(2)+(c)^(2)+2*a*b+2*b*c', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.IsEquivalentTo(
-      '(a+b-c)^(2)', {x: inputString})).toBeFalse();
+      '(a+b-c)^2', {x: inputString})).toBeFalse();
 
 
-    inputString = '(x)^(2*t+3)+(x)^(4)';
+    inputString = 'x^(2*t+3)+x^4';
 
     expect(algebraicRulesService.IsEquivalentTo(
-      '(x)^(2*t+3)+(x)^(4)', {x: inputString})).toBeTrue();
+      'x^(2*t+3)+x^4', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '(x)^(2*t)*(x)^(3)+((x)^(2))^(2)', {x: inputString})).toBeTrue();
+      'x^(2*t)*x^3+((x)^(2))^2', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '((x)^(2*t))/((x)^(-3))+((x)^(8))/((x)^(4))',
+      '(x^(2*t))/(x^(-3))+(x^8)/(x^4)',
       {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '((x)^(2*t+5))/((x)^(2))-(-(x)^(4))', {x: inputString})).toBeTrue();
+      '(x^(2*t+5))/((x)^(2))-(-x^4)', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '(x)^(3)*((x)^(2*t)+x)', {x: inputString})).toBeTrue();
+      'x^3*(x^(2*t)+x)', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '(x)^(4)*((x)^(2*t-1)+1)', {x: inputString})).toBeTrue();
+      'x^4*(x^(2*t-1)+1)', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '((x)^(2*t+4)+(x)^(5))/(x)', {x: inputString})).toBeTrue();
+      '(x^(2*t+4)+x^5)/x', {x: inputString})).toBeTrue();
 
     expect(algebraicRulesService.IsEquivalentTo(
-      '(x)^(2*t+3)+(x)^(3)+x', {x: inputString})).toBeFalse();
+      'x^(2*t+3)+x^3+x', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.IsEquivalentTo(
-      '(x)^(2*t+3)-(x)^(4)', {x: inputString})).toBeFalse();
+      'x^(2*t+3)-x^4', {x: inputString})).toBeFalse();
 
 
     inputString = '9*(x)^(2)-6*x+1';
@@ -199,20 +240,25 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.IsEquivalentTo(
       '3*(3*(x)^(2)-2*x)+1', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '(3*x)^(2)-6*x+1', {x: inputString})).toBeTrue();
+      '(3*x)^2-6*x+1', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '((3*x-1))^(2)', {x: inputString})).toBeTrue();
+      '((3*x-1))^2', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
       '3*x(3*x-2)+1', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.IsEquivalentTo(
-      '(1-3x)^(2)', {x: inputString})).toBeTrue();
+      '(1-3x)^2', {x: inputString})).toBeTrue();
 
     expect(algebraicRulesService.IsEquivalentTo(
-      'sqrt((3x-1)^(2))', {x: inputString})).toBeFalse();
+      'sqrt((3x-1)^2)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.IsEquivalentTo(
       '9*(x)^(2)-6*x-1', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.IsEquivalentTo(
-      '((3*x-1))^(4)', {x: inputString})).toBeFalse();
+      '((3*x-1))^4', {x: inputString})).toBeFalse();
+
+    inputString = '6-(-4)';
+
+    expect(algebraicRulesService.IsEquivalentTo(
+      '10', {x: inputString})).toBeTrue();
   });
 
   it('should have a correct ContainsSomeOf rule', () => {
@@ -232,9 +278,9 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.ContainsSomeOf(
       '(x-(x)^(2))/(z)+4*y', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.ContainsSomeOf(
-      'x(x-1)/z', {x: inputString})).toBeFalse();
+      'x(x-1)/(z)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.ContainsSomeOf(
-      '(x^2)/z - x/z', {x: inputString})).toBeFalse();
+      '((x)^(2))/(z) - x/(z)', {x: inputString})).toBeFalse();
 
 
     inputString = '(a)^(2)+(b)^(2)+(c)^(2)+2*a*b+2*b*c+2*a*c';
@@ -264,7 +310,7 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.ContainsSomeOf(
       'x^4', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.ContainsSomeOf(
-      '(x^2)^2', {x: inputString})).toBeTrue();
+      '((x)^(2))^2', {x: inputString})).toBeTrue();
 
     expect(algebraicRulesService.ContainsSomeOf(
       '(x^3)(x^(2t) + x)', {x: inputString})).toBeFalse();
@@ -272,25 +318,25 @@ describe('Algebraic expression input rules service', () => {
       '(x^(2t+4) + x^5)/x', {x: inputString})).toBeFalse();
 
 
-    inputString = '9x^2 - 6x + 1';
+    inputString = '9(x)^(2) - 6x + 1';
 
     expect(algebraicRulesService.ContainsSomeOf(
-      '9x^2 - 6x + 1', {x: inputString})).toBeTrue();
+      '9(x)^(2) - 6x + 1', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.ContainsSomeOf(
-      '9x^2 - 6x', {x: inputString})).toBeTrue();
+      '9(x)^(2) - 6x', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.ContainsSomeOf(
-      '9x^2 + 1', {x: inputString})).toBeTrue();
+      '9(x)^(2) + 1', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.ContainsSomeOf(
       '- 6x + 1', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.ContainsSomeOf(
-      '9x^2 - 6x - 1', {x: inputString})).toBeTrue();
+      '9(x)^(2) - 6x - 1', {x: inputString})).toBeTrue();
 
     expect(algebraicRulesService.ContainsSomeOf(
-      'sqrt((3x-1)^(2))', {x: inputString})).toBeFalse();
+      'sqrt((3x-1)^2)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.ContainsSomeOf(
-      '3*(3x^2 - 2x) - 1', {x: inputString})).toBeFalse();
+      '3*(3(x)^(2) - 2x) - 1', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.ContainsSomeOf(
-      '((3*x-1))^(4)', {x: inputString})).toBeFalse();
+      '((3*x-1))^4', {x: inputString})).toBeFalse();
   });
 
   it('should have a correct OmitsSomeOf rule', () => {
@@ -303,7 +349,7 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.OmitsSomeOf(
       '4*y', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.OmitsSomeOf(
-      '(x^2)/z - x/z - 4y', {x: inputString})).toBeTrue();
+      '((x)^(2))/(z) - x/(z) - 4y', {x: inputString})).toBeTrue();
 
     expect(algebraicRulesService.OmitsSomeOf(
       '((x)^(2)-x)/(z)-4*y', {x: inputString})).toBeFalse();
@@ -328,11 +374,11 @@ describe('Algebraic expression input rules service', () => {
     inputString = 'x^(2t+3) + x^4';
 
     expect(algebraicRulesService.OmitsSomeOf(
-      '(x)^(2*t+3)', {x: inputString})).toBeTrue();
+      'x^(2*t+3)', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.OmitsSomeOf(
-      '(x)^(4)', {x: inputString})).toBeTrue();
+      'x^4', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.OmitsSomeOf(
-      '(x^2)^2', {x: inputString})).toBeTrue();
+      '((x)^(2))^2', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.OmitsSomeOf(
       '(x^(2t))*x^3', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.OmitsSomeOf(
@@ -344,19 +390,19 @@ describe('Algebraic expression input rules service', () => {
       'x^(2t+4-1) + x^(8-4)', {x: inputString})).toBeFalse();
 
 
-    inputString = '9x^2 - 6x + 1';
+    inputString = '9(x)^(2) - 6x + 1';
 
     expect(algebraicRulesService.OmitsSomeOf(
-      '9x^2 - 6x', {x: inputString})).toBeTrue();
+      '9(x)^(2) - 6x', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.OmitsSomeOf(
-      '9x^2 + 1', {x: inputString})).toBeTrue();
+      '9(x)^(2) + 1', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.OmitsSomeOf(
       '- 6x + 1', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.OmitsSomeOf(
-      '9x^2 - 6x - 1', {x: inputString})).toBeTrue();
+      '9(x)^(2) - 6x - 1', {x: inputString})).toBeTrue();
 
     expect(algebraicRulesService.OmitsSomeOf(
-      '9x^2 - 6x + 1', {x: inputString})).toBeFalse();
+      '9(x)^(2) - 6x + 1', {x: inputString})).toBeFalse();
   });
 
   it('should have a correct MatchesWithGeneralForm rule', () => {

@@ -29,10 +29,10 @@ export interface ViewContributionBackendResponse {
 }
 
 export interface ContributionRightsBackendResponse {
-  'can_review_questions': boolean,
-  'can_review_translation_for_language_codes': string[],
-  'can_review_voiceover_for_language_codes': string[],
-  'can_submit_questions': boolean
+  'can_review_questions': boolean;
+  'can_review_translation_for_language_codes': string[];
+  'can_review_voiceover_for_language_codes': string[];
+  'can_submit_questions': boolean;
 }
 
 export interface TranslationContributionStatsBackendResponse {
@@ -40,16 +40,16 @@ export interface TranslationContributionStatsBackendResponse {
 }
 
 interface TranslationContributionStats {
-  'language': string,
-  'topic_name': string,
-  'submitted_translations_count': number,
-  'submitted_translation_word_count': number,
-  'accepted_translations_count': number,
-  'accepted_translations_without_reviewer_edits_count': number,
-  'accepted_translation_word_count': number,
-  'rejected_translations_count': number,
-  'rejected_translation_word_count': number,
-  'contribution_months': string[]
+  'language': string;
+  'topic_name': string;
+  'submitted_translations_count': number;
+  'submitted_translation_word_count': number;
+  'accepted_translations_count': number;
+  'accepted_translations_without_reviewer_edits_count': number;
+  'accepted_translation_word_count': number;
+  'rejected_translations_count': number;
+  'rejected_translation_word_count': number;
+  'contribution_months': string[];
 }
 
 @Injectable({
@@ -61,7 +61,7 @@ export class ContributorDashboardAdminBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
 
   async addContributionReviewerAsync(
-      category: string, username: string, languageCode: string
+      category: string, username: string, languageCode: string | null
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
@@ -79,7 +79,7 @@ export class ContributorDashboardAdminBackendApiService {
   }
 
   async viewContributionReviewersAsync(
-      category: string, languageCode: string
+      category: string, languageCode: string | null
   ): Promise<ViewContributionBackendResponse> {
     let params = {};
     if (languageCode !== null) {
@@ -119,13 +119,19 @@ export class ContributorDashboardAdminBackendApiService {
   }
 
   async removeContributionReviewerAsync(
-      username: string, category: string, languageCode: string): Promise<void> {
-    var url = this.urlInterpolationService.interpolateUrl(
+      username: string, category: string, languageCode: string | null
+  ): Promise<void> {
+    const url = this.urlInterpolationService.interpolateUrl(
       PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, { category });
-    var params = {
-      username: username,
-      language_code: languageCode
+    const params: {
+      username: string;
+      language_code?: string;
+    } = {
+      username: username
     };
+    if (languageCode !== null) {
+      params.language_code = languageCode;
+    }
     return new Promise((resolve, reject) => {
       this.http.delete<void>(url, {
         params

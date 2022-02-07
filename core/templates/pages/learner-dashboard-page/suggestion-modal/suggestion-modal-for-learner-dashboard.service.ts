@@ -22,9 +22,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-suggestion-modal.component';
 interface ExtraParams {
-  'newContent': string,
-  'oldContent': string,
-  'description': string
+  'newContent': string;
+  'oldContent': string;
+  'description': string;
 }
 
 @Injectable({

@@ -196,7 +196,13 @@ class JobTestBase(PipelinedTestBase):
         Returns:
             PCollection. The output of the job.
         """
-        return self.job.run()
+        job_results = self.job.run()
+        # NDB operations in Beam do not properly update the context cache
+        # (this cache is separate for every application thread), thus we clear
+        # it ourselves.
+        with datastore_services.get_ndb_context() as ndb_context:
+            ndb_context.clear_cache()
+        return job_results
 
     def put_multi(self, model_list: Sequence[base_models.BaseModel]) -> None:
         """Puts the input models into the datastore.

@@ -341,9 +341,10 @@ describe('Library Page Component', () => {
       expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
       expect(userService.getUserInfoAsync).toHaveBeenCalled();
       expect(loggerService.error).toHaveBeenCalledWith(
-        'The actual width of tile is different than the ' +
-        'expected width. Actual size: ' + actualWidth +
-        ', Expected size: ' + AppConstants.LIBRARY_TILE_WIDTH_PX
+        'The actual width of tile is different than either of the ' +
+        'expected widths. Actual size: ' + actualWidth +
+        ', Expected sizes: ' + AppConstants.LIBRARY_TILE_WIDTH_PX +
+        '/' + AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX
       );
     }));
 
@@ -380,6 +381,65 @@ describe('Library Page Component', () => {
     expect(userService.getUserInfoAsync).toHaveBeenCalled();
     expect(loggerService.error).toHaveBeenCalled();
   }));
+
+  it('should not initiate carousels if in mobile view', () => {
+    componentInstance.libraryWindowIsNarrow = true;
+    componentInstance.initCarousels();
+    expect(componentInstance.leftmostCardIndices.length).toEqual(0);
+  });
+
+  it('should toggle the correct button\'s text when clicked', () => {
+    componentInstance.mobileLibraryGroupsProperties = [
+      {
+        inCollapsedState: true,
+        buttonText: 'See More'
+      },
+      {
+        inCollapsedState: false,
+        buttonText: 'Collapse Section'
+      }
+    ];
+    componentInstance.toggleButtonText(0);
+
+    // Correct button text should be toggled.
+    expect(componentInstance.mobileLibraryGroupsProperties[0].buttonText)
+      .toBe('Collapse Section');
+    // Other button's text should remain unchanged.
+    expect(componentInstance.mobileLibraryGroupsProperties[1].buttonText)
+      .toBe('Collapse Section');
+
+    componentInstance.toggleButtonText(1);
+
+    expect(componentInstance.mobileLibraryGroupsProperties[1].buttonText)
+      .toBe('See More');
+    expect(componentInstance.mobileLibraryGroupsProperties[0].buttonText)
+      .toBe('Collapse Section');
+  });
+
+  it('should toggle the corresponding container\'s max-height' +
+    'and toggle the corresponding button\'s text', () => {
+    let buttonTextToggleSpy = spyOn(componentInstance, 'toggleButtonText');
+    componentInstance.mobileLibraryGroupsProperties = [
+      {
+        inCollapsedState: true,
+        buttonText: 'See More'
+      },
+      {
+        inCollapsedState: false,
+        buttonText: 'Collapse Section'
+      }
+    ];
+
+    componentInstance.toggleCardContainerHeightInMobileView(0);
+
+    // Correct container's height should be toggled.
+    expect(componentInstance.mobileLibraryGroupsProperties[0].inCollapsedState)
+      .toBe(false);
+    // Other container's height should remain unchanged.
+    expect(componentInstance.mobileLibraryGroupsProperties[1].inCollapsedState)
+      .toBe(false);
+    expect(buttonTextToggleSpy).toHaveBeenCalledWith(0);
+  });
 
   it('should show full results page when full results url is available',
     () => {
@@ -499,10 +559,10 @@ describe('Library Page Component', () => {
 
     spyOn(window, '$').and.returnValue({
       animate: (options, arg2: {
-        duration: number,
-        queue: boolean,
-        start: () => void,
-        complete: () => void
+        duration: number;
+        queue: boolean;
+        start: () => void;
+        complete: () => void;
       }) => {
         arg2.start();
         arg2.complete();
@@ -556,10 +616,10 @@ describe('Library Page Component', () => {
 
     spyOn(window, '$').and.returnValue({
       animate: (options, arg2: {
-        duration: number,
-        queue: boolean,
-        start: () => void,
-        complete: () => void
+        duration: number;
+        queue: boolean;
+        start: () => void;
+        complete: () => void;
       }) => {
         arg2.start();
         arg2.complete();

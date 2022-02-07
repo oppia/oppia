@@ -21,25 +21,25 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Question } from 'domain/question/QuestionObjectFactory';
 
-interface UsedHint {
-  timestamp: number
+interface UsedHintOrSolution {
+  timestamp: number;
 }
 
 interface Answer {
   isCorrect: boolean;
   timestamp: number;
-  taggedSkillMisconceptionId: string
+  taggedSkillMisconceptionId: string;
 }
 
+// Viewed solution being undefined signifies that the solution
+// has not yet been viewed.
 interface QuestionPlayerState {
   [key: string]: {
-    linkedSkillIds: string[],
-    answers: Answer[],
-    usedHints: UsedHint[],
-    viewedSolution: {
-      timestamp: number
-    }
-  }
+    linkedSkillIds: string[];
+    answers: Answer[];
+    usedHints: UsedHintOrSolution[];
+    viewedSolution: UsedHintOrSolution | undefined;
+  };
 }
 
 @Injectable({
@@ -47,7 +47,8 @@ interface QuestionPlayerState {
 })
 export class QuestionPlayerStateService {
   questionPlayerState: QuestionPlayerState = {};
-  private _questionSessionCompletedEventEmitter = new EventEmitter<void>();
+  private _questionSessionCompletedEventEmitter = new EventEmitter<object>();
+  private _resultsPageIsLoadedEventEmitter = new EventEmitter<boolean>();
 
   private _getCurrentTime(): number {
     return new Date().getTime();
@@ -61,23 +62,23 @@ export class QuestionPlayerStateService {
       linkedSkillIds: linkedSkillIds,
       answers: [],
       usedHints: [],
-      viewedSolution: null
+      viewedSolution: undefined
     };
   }
 
   hintUsed(question: Question): void {
-    let questionId = question.getId();
+    let questionId = question.getId() as string;
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
     }
-    this.questionPlayerState[questionId].usedHints.push(
-      {timestamp: this._getCurrentTime()}
-    );
+    this.questionPlayerState[questionId].usedHints.push({
+      timestamp: this._getCurrentTime()
+    });
   }
 
   solutionViewed(question: Question): void {
-    let questionId = question.getId();
+    let questionId = question.getId() as string;
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
@@ -91,7 +92,7 @@ export class QuestionPlayerStateService {
       question: Question,
       isCorrect: boolean,
       taggedSkillMisconceptionId: string): void {
-    let questionId = question.getId();
+    let questionId = question.getId() as string;
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
@@ -114,8 +115,12 @@ export class QuestionPlayerStateService {
     return this.questionPlayerState;
   }
 
-  get onQuestionSessionCompleted(): EventEmitter<void> {
+  get onQuestionSessionCompleted(): EventEmitter<object> {
     return this._questionSessionCompletedEventEmitter;
+  }
+
+  get resultsPageIsLoadedEventEmitter(): EventEmitter<boolean> {
+    return this._resultsPageIsLoadedEventEmitter;
   }
 }
 

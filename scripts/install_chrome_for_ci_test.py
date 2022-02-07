@@ -16,9 +16,9 @@
 
 from __future__ import annotations
 
+import builtins
 import subprocess
 
-from core import python_utils
 from core.tests import test_utils
 from scripts import common
 from scripts import install_chrome_for_ci
@@ -67,7 +67,7 @@ class InstallChromeTests(test_utils.GenericTestBase):
             ])
 
         with run_cmd_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 subprocess.CalledProcessError,
                 'Command \'sudo apt-get update\' returned non-zero exit '
                 'status 1'
@@ -103,7 +103,7 @@ class GetChromeVersionTests(test_utils.GenericTestBase):
             ])
 
         with run_cmd_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 subprocess.CalledProcessError,
                 'Command \'google-chrome --version\' returned non-zero exit '
                 'status 1'
@@ -134,7 +134,7 @@ class MainTests(test_utils.GenericTestBase):
             mock_get_chrome_version,
             expected_args=[tuple()])
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', mock_print,
+            builtins, 'print', mock_print,
             expected_args=[
                 (
                     'Chrome version {} installed.'.format(
@@ -165,7 +165,7 @@ class MainTests(test_utils.GenericTestBase):
             expected_args=[tuple()])
 
         with install_chrome_swap, get_version_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 RuntimeError, (
                     'Chrome version {} should have been installed. '
                     'Version 123.0.12.45 was found instead.'

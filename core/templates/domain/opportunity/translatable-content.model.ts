@@ -17,11 +17,11 @@
  */
 
 export interface TranslatableItemBackendDict {
-  'content': string | string[],
-  'data_format': string,
-  'content_type': string,
-  'interaction_id': string | null,
-  'rule_type': string | null
+  'content': string | string[];
+  'data_format': string;
+  'content_type': string;
+  'interaction_id': string | null;
+  'rule_type': string | null;
 }
 
 export class TranslatableItem {

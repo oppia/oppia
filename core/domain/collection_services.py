@@ -30,7 +30,6 @@ import logging
 import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import activity_services
@@ -579,7 +578,7 @@ def get_collection_ids_matching_query(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        offset: str or None. Offset indicating where, in the list of
+        offset: int or None. Offset indicating where, in the list of
             collections, to start the search from.
 
     Returns:
@@ -590,7 +589,7 @@ def get_collection_ids_matching_query(
                 feconf.SEARCH_RESULTS_PAGE_SIZE results if there are at least
                 that many, otherwise it contains all remaining results. (If this
                 behaviour does not occur, an error will be logged.)
-            search_offset: str. Search offset for future fetches.
+            search_offset: int. Search offset for future fetches.
     """
     returned_collection_ids = []
     search_offset = offset
@@ -760,7 +759,8 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             'Unexpected error: trying to update version %s of collection '
             'from version %s. Please reload the page and try again.'
             % (collection_model.version, collection.version))
-    elif collection.version < collection_model.version:
+
+    if collection.version < collection_model.version:
         raise Exception(
             'Trying to update version %s of collection from version %s, '
             'which is too old. Please reload the page and try again.'
@@ -1071,8 +1071,7 @@ def compute_collection_contributors_summary(collection_id):
     contributor_ids = list(contributors_summary)
     # Remove IDs that are deleted or do not exist.
     users_settings = user_services.get_users_settings(contributor_ids)
-    for contributor_id, user_settings in python_utils.ZIP(
-            contributor_ids, users_settings):
+    for contributor_id, user_settings in zip(contributor_ids, users_settings):
         if user_settings is None:
             del contributors_summary[contributor_id]
 

@@ -28,13 +28,13 @@ export class SelectTopicsComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() topicSummaries!:
-    { id: string, name: string, isSelected: boolean }[];
+    { id: string; name: string; isSelected: boolean }[];
   @Input() selectedTopicIds!: string[];
   @Output() selectedTopicIdsChange: EventEmitter<string[]> = (
     new EventEmitter());
   topicsSelected: string[] = [];
   topicFilterText: string = '';
-  filteredTopics: { id: string, name: string, isSelected: boolean }[] = [];
+  filteredTopics: { id: string; name: string; isSelected: boolean }[] = [];
 
   selectOrDeselectTopic(topicId: string): void {
     let topic = this.topicSummaries.find(
@@ -59,7 +59,7 @@ export class SelectTopicsComponent {
   }
 
   searchInTopics(searchText: string):
-  { id: string, name: string, isSelected: boolean }[] {
+  { id: string; name: string; isSelected: boolean }[] {
     this.filteredTopics = this.topicSummaries.filter(
       topic => topic.name.toLowerCase().indexOf(
         searchText.toLowerCase()) !== -1);

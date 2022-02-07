@@ -1,4 +1,4 @@
-<div class="oppia-attribution-guide">
+<div class="oppia-attribution-guide" *ngIf="!checkMobileView()">
   <div [ngStyle]="isLanguageRTL() ? {'left': '25px'} : {'right': '25px'}" class="oppia-cc-icon oppia-transition-200" *ngIf="!deviceUsedIsMobile && !iframed">
     <div class="oppia-neutral-element protractor-test-neutral-element"></div>
 
@@ -128,7 +128,7 @@
   }
 
   .oppia-attribution-guide .attribution-modal {
-    background-color: #FFF;
+    background-color: #fff;
     -moz-box-shadow: 0 3px 5px 1px #ccc;
     -webkit-box-shadow: 0 3px 5px 1px #ccc;
     box-shadow: 0 3px 5px 1px #ccc;
@@ -188,7 +188,7 @@
   }
 
   .oppia-attribution-guide .attribution-copy-button {
-    background: #0D48A1;
+    background: #0d48a1;
     border: none;
     border-radius: 3px;
     color: #fff;

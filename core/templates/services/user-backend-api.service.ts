@@ -59,7 +59,7 @@ export type PreferencesBackendDict = (
 );
 
 export interface UpdatePreferencesResponse {
-  'bulk_email_signup_message_should_be_shown': boolean
+  'bulk_email_signup_message_should_be_shown': boolean;
 }
 
 interface LoginUrlResponseDict {

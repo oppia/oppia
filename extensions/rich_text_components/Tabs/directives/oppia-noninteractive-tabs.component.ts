@@ -39,7 +39,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
 export interface TabContent {
-  title: string,
+  title: string;
   content: string;
 }
 

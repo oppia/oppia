@@ -25,9 +25,9 @@ import { IdGenerationService } from 'services/id-generation.service';
 
 interface ImageTypeMapping {
   [key: string]: {
-    format: string,
-    fileExtension: RegExp
-  }
+    format: string;
+    fileExtension: RegExp;
+  };
 }
 
 @Component({

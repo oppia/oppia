@@ -29,9 +29,9 @@ interface HistoryTabResposne {
 }
 
 interface HistoryTabPostData{
-  revertExplorationUrl: string,
-  currentVersion: number,
-  revertToVersion: number
+  revertExplorationUrl: string;
+  currentVersion: number;
+  revertToVersion: number;
 }
 
 @Injectable({

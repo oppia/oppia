@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import builtins
 import os
 import subprocess
 import sys
@@ -67,7 +68,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             python_utils, 'open_file', mock_open_file
         )
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call
         )
@@ -107,7 +108,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             'end_of_record\n'
         )
         with self.open_file_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception,
                 'The test path is empty or null. '
                 'It\'s not possible to diff the test coverage correctly.',
@@ -122,7 +123,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             'end_of_record\n'
         )
         with self.open_file_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception,
                 'It wasn\'t possible to get the total lines of file.ts file.'
                 'It\'s not possible to diff the test coverage correctly.',
@@ -137,7 +138,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             'end_of_record\n'
         )
         with self.open_file_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception,
                 'It wasn\'t possible to get the covered lines of file.ts file.'
                 'It\'s not possible to diff the test coverage correctly.',
@@ -181,7 +182,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         with exists_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception,
                 'Expected lcov file to be'
                 r' available at [A-Za-z\._/]+, but the file does not exist.',
@@ -205,7 +206,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
             with not_fully_covered_files_swap, self.capture_logging() as logs:
-                with self.assertRaisesRegexp(SystemExit, '1'):
+                with self.assertRaisesRegex(SystemExit, '1'):
                     check_frontend_test_coverage.check_coverage_changes()
                 self.assertEqual(
                     logs,
@@ -230,7 +231,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
             with not_fully_covered_files_swap, self.capture_logging() as logs:
-                with self.assertRaisesRegexp(SystemExit, '1'):
+                with self.assertRaisesRegex(SystemExit, '1'):
                     check_frontend_test_coverage.check_coverage_changes()
                 self.assertEqual(
                     logs,
@@ -261,7 +262,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
             with not_fully_covered_files_swap, self.capture_logging() as logs:
-                with self.assertRaisesRegexp(SystemExit, '1'):
+                with self.assertRaisesRegex(SystemExit, '1'):
                     check_frontend_test_coverage.check_coverage_changes()
                 self.assertEqual(
                     logs,
@@ -334,7 +335,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
             with not_fully_covered_files_swap, self.capture_logging() as logs:
-                with self.assertRaisesRegexp(SystemExit, '1'):
+                with self.assertRaisesRegex(SystemExit, '1'):
                     (
                         check_frontend_test_coverage
                         .check_not_fully_covered_filenames_list_is_sorted()

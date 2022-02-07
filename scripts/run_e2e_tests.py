@@ -22,7 +22,6 @@ import os
 import subprocess
 import sys
 
-from core import python_utils
 from core.constants import constants
 from scripts import build
 from scripts import common
@@ -95,7 +94,6 @@ _PARSER.add_argument(
     help='Build webpack with source maps.',
     action='store_true')
 
-
 # Never rerun failing tests, even when they match a known flake.
 RERUN_POLICY_NEVER = 'never'
 # Only rerun failing tests when they match a known flake.
@@ -159,7 +157,7 @@ def is_oppia_server_already_running():
     """
     for port in PORTS_USED_BY_OPPIA_PROCESSES:
         if common.is_port_in_use(port):
-            python_utils.PRINT(
+            print(
                 'There is already a server running on localhost:%s. '
                 'Please terminate it before running the end-to-end tests. '
                 'Exiting.' % port)
@@ -183,14 +181,14 @@ def run_webpack_compilation(source_maps=False):
             with managed_webpack_compiler as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:
-            python_utils.PRINT(error.output)
+            print(error.output)
             sys.exit(error.returncode)
             return
         if os.path.isdir(webpack_bundles_dir_name):
             break
     else:
         # We didn't break out of the loop, meaning all attempts have failed.
-        python_utils.PRINT('Failed to complete webpack compilation, exiting...')
+        print('Failed to complete webpack compilation, exiting...')
         sys.exit(1)
 
 
@@ -214,7 +212,7 @@ def build_js_files(dev_mode, source_maps=False):
             building webpack.
     """
     if not dev_mode:
-        python_utils.PRINT('Generating files for production mode...')
+        print('Generating files for production mode...')
 
         build_args = ['--prod_env']
         if source_maps:
@@ -273,7 +271,7 @@ def run_tests(args):
             sharding_instances=args.sharding_instances,
             stdout=subprocess.PIPE))
 
-        python_utils.PRINT(
+        print(
             'Servers have come up.\n'
             'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
             'core/tests/protractor.conf.js, you can view screenshots of the '
@@ -288,7 +286,7 @@ def run_tests(args):
                     # Although our unit tests always provide unicode strings,
                     # the actual server needs this failsafe since it can output
                     # non-unicode strings.
-                    line = line.encode('utf-8')  # pragma: nocover
+                    line = line.encode('utf-8')  # pragma: no cover
                 output_lines.append(line.rstrip())
                 # Replaces non-ASCII characters with '?'.
                 common.write_stdout_safe(line.decode('ascii', errors='replace'))
@@ -307,12 +305,12 @@ def main(args=None):
 
     with servers.managed_portserver():
         for attempt_num in range(1, MAX_RETRY_COUNT + 1):
-            python_utils.PRINT('***Attempt %d.***' % attempt_num)
+            print('***Attempt %d.***' % attempt_num)
             output, return_code = run_tests(parsed_args)
 
             if not flake_checker.check_if_on_ci():
                 # Don't rerun off of CI.
-                python_utils.PRINT('No reruns because not running on CI.')
+                print('No reruns because not running on CI.')
                 break
 
             if return_code == 0:
@@ -320,21 +318,34 @@ def main(args=None):
                 flake_checker.report_pass(parsed_args.suite)
                 break
 
-            # Check whether we should rerun based on this suite's policy.
-            test_is_flaky = flake_checker.is_test_output_flaky(
+            # Check whether we should rerun based on this suite's policy
+            # and override instructions from the flake checker server.
+            test_is_flaky, rerun_override = flake_checker.is_test_output_flaky(
                 output, parsed_args.suite)
-            if policy == RERUN_POLICY_NEVER:
-                python_utils.PRINT(
+            if rerun_override == flake_checker.RERUN_YES:
+                print(
+                    'Rerunning as per instructions from logging '
+                    'server.')
+            elif rerun_override == flake_checker.RERUN_NO:
+                print(
+                    'Not rerunning as per instructions from '
+                    'logging server.')
+                break
+            # No rerun override, so follow rerun policies.
+            elif policy == RERUN_POLICY_NEVER:
+                print(
                     'Not rerunning because the policy is to never '
                     'rerun the {} suite'.format(parsed_args.suite))
                 break
-            if policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
-                python_utils.PRINT((
+            elif policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
+                print((
                     'Not rerunning because the policy is to only '
                     'rerun the %s suite on known flakes, and this '
                     'failure did not match any known flakes')
                     % parsed_args.suite)
                 break
+            # Else rerun policy is either always or we had a known flake
+            # with a known flakes rerun policy, so rerun.
 
     sys.exit(return_code)
 

@@ -26,16 +26,14 @@ from core.platform import models
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
 
-DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
-
 
 class Registry:
     """Registry of all platform parameters."""
 
     DEFAULT_VALUE_BY_TYPE_DICT = {
-        DATA_TYPES.bool: False,
-        DATA_TYPES.number: 0,
-        DATA_TYPES.string: '',
+        platform_parameter_domain.DataTypes.BOOL: False,
+        platform_parameter_domain.DataTypes.NUMBER: 0,
+        platform_parameter_domain.DataTypes.STRING: '',
     }
 
     # The keys of parameter_registry are the property names, and the values
@@ -52,10 +50,10 @@ class Registry:
         Args:
             name: Enum(PARAMS). The name of the platform parameter.
             description: str. The description of the platform parameter.
-            data_type: Enum(DATA_TYPES). The data type of the platform
+            data_type: Enum(DataTypes). The data type of the platform
                 parameter, must be one of the following: bool, number, string.
             is_feature: bool. True if the platform parameter is a feature flag.
-            feature_stage: Enum(FEATURE_STAGES)|None. The stage of the feature,
+            feature_stage: Enum(FeatureStages)|None. The stage of the feature,
                 required if 'is_feature' is True.
 
         Returns:
@@ -94,13 +92,13 @@ class Registry:
         Args:
             name: Enum(PARAMS). The name of the platform parameter.
             description: str. The description of the platform parameter.
-            stage: Enum(FEATURE_STAGES). The stage of the feature.
+            stage: Enum(FeatureStages). The stage of the feature.
 
         Returns:
             PlatformParameter. The created feature flag.
         """
         return cls.create_platform_parameter(
-            name, description, DATA_TYPES.bool,
+            name, description, platform_parameter_domain.DataTypes.BOOL,
             is_feature=True, feature_stage=stage)
 
     @classmethod
@@ -150,31 +148,29 @@ class Registry:
 
     @classmethod
     def update_platform_parameter(
-            cls, name, committer_id, commit_message, new_rule_dicts):
+        cls, name, committer_id, commit_message, new_rules
+    ):
         """Updates the platform parameter with new rules.
 
         Args:
             name: str. The name of the platform parameter to update.
             committer_id: str. ID of the committer.
             commit_message: str. The commit message.
-            new_rule_dicts: list(dist). A list of dict mappings of all fields
-                of PlatformParameterRule object.
+            new_rules: list(PlatformParameterRule). A list of
+                PlatformParameterRule objects.
         """
         param = cls.get_platform_parameter(name)
 
         # Create a temporary param instance with new rules for validation,
         # if the new rules are invalid, an exception will be raised in
         # validate() method.
+        new_rule_dicts = [rules.to_dict() for rules in new_rules]
         param_dict = param.to_dict()
         param_dict['rules'] = new_rule_dicts
         updated_param = param.from_dict(param_dict)
         updated_param.validate()
 
         model_instance = cls._to_platform_parameter_model(param)
-
-        new_rules = [
-            platform_parameter_domain.PlatformParameterRule.from_dict(rule_dict)
-            for rule_dict in new_rule_dicts]
         param.set_rules(new_rules)
 
         model_instance.rules = [rule.to_dict() for rule in param.rules]

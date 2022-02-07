@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import builtins
 import os
 import shutil
 import subprocess
@@ -80,7 +81,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_check_call)
         self.Popen_error_swap = self.swap(
             subprocess, 'Popen', mock_popen_error_call)
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
         def mock_ensure_directory_exists(unused_path):
             pass
@@ -277,7 +278,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         with os_name_swap, url_retrieve_swap:
             with self.dir_exists_swap, isfile_swap, zipfile_swap:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     Exception, 'Error installing protoc binary'):
                     install_third_party_libs.install_buf_and_protoc()
 
@@ -292,27 +293,47 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
     def test_proto_file_compilation_raises_exception_on_compile_errors(self):
         with self.Popen_error_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception, 'Error compiling proto files at mock_path'):
                 install_third_party_libs.compile_protobuf_files(['mock_path'])
 
-    def test_ensure_pip_library_is_installed(self):
-        check_function_calls = {
-            'pip_install_is_called': False
-        }
-        def mock_exists(unused_path):
-            return False
-        def mock_pip_install(unused_versioned_package, unused_path):
-            check_function_calls['pip_install_is_called'] = True
-
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        pip_install_swap = self.swap(
-            install_backend_python_libs, 'pip_install', mock_pip_install)
+    def test_ensure_pip_library_is_installed_with_regular_package(self):
+        exists_swap = self.swap_with_checks(
+            os.path,
+            'exists',
+            lambda _: False,
+            expected_args=[('path/package-1.1.0',)]
+        )
+        pip_install_swap = self.swap_with_checks(
+            install_backend_python_libs,
+            'pip_install',
+            lambda _, __: None,
+            expected_args=[('package==1.1.0', 'path/package-1.1.0')]
+        )
 
         with exists_swap, pip_install_swap:
             install_third_party_libs.ensure_pip_library_is_installed(
-                'package', 'version', 'path')
-        self.assertTrue(check_function_calls['pip_install_is_called'])
+                'package', '1.1.0', 'path')
+
+    def test_ensure_pip_library_is_installed_with_git_repo_package(self):
+        exists_swap = self.swap_with_checks(
+            os.path,
+            'exists',
+            lambda _: False,
+            expected_args=[('path/package-1.1.0',)]
+        )
+        pip_install_swap = self.swap_with_checks(
+            install_backend_python_libs,
+            'pip_install',
+            lambda _, __: None,
+            expected_args=[(
+                'git+https://aaa.com/package.git@1.1.0', 'path/package-1.1.0'
+            )]
+        )
+
+        with exists_swap, pip_install_swap:
+            install_third_party_libs.ensure_pip_library_is_installed(
+                'git+https://aaa.com/package.git', '1.1.0', 'path')
 
     def test_function_calls(self):
         check_function_calls = {

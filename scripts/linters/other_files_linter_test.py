@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import io
 import multiprocessing
 import os
 
@@ -41,12 +42,12 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     def setUp(self):
         super(CustomLintChecksManagerTests, self).setUp()
         self.verbose_mode_enabled = False
-        self.dependencies_file = python_utils.string_io(
-            buffer_value='{\"dependencies\":{\"frontend\":{\"guppy\":'
+        self.dependencies_file = io.StringIO(
+            '{\"dependencies\":{\"frontend\":{\"guppy\":'
             '{\"version\": \"0.1\"},\"skulpt-dist\":{\"version\": \"0.2\"}'
             ',\"midiJs\":{\"version\": \"0.4\"}}}}')
-        self.package_file = python_utils.string_io(
-            buffer_value='{\"dependencies\":{\"nerdamer\":\"^0.6\"}}')
+        self.package_file = io.StringIO(
+            '{\"dependencies\":{\"nerdamer\":\"^0.6\"}}')
         self.files_in_typings_dir = [
             'guppy-defs-0.1.d.ts',
             'skulpt-defs-0.2.d.ts',

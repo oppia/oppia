@@ -39,6 +39,20 @@ class ActivityListModelTest(test_utils.GenericTestBase):
             activity_models.ActivityReferencesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            activity_models.ActivityReferencesModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        sample_dict = base_models.BaseModel.get_export_policy()
+        sample_dict.update(
+            {'activity_references': base_models.EXPORT_POLICY.NOT_APPLICABLE})
+        self.assertEqual(
+            activity_models.ActivityReferencesModel.get_export_policy(),
+            sample_dict)
+
     def test_featured_activity_list_always_exists(self) -> None:
         featured_model_instance = (
             activity_models.ActivityReferencesModel.get_or_create('featured'))
@@ -47,7 +61,7 @@ class ActivityListModelTest(test_utils.GenericTestBase):
         self.assertEqual(featured_model_instance.activity_references, [])
 
     def test_retrieving_non_existent_list(self) -> None:
-        with self.assertRaisesRegexp(Exception, 'Invalid ActivityListModel'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid ActivityListModel'): # type: ignore[no-untyped-call]
             activity_models.ActivityReferencesModel.get_or_create(
                 'nonexistent_key')
 

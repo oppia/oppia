@@ -35,15 +35,14 @@ import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { MatButtonModule } from '@angular/material/button';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
-import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
-import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
 import { InformationCardModalComponent } from './templates/information-card-modal.component';
 import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   imports: [
@@ -61,23 +60,21 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
   ],
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
-    LearnerAnswerInfoCard,
+    ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
-    FeedbackPopupComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
     SwitchContentLanguageRefreshRequiredModalComponent,
+    ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
-    FeedbackPopupComponent,
-    LearnerAnswerInfoCard,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
@@ -106,7 +103,7 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { ToastrModule } from 'ngx-toastr';
+import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

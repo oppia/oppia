@@ -23,6 +23,13 @@ import { GuppyInitializationService, GuppyObject } from 'services/guppy-initiali
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveMathEquationInput } from './oppia-interactive-math-equation-input.component';
+import { TranslateService } from '@ngx-translate/core';
+
+class MockTranslateService {
+  instant(key: string): string {
+    return key;
+  }
+}
 
 describe('MathEquationInputInteractive', () => {
   let component: InteractiveMathEquationInput;
@@ -70,6 +77,10 @@ describe('MathEquationInputInteractive', () => {
           {
             provide: CurrentInteractionService,
             useClass: MockCurrentInteractionService
+          },
+          {
+            provide: TranslateService,
+            useClass: MockTranslateService
           }
         ]
       }).compileComponents();
@@ -109,7 +120,7 @@ describe('MathEquationInputInteractive', () => {
   it('should submit the answer if valid', function() {
     component.hasBeenTouched = true;
     // Invalid answer.
-    component.value = '(x + y) = 3';
+    component.value = 'x + y = 3';
 
     spyOn(guppyInitializationService, 'getCustomOskLetters').and.returnValue(
       ['x', 'y']);

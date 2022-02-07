@@ -35,7 +35,6 @@ import zipfile
 
 from core import android_validation_constants
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import activity_services
@@ -151,12 +150,20 @@ def get_exploration_ids_matching_query(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        offset: str or None. Optional offset from which to start the search
+        offset: int or None. Optional offset from which to start the search
             query. If no offset is supplied, the first N results matching
             the query are returned.
 
     Returns:
-        list(str). A list of exploration ids matching the given search query.
+        2-tuple of (returned_exploration_ids, search_offset). Where:
+            returned_exploration_ids : list(str). A list with all
+                exploration ids matching the given search query string,
+                as well as a search offset for future fetches.
+                The list contains exactly feconf.SEARCH_RESULTS_PAGE_SIZE
+                results if there are at least that many, otherwise it
+                contains all remaining results. (If this behaviour does
+                not occur, an error will be logged.)
+            search_offset: int. Search offset for future fetches.
     """
     returned_exploration_ids = []
     search_offset = offset
@@ -337,8 +344,10 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
         exploration_id, version=version)
     exploration_dict = {}
     for state in exploration.states:
-        exploration_dict[state] = python_utils.yaml_from_dict(
-            exploration.states[state].to_dict(), width=width)
+        exploration_dict[state] = utils.yaml_from_dict(
+            exploration.states[state].to_dict(),
+            width=width
+        )
     return exploration_dict
 
 
@@ -602,7 +611,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             'Unexpected error: trying to update version %s of exploration '
             'from version %s. Please reload the page and try again.'
             % (exploration_model.version, exploration.version))
-    elif exploration.version < exploration_model.version:
+
+    if exploration.version < exploration_model.version:
         raise Exception(
             'Trying to update version %s of exploration from version %s, '
             'which is too old. Please reload the page and try again.'
@@ -1223,8 +1233,7 @@ def _compute_summary_of_exploration(exploration):
     contributor_ids = list(contributors_summary.keys())
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        python_utils.divide(
-            get_last_updated_by_human_ms(exploration.id), 1000.0))
+        get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
@@ -1275,8 +1284,7 @@ def compute_exploration_contributors_summary(exploration_id):
     contributor_ids = list(contributors_summary)
     # Remove IDs that are deleted or do not exist.
     users_settings = user_services.get_users_settings(contributor_ids)
-    for contributor_id, user_settings in python_utils.ZIP(
-            contributor_ids, users_settings):
+    for contributor_id, user_settings in zip(contributor_ids, users_settings):
         if user_settings is None:
             del contributors_summary[contributor_id]
 
@@ -1372,7 +1380,8 @@ def revert_exploration(
             'Unexpected error: trying to update version %s of exploration '
             'from version %s. Please reload the page and try again.'
             % (exploration_model.version, current_version))
-    elif current_version < exploration_model.version:
+
+    if current_version < exploration_model.version:
         raise Exception(
             'Trying to update version %s of exploration from version %s, '
             'which is too old. Please reload the page and try again.'
@@ -1655,7 +1664,7 @@ def get_average_rating(ratings):
 
         for rating_value, rating_count in ratings.items():
             rating_sum += rating_weightings[rating_value] * rating_count
-        return python_utils.divide(rating_sum, (number_of_ratings * 1.0))
+        return rating_sum / number_of_ratings
 
 
 def get_scaled_average_rating(ratings):
@@ -1675,15 +1684,12 @@ def get_scaled_average_rating(ratings):
         return 0
     average_rating = get_average_rating(ratings)
     z = 1.9599639715843482
-    x = python_utils.divide((average_rating - 1), 4)
+    x = (average_rating - 1) / 4
     # The following calculates the lower bound Wilson Score as documented
     # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
-    a = x + python_utils.divide((z**2), (2 * n))
-    b = z * math.sqrt(
-        python_utils.divide((x * (1 - x)), n) + python_utils.divide(
-            (z**2), (4 * n**2)))
-    wilson_score_lower_bound = python_utils.divide(
-        (a - b), (1 + python_utils.divide(z**2, n)))
+    a = x + ((z**2) / (2 * n))
+    b = z * math.sqrt(((x * (1 - x)) / n) + ((z**2) / (4 * n**2)))
+    wilson_score_lower_bound = (a - b) / (1 + ((z**2) / n))
     return 1 + 4 * wilson_score_lower_bound
 
 

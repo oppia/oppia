@@ -57,11 +57,11 @@
           <[getEmptyContentMessage()]>
         </span>
         <span>
-          <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                             ng-click="onContentClick($event)"
-                             html-data="getRequiredHtml(stateContent)"
-                             class="oppia-rte-editor">
-          </angular-html-bind>
+          <oppia-rte-output-display [rte-string]="getRequiredHtml(stateContent)"
+                                    ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                    ng-click="onContentClick($event)"
+                                    class="oppia-rte-editor">
+          </oppia-rte-output-display>
         </span>
       </span>
     </div>
@@ -78,12 +78,13 @@
              class="oppia-rule-tab"
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
              ng-style="contentIdStatusColorStyle(caContent.content.contentId)">
-            <response-header index="$index"
-                             summary="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
-                             short-summary="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
-                             is-active="$index === activeCustomizationArgContentIndex"
-                             show-warning="contentIdNeedUpdates(caContent.content.contentId)">
-            </response-header>
+            <oppia-response-header [index]="$index"
+                                   [default-outcome]="true"
+                                   [summary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
+                                   [short-summary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
+                                   [is-active]="$index === activeCustomizationArgContentIndex"
+                                   [show-warning]="contentIdNeedUpdates(caContent.content.contentId)">
+            </oppia-response-header>
           </a>
           <div ng-if="activeCustomizationArgContentIndex === $index">
             <div class="oppia-editor-card-section" ng-if="caContent.content._html">
@@ -145,17 +146,18 @@
                ng-click="changeActiveAnswerGroupIndex($index)"
                ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}"
                ng-style="contentIdStatusColorStyle(answerGroup.outcome.feedback.contentId)">
-              <response-header index="$index"
-                               summary="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, false)"
-                               short-summary="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, true)"
-                               is-active="$index === activeAnswerGroupIndex"
-                               outcome="answerGroup.outcome"
-                               num-rules="answerGroup.rules.length"
-                               is-response="true"
-                               show-warning="contentIdNeedUpdates(answerGroup.outcome.feedback.contentId)"
-                               navigate-to-state="navigateToState"
-                               correctness-feedback-enabled="ExplorationCorrectnessFeedbackService.isEnabled()">
-              </response-header>
+              <oppia-response-header [index]="$index"
+                                     [summary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, false)"
+                                     [short-summary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, true)"
+                                     [is-active]="$index === activeAnswerGroupIndex"
+                                     [outcome]="answerGroup.outcome"
+                                     [default-outcome]="true"
+                                     [num-rules]="answerGroup.rules.length"
+                                     [is-response]="true"
+                                     [show-warning]="contentIdNeedUpdates(answerGroup.outcome.feedback.contentId)"
+                                     (navigate-to-state)="navigateToState($event)"
+                                     [correctness-feedback-enabled]="ExplorationCorrectnessFeedbackService.isEnabled()">
+              </oppia-response-header>
             </a>
             <div ng-if="activeAnswerGroupIndex === $index">
               <div class="oppia-editor-card-section protractor-test-feedback-<[$index]>-text">
@@ -186,16 +188,17 @@
                ng-click="changeActiveAnswerGroupIndex(stateAnswerGroups.length)"
                ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == stateAnswerGroups.length}"
                ng-style="contentIdStatusColorStyle(stateDefaultOutcome.feedback.contentId)">
-              <response-header index="$index"
-                               is-active="$index === activeAnswerGroupIndex"
-                               summary="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, false)"
-                               short-summary="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, true)"
-                               outcome="stateDefaultOutcome"
-                               is-response="true"
-                               show-warning="contentIdNeedUpdates(stateDefaultOutcome.feedback.contentId)"
-                               navigate-to-state="navigateToState"
-                               correctness-feedback-enabled="ExplorationCorrectnessFeedbackService.isEnabled()">
-              </response-header>
+              <oppia-response-header [index]="$index"
+                                     [is-active]="$index === activeAnswerGroupIndex"
+                                     [summary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, false)"
+                                     [short-summary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, true)"
+                                     [outcome]="stateDefaultOutcome"
+                                     [default-outcome]="true"
+                                     [is-response]="true"
+                                     [show-warning]="contentIdNeedUpdates(stateDefaultOutcome.feedback.contentId)"
+                                     (navigate-to-state)="navigateToState($event)"
+                                     [correctness-feedback-enabled]="ExplorationCorrectnessFeedbackService.isEnabled()">
+              </oppia-response-header>
             </a>
             <div ng-if="activeAnswerGroupIndex === stateAnswerGroups.length">
               <div class="oppia-editor-card-section protractor-test-feedback-<[stateAnswerGroups.length]>-text">
@@ -221,12 +224,13 @@
              class="oppia-rule-tab protractor-test-hint-<[$index]>"
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
              ng-style="contentIdStatusColorStyle(hint.hintContent.contentId)">
-            <response-header index="$index"
-                             summary="getSubtitledContentSummary(hint.hintContent)"
-                             short-summary="getSubtitledContentSummary(hint.hintContent)"
-                             is-active="$index === activeHintIndex"
-                             show-warning="contentIdNeedUpdates(hint.hintContent.contentId)">
-            </response-header>
+            <oppia-response-header [index]="$index"
+                                   [default-outcome]="true"
+                                   [summary]="getSubtitledContentSummary(hint.hintContent)"
+                                   [short-summary]="getSubtitledContentSummary(hint.hintContent)"
+                                   [is-active]="$index === activeHintIndex"
+                                   [show-warning]="contentIdNeedUpdates(hint.hintContent.contentId)">
+            </oppia-response-header>
           </a>
           <div ng-if="activeHintIndex === $index">
             <div class="oppia-editor-card-section protractor-test-hint-<[$index]>-text">

@@ -30,6 +30,7 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { MathEquationInputRulesService } from './math-equation-input-rules.service';
+import { TranslateService } from '@ngx-translate/core';
 import constants from 'assets/constants';
 
 @Component({
@@ -51,7 +52,8 @@ export class InteractiveMathEquationInput implements OnInit {
     private deviceInfoService: DeviceInfoService,
     private htmlEscaperService: HtmlEscaperService,
     private mathEquationInputRulesService: MathEquationInputRulesService,
-    private mathInteractionsService: MathInteractionsService
+    private mathInteractionsService: MathInteractionsService,
+    private translateService: TranslateService,
   ) {}
 
   isCurrentAnswerValid(): boolean {
@@ -90,9 +92,11 @@ export class InteractiveMathEquationInput implements OnInit {
     this.guppyConfigurationService.init();
     this.guppyConfigurationService.changeDivSymbol(
       JSON.parse(this.useFractionForDivisionWithValue || 'false'));
+    let translatedPlaceholder = this.translateService.instant(
+      constants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
     this.guppyInitializationService.init(
       'guppy-div-learner',
-      constants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput,
+      translatedPlaceholder,
       (this.savedSolution as string) !==
       undefined ? this.savedSolution as string : ''
     );

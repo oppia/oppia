@@ -96,7 +96,7 @@
               <span class="oppia-input-box-subtitle">
                 <em>
                   Enter the middle component of the page title. For example, if you enter "Add, Subtract, Multiply and Divide" it will show up in the browser tab as "Learn <[editableName]> | Add, Subtract, Multiply and Divide | Oppia".
-                  It should be at most <[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]> characters.
+                  It should be at least <[MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]> and at most <[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]> characters.
                 </em>
               </span>
             </div>
@@ -118,6 +118,7 @@
             </div>
             <label class="form-heading">Thumbnail</label>
             <oppia-thumbnail-uploader [disabled]="!topicRights.canEditTopic()"
+                                      [use-local-storage]="false"
                                       [filename]="topic.getThumbnailFilename()"
                                       (update-filename)="updateTopicThumbnailFilename($event)"
                                       [bg-color]="topic.getThumbnailBgColor()"
@@ -365,7 +366,7 @@
   }
 
   topic-editor-tab .topic-dashboard-link a {
-    color: #015F9C;
+    color: #015f9c;
     text-decoration: none;
   }
 
@@ -379,7 +380,7 @@
 
   .topic-editor .entity-count {
     align-items: center;
-    background-color: #FFF;
+    background-color: #fff;
     border: 1px solid #aaaac1;
     border-radius: 6px;
     box-shadow: none;
@@ -480,7 +481,7 @@
   .topic-editor .add-skill-btn,
   .topic-editor .add-story-btn {
     background-color: #008098;
-    color: #FFF;
+    color: #fff;
     font-weight: bold;
     text-align: left;
   }
@@ -603,8 +604,8 @@
   }
 
   .topic-editor .skills-invalid {
-    background-color: #C55F4533;
-    border: 2px solid #C55F45;
+    background-color: #c55f4533;
+    border: 2px solid #c55f45;
   }
 
   .topic-editor .clickable-item:hover {
@@ -628,7 +629,7 @@
   .topic-editor .practice-tab-info-circle {
     background: #000;
     border-radius: 10px;
-    color: #FFF;
+    color: #fff;
     margin-left: 3px;
     padding: 1px;
   }

@@ -17,8 +17,8 @@
  */
 
 export interface SkillRightsBackendDict {
-  'can_edit_skill_description': boolean,
-  'skill_id': string
+  'can_edit_skill_description': boolean;
+  'skill_id': string;
 }
 
 export class SkillRights {

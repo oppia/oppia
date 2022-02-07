@@ -41,10 +41,10 @@ interface LessonsQuality {
 }
 
 interface TopicData {
-  topicTitle: string,
-  topicTagline: string,
-  collectionId: string,
-  chapters: string[]
+  topicTitle: string;
+  topicTagline: string;
+  collectionId: string;
+  chapters: string[];
 }
 
 @Component({

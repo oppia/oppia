@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core import utils
 # TODO(#13594): After the domain layer is refactored to be independent of
 # the storage layer, the disable=invalid-import will
@@ -470,7 +469,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         # Generate the new ids.
         instance_ids = [
             cls._generate_id(thread_id, message_id) for thread_id, message_id
-            in python_utils.ZIP(thread_ids, message_ids)
+            in zip(thread_ids, message_ids)
         ]
 
         # Check if the new ids are valid.
@@ -864,10 +863,8 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data corresponding to a user: id field but it isn't
-        deleted because it is needed for auditing purposes.
-        """
-        return base_models.DELETION_POLICY.KEEP
+        """Model contains data corresponding to a user: id field."""
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user(
@@ -883,6 +880,15 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'retries': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instance of UnsentFeedbackEmailModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:

@@ -25,19 +25,24 @@ require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 require('services/validators.service.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-data-backend-api.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
-    '$http', '$scope', '$uibModalInstance', 'AlertsService', 'ContextService',
+    '$scope', '$uibModalInstance', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
-    'LanguageUtilService', 'SiteAnalyticsService', 'UrlInterpolationService',
+    'LanguageUtilService', 'SiteAnalyticsService',
+    'ThreadDataBackendApiService',
     'UserService', 'ValidatorsService', 'initialSuggestionId', 'reviewable',
     'subheading', 'suggestionIdToContribution', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT', 'MAX_REVIEW_MESSAGE_LENGTH',
     function(
-        $http, $scope, $uibModalInstance, AlertsService, ContextService,
+        $scope, $uibModalInstance, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
-        LanguageUtilService, SiteAnalyticsService, UrlInterpolationService,
+        LanguageUtilService, SiteAnalyticsService,
+        ThreadDataBackendApiService,
         UserService, ValidatorsService, initialSuggestionId, reviewable,
         subheading, suggestionIdToContribution, ACTION_ACCEPT_SUGGESTION,
         ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT, MAX_REVIEW_MESSAGE_LENGTH) {
@@ -113,17 +118,12 @@ angular.module('oppia').controller(
 
         return commitMessage;
       };
-
-      var _getThreadHandlerUrl = function(suggestionId) {
-        return UrlInterpolationService.interpolateUrl(
-          '/threadhandler/<suggestionId>', { suggestionId });
-      };
-
-      var _getThreadMessagesAsync = function(threadId) {
-        return $http.get(_getThreadHandlerUrl(threadId)).then((response) => {
-          let threadMessageBackendDicts = response.data.messages;
-          return threadMessageBackendDicts.map(
-            m => ThreadMessage.createFromBackendDict(m));
+      const _getThreadMessagesAsync = function(threadId) {
+        return ThreadDataBackendApiService.fetchMessagesAsync(
+          threadId).then((response) => {
+          const threadMessageBackendDicts = response.messages;
+          $scope.reviewMessage = threadMessageBackendDicts.map(
+            m => ThreadMessage.createFromBackendDict(m))[1].text;
         });
       };
 
@@ -175,11 +175,7 @@ angular.module('oppia').controller(
           $scope.suggestionIsRejected = (
             $scope.activeSuggestion.status === 'rejected');
           if ($scope.suggestionIsRejected) {
-            _getThreadMessagesAsync($scope.activeSuggestionId).then(
-              function(messageSummaries) {
-                $scope.reviewMessage = messageSummaries[1].text;
-              }
-            );
+            _getThreadMessagesAsync($scope.activeSuggestionId);
           }
         }
       };
@@ -196,6 +192,13 @@ angular.module('oppia').controller(
 
         [$scope.activeSuggestionId, $scope.activeContribution] = (
           remainingContributions.pop());
+        // Close modal instance if the suggestion's corresponding opportunity
+        // is deleted. See issue #14234.
+        if (!$scope.activeContribution.details) {
+          $uibModalInstance.close(resolvedSuggestionIds);
+          return;
+        }
+
         $scope.activeSuggestion = $scope.activeContribution.suggestion;
         $scope.activeContributionDetails = $scope.activeContribution.details;
         ContextService.setCustomEntityContext(
@@ -255,18 +258,26 @@ angular.module('oppia').controller(
       // Returns whether the active suggestion's exploration_content_html
       // differs from the content_html of the suggestion's change object.
       $scope.hasExplorationContentChanged = function() {
-        if (
-          Array.isArray($scope.contentHtml) ||
-          Array.isArray($scope.explorationContentHtml)) {
+        return !$scope.isHtmlContentEqual(
+          $scope.contentHtml, $scope.explorationContentHtml);
+      };
+
+      $scope.isHtmlContentEqual = function(first, second) {
+        if (Array.isArray(first) || Array.isArray(second)) {
           // Check equality of all array elements.
           return (
-            $scope.contentHtml.length !==
-              $scope.explorationContentHtml.length ||
-            $scope.contentHtml.some(
-              (val, index) => val !== $scope.explorationContentHtml[index])
+            first.length === second.length &&
+            first.every(
+              (val, index) => stripWhitespace(val) === stripWhitespace(
+                second[index]))
           );
         }
-        return $scope.contentHtml !== $scope.explorationContentHtml;
+        return stripWhitespace(first) === stripWhitespace(second);
+      };
+
+      // Strips whitespace (spaces, tabs, line breaks) and '&nbsp;'.
+      const stripWhitespace = function(htmlString) {
+        return htmlString.replace(/&nbsp;|\s+/g, '');
       };
 
       $scope.editSuggestion = function() {

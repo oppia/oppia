@@ -4,15 +4,16 @@
   <text x="100" y="160" fill="#015C53"> {{ score }}%</text>
   <circle class="score-outer-ring-circle"
           [attr.stroke]="getScoreOuterRingColor()"
-          stroke-width="10"
+          stroke-width="13"
           fill="transparent"
           r="125"
           cx="150"
           cy="150">
   </circle>
-  <circle class="score-ring-circle"
+  <circle #scoreRing
+          class="score-ring-circle"
           [attr.stroke]="getScoreRingColor()"
-          stroke-width="10"
+          stroke-width="13"
           fill="transparent"
           r="125"
           cx="150"
@@ -26,15 +27,14 @@
     font-style: normal;
     font-weight: normal;
     line-height: 60px;
+    margin: 0;
     text-align: center;
   }
 
   .score-ring-circle {
     transform: rotate(-90deg);
     transform-origin: 50% 50%;
-    transition: 0.35s stroke-dashoffset;
-    transition-delay: 2s;
-    transition-duration: 5s;
+    transition-property: stroke-dashoffset;
   }
   @media(max-width: 425px) {
     .score-ring {

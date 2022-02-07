@@ -36,11 +36,11 @@ export interface AnswerStatsBackendDict {
 export type Option = string | string[];
 
 export interface VisualizationInfoBackendDict {
-    'addressed_info_is_supported': boolean;
-    'data': AnswerStatsBackendDict[];
-    'id': string;
-    'options': {
-      [name: string]: Option
+  'addressed_info_is_supported': boolean;
+  'data': AnswerStatsBackendDict[];
+  'id': string;
+  'options': {
+    [name: string]: Option;
   };
 }
 
@@ -54,7 +54,7 @@ export class VisualizationInfo {
 
   constructor(
       addressedInfoIsSupported: boolean, data: AnswerStats[], id: string,
-      options: { [name: string]: Object; }) {
+      options: { [name: string]: Object }) {
     this.addressedInfoIsSupported = addressedInfoIsSupported;
     this.data = data;
     this.id = id;
