@@ -185,7 +185,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
                   console.error(
                     e +
                     '\ncurrentStateId(): ' + $scope.currentStateId(
-                      ) +
+                    ) +
                     '\nnodeData:' + nodeData + '\n\n\n'
                   );
                 }
