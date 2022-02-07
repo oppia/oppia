@@ -15,33 +15,66 @@
 /**
  * @fileoverview Directive for a schema-based editor for HTML.
  */
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, AbstractControl, ControlValueAccessor, ValidationErrors, Validator } from '@angular/forms';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('components/ck-editor-helpers/ck-editor-4-rte.component.ts');
-require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+@Component({
+  selector: 'schema-based-html-editor',
+  templateUrl: './schema-based-html-editor.directive.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedHtmlEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedHtmlEditorComponent),
+    },
+  ]
+})
 
-angular.module('oppia').directive('schemaBasedHtmlEditor', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        localValue: '=',
-        isDisabled: '&',
-        labelForFocusTarget: '&',
-        uiConfig: '&',
-        headersEnabled: '&',
-      },
-      template: require('./schema-based-html-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$scope', function($scope) {
-        var ctrl = this;
-        ctrl.updateValue = function(value: string) {
-          ctrl.localValue = value;
-          $scope.$applyAsync();
-          setTimeout(() => {
-            $scope.$applyAsync();
-          });
-        };
-      }]
-    };
-  }]);
+export class SchemaBasedHtmlEditorComponent
+implements ControlValueAccessor, OnInit, Validator {
+  localValue;
+  @Input() disabled;
+  @Input() labelForFocusTarget;
+  @Input() uiConfig;
+  @Input() headersEnabled;
+  onChange: (val: unknown) => void = () => {};
+  constructor() { }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  writeValue(value: unknown): void {
+    this.localValue = value;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (val: unknown) => void): void {
+    this.onChange = fn;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnTouched(): void {
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
+  }
+
+  ngOnInit(): void { }
+
+  updateValue(value: string): void {
+    this.onChange(value);
+    setTimeout(() => {
+      this.onChange(value);
+    });
+  }
+}
+
+angular.module('oppia').directive('schemaBasedHtmlEditor', downgradeComponent({
+  component: SchemaBasedHtmlEditorComponent
+}));

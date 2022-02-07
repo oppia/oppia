@@ -19,26 +19,27 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Output } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExplorationPropertyService {
-  public displayed: string | boolean;
-  savedMemento: string | boolean;
+  public displayed: ParamSpecs;
+  savedMemento: ParamSpecs;
 
   // The backend name for this property. THIS MUST BE SPECIFIED BY
   // SUBCLASSES.
   propertyName: string = null;
 
-  @Output() _explorationPropertyChangedEventEmitter = new EventEmitter();
+  _explorationPropertyChangedEventEmitter = new EventEmitter();
   constructor(
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
@@ -56,7 +57,7 @@ export class ExplorationPropertyService {
     },
   };
 
-  init(value: string | boolean): void {
+  init(value: ParamSpecs): void {
     if (!this.propertyName) {
       throw new Error('Exploration property name cannot be null.');
     }
@@ -83,14 +84,14 @@ export class ExplorationPropertyService {
 
   // Transforms the given value into a normalized form. THIS CAN BE
   // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
-  _normalize(value: string | boolean): string | boolean {
+  _normalize(value: ParamSpecs): ParamSpecs {
     return value;
   }
 
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
-  _isValid(value: string | boolean): boolean {
+  _isValid(value: ParamSpecs): boolean {
     return true;
   }
 

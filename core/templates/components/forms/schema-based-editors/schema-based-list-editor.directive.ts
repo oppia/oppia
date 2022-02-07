@@ -15,228 +15,263 @@
 /**
  * @fileoverview Directive for a schema-based editor for lists.
  */
-
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-
-require('services/id-generation.service.ts');
-require('services/nested-directives-recursion-timeout-prevention.service.ts');
-require('services/schema-default-value.service.ts');
-require('services/schema-undefined-last-element.service.ts');
-require('services/schema-form-submitted.service.ts');
-require('services/stateful/focus-manager.service.ts');
-
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Subscription } from 'rxjs';
+import { IdGenerationService } from 'services/id-generation.service';
+import { Schema, SchemaDefaultValue, SchemaDefaultValueService } from 'services/schema-default-value.service';
+import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { SchemaUndefinedLastElementService } from 'services/schema-undefined-last-element.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+interface OppiaValidator {
+  id: string;
+  'min_value': number;
+  'max_value': number;
+}
 
-
-angular.module('oppia').directive('schemaBasedListEditor', [
-  'FocusManagerService', 'IdGenerationService',
-  'NestedDirectivesRecursionTimeoutPreventionService',
-  'SchemaDefaultValueService', 'SchemaFormSubmittedService',
-  'SchemaUndefinedLastElementService',
-  function(
-      FocusManagerService, IdGenerationService,
-      NestedDirectivesRecursionTimeoutPreventionService,
-      SchemaDefaultValueService, SchemaFormSubmittedService,
-      SchemaUndefinedLastElementService) {
-    return {
-      scope: {
-        localValue: '=',
-        isDisabled: '&',
-        // Read-only property. The schema definition for each item in the list.
-        itemSchema: '&',
-        // The length of the list. If not specified, the list is of arbitrary
-        // length.
-        len: '=',
-        // UI configuration. May be undefined.
-        uiConfig: '&',
-        validators: '&',
-        labelForFocusTarget: '&'
-      },
-      template: require('./schema-based-list-editor.directive.html'),
-      restrict: 'E',
-      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: ['$scope', function($scope) {
-        var ctrl = this;
-        ctrl.directiveSubscriptions = new Subscription();
-        var baseFocusLabel = (
-          $scope.labelForFocusTarget() ||
-          IdGenerationService.generateNewId() + '-');
-        $scope.getFocusLabel = function(index) {
-          // Treat the first item in the list as a special case -- if this list
-          // is contained in another list, and the outer list is opened with a
-          // desire to autofocus on the first input field, we can then focus on
-          // the given $scope.labelForFocusTarget().
-          // NOTE: This will cause problems for lists nested within lists, since
-          // sub-element 0 > 1 will have the same label as sub-element 1 > 0.
-          // But we will assume (for now) that nested lists won't be used -- if
-          // they are, this will need to be changed.
-          return (
-            index === 0 ? baseFocusLabel : baseFocusLabel + index.toString());
-        };
-
-        $scope.hasDuplicates = function() {
-          var valuesSoFar = {};
-          for (var i = 0; i < $scope.localValue.length; i++) {
-            var value = $scope.localValue[i];
-            if (!valuesSoFar.hasOwnProperty(value)) {
-              valuesSoFar[value] = true;
-            } else {
-              return true;
-            }
-          }
-          return false;
-        };
-
-        var validate = function() {
-          if ($scope.showDuplicatesWarning) {
-            $scope.listEditorForm.$setValidity(
-              'isUniquified',
-              !$scope.hasDuplicates());
-          }
-        };
-        ctrl.$onInit = function() {
-          $scope.isAddItemButtonPresent = true;
-          $scope.addElementText = 'Add element';
-          if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
-            $scope.addElementText = $scope.uiConfig().add_element_text;
-          }
-
-          // Only hide the 'add item' button in the case of single-line unicode
-          // input.
-          $scope.isOneLineInput = true;
-          if ($scope.itemSchema().type !== 'unicode' ||
-              $scope.itemSchema().hasOwnProperty('choices')) {
-            $scope.isOneLineInput = false;
-          } else if ($scope.itemSchema().ui_config) {
-            if ($scope.itemSchema().ui_config.coding_mode) {
-              $scope.isOneLineInput = false;
-            } else if (
-              $scope.itemSchema().ui_config.hasOwnProperty('rows') &&
-              $scope.itemSchema().ui_config.rows > 2) {
-              $scope.isOneLineInput = false;
-            }
-          }
-
-          $scope.minListLength = null;
-          $scope.maxListLength = null;
-          $scope.showDuplicatesWarning = false;
-          if ($scope.validators()) {
-            for (var i = 0; i < $scope.validators().length; i++) {
-              if ($scope.validators()[i].id === 'has_length_at_most') {
-                $scope.maxListLength = $scope.validators()[i].max_value;
-              } else if ($scope.validators()[i].id === 'has_length_at_least') {
-                $scope.minListLength = $scope.validators()[i].min_value;
-              } else if ($scope.validators()[i].id === 'is_uniquified') {
-                $scope.showDuplicatesWarning = true;
-              }
-            }
-          }
-
-          while ($scope.localValue.length < $scope.minListLength) {
-            $scope.localValue.push(
-              SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
-          }
-          $scope.$watch('localValue', validate, true);
-
-          if ($scope.len === undefined) {
-            $scope.addElement = function() {
-              if ($scope.isOneLineInput) {
-                $scope.hideAddItemButton();
-              }
-
-              $scope.localValue.push(
-                SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
-              FocusManagerService.setFocus(
-                $scope.getFocusLabel($scope.localValue.length - 1));
-            };
-
-            var _deleteLastElementIfUndefined = function() {
-              var lastValueIndex = $scope.localValue.length - 1;
-              var valueToConsiderUndefined = (
-                SchemaUndefinedLastElementService.getUndefinedValue(
-                  $scope.itemSchema()));
-              if ($scope.localValue[lastValueIndex] ===
-                  valueToConsiderUndefined) {
-                $scope.deleteElement(lastValueIndex);
-              }
-            };
-
-            var deleteEmptyElements = function() {
-              for (var i = 0; i < $scope.localValue.length - 1; i++) {
-                if ($scope.localValue[i].length === 0) {
-                  $scope.deleteElement(i);
-                  i--;
-                }
-              }
-            };
-
-            if ($scope.localValue.length === 1) {
-              if ($scope.localValue[0].length === 0) {
-                $scope.isAddItemButtonPresent = false;
-              }
-            }
-
-            $scope.lastElementOnBlur = function() {
-              _deleteLastElementIfUndefined();
-              $scope.showAddItemButton();
-            };
-
-            $scope.showAddItemButton = function() {
-              deleteEmptyElements();
-              $scope.isAddItemButtonPresent = true;
-            };
-
-            $scope.hideAddItemButton = function() {
-              $scope.isAddItemButtonPresent = false;
-            };
-
-            $scope._onChildFormSubmit = function() {
-              if (!$scope.isAddItemButtonPresent) {
-                /**
-                 * If form submission happens on last element of the set (i.e
-                 * the add item button is absent) then automatically add the
-                 * element to the list.
-                 */
-                if (($scope.maxListLength === null ||
-                     $scope.localValue.length < $scope.maxListLength) &&
-                    !!$scope.localValue[$scope.localValue.length - 1]) {
-                  $scope.addElement();
-                }
-              } else {
-                /**
-                 * If form submission happens on existing element remove focus
-                 * from it
-                 */
-                (document.activeElement as HTMLElement).blur();
-              }
-            };
-            ctrl.directiveSubscriptions.add(
-              SchemaFormSubmittedService.onSubmittedSchemaBasedForm.subscribe(
-                () => $scope._onChildFormSubmit()
-              )
-            );
-
-            $scope.deleteElement = function(index) {
-              // Need to let the RTE know that HtmlContent has been changed.
-              $scope.localValue.splice(index, 1);
-            };
-          } else {
-            if ($scope.len <= 0) {
-              throw new Error(
-                'Invalid length for list editor: ' + $scope.len);
-            }
-            if ($scope.len !== $scope.localValue.length) {
-              throw new Error(
-                'List editor length does not match length of input value: ' +
-                $scope.len + ' ' + $scope.localValue);
-            }
-          }
-        };
-        ctrl.$onDestroy = function() {
-          ctrl.directiveSubscriptions.unsubscribe();
-        };
-      }]
-    };
+@Component({
+  selector: 'schema-based-list-editor',
+  templateUrl: './schema-based-list-editor.directive.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedListEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedListEditorComponent),
+    },
+  ]
+})
+export class SchemaBasedListEditorComponent
+implements OnInit, ControlValueAccessor, Validator {
+  localValue: SchemaDefaultValue[];
+  directiveSubscriptions = new Subscription();
+  @Input() disabled: boolean;
+  // Read-only property. The schema definition for each item in the list.
+  @Input() itemSchema: {
+    'ui_config': {'coding_mode': unknown; rows: number};
+  } & Schema;
+  // The length of the list. If not specified, the list is of arbitrary
+  // length.
+  @Input() len: number;
+  // UI configuration. May be undefined.
+  @Input() uiConfig: {'add_element_text': string};
+  @Input() validators: OppiaValidator[];
+  @Input() labelForFocusTarget: string;
+  onChange: (value: unknown) => void = (_: unknown) => {};
+  isAddItemButtonPresent: boolean;
+  addElementText: string;
+  isOneLineInput: boolean;
+  minListLength: number;
+  maxListLength: number;
+  showDuplicatesWarning: boolean;
+  constructor(
+    private focusManagerService: FocusManagerService,
+    private idGenerationService: IdGenerationService,
+    private schemaDefaultValueService: SchemaDefaultValueService,
+    private schemaFormSubmittedService: SchemaFormSubmittedService,
+    private schemaUndefinedLastElementService: SchemaUndefinedLastElementService
+  ) {}
+  writeValue(value: SchemaDefaultValue[]): void {
+    if (Array.isArray(value)) {
+      this.localValue = value;
+    }
   }
-]);
+  registerOnChange(fn: (value: unknown) => void): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: () => void): void {
+  }
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
+  }
+
+  baseFocusLabel: string = '';
+  getFocusLabel(index: number): string {
+    // Treat the first item in the list as a special case -- if this list
+    // is contained in another list, and the outer list is opened with a
+    // desire to autofocus on the first input field, we can then focus on
+    // the given $scope.labelForFocusTarget().
+    // NOTE: This will cause problems for lists nested within lists, since
+    // sub-element 0 > 1 will have the same label as sub-element 1 > 0.
+    // But we will assume (for now) that nested lists won't be used -- if
+    // they are, this will need to be changed.
+    return (
+      index === 0 ? this.baseFocusLabel : this.baseFocusLabel + index.toString()
+    );
+  }
+
+  private _deleteEmptyElements(): void {
+    for (var i = 0; i < this.localValue.length - 1; i++) {
+      const val = this.localValue[i] as SchemaDefaultValue[];
+      if (val.length === 0) {
+        this.deleteElement(i);
+        i--;
+      }
+    }
+  }
+
+  hasDuplicates(): boolean {
+    let valuesSoFar: Record<string | number, unknown> = {};
+    for (let i = 0; i < this.localValue.length; i++) {
+      const value = this.localValue[i];
+      if (!valuesSoFar.hasOwnProperty(value as string)) {
+        valuesSoFar[value as string] = true;
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  lastElementOnBlur(): void {
+    this._deleteLastElementIfUndefined();
+    this.showAddItemButton();
+  }
+
+  addElement(): void {
+    if (this.isOneLineInput) {
+      this.hideAddItemButton();
+    }
+
+    this.localValue.push(
+      this.schemaDefaultValueService.getDefaultValue(this.itemSchema));
+    this.focusManagerService.setFocus(
+      this.getFocusLabel(this.localValue.length - 1));
+  }
+
+  private _deleteLastElementIfUndefined(): void {
+    var lastValueIndex = this.localValue.length - 1;
+    var valueToConsiderUndefined = (
+      this.schemaUndefinedLastElementService.getUndefinedValue(
+        this.itemSchema));
+    if (this.localValue[lastValueIndex] ===
+              valueToConsiderUndefined) {
+      this.deleteElement(lastValueIndex);
+    }
+  }
+
+  showAddItemButton(): void {
+    this._deleteEmptyElements();
+    this.isAddItemButtonPresent = true;
+  }
+
+  hideAddItemButton(): void {
+    this.isAddItemButtonPresent = false;
+  }
+
+  _onChildFormSubmit(): void {
+    if (!this.isAddItemButtonPresent) {
+      /**
+             * If form submission happens on last element of the set (i.e
+             * the add item button is absent) then automatically add the
+             * element to the list.
+             */
+      if ((this.maxListLength === null ||
+                 this.localValue.length < this.maxListLength) &&
+                !!this.localValue[this.localValue.length - 1]) {
+        this.addElement();
+      }
+    } else {
+      /**
+             * If form submission happens on existing element remove focus
+             * from it
+             */
+      (document.activeElement as HTMLElement).blur();
+    }
+  }
+
+  deleteElement(index: number): void {
+    // Need to let the RTE know that HtmlContent has been changed.
+    this.localValue.splice(index, 1);
+  }
+
+  setValue(val: SchemaDefaultValue, index: number): void {
+    if (val === null) {
+      return;
+    }
+    this.localValue[index] = val;
+    this.localValue = [...this.localValue];
+    this.onChange(this.localValue);
+  }
+
+  ngOnInit(): void {
+    this.baseFocusLabel = (
+      this.labelForFocusTarget ||
+      this.idGenerationService.generateNewId() + '-');
+    this.isAddItemButtonPresent = true;
+    this.addElementText = 'Add element';
+    if (this.uiConfig && this.uiConfig.add_element_text) {
+      this.addElementText = this.uiConfig.add_element_text;
+    }
+
+    // Only hide the 'add item' button in the case of single-line unicode
+    // input.
+    this.isOneLineInput = true;
+    if (this.itemSchema.type !== 'unicode' ||
+              this.itemSchema.hasOwnProperty('choices')) {
+      this.isOneLineInput = false;
+    } else if (this.itemSchema.ui_config) {
+      if (this.itemSchema.ui_config.coding_mode) {
+        this.isOneLineInput = false;
+      } else if (
+        this.itemSchema.ui_config.hasOwnProperty('rows') &&
+              this.itemSchema.ui_config.rows > 2) {
+        this.isOneLineInput = false;
+      }
+    }
+
+    this.minListLength = null;
+    this.maxListLength = null;
+    this.showDuplicatesWarning = false;
+    if (this.validators) {
+      for (var i = 0; i < this.validators.length; i++) {
+        if (this.validators[i].id === 'has_length_at_most') {
+          this.maxListLength = this.validators[i].max_value;
+        } else if (this.validators[i].id === 'has_length_at_least') {
+          this.minListLength = this.validators[i].min_value;
+        } else if (this.validators[i].id === 'is_uniquified') {
+          this.showDuplicatesWarning = true;
+        }
+      }
+    }
+
+    while (this.localValue.length < this.minListLength) {
+      this.localValue.push(
+        this.schemaDefaultValueService.getDefaultValue(this.itemSchema));
+    }
+
+    if (this.len === undefined) {
+      if (this.localValue.length === 1) {
+        if ((this.localValue[0] as SchemaDefaultValue[]).length === 0) {
+          this.isAddItemButtonPresent = false;
+        }
+      }
+
+      this.directiveSubscriptions.add(
+        this.schemaFormSubmittedService.onSubmittedSchemaBasedForm.subscribe(
+          () => this._onChildFormSubmit()
+        )
+      );
+    } else {
+      if (this.len <= 0) {
+        throw new Error(
+          'Invalid length for list editor: ' + this.len);
+      }
+      if (this.len !== this.localValue.length) {
+        throw new Error(
+          'List editor length does not match length of input value: ' +
+                this.len + ' ' + this.localValue);
+      }
+    }
+  }
+}
+
+angular.module('oppia').directive('schemaBasedListEditor', downgradeComponent({
+  component: SchemaBasedListEditorComponent
+}) as angular.IDirectiveFactory);

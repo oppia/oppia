@@ -86,7 +86,7 @@ interface DictSchemaDefaultValue {
   [property: string]: SchemaDefaultValue;
 }
 
-type SchemaDefaultValue = (
+export type SchemaDefaultValue = (
   string |
   number |
   boolean |

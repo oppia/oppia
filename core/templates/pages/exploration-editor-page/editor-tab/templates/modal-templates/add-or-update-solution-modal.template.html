@@ -29,7 +29,8 @@
         <strong>Explanation:</strong>
         <schema-based-editor class="protractor-test-explanation-textarea"
                              schema="EXPLANATION_FORM_SCHEMA"
-                             local-value="data.explanationHtml">
+                             ng-model="data.explanationHtml"
+                             ng-model-change="$applyAsync()">
         </schema-based-editor>
       </div>
     </div>

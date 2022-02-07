@@ -16,37 +16,63 @@
  * @fileoverview Directive for a schema-based editor for expressions.
  */
 
-angular.module('oppia').directive('schemaBasedExpressionEditor', [
-  function() {
-    return {
-      scope: {
-        localValue: '=',
-        isDisabled: '&',
-        // TODO(sll): Currently only takes a string which is either 'bool',
-        // 'int' or 'float'. May need to generalize.
-        outputType: '&',
-        labelForFocusTarget: '&'
-      },
-      template: require('./schema-based-expression-editor.directive.html'),
-      restrict: 'E',
-      controllerAs: '$ctrl',
-      controller: [
-        '$scope', '$timeout',
-        'FocusManagerService',
-        function(
-            $scope, $timeout,
-            FocusManagerService) {
-          var ctrl = this;
-          var labelForFocus = $scope.labelForFocusTarget();
+import { Component, Input, OnInit } from '@angular/core';
+import { AbstractControl, ControlValueAccessor, ValidationErrors, Validator } from '@angular/forms';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.directive';
 
-          ctrl.$onInit = function() {
-            // So that focus is applied after all the functions in
-            // main thread have executed.
-            $timeout(function() {
-              FocusManagerService.setFocusWithoutScroll(labelForFocus);
-            }, 5);
-          };
-        }
-      ]
-    };
-  }]);
+@Component({
+  selector: 'oppia-schema-based-editor',
+  templateUrl: './schema-based-expression-editor.directive.html'
+})
+export class SchemaBasedExpressionEditorComponent
+implements ControlValueAccessor, Validator, OnInit {
+  localValue!: unknown;
+  @Input() disabled: boolean = false;
+  @Input() outputType: 'bool' | 'int' | 'float';
+  @Input() labelForFocusTarget: string;
+  onChange: (val: unknown) => void = (val: unknown) => {};
+
+  constructor(private focusManagerService: FocusManagerService) {}
+
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.focusManagerService.setFocusWithoutScroll(this.labelForFocusTarget);
+    });
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  writeValue(value: unknown): void {
+    this.localValue = value;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (val: unknown) => void): void {
+    this.onChange = fn;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnTouched(): void {
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
+  }
+
+  localValueChange(value: unknown): void {
+    if (value === this.localValueChange) {
+      return;
+    }
+    this.localValue = value;
+    this.onChange(this.localValue);
+  }
+}
+
+angular.module('oppia').directive(
+  'schemaBasedExpressionEditor',
+  downgradeComponent({
+    component: SchemaBasedDictEditorComponent
+  }) as angular.IDirectiveFactory
+);

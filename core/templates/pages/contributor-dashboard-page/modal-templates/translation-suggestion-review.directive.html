@@ -44,11 +44,11 @@
               <[item]>
             </li>
           </ul>
-          <schema-based-editor schema="HTML_SCHEMA" local-value="editedContent.html" ng-if="startedEditing && isHtmlContent">
+          <schema-based-editor schema="HTML_SCHEMA" ng-model="editedContent.html" ng-model-change="$applyAsync()" ng-if="startedEditing && isHtmlContent">
           </schema-based-editor>
-          <schema-based-editor schema="UNICODE_SCHEMA" local-value="editedContent.html" ng-if="startedEditing && isUnicodeContent">
+          <schema-based-editor schema="UNICODE_SCHEMA" ng-model="editedContent.html" ng-model-change="$applyAsync()" ng-if="startedEditing && isUnicodeContent">
           </schema-based-editor>
-          <schema-based-editor schema="SET_OF_STRINGS_SCHEMA" local-value="editedContent.html" ng-if="startedEditing && isSetOfStringsContent">
+          <schema-based-editor schema="SET_OF_STRINGS_SCHEMA" ng-model="editedContent.html" ng-model-change="$applyAsync()" ng-if="startedEditing && isSetOfStringsContent">
           </schema-based-editor>
         </div>
         <div class="oppia-translation-review-edit-buttons">
