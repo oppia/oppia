@@ -16,11 +16,11 @@
  * @fileoverview Directive for general schema-based editors.
  */
 
-import { Input, Output, EventEmitter, Component, forwardRef, AfterViewInit, ViewChild } from '@angular/core';
+import { Input, Output, EventEmitter, Component, forwardRef, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors, NgForm } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Schema } from 'services/schema-default-value.service';
-
+const INVALID = 'INVALID';
 @Component({
   selector: 'schema-based-editor',
   templateUrl: './schema-based-editor.directive.html',
@@ -49,7 +49,6 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   @Input() headersEnabled;
   @Input() notRequired: boolean;
   onChange: (val: unknown) => void = () => {};
-
   get localValue(): unknown {
     return this._localValue;
   }
@@ -64,10 +63,13 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   }
 
   @Output() localValueChange = new EventEmitter();
-  constructor() { }
+  constructor(private elementRef: ElementRef) { }
 
   // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: unknown): void {
+    if (value === null) {
+      return;
+    }
     this.localValue = value;
   }
 
@@ -86,11 +88,16 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   }
 
   ngAfterViewInit(): void {
+    let form: angular.IFormController = angular.element(
+      this.elementRef.nativeElement).controller('form');
     this.frm.statusChanges.subscribe((x) => {
-      if (x === 'INVALID') {
-        // TBD.
+      if (form === null || form === undefined) {
+        return;
+      }
+      if (x === INVALID) {
+        form.$setValidity('schema', false, form);
       } else {
-        // TBD.
+        form.$setValidity('schema', true, form);
       }
     });
   }
