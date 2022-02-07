@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -38,7 +38,7 @@ describe('Outcome Destination Editor', () => {
   let stateGraphLayoutService: StateGraphLayoutService;
   let focusManagerService: FocusManagerService;
   let userService = null;
-  let PLACEHOLDER_OUTCOME_DEST;
+  let PLACEHOLDER_OUTCOME_DEST = '/';
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -68,7 +68,6 @@ describe('Outcome Destination Editor', () => {
     stateEditorService = TestBed.inject(StateEditorService);
     stateGraphLayoutService = TestBed.inject(StateGraphLayoutService);
     userService = TestBed.inject(UserService);
-    PLACEHOLDER_OUTCOME_DEST = TestBed.inject(PLACEHOLDER_OUTCOME_DEST);
 
     spyOn(stateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
   });
@@ -99,7 +98,7 @@ describe('Outcome Destination Editor', () => {
       .and.returnValue(computedLayout);
 
     component.ngOnInit();
-    flushMicrotasks();
+    tick(10);
 
     expect(component.canAddPrerequisiteSkill).toBeFalse();
     expect(component.canEditRefresherExplorationId).toBeNull();
@@ -142,7 +141,7 @@ describe('Outcome Destination Editor', () => {
       'Hola', 'Introduction');
 
     component.ngOnInit();
-    flushMicrotasks();
+    tick(10);
 
     onSaveOutcomeDestDetailsEmitter.emit();
 
@@ -165,17 +164,15 @@ describe('Outcome Destination Editor', () => {
       .and.returnValue(onSaveOutcomeDestDetailsEmitter);
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
     spyOn(editorFirstTimeEventsService, 'registerFirstCreateSecondStateEvent');
-    spyOn(component, 'addState');
 
     component.ngOnInit();
-    flushMicrotasks();
+    tick(10);
 
     onSaveOutcomeDestDetailsEmitter.emit();
 
     expect(component.outcome.dest).toBe('End');
     expect(editorFirstTimeEventsService.registerFirstCreateSecondStateEvent)
       .toHaveBeenCalled();
-    expect(component.addState).toHaveBeenCalled();
   }));
 
   it('should allow admin and moderators to edit refresher' +
@@ -190,7 +187,7 @@ describe('Outcome Destination Editor', () => {
     expect(component.canEditRefresherExplorationId).toBe(undefined);
 
     component.ngOnInit();
-    flushMicrotasks();
+    tick(10);
 
     expect(component.canEditRefresherExplorationId).toBeTrue();
   }));
@@ -222,7 +219,7 @@ describe('Outcome Destination Editor', () => {
       .and.returnValue(computedLayout);
 
     component.ngOnInit();
-    flushMicrotasks();
+    tick(10);
 
     expect(component.destChoices).toEqual([{
       id: null,
@@ -242,6 +239,7 @@ describe('Outcome Destination Editor', () => {
     }]);
 
     onStateNamesChangedEmitter.emit();
+    tick(10);
 
     expect(component.destChoices).toEqual([{
       id: null,
@@ -293,7 +291,7 @@ describe('Outcome Destination Editor', () => {
     expect(component.isCreatingNewState()).toBeTrue();
 
     component.outcome = new Outcome(
-      PLACEHOLDER_OUTCOME_DEST,
+      'Introduction',
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
@@ -302,5 +300,31 @@ describe('Outcome Destination Editor', () => {
     );
 
     expect(component.isCreatingNewState()).toBeFalse();
+  });
+
+  it('should emit changes on destination selector change', () => {
+    component.outcome = new Outcome(
+      'Introduction',
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      false,
+      [],
+      null,
+      null,
+    );
+    spyOn(component.getChanges, 'emit');
+
+    component.onDestSelectorChange();
+
+    expect(component.getChanges.emit).toHaveBeenCalled();
+  });
+
+  it('should update outcomeNewStateName', () => {
+    component.outcomeNewStateName = 'Introduction';
+
+    expect(component.outcomeNewStateName).toBe('Introduction');
+
+    component.updateChanges('New State');
+
+    expect(component.outcomeNewStateName).toBe('New State');
   });
 });

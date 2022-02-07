@@ -34,6 +34,7 @@ import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 describe('Add Answer Group Modal Controller', function() {
   importAllAngularServices();
 
+  let $rootScope = null;
   var $scope = null;
   var $uibModalInstance = null;
   var editorFirstTimeEventsService = null;
@@ -171,5 +172,13 @@ describe('Add Answer Group Modal Controller', function() {
       tmpTaggedSkillMisconceptionId: null,
       reopen: null
     });
+  });
+
+  it('should update the changes', function() {
+    spyOn($rootScope, '$apply');
+
+    $scope.getChanges();
+
+    expect($rootScope.$apply).toHaveBeenCalled();
   });
 });

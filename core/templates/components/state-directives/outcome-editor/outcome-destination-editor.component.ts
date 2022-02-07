@@ -167,7 +167,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
         });
       }
     // This value of 10ms is arbitrary, it has no significance.
-    }, 0);
+    }, 10);
   }
 
   ngOnInit(): void {
