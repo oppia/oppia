@@ -84,9 +84,9 @@ implements ControlValueAccessor, Validator, AfterViewInit {
   ngAfterViewInit(): void {
     this.frm.statusChanges.subscribe((x) => {
       if (x === 'INVALID') {
-        console.log(this.frm.errors);
+        // TBD console.log(this.frm.errors);
       } else {
-        console.log(x);
+        // TBD console.log(x);
       }
     });
   }

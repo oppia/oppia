@@ -26,14 +26,13 @@ import cloneDeep from 'lodash/cloneDeep';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExplorationPropertyService {
-  public displayed: ParamSpecs;
-  savedMemento: ParamSpecs;
+  public displayed: string | boolean;
+  savedMemento: string | boolean;
 
   // The backend name for this property. THIS MUST BE SPECIFIED BY
   // SUBCLASSES.
@@ -57,7 +56,7 @@ export class ExplorationPropertyService {
     },
   };
 
-  init(value: ParamSpecs): void {
+  init(value: string | boolean): void {
     if (!this.propertyName) {
       throw new Error('Exploration property name cannot be null.');
     }
@@ -84,14 +83,14 @@ export class ExplorationPropertyService {
 
   // Transforms the given value into a normalized form. THIS CAN BE
   // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
-  _normalize(value: ParamSpecs): ParamSpecs {
+  _normalize(value: string | boolean): string | boolean {
     return value;
   }
 
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
-  _isValid(value: ParamSpecs): boolean {
+  _isValid(value: string | boolean): string | boolean {
     return true;
   }
 
