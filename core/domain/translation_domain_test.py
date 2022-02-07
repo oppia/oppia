@@ -194,7 +194,9 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
                 'My name is Nikhil.', True)
         }
         entity_translations = translation_domain.EntityTranslation(
-            'exp_id', 'exploration', 1, 'en', translation_dict)
+            'exp_id',
+            translation_domain.PossibleEntityTypesSupportingNewTranslationArch
+            .ENTITY_TYPE_EXPLORATION, 1, 'en', translation_dict)
 
         translatable_object = DummyTranslatableObjectWithFourParams(
             'My name is jack.', 'My name is jhon.', 'My name is Nikhil.', '')
@@ -225,7 +227,9 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
                 'My name is Nikhil.', False)
         }
         entity_translations = translation_domain.EntityTranslation(
-            'exp_id', 'exploration', 1, 'en', translation_dict)
+            'exp_id',
+            translation_domain.PossibleEntityTypesSupportingNewTranslationArch
+            .ENTITY_TYPE_EXPLORATION, 1, 'en', translation_dict)
 
         self.assertEqual(entity_translations.entity_id, 'exp_id')
         self.assertEqual(entity_translations.entity_type, 'exploration')
