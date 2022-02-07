@@ -19,7 +19,6 @@
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { Rubric } from 'domain/skill/rubric.model';
 import { RubricsEditorComponent } from './rubrics-editor.component';

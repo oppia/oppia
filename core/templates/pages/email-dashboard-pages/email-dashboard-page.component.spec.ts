@@ -23,7 +23,6 @@ import { AppConstants } from 'app.constants';
 import { EmailDashboardQuery } from 'domain/email-dashboard/email-dashboard-query.model';
 import { UserInfo } from 'domain/user/user-info.model';
 import { LoaderService } from 'services/loader.service';
-import { CustomSchema } from 'services/schema-default-value.service';
 import { UserService } from 'services/user.service';
 import { EmailDashboardDataService } from './email-dashboard-data.service';
 import { EmailDashboardPageComponent } from './email-dashboard-page.component';
