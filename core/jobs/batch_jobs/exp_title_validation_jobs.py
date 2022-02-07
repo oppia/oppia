@@ -17,6 +17,8 @@
 
 """Validation Jobs for title exploration"""
 
+from __future__ import annotations
+
 from core.domain import exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -29,18 +31,39 @@ import apache_beam as beam
 
 
 class GetNumberOfExpExceedsMaxTitleLengthJob(base_jobs.JobBase):
+    """Job that returns exploration having title length more than 36."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        exp_ids_with_exceeding_max_title_len = (
+        """Returns PCollection of invalid explorations with their id and
+        actual length.
+
+        Returns:
+            PCollection. Returns PCollection of invalid explorations with
+            their id and actual length.
+        """
+        total_explorations = (
             self.pipeline
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False))
             | 'Get exploration from model' >> beam.Map(
                 exp_fetchers.get_exploration_from_model)
+        )
+
+        exp_ids_with_exceeding_max_title_len = (
+            total_explorations
             | 'Combine exploration title and ids' >> beam.Map(
                 lambda exp: (exp.id, exp.title))
-            | 'Filter exploraton with title length greater than 36' >> beam.Filter(
-                lambda exp: len(exp[1]) > 36)
+            | 'Filter exploraton with title length greater than 36' >>
+                beam.Filter(lambda exp: len(exp[1]) > 36)
+        )
+
+        report_number_of_exps_queried = (
+            total_explorations
+            | 'Count exp models' >> beam.combiners.Count.Globally()
+            | 'Report count of exp models' >> beam.Map(
+                lambda object_count: job_run_result.JobRunResult.as_stdout(
+                    'RESULT: Queried %s exp rights in total.' % (object_count)
+                ))
         )
 
         report_number_of_invalid_exps = (
@@ -56,11 +79,16 @@ class GetNumberOfExpExceedsMaxTitleLengthJob(base_jobs.JobBase):
             exp_ids_with_exceeding_max_title_len
             | 'Save info on invalid exps' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The id of exp is %s and its actual len is %s' % (objects[0], len(objects[1]))
+                    'The id of exp is %s and its actual len is %s'
+                    % (objects[0], len(objects[1]))
                 ))
         )
 
         return (
-            (report_number_of_invalid_exps, report_invalid_ids_and_their_actual_len)
+            (
+                report_number_of_exps_queried,
+                report_number_of_invalid_exps,
+                report_invalid_ids_and_their_actual_len
+            )
             | 'Combine results' >> beam.Flatten()
         )
