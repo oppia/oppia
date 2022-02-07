@@ -123,7 +123,6 @@ class ClassifierDict(TypedDict):
 
 # Valid model names.
 
-
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.

@@ -30,17 +30,20 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models  # pylint: disable=unused-import
 
+# Constant for valid model names
+NAMES = feconf.NAMES
+
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 
 
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
-    feconf.NAMES.app_feedback_report, feconf.NAMES.blog,
-    feconf.NAMES.collection, feconf.NAMES.config, feconf.NAMES.exploration,
-    feconf.NAMES.feedback, feconf.NAMES.question, feconf.NAMES.skill,
-    feconf.NAMES.story, feconf.NAMES.subtopic, feconf.NAMES.suggestion,
-    feconf.NAMES.topic
+    NAMES.app_feedback_report, NAMES.blog,
+    NAMES.collection, NAMES.config, NAMES.exploration,
+    NAMES.feedback, NAMES.question, NAMES.skill,
+    NAMES.story, NAMES.subtopic, NAMES.suggestion,
+    NAMES.topic
 )
 
 GAE_PLATFORM = 'gae'
@@ -51,7 +54,7 @@ class Platform:
 
     @classmethod
     def import_models(
-            cls, unused_model_names: List[feconf.NAMES]
+            cls, unused_model_names: List[NAMES]
     ) -> Tuple[ModuleType, ...]:
         """An abstract method that should be implemented on inherited
         classes.
@@ -73,8 +76,8 @@ class _Gae(Platform):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def import_models(
-            cls, model_names: List[feconf.NAMES]
+    def import_models(cls,
+            model_names: List[NAMES]
     ) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
@@ -93,91 +96,91 @@ class _Gae(Platform):
         # here since when we import modules using this function, we need to add
         # separate imports for mypy anyway.
         for name in model_names:
-            if name == feconf.NAMES.activity:
+            if name == NAMES.activity:
                 from core.storage.activity import gae_models as activity_models
                 returned_models.append(activity_models)
-            elif name == feconf.NAMES.app_feedback_report:
+            elif name == NAMES.app_feedback_report:
                 from core.storage.app_feedback_report import (
                     gae_models as app_feedback_report_models)
                 returned_models.append(app_feedback_report_models)
-            elif name == feconf.NAMES.audit:
+            elif name == NAMES.audit:
                 from core.storage.audit import gae_models as audit_models
                 returned_models.append(audit_models)
-            elif name == feconf.NAMES.auth:
+            elif name == NAMES.auth:
                 from core.storage.auth import gae_models as auth_models
                 returned_models.append(auth_models)
-            elif name == feconf.NAMES.base_model:
+            elif name == NAMES.base_model:
                 from core.storage.base_model import gae_models as base_model
                 returned_models.append(base_model)
-            elif name == feconf.NAMES.beam_job:
+            elif name == NAMES.beam_job:
                 from core.storage.beam_job import gae_models as beam_job_models
                 returned_models.append(beam_job_models)
-            elif name == feconf.NAMES.blog:
+            elif name == NAMES.blog:
                 from core.storage.blog import gae_models as blog_models
                 returned_models.append(blog_models)
-            elif name == feconf.NAMES.classifier:
+            elif name == NAMES.classifier:
                 from core.storage.classifier import (
                     gae_models as classifier_models)
                 returned_models.append(classifier_models)
-            elif name == feconf.NAMES.collection:
+            elif name == NAMES.collection:
                 from core.storage.collection import (
                     gae_models as collection_models)
                 returned_models.append(collection_models)
-            elif name == feconf.NAMES.config:
+            elif name == NAMES.config:
                 from core.storage.config import gae_models as config_models
                 returned_models.append(config_models)
-            elif name == feconf.NAMES.email:
+            elif name == NAMES.email:
                 from core.storage.email import gae_models as email_models
                 returned_models.append(email_models)
-            elif name == feconf.NAMES.exploration:
+            elif name == NAMES.exploration:
                 from core.storage.exploration import gae_models as exp_models
                 returned_models.append(exp_models)
-            elif name == feconf.NAMES.feedback:
+            elif name == NAMES.feedback:
                 from core.storage.feedback import gae_models as feedback_models
                 returned_models.append(feedback_models)
-            elif name == feconf.NAMES.improvements:
+            elif name == NAMES.improvements:
                 from core.storage.improvements import (
                     gae_models as improvements_models)
                 returned_models.append(improvements_models)
-            elif name == feconf.NAMES.job:
+            elif name == NAMES.job:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
-            elif name == feconf.NAMES.opportunity:
+            elif name == NAMES.opportunity:
                 from core.storage.opportunity import (
                     gae_models as opportunity_models)
                 returned_models.append(opportunity_models)
-            elif name == feconf.NAMES.question:
+            elif name == NAMES.question:
                 from core.storage.question import gae_models as question_models
                 returned_models.append(question_models)
-            elif name == feconf.NAMES.recommendations:
+            elif name == NAMES.recommendations:
                 from core.storage.recommendations import (
                     gae_models as recommendations_models)
                 returned_models.append(recommendations_models)
-            elif name == feconf.NAMES.skill:
+            elif name == NAMES.skill:
                 from core.storage.skill import gae_models as skill_models
                 returned_models.append(skill_models)
-            elif name == feconf.NAMES.statistics:
+            elif name == NAMES.statistics:
                 from core.storage.statistics import (
                     gae_models as statistics_models)
                 returned_models.append(statistics_models)
-            elif name == feconf.NAMES.story:
+            elif name == NAMES.story:
                 from core.storage.story import gae_models as story_models
                 returned_models.append(story_models)
-            elif name == feconf.NAMES.subtopic:
+            elif name == NAMES.subtopic:
                 from core.storage.subtopic import gae_models as subtopic_models
                 returned_models.append(subtopic_models)
-            elif name == feconf.NAMES.suggestion:
+            elif name == NAMES.suggestion:
                 from core.storage.suggestion import (
                     gae_models as suggestion_models)
                 returned_models.append(suggestion_models)
-            elif name == feconf.NAMES.topic:
+            elif name == NAMES.topic:
                 from core.storage.topic import gae_models as topic_models
                 returned_models.append(topic_models)
-            elif name == feconf.NAMES.translation:
+            elif name == NAMES.translation:
                 from core.storage.translation import (
                     gae_models as translation_models)
                 returned_models.append(translation_models)
-            elif name == feconf.NAMES.user:
+            elif name == NAMES.user:
                 from core.storage.user import gae_models as user_models
                 returned_models.append(user_models)
             else:
@@ -186,8 +189,8 @@ class _Gae(Platform):
         return tuple(returned_models)
 
     @classmethod
-    def get_storage_model_classes(
-            cls, model_names: List[feconf.NAMES]
+    def get_storage_model_classes(cls,
+            model_names: List[NAMES]
     ) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.
@@ -220,8 +223,7 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
-        model_names = [name for name in feconf.NAMES if name != (
-            feconf.NAMES.base_model)]
+        model_names = [name for name in NAMES if name != (NAMES.base_model)]
         return cls.get_storage_model_classes(model_names)
 
     @classmethod
@@ -407,7 +409,7 @@ class Registry:
 
     @classmethod
     def import_models(
-            cls, model_names: List[feconf.NAMES]
+            cls, model_names: List[NAMES]
     ) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
@@ -421,7 +423,7 @@ class Registry:
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[feconf.NAMES]
+            cls, model_names: List[NAMES]
     ) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.
