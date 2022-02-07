@@ -36,7 +36,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'DeferredTasksHandler',
     'DeleteAccountPage',
     'EditableQuestionDataHandler',
-    'EditableSkillDataHandler',
     'EditableStoryDataHandler',
     'ExportAccountHandler',
     'FeedbackThreadStatusChangeEmailHandler',
