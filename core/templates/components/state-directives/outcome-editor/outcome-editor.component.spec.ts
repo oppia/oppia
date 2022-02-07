@@ -21,7 +21,8 @@ import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExternalSaveService } from 'services/external-save.service';
 import { OutcomeEditorComponent } from './outcome-editor.component';
 
@@ -64,15 +65,16 @@ describe('Outcome Editor Component', () => {
   });
 
   it('should set component properties on initialization', () => {
-    let outcome = {
-      feedback: {
-        html: '<p> Previous HTML string </p>'
-      },
-      hasNonemptyFeedback: () => true
-    };
+    let outcome = new Outcome(
+      'Introduction',
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
     component.outcome = outcome;
 
-    expect(component.editOutcomeForm).toEqual(undefined);
     expect(component.canAddPrerequisiteSkill).toBe(undefined);
     expect(component.feedbackEditorIsOpen).toBe(undefined);
     expect(component.destinationEditorIsOpen).toBe(undefined);
@@ -81,7 +83,6 @@ describe('Outcome Editor Component', () => {
 
     component.ngOnInit();
 
-    expect(component.editOutcomeForm).toEqual({});
     expect(component.canAddPrerequisiteSkill).toBe(false);
     expect(component.feedbackEditorIsOpen).toBe(false);
     expect(component.destinationEditorIsOpen).toBe(false);
@@ -100,11 +101,6 @@ describe('Outcome Editor Component', () => {
     component.ngOnInit();
 
     component.feedbackEditorIsOpen = true;
-    component.editOutcomeForm = {
-      editFeedbackForm: {
-        $valid: true
-      }
-    };
 
     onExternalSaveEmitter.emit();
 
@@ -123,17 +119,22 @@ describe('Outcome Editor Component', () => {
 
     // Setup. No pre-check as we are setting up values below.
     component.feedbackEditorIsOpen = true;
-    component.editOutcomeForm = {
-      editFeedbackForm: {
-        $valid: false
-      }
-    };
-    component.savedOutcome = {
-      feedback: 'Saved Outcome'
-    };
-    component.outcome = {
-      feedback: 'Outcome'
-    };
+    component.savedOutcome = new Outcome(
+      'Introduction',
+      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
+    component.outcome = new Outcome(
+      'Introduction',
+      new SubtitledHtml('<p>Outcome</p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
 
     // Action.
     onExternalSaveEmitter.emit();
@@ -154,11 +155,6 @@ describe('Outcome Editor Component', () => {
     component.ngOnInit();
 
     component.destinationEditorIsOpen = true;
-    component.editOutcomeForm = {
-      editDestForm: {
-        $valid: true
-      }
-    };
 
     onInteractionIdChangedEmitter.emit();
 
@@ -177,21 +173,22 @@ describe('Outcome Editor Component', () => {
 
     // Setup. No pre-check as we are setting up values below.
     component.destinationEditorIsOpen = true;
-    component.editOutcomeForm = {
-      editDestForm: {
-        $valid: false
-      }
-    };
-    component.savedOutcome = {
-      dest: 'Saved Dest',
-      refresherExplorationId: 'ExpId',
-      missingPrerequisiteSkillId: 'SkillId'
-    };
-    component.outcome = {
-      dest: 'Dest',
-      refresherExplorationId: '',
-      missingPrerequisiteSkillId: ''
-    };
+    component.savedOutcome = new Outcome(
+      'Introduction',
+      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+      true,
+      [],
+      'ExpId',
+      'SkillId',
+    );
+    component.outcome = new Outcome(
+      'Introduction',
+      new SubtitledHtml('<p>Outcome</p>', 'Id'),
+      true,
+      [],
+      '',
+      '',
+    );
 
     // Action.
     onInteractionIdChangedEmitter.emit();
@@ -229,21 +226,44 @@ describe('Outcome Editor Component', () => {
   });
 
   it('should check if a state is in self loop', () => {
+    component.outcome = new Outcome(
+      'Hola',
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
     spyOn(stateEditorService, 'getActiveStateName')
       .and.returnValue('Hola');
 
-    expect(component.isSelfLoop({dest: 'Hola'})).toBe(true);
-    expect(component.isSelfLoop({dest: 'Introduction'})).toBe(false);
+    expect(component.isSelfLoop()).toBe(true);
+
+    component.outcome = new Outcome(
+      'Introduction',
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
+    expect(component.isSelfLoop()).toBe(false);
   });
 
   it('should check if state if of self loop with no feedback', () => {
-    let outcome = outcomeObjectFactory.createNew(
-      'State Name', '1', '', []);
+    component.outcome = new Outcome(
+      'Introduction',
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
     spyOn(stateEditorService, 'getActiveStateName')
       .and.returnValue('State Name');
 
-    expect(component.isSelfLoopWithNoFeedback(outcome)).toBe(true);
-    expect(component.isSelfLoopWithNoFeedback(null)).toBe(false);
+    expect(component.isSelfLoopWithNoFeedback()).toBe(true);
+    expect(component.isSelfLoopWithNoFeedback()).toBe(false);
   });
 
   it('should check if state will become invalid after feedback' +
@@ -287,12 +307,22 @@ describe('Outcome Editor Component', () => {
   });
 
   it('should save correctness label when it is changed', () => {
-    component.savedOutcome = {
-      labelledAsCorrect: false
-    };
-    component.outcome = {
-      labelledAsCorrect: true
-    };
+    component.savedOutcome = new Outcome(
+      'Introduction',
+      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+      false,
+      [],
+      'ExpId',
+      'SkillId',
+    );
+    component.outcome = new Outcome(
+      'Introduction',
+      new SubtitledHtml('<p>Outcome</p>', 'Id'),
+      true,
+      [],
+      '',
+      '',
+    );
 
     component.onChangeCorrectnessLabel();
 
@@ -301,20 +331,22 @@ describe('Outcome Editor Component', () => {
 
   it('should set destination as null when saving feedback in' +
     ' question mode', () => {
-    component.savedOutcome = {
-      feedback: {
-        contentId: 'savedContentId',
-        html: '<p> Saved Outcome </p>'
-      },
-      dest: 'Saved Dest'
-    };
-    component.outcome = {
-      feedback: {
-        contentId: 'contentId',
-        html: '<p> Outcome </p>'
-      },
-      dest: 'Dest'
-    };
+    component.savedOutcome = new Outcome(
+      'Saved Dest',
+      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
+      false,
+      [],
+      'ExpId',
+      'SkillId',
+    );
+    component.outcome = new Outcome(
+      'Dest',
+      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
+      true,
+      [],
+      '',
+      '',
+    );
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
     spyOn(component, 'showMarkAllAudioAsNeedingUpdateModalIfRequired');
 
@@ -326,20 +358,22 @@ describe('Outcome Editor Component', () => {
   });
 
   it('should set destination when saving feedback not in question mode', () => {
-    component.savedOutcome = {
-      feedback: {
-        contentId: 'savedContentId',
-        html: '<p> Saved Outcome </p>'
-      },
-      dest: 'Dest',
-    };
-    component.outcome = {
-      feedback: {
-        contentId: 'contentId',
-        html: '<p> Outcome </p>'
-      },
-      dest: 'Dest',
-    };
+    component.savedOutcome = new Outcome(
+      'Dest',
+      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
+      false,
+      [],
+      'ExpId',
+      'SkillId',
+    );
+    component.outcome = new Outcome(
+      'Dest',
+      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
+      true,
+      [],
+      '',
+      '',
+    );
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
 
@@ -350,24 +384,22 @@ describe('Outcome Editor Component', () => {
 
   it('should set refresher exploration ID as null on saving destination' +
     ' when state is not in self loop', () => {
-    component.savedOutcome = {
-      feedback: {
-        contentId: 'savedContentId',
-        html: '<p> Saved Outcome </p>'
-      },
-      dest: 'Saved Dest',
-      refresherExplorationId: 'ExpId',
-      missingPrerequisiteSkillId: ''
-    };
-    component.outcome = {
-      feedback: {
-        contentId: 'contentId',
-        html: '<p> Outcome </p>'
-      },
-      dest: 'Dest',
-      refresherExplorationId: 'OutcomeExpId',
-      missingPrerequisiteSkillId: 'SkillId'
-    };
+    component.savedOutcome = new Outcome(
+      'Saved Dest',
+      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
+      false,
+      [],
+      'ExpId',
+      '',
+    );
+    component.outcome = new Outcome(
+      'Dest',
+      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
+      true,
+      [],
+      'OutcomeExpId',
+      'SkillId',
+    );
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Dest1');
 
     component.saveThisDestination();
@@ -378,18 +410,24 @@ describe('Outcome Editor Component', () => {
   });
 
   it('should check if outcome feedback exceeds 10000 characters', () => {
-    component.outcome = {
-      feedback: {
-        _html: 'a'.repeat(10000)
-      }
-    };
+    component.outcome = new Outcome(
+      'Dest',
+      new SubtitledHtml('a'.repeat(10000), 'contentId'),
+      true,
+      [],
+      'OutcomeExpId',
+      'SkillId',
+    );
     expect(component.isFeedbackLengthExceeded()).toBe(false);
 
-    component.outcome = {
-      feedback: {
-        _html: 'a'.repeat(10001)
-      }
-    };
+    component.outcome = new Outcome(
+      'Dest',
+      new SubtitledHtml('a'.repeat(10001), 'contentId'),
+      true,
+      [],
+      'OutcomeExpId',
+      'SkillId',
+    );
     expect(component.isFeedbackLengthExceeded()).toBe(true);
   });
 });

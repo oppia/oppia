@@ -38,16 +38,16 @@ export class OutcomeEditorComponent implements OnInit {
   @Input() outcomeHasFeedback: boolean;
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
   EventEmitter<string[]> = new EventEmitter();
-  @Output() saveDest: EventEmitter<string> = new EventEmitter();
-  @Output() saveFeedback: EventEmitter<string> = new EventEmitter();
-  @Output() saveCorrectnessLabel: EventEmitter<string> = new EventEmitter();
+  @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();
+  @Output() saveFeedback: EventEmitter<Outcome> = new EventEmitter();
+  @Output() saveCorrectnessLabel: EventEmitter<Outcome> = new EventEmitter();
   directiveSubscriptions = new Subscription();
   ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
   canAddPrerequisiteSkill: boolean;
   feedbackEditorIsOpen: boolean;
-  destinationEditorIsOpen;
-  correctnessLabelEditorIsOpen;
-  savedOutcome;
+  destinationEditorIsOpen: boolean;
+  correctnessLabelEditorIsOpen: boolean;
+  savedOutcome: Outcome;
 
 
   constructor(

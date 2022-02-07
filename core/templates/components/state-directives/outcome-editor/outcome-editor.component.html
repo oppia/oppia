@@ -125,11 +125,11 @@
 <div *ngIf="isEditable && destinationEditorIsOpen && !isInQuestionMode()">
   <form role="form"
         class="form-inline protractor-test-edit-outcome-dest"
-        name="editOutcomeForm.editDestForm"
-        (ngSubmit)="saveThisDestination()">
+        ng-submit="saveThisDestination()">
     <oppia-outcome-destination-editor [outcome]="outcome"
+                                      (getChanges)="getChanges()"
                                       [outcomeHasFeedback]="displayFeedback"
-                                      [addState]="addState">
+                                      (addState)="addState($event)">
     </oppia-outcome-destination-editor>
   </form>
 

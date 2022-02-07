@@ -16,7 +16,8 @@
  * @fileoverview Component for the outcome destination editor.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
@@ -26,7 +27,11 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { downgradeComponent } from '@angular/upgrade/static';
+
+interface DestChoices {
+  id: string;
+  text: string;
+}
 
 @Component({
   selector: 'oppia-outcome-destination-editor',
@@ -35,20 +40,27 @@ import { downgradeComponent } from '@angular/upgrade/static';
 export class OutcomeDestinationEditorComponent implements OnInit {
   @Input() outcome: Outcome;
   @Input() outcomeHasFeedback: boolean;
-  @Input() addState;
-  directiveSubscriptions = new Subscription();
-  ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
-  EXPLORATION_AND_SKILL_ID_PATTERN = (
-    AppConstants.EXPLORATION_AND_SKILL_ID_PATTERN);
-  MAX_STATE_NAME_LENGTH = AppConstants.MAX_STATE_NAME_LENGTH;
-  PLACEHOLDER_OUTCOME_DEST = AppConstants.PLACEHOLDER_OUTCOME_DEST;
-  canAddPrerequisiteSkill;
-  canEditRefresherExplorationId;
-  explorationAndSkillIdPattern;
-  newStateNamePattern;
-  destChoices;
-  currentStateName = null;
+  @Output() addState:
+  EventEmitter<string> = new EventEmitter<string>();
+  @Output() getChanges:
+  EventEmitter<void> = new EventEmitter();
+  directiveSubscriptions: Subscription = new Subscription();
+  canAddPrerequisiteSkill: boolean;
+  canEditRefresherExplorationId: boolean;
+  explorationAndSkillIdPattern: RegExp;
+  newStateNamePattern: RegExp;
+  destChoices: DestChoices[];
   maxLen: number;
+  outcomeNewStateName: string;
+  currentStateName: string = null;
+  ENABLE_PREREQUISITE_SKILLS: boolean = (
+    AppConstants.ENABLE_PREREQUISITE_SKILLS);
+  EXPLORATION_AND_SKILL_ID_PATTERN: RegExp = (
+    AppConstants.EXPLORATION_AND_SKILL_ID_PATTERN);
+  MAX_STATE_NAME_LENGTH: number = (
+    AppConstants.MAX_STATE_NAME_LENGTH);
+  PLACEHOLDER_OUTCOME_DEST: string = (
+    AppConstants.PLACEHOLDER_OUTCOME_DEST);
 
   constructor(
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
@@ -62,90 +74,100 @@ export class OutcomeDestinationEditorComponent implements OnInit {
     return this.outcome.dest === this.currentStateName;
   }
 
+  updateChanges($event: string): void {
+    this.outcomeNewStateName = $event;
+    this.getChanges.emit();
+  }
+
   onDestSelectorChange(): void {
     if (this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST) {
       this.focusManagerService.setFocus('newStateNameInputField');
+    } else {
+      this.getChanges.emit();
     }
   }
 
-  isCreatingNewState(outcome: {dest: string}): boolean {
+  isCreatingNewState(): boolean {
     this.maxLen = this.MAX_STATE_NAME_LENGTH;
-    return outcome.dest === this.PLACEHOLDER_OUTCOME_DEST;
+    return this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST;
   }
 
-
   updateOptionNames(): void {
-    this.currentStateName = this.stateEditorService.getActiveStateName();
-    let questionModeEnabled = this.stateEditorService.isInQuestionMode();
-    // This is a list of objects, each with an ID and name. These
-    // represent all states, as well as an option to create a
-    // new state.
-    this.destChoices = [{
-      id: (questionModeEnabled ? null : this.currentStateName),
-      text: '(try again)'
-    }];
+    // The seTimeout is being used here to update the view.
+    setTimeout(() => {
+      this.currentStateName = this.stateEditorService.getActiveStateName();
+      let questionModeEnabled = this.stateEditorService.isInQuestionMode();
+      // This is a list of objects, each with an ID and name. These
+      // represent all states, as well as an option to create a
+      // new state.
+      this.destChoices = [{
+        id: (questionModeEnabled ? null : this.currentStateName),
+        text: '(try again)'
+      }];
 
-    // Arrange the remaining states based on their order in the state
-    // graph.
-    let lastComputedArrangement = (
-      this.stateGraphLayoutService.getLastComputedArrangement());
-    let allStateNames = this.stateEditorService.getStateNames();
+      // Arrange the remaining states based on their order in the state
+      // graph.
+      let lastComputedArrangement = (
+        this.stateGraphLayoutService.getLastComputedArrangement());
+      let allStateNames = this.stateEditorService.getStateNames();
 
-    // It is possible that lastComputedArrangement is null if the
-    // graph has never been rendered at the time this computation is
-    // being carried out.
-    let stateNames = cloneDeep(allStateNames);
-    let stateName = null;
-    if (lastComputedArrangement) {
-      let maxDepth = 0;
-      let maxOffset = 0;
-      for (let stateName in lastComputedArrangement) {
-        maxDepth = Math.max(
-          maxDepth, lastComputedArrangement[stateName].depth);
-        maxOffset = Math.max(
-          maxOffset, lastComputedArrangement[stateName].offset);
+      // It is possible that lastComputedArrangement is null if the
+      // graph has never been rendered at the time this computation is
+      // being carried out.
+      let stateNames = cloneDeep(allStateNames);
+      let stateName = null;
+      if (lastComputedArrangement) {
+        let maxDepth = 0;
+        let maxOffset = 0;
+        for (let stateName in lastComputedArrangement) {
+          maxDepth = Math.max(
+            maxDepth, lastComputedArrangement[stateName].depth);
+          maxOffset = Math.max(
+            maxOffset, lastComputedArrangement[stateName].offset);
+        }
+
+        // Higher scores come later.
+        let allStateScores = {};
+        let unarrangedStateCount = 0;
+        for (let i = 0; i < allStateNames.length; i++) {
+          stateName = allStateNames[i];
+          if (lastComputedArrangement.hasOwnProperty(stateName)) {
+            allStateScores[stateName] = (
+              lastComputedArrangement[stateName].depth *
+              (maxOffset + 1) +
+              lastComputedArrangement[stateName].offset);
+          } else {
+            // States that have just been added in the rule 'create new'
+            // modal are not yet included as part of
+            // lastComputedArrangement so we account for them here.
+            allStateScores[stateName] = (
+              (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
+            unarrangedStateCount++;
+          }
+        }
+
+        stateNames = allStateNames.sort((a, b) => {
+          return allStateScores[a] - allStateScores[b];
+        });
       }
 
-      // Higher scores come later.
-      let allStateScores = {};
-      let unarrangedStateCount = 0;
-      for (let i = 0; i < allStateNames.length; i++) {
-        stateName = allStateNames[i];
-        if (lastComputedArrangement.hasOwnProperty(stateName)) {
-          allStateScores[stateName] = (
-            lastComputedArrangement[stateName].depth *
-            (maxOffset + 1) +
-            lastComputedArrangement[stateName].offset);
-        } else {
-          // States that have just been added in the rule 'create new'
-          // modal are not yet included as part of
-          // lastComputedArrangement so we account for them here.
-          allStateScores[stateName] = (
-            (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
-          unarrangedStateCount++;
+      for (let i = 0; i < stateNames.length; i++) {
+        if (stateNames[i] !== this.currentStateName) {
+          this.destChoices.push({
+            id: stateNames[i],
+            text: stateNames[i]
+          });
         }
       }
 
-      stateNames = allStateNames.sort((a, b) => {
-        return allStateScores[a] - allStateScores[b];
-      });
-    }
-
-    for (let i = 0; i < stateNames.length; i++) {
-      if (stateNames[i] !== this.currentStateName) {
+      if (!questionModeEnabled) {
         this.destChoices.push({
-          id: stateNames[i],
-          text: stateNames[i]
+          id: this.PLACEHOLDER_OUTCOME_DEST,
+          text: 'A New Card Called...'
         });
       }
-    }
-
-    if (!questionModeEnabled) {
-      this.destChoices.push({
-        id: this.PLACEHOLDER_OUTCOME_DEST,
-        text: 'A New Card Called...'
-      });
-    }
+    // This value of 10ms is arbitrary, it has no significance.
+    }, 10);
   }
 
   ngOnInit(): void {
@@ -159,10 +181,12 @@ export class OutcomeDestinationEditorComponent implements OnInit {
           this.editorFirstTimeEventsService
             .registerFirstCreateSecondStateEvent();
 
-          let newStateName = this.stateEditorService.getActiveStateName();
+          let newStateName = this.outcomeNewStateName;
           this.outcome.dest = newStateName;
 
-          this.addState(newStateName);
+          delete this.outcomeNewStateName;
+
+          this.addState.emit(newStateName);
         }
       }));
     this.updateOptionNames();
@@ -182,9 +206,10 @@ export class OutcomeDestinationEditorComponent implements OnInit {
         userInfo.isCurriculumAdmin() || userInfo.isModerator());
     });
 
-    this.explorationAndSkillIdPattern =
-      this.EXPLORATION_AND_SKILL_ID_PATTERN;
+    this.explorationAndSkillIdPattern = (
+      this.EXPLORATION_AND_SKILL_ID_PATTERN);
     this.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
+    this.destChoices = [];
   }
 
   ngOnDestroy(): void {
@@ -192,6 +217,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaOutcomeDestinationEditor', downgradeComponent(
-    {component: OutcomeDestinationEditorComponent}));
+angular.module('oppia').directive('oppiaOutcomeDestinationEditor',
+  downgradeComponent({
+    component: OutcomeDestinationEditorComponent
+  }) as angular.IDirectiveFactory);

@@ -98,6 +98,7 @@ import { TutorCardComponent } from 'pages/exploration-player-page/learner-experi
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
+import { AddOrUpdateSolutionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
 import { SavePendingChangesModalComponent } from './save-pending-changes/save-pending-changes-modal.component';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
@@ -121,6 +122,8 @@ import { TagMisconceptionModalComponent } from './question-directives/question-m
 import { QuestionMisconceptionEditorComponent } from './question-directives/question-misconception-editor/question-misconception-editor.component';
 import { SolutionExplanationEditor } from './state-directives/solution-editor/solution-explanation-editor.component';
 import { SolutionEditor } from './state-directives/solution-editor/solution-editor.component';
+import { OutcomeDestinationEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
+import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -208,7 +211,10 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
+<<<<<<< HEAD
     OutcomeEditorComponent,
+=======
+>>>>>>> 7b1701c7dc0f103968cf62097aea88e1b2293c37
     OutcomeDestinationEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
@@ -248,6 +254,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    AddOrUpdateSolutionModalComponent,
     AddHintModalComponent,
     QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
@@ -263,6 +270,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
+    StateSolutionEditorComponent
   ],
 
   entryComponents: [
@@ -310,6 +318,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     OutcomeEditorComponent,
     OutcomeDestinationEditorComponent,
     LearnerAnswerInfoCard,
+    OutcomeDestinationEditorComponent,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
@@ -339,6 +348,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    AddOrUpdateSolutionModalComponent,
     AddHintModalComponent,
     QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
@@ -353,7 +363,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TagMisconceptionModalComponent,
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
-    SolutionExplanationEditor
+    SolutionExplanationEditor,
+    StateSolutionEditorComponent
   ],
 
   exports: [
@@ -414,7 +425,10 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
+<<<<<<< HEAD
     OutcomeEditorComponent,
+=======
+>>>>>>> 7b1701c7dc0f103968cf62097aea88e1b2293c37
     OutcomeDestinationEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
@@ -447,6 +461,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
+    AddOrUpdateSolutionModalComponent,
     QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
@@ -458,7 +473,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TagMisconceptionModalComponent,
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
-    SolutionExplanationEditor
+    SolutionExplanationEditor,
+    StateSolutionEditorComponent
   ],
 })
 
