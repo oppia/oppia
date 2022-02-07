@@ -957,8 +957,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       this.data.metadata.uploadedImageData as string);
     const mimeType = imageDataURI.split(';')[0];
     let resampledFile;
-    let svgString;
-    let cleanedSvgString;
 
     if (mimeType === 'data:image/gif') {
       let successCb = obj => {
@@ -984,12 +982,17 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       let gifHeight = dimensions.height;
       this.processGIFImage(imageDataURI, gifWidth, gifHeight, null, successCb);
     } else if (mimeType === 'data:image/svg+xml') {
-      svgString = atob(imageDataURI.split(',')[1]);
-      cleanedSvgString = this.svgSanitizerService.cleanMathExpressionSvgString(
-        svgString);
+      const svgString = atob(imageDataURI.split(',')[1]);
+      let domParser = new DOMParser();
+      let doc = domParser.parseFromString(svgString, 'image/svg+xml');
+      doc.querySelectorAll('*').forEach((node) => {
+        if (node.tagName.toLowerCase() === 'svg') {
+          node.removeAttribute('data-name');
+        }
+      });
       imageDataURI = (
         'data:image/svg+xml;base64,' +
-        btoa(unescape(encodeURIComponent(cleanedSvgString))));
+        btoa(unescape(encodeURIComponent(doc.documentElement.outerHTML))));
       this.invalidTagsAndAttributes = (
         this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
           imageDataURI));
