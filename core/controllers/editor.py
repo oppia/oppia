@@ -52,43 +52,42 @@ def _require_valid_version(version_from_payload, exploration_version):
             % (exploration_version, version_from_payload))
 
 
-def get_updated_rights_by_exploration_id(exploration_id):
-    """Updates the thread with names.
+def replace_ids_with_names_in_dict(exploration_id):
+    """Replace ids with the names and return rights as a dictionary.
 
     Args:
         exploration_id: str. ID of the exploration.
 
     Returns:
-        dict. The rights dictionary with names inserted.
+        dict. The dictionary where ids are replaced with corresponding names.
     """
 
     rights_dict = rights_manager.get_exploration_rights(
         exploration_id).to_dict()
-
-    rights_dict['owner_names'] = rights_dict.pop('owner_ids')
-    rights_dict['editor_names'] = rights_dict.pop('editor_ids')
-    rights_dict['voice_artist_names'] = rights_dict.pop('voice_artist_ids')
-    rights_dict['viewer_names'] = rights_dict.pop('viewer_ids')
 
     if rights_dict['community_owned']:
         rights_dict['owner_names'] = []
         rights_dict['editor_names'] = []
         rights_dict['voice_artist_names'] = []
         rights_dict['viewer_names'] = []
-        return rights_dict
     else:
         rights_dict['owner_names'] = user_services.get_human_readable_user_ids(
-            rights_dict['owner_names'])
+            rights_dict['owner_ids'])
         rights_dict['editor_names'] = (
             user_services.get_human_readable_user_ids(
-                rights_dict['editor_names']))
+                rights_dict['editor_ids']))
         rights_dict['voice_artist_names'] = (
             user_services.get_human_readable_user_ids(
-                rights_dict['voice_artist_names']))
+                rights_dict['voice_artist_ids']))
         rights_dict['viewer_names'] = (
             user_services.get_human_readable_user_ids(
-                rights_dict['viewer_names']))
-        return rights_dict
+                rights_dict['viewer_ids']))
+
+    rights_dict.pop('owner_ids')
+    rights_dict.pop('editor_ids')
+    rights_dict.pop('voice_artist_ids')
+    rights_dict.pop('viewer_ids')
+    return rights_dict
 
 
 # Common schemas used in this file.
@@ -418,7 +417,7 @@ class ExplorationRightsHandler(EditorHandler):
                 'No change was made to this exploration.')
 
         self.render_json({
-            'rights': get_updated_rights_by_exploration_id(
+            'rights': replace_ids_with_names_in_dict(
                 exploration_id)
         })
 
@@ -437,7 +436,7 @@ class ExplorationRightsHandler(EditorHandler):
         rights_manager.deassign_role_for_exploration(
             self.user, exploration_id, user_id)
         self.render_json({
-            'rights': get_updated_rights_by_exploration_id(
+            'rights': replace_ids_with_names_in_dict(
                 exploration_id)
         })
 
@@ -488,7 +487,7 @@ class ExplorationStatusHandler(EditorHandler):
             self._publish_exploration(exploration_id)
 
         self.render_json({
-            'rights': get_updated_rights_by_exploration_id(
+            'rights': replace_ids_with_names_in_dict(
                 exploration_id)
         })
 
@@ -547,7 +546,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
                     exploration.title, email_body)
 
         self.render_json({
-            'rights': get_updated_rights_by_exploration_id(
+            'rights': replace_ids_with_names_in_dict(
                 exploration_id)
         })
 
