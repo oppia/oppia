@@ -58,6 +58,8 @@ FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION = (
 FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY = 'regenerate_exploration_summary'
 FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS = 'untag_deleted_misconceptions'
 FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS = 'remove_user_from_rights_models'
+FUNCTION_ID_UPDATE_TRANSLATION_RELATED_CHANGE = (
+    'update_translation_related_changes')
 
 
 def defer(fn_identifier, queue_name, *args, **kwargs):
