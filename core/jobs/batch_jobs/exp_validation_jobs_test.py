@@ -40,48 +40,55 @@ class GetExpRightsWithDuplicateUsersJobTests(
     USER_ID_2 = 'id_2'
     USER_ID_3 = 'id_3'
 
-    # This is an invalid model with duplicate: USER_ID_1.
-    EXP_RIGHTS_1 = super().createModel(
-        exp_models.ExplorationRightsModel,
-        id=EXPLORATION_ID_1,
-        owner_ids=[USER_ID_1],
-        editor_ids=[USER_ID_1],
-        voice_artist_ids=[USER_ID_2],
-        viewer_ids=[USER_ID_3],
-        community_owned=False,
-        status=constants.ACTIVITY_STATUS_PUBLIC,
-        viewable_if_private=False,
-        first_published_msec=0.0
-    )
-    USER_LIST_1 = [USER_ID_1, USER_ID_1, USER_ID_2, USER_ID_3]
-    # This is a valid model without duplicates.
-    EXP_RIGHTS_2 = super().createModel(
-        exp_models.ExplorationRightsModel,
-        id=EXPLORATION_ID_2,
-        owner_ids=[USER_ID_1],
-        editor_ids=[USER_ID_2],
-        voice_artist_ids=[USER_ID_3],
-        viewer_ids=[],
-        community_owned=False,
-        status=constants.ACTIVITY_STATUS_PUBLIC,
-        viewable_if_private=False,
-        first_published_msec=0.0
-    )
-    USER_LIST_2 = [USER_ID_1, USER_ID_2, USER_ID_3]
-    # This is an invalid model with duplicate: USER_ID_3.
-    EXP_RIGHTS_3 = super().createModel(
-        exp_models.ExplorationRightsModel,
-        id=EXPLORATION_ID_3,
-        owner_ids=[USER_ID_3],
-        editor_ids=[USER_ID_1],
-        voice_artist_ids=[USER_ID_2],
-        viewer_ids=[USER_ID_3],
-        community_owned=False,
-        status=constants.ACTIVITY_STATUS_PUBLIC,
-        viewable_if_private=False,
-        first_published_msec=0.0
-    )
-    USER_LIST_3 = [USER_ID_3, USER_ID_1, USER_ID_2, USER_ID_3]
+    def __init__(self):
+        # This is an invalid model with duplicate: USER_ID_1.
+        self.EXP_RIGHTS_1 = self.create_model(
+            exp_models.ExplorationRightsModel,
+            id=self.EXPLORATION_ID_1,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_2],
+            viewer_ids=[self.USER_ID_3],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        )
+        self.USER_LIST_1 = [
+            self.USER_ID_1, self.USER_ID_1, self.USER_ID_2, self.USER_ID_3
+        ]
+
+        # This is a valid model without duplicates.
+        self.EXP_RIGHTS_2 = self.create_model(
+            exp_models.ExplorationRightsModel,
+            id=self.EXPLORATION_ID_2,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_2],
+            voice_artist_ids=[self.USER_ID_3],
+            viewer_ids=[],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        )
+        self.USER_LIST_2 = [self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]
+
+        # This is an invalid model with duplicate: USER_ID_3.
+        self.EXP_RIGHTS_3 = self.create_model(
+            exp_models.ExplorationRightsModel,
+            id=self.EXPLORATION_ID_3,
+            owner_ids=[self.USER_ID_3],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_2],
+            viewer_ids=[self.USER_ID_3],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        )
+        self.USER_LIST_3 = [
+            self.USER_ID_3, self.USER_ID_1, self.USER_ID_2, self.USER_ID_3
+        ]
 
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is(
