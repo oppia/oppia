@@ -96,11 +96,8 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     PreviewSetParametersModalComponent,
     RevertExplorationModalComponent,
     WelcomeTranslationModalComponent,
-    ConfirmDeleteStateModalComponent,
     DeleteAudioTranslationModalComponent,
-    ConfirmDeleteStateModalComponent,
     TranslationTabBusyModalComponent,
-    WelcomeTranslationModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -129,11 +126,8 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     PreviewSetParametersModalComponent,
     RevertExplorationModalComponent,
     WelcomeTranslationModalComponent,
-    ConfirmDeleteStateModalComponent,
     DeleteAudioTranslationModalComponent,
-    ConfirmDeleteStateModalComponent,
     TranslationTabBusyModalComponent,
-    WelcomeTranslationModalComponent
   ],
   providers: [
     {

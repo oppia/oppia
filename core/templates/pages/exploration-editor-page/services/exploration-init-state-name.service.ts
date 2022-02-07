@@ -25,16 +25,15 @@ import { ExplorationPropertyService } from './exploration-property.service';
 import { AlertsService } from 'services/alerts.service';
 import { ChangeListService } from './change-list.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { ContextService } from 'services/context.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExplorationInitStateNameService
-  extends ExplorationPropertyService {
+    extends ExplorationPropertyService {
+  savedMemento: string;
   propertyName: string = 'init_state_name';
   constructor(
-    private contextService: ContextService,
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
     protected loggerService: LoggerService
