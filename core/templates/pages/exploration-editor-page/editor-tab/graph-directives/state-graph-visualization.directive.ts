@@ -181,11 +181,13 @@ angular.module('oppia').directive('stateGraphVisualization', [
                   origTranslations[0] = (
                     dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
                     nodeData[$scope.currentStateId()].width / 2);
-                } catch(e) {
-                  console.error(e +
-                    "\ncurrentStateId(): " + $scope.currentStateId() +
-                    "\nnodeData:" + nodeData + "\n\n\n"
-                    );
+                } catch (e) {
+                  console.error(
+                    e +
+                    '\ncurrentStateId(): ' + $scope.currentStateId(
+                      ) +
+                    '\nnodeData:' + nodeData + '\n\n\n'
+                  );
                 }
 
                 origTranslations[1] = (
