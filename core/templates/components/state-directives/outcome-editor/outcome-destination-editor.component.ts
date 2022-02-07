@@ -28,7 +28,7 @@ import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
-interface DestChoices {
+interface DestinationChoice {
   id: string;
   text: string;
 }
@@ -49,7 +49,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   canEditRefresherExplorationId: boolean;
   explorationAndSkillIdPattern: RegExp;
   newStateNamePattern: RegExp;
-  destChoices: DestChoices[];
+  destinationChoices: DestinationChoice[];
   maxLen: number;
   outcomeNewStateName: string;
   currentStateName: string = null;
@@ -100,7 +100,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
       // This is a list of objects, each with an ID and name. These
       // represent all states, as well as an option to create a
       // new state.
-      this.destChoices = [{
+      this.destinationChoices = [{
         id: (questionModeEnabled ? null : this.currentStateName),
         text: '(try again)'
       }];
@@ -153,7 +153,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
 
       for (let i = 0; i < stateNames.length; i++) {
         if (stateNames[i] !== this.currentStateName) {
-          this.destChoices.push({
+          this.destinationChoices.push({
             id: stateNames[i],
             text: stateNames[i]
           });
@@ -161,7 +161,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
       }
 
       if (!questionModeEnabled) {
-        this.destChoices.push({
+        this.destinationChoices.push({
           id: this.PLACEHOLDER_OUTCOME_DEST,
           text: 'A New Card Called...'
         });
@@ -209,7 +209,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
     this.explorationAndSkillIdPattern = (
       this.EXPLORATION_AND_SKILL_ID_PATTERN);
     this.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
-    this.destChoices = [];
+    this.destinationChoices = [];
   }
 
   ngOnDestroy(): void {
