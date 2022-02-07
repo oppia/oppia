@@ -94,24 +94,6 @@ describe('Email Dashboard Page Component', () => {
     expect(componentInstance.currentPageOfQueries).toEqual(queries);
   }));
 
-  it('should tell if field is required', () => {
-    let fieldIsRequired = true;
-    componentInstance.isRequired = fieldIsRequired;
-    expect(componentInstance.isFieldRequired()).toEqual(fieldIsRequired);
-  });
-
-  it('should provide schema object', () => {
-    let schema = {} as CustomSchema;
-    let customizationArgSpec = {
-      backend_id: '',
-      backend_attr: '',
-      description: '',
-      schema,
-      default_value: ''
-    };
-    expect(componentInstance.getSchema(customizationArgSpec)()).toEqual(schema);
-  });
-
   it('should update query data', () => {
     let field = 'f1';
     componentInstance.data = {};
