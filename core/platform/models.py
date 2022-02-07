@@ -30,7 +30,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models  # pylint: disable=unused-import
 
-# Constant for valid model names
+# Constant for valid model names.
 NAMES = feconf.NAMES
 
 # Types of deletion policies. The pragma comment is needed because Enums are
@@ -76,8 +76,8 @@ class _Gae(Platform):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def import_models(cls,
-            model_names: List[NAMES]
+    def import_models(
+            cls, model_names: List[NAMES]
     ) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
@@ -189,8 +189,8 @@ class _Gae(Platform):
         return tuple(returned_models)
 
     @classmethod
-    def get_storage_model_classes(cls,
-            model_names: List[NAMES]
+    def get_storage_model_classes(
+            cls, model_names: List[NAMES]
     ) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.
