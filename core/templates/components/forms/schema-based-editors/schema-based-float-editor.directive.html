@@ -13,8 +13,7 @@
              [oppiaFocusOn]="labelForFocusTarget"
              (keypress)="onKeypress($event)"
              applyValidation [validators]="validators"
-             (blur)="onBlur()" (focus)="onFocus()"
-             (ngModelChange)="generateErrors()">
+             (blur)="onBlur()" (focus)="onFocus()">
       <span *ngIf="errorString" class="oppia-form-error oppia-numeric-input-error">
         {{errorString}}
       </span>
@@ -58,4 +57,3 @@
     font-size: 0.85em;
   }
 </style>
-

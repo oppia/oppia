@@ -106,6 +106,7 @@ implements ControlValueAccessor, OnInit, Validator {
 
   updateLocalValue(value: number): void {
     this.localValue = value;
+    this.generateErrors();
     this.onChange(this.localValue);
   }
 
