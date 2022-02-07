@@ -953,10 +953,12 @@ export class ImageEditorComponent implements OnInit, OnChanges {
 
     // Check mime type from imageDataURI.
     // Check point 2 in the note before imports and after fileoverview.
-    const imageDataURI = this.imgData || (
+    let imageDataURI = this.imgData || (
       this.data.metadata.uploadedImageData as string);
     const mimeType = imageDataURI.split(';')[0];
     let resampledFile;
+    let svgString;
+    let cleanedSvgString;
 
     if (mimeType === 'data:image/gif') {
       let successCb = obj => {
@@ -982,6 +984,12 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       let gifHeight = dimensions.height;
       this.processGIFImage(imageDataURI, gifWidth, gifHeight, null, successCb);
     } else if (mimeType === 'data:image/svg+xml') {
+      svgString = atob(imageDataURI.split(',')[1]);
+      cleanedSvgString = this.svgSanitizerService.cleanMathExpressionSvgString(
+        svgString);
+      imageDataURI = (
+        'data:image/svg+xml;base64,' +
+        btoa(unescape(encodeURIComponent(cleanedSvgString))));
       this.invalidTagsAndAttributes = (
         this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
           imageDataURI));
