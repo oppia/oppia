@@ -37,7 +37,7 @@ implements OnInit, ControlValueAccessor, Validator {
     type: 'float'
   };
   onChange: (_: unknown) => void = () => {};
-  onTouch: () => void;
+  onTouch: () => void = () => {};
   onValidatorChange: () => void = () => {};
 
   temp = 0;
