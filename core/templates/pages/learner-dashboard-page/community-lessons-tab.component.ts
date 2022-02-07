@@ -47,8 +47,12 @@ export class CommunityLessonsTabComponent {
   @Input() completedToIncompleteCollections: string[];
   noCommunityLessonActivity: boolean;
   noPlaylistActivity: boolean;
+  tempIncompleteLessonsList: (
+    LearnerExplorationSummary | CollectionSummary)[] = [];
   totalIncompleteLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+  tempCompletedLessonsList: (
+      LearnerExplorationSummary | CollectionSummary)[] = [];
   totalCompletedLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
   totalLessonsInPlaylist: (
@@ -97,10 +101,12 @@ export class CommunityLessonsTabComponent {
     this.noPlaylistActivity = (
       (this.explorationPlaylist.length === 0) &&
       (this.collectionPlaylist.length === 0));
-    this.totalIncompleteLessonsList.push(
+    this.tempIncompleteLessonsList.push(
       ...this.incompleteExplorationsList, ...this.incompleteCollectionsList);
-    this.totalCompletedLessonsList.push(
+    this.totalIncompleteLessonsList = this.tempIncompleteLessonsList.reverse();
+    this.tempCompletedLessonsList.push(
       ...this.completedExplorationsList, ...this.completedCollectionsList);
+    this.totalCompletedLessonsList = this.tempCompletedLessonsList.reverse();
     this.totalLessonsInPlaylist.push(
       ...this.explorationPlaylist, ...this.collectionPlaylist);
     this.allCommunityLessons.push(
