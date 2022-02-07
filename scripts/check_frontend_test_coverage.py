@@ -39,13 +39,11 @@ EXCLUDED_DIRECTORIES = [
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
     'angular-html-bind.directive.ts',
-    'answer-classification.service.ts',
     'App.ts',
     'audio-preloader.service.ts',
     'Base.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
-    'collection-player-page.component.ts',
     'collection.model.ts',
     'contribution-and-review.service.ts',
     'exploration-states.service.ts',
@@ -67,7 +65,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'refresher-exploration-confirmation-modal.service.ts',
     'rule-type-selector.directive.ts',
     'select2-dropdown.directive.ts',
-    'state-card.model.ts',
     'state-content-editor.directive.ts',
     'state-interaction-editor.directive.ts',
     'story-node.model.ts',
