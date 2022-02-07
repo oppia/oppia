@@ -21,6 +21,7 @@
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
 
 @Component({
@@ -44,7 +45,9 @@ export class ParameterNameEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.availableParamNames = (
-      this.explorationParamSpecsService.savedMemento.getParamNames());
+      // Find a solution for this.
+      (this.explorationParamSpecsService.savedMemento as unknown as ParamSpecs)
+        .getParamNames());
 
     if (this.availableParamNames.length === 0) {
       this.value = null;
