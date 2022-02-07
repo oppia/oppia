@@ -18,6 +18,7 @@
       <div id="tutorialStateContent" class="oppia-editor-card-section state-content-editor-parent-container">
         <oppia-state-content-editor (on-save-state-content)="$ctrl.onSaveStateContent($event)"
                                     (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
+                                    (intialize)="updateView()"
                                     [state-content-placeholder]="$ctrl.getStateContentPlaceholder()"
                                     [state-content-save-button-placeholder]="$ctrl.getStateContentSaveButtonPlaceholder()">
         </oppia-state-content-editor>
