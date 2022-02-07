@@ -47,12 +47,8 @@ export class CommunityLessonsTabComponent {
   @Input() completedToIncompleteCollections: string[];
   noCommunityLessonActivity: boolean;
   noPlaylistActivity: boolean;
-  tempIncompleteLessonsList: (
-    LearnerExplorationSummary | CollectionSummary)[] = [];
   totalIncompleteLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
-  tempCompletedLessonsList: (
-      LearnerExplorationSummary | CollectionSummary)[] = [];
   totalCompletedLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
   totalLessonsInPlaylist: (
@@ -93,6 +89,10 @@ export class CommunityLessonsTabComponent {
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
+    var tempIncompleteLessonsList: (
+      LearnerExplorationSummary | CollectionSummary)[] = [];
+    var tempCompletedLessonsList: (
+    LearnerExplorationSummary | CollectionSummary)[] = [];
     this.noCommunityLessonActivity = (
       (this.incompleteExplorationsList.length === 0) &&
         (this.completedExplorationsList.length === 0) &&
@@ -101,12 +101,12 @@ export class CommunityLessonsTabComponent {
     this.noPlaylistActivity = (
       (this.explorationPlaylist.length === 0) &&
       (this.collectionPlaylist.length === 0));
-    this.tempIncompleteLessonsList.push(
+    tempIncompleteLessonsList.push(
       ...this.incompleteExplorationsList, ...this.incompleteCollectionsList);
-    this.totalIncompleteLessonsList = this.tempIncompleteLessonsList.reverse();
-    this.tempCompletedLessonsList.push(
+    this.totalIncompleteLessonsList = tempIncompleteLessonsList.reverse();
+    tempCompletedLessonsList.push(
       ...this.completedExplorationsList, ...this.completedCollectionsList);
-    this.totalCompletedLessonsList = this.tempCompletedLessonsList.reverse();
+    this.totalCompletedLessonsList = tempCompletedLessonsList.reverse();
     this.totalLessonsInPlaylist.push(
       ...this.explorationPlaylist, ...this.collectionPlaylist);
     this.allCommunityLessons.push(
