@@ -65,6 +65,7 @@
       <div class="thumbnail-editor protractor-test-subtopic-thumbnail protractor-test-photo-button create-new-subtopic-input-field">
         <strong>Thubmnail Image*</strong>
         <oppia-thumbnail-uploader (updateFilename)="updateSubtopicThumbnailFilename($event)"
+                                  [useLocalStorage]="false"
                                   [bgColor]="editableThumbnailBgColor"
                                   (updateBgColor)="updateSubtopicThumbnailBgColor($event)"
                                   [allowedBgColors]="allowedBgColors"
