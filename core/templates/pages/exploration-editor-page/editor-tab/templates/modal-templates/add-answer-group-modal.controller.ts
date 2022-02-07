@@ -105,9 +105,10 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
         tmpOutcome.dest ===
         stateName && !tmpOutcome.hasNonemptyFeedback());
     };
+
+    // Remove this function once this controller is migrated to
+    // Angular 2+.
     $scope.getChanges = function() {
-      // TODO(#8521): Remove the use of $rootScope.$apply()
-      // once the controller is migrated to angular.
       $rootScope.$apply();
     };
 
