@@ -836,7 +836,7 @@ describe('Contributions and review component', function() {
     it('should not resolve suggestion to skill when dismissing show question' +
       ' suggestion modal', function() {
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
-      spyOn(contributionAndReviewService, 'resolveSuggestiontoSkill');
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject({})
       });
@@ -854,7 +854,7 @@ describe('Contributions and review component', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: Promise.resolve([])
       });
-      spyOn(contributionAndReviewService, 'resolveSuggestiontoSkill')
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion')
         .and.callFake((
             targetId, suggestionId, action, reviewMessage,
             skillDifficulty, resolveSuggestion, cb) => {

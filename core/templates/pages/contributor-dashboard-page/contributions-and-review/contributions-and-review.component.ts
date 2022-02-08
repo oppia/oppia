@@ -88,6 +88,29 @@ angular.module('oppia').component('contributionsAndReview', {
       ctrl.TAB_TYPE_CONTRIBUTIONS = 'contributions';
       ctrl.TAB_TYPE_REVIEWS = 'reviews';
 
+      var tabNameToOpportunityFetchFunction = {
+        [SUGGESTION_TYPE_QUESTION]: {
+          [ctrl.TAB_TYPE_CONTRIBUTIONS]: () => {
+            return ContributionAndReviewService
+              .getUserCreatedQuestionSuggestionsAsync();
+          },
+          [ctrl.TAB_TYPE_REVIEWS]: () => {
+            return ContributionAndReviewService
+              .getReviewableQuestionSuggestionsAsync();
+          }
+        },
+        [SUGGESTION_TYPE_TRANSLATE]: {
+          [ctrl.TAB_TYPE_CONTRIBUTIONS]: () => {
+            return ContributionAndReviewService
+              .getUserCreatedTranslationSuggestionsAsync();
+          },
+          [ctrl.TAB_TYPE_REVIEWS]: () => {
+            return ContributionAndReviewService
+              .getReviewableTranslationSuggestionsAsync();
+          }
+        }
+      };
+
       var getQuestionContributionsSummary = function(
           suggestionIdToSuggestions) {
         var questionContributionsSummaryList = [];
@@ -214,7 +237,7 @@ angular.module('oppia').component('contributionsAndReview', {
           },
           controller: 'QuestionSuggestionReviewModalController'
         }).result.then(function(result) {
-          ContributionAndReviewService.resolveSuggestiontoSkill(
+          ContributionAndReviewService.reviewSkillSuggestion(
             targetId, suggestionId, result.action, result.reviewMessage,
             result.skillDifficulty, resolveSuggestionSuccess, () => {
               AlertsService.addInfoMessage('Failed to submit suggestion.');

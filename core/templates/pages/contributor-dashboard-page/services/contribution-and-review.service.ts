@@ -30,15 +30,8 @@ export interface OpportunityDict {
   'skill_description': string;
 }
 
-export interface FetchSuggestionsResponse {
-  'target_id_to_opportunity_dict': {
-    [propName: string]: OpportunityDict;
-  };
-  suggestions: SuggestionBackendDict[];
-}
-
-interface FetchSuggestionsReturn {
-  [propName: string]: {
+interface FetchSuggestionsResponse {
+  [targetId: string]: {
     suggestion: SuggestionBackendDict;
     details: OpportunityDict;
   };
@@ -53,16 +46,16 @@ export class ContributionAndReviewService {
       ContributionAndReviewBackendApiService
   ) {}
 
-  private async _fetchSuggestionsAsync(
-      url: string, targetType: string, suggestionType: string
-  ): Promise<FetchSuggestionsReturn> {
+  private async fetchSuggestionsAsync(
+      fetchType: string
+  ): Promise<FetchSuggestionsResponse> {
     return (
       this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
-        url, targetType, suggestionType
-      ).then((data) => {
-        let suggestionIdToSuggestions: FetchSuggestionsReturn = {};
-        let targetIdToDetails = data.target_id_to_opportunity_dict;
-        data.suggestions.forEach((suggestion) => {
+        fetchType
+      ).then((responseBody) => {
+        const suggestionIdToSuggestions: FetchSuggestionsResponse = {};
+        const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
+        responseBody.suggestions.forEach((suggestion) => {
           suggestionIdToSuggestions[suggestion.suggestion_id] = {
             suggestion: suggestion,
             details: targetIdToDetails[suggestion.target_id]
@@ -74,41 +67,32 @@ export class ContributionAndReviewService {
   }
 
   async getUserCreatedQuestionSuggestionsAsync():
-  Promise<FetchSuggestionsReturn> {
-    return this._fetchSuggestionsAsync(
-      '_SUBMITTED_SUGGESTION_LIST_HANDLER_URL', 'skill', 'add_question'
-    );
+  Promise<FetchSuggestionsResponse> {
+    return this.fetchSuggestionsAsync('SUBMITTED_QUESTION_SUGGESTIONS');
   }
 
   async getReviewableQuestionSuggestionsAsync():
-  Promise<FetchSuggestionsReturn> {
-    return this._fetchSuggestionsAsync(
-      '_REVIEWABLE_SUGGESTIONS_HANDLER_URL', 'skill', 'add_question'
-    );
+  Promise<FetchSuggestionsResponse> {
+    return this.fetchSuggestionsAsync('REVIEWABLE_QUESTION_SUGGESTIONS');
   }
 
   async getUserCreatedTranslationSuggestionsAsync():
-  Promise<FetchSuggestionsReturn> {
-    return this._fetchSuggestionsAsync(
-      '_SUBMITTED_SUGGESTION_LIST_HANDLER_URL',
-      'exploration', 'translate_content'
-    );
+  Promise<FetchSuggestionsResponse> {
+    return this.fetchSuggestionsAsync('SUBMITTED_TRANSLATION_SUGGESTIONS');
   }
 
   async getReviewableTranslationSuggestionsAsync():
-    Promise<FetchSuggestionsReturn> {
-    return this._fetchSuggestionsAsync(
-      '_REVIEWABLE_SUGGESTIONS_HANDLER_URL', 'exploration', 'translate_content'
-    );
+  Promise<FetchSuggestionsResponse> {
+    return this.fetchSuggestionsAsync('REVIEWABLE_TRANSLATION_SUGGESTIONS');
   }
 
-  resolveSuggestionToExploration(
+  reviewExplorationSuggestion(
       targetId: string, suggestionId: string, action: string,
       reviewMessage: string, commitMessage: string,
       onSuccess: (suggestionId: string) => void,
       onFailure: (error) => void
   ): Promise<void> {
-    let data = {
+    const requestBody = {
       action: action,
       review_message: reviewMessage,
       commit_message: (
@@ -118,8 +102,8 @@ export class ContributionAndReviewService {
     };
 
     return this.contributionAndReviewBackendApiService
-      .resolveToExplorationAsync(
-        targetId, suggestionId, data
+      .reviewExplorationSuggestionAsync(
+        targetId, suggestionId, requestBody
       ).then(() => {
         onSuccess(suggestionId);
       }, (error) => {
@@ -127,25 +111,26 @@ export class ContributionAndReviewService {
       });
   }
 
-  resolveSuggestiontoSkill(
+  reviewSkillSuggestion(
       targetId: string, suggestionId: string, action: string,
       reviewMessage: string, skillDifficulty: string,
       onSuccess: (suggestionId: string) => void,
       onFailure: () => void
   ): Promise<void> {
-    let data = {
+    const requestBody = {
       action: action,
       review_message: reviewMessage,
       skill_difficulty: skillDifficulty
     };
 
-    return this.contributionAndReviewBackendApiService.resolveToSkillAsync(
-      targetId, suggestionId, data
-    ).then(() => {
-      onSuccess(suggestionId);
-    }, () => {
-      onFailure && onFailure();
-    });
+    return this.contributionAndReviewBackendApiService
+      .reviewSkillSuggestionAsync(
+        targetId, suggestionId, requestBody
+      ).then(() => {
+        onSuccess(suggestionId);
+      }, () => {
+        onFailure && onFailure();
+      });
   }
 
   async updateTranslationSuggestionAsync(
@@ -153,13 +138,13 @@ export class ContributionAndReviewService {
       onSuccess: () => void,
       onFailure: (error) => void
   ): Promise<void> {
-    let data = {
+    const requestBody = {
       translation_html: translationHtml
     };
 
     return this.contributionAndReviewBackendApiService
       .updateTranslationSuggestionAsync(
-        suggestionId, data
+        suggestionId, requestBody
       ).then(() => {
         onSuccess();
       }, (error) => onFailure && onFailure(error));
@@ -175,17 +160,17 @@ export class ContributionAndReviewService {
       skill_difficulty: skillDifficulty,
       question_state_data: questionStateData
     };
-    const body = new FormData();
-    body.append('payload', JSON.stringify(payload));
+    const requestBody = new FormData();
+    requestBody.append('payload', JSON.stringify(payload));
     imagesData.forEach(obj => {
       if (obj.imageBlob !== null) {
-        body.append(obj.filename, obj.imageBlob);
+        requestBody.append(obj.filename, obj.imageBlob);
       }
     });
 
     return this.contributionAndReviewBackendApiService
       .updateQuestionSuggestionAsync(
-        suggestionId, body
+        suggestionId, requestBody
       ).then(() => {
         onSuccess(suggestionId);
       }, () => onFailure && onFailure(suggestionId));
