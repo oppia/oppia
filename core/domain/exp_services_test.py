@@ -1536,8 +1536,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
             exploration.validate(strict=True)
 
             duration = datetime.datetime.utcnow() - start_time
-            processing_time = duration.seconds + python_utils.divide(
-                duration.microseconds, 1E6)
+            processing_time = duration.seconds + (duration.microseconds / 1E6)
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)' %
                 (exploration.title, processing_time))
