@@ -18,11 +18,13 @@
 
 import { Component, OnInit, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
 import { ContextService } from 'services/context.service';
-import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { ExternalSaveService } from 'services/external-save.service';
+import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Subscription } from 'rxjs';
 
@@ -44,20 +46,20 @@ export class StateContentEditorComponent implements OnInit {
     new EventEmitter<string[]>();
   @Input() stateContentPlaceholder: string;
   @Input() stateContentSaveButtonPlaceholder: string;
+  cardHeightLimitWarningIsShown: boolean;
   contentId: string;
   contentEditorIsOpen: boolean;
+  directiveSubscriptions = new Subscription();
   isEditable: boolean;
   HTML_SCHEMA: HTMLSchema;
-  directiveSubscriptions = new Subscription();
-  cardHeightLimitWarningIsShown: boolean;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
+    private editorFirstTimeEventsService: EditorFirstTimeEventsService,
+    private externalSaveService: ExternalSaveService,
     private stateContentService: StateContentService,
     private stateEditorService: StateEditorService,
-    private editorFirstTimeEventsService: EditorFirstTimeEventsService,
-    private externalSaveService: ExternalSaveService
   ) {}
 
   ngOnInit(): void {
@@ -88,9 +90,6 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   isCardContentLengthLimitReached(): boolean {
-    if (this.stateContentService.displayed === undefined) {
-      return false;
-    }
     var content = this.stateContentService.displayed.html;
     return (content.length > 4500);
   }

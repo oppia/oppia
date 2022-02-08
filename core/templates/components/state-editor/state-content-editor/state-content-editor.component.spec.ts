@@ -17,25 +17,29 @@
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { fakeAsync, tick } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
 import { StateContentEditorComponent } from './state-content-editor.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
-// import { ExplorationStatesService } from 
+
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
-import { EditabilityService } from 'services/editability.service';
-import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { ExternalSaveService } from 'services/external-save.service';
+import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
+
+class MockChangeDetectorRef {
+  detectChanges(): void {}
+}
 
 describe('StateHintsEditorComponent', () => {
   let component: StateContentEditorComponent;
   let fixture: ComponentFixture<StateContentEditorComponent>;
-  let editabilityService: EditabilityService;
-  let stateContentService: StateContentService;
-  let explorationStatesService: ExplorationStatesService;
+  let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
   let changeListService: ChangeListService;
-  let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
+  let externalSaveService: ExternalSaveService;
+  let stateContentService: StateContentService;
 
   var _getContent = function(contentId, contentString) {
     return SubtitledHtml.createFromBackendDict({
@@ -46,15 +50,21 @@ describe('StateHintsEditorComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
       declarations: [
-        StateContentEditorComponent
+        StateContentEditorComponent,
+        MockTranslatePipe
       ],
       providers: [
+        {
+          provide: ChangeDetectorRef,
+          useValue: changeDetectorRef
+        },
         ChangeListService,
-        StateContentService,
         ExternalSaveService,
-        EditabilityService,
-        StateRecordedVoiceoversService,
+        StateContentService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -64,250 +74,142 @@ describe('StateHintsEditorComponent', () => {
     fixture = TestBed.createComponent(StateContentEditorComponent);
     component = fixture.componentInstance;
 
-    editabilityService = TestBed.inject(EditabilityService);
-    stateContentService = TestBed.inject(StateContentService);
-    externalSaveService = TestBed.inject(ExternalSaveService);
     changeListService = TestBed.inject(ChangeListService);
-    stateRecordedVoiceoversService = TestBed.inject(
-      StateRecordedVoiceoversService);
+    externalSaveService = TestBed.inject(ExternalSaveService);
+    stateContentService = TestBed.inject(StateContentService);
 
-    var recordedVoiceOversDict = {
-      voiceovers_mapping: {
-        content: {},
-        default_outcome: {},
-        feedback_1: {}
-      }
-    };
-
-    stateContentService.init('Third State', _getContent('content', 'This is some content.'));
-    stateRecordedVoiceoversService.init(
-      'Third State', RecordedVoiceovers.createFromBackendDict(recordedVoiceOversDict));
-    editabilityService.markEditable();
-    externalSaveService.init({
-      'First State': {
-        content: {
-          content_id: 'content',
-          html: 'First State Content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        },
-        interaction: {
-          id: 'TextInput',
-          answer_groups: [{
-            rule_specs: [],
-            outcome: {
-              dest: 'unused',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-          }],
-          default_outcome: {
-            dest: 'default',
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
-            },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null
-          },
-          hints: []
-        },
-        param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        }
-      },
-      'Second State': {
-        content: {
-          content_id: 'content',
-          html: 'Second State Content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        },
-        interaction: {
-          id: 'TextInput',
-          answer_groups: [{
-            rule_specs: [],
-            outcome: {
-              dest: 'unused',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            }
-          }],
-          default_outcome: {
-            dest: 'default',
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
-            },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null
-          },
-          hints: []
-        },
-        param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        }
-      },
-      'Third State': {
-        content: {
-          content_id: 'content',
-          html: 'This is some content.'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        },
-        interaction: {
-          id: 'TextInput',
-          answer_groups: [{
-            rule_specs: [],
-            outcome: {
-              dest: 'unused',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            }
-          }],
-          default_outcome: {
-            dest: 'default',
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
-            },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null
-          },
-          hints: []
-        },
-        param_changes: [{
-          name: 'comparison',
-          generator_id: 'Copier',
-          customization_args: {
-            value: 'something clever',
-            parse_with_jinja: false
-          }
-        }],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        }
-      }
-    });
-
-      var templateHtml = $templateCache.get(
-        '/pages/exploration_editor/editor_tab/' +
-        'state_content_editor_directive.html');
-      $compile(templateHtml, $rootScope);
-      $rootScope.$digest();
-
-      outerScope = $rootScope.$new();
-      outerScope.saveStateContent = jasmine.createSpy('saveStateContent');
-      outerScope.showMarkAllAudioAsNeedingUpdateModalIfRequired = (
-        jasmine.createSpy(''));
-      var elem = angular.element(
-        '<state-content-editor ' +
-        'on-save-state-content="saveStateContent" ' +
-        'show-mark-all-audio-as-needing-update-modal-if-required=' +
-        '"showMarkAllAudioAsNeedingUpdateModalIfRequired">' +
-        '</state-content-editor>');
-      var compiledElem = $compile(elem)(outerScope);
-      outerScope.$digest();
-      ctrlScope = compiledElem[0].getControllerScope();
-    }));
+    fixture.detectChanges();
+  });
 
   it('should start with the content editor not being open', function() {
-    expect(ctrlScope.contentEditorIsOpen).toBe(false);
+    component.ngOnInit();
+
+    expect(component.contentEditorIsOpen).toBe(false);
+  });
+
+  it('should save hint when external save event is triggered', fakeAsync(() => {
+    let onExternalSaveEmitter = new EventEmitter();
+    spyOnProperty(externalSaveService, 'onExternalSave')
+      .and.returnValue(onExternalSaveEmitter);
+    spyOn(component.onSaveStateContent, 'emit')
+      .and.callThrough();
+
+    component.ngOnInit();
+    component.contentEditorIsOpen = true;
+
+    onExternalSaveEmitter.emit();
+    tick();
+
+    expect(component.onSaveStateContent.emit)
+      .toHaveBeenCalled();
+  }));
+
+  it('should hide card height limit warning', function() {
+    component.cardHeightLimitWarningIsShown = true;
+    component.hideCardHeightLimitWarning();
+
+    expect(component.cardHeightLimitWarningIsShown).toBe(false);
+  });
+
+  it('should show card height limit warning', function() {
+    stateContentService.displayed = (
+      _getContent('content', ''));
+
+    expect(component.isCardContentLengthLimitReached()).toBe(false);
   });
 
   it('should correctly handle no-op edits', function() {
-    expect(ctrlScope.contentEditorIsOpen).toBe(false);
-    expect(scs.savedMemento).toEqual(_getContent(
-      'content', 'This is some content.'));
-    ctrlScope.openStateContentEditor();
-    expect(ctrlScope.contentEditorIsOpen).toBe(true);
-    scs.displayed = _getContent('content', 'This is some content.');
-    ctrlScope.onSaveContentButtonClicked();
+    component.ngOnInit();
 
-    expect(ctrlScope.contentEditorIsOpen).toBe(false);
-    expect(cls.getChangeList()).toEqual([]);
+    expect(component.contentEditorIsOpen).toBe(false);
+    expect(stateContentService.savedMemento).toEqual(_getContent(
+      'content', ''));
+
+    component.openStateContentEditor();
+
+    expect(component.contentEditorIsOpen).toBe(true);
+
+    stateContentService.displayed = (
+      _getContent('content', ''));
+    component.onSaveContentButtonClicked();
+
+    expect(component.contentEditorIsOpen).toBe(false);
+    expect(changeListService.getChangeList()).toEqual([]);
   });
 
   it('should check that content edits are saved correctly', function() {
-    expect(cls.getChangeList()).toEqual([]);
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
+    spyOn(component.onSaveStateContent, 'emit');
 
-    ctrlScope.openStateContentEditor();
-    scs.displayed = _getContent('content', 'babababa');
-    ctrlScope.onSaveContentButtonClicked();
-    expect(outerScope.saveStateContent).toHaveBeenCalled();
+    component.ngOnInit();
 
-    ctrlScope.openStateContentEditor();
-    scs.displayed = _getContent(
+    expect(changeListService.getChangeList()).toEqual([]);
+
+    component.openStateContentEditor();
+    stateContentService.displayed = _getContent('content', 'babababa');
+    component.onSaveContentButtonClicked();
+
+    expect(component.onSaveStateContent.emit)
+      .toHaveBeenCalled();
+
+    component.openStateContentEditor();
+    stateContentService.displayed = _getContent(
       'content', 'And now for something completely different.');
-    ctrlScope.onSaveContentButtonClicked();
-    expect(outerScope.saveStateContent).toHaveBeenCalled();
-    expect(
-      outerScope.showMarkAllAudioAsNeedingUpdateModalIfRequired)
+    component.onSaveContentButtonClicked();
+
+    expect(component.onSaveStateContent.emit)
+      .toHaveBeenCalled();
+    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
       .toHaveBeenCalled();
   });
 
   it('should not save changes to content when edit is cancelled', function() {
-    var contentBeforeEdit = angular.copy(scs.savedMemento);
+    component.ngOnInit();
+    var contentBeforeEdit = angular.copy(stateContentService.savedMemento);
 
-    scs.displayed = _getContent('content', 'Test Content');
-    ctrlScope.cancelEdit();
-    expect(ctrlScope.contentEditorIsOpen).toBe(false);
-    expect(scs.savedMemento).toEqual(contentBeforeEdit);
-    expect(scs.displayed).toEqual(contentBeforeEdit);
+    stateContentService.displayed = _getContent('content', 'Test Content');
+
+    component.cancelEdit();
+
+    expect(component.contentEditorIsOpen).toBe(false);
+    expect(stateContentService.savedMemento).toEqual(contentBeforeEdit);
+    expect(stateContentService.displayed).toEqual(contentBeforeEdit);
   });
 
   it('should call the callback function on-save', function() {
-    ctrlScope.onSaveContentButtonClicked();
-    expect(outerScope.saveStateContent).toHaveBeenCalled();
+    spyOn(component.onSaveStateContent, 'emit');
+
+    component.onSaveContentButtonClicked();
+
+    expect(component.onSaveStateContent.emit)
+      .toHaveBeenCalled();
+  });
+
+  it('should get schema', () => {
+    expect(component.getHtmlSchema())
+      .toEqual(component.HTML_SCHEMA);
+  });
+
+  it('should invoke change detection when html is updated', () => {
+    stateContentService.displayed = (
+      _getContent('content', 'old'));
+    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+
+    component.updateHtml('new');
+
+    expect(stateContentService.displayed).toEqual(
+      _getContent('content', 'new'));
+  });
+
+  it('should not invoke change detection when html is not updated', () => {
+    stateContentService.displayed = (
+      _getContent('content', 'old'));
+    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+
+    component.updateHtml('old');
+
+    expect(stateContentService.displayed).toEqual(
+      _getContent('content', 'old'));
+    expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
   });
 });
