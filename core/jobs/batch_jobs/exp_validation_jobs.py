@@ -53,7 +53,7 @@ class GetExpRightsWithDuplicateUsersJob(base_jobs.JobBase):
                     rights.voice_artist_ids + rights.viewer_ids
                 ))
             | 'Filter exp ids with duplicate users' >> beam.Filter(
-                lambda _, user_ids: len(user_ids) != len(set(user_ids)))
+                lambda obj: len(obj[1]) != len(set(obj[1])))
         )
 
         report_number_of_exps_queried = (
