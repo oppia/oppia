@@ -264,8 +264,8 @@ export class NumericInputValidationService {
     const stringValueRegExp = stringValue.match(/\d/g);
 
     if (stringValueRegExp === null) {
-      return 'The answer should be a valid number and ' +
-      `can contain at most 15 digits (0-9) or symbols(${decimalSeparator}).`;
+      return 'The answer should be a valid number and can ' +
+      `contain at most 15 digits (0-9) or symbols(${decimalSeparator} or -).`;
     } else if (stringValueRegExp.length > 15) {
       return 'The answer can contain at most 15 digits (0-9) or symbols ' +
         `(${decimalSeparator} or -).`;
