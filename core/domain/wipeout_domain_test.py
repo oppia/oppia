@@ -49,7 +49,7 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         """Tests the create_default_topic() function."""
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL))
+                 self.user_id_a, 'a@example.com'))
         pending_deletion_request.pseudonymizable_entity_mappings = {
             'wrong_key': {}
         }
