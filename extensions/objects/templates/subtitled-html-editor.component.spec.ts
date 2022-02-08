@@ -19,15 +19,13 @@
 import { ChangeDetectorRef } from '@angular/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledHtmlEditorComponent } from './subtitled-html-editor.component';
 
 describe('SubtitledHtmlEditorComponent', () => {
   let component: SubtitledHtmlEditorComponent;
   let fixture: ComponentFixture<SubtitledHtmlEditorComponent>;
-  let mockValue = {
-    _html: '<p>test</p>',
-    _contentId: null
-  };
+  let mockValue = new SubtitledHtml('<p>test</p>', null);
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
