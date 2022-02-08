@@ -983,8 +983,12 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       this.processGIFImage(imageDataURI, gifWidth, gifHeight, null, successCb);
     } else if (mimeType === 'data:image/svg+xml') {
       // Check if the SVG containes 'data-name' attribute and remove it.
-      // DOMParser.parseFromString() returns an HTML/XML document and we
-      // remove 'data-name' attribute from all its nodes.
+      // We are removing this attribute, because currently it is not in
+      // the allowlist of valid attributes. The allowlist is based on the
+      // list of tags and attributes specified in this project:
+      // https://github.com/cure53/DOMPurify
+      // Complete list of valid SVG attributes is present at
+      // '~assets/constants.ts/'.
       const svgString = atob(imageDataURI.split(',')[1]);
       let domParser = new DOMParser();
       let doc = domParser.parseFromString(svgString, 'image/svg+xml');
