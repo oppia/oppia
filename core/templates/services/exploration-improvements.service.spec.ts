@@ -47,6 +47,7 @@ import { StateTopAnswersStatsService } from
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmDeleteStateModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 
 /**
  * @fileoverview Tests for ExplorationImprovementsService.
@@ -56,7 +57,7 @@ describe('ExplorationImprovementsService', function() {
   let explorationImprovementsService;
 
   let $uibModal;
-  let ngbModal: NgbModal = null;
+  let ngbModal: NgbModal;
   let changeListService: ChangeListService;
   let explorationStatesService;
   let explorationRightsService;
@@ -161,10 +162,26 @@ describe('ExplorationImprovementsService', function() {
     });
   }));
 
+  class MockNgbModal {
+    open() {
+      return {
+        componentInstance: {},
+        result: Promise.resolve()
+      };
+    }
+  }
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        ChangeListService
+        ChangeListService,
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        }
+      ],
+      declarations: [
+        ConfirmDeleteStateModalComponent
       ]
     });
   });
