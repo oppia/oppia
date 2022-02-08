@@ -32,6 +32,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -55,6 +56,7 @@ describe('Side Navigation Bar Component', () => {
   let sidebarStatusService: SidebarStatusService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let userService: UserService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   class MockUrlInterpolationService {
     getStaticImageUrl(imagePath: string): string {
@@ -98,6 +100,7 @@ describe('Side Navigation Bar Component', () => {
     componentInstance = fixture.componentInstance;
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     userService = TestBed.inject(UserService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   it('should create', () => {
@@ -198,6 +201,8 @@ describe('Side Navigation Bar Component', () => {
 
       let array: CreatorTopicSummary[] = [cData1, cData2];
       let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+      let topicTitlesTranslationKeys: string[] =
+        ['I18n_TOPIC_dummy_TITLE', 'I18n_TOPIC_dummy2_TITLE'];
       spyOn(
         classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.resolveTo(classroomData);
@@ -208,7 +213,23 @@ describe('Side Navigation Bar Component', () => {
       tick();
 
       expect(componentInstance.classroomData).toEqual(array);
+      expect(componentInstance.topicTitlesTranslationKeys).toEqual(
+        topicTitlesTranslationKeys);
       expect(siteAnalyticsService.registerClassroomPageViewed)
         .toHaveBeenCalled();
     }));
+
+    it('should check whether hacky translations are displayed or not', () => {
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValues(false, true);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValues(false, false);
+  
+      let hackyStoryTitleTranslationIsDisplayed =
+        componentInstance.isHackyTopicTitleTranslationDisplayed(0);
+      expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
+      hackyStoryTitleTranslationIsDisplayed =
+        componentInstance.isHackyTopicTitleTranslationDisplayed(0);
+      expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+    });
 });

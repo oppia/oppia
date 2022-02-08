@@ -548,6 +548,8 @@ describe('TopNavigationBarComponent', () => {
 
       let array: CreatorTopicSummary[] = [cData1, cData2];
       let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+      let topicTitlesTranslationKeys: string[] =
+        ['I18n_TOPIC_dummy_TITLE', 'I18n_TOPIC_dummy2_TITLE'];
       spyOn(
         classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.resolveTo(classroomData);
@@ -558,7 +560,23 @@ describe('TopNavigationBarComponent', () => {
       tick();
 
       expect(component.classroomData).toEqual(array);
+      expect(component.topicTitlesTranslationKeys).toEqual(
+        topicTitlesTranslationKeys);
       expect(siteAnalyticsService.registerClassroomPageViewed)
         .toHaveBeenCalled();
     }));
+
+    it('should check whether hacky translations are displayed or not', () => {
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValues(false, true);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValues(false, false);
+  
+      let hackyStoryTitleTranslationIsDisplayed =
+        component.isHackyTopicTitleTranslationDisplayed(0);
+      expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
+      hackyStoryTitleTranslationIsDisplayed =
+        component.isHackyTopicTitleTranslationDisplayed(0);
+      expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+    });
 });

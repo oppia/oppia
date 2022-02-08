@@ -27,6 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
  @Component({
    selector: 'oppia-side-navigation-bar',
@@ -41,6 +42,7 @@ export class SideNavigationBarComponent {
    DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
    currentUrl!: string;
    classroomData: CreatorTopicSummary[] = [];
+   topicTitlesTranslationKeys: string[] = [];
    CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
    getinvolvedSubmenuIsShown: boolean = false;
    learnSubmenuIsShown: boolean = true;
@@ -54,6 +56,7 @@ export class SideNavigationBarComponent {
      private accessValidationBackendApiService:
       AccessValidationBackendApiService,
      private changeDetectorRef: ChangeDetectorRef,
+     private i18nLanguageCodeService: I18nLanguageCodeService,
      private siteAnalyticsService: SiteAnalyticsService,
      private userService: UserService,
      private sidebarStatusService: SidebarStatusService,
@@ -78,9 +81,21 @@ export class SideNavigationBarComponent {
              this.classroomBackendApiService.fetchClassroomDataAsync(
                this.DEFAULT_CLASSROOM_URL_FRAGMENT)
                .then((classroomData) => {
-                 this.classroomData = classroomData.getTopicSummaries();
-                 this.classroomBackendApiService.onInitializeTranslation.emit();
-                 this.siteAnalyticsService.registerClassroomPageViewed();
+                  this.classroomData = classroomData.getTopicSummaries();
+                  this.classroomBackendApiService.onInitializeTranslation.emit();
+                  this.siteAnalyticsService.registerClassroomPageViewed();
+                  // Store hacky tranlation keys of topics
+                  for (let i = 0; i < this.classroomData.length; i++) {
+                    let topicSummary = this.classroomData[i];
+                    let hackyTopicTranslationKey = (
+                      this.i18nLanguageCodeService.getTopicTranslationKey(
+                        topicSummary.getId(), TranslationKeyType.TITLE
+                      )
+                    );
+                    this.topicTitlesTranslationKeys.push(
+                      hackyTopicTranslationKey
+                    );
+                  }
                });
            });
          }
@@ -115,6 +130,14 @@ export class SideNavigationBarComponent {
        this.windowRef.nativeWindow.location.href = classroomUrl;
      }, 150);
    }
+
+   isHackyTopicTitleTranslationDisplayed(index: number): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.topicTitlesTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
 }
 
 angular.module('oppia').directive('oppiaSideNavigationBar',
