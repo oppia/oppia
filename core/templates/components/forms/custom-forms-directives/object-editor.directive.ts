@@ -229,12 +229,6 @@ ControlValueAccessor, Validator {
               this.value = [...e];
               return;
             }
-            if (typeof e === 'object') {
-              this.value = (
-                Object.assign(Object.create(Object.getPrototypeOf(e)), e));
-              return;
-              // The return statement is intentionally omitted.
-            }
             // SetTimeout(() => this.value = e, 0);
             this.value = e;
           })
