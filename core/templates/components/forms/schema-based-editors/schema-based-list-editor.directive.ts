@@ -19,7 +19,6 @@
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Subscription } from 'rxjs';
 import { IdGenerationService } from 'services/id-generation.service';
 import { Schema, SchemaDefaultValue, SchemaDefaultValueService } from 'services/schema-default-value.service';

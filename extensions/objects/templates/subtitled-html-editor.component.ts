@@ -18,7 +18,6 @@
 
 import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 interface SubtitledHtmlEditorSchema {
   type: string;

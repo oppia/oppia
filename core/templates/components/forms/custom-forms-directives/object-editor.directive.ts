@@ -235,7 +235,7 @@ ControlValueAccessor, Validator {
               return;
               // The return statement is intentionally omitted.
             }
-            // setTimeout(() => this.value = e, 0);
+            // SetTimeout(() => this.value = e, 0);
             this.value = e;
           })
         );
