@@ -111,8 +111,8 @@ def normalize_against_schema(
         assert (name in schema[SCHEMA_KEY_OPTIONS]), (
             '%s, type %s is not present in options %s' %
             (obj, name, schema[SCHEMA_KEY_OPTIONS]))
-        schema[SCHEMA_KEY_TYPE] = name
-    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
+        normalized_obj = obj
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_CUSTOM:
