@@ -1,4 +1,4 @@
-<div class="image-with-regions-editor" *ngIf="value !== null">
+<div class="image-with-regions-editor" *ngIf="value">
   <div *ngIf="value.imagePath === ''">
     <schema-based-editor [localValue]="value.imagePath"
                          (localValueChange)="imageValueChanged($event)"
