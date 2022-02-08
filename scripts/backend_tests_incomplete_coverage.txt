@@ -49,7 +49,6 @@ core.domain.learner_progress_services_test
 core.domain.question_fetchers_test
 core.domain.exp_domain_test
 core.domain.topic_services_test
-core.domain.skill_fetchers_test
 scripts.linters.pylint_extensions_test
 core.storage.suggestion.gae_models_test
 core.storage.app_feedback_report.gae_models_test
