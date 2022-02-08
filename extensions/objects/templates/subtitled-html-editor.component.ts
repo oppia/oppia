@@ -18,6 +18,7 @@
 
 import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 interface SubtitledHtmlEditorSchema {
   type: string;
@@ -34,7 +35,7 @@ export class SubtitledHtmlEditorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() schema!: { 'replacement_ui_config': unknown | {} };
-  @Input() value!: { _html: unknown };
+  @Input() value!: SubtitledHtml;
   @Output() valueChanged = new EventEmitter();
   SCHEMA!: SubtitledHtmlEditorSchema;
 
@@ -54,15 +55,15 @@ export class SubtitledHtmlEditorComponent implements OnInit {
     return this.SCHEMA;
   }
 
-  updateValue(newValue: unknown): void {
-    if (this.value && this.value._html === newValue) {
-      return;
+  updateValue(newValue: string): void {
+    if (this.value) {
+      if (this.value.html === newValue) {
+        return;
+      }
+      this.value.html = newValue;
+      this.valueChanged.emit(this.value);
+      this.changeDetectorRef.detectChanges();
     }
-    this.value = {
-      _html: newValue
-    };
-    this.valueChanged.emit(this.value);
-    this.changeDetectorRef.detectChanges();
   }
 }
 

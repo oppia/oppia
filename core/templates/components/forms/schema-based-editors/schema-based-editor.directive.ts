@@ -54,9 +54,6 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   }
 
   @Input() set localValue(val: unknown) {
-    if (this._localValue === val) {
-      return;
-    }
     this._localValue = val;
     this.onChange(val);
     this.localValueChange.emit(val);

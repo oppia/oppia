@@ -73,9 +73,6 @@ implements ControlValueAccessor, Validator, AfterViewInit {
   }
 
   updateValue(e: unknown): void {
-    if (this.localValue === e) {
-      return;
-    }
     this.localValueChange.emit(e);
     this.localValue = e;
     this.onChange(e);

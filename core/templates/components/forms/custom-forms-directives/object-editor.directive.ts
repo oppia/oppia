@@ -154,9 +154,6 @@ ControlValueAccessor, Validator {
     return this._value;
   }
   @Input() set value(val: unknown) {
-    if (this._value === val) {
-      return;
-    }
     this._value = val;
     if (this.ref) {
       this.ref.instance.value = this._value;
@@ -257,6 +254,7 @@ ControlValueAccessor, Validator {
         );
       }
       this.ref = ref;
+      this.ref.changeDetectorRef.detectChanges();
     } else {
       this.loggerService.error('Editor: ' + editorName + ' not supported');
     }
@@ -274,6 +272,7 @@ ControlValueAccessor, Validator {
   ngOnDestroy(): void {
     this.componentSubscriptions.unsubscribe();
     this.viewContainerRef.clear();
+    this.ref.changeDetectorRef.detach();
   }
 }
 
