@@ -130,12 +130,12 @@
                            tabindex="0"
                            class="underline"
                            href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/{{topicSummary.getUrlFragment()}}">
-                           <span *ngIf="!isHackyTopicTitleTranslationDisplayed(idx)">
+                          <span *ngIf="!isHackyTopicTitleTranslationDisplayed(idx)">
                             {{ topicSummary.getName() }}
-                           </span>
-                           <span *ngIf="isHackyTopicTitleTranslationDisplayed(idx)">
+                          </span>
+                          <span *ngIf="isHackyTopicTitleTranslationDisplayed(idx)">
                             {{ topicTitlesTranslationKeys[idx] | translate }}
-                           </span>
+                          </span>
                         </a>
                       </div>
                     </div>

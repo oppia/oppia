@@ -81,22 +81,22 @@ export class SideNavigationBarComponent {
              this.classroomBackendApiService.fetchClassroomDataAsync(
                this.DEFAULT_CLASSROOM_URL_FRAGMENT)
                .then((classroomData) => {
-                  this.classroomData = classroomData.getTopicSummaries();
-                  this.classroomBackendApiService.onInitializeTranslation.emit();
-                  this.siteAnalyticsService.registerClassroomPageViewed();
-                  // Store hacky tranlation keys of topics
-                  for (let i = 0; i < this.classroomData.length; i++) {
-                    let topicSummary = this.classroomData[i];
-                    let hackyTopicTranslationKey = (
-                      this.i18nLanguageCodeService.getTopicTranslationKey(
-                        topicSummary.getId(), TranslationKeyType.TITLE
-                      )
-                    );
-                    this.topicTitlesTranslationKeys.push(
-                      hackyTopicTranslationKey
-                    );
-                  }
-               });
+                 this.classroomData = classroomData.getTopicSummaries();
+                 this.classroomBackendApiService.onInitializeTranslation.emit();
+                 this.siteAnalyticsService.registerClassroomPageViewed();
+                 // Store hacky tranlation keys of topics.
+                 for (let i = 0; i < this.classroomData.length; i++) {
+                  let topicSummary = this.classroomData[i];
+                  let hackyTopicTranslationKey = (
+                    this.i18nLanguageCodeService.getTopicTranslationKey(
+                      topicSummary.getId(), TranslationKeyType.TITLE
+                    )
+                  );
+                  this.topicTitlesTranslationKeys.push(
+                    hackyTopicTranslationKey
+                  );
+                 }
+                });
            });
          }
        });

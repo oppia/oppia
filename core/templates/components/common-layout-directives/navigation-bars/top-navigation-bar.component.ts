@@ -196,7 +196,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
                 this.classroomData = classroomData.getTopicSummaries();
                 this.classroomBackendApiService.onInitializeTranslation.emit();
                 this.siteAnalyticsService.registerClassroomPageViewed();
-                // Store hacky tranlation keys of topics
+                // Store hacky tranlation keys of topics.
                 for (let i = 0; i < this.classroomData.length; i++) {
                   let topicSummary = this.classroomData[i];
                   let hackyTopicTranslationKey = (
@@ -208,13 +208,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
                     hackyTopicTranslationKey
                   );
                 }
-                console.log(this.classroomData, "inside classroomData");
               });
           });
         }
       });
-      
-    console.log(this.classroomData, "classroomData");
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
     // first save a reference to that context in a variable, and then use that

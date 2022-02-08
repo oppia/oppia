@@ -219,17 +219,17 @@ describe('Side Navigation Bar Component', () => {
         .toHaveBeenCalled();
     }));
 
-    it('should check whether hacky translations are displayed or not', () => {
-      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-        .and.returnValues(false, true);
-      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-        .and.returnValues(false, false);
-  
-      let hackyStoryTitleTranslationIsDisplayed =
-        componentInstance.isHackyTopicTitleTranslationDisplayed(0);
-      expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
-      hackyStoryTitleTranslationIsDisplayed =
-        componentInstance.isHackyTopicTitleTranslationDisplayed(0);
-      expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
-    });
+  it('should check whether hacky translations are displayed or not', () => {
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValues(false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValues(false, false);
+
+    let hackyStoryTitleTranslationIsDisplayed =
+      componentInstance.isHackyTopicTitleTranslationDisplayed(0);
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
+    hackyStoryTitleTranslationIsDisplayed =
+      componentInstance.isHackyTopicTitleTranslationDisplayed(0);
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+  });
 });
