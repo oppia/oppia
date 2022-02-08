@@ -62,7 +62,7 @@ class GetNumberOfExpExceedsMaxTitleLengthJob(base_jobs.JobBase):
             | 'Count exp models' >> beam.combiners.Count.Globally()
             | 'Report count of exp models' >> beam.Map(
                 lambda object_count: job_run_result.JobRunResult.as_stdout(
-                    'RESULT: Queried %s exp rights in total.' % (object_count)
+                    'RESULT: Queried %s exps in total.' % (object_count)
                 ))
         )
 
@@ -71,7 +71,7 @@ class GetNumberOfExpExceedsMaxTitleLengthJob(base_jobs.JobBase):
             | 'Count all new models' >> beam.combiners.Count.Globally()
             | 'Save number of invalid exps' >> beam.Map(
                 lambda object_count: job_run_result.JobRunResult.as_stdout(
-                    'RESULT: There are total %s invalid exp.' % (object_count)
+                    'RESULT: There are total %s invalid exps.' % (object_count)
                 ))
         )
 
