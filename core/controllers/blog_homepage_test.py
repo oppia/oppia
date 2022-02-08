@@ -157,6 +157,18 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
             len(json_response['summary_dicts']), 2)
         self.assertIsNotNone(json_response['profile_picture_data_url'])
 
+    def test_raise_exception_if_blog_post_does_not_exists(self):
+        self.login(self.user_email)
+        blog_post = blog_services.get_blog_post_by_id(self.blog_post.id)
+        self.get_json(
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_URL, blog_post.url_fragment),
+        )
+        blog_services.delete_blog_post(blog_post.id)
+        self.get_json(
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_URL, blog_post.url_fragment),
+            expected_status_int=404
+        )
+
 
 class AuthorsPageHandlerTest(test_utils.GenericTestBase):
     """Checks that the author data and related blog summary cards are
