@@ -248,11 +248,7 @@ def main() -> None:
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
         ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
-        (
-            'git+https://github.com/oppia/pip-tools.git',
-            common.PIP_TOOLS_VERSION,
-            common.OPPIA_TOOLS_DIR
-        ),
+        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
         ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
