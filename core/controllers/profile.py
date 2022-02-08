@@ -532,6 +532,17 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'site_language_code': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
