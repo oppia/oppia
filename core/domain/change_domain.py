@@ -20,16 +20,10 @@ from __future__ import annotations
 
 import copy
 
+from core import feconf
 from core import utils
 
 from typing import Dict
-
-from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
-
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
@@ -125,7 +119,7 @@ class BaseChange:
     # This is a list of common commands which is valid for all subclasses.
     # This should not be overriden by subclasses.
     COMMON_ALLOWED_COMMANDS = [{
-        'name': base_models.VersionedModel.CMD_DELETE_COMMIT,
+        'name': feconf.CMD_DELETE_COMMIT,
         'required_attribute_names': [],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
@@ -228,6 +222,32 @@ class BaseChange:
                     self, attribute_name)
 
         return base_change_dict
+
+    @classmethod
+    def from_dict(cls, base_change_dict):
+        """Returns a BaseChange domain object from a dict.
+
+        Args:
+            base_change_dict: dict. The dict representation of
+                BaseChange object.
+
+        Returns:
+            BaseChange. The corresponding BaseChange domain object.
+        """
+        return cls(base_change_dict)
+
+    def validate(self):
+        """Validates various properties of the BaseChange object.
+
+        Raises:
+            ValidationError. One or more attributes of the BaseChange are
+                invalid.
+        """
+        # We validate the BaseChange object by converting
+        # it into a dict and using the validate_dict method.
+        # This is done because schema_utils used the validate method
+        # to verify that the domain object is correct.
+        self.validate_dict(self.to_dict())
 
     def __getattr__(self, name: str) -> str:
         # AttributeError needs to be thrown in order to make
