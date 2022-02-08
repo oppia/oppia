@@ -47,6 +47,8 @@ class TranslatedContentDict(TypedDict):
     needs_update: bool
 
 
+# TODO(#14537): This is a duplicate of the same enum in translation_domain,
+# it should be removed after we refactor our importing.
 class EntityTypesSupportingNewTranslationArch(enum.Enum):
     """Represents all possible entity types which support new translations
     architecture.
@@ -61,7 +63,8 @@ class EntityTranslationsModel(base_models.BaseModel):
 
     # The id of the corresponding entity.
     entity_id = datastore_services.StringProperty(required=True, indexed=True)
-    # The type of the corresponding entity.
+    # The type of the corresponding entity, supporting new translation
+    # architecture.
     entity_type = datastore_services.StringProperty(
         required=True, indexed=True, choices=[
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -120,7 +123,7 @@ class EntityTranslationsModel(base_models.BaseModel):
             [entity_type]-[entity_id]-[entity_version]-[language_code].
         """
         return '%s-%s-%s-%s' % (
-            entity_type, entity_id, entity_version, language_code)
+            entity_type.value, entity_id, entity_version, language_code)
 
     @classmethod
     def get_model(
@@ -171,7 +174,7 @@ class EntityTranslationsModel(base_models.BaseModel):
             exist.
         """
         return cls.query(
-            cls.entity_type == entity_type,
+            cls.entity_type == entity_type.value,
             cls.entity_id == entity_id,
             cls.entity_version == entity_version
         ).fetch()
@@ -202,7 +205,7 @@ class EntityTranslationsModel(base_models.BaseModel):
         return cls(
             id=cls._generate_id(
                 entity_type, entity_id, entity_version, language_code),
-            entity_type=entity_type,
+            entity_type=entity_type.value,
             entity_id=entity_id,
             entity_version=entity_version,
             language_code=language_code,

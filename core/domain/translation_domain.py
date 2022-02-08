@@ -192,7 +192,7 @@ class EntityTranslation:
         translations: Dict[str, TranslatedContent]
     ):
         self.entity_id = entity_id
-        self.entity_type = entity_type
+        self.entity_type = entity_type.value
         self.entity_version = entity_version
         self.language_code = language_code
         self.translations = translations
