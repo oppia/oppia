@@ -202,7 +202,7 @@ describe('Side Navigation Bar Component', () => {
       let array: CreatorTopicSummary[] = [cData1, cData2];
       let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
       let topicTitlesTranslationKeys: string[] =
-        ['I18n_TOPIC_dummy_TITLE', 'I18n_TOPIC_dummy2_TITLE'];
+        ['I18N_TOPIC_dummy_TITLE', 'I18N_TOPIC_dummy2_TITLE'];
       spyOn(
         classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.resolveTo(classroomData);
