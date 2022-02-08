@@ -30,7 +30,7 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() outcome!: Outcome;
-  @Output() outcomeChange: EventEmitter<void> = new EventEmitter();
+  @Output() outcomeChange: EventEmitter<Outcome> = new EventEmitter();
   OUTCOME_FEEDBACK_SCHEMA!: object;
   constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -50,12 +50,8 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
     if (newHtmlString !== this.outcome.feedback.html) {
       this.outcome.feedback.html = newHtmlString;
       this.changeDetectorRef.detectChanges();
-      this.outcomeChange.emit();
+      this.outcomeChange.emit(this.outcome);
     }
-  }
-
-  getSchema(): object {
-    return this.OUTCOME_FEEDBACK_SCHEMA;
   }
 }
 angular.module('oppia').directive(

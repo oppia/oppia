@@ -54,10 +54,12 @@ angular.module('oppia').component('outcomeEditor', {
   template: require('./outcome-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
+    '$rootScope',
     'ExternalSaveService', 'StateEditorService',
     'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
     'INTERACTION_SPECS',
     function(
+        $rootScope,
         ExternalSaveService, StateEditorService,
         StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
         INTERACTION_SPECS) {
@@ -128,6 +130,10 @@ angular.module('oppia').component('outcomeEditor', {
             !outcome.hasNonemptyFeedback();
         }
         return false;
+      };
+
+      ctrl.updateView = function() {
+        $rootScope.$applyAsync();
       };
 
       ctrl.invalidStateAfterFeedbackSave = function() {
