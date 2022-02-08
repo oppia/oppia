@@ -17,10 +17,7 @@
 """Unit tests for jobs.batch_jobs.exp_title_validation_jobs."""
 
 from __future__ import annotations
-from turtle import title
-from unicodedata import category
 
-from core.constants import constants
 from core.domain import state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_title_validation_jobs
@@ -38,15 +35,13 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
     EXPLORATION_ID_3 = '3'
-
     STATE_1 = state_domain.State.create_default_state('ABC')
     STATE_2 = state_domain.State.create_default_state('DEF')
     STATE_3 = state_domain.State.create_default_state('GHI')
 
     def __init__(self):
-        super().__init__
 
-        #Invalid exploration
+        # This is an invalid model with title length greater than 36.
         self.EXP_1 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_1,
@@ -57,7 +52,7 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
             states={'Introduction1': self.STATE_1}
         )
 
-        #Valid exploration
+        # This is an valid model with title length lesser than 36.
         self.EXP_2 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_2,
@@ -68,7 +63,7 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
             states={'Introduction2': self.STATE_2}
         )
 
-        #Invalid exploration
+        # This is an invalid model with title length greater than 36.
         self.EXP_3 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_3,
