@@ -68,10 +68,9 @@ describe('Skills List Component', () => {
 
 
   class MockNgbModal {
-    // Avoiding non null assertion for modal below by suffixing ! symbol;
-    // It was done as value of modal is not being initialized right away;
-    // The modal is initialized to different values to test various component;
-    // See line 344, 364, 370, 392, 400, 420 to see the test assertions;
+    // Avoiding non-null assertion for modal below by suffixing '!' symbol.
+    // It was done as the value of modal is not being initialized right away.
+    // The modal is initialized to different values to test various components.
     modal!: string;
     success: boolean = true;
     open(
