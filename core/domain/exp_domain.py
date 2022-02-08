@@ -30,7 +30,6 @@ import re
 import string
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
@@ -2329,7 +2328,7 @@ class Exploration:
         # YAML representation.
         del exp_dict['id']
 
-        return python_utils.yaml_from_dict(exp_dict)
+        return utils.yaml_from_dict(exp_dict)
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all
@@ -2621,7 +2620,7 @@ class ExplorationSummary:
                     'Expected value to be non-negative, received %s' % (
                         value))
 
-        if not isinstance(self.scaled_average_rating, float):
+        if not isinstance(self.scaled_average_rating, (float, int)):
             raise utils.ValidationError(
                 'Expected scaled_average_rating to be float, received %s' % (
                     self.scaled_average_rating))
@@ -3156,8 +3155,7 @@ class ExplorationChangeMergeVerifier:
             if change_is_mergeable:
                 changes_are_mergeable = True
                 continue
-            else:
-                changes_are_mergeable = False
-                break
+            changes_are_mergeable = False
+            break
 
         return changes_are_mergeable, False

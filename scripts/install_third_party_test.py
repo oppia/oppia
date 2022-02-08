@@ -436,8 +436,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             # exception so that the script can execute the installation pathway.
             if unused_cmd_tokens == [common.REDIS_SERVER_PATH, '--version']:
                 raise OSError('redis-server: command not found')
-            else:
-                return Ret()
+
+            return Ret()
 
         swap_call = self.swap(
             subprocess, 'call', mock_call)
@@ -486,8 +486,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             if unused_cmd_tokens == [
                     '%s/bin/elasticsearch' % common.ES_PATH, '--version']:
                 raise OSError('elasticsearch: command not found')
-            else:
-                return Ret()
+
+            return Ret()
 
         swap_call = self.swap(
             subprocess, 'call', mock_call)
@@ -533,8 +533,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             if unused_cmd_tokens == [
                     '%s/bin/elasticsearch' % common.ES_PATH, '--version']:
                 raise OSError('elasticsearch: command not found')
-            else:
-                return Ret()
+
+            return Ret()
 
         swap_call = self.swap(
             subprocess, 'call', mock_call)
@@ -578,8 +578,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             if unused_cmd_tokens == [
                     '%s/bin/elasticsearch' % common.ES_PATH, '--version']:
                 raise OSError('elasticsearch: command not found')
-            else:
-                return Ret()
+
+            return Ret()
 
         swap_call = self.swap(
             subprocess, 'call', mock_call)

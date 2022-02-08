@@ -338,13 +338,13 @@ class HangingIndentChecker(checkers.BaseChecker):
                         comment_index = split_content.index('#')
                         if comment_index == 0:
                             continue
-                        else:
-                            last_content_before_comment = (
-                                split_content[comment_index - 1])
-                            if last_content_before_comment.endswith(
-                                    ('(', '[', '{')
-                            ):
-                                continue
+
+                        last_content_before_comment = (
+                            split_content[comment_index - 1])
+                        if last_content_before_comment.endswith(
+                                ('(', '[', '{')
+                        ):
+                            continue
                     self.add_message(
                         'no-break-after-hanging-indent', line=line_num)
 
@@ -1670,32 +1670,6 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             self.add_message('newline-at-eof', line=file_length)
 
 
-class DivisionOperatorChecker(checkers.BaseChecker):
-    """Checks if division operator is used."""
-
-    __implements__ = interfaces.IAstroidChecker
-    name = 'division-operator-used'
-    priority = -1
-    msgs = {
-        'C0015': (
-            'Please use python_utils.divide() instead of the "/" operator',
-            'division-operator-used',
-            'Do not use division operator.'
-        )
-    }
-
-    def visit_binop(self, node):
-        """Visit assign statements to ensure that the division operator('/')
-        is not used and python_utils.divide() is used instead.
-
-        Args:
-            node: astroid.node.BinOp. Node to access module content.
-        """
-        if node.op == '/':
-            self.add_message(
-                'division-operator-used', node=node)
-
-
 class SingleLineCommentChecker(checkers.BaseChecker):
     """Checks if comments follow correct style."""
 
@@ -2346,7 +2320,6 @@ def register(linter):
     linter.register_checker(FunctionArgsOrderChecker(linter))
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
-    linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(SingleLinePragmaChecker(linter))

@@ -46,7 +46,7 @@ PYLINT_VERSION = '2.11.1'
 PYLINT_QUOTES_VERSION = '0.2.3'
 PYGITHUB_VERSION = '1.55'
 WEBTEST_VERSION = '3.0.0'
-PIP_TOOLS_VERSION = '6.4.0'
+PIP_TOOLS_VERSION = '6.5.0'
 GRPCIO_VERSION = '1.41.1'
 PROTOBUF_VERSION = '3.13.0'
 SETUPTOOLS_VERSION = '58.5.3'
@@ -802,5 +802,5 @@ def write_stdout_safe(string):
         except OSError as e:
             if e.errno == errno.EAGAIN:
                 continue
-            else:
-                raise
+
+            raise

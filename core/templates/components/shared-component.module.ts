@@ -98,13 +98,31 @@ import { TutorCardComponent } from 'pages/exploration-player-page/learner-experi
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
+import { AddOrUpdateSolutionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
 import { SavePendingChangesModalComponent } from './save-pending-changes/save-pending-changes-modal.component';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
+import { QuestionMisconceptionSelectorComponent } from './question-directives/question-misconception-selector/question-misconception-selector.component';
+import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
+import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
+import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
+import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-directives/feedback-popup.component';
+import { ConversationSkinEmbedComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin-embed.component';
+import { ConfirmQuestionExitModalComponent } from './question-directives/modal-templates/confirm-question-exit-modal.component';
+import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
+import { QuestionsListSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.component';
+import { QuestionEditorSaveModalComponent } from './question-directives/modal-templates/question-editor-save-modal.component';
 import { HintEditorComponent } from 'components/state-directives/hint-editor/hint-editor.component';
 import { ResponseHeaderComponent } from './state-directives/response-header/response-header.component';
 import { StateHintsEditorComponent } from 'components/state-editor/state-hints-editor/state-hints-editor.component';
 import { ReviewMaterialEditorComponent } from './review-material-editor/review-material-editor.component';
+import { ConfirmLeaveModalComponent } from 'pages/exploration-editor-page/modal-templates/confirm-leave-modal.component';
+import { CustomizeInteractionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component';
+import { TagMisconceptionModalComponent } from './question-directives/question-misconception-editor/tag-misconception-modal-component';
+import { QuestionMisconceptionEditorComponent } from './question-directives/question-misconception-editor/question-misconception-editor.component';
+import { SolutionExplanationEditor } from './state-directives/solution-editor/solution-explanation-editor.component';
+import { SolutionEditor } from './state-directives/solution-editor/solution-editor.component';
+import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -160,10 +178,15 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    ConfirmLeaveModalComponent,
+    ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
+    ConversationSkinComponent,
+    ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
+    CustomizeInteractionModalComponent,
     DeleteAnswerGroupModalComponent,
     DeleteHintModalComponent,
     DeleteInteractionModalComponent,
@@ -175,6 +198,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
+    FeedbackPopupComponent,
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
@@ -183,6 +207,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     HintEditorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
+    LearnerAnswerInfoCard,
     LazyLoadingComponent,
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
@@ -192,7 +217,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ProfileLinkTextComponent,
     ProgressNavComponent,
     QuestionDifficultySelectorComponent,
+    QuestionEditorSaveModalComponent,
     RatingDisplayComponent,
+    RatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     ScoreRingComponent,
@@ -223,13 +250,23 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    AddOrUpdateSolutionModalComponent,
+    AddHintModalComponent,
+    QuestionMisconceptionSelectorComponent,
+    QuestionsOpportunitiesSelectDifficultyModalComponent,
+    QuestionsListSelectSkillAndDifficultyModalComponent,
     DeleteInteractionModalComponent,
     DeleteHintModalComponent,
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
-    ReviewMaterialEditorComponent
+    ReviewMaterialEditorComponent,
+    TagMisconceptionModalComponent,
+    QuestionMisconceptionEditorComponent,
+    SolutionEditor,
+    SolutionExplanationEditor,
+    StateSolutionEditorComponent
   ],
 
   entryComponents: [
@@ -238,11 +275,16 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    ConfirmLeaveModalComponent,
+    ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ConceptCardComponent,
     ContentLanguageSelectorComponent,
+    ConversationSkinComponent,
+    ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
+    CustomizeInteractionModalComponent,
     DeleteHintModalComponent,
     DeleteInteractionModalComponent,
     DeleteLastHintModalComponent,
@@ -250,8 +292,10 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
+    FeedbackPopupComponent,
     MultiSelectionFieldComponent,
     PracticeTabComponent,
+    QuestionEditorSaveModalComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
@@ -269,6 +313,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TakeBreakModalComponent,
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
+    LearnerAnswerInfoCard,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
@@ -278,6 +323,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     PreviewThumbnailComponent,
     QuestionDifficultySelectorComponent,
     RatingDisplayComponent,
+    RatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     StateHintsEditorComponent,
@@ -297,13 +343,23 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    AddOrUpdateSolutionModalComponent,
+    AddHintModalComponent,
+    QuestionMisconceptionSelectorComponent,
+    QuestionsOpportunitiesSelectDifficultyModalComponent,
+    QuestionsListSelectSkillAndDifficultyModalComponent,
     DeleteInteractionModalComponent,
     DeleteHintModalComponent,
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
-    ReviewMaterialEditorComponent
+    ReviewMaterialEditorComponent,
+    TagMisconceptionModalComponent,
+    QuestionMisconceptionEditorComponent,
+    SolutionEditor,
+    SolutionExplanationEditor,
+    StateSolutionEditorComponent
   ],
 
   exports: [
@@ -327,10 +383,15 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    ConfirmLeaveModalComponent,
+    ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
+    ConversationSkinComponent,
+    ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
+    CustomizeInteractionModalComponent,
     DeleteAnswerGroupModalComponent,
     DeleteHintModalComponent,
     DeleteInteractionModalComponent,
@@ -341,6 +402,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    FeedbackPopupComponent,
+    LearnerAnswerInfoCard,
     MultiSelectionFieldComponent,
     FilteredChoicesFieldComponent,
     PracticeTabComponent,
@@ -353,6 +416,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ProfileLinkImageComponent,
     PreviewThumbnailComponent,
     RatingDisplayComponent,
+    RatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
@@ -363,6 +427,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SearchBarComponent,
     StateHintsEditorComponent,
     QuestionDifficultySelectorComponent,
+    QuestionEditorSaveModalComponent,
     ScoreRingComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,
@@ -388,11 +453,20 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
+    AddOrUpdateSolutionModalComponent,
+    QuestionMisconceptionSelectorComponent,
+    QuestionsOpportunitiesSelectDifficultyModalComponent,
+    QuestionsListSelectSkillAndDifficultyModalComponent,
     DeleteInteractionModalComponent,
     DeleteHintModalComponent,
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
-    ReviewMaterialEditorComponent
+    ReviewMaterialEditorComponent,
+    TagMisconceptionModalComponent,
+    QuestionMisconceptionEditorComponent,
+    SolutionEditor,
+    SolutionExplanationEditor,
+    StateSolutionEditorComponent
   ],
 })
 
