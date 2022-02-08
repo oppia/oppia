@@ -289,15 +289,15 @@ describe('Skills List Component', () => {
     componentInstance.untriagedSkillSummaries = [];
 
     topicsAndSkillsDashboardBackendApiService = (
-      TestBed.inject(TopicsAndSkillsDashboardBackendApiService) as
-      unknown) as jasmine.SpyObj<MockTopicsAndSkillsDashboardBackendApiService>;
+      TestBed.inject(TopicsAndSkillsDashboardBackendApiService) as unknown
+    ) as jasmine.SpyObj<MockTopicsAndSkillsDashboardBackendApiService>;
     alertsService = TestBed.inject(AlertsService);
     alertsService = (alertsService as unknown) as jasmine.SpyObj<AlertsService>;
     mockNgbModal = (TestBed.inject(NgbModal) as unknown) as
       jasmine.SpyObj<MockNgbModal>;
     mockSkillBackendApiService = (
-      TestBed.inject(SkillBackendApiService) as
-      unknown) as jasmine.SpyObj<MockSkillBackendApiService>;
+      TestBed.inject(SkillBackendApiService) as unknown
+    ) as jasmine.SpyObj<MockSkillBackendApiService>;
   });
 
   it('should create', () => {
