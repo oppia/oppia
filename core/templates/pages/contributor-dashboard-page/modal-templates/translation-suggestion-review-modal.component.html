@@ -1,0 +1,173 @@
+<div class="modal-header">
+  <div class="row align-items-start">
+    <h3 class="col-3">Review translation</h3>
+    <span title="{{ subheading }}"
+          class="col-8 pt-1 mt-4 oppia-translation-modal-subheading protractor-translation-suggestion-review-subheading"
+          aria-hidden="false"> {{ subheading }}
+    </span>
+    <button type="button" class="col-1 close oppia-close-button-position" (click)="cancel()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="w-100"></div>
+    <h4 class="col oppia-translation-modal-author-header">Submitted by {{ authorName }} in {{ languageDescription }} language</h4>
+  </div>
+</div>
+
+<div class="modal-body">
+  <section class="oppia-suggestion-review-container">
+    <div class="oppia-suggestion-review-panel-container float-left">
+      <div class="oppia-suggestion-review-panel-header-container">
+        <strong>Content to translate:</strong>
+      </div>
+      <div class="oppia-suggestion-review-panel">
+        <ul *ngIf="isSetOfStringsContent">
+          <li *ngFor="let item of displayExplorationContent(); index as idx">
+            {{ item }}
+          </li>
+        </ul>
+        <angular-html-bind-wrapper *ngIf="!isSetOfStringsContent"
+                                    [htmlData]="displayExplorationContent()">
+        </angular-html-bind-wrapper>
+      </div>
+    </div>
+    <div class="oppia-suggestion-review-panel-container float-right">
+      <div dir="auto" class="oppia-suggestion-review-panel-header-container">
+        <strong> Translation:</strong>
+        <button class="btn btn-sm btn-secondary float-right" *ngIf="!startedEditing && status === 'review' && canEditTranslation" (click)="editSuggestion()">Edit</button>
+      </div>
+      <div class="oppia-suggestion-review-panel">
+        <div>
+          <angular-html-bind-wrapper [htmlData]="translationHtml" *ngIf="!startedEditing">
+          </angular-html-bind-wrapper>
+          <ul *ngIf="isSetOfStringsContent">
+            <li *ngFor="let item of translationHtml; index as idx">
+              {{ item }}
+            </li>
+          </ul>
+          <schema-based-editor [schema]="getHtmlSchema()"
+                               *ngIf="startedEditing && isHtmlContent"
+                               [localValue]="editedContent.html"
+                               (localValueChange)="updateHtml($event)">
+          </schema-based-editor>
+          <schema-based-editor [schema]="getUnicodeSchema()"
+                               *ngIf="startedEditing && isUnicodeContent"
+                               [localValue]="editedContent.html"
+                               (localValueChange)="updateHtml($event)">
+          </schema-based-editor>
+          <schema-based-editor [schema]="getSetOfStringsSchema()"
+                               *ngIf="startedEditing && isSetOfStringsContent"
+                               [localValue]="editedContent.html"
+                               (localValueChange)="updateHtml($event)">
+          </schema-based-editor>
+        </div>
+        <div class="oppia-translation-review-edit-buttons">
+          <button class="btn btn-secondary" *ngIf="startedEditing" (click)="cancelEdit()">Cancel</button>
+          <button class="btn btn-success" *ngIf="startedEditing" (click)="updateSuggestion()">Update</button>
+        </div>
+        <div class="oppia-translation-error-section" *ngIf="startedEditing && errorFound">
+          <p>
+            {{ errorMessage }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="oppia-suggestion-review-exploration-change" *ngIf="hasExplorationContentChanged()">
+    <p class="oppia-suggestion-review-exploration-change-note">
+      <strong>NOTE: The content has been modified since this translation has been submitted. Please edit the translation as necessary. The original content at the time of submission was:</strong>
+    </p>
+    <div class="oppia-suggestion-review-panel">
+      <ul *ngIf="isSetOfStringsContent">
+        <li *ngFor="let item of contentHtml; index as idx">
+          {{ item }}
+        </li>
+      </ul>
+      <angular-html-bind-wrapper *ngIf="!isSetOfStringsContent"
+                                 [htmlData]="contentHtml">
+      </angular-html-bind-wrapper>
+    </div>
+  </section>
+  <div [hidden]="!reviewable" class="oppia-suggestion-review-message">
+    Review message (required if rejecting):
+    <textarea class="protractor-test-suggestion-review-message w-100" rows="3" [(ngModel)]="reviewMessage" [maxlength]="MAX_REVIEW_MESSAGE_LENGTH"></textarea>
+    <div class="alert alert-danger" [hidden]="!(reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH)">
+      Review message should be at most {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
+    </div>
+  </div>
+  <div [hidden]="reviewable && !suggestionIsRejected" class="oppia-suggestion-review-message">
+    <strong>Review message: </strong>{{ reviewMessage }}
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Close</button>
+  <span ngbTooltip="Enter review message before rejecting" placement="bottom" [disableTooltip]="!(reviewMessage.length == 0)">
+    <button class="btn btn-danger oppia-suggestion-resolve-button" *ngIf="reviewable" [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion" (click)="rejectAndReviewNext()">
+      <i [hidden]="!resolvingSuggestion" class="fa fa-spinner"></i>
+      <span [hidden]="resolvingSuggestion">{{ lastSuggestionToReview ? 'Reject' : 'Reject and review next' }}</span>
+    </button>
+  </span>
+  <span>
+    <button class="btn btn-success oppia-suggestion-resolve-button" [disabled]="resolvingSuggestion || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH" *ngIf="reviewable" (click)="acceptAndReviewNext()">
+      <i [hidden]="!resolvingSuggestion" class="fa fa-spinner"></i>
+      <span [hidden]="resolvingSuggestion">{{ lastSuggestionToReview ? 'Accept' : 'Accept and review next' }}</span>
+    </button>
+  </span>
+</div>
+
+<style>
+  .oppia-translation-modal-author-header {
+    margin-top: -12px;
+  }
+
+  .oppia-translation-modal-subheading {
+    margin: 18px 12px;
+  }
+  .oppia-suggestion-review-panel {
+    border: 1px solid #ccc;
+    height: 88%;
+    padding: 10px 0 10px 10px;
+    position: relative;
+  }
+  .oppia-suggestion-review-message {
+    margin-left: 10px;
+    margin-top: 20px;
+  }
+  .oppia-suggestion-resolve-button {
+    min-width: 165px;
+  }
+  .oppia-suggestion-review-panel-header-container {
+    height: 12%;
+  }
+  .oppia-suggestion-review-exploration-change {
+    padding: 0 10px;
+  }
+  .oppia-suggestion-review-exploration-change-note {
+    margin-top: 18px;
+  }
+  .oppia-translation-review-edit-buttons {
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+  .oppia-translation-error-section {
+    bottom: 10px;
+    color: red;
+    position: absolute;
+  }
+  .oppia-close-button-position {
+    font-size: 2.5rem;
+    position: absolute;
+    right: 8px;
+    top: 12px;
+  }
+  /* From 1023px onwards, the modal text branches to the next line.
+     The use of line height ensures that alternate lines of the
+     heading stay close together.
+  */
+  @media only screen and (max-width: 1023px) {
+    .oppia-translation-modal-subheading {
+      line-height: 1.1;
+      margin: 20px 12px;
+    }
+  }
+</style>
