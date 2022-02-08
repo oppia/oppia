@@ -113,6 +113,7 @@ LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
+
 class NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for valid model names."""
 
@@ -143,17 +144,20 @@ class NAMES(enum.Enum): # pylint: disable=invalid-name
     translation = 'translation' # pylint: disable=invalid-name
     user = 'user' # pylint: disable=invalid-name
 
+
 # A mapping of interaction ids to classifier properties.
 # TODO(#10217): As of now we support only one algorithm per interaction.
 # However, we do have the necessary storage infrastructure to support multiple
 # algorithms per interaction. Hence, whenever we find a secondary algorithm
 # candidate for any of the supported interactions, the logical functions to
 # support multiple algorithms need to be implemented.
+
 class ClassifierDict(TypedDict):
     """Representing INTERACTION_CLASSIFIER_MAPPING dict values."""
 
     algorithm_id: str
     algorithm_version: int
+
 
 INTERACTION_CLASSIFIER_MAPPING: Dict[str, ClassifierDict] = {
     'TextInput': {

@@ -16,10 +16,10 @@
 
 from __future__ import annotations
 
-from typing import Dict, Optional
-
 from core import feconf
 from core import utils
+
+from typing import Dict, Optional
 
 USER_DELETION_SUCCESS = 'SUCCESS'
 USER_DELETION_ALREADY_DONE = 'ALREADY DONE'
