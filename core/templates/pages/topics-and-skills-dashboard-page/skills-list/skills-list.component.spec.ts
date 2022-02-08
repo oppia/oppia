@@ -76,7 +76,7 @@ describe('Skills List Component', () => {
           DeleteSkillModalComponent |
           MergeSkillModalComponent |
           UnassignSkillFromTopicsModalComponent
-        ), 
+        ),
         options: NgbModalOptions
     ) {
       if (this.modal === 'delete_skill') {
