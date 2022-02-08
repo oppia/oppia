@@ -110,10 +110,12 @@ describe('Skills List Component', () => {
           },
           result: {
             then: (
-                successCallback: (result: {
-                skill: {};
-                supersedingSkillId: string;
-              }) => void,
+                successCallback: (
+                  result: {
+                    skill: {};
+                    supersedingSkillId: string;
+                  }
+                ) => void,
                 cancelCallback: () => void
             ) => {
               if (this.success) {
