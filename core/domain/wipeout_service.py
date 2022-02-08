@@ -87,19 +87,6 @@ def get_number_of_pending_deletion_requests():
     return user_models.PendingDeletionRequestModel.query().count()
 
 
-def validate_pending_deletion_request(pending_deletion_request):
-    """Checks that the pending deletion request is valid.
-
-    Raises:
-        ValidationError. The field pseudonymizable_entity_mappings
-            contains wrong key.
-    """
-    for key in pending_deletion_request.pseudonymizable_entity_mappings.keys():
-        if key not in [name.value for name in models.NAMES]:
-            raise utils.ValidationError(
-                'pseudonymizable_entity_mappings contain wrong key')
-
-
 def save_pending_deletion_requests(pending_deletion_requests):
     """Save a list of pending deletion request domain objects as
     PendingDeletionRequestModel entities in the datastore.
@@ -116,7 +103,7 @@ def save_pending_deletion_requests(pending_deletion_requests):
     final_pending_deletion_request_models = []
     for deletion_request_model, deletion_request in zip(
             pending_deletion_request_models, pending_deletion_requests):
-        validate_pending_deletion_request(deletion_request)
+        deletion_request.validate()
         deletion_request_dict = {
             'email': deletion_request.email,
             'normalized_long_term_username': (
