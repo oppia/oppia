@@ -17,6 +17,8 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
+import { TranslationSuggestionReviewModalComponent } from '../modal-templates/translation-suggestion-review-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 require('base-components/base-content.component.ts');
 require(
@@ -37,9 +39,6 @@ require(
 require(
   'pages/contributor-dashboard-page/modal-templates/' +
   'question-suggestion-review-modal.controller.ts');
-require(
-  'pages/contributor-dashboard-page/modal-templates/' +
-  'translation-suggestion-review-modal.controller.ts');
 
 require(
   'pages/contributor-dashboard-page/services/' +
@@ -47,6 +46,7 @@ require(
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/suggestion-modal.service.ts');
+require('services/ngb-modal.service.ts');
 
 require(
   // eslint-disable-next-line max-len
@@ -57,13 +57,13 @@ angular.module('oppia').component('contributionsAndReview', {
   controller: [
     '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
-    'QuestionObjectFactory', 'SkillBackendApiService',
+    'NgbModal', 'QuestionObjectFactory', 'SkillBackendApiService',
     'UrlInterpolationService', 'UserService',
     'CORRESPONDING_DELETED_OPPORTUNITY_TEXT', 'IMAGE_CONTEXT',
     function(
         $filter, $rootScope, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
-        QuestionObjectFactory, SkillBackendApiService,
+        NgbModal, QuestionObjectFactory, SkillBackendApiService,
         UrlInterpolationService, UserService,
         CORRESPONDING_DELETED_OPPORTUNITY_TEXT, IMAGE_CONTEXT) {
       var ctrl = this;
@@ -252,33 +252,22 @@ angular.module('oppia').component('contributionsAndReview', {
 
       var _showTranslationSuggestionModal = function(
           suggestionIdToContribution, initialSuggestionId, reviewable) {
-        var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/contributor-dashboard-page/modal-templates/' +
-          'translation-suggestion-review.directive.html');
         var details = ctrl.contributions[initialSuggestionId].details;
         var subheading = (
           details.topic_name + ' / ' + details.story_title +
           ' / ' + details.chapter_title);
-        $uibModal.open({
-          templateUrl: _templateUrl,
-          backdrop: 'static',
-          size: 'lg',
-          resolve: {
-            suggestionIdToContribution: function() {
-              return cloneDeep(suggestionIdToContribution);
-            },
-            initialSuggestionId: function() {
-              return initialSuggestionId;
-            },
-            reviewable: function() {
-              return reviewable;
-            },
-            subheading: function() {
-              return subheading;
-            }
-          },
-          controller: 'TranslationSuggestionReviewModalController'
-        }).result.then(function(resolvedSuggestionIds) {
+        const modalRef: NgbModalRef = NgbModal.open(
+          TranslationSuggestionReviewModalComponent, {
+            backdrop: 'static',
+            windowClass: 'oppia-translation-suggestion-review-modal',
+            size: 'lg',
+          });
+        modalRef.componentInstance.suggestionIdToContribution = (
+          cloneDeep(suggestionIdToContribution));
+        modalRef.componentInstance.initialSuggestionId = initialSuggestionId;
+        modalRef.componentInstance.reviewable = reviewable;
+        modalRef.componentInstance.subheading = subheading;
+        modalRef.result.then(function(resolvedSuggestionIds) {
           ContributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
             resolvedSuggestionIds);
           resolvedSuggestionIds.forEach(function(suggestionId) {
