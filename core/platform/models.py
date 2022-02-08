@@ -39,11 +39,9 @@ NAMES = feconf.NAMES
 
 
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
-    NAMES.app_feedback_report, NAMES.blog,
-    NAMES.collection, NAMES.config, NAMES.exploration,
-    NAMES.feedback, NAMES.question, NAMES.skill,
-    NAMES.story, NAMES.subtopic, NAMES.suggestion,
-    NAMES.topic
+    NAMES.app_feedback_report, NAMES.blog, NAMES.collection, NAMES.config,
+    NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
+    NAMES.subtopic, NAMES.suggestion, NAMES.topic
 )
 
 GAE_PLATFORM = 'gae'
@@ -221,7 +219,7 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
-        model_names = [name for name in NAMES if name != (NAMES.base_model)]
+        model_names = [name for name in NAMES if name != NAMES.base_model]
         return cls.get_storage_model_classes(model_names)
 
     @classmethod

@@ -84,7 +84,7 @@ class PendingDeletionRequest:
             user_id, email, normalized_long_term_username, False, {})
 
     def validate(self) -> None:
-        """Checks that the pending deletion request is valid.
+        """Checks that the domain object is valid.
 
         Raises:
             ValidationError. The field pseudonymizable_entity_mappings
