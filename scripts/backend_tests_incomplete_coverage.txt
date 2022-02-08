@@ -10,7 +10,6 @@ core.domain.suggestion_registry_test
 core.controllers.feedback_test
 core.domain.topic_domain_test
 core.controllers.acl_decorators_test
-core.domain.question_domain_test
 core.domain.rights_manager_test
 core.domain.story_domain_test
 core.domain.suggestion_services_test
@@ -23,7 +22,6 @@ core.domain.auth_services_test
 core.domain.opportunity_services_test
 core.domain.feedback_domain_test
 core.domain.playthrough_issue_registry_test
-core.domain.feedback_services_test
 core.domain.exp_services_test
 core.domain.blog_domain_test
 core.domain.blog_services_test
