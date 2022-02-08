@@ -757,9 +757,9 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             next_job.algorithm_version
         )
 
-    def test_create_classifier_training_job_for_reverted_exploration(self):
-        """Test the create_classifier_training_job_for_reverted_exploration
-         method.
+    def test_reverted_exploration_maintains_classifier_model_mapping(self):
+        """Test if the classifier model mapping is maintained when an
+        exploration is reverted.
         """
 
         state_name = 'Home'
@@ -784,7 +784,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             classifier_services
             .create_classifier_training_job_for_reverted_exploration(
             current_exploration, old_exploration))
-        # Verify if classifier model mapping is maintiained using the job ID.
+        # Verify if classifier model mapping is maintained using the job ID.
         new_job = classifier_services.get_classifier_training_job(
             self.exp_id, current_exploration.version, state_name,
             algorithm_id)
