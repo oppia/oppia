@@ -463,6 +463,7 @@
       }
     ],
     "no-dupe-class-members": "off",
-    "@typescript-eslint/no-dupe-class-members": ["error"]
+    "@typescript-eslint/no-dupe-class-members": ["error"],
+    "@typescript-eslint/prefer-string-starts-ends-with": "error"
   }
 }
