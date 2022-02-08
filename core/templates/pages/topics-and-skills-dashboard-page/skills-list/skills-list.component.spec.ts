@@ -71,11 +71,14 @@ describe('Skills List Component', () => {
     modal!: string;
     success: boolean = true;
     open(
-        content: AssignSkillToTopicModalComponent |
-        DeleteSkillModalComponent |
-        MergeSkillModalComponent |
-        UnassignSkillFromTopicsModalComponent
-        , options: NgbModalOptions) {
+        content: (
+          AssignSkillToTopicModalComponent |
+          DeleteSkillModalComponent |
+          MergeSkillModalComponent |
+          UnassignSkillFromTopicsModalComponent
+        ), 
+        options: NgbModalOptions
+    ) {
       if (this.modal === 'delete_skill') {
         return {
           componentInstance: {
