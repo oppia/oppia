@@ -24,9 +24,8 @@ import constants from 'assets/constants';
 
 import {
   StoryContentsBackendDict,
-  StoryContents,
-  StoryContentsObjectFactory
-} from 'domain/story/StoryContentsObjectFactory';
+  StoryContents
+} from 'domain/story/storycontents-object.model';
 
 export interface StoryBackendDict {
   'id': string;
@@ -231,12 +230,12 @@ export class Story {
   providedIn: 'root'
 })
 export class StoryObjectFactory {
-  constructor(private storyContentsObjectFactory: StoryContentsObjectFactory) {}
+  constructor() {}
   createFromBackendDict(storyBackendDict: StoryBackendDict): Story {
     return new Story(
       storyBackendDict.id, storyBackendDict.title,
       storyBackendDict.description, storyBackendDict.notes,
-      this.storyContentsObjectFactory.createFromBackendDict(
+      StoryContents.createFromBackendDict(
         storyBackendDict.story_contents),
       storyBackendDict.language_code,
       storyBackendDict.version, storyBackendDict.corresponding_topic_id,

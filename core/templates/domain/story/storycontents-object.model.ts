@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model class for creating and mutating instances of frontend
  * story contents domain objects.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
@@ -314,27 +311,17 @@ export class StoryContents {
     }
     this._nodes[index].removeDestinationNodeId(destinationNodeId);
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class StoryContentsObjectFactory {
-  constructor() {}
-  createFromBackendDict(
-      storyContentsBackendObject: StoryContentsBackendDict): StoryContents {
-    var nodes = [];
-    for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
-      nodes.push(
-        StoryNode.createFromBackendDict(
-          storyContentsBackendObject.nodes[i]));
-    }
-    return new StoryContents(
-      storyContentsBackendObject.initial_node_id, nodes,
-      storyContentsBackendObject.next_node_id);
+  static createFromBackendDict(
+    storyContentsBackendObject: StoryContentsBackendDict): StoryContents {
+  var nodes = [];
+  for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
+    nodes.push(
+      StoryNode.createFromBackendDict(
+        storyContentsBackendObject.nodes[i]));
   }
+  return new StoryContents(
+    storyContentsBackendObject.initial_node_id, nodes,
+    storyContentsBackendObject.next_node_id);
 }
-
-angular.module('oppia').factory(
-  'StoryContentsObjectFactory',
-  downgradeInjectable(StoryContentsObjectFactory));
+}
