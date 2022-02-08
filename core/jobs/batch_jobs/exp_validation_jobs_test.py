@@ -40,7 +40,7 @@ class GetExpRightsWithDuplicateUsersJobTests(
     USER_ID_3 = 'id_3'
 
     def setUp(self):
-        super(GetExpRightsWithDuplicateUsersJobTests, self).setUp()
+        super().setUp()
 
         # This is an invalid model with duplicate: USER_ID_1.
         self.exp_rights_1 = self.create_model(
@@ -92,25 +92,19 @@ class GetExpRightsWithDuplicateUsersJobTests(
         ]
 
     def test_run_with_no_models(self) -> None:
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                '#EXPS SUCCESS: 0')
-        ])
+        self.assert_job_output_is([])
 
     def test_run_with_single_valid_model(self) -> None:
         self.put_multi([self.exp_rights_2])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                '#EXPS SUCCESS: 1')
+            job_run_result.JobRunResult.as_stdout('#EXPS SUCCESS: 1')
         ])
 
     def test_run_with_single_invalid_model(self) -> None:
         self.put_multi([self.exp_rights_1])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                '#EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout(
-                '#INVALID SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('#EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('#INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
                 f'{self.EXPLORATION_ID_1}: {self.user_list_1}'),
         ])
@@ -120,10 +114,8 @@ class GetExpRightsWithDuplicateUsersJobTests(
             self.exp_rights_1, self.exp_rights_2, self.exp_rights_3
         ])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                '#EXPS SUCCESS: 3'),
-            job_run_result.JobRunResult.as_stdout(
-                '#INVALID SUCCESS: 2'),
+            job_run_result.JobRunResult.as_stdout('#EXPS SUCCESS: 3'),
+            job_run_result.JobRunResult.as_stdout('#INVALID SUCCESS: 2'),
             job_run_result.JobRunResult.as_stderr(
                 f'{self.EXPLORATION_ID_1}: {self.user_list_1}'),
             job_run_result.JobRunResult.as_stderr(
