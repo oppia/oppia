@@ -330,12 +330,11 @@ class NumericInput(base.BaseInteraction):
         is_within_tolerance_proto = {}
         x = inputs['x']
         tol = inputs['tol']
-        if isinstance(x, (int, float)) and isinstance(tol, (int, float)):
-            is_within_tolerance_proto = (
-                numeric_rule_spec.IsWithinToleranceSpecDto(
-                    inputTolerance=tol,
-                    inputComparedValue=x
-                )
+        is_within_tolerance_proto = (
+            numeric_rule_spec.IsWithinToleranceSpecDto(
+                inputTolerance=tol,
+                inputComparedValue=x
             )
+        )
 
         return is_within_tolerance_proto

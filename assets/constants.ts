@@ -4766,7 +4766,7 @@ export default {
     "description": "Hindi"
   }, {
     "code": "pt-br",
-    "description": "Português (Brasil)"
+    "description": "Brazilian Portuguese"
   }],
 
   // List of supported content languages in which we can create explorations or

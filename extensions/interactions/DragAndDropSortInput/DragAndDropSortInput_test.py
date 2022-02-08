@@ -122,6 +122,17 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
                 interaction_domain.hints,
                 interaction_domain.answer_groups))
 
+        customization_args_proto = (
+            drag_and_drop_sort_input_proto.customization_args)
+        self.assertTrue(
+            customization_args_proto.allowMultipleItemsInSamePosition)
+        self.assertEqual(
+            customization_args_proto.choices[0].content_id,
+            'ca_choices_2')
+        self.assertEqual(
+            customization_args_proto.choices[0].text,
+            '<p>Choice 1</p>')
+
         self.assertEqual(
             drag_and_drop_sort_input_proto.default_outcome.destination_state,
             'abc')

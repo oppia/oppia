@@ -13,6 +13,7 @@
         "extensions.interactions.AlgebraicExpressionInput.AlgebraicExpressionInput_test",
         "extensions.interactions.Continue.Continue_test",
         "extensions.interactions.DragAndDropSortInput.DragAndDropSortInput_test",
+        "extensions.interactions.EndExploration.EndExploration_test",
         "extensions.interactions.FractionInput.FractionInput_test",
         "extensions.interactions.ImageClickInput.ImageClickInput_test",
         "extensions.interactions.ItemSelectionInput.ItemSelectionInput_test",
