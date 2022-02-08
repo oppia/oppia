@@ -25,6 +25,7 @@
           <schema-based-editor [schema]="itemSchema"
                                [disabled]="disabled"
                                [ngModel]="localValue[idx]"
+                               [ngModelOptions]="{standalone: true}"
                                (localValueChange)="setValue($event, idx)"
                                [name]="idx"
                                [labelForFocusTarget]="getFocusLabel(idx)"

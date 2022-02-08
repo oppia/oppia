@@ -35,10 +35,12 @@ export class SubtitledUnicodeEditorComponent {
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   updateValue(val: string): void {
-    if (this.value._unicode === val) {
+    if (this.value && this.value._unicode === val) {
       return;
     }
-    this.value._unicode = val;
+    this.value = {
+      _unicode: val
+    };
     this.valueChanged.emit(this.value);
     this.changeDetectorRef.detectChanges();
   }

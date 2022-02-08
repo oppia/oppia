@@ -55,10 +55,12 @@ export class SubtitledHtmlEditorComponent implements OnInit {
   }
 
   updateValue(newValue: unknown): void {
-    if (this.value._html === newValue) {
+    if (this.value && this.value._html === newValue) {
       return;
     }
-    this.value._html = newValue;
+    this.value = {
+      _html: newValue
+    };
     this.valueChanged.emit(this.value);
     this.changeDetectorRef.detectChanges();
   }
