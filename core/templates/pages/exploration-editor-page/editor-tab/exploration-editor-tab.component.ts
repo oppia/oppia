@@ -344,12 +344,12 @@ angular.module('oppia').component('explorationEditorTab', {
           })
         );
 
-        $scope.$watch(ExplorationStatesService.getStates, function() {
+        ExplorationStatesService.registerOnStatesChangedCallback(() => {
           if (ExplorationStatesService.getStates()) {
             StateEditorService.setStateNames(
               ExplorationStatesService.getStateNames());
           }
-        }, true);
+        });
         ctrl.interactionIsShown = false;
       };
       ctrl.$onDestroy = function() {
