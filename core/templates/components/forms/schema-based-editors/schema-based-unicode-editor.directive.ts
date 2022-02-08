@@ -29,7 +29,6 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
-
 interface OppiaValidator {
   id: string;
   'min_value': number;
@@ -73,19 +72,20 @@ implements ControlValueAccessor, OnInit, Validator {
     readOnly?: string; mode?: unknown;
   } = {
     // Convert tabs to spaces.
-    extraKeys: {
-      Tab: function(cm) {
-        var spaces = Array(
-          cm.getOption('indentUnit') + 1).join(' ');
-        cm.replaceSelection(spaces);
-        // Move the cursor to the end of the selection.
-        var endSelectionPos = cm.getDoc().getCursor('head');
-        cm.getDoc().setCursor(endSelectionPos);
-      }
-    },
-    indentWithTabs: false,
-    lineNumbers: true
-  };
+      extraKeys: {
+        Tab: function(cm) {
+          var spaces = Array(
+            cm.getOption('indentUnit') + 1).join(' ');
+          cm.replaceSelection(spaces);
+          // Move the cursor to the end of the selection.
+          var endSelectionPos = cm.getDoc().getCursor('head');
+          cm.getDoc().setCursor(endSelectionPos);
+        }
+      },
+      indentWithTabs: false,
+      lineNumbers: true
+    };
+
   constructor(
     private deviceInfoService: DeviceInfoService,
     private focusManagerService: FocusManagerService,

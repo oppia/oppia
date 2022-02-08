@@ -15,35 +15,3 @@
 /**
  * @fileoverview Unit tests for Schema Based Choices Editor Directive
  */
-
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
-describe('Schema Based Choices Editor Directive', () => {
-  let ctrl = null;
-  let $rootScope = null;
-  let $scope = null;
-  let directive = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
-  beforeEach(angular.mock.inject(function($injector) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    directive = $injector.get('schemaBasedChoicesEditorDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
-      $scope: $scope
-    });
-
-    ctrl.schema = () => {
-      return {
-        choices: ['Choice 1']
-      };
-    };
-  }));
-
-  it('should get read only schema', () => {
-    expect(ctrl.getReadonlySchema()).toEqual({});
-  });
-});

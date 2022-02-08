@@ -22,8 +22,11 @@
     <table class="w-100">
       <tr *ngFor="let item of localValue; let idx = index">
         <td>
-          <schema-based-editor [schema]="itemSchema" [disabled]="disabled" [ngModel]="localValue[idx]"
-                               (localValueChange)="setValue($event, idx)" name=a{{idx}}
+          <schema-based-editor [schema]="itemSchema"
+                               [disabled]="disabled"
+                               [ngModel]="localValue[idx]"
+                               (localValueChange)="setValue($event, idx)"
+                               [name]="idx"
                                [labelForFocusTarget]="getFocusLabel(idx)"
                                (inputBlur)="(idx === localValue.length - 1 ? lastElementOnBlur() : showAddItemButton())"
                                (inputFocus)="(idx === localValue.length - 1 ? hideAddItemButton() : showAddItemButton())">

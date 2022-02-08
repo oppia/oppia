@@ -15,6 +15,7 @@
 /**
  * @fileoverview Directive for a schema-based editor for lists.
  */
+
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -49,7 +50,7 @@ interface OppiaValidator {
 })
 export class SchemaBasedListEditorComponent
 implements OnInit, ControlValueAccessor, Validator {
-  localValue: SchemaDefaultValue[];
+  localValue: SchemaDefaultValue[] = [];
   directiveSubscriptions = new Subscription();
   @Input() disabled: boolean;
   // Read-only property. The schema definition for each item in the list.
