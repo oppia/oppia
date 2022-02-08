@@ -45,7 +45,6 @@ describe('Progress nav component', () => {
   let focusManagerService: FocusManagerService;
   let playerTranscriptService: PlayerTranscriptService;
   let windowDimensionsService: WindowDimensionsService;
-  let explorationEngineService: ExplorationEngineService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let schemaFormSubmittedService: SchemaFormSubmittedService;
   let mockDisplayedCard = new StateCard(
@@ -86,7 +85,6 @@ describe('Progress nav component', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
-    explorationEngineService = TestBed.inject(ExplorationEngineService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
 
@@ -221,24 +219,14 @@ describe('Progress nav component', () => {
 
   it('should change card', () => {
     componentInstance.transcriptLength = 5;
-    spyOn(playerPositionService, 'recordNavigationButtonClick');
-    spyOn(playerPositionService, 'setDisplayedCardIndex');
-    spyOn(explorationEngineService.onUpdateActiveStateIfInEditor, 'emit');
-    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue('');
-    spyOn(playerPositionService, 'changeCurrentQuestion');
+    spyOn(componentInstance.changeCard, 'emit');
 
-    componentInstance.changeCard(0);
+    componentInstance.validateIndexAndChangeCard(0);
 
-    expect(playerPositionService.recordNavigationButtonClick)
-      .toHaveBeenCalled();
-    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalled();
-    expect(explorationEngineService.onUpdateActiveStateIfInEditor.emit)
-      .toHaveBeenCalled();
-    expect(playerPositionService.getCurrentStateName).toHaveBeenCalled();
-    expect(playerPositionService.changeCurrentQuestion).toHaveBeenCalled();
+    expect(componentInstance.changeCard.emit).toHaveBeenCalled();
 
     expect(() => {
-      componentInstance.changeCard(-1);
+      componentInstance.validateIndexAndChangeCard(-1);
     }).toThrowError('Target card index out of bounds.');
   });
 
