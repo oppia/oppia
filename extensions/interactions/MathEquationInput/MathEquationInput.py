@@ -156,7 +156,8 @@ class MathEquationInput(base.BaseInteraction):
                 cls._convert_matches_exactly_rule_spec_to_proto),
             'IsEquivalentTo': cls._convert_is_equivalent_rule_spec_to_proto,
             'MatchesUpToTrivialManipulations': (
-                cls._convert_matches_upto_rule_spec_to_proto)
+                cls._convert_matches_upto_trivial_manipulation_rule_spec_to_proto # pylint: disable=line-too-long
+            )
         }
 
         rule_type_to_proto_mapping = {
@@ -218,7 +219,9 @@ class MathEquationInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _convert_matches_upto_rule_spec_to_proto(cls, inputs):
+    def _convert_matches_upto_trivial_manipulation_rule_spec_to_proto(
+        cls, inputs
+    ):
         """Creates a proto object for MatchesUpToTrivialManipulationsSpecDto.
 
         Args:
