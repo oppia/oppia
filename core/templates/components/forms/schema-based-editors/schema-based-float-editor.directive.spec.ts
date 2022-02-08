@@ -173,7 +173,7 @@ describe('Schema Based Float Editor Directive', () => {
     expect(ctrl.errorString)
       .toBe(
         'The answer should be a valid number ' +
-        'and can contain at most 15 digits (0-9) or symbols(.).');
+        'and can contain at most 15 digits (0-9) or symbols(. or -).');
   });
 
   it('should get current decimal separator', ()=>{
