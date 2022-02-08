@@ -22,14 +22,13 @@ from core.constants import constants
 from core.domain import rights_manager
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
 
-(exp_models, ) = models.Registry.import_models([
-    models.NAMES.exploration
-])
+(exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 
 class GetExpRightsWithDuplicateUsersJob(base_jobs.JobBase):
@@ -59,20 +58,14 @@ class GetExpRightsWithDuplicateUsersJob(base_jobs.JobBase):
 
         report_number_of_exps_queried = (
             exp_rights
-            | 'Count rights models' >> beam.combiners.Count.Globally()
-            | 'Report count of rights models' >> beam.Map(
-                lambda object_count: job_run_result.JobRunResult.as_stdout(
-                    'RESULT: Queried %s exp rights in total.' % (object_count)
-                ))
+            | 'Report count of rights models' >> (
+                job_result_transforms.CountObjectsToJobRunResult('#EXPS'))
         )
 
         report_number_of_invalid_exps = (
             exp_ids_with_duplicate_users
-            | 'Count invalid rights models' >> beam.combiners.Count.Globally()
-            | 'Report count of invalid rights models' >> beam.Map(
-                lambda object_count: job_run_result.JobRunResult.as_stdout(
-                    'RESULT: There are %s invalid exp rights.' % (object_count)
-                ))
+            | 'Report count of invalid rights models' >> (
+                job_result_transforms.CountObjectsToJobRunResult('#INVALID'))
         )
 
         report_invalid_ids_and_users = (
