@@ -313,15 +313,15 @@ export class StoryContents {
   }
 
   static createFromBackendDict(
-    storyContentsBackendObject: StoryContentsBackendDict): StoryContents {
-  var nodes = [];
-  for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
-    nodes.push(
-      StoryNode.createFromBackendDict(
-        storyContentsBackendObject.nodes[i]));
+      storyContentsBackendObject: StoryContentsBackendDict): StoryContents {
+    var nodes = [];
+    for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
+      nodes.push(
+        StoryNode.createFromBackendDict(
+          storyContentsBackendObject.nodes[i]));
+    }
+    return new StoryContents(
+      storyContentsBackendObject.initial_node_id, nodes,
+      storyContentsBackendObject.next_node_id);
   }
-  return new StoryContents(
-    storyContentsBackendObject.initial_node_id, nodes,
-    storyContentsBackendObject.next_node_id);
-}
 }

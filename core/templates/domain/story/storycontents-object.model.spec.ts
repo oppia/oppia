@@ -16,7 +16,6 @@
  * @fileoverview Tests for StoryContentsObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { StoryContents, StoryContentsBackendDict } from
   'domain/story/storycontents-object.model';
@@ -27,8 +26,6 @@ describe('Story contents object factory', () => {
   let sampleStoryContentsBackendDict: StoryContentsBackendDict;
 
   beforeEach(() => {
-    
-
     sampleStoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
