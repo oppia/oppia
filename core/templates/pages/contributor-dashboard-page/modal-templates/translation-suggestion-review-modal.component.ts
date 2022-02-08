@@ -296,7 +296,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.siteAnalyticsService.registerContributorDashboardAcceptSuggestion(
       'Translation');
 
-    this.contributionAndReviewService.resolveSuggestionToExploration(
+    this.contributionAndReviewService.reviewExplorationSuggestion(
       this.activeSuggestion.target_id, this.activeSuggestionId,
       AppConstants.ACTION_ACCEPT_SUGGESTION,
       this.reviewMessage, this.finalCommitMessage,
@@ -316,7 +316,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
         'Translation');
 
-      this.contributionAndReviewService.resolveSuggestionToExploration(
+      this.contributionAndReviewService.reviewExplorationSuggestion(
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
         reviewMessage || this.reviewMessage, this.generateCommitMessage(),

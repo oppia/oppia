@@ -256,7 +256,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(
         siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
-      expect(contributionAndReviewService.resolveSuggestionToExploration)
+      expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
           '2', 'suggestion_2', 'accept', 'Review message example 2',
           'hint section of "StateName" card', jasmine.any(Function),
@@ -273,7 +273,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.reviewable).toBe(reviewable);
       expect(component.reviewMessage).toBe('');
 
-      spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+      spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
             targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
@@ -295,7 +295,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
-      expect(contributionAndReviewService.resolveSuggestionToExploration)
+      expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'reject', 'Review message example',
           'hint section of "StateName" card', jasmine.any(Function),
@@ -308,7 +308,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
-      expect(contributionAndReviewService.resolveSuggestionToExploration)
+      expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
           '2', 'suggestion_2', 'reject', 'Review message example 2',
           'hint section of "StateName" card', jasmine.any(Function),
