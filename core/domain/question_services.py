@@ -249,8 +249,7 @@ def get_questions_by_skill_ids(
         skill difficulty and the medium difficulty.
 
     Raises:
-        Exception. The total_question_count is higher than
-            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME.
+        Exception. Question count is higher than the maximum limit.
     """
 
     if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
@@ -542,7 +541,7 @@ def apply_change_list(question_id, change_list):
         Question. The resulting question domain object.
 
     Raises:
-        Exception. The change list is not applicable to the question ID.
+        Exception. The change list is not applicable to the question.
     """
     question = get_question_by_id(question_id)
     question_property_inapplicable_skill_misconception_ids = (

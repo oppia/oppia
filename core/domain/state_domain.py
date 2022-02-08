@@ -167,7 +167,7 @@ class AnswerGroup:
             list(str). The list of all html content strings in the interaction.
 
         Raises:
-            Exception. If the Rule spec is of invalid format.
+            Exception. If the Rule spec has invalid format.
             Exception. If the Rule spec has no valid input variable
                 with html in it.
         """
@@ -432,7 +432,7 @@ class Solution:
             dict. The converted Solution dict.
 
         Raises:
-            Exception. If the Solution dict have invalid answer type.
+            Exception. If the Solution dict has invalid answer type.
         """
         if interaction_id is None:
             return solution_dict
@@ -792,7 +792,7 @@ class InteractionInstance:
             list(str). The list of all html content strings in the interaction.
 
         Raises:
-            Exception. If the solution_dict have invalid correct_answer type.
+            Exception. The solution has invalid type.
         """
         html_list = []
 
@@ -2183,7 +2183,7 @@ class RuleSpec:
             dict. The converted Rule Spec dict.
 
         Raises:
-            Exception. If the Rule spec is of invalid format.
+            Exception. If the Rule spec has invalid format.
             Exception. If the Rule spec has no valid input variable
                 with html in it.
         """
@@ -2791,8 +2791,8 @@ class State:
                 state.
 
         Raises:
-            Exception. The content ID to be deleted doesn't exist.
-            Exception. The content ID to be added already exist.
+            Exception. The content to be deleted doesn't exist.
+            Exception. The content to be added already exists.
         """
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
@@ -2948,7 +2948,7 @@ class State:
             customization_args_dict: dict. The new customization_args to set.
 
         Raises:
-            Exception. Elements of customization_args dict are not unique.
+            Exception. The customization arguments are not unique.
         """
         customization_args = (
             InteractionInstance.

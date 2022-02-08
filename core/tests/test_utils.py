@@ -1934,7 +1934,7 @@ title: Title
             None. Empty yield statement.
 
         Raises:
-            Exception. Given mocked_now is not datetime.
+            Exception. Given argument is not a datetime.
         """
         if not isinstance(mocked_now, datetime.datetime):
             raise Exception('mocked_now must be datetime, got: %r' % mocked_now)

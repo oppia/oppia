@@ -93,8 +93,9 @@ def validate_new_config_property_values(new_config_property):
         dict(str, *). Returns a dict for new config properties.
 
     Raises:
-        Exception. The keys in new_config_property is not a string.
-        Exception. The values in new_config_property don't have any schema.
+        Exception. The config property name is not a string.
+        Exception. The value corresponding to config property name
+            don't have any schema.
     """
     for (name, value) in new_config_property.items():
         if not isinstance(name, str):
@@ -123,7 +124,7 @@ def validate_change_dict_for_blog_post(change_dict):
         dict. Returns the change_dict after validation.
 
     Raises:
-        Exception. Invalid tags provided in change_dict.
+        Exception. Invalid tags provided.
     """
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title( # type: ignore[no-untyped-call]

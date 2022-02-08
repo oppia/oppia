@@ -48,8 +48,8 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
 
     Raises:
         ValueError. The assigned rating is not of type int.
-        ValueError. The assigned rating is not in 1-5.
-        ValueError. The assigned rating is invalid.
+        ValueError. The assigned rating is lower than 1 or higher than 5.
+        ValueError. The exploration does not exist.
     """
 
     if not isinstance(new_rating, int):

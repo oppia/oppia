@@ -816,7 +816,7 @@ def add_math_content_to_math_rte_components(html_string):
         attribute.
 
     Raises:
-        Exception. Invalid raw_latex string found while parsing the given
+        Exception. Invalid latex string found while parsing the given
             HTML string.
     """
     soup = bs4.BeautifulSoup(html_string, 'html.parser')

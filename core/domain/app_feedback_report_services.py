@@ -79,8 +79,8 @@ def store_incoming_report_stats(
         report_obj: AppFeedbackReport. AppFeedbackReport domain object.
 
     Raises:
-        NotImplementedError. Stats aggregation for report_obj have not been
-            implemented yet.
+        NotImplementedError. Stats aggregation for the domain object
+            have not been implemented yet.
     """
     if report_obj.platform == PLATFORM_WEB:
         raise NotImplementedError(

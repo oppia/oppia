@@ -186,7 +186,7 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
         reviewer_id: str. The user ID of the reviewer.
 
     Raises:
-        Exception. If reviewer_id is same as author id.
+        Exception. Reviewer ID is same as the author ID.
     """
     voiceover_application = get_voiceover_application_by_id(
         voiceover_application_id)
@@ -311,7 +311,7 @@ def get_text_to_create_voiceover_application(
         str. The text which can be voiceover for a voiceover application.
 
     Raises:
-        Exception. Invalid target_type.
+        Exception. Invalid target type.
     """
     if target_type == feconf.ENTITY_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)

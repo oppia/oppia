@@ -958,7 +958,7 @@ def update_collection(
             unpublished collections, it may be equal to None.
 
     Raises:
-        ValueError. Collection is public but no commit message recieved.
+        ValueError. The collection is public but no commit message received.
     """
     is_public = rights_manager.is_collection_public(collection_id)
 

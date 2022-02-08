@@ -1495,7 +1495,7 @@ class Topic:
             None.
 
         Raises:
-            Exception. The subtopic with ID subtopic_id does not exist.
+            Exception. The subtopic does not exist.
         """
         for ind, subtopic in enumerate(self.subtopics):
             if subtopic.id == subtopic_id:
@@ -1511,8 +1511,8 @@ class Topic:
             title: str. The title for the new subtopic.
 
         Raises:
-            Exception. The new_subtopic_id and the expected next subtopic id
-                differs.
+            Exception. The new subtopic ID is not equal to the expected next
+                subtopic ID.
         """
         if self.next_subtopic_id != new_subtopic_id:
             raise Exception(

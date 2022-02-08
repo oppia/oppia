@@ -1120,7 +1120,7 @@ class ModifiableUserData:
         Raises:
             Exception. No schema version specified.
             Exception. Schema version is not of type int.
-            Exception. Schema version is not the CURRENT_SCHEMA_VERSION.
+            Exception. Invalid schema version.
         """
         data_schema_version = raw_user_data_dict.get('schema_version')
 

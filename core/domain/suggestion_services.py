@@ -84,7 +84,7 @@ def create_suggestion(
         Suggestion. The newly created suggestion domain object.
 
     Raises:
-        Exception. Invalid suggestion_type.
+        Exception. Invalid suggestion type.
     """
     if description is None:
         description = DEFAULT_SUGGESTION_THREAD_SUBJECT

@@ -116,7 +116,7 @@ def apply_change_list(story_id, change_list):
         the story.
 
     Raises:
-        Exception. The elements in change_list are not of a domain object type.
+        Exception. The elements in change list are not of domain object type.
     """
     story = story_fetchers.get_story_by_id(story_id)
     exp_ids_in_old_story = story.story_contents.get_all_linked_exp_ids()
@@ -336,7 +336,7 @@ def validate_explorations_for_story(exp_ids, strict):
             explorations before adding them to a story.
         ValidationError. All explorations in a story should be of the same
             category.
-        Exception. Exploration validation failed for exploration with exp_ids.
+        Exception. Exploration validation failed for given exploration IDs.
     """
     validation_error_messages = []
 
