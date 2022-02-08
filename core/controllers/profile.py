@@ -587,15 +587,28 @@ class UrlHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'current_url': {
+                'schema': {
+                        'type': 'basestring'
+                 },
+                 'default_value': None
+             }
+        }
+    }
+
     @acl_decorators.open_access
     def get(self):
         if self.user_id:
             self.render_json({'login_url': None})
         else:
-            if self.request and self.request.get('current_url'):
-                target_url = self.request.get('current_url')
-                login_url = user_services.create_login_url(target_url)
-                self.render_json({'login_url': login_url})
+            if self.request:
+                if self.request.get('current_url'):
+                    target_url = self.request.get('current_url')
+                    login_url = user_services.create_login_url(target_url)
+                    self.render_json({'login_url': login_url})
             else:
                 raise self.InvalidInputException(
                     'Incomplete or empty GET parameters passed'
