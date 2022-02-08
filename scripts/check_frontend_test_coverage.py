@@ -68,8 +68,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-interaction-editor.directive.ts',
     'story-node.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
-    'truncate-and-capitalize.filter.ts',
-    'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
     'unit-test-utils.ajs.ts',
