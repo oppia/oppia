@@ -988,7 +988,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       // list of tags and attributes specified in this project:
       // https://github.com/cure53/DOMPurify
       // Complete list of valid SVG attributes is present at
-      // '~assets/constants.ts/'.
+      // 'assets/constants.ts'.
       const svgString = atob(imageDataURI.split(',')[1]);
       let domParser = new DOMParser();
       let doc = domParser.parseFromString(svgString, 'image/svg+xml');
