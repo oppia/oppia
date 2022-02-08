@@ -37,7 +37,6 @@ import { TopicsAndSkillsDashboardPageService } from './topics-and-skills-dashboa
 })
 export class TopicsAndSkillsDashboardPageComponent {
   directiveSubscriptions: Subscription = new Subscription();
-  TOPIC_CLASSROOM_UNASSIGNED: string = 'UNASSIGNED';
   totalTopicSummaries: CreatorTopicSummary[] = [];
   topicSummaries: CreatorTopicSummary[] = [];
   totalEntityCountToDisplay: number;
