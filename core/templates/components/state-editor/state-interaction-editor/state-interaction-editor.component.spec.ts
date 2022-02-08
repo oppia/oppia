@@ -87,20 +87,20 @@ class MockNgbModal {
 
 describe('State Interaction component', () => {
   let component: StateInteractionEditorComponent;
-  let fixture: ComponentFixture<StateInteractionEditorComponent>;
-  let stateEditorService: StateEditorService;
-  let responsesService: ResponsesService;
-  let urlInterpolationService: UrlInterpolationService;
-  let editabilityService: EditabilityService;
-  let mockNgbModal: MockNgbModal;
-  let stateNextContentIdIndexService: StateNextContentIdIndexService;
-  let stateInteractionIdService: StateInteractionIdService;
-  let stateContentService: StateContentService;
   let contextService: ContextService;
-  let stateCustomizationArgsService: StateCustomizationArgsService;
-  let stateSolutionService: StateSolutionService;
+  let editabilityService: EditabilityService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
+  let fixture: ComponentFixture<StateInteractionEditorComponent>;
   let interactionDetailsCacheService: InteractionDetailsCacheService;
+  let mockNgbModal: MockNgbModal;
+  let responsesService: ResponsesService;
+  let stateContentService: StateContentService;
+  let stateCustomizationArgsService: StateCustomizationArgsService;
+  let stateEditorService: StateEditorService;
+  let stateInteractionIdService: StateInteractionIdService;
+  let stateNextContentIdIndexService: StateNextContentIdIndexService;
+  let stateSolutionService: StateSolutionService;
+  let urlInterpolationService: UrlInterpolationService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -111,23 +111,23 @@ describe('State Interaction component', () => {
         StateInteractionEditorComponent,
       ],
       providers: [
-        StateEditorService,
-        ResponsesService,
+        ContextService,
+        CustomizeInteractionModalComponent,
+        EditabilityService,
+        ExplorationHtmlFormatterService,
+        InteractionDetailsCacheService,
         {
           provide: NgbModal,
           useClass: MockNgbModal
         },
-        InteractionDetailsCacheService,
-        CustomizeInteractionModalComponent,
-        UrlInterpolationService,
-        EditabilityService,
-        StateNextContentIdIndexService,
-        StateInteractionIdService,
-        StateSolutionService,
+        ResponsesService,
         StateContentService,
-        ExplorationHtmlFormatterService,
-        ContextService,
-        StateCustomizationArgsService
+        StateCustomizationArgsService,
+        StateEditorService,
+        StateInteractionIdService,
+        StateNextContentIdIndexService,
+        StateSolutionService,
+        UrlInterpolationService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -137,44 +137,45 @@ describe('State Interaction component', () => {
     fixture = TestBed.createComponent(StateInteractionEditorComponent);
     component = fixture.componentInstance;
 
-    stateEditorService = TestBed.inject(StateEditorService);
-    responsesService = TestBed.inject(ResponsesService);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    editabilityService = TestBed.inject(EditabilityService);
-    stateNextContentIdIndexService =
-      TestBed.inject(StateNextContentIdIndexService);
-    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
-    stateContentService = TestBed.inject(StateContentService);
-    mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
     contextService = TestBed.inject(ContextService);
-    stateCustomizationArgsService =
-      TestBed.inject(StateCustomizationArgsService);
-    interactionDetailsCacheService =
-      TestBed.inject(InteractionDetailsCacheService);
-    stateSolutionService = TestBed.inject(StateSolutionService);
+    editabilityService = TestBed.inject(EditabilityService);
     explorationHtmlFormatterService =
       TestBed.inject(ExplorationHtmlFormatterService);
+    interactionDetailsCacheService =
+      TestBed.inject(InteractionDetailsCacheService);
+    mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
+    responsesService = TestBed.inject(ResponsesService);
+    stateContentService = TestBed.inject(StateContentService);
+    stateCustomizationArgsService =
+      TestBed.inject(StateCustomizationArgsService);
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    stateNextContentIdIndexService =
+      TestBed.inject(StateNextContentIdIndexService);
+    stateSolutionService = TestBed.inject(StateSolutionService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     fixture.detectChanges();
   });
 
-  it('should keep non-empty content when setting a interaction',
-    fakeAsync(() => {
-      spyOn(component, 'throwError').and.stub();
-      spyOn(stateEditorService, 'updateStateInteractionEditorInitialised')
-        .and.stub();
+  it('should keep non-empty content when setting an interaction ' +
+    'and throw error if state is undefined', fakeAsync(() => {
+    spyOn(component, 'throwError').and.stub();
+    spyOn(stateEditorService, 'updateStateInteractionEditorInitialised')
+      .and.stub();
 
-      component.ngOnInit();
-      tick();
-      stateEditorService.onStateEditorInitialized.emit(undefined);
-      tick();
+    component.ngOnInit();
+    tick();
+    stateEditorService.onStateEditorInitialized.emit(undefined);
+    tick();
 
-      expect(component.interactionIsDisabled).toBe(false);
-      expect(stateEditorService.updateStateInteractionEditorInitialised)
-        .toHaveBeenCalled();
-    }));
+    expect(component.interactionIsDisabled).toBe(false);
+    expect(stateEditorService.updateStateInteractionEditorInitialised)
+      .toHaveBeenCalled();
+  }));
 
-  it('should keep non-empty content when setting a interaction', () => {
+  it('should keep non-empty content when setting an interaction ' +
+    'and update changed state', () => {
     spyOn(responsesService.onInitializeAnswerGroups, 'emit').and.stub();
 
     const state = new State(
@@ -191,7 +192,7 @@ describe('State Interaction component', () => {
       .toHaveBeenCalled();
   });
 
-  it('should 2', () => {
+  it('should show interaction when interaction is made', () => {
     const interactionCustomizationArgsValue = {
       placeholder: {
         value: null
@@ -216,26 +217,27 @@ describe('State Interaction component', () => {
       interactionCustomizationArgsValue)).toBe('htmlValue');
   });
 
-  it('should delete interaction when user click on cross btn', fakeAsync(() => {
-    mockNgbModal.modal = 'delete_interaction';
+  it('should delete interaction when user click on delete btn',
+    fakeAsync(() => {
+      mockNgbModal.modal = 'delete_interaction';
 
-    spyOn(stateSolutionService, 'saveDisplayedValue').and.stub();
-    spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        {
-          result: Promise.resolve('success')
-        }
-      ) as NgbModalRef;
-    });
+      spyOn(stateSolutionService, 'saveDisplayedValue').and.stub();
+      spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
+        return (
+          {
+            result: Promise.resolve('success')
+          }
+        ) as NgbModalRef;
+      });
 
-    component.deleteInteraction();
-    tick();
+      component.deleteInteraction();
+      tick();
 
-    expect(stateSolutionService.saveDisplayedValue)
-      .toHaveBeenCalled();
-  }));
+      expect(stateSolutionService.saveDisplayedValue)
+        .toHaveBeenCalled();
+    }));
 
-  it('should not delete interaction when user click on cross btn',
+  it('should not delete interaction when user click on cancel btn',
     fakeAsync(() => {
       mockNgbModal.modal = 'delete_interaction';
 
@@ -298,7 +300,7 @@ describe('State Interaction component', () => {
       .toHaveBeenCalledTimes(1);
   }));
 
-  it('should save interaction when user click okay', fakeAsync(() => {
+  it('should save interaction when user click save', fakeAsync(() => {
     stateNextContentIdIndexService.displayed = 2;
     stateNextContentIdIndexService.savedMemento = 1;
     stateInteractionIdService.displayed = 'EndExploration';
@@ -352,7 +354,7 @@ describe('State Interaction component', () => {
     expect(stateContentService.saveDisplayedValue).toHaveBeenCalled();
   }));
 
-  it('should through error', () => {
+  it('should through error when state is undefined', () => {
     expect(() => {
       component.throwError(undefined);
     }).toThrowError('Expected stateData to be defined but received undefined');
