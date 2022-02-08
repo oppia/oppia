@@ -24,8 +24,8 @@ from core.jobs.batch_jobs import exp_title_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-(exp_models, ) = models.Registry.import_models(
-    [models.NAMES.exploration])
+(exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
+
 
 class GetNumberOfExpExceedsMaxTitleLengthJobTests(
     job_test_utils.JobTestBase):
@@ -39,10 +39,11 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
     STATE_2 = state_domain.State.create_default_state('DEF')
     STATE_3 = state_domain.State.create_default_state('GHI')
 
-    def __init__(self):
+    def setUp(self):
+        super().setUp()
 
         # This is an invalid model with title length greater than 36.
-        self.EXP_1 = self.create_model(
+        self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_1,
             title='titleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
@@ -53,7 +54,7 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
         )
 
         # This is an valid model with title length lesser than 36.
-        self.EXP_2 = self.create_model(
+        self.exp_2 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_2,
             title='title',
@@ -64,7 +65,7 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
         )
 
         # This is an invalid model with title length greater than 36.
-        self.EXP_3 = self.create_model(
+        self.exp_3 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_3,
             title='titleeeeeeeeeeeeeabcdefghijklmnopqrstuv',
@@ -75,53 +76,35 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
         )
 
     def test_run_with_no_models(self) -> None:
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'RESULT: Queried 0 exps in total.'),
-                job_run_result.JobRunResult.as_stdout(
-                    'RESULT: There are total 0 invalid exps.'),
-            ]
-        )
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 0')
+        ])
 
     def test_run_with_single_valid_model(self) -> None:
-        self.put_multi([self.EXP_2])
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'RESULT: Queried 1 exps in total.'),
-                job_run_result.JobRunResult.as_stdout(
-                    'RESULT: There are total 0 invalid exps.'),
-            ]
-        )
+        self.put_multi([self.exp_2])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1')
+        ])
 
     def test_run_with_single_invalid_model(self) -> None:
-        self.put_multi([self.EXP_1])
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'RESULT: Queried 1 exps in total.'),
-                job_run_result.JobRunResult.as_stdout(
-                    'RESULT: There are total 1 invalid exps.'),
-                job_run_result.JobRunResult.as_stderr(
-                    f'The id of exp is {self.EXPLORATION_ID_1} and its actual '
-                    + f'len is {len(self.EXP_1.title)}'),
-            ]
-        )
+        self.put_multi([self.exp_1])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stderr(
+                f'The id of exp is {self.EXPLORATION_ID_1} and its actual '
+                + f'len is {len(self.exp_1.title)}'),
+        ])
 
     def test_run_with_mixed_models(self) -> None:
-        self.put_multi([self.EXP_1, self.EXP_2, self.EXP_3])
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'RESULT: Queried 3 exps in total.'),
-                job_run_result.JobRunResult.as_stdout(
-                    'RESULT: There are total 2 invalid exps.'),
-                job_run_result.JobRunResult.as_stderr(
-                    f'The id of exp is {self.EXPLORATION_ID_1} and its actual '
-                    + f'len is {len(self.EXP_1.title)}'),
-                job_run_result.JobRunResult.as_stderr(
-                    f'The id of exp is {self.EXPLORATION_ID_3} and its actual '
-                    + f'len is {len(self.EXP_3.title)}'),
-            ]
-        )
+        self.put_multi([self.exp_1, self.exp_2, self.exp_3])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 3'),
+            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
+            job_run_result.JobRunResult.as_stderr(
+                f'The id of exp is {self.EXPLORATION_ID_1} and its actual '
+                + f'len is {len(self.exp_1.title)}'),
+            job_run_result.JobRunResult.as_stderr(
+                f'The id of exp is {self.EXPLORATION_ID_3} and its actual '
+                + f'len is {len(self.exp_3.title)}'),
+        ])

@@ -24,6 +24,7 @@ from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
+from core.jobs.transforms import job_result_transforms
 
 import apache_beam as beam
 
@@ -59,20 +60,14 @@ class GetNumberOfExpExceedsMaxTitleLengthJob(base_jobs.JobBase):
 
         report_number_of_exps_queried = (
             total_explorations
-            | 'Count exp models' >> beam.combiners.Count.Globally()
-            | 'Report count of exp models' >> beam.Map(
-                lambda object_count: job_run_result.JobRunResult.as_stdout(
-                    'RESULT: Queried %s exps in total.' % (object_count)
-                ))
+            | 'Report count of exp models' >> (
+                job_result_transforms.CountObjectsToJobRunResult('EXPS'))
         )
 
         report_number_of_invalid_exps = (
             exp_ids_with_exceeding_max_title_len
-            | 'Count all new models' >> beam.combiners.Count.Globally()
-            | 'Save number of invalid exps' >> beam.Map(
-                lambda object_count: job_run_result.JobRunResult.as_stdout(
-                    'RESULT: There are total %s invalid exps.' % (object_count)
-                ))
+            | 'Report count of invalid exp models' >> (
+                job_result_transforms.CountObjectsToJobRunResult('INVALID'))
         )
 
         report_invalid_ids_and_their_actual_len = (
