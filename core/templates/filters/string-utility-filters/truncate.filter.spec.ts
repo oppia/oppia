@@ -36,4 +36,21 @@ describe('Testing filters', function() {
   it('should have all expected filters', angular.mock.inject(function($filter) {
     expect($filter(filterName)).not.toEqual(null);
   }));
+
+  it('should validate inputs and return filtered string correctly',
+    angular.mock.inject(function($filter) {
+      var filter = $filter('truncate');
+      // Checking when input is null.
+      expect(filter(null, 4, '...')).toEqual('');
+      // Checking when length parameter is NaN.
+      expect(filter('example', 'a', '...')).toEqual('example');
+      // Checking when input is not a string.
+      expect(filter(1, 4, '...')).toEqual('1');
+      // Checking when suffix is undefined.
+      var testSuffix;
+      expect(filter('example', 10, testSuffix)).toEqual('example');
+      // Checking when length of input is greater than the length parameter.
+      expect(filter('example of long input', 18, '...')).toEqual(
+        'example of long...');
+    }));
 });

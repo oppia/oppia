@@ -37,6 +37,11 @@ describe('Testing filters', function() {
     expect($filter(filterName)).not.toEqual(null);
   }));
 
+  it('should check for null inputs', angular.mock.inject(function($filter) {
+    var filter = $filter('truncateAndCapitalize');
+    expect(filter(null, 1)).toBeNull();
+  }));
+
   it(
     'should capitalize first letter and truncate string at a word break',
     angular.mock.inject(function($filter) {
