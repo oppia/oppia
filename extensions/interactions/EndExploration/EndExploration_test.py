@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core.domain import interaction_registry
-from core.domain import state_domain
 from core.tests import test_utils
 
 
