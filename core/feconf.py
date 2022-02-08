@@ -114,6 +114,7 @@ LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
 
+
 class NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for valid model names."""
 
@@ -151,6 +152,7 @@ class NAMES(enum.Enum): # pylint: disable=invalid-name
 # algorithms per interaction. Hence, whenever we find a secondary algorithm
 # candidate for any of the supported interactions, the logical functions to
 # support multiple algorithms need to be implemented.
+
 
 class ClassifierDict(TypedDict):
     """Representing INTERACTION_CLASSIFIER_MAPPING dict values."""
