@@ -39,7 +39,7 @@ EXPECTED_THREAD_KEYS = [
     'subject', 'last_updated_msecs', 'message_count',
     'last_nonempty_message_text', 'last_nonempty_message_author']
 EXPECTED_MESSAGE_KEYS = [
-    'author_id', 'created_on_msecs', 'entity_type', 'message_id',
+    'author_username', 'created_on_msecs', 'entity_type', 'message_id',
     'entity_id', 'text', 'updated_status', 'updated_subject']
 
 
@@ -220,7 +220,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             set(response_dict['messages'][0].keys()),
             set(EXPECTED_MESSAGE_KEYS))
         self.assertDictContainsSubset({
-            'author_id': self.editor_id,
+            'author_username': self.EDITOR_USERNAME,
             'entity_id': self.EXP_ID,
             'message_id': 0,
             'updated_status': 'open',
@@ -228,7 +228,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             'text': u'Message 0 ¡unicode!',
         }, response_dict['messages'][0])
         self.assertDictContainsSubset({
-            'author_id': self.editor_id,
+            'author_username': self.EDITOR_USERNAME,
             'entity_id': self.EXP_ID,
             'message_id': 1,
             'updated_status': None,

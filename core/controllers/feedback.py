@@ -30,16 +30,20 @@ def replace_user_id_with_username_in_dict(thread_dicts, user_keys):
 
     Args:
         thread_dicts: list(dict). The dictionary that will be updated.
-        user_keys: list(tuple). A list that contain tuples of
-            keys(user id and username).
+        user_keys: list(tuple). A list that contains tuples of keys. The first
+            item in the tuple is a key of the user ID and the second item is a
+            key of a newly added username.
 
     Returns:
         list(dict). The updated dictionary.
     """
-    for t in thread_dicts:
-        for k in user_keys:
-            t[k[1]] = user_services.get_username(t[k[0]]) if t[k[0]] else None
-            t.pop(k[0])
+    for thread_dict in thread_dicts:
+        for user_id_key, username_key in user_keys:
+            thread_dict[username_key] = (
+                user_services.get_username(thread_dict[user_id_key])
+                if thread_dict[user_id_key] else None
+            )
+            thread_dict.pop(user_id_key)
     return thread_dicts
 
 
@@ -78,24 +82,30 @@ class ThreadListHandler(base.BaseHandler):
     def get(self, exploration_id):
 
         feedback_thread_dicts = [
-            t.to_dict() for t in feedback_services.get_all_threads(
-            feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]
-
+            thread.to_dict() for thread in feedback_services.get_all_threads(
+               feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False
+            )
+        ]
         suggestion_thread_dicts = [
-            t.to_dict() for t in feedback_services.get_all_threads(
-            feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)]
+            thread.to_dict() for thread in feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True
+            )
+        ]
 
         self.values.update({
             'feedback_thread_dicts': replace_user_id_with_username_in_dict(
-                feedback_thread_dicts, [(
-                    'original_author_id',
-                    'original_author_username'), (
-                    'last_nonempty_message_author_id',
-                    'last_nonempty_message_author')]),
+                feedback_thread_dicts, [
+                    ('original_author_id', 'original_author_username'),
+                    (
+                        'last_nonempty_message_author_id',
+                        'last_nonempty_message_author'
+                    )
+                ]
+            ),
             'suggestion_thread_dicts': replace_user_id_with_username_in_dict(
-                suggestion_thread_dicts, [(
-                    'original_author_id',
-                    'original_author_username')])
+                suggestion_thread_dicts,
+                [('original_author_id', 'original_author_username')]
+            )
         })
         self.render_json(self.values)
 
@@ -132,13 +142,17 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
 
-        thread_dicts = [t.to_dict() for t in feedback_services.get_all_threads(
-            feconf.ENTITY_TYPE_TOPIC, topic_id, True)]
+        suggestion_thread_dicts = [
+            thread.to_dict() for thread in feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_TOPIC, topic_id, True
+            )
+        ]
         self.values.update({
             'suggestion_thread_dicts': replace_user_id_with_username_in_dict(
-                thread_dicts, [(
-                    'original_author_id', 'original_author_username')])
-            })
+                suggestion_thread_dicts,
+                [('original_author_id', 'original_author_username')]
+            )
+        })
         self.render_json(self.values)
 
 
@@ -185,16 +199,21 @@ class ThreadHandler(base.BaseHandler):
         suggestion_id = thread_id
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
-        messages = [m.to_dict() for m in feedback_services.get_messages(
-            thread_id)]
-        message_ids = [message['message_id'] for message in messages]
+        message_dicts = [
+            message.to_dict() for message in feedback_services.get_messages(
+                thread_id
+            )
+        ]
+        message_ids = [message['message_id'] for message in message_dicts]
         if self.user_id:
             feedback_services.update_messages_read_by_the_user(
                 self.user_id, thread_id, message_ids)
 
         self.values.update({
             'messages': replace_user_id_with_username_in_dict(
-                messages, [('author_id', 'author_username')]),
+                message_dicts,
+                [('author_id', 'author_username')]
+            ),
             'suggestion': suggestion.to_dict() if suggestion else None
         })
         self.render_json(self.values)
@@ -219,8 +238,13 @@ class ThreadHandler(base.BaseHandler):
         # messages after adding new message model to the datastore because of an
         # unknown reason.
         messages.append(new_message)
+        message_dict = [message.to_dict() for message in messages]
+
         self.render_json({
-            'messages': [message.to_dict() for message in messages]
+            'messages': replace_user_id_with_username_in_dict(
+                message_dict,
+                [('author_id', 'author_username')]
+            )
         })
 
 
@@ -252,11 +276,13 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
             feedback_services.get_next_page_of_all_feedback_messages(
                 urlsafe_start_cursor=urlsafe_start_cursor))
 
-        messages_dict = [m.to_dict() for m in all_feedback_messages]
+        message_dict = [message.to_dict() for message in all_feedback_messages]
 
         self.render_json({
             'results': replace_user_id_with_username_in_dict(
-                messages_dict, [('author_id', 'author_username')]),
+                message_dict,
+                [('author_id', 'author_username')]
+            ),
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })
