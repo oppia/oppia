@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import json
-import urllib.parse
 
 from core import android_validation_constants
 from core import feconf
@@ -144,7 +143,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
     def test_error_when_given_webhook_secret_is_invalid(self):
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         mailchimp_swap = self.swap_to_always_return(
-            feconf,'MAILCHIMP_WEBHOOK_SECRET', value=self.secret)
+            feconf, 'MAILCHIMP_WEBHOOK_SECRET', value=self.secret)
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
@@ -162,7 +161,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
     def test_no_error_when_given_webhook_secret_is_valid(self):
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         mailchimp_swap = self.swap(
-            feconf,'MAILCHIMP_WEBHOOK_SECRET', self.secret)
+            feconf, 'MAILCHIMP_WEBHOOK_SECRET', self.secret)
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
@@ -223,7 +222,7 @@ class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], 'Invalid skill id.')
 
     def test_page_not_found_exception_with_invalid_skill_ids(self):
-        skill_ids = ['invalid_id12','invalid_id13']
+        skill_ids = ['invalid_id12', 'invalid_id13']
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_skills/%s' % json.dumps(skill_ids),
@@ -3552,7 +3551,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
-    def test_authorised_user_can_accept_suggestion(self):
+    def test_user_with_review_rights_can_accept_suggestion(self):
         self.login(self.EDITOR_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         review_swap = self.swap_to_always_return(
@@ -3565,7 +3564,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
-    def test_user_with_translation_suggestion_rights_can_accept_suggestion(self):
+    def test_user_with_review_rights_can_accept_translation_suggestion(self):
         self.login(self.EDITOR_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         translation_review_swap = self.swap_to_always_return(
@@ -3578,7 +3577,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
-    def test_user_with_question_suggestion_rights_can_accept_suggestion(self):
+    def test_user_with_review_rights_can_accept_question_suggestion(self):
         self.login(self.EDITOR_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         question_review_swap = self.swap_to_always_return(
@@ -3636,6 +3635,7 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
     """Tests for can_view_reviewable_suggestions decorator."""
 
     TARGET_TYPE = feconf.ENTITY_TYPE_EXPLORATION
+
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
@@ -3696,7 +3696,7 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
-    def test_user_with_translation_suggestion_rights_can_review_suggestion(self):
+    def test_user_with_review_rights_can_review_translation_suggestions(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         translation_review_swap = self.swap_to_always_return(
@@ -3712,7 +3712,7 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_user_with_question_suggestion_rights_can_review_suggestion(self):
+    def test_user_with_review_rights_can_review_question_suggestions(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         question_review_swap = self.swap_to_always_return(
@@ -4256,7 +4256,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
-                '/mock_view_topic_editor/<topic_id>',self.MockHandler)],
+                '/mock_view_topic_editor/<topic_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
         self.topic_id = topic_fetchers.get_new_topic_id()
