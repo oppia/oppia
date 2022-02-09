@@ -1130,8 +1130,8 @@ describe('Admin backend api service', () => {
       num_dummy_ops_to_generate: numDummyOpsToGenerate,
     };
 
-    abas.generateDummyOpportunitiesAsync(numDummyOpsToGenerate
-    ).then(successHandler, failHandler);
+    abas.generateDummyOpportunitiesAsync(
+      numDummyOpsToGenerate).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
