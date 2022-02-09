@@ -1866,7 +1866,8 @@ class WrittenTranslations:
 
         for (lang_code, written_translation_content_map) in (
             language_to_content_id_written_translation_map.items()):
-            if lang_code in android_validation_constants.SUPPORTED_LANGUAGES:
+            if lang_code in (
+                android_validation_constants.SUPPORTED_LANGUAGE_CODES):
                 proto = languages_pb2.WrittenTranslationContentMappingDto(
                     language=language_code[lang_code],
                     translation_content_mapping=written_translation_content_map)
@@ -2205,7 +2206,8 @@ class RecordedVoiceovers:
 
         for (lang_code, voiceover_file_content_map) in (
             language_to_content_id_voiceover_file_map.items()):
-            if lang_code in android_validation_constants.SUPPORTED_LANGUAGES:
+            if lang_code in (
+                android_validation_constants.SUPPORTED_LANGUAGE_CODES):
                 voiceover_content_mapping_proto = (
                     languages_pb2.VoiceoverContentMappingDto(
                         language=language_code[lang_code],
