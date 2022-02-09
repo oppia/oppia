@@ -264,6 +264,7 @@
     "core/templates/domain/story/StoryObjectFactorySpec.ts",
     "core/templates/domain/story/story-domain.constants.ts",
     "core/templates/domain/story/story-node.model.ts",
+    "core/templates/domain/story/story-node.model.spec.ts",
     "core/templates/domain/story/story-summary.model.ts",
     "core/templates/domain/story/story-summary.model.spec.ts",
     "core/templates/domain/story/story-validation.service.ts",

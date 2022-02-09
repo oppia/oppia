@@ -59,15 +59,11 @@ describe('Story node model', () => {
   });
 
   it('should throw error when validating node with invalid id', () => {
-    const invalidStoryNode1 = StoryNode.createFromIdAndTitle(
+    const invalidStoryNode = StoryNode.createFromIdAndTitle(
       '1', 'Title 1');
-    const invalidStoryNode2 = StoryNode.createFromIdAndTitle(
-      undefined, 'Title 2');
 
-    expect(() => invalidStoryNode1.validate()).toThrowError(
+    expect(() => invalidStoryNode.validate()).toThrowError(
       'The node id 1 is invalid.');
-    expect(() => invalidStoryNode2.validate()).toThrowError(
-      'The node id undefined is invalid.');
   });
 
   it('should raise issue when validating node with duplicated ' +
