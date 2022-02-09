@@ -100,6 +100,10 @@ export class CommunityLessonsTabComponent {
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
+    var tempIncompleteLessonsList: (
+      LearnerExplorationSummary | CollectionSummary)[] = [];
+    var tempCompletedLessonsList: (
+    LearnerExplorationSummary | CollectionSummary)[] = [];
     this.noCommunityLessonActivity = (
       (this.incompleteExplorationsList.length === 0) &&
         (this.completedExplorationsList.length === 0) &&
@@ -108,10 +112,12 @@ export class CommunityLessonsTabComponent {
     this.noPlaylistActivity = (
       (this.explorationPlaylist.length === 0) &&
       (this.collectionPlaylist.length === 0));
-    this.totalIncompleteLessonsList.push(
+    tempIncompleteLessonsList.push(
       ...this.incompleteExplorationsList, ...this.incompleteCollectionsList);
-    this.totalCompletedLessonsList.push(
+    this.totalIncompleteLessonsList = tempIncompleteLessonsList.reverse();
+    tempCompletedLessonsList.push(
       ...this.completedExplorationsList, ...this.completedCollectionsList);
+    this.totalCompletedLessonsList = tempCompletedLessonsList.reverse();
     this.totalLessonsInPlaylist.push(
       ...this.explorationPlaylist, ...this.collectionPlaylist);
     this.allCommunityLessons.push(
