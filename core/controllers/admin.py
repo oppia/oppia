@@ -754,7 +754,7 @@ class AdminHandler(base.BaseHandler):
                         True, [], None, None
                     )
                 )
-            customization_args = {'recommendedExplorationIds' : {'value': []}}
+            customization_args = {'recommendedExplorationIds': {'value': []}}
             new_end_state = state_domain.State.create_default_state('End')
             new_end_state.update_interaction_id('EndExploration')
             new_end_state.update_interaction_customization_args(
@@ -765,24 +765,26 @@ class AdminHandler(base.BaseHandler):
                                'Wonder Anatomy',
                                'Elvish, language',
                                'The Science of Superheroes']
-            interactionNumber = 20
+            interaction_number = 20
             exploration_ids_to_publish = []
             for i in range(num_dummy_ops_to_generate):
-                title = random.choice(possible_titles) + " " + str(i)
-                category = "Algorithms"
+                title = random.choice(possible_titles) + '' + str(i)
+                category = 'Algorithms'
                 new_exploration_id = exp_fetchers.get_new_exploration_id()
                 exp = exp_domain.Exploration.create_default_exploration(
                     new_exploration_id, title=title, category=category,
                     objective='Dummy Objective')
 
-                for i in range(interactionNumber):
+                for opportunity in range(interaction_number):
                     dest = 'Interaction' + str(i + 1)
-                    if i == 0:
-                        create_dummy_interactions(exp.states['Introduction'], dest)
+                    if opportunity == 0:
+                        create_dummy_interactions(
+                            exp.states['Introduction'], dest)
                     else:
-                        if i == interactionNumber - 1:
+                        if opportunity == interaction_number - 1:
                             dest = 'End'
-                        cur_state = state_domain.State.create_default_state('Interaction' + str(i))
+                        cur_state = state_domain.State.create_default_state(
+                            'Interaction' + str(i))
                         exp.states['Interaction' + str(i)] = cur_state
                         create_dummy_interactions(cur_state, dest)
 
@@ -794,15 +796,17 @@ class AdminHandler(base.BaseHandler):
                         self.user, new_exploration_id)
 
                 exp_services.update_exploration(
-                self.user_id, new_exploration_id, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'correctness_feedback_enabled',
-                    'new_value': True
+                    self.user_id,
+                    new_exploration_id,
+                    [exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'correctness_feedback_enabled',
+                        'new_value': True
                 })], 'Changed correctness_feedback_enabled.')
                 story_node_dicts.append(
                     {'exp_id': new_exploration_id,
-                     'title':title,
-                     'description': category })
+                     'title': title,
+                     'description': category})
             exp_services.index_explorations_given_ids(
                 exploration_ids_to_publish)
 
@@ -841,7 +845,6 @@ class AdminHandler(base.BaseHandler):
             for i, story_node_dict in enumerate(story_node_dicts):
                 generate_dummy_story_nodes(i + 1, **story_node_dict)
 
-
             story_services.save_new_story(self.user_id, story)
             topic_services.save_new_topic(self.user_id, topic_1)
 
@@ -860,6 +863,7 @@ class AdminHandler(base.BaseHandler):
         else:
             raise Exception(
                 'Cannot generate dummy explorations in production.')
+
 
 class AdminRoleHandler(base.BaseHandler):
     """Handler for roles tab of admin page. Used to view and update roles."""
