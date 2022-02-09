@@ -278,8 +278,8 @@ def main(args=None):
     if options.prompt_for_mailgun_and_terms_update:
         try:
             utils.url_open(TERMS_PAGE_FOLDER_URL)
-        except Exception:
-            raise Exception('Terms mainpage does not exist on Github.')
+        except Exception as e:
+            raise Exception('Terms mainpage does not exist on Github.') from e
         add_mailgun_api_key(release_feconf_path)
         add_mailchimp_api_key(release_feconf_path)
         check_updates_to_terms_of_service(

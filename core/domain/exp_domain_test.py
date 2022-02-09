@@ -2492,11 +2492,17 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected value to be non-negative, received -1'):
             self.exp_summary.validate()
 
+    def test_validation_passes_with_int_scaled_average_rating(self):
+        self.exp_summary.scaled_average_rating = 1
+        self.exp_summary.validate()
+        self.assertEqual(self.exp_summary.scaled_average_rating, 1)
+
     def test_validation_fails_with_invalid_scaled_average_rating(self):
         self.exp_summary.scaled_average_rating = 'one'
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected scaled_average_rating to be float, received one'):
+            'Expected scaled_average_rating to be float, received one'
+        ):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_status(self):

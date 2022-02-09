@@ -35,7 +35,6 @@ import zipfile
 
 from core import android_validation_constants
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import activity_services
@@ -345,8 +344,10 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
         exploration_id, version=version)
     exploration_dict = {}
     for state in exploration.states:
-        exploration_dict[state] = python_utils.yaml_from_dict(
-            exploration.states[state].to_dict(), width=width)
+        exploration_dict[state] = utils.yaml_from_dict(
+            exploration.states[state].to_dict(),
+            width=width
+        )
     return exploration_dict
 
 
@@ -1253,8 +1254,7 @@ def _compute_summary_of_exploration(exploration):
     contributor_ids = list(contributors_summary.keys())
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        python_utils.divide(
-            get_last_updated_by_human_ms(exploration.id), 1000.0))
+        get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
@@ -1703,7 +1703,7 @@ def get_average_rating(ratings):
 
         for rating_value, rating_count in ratings.items():
             rating_sum += rating_weightings[rating_value] * rating_count
-        return python_utils.divide(rating_sum, (number_of_ratings * 1.0))
+        return rating_sum / number_of_ratings
 
 
 def get_scaled_average_rating(ratings):
@@ -1723,15 +1723,12 @@ def get_scaled_average_rating(ratings):
         return 0
     average_rating = get_average_rating(ratings)
     z = 1.9599639715843482
-    x = python_utils.divide((average_rating - 1), 4)
+    x = (average_rating - 1) / 4
     # The following calculates the lower bound Wilson Score as documented
     # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
-    a = x + python_utils.divide((z**2), (2 * n))
-    b = z * math.sqrt(
-        python_utils.divide((x * (1 - x)), n) + python_utils.divide(
-            (z**2), (4 * n**2)))
-    wilson_score_lower_bound = python_utils.divide(
-        (a - b), (1 + python_utils.divide(z**2, n)))
+    a = x + ((z**2) / (2 * n))
+    b = z * math.sqrt(((x * (1 - x)) / n) + ((z**2) / (4 * n**2)))
+    wilson_score_lower_bound = (a - b) / (1 + ((z**2) / n))
     return 1 + 4 * wilson_score_lower_bound
 
 
