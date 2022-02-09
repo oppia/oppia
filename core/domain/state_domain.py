@@ -634,7 +634,7 @@ class InteractionInstance:
         elif self.id == 'RatioExpressionInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
                 ratio_expression_input=(
-                    interaction_instance.to_android_ratio_input_proto(
+                    interaction_instance.to_android_ratio_expression_input_proto( # pylint: disable=line-too-long
                         self.default_outcome, self.customization_args,
                         self.solution, self.hints, self.answer_groups)))
         elif self.id == 'ImageClickInput':
