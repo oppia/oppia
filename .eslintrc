@@ -1,7 +1,8 @@
 {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": ["./tsconfig.json"]
   },
   "extends": [
     "eslint:recommended"
@@ -464,6 +465,6 @@
     ],
     "no-dupe-class-members": "off",
     "@typescript-eslint/no-dupe-class-members": ["error"],
-    "@typescript-eslint/prefer-string-starts-ends-with": "error"
+    "@typescript-eslint/prefer-string-starts-ends-with": ["error"]
   }
 }
