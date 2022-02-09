@@ -41,7 +41,7 @@ interface HTMLSchema {
 })
 export class StateContentEditorComponent implements OnInit {
   @Output() intialize: EventEmitter<void> = new EventEmitter();
-  @Output() onSaveStateContent = new EventEmitter<SubtitledHtml>();
+  @Output() saveStateContent = new EventEmitter<SubtitledHtml>();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
     new EventEmitter<string[]>();
   @Input() stateContentPlaceholder: string;
@@ -108,7 +108,7 @@ export class StateContentEditorComponent implements OnInit {
 
   saveContent(): void {
     this.stateContentService.saveDisplayedValue();
-    this.onSaveStateContent.emit(this.stateContentService.displayed);
+    this.saveStateContent.emit(this.stateContentService.displayed);
     this.contentEditorIsOpen = false;
     this.intialize.emit();
   }
