@@ -34,17 +34,17 @@
 
       <strong>Oppia tells the learner...</strong>
       <div class="position-relative">
-        <span *ngIf="isSelfLoopWithNoFeedback()">
+        <span *ngIf="isSelfLoopWithNoFeedback() && !areWarningsSuppressed">
           <span class="oppia-confusing-outcome-warning-text">
             <i class="material-icons">&#xE002;</i>
             Please give Oppia something useful to say here.
           </span>
         </span>
-        <span *ngIf="!isSelfLoopWithNoFeedback()"
+        <span *ngIf="(!isSelfLoopWithNoFeedback() && !this.outcome.hasNonemptyFeedback()) || (isSelfLoopWithNoFeedback() && areWarningsSuppressed())"
               class="oppia-nothing-text">
           <em>Nothing</em>
         </span>
-        <span class="oppia-non-empty-feedback-text" *ngIf="this.outcome.hasNonemptyFeedback()">
+        <span *ngIf="this.outcome.hasNonemptyFeedback()" class="oppia-non-empty-feedback-text">
           <angular-html-bind-wrapper classStr="oppia-rte-editor" [htmlData]="outcome.feedback.html">
           </angular-html-bind-wrapper>
         </span>
@@ -56,11 +56,10 @@
 </div>
 
 <div *ngIf="isEditable && feedbackEditorIsOpen">
-  <form role="form"
-        class="form-inline protractor-test-edit-outcome-feedback">
+  <div class="form-inline protractor-test-edit-outcome-feedback">
     <oppia-outcome-feedback-editor [outcome]="outcome">
     </oppia-outcome-feedback-editor>
-  </form>
+  </div>
 
   <div *ngIf="isFeedbackLengthExceeded()" class="oppia-length-validation-error">
     The feedback length is too long. Please use at most 500 characters.
@@ -108,12 +107,12 @@
           {{ outcome.dest }}
         </span>
         <span *ngIf="isSelfLoop()" class="position-relative">
-          <span *ngIf="!outcome.refresherExplorationId">(try again)</span>
-          <span *ngIf="outcome.refresherExplorationId">
+          <span *ngIf="!this.outcome.refresherExplorationId">(try again)</span>
+          <span *ngIf="this.outcome.refresherExplorationId">
             (try again, with refresher exploration "{{ outcome.refresherExplorationId }}")
           </span>
         </span>
-        <div class="oppia-prerequisite-skill-text" *ngIf="outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
+        <div class="oppia-prerequisite-skill-text" *ngIf="this.outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
           <strong> Attached prerequisite skill for the current state: </strong>
           {{ outcome.missingPrerequisiteSkillId }}
         </div>
@@ -123,9 +122,8 @@
 </div>
 
 <div *ngIf="isEditable && destinationEditorIsOpen && !isInQuestionMode()">
-  <form role="form"
-        class="form-inline protractor-test-edit-outcome-dest"
-        ng-submit="saveThisDestination()">
+  <form class="form-inline protractor-test-edit-outcome-dest"
+        (submit)="saveThisDestination()">
     <oppia-outcome-destination-editor [outcome]="outcome"
                                       (getChanges)="getChanges()"
                                       [outcomeHasFeedback]="displayFeedback"

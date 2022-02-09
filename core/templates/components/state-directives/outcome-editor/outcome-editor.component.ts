@@ -127,7 +127,7 @@ export class OutcomeEditorComponent implements OnInit {
     tmpOutcome.feedback = cloneDeep(this.outcome.feedback);
     return Boolean (
       tmpOutcome.dest === this.stateEditorService.getActiveStateName() &&
-      !tmpOutcome.hasNonemptyFeedback());
+      !this.outcome.hasNonemptyFeedback());
   }
 
   invalidStateAfterDestinationSave(): boolean {
@@ -135,7 +135,7 @@ export class OutcomeEditorComponent implements OnInit {
     tmpOutcome.dest = cloneDeep(this.outcome.dest);
     return Boolean (
       tmpOutcome.dest === this.stateEditorService.getActiveStateName() &&
-      !tmpOutcome.hasNonemptyFeedback());
+      !this.outcome.hasNonemptyFeedback());
   }
 
   openFeedbackEditor(): void {
@@ -229,9 +229,6 @@ export class OutcomeEditorComponent implements OnInit {
     this.feedbackEditorIsOpen = false;
     this.destinationEditorIsOpen = false;
     this.correctnessLabelEditorIsOpen = false;
-    // TODO(sll): Investigate whether this line can be removed, due to
-    // this.savedOutcome now being set in onExternalSave().
-    this.savedOutcome = cloneDeep(this.outcome);
   }
 
   ngOnDestroy(): void {
