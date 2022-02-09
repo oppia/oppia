@@ -646,13 +646,13 @@ class InteractionInstance:
         elif self.id == 'DragAndDropSortInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
                 drag_and_drop_sort_input=(
-                    interaction_instance.to_android_drag_drop_input_proto(
+                    interaction_instance.to_android_drag_and_drop_sort_input_proto( # pylint: disable=line-too-long
                         self.default_outcome, self.customization_args,
                         self.solution, self.hints, self.answer_groups)))
         elif self.id == 'AlgebraicExpressionInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
                 algebraic_expression_input=(
-                    interaction_instance.to_android_algebric_expression_proto(
+                    interaction_instance.to_android_algebraic_expression_proto(
                         self.default_outcome, self.customization_args,
                         self.solution, self.hints, self.answer_groups)))
         elif self.id == 'MathEquationInput':
@@ -1844,7 +1844,7 @@ class WrittenTranslations:
         """Creates a WrittenTranslationContentMapping proto object.
 
         Returns:
-            list. The WrittenTranslationContentMapping protos list.
+            list(WrittenTranslationContentMappingDto). The proto object list.
         """
         language_to_content_id_written_translation_map = (
             collections.defaultdict(dict))
@@ -2186,7 +2186,7 @@ class RecordedVoiceovers:
         """Creates a VoiceoverContentMapping proto object.
 
         Returns:
-            list. The VoiceoverContentMapping protos list.
+            list(VoiceoverContentMappingDto). The proto object list.
         """
         language_to_content_id_voiceover_file_map = (
             collections.defaultdict(dict))
@@ -2745,7 +2745,7 @@ class TranslatableItem:
             translation: str. The translated content.
 
         Returns:
-            WrittenTranslatableText. The proto object.
+            WrittenTranslatableTextDto. The proto object.
         """
         return languages_pb2.WrittenTranslatableTextDto(translation=translation)
 
