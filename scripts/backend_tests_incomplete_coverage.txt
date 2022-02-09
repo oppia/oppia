@@ -62,5 +62,3 @@ core.domain.user_domain_test
 scripts.install_third_party_libs_test
 core.storage.exploration.gae_models_test
 scripts.docstrings_checker_test
-scripts.rtl_css_test
-scripts.rtl_css

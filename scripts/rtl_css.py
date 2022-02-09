@@ -26,6 +26,8 @@ import argparse
 import os
 import subprocess
 
+from core import python_utils
+
 _PARSER = argparse.ArgumentParser(
     description="""
 Run the script from the oppia root folder:
@@ -97,35 +99,30 @@ def main(args=None):
         for file_path in css_files_list:
             _, err = start_subprocess_for_result([rtlcss_path, file_path])
             if err:
-                raise ValueError(err)
+                raise Exception(err)
         print('All RTL CSS files generated!')
 
     elif parsed_args.mode == 'validate':
         invalid_files = []
         for file_path in css_files_list:
-            css_file = open(file_path, 'rb')
+            css_file = python_utils.open_file(file_path, 'rb', encoding=None)
             out, err = start_subprocess_for_result_with_input(
                 [rtlcss_path, '-'], css_file.read())
             out = out.replace(b'\n', b'')
 
             rtl_file_path = file_path[:-4] + '.rtl' + file_path[-4:]
-            rtl_css_content = open(rtl_file_path, 'rb').read()
+            rtl_css_content = python_utils.open_file(
+                rtl_file_path, 'rb', encoding=None).read()
             rtl_css_content = rtl_css_content.replace(b'\n', b'')
             if out != rtl_css_content:
                 invalid_files.append(file_path)
 
         if invalid_files:
             raise Exception(
-                'Invalid RTL CSS for the following files: ' +
-                str(invalid_files) + '. Please run '
-                '`python -m scripts.rtl_css --mode generate` '
-                'to autogenerate the corresponding files. ')
+                'Invalid RTL CSS for the following files: %s'
+                '. Please run \'python -m scripts.rtl_css --mode generate\' '
+                'to autogenerate the corresponding files.' % invalid_files)
         print('All RTL CSS files validated!')
-
-    else:
-        raise Exception(
-            'Invalid parameter passed in: \'%s\', please choose'
-            'from \'generate\' or \'validate\'' % parsed_args.mode)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
