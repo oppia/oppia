@@ -3,7 +3,7 @@
     <div class="form-group">
       <label for="{{fieldIds[property.name]}}">{{getHumanReadablePropertyDescription(property)}}</label>
       <!-- TODO(sll): This is in the wrong place. It should be on the input field. -->
-      <div id="{{fieldIds[property.name]}}">
+      <div id="{{fieldIds[property.name]}}" *ngIf="localValue">
         <schema-based-editor [schema]="getSchema(idx)" [disabled]="disabled"
                              [ngModel]="localValue[property.name]"
                              (ngModelChange)="updateValue($event, property.name)"

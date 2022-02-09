@@ -112,6 +112,7 @@ export class SchemaValidators {
       const VALID_URL_FRAGMENT_REGEX = new RegExp(
         AppConstants.VALID_URL_FRAGMENT_REGEX);
       if (
+        control.value &&
         VALID_URL_FRAGMENT_REGEX.test(control.value) &&
         control.value.length <= args.charLimit
       ) {
