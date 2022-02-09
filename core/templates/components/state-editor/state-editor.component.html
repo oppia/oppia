@@ -28,14 +28,14 @@
 </md-card>
 
 <div ng-show="$ctrl.isInteractionShown()">
-  <state-interaction-editor on-save-state-content="$ctrl.onSaveStateContent"
-                            on-save-interaction-id="$ctrl.onSaveInteractionId"
-                            on-save-interaction-customization-args="$ctrl.onSaveInteractionCustomizationArgs"
-                            on-save-next-content-id-index="$ctrl.onSaveNextContentIdIndex"
-                            on-save-solution="$ctrl.onSaveSolution"
-                            recompute-graph="$ctrl.recomputeGraph"
-                            show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
-  </state-interaction-editor>
+  <oppia-state-interaction-editor (on-save-state-content)="$ctrl.onSaveStateContent($event)"
+                                  (on-save-interaction-id)="$ctrl.onSaveInteractionId($event)"
+                                  (on-save-interaction-customization-args)="$ctrl.onSaveInteractionCustomizationArgs($event)"
+                                  (on-save-next-content-id-index)="$ctrl.onSaveNextContentIdIndex($event)"
+                                  (on-save-solution)="$ctrl.onSaveSolution($event)"
+                                  (recompute-graph)="$ctrl.recomputeGraph()"
+                                  (mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+  </oppia-state-interaction-editor>
 </div>
 
 <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">

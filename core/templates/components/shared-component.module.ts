@@ -124,6 +124,7 @@ import { QuestionMisconceptionEditorComponent } from './question-directives/ques
 import { SolutionExplanationEditor } from './state-directives/solution-editor/solution-explanation-editor.component';
 import { SolutionEditor } from './state-directives/solution-editor/solution-editor.component';
 import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
+import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -268,7 +269,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
-    StateSolutionEditorComponent
+    StateSolutionEditorComponent,
+    StateInteractionEditorComponent
   ],
 
   entryComponents: [
@@ -362,7 +364,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
-    StateSolutionEditorComponent
+    StateSolutionEditorComponent,
+    StateInteractionEditorComponent
   ],
 
   exports: [
@@ -470,7 +473,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
-    StateSolutionEditorComponent
+    StateSolutionEditorComponent,
+    StateInteractionEditorComponent,
   ],
 })
 
