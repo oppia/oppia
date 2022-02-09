@@ -34,6 +34,10 @@ implements PipeTransform {
         return 'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
           character.toLowerCase()) !== -1;
       };
+      let isAdditionalChars = function(character: string) {
+        return '/@$!{}()'.indexOf(
+          character) !== -1;   //more additional characters can be included as per demand
+      };
 
       input = input.trim();
       let inputLines = input.split('\n');
@@ -49,6 +53,18 @@ implements PipeTransform {
                                 isAlphanumeric(inputLine.charAt(j - 1)) &&
                                 isAlphanumeric(inputLine.charAt(j + 1))) {
               result += currentChar;
+            }
+            else
+            {
+              if(j > 0 && j < inputLine.length - 1 && !isAlphanumeric(inputLine.charAt(j - 1)))
+              {
+                result = result.slice(0,j-1);
+                result += currentChar;
+              }
+              else if(j > 0 && j < inputLine.length - 1 && !isAlphanumeric(inputLine.charAt(j + 1)) && isAdditionalChars(inputLine.charAt(j + 1)))
+              {
+                result += currentChar;
+              }
             }
           } else {
             result += currentChar;
