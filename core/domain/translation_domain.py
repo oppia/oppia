@@ -19,51 +19,11 @@
 from __future__ import annotations
 
 import copy
-import enum
 
+from core import feconf
 from core import utils
 
-from typing import Dict, List, Union
-from typing_extensions import TypedDict
-
-
-class TranslatableContentPossibleDataTypes(enum.Enum):
-    """Represents all possible data types for any translatable content."""
-
-    TRANSLATABLE_CONTENT_FORMAT_HTML = 'html'
-    TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING = 'unicode'
-    TRANSLATABLE_CONTENT_FORMAT_SET_OF_NORMALIZED_STRING = (
-        'set_of_normalized_string')
-    TRANSLATABLE_CONTENT_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
-
-
-class EntityTypesSupportingNewTranslationArch(enum.Enum):
-    """Represents all possible entity types which support new translations
-    architecture.
-    """
-
-    ENTITY_TYPE_EXPLORATION = 'exploration'
-    ENTITY_TYPE_QUESTION = 'question'
-
-
-# The data type for the content in the TranslatableContent/TranslatedContent
-# object.
-ContentInTranslatableContent = Union[str, List[str]]
-
-
-class TranslatableContentDict(TypedDict):
-    """Dictionary representing TranslatableContent object."""
-
-    content_id: str
-    content: ContentInTranslatableContent
-    content_type: TranslatableContentPossibleDataTypes
-
-
-class TranslatedContentDict(TypedDict):
-    """Dictionary representing TranslatedContent object."""
-
-    content: ContentInTranslatableContent
-    needs_update: bool
+from typing import Dict, List
 
 
 class BaseTranslatableObject:
@@ -89,14 +49,14 @@ class BaseTranslatableObject:
 
     def _register_translatable_field(
         self,
-        field_type: TranslatableContentPossibleDataTypes,
+        field_type: feconf.TranslatableContentFormat,
         content_id: str,
-        value: ContentInTranslatableContent
+        value: feconf.ContentInTranslatableContent
     ) -> None:
         """Method to register a translatable field in a translatable object.
 
         Args:
-            field_type: TranslatableContentPossibleDataTypes. The type of the
+            field_type: TranslatableContentFormat. The type of the
                 corresponding translatable content.
             content_id: str. The id of the corresponding translatable content.
             value: ContentInTranslatableContent. Value of the content which is
@@ -133,12 +93,12 @@ class BaseTranslatableObject:
         self._register_all_translatable_fields()
         return copy.deepcopy(self._translatable_contents)
 
-    def get_all_contents_which_needs_translations(
+    def get_all_contents_which_need_translations(
         self,
         entity_translation: EntityTranslation
     ) -> List[TranslatableContent]:
-        """Returns a list of TranslatableContent instances which need
-        translation or which need updates in existing translation.
+        """Returns a list of TranslatableContent instances which need new or
+        updated translations.
 
         Args:
             entity_translation: EntityTranslation. An object storing the
@@ -176,7 +136,7 @@ class EntityTranslation:
 
     Args:
         entity_id: str. The id of the corresponding entity.
-        entity_type: EntityTypesSupportingNewTranslationArch. The type
+        entity_type: TranslatableEntityType. The type
             of the corresponding entity.
         entity_version: str. The version of the corresponding entity.
         language_code: str. The language code for the corresponding entity.
@@ -186,7 +146,7 @@ class EntityTranslation:
     def __init__(
         self,
         entity_id: str,
-        entity_type: EntityTypesSupportingNewTranslationArch,
+        entity_type: feconf.TranslatableEntityType,
         entity_version: int,
         language_code: str,
         translations: Dict[str, TranslatedContent]
@@ -199,22 +159,22 @@ class EntityTranslation:
 
 
 class TranslatableContent:
-    """TranslatablesContent represents a content of a translatable object which
+    """TranslatableContent represents a content of a translatable object which
     can be translated into multiple languages.
 
     Args:
         content_id: str. The id of the corresponding content.
         content: ContentInTranslatableContent. The content which can be
             translated.
-        content_type: TranslatableContentPossibleDataTypes. The type of the
+        content_type: TranslatableContentFormat. The type of the
             corresponding content.
     """
 
     def __init__(
         self,
         content_id: str,
-        content: ContentInTranslatableContent,
-        content_type: TranslatableContentPossibleDataTypes
+        content: feconf.ContentInTranslatableContent,
+        content_type: feconf.TranslatableContentFormat
     ) -> None:
         self.content_id = content_id
         self.content = content
@@ -223,7 +183,7 @@ class TranslatableContent:
     @classmethod
     def from_dict(
         cls,
-        translatable_content_dict: TranslatableContentDict
+        translatable_content_dict: feconf.TranslatableContentDict
     ) -> TranslatableContent:
         """Returns a TranslatableContent object from its dict representation.
 
@@ -239,7 +199,7 @@ class TranslatableContent:
             translatable_content_dict['content'],
             translatable_content_dict['content_type'])
 
-    def to_dict(self) -> TranslatableContentDict:
+    def to_dict(self) -> feconf.TranslatableContentDict:
         """Returns the dict representation of TranslatableContent object.
 
         Returns:
@@ -256,15 +216,15 @@ class TranslatedContent:
     """Represents the translated content of the TranslatableContent object.
 
     Args:
-        content: ContentInTranslatableContent. Represents already translated
-            content in a translated object.
+        content: ContentInTranslatableContent. Represents already-translated
+            content of TranslatableContent object.
         needs_update: bool. A boolean value represents whether any translation
             needs an update or not.
     """
 
     def __init__(
         self,
-        content: ContentInTranslatableContent,
+        content: feconf.ContentInTranslatableContent,
         needs_update: bool
     ) -> None:
         self.content = content
@@ -273,7 +233,7 @@ class TranslatedContent:
     @classmethod
     def from_dict(
         cls,
-        translated_contents_dict: TranslatedContentDict
+        translated_contents_dict: feconf.TranslatedContentDict
     ) -> TranslatedContent:
         """Returns a TranslatedContent object from its dict representation.
 
@@ -288,7 +248,7 @@ class TranslatedContent:
             translated_contents_dict['content'],
             translated_contents_dict['needs_update'])
 
-    def to_dict(self) -> TranslatedContentDict:
+    def to_dict(self) -> feconf.TranslatedContentDict:
         """Returns the dict representation of TranslatedContent object.
 
         Returns:

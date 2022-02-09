@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
@@ -36,9 +37,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
     def test_create_new_model(self) -> None:
         enitity_translation_model = (
             translation_models.EntityTranslationsModel.create_new(
-                translation_models
-                .EntityTypesSupportingNewTranslationArch
-                .ENTITY_TYPE_EXPLORATION, 'exp_id', 1, 'hi', {
+                feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'hi', {
                     '123': {
                         'content': 'Hello world!',
                         'needs_update': False
@@ -58,9 +57,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
 
     def test_get_model_method_returns_correctly(self) -> None:
         translation_models.EntityTranslationsModel.create_new(
-            translation_models
-            .EntityTypesSupportingNewTranslationArch
-            .ENTITY_TYPE_EXPLORATION, 'exp_id', 1, 'hi', {
+            feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'hi', {
                 '123': {
                     'content': 'Hello world!',
                     'needs_update': False
@@ -69,9 +66,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
         ).put()
         enitity_translation_model = (
             translation_models.EntityTranslationsModel.get_model(
-                translation_models
-                .EntityTypesSupportingNewTranslationArch
-                .ENTITY_TYPE_EXPLORATION, 'exp_id', 1, 'hi'))
+                feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'hi'))
         self.assertEqual(enitity_translation_model.entity_type, 'exploration')
         self.assertEqual(enitity_translation_model.entity_id, 'exp_id')
         self.assertEqual(enitity_translation_model.entity_version, 1)
@@ -85,9 +80,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
 
     def test_get_all_for_entity_returns_correctly(self) -> None:
         translation_models.EntityTranslationsModel.create_new(
-            translation_models
-            .EntityTypesSupportingNewTranslationArch
-            .ENTITY_TYPE_EXPLORATION, 'exp_id', 1, 'en', {
+            feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'en', {
                 '123': {
                     'content': 'Hey I am Jhon.',
                     'needs_update': False
@@ -95,9 +88,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
             }
         ).put()
         translation_models.EntityTranslationsModel.create_new(
-            translation_models
-                .EntityTypesSupportingNewTranslationArch
-                .ENTITY_TYPE_EXPLORATION, 'exp_id2', 2, 'hi', {
+            feconf.TranslatableEntityType.EXPLORATION, 'exp_id2', 2, 'hi', {
                 '123': {
                     'content': 'Hello world!',
                     'needs_update': False
@@ -105,9 +96,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
             }
         ).put()
         translation_models.EntityTranslationsModel.create_new(
-            translation_models
-            .EntityTypesSupportingNewTranslationArch
-            .ENTITY_TYPE_EXPLORATION, 'exp_id', 1, 'hi', {
+            feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'hi', {
                 '123': {
                     'content': 'Hey I am Nikhil.',
                     'needs_update': False
@@ -117,16 +106,12 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
 
         enitity_translation_models = (
             translation_models.EntityTranslationsModel.get_all_for_entity(
-                translation_models
-                .EntityTypesSupportingNewTranslationArch
-                .ENTITY_TYPE_EXPLORATION, 'exp_id', 1))
+                feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1))
         self.assertEqual(len(enitity_translation_models), 2)
 
         enitity_translation_models = (
             translation_models.EntityTranslationsModel.get_all_for_entity(
-                translation_models
-                .EntityTypesSupportingNewTranslationArch
-                .ENTITY_TYPE_EXPLORATION, 'exp_id2', 2))
+                feconf.TranslatableEntityType.EXPLORATION, 'exp_id2', 2))
         self.assertEqual(len(enitity_translation_models), 1)
 
     def test_get_export_policy_not_applicable(self) -> None:

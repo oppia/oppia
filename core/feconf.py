@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import copy
 import datetime
+import enum
 import os
 
 from core.constants import constants
@@ -1504,3 +1505,41 @@ COMMIT_TYPE_CREATE = 'create'
 COMMIT_TYPE_REVERT = 'revert'
 COMMIT_TYPE_EDIT = 'edit'
 COMMIT_TYPE_DELETE = 'delete'
+
+# The data type for the content in the TranslatableContent/TranslatedContent
+# object.
+ContentInTranslatableContent = Union[str, List[str]]
+
+
+class TranslatableContentFormat(enum.Enum):
+    """Represents all possible data types for any translatable content."""
+
+    HTML = 'html'
+    UNICODE_STRING = 'unicode'
+    SET_OF_NORMALIZED_STRING = (
+        'set_of_normalized_string')
+    SET_OF_UNICODE_STRING = 'set_of_unicode_string'
+
+
+class TranslatableEntityType(enum.Enum):
+    """Represents all possible entity types which support new translations
+    architecture.
+    """
+
+    EXPLORATION = 'exploration'
+    QUESTION = 'question'
+
+
+class TranslatableContentDict(TypedDict):
+    """Dictionary representing TranslatableContent object."""
+
+    content_id: str
+    content: ContentInTranslatableContent
+    content_type: TranslatableContentFormat
+
+
+class TranslatedContentDict(TypedDict):
+    """Dictionary representing TranslatedContent object."""
+
+    content: ContentInTranslatableContent
+    needs_update: bool
