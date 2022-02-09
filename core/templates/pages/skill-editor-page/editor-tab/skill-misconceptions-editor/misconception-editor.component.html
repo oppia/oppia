@@ -86,9 +86,8 @@
     <div *ngIf="notesEditorIsOpen && isEditable">
       <div class="oppia-rule-details-header">
         <strong>Notes for Creator</strong>
-        <schema-based-editor [schema]="getSchemaNotes.(this)"
-                             [localValue]="container.misconceptionNotes"
-                             (localValueChange)="this.updateLocalNotes($event)">
+        <schema-based-editor [schema]="NOTES_FORM_SCHEMA"
+                             [(localValue)]="container.misconceptionNotes">
         </schema-based-editor>
       </div>
 
@@ -133,9 +132,8 @@
     <div *ngIf="feedbackEditorIsOpen && isEditable">
       <div class="oppia-rule-details-header">
         <strong>Feedback for Learner</strong>
-        <schema-based-editor [schema]="getSchemaFeedback()"
-                             [localValue]="container.misconceptionFeedback"
-                             (localValueChange)="this.updateLocalFeedback($event)">
+        <schema-based-editor [schema]="FEEDBACK_FORM_SCHEMA"
+                             [(localValue)]="container.misconceptionFeedback">
         </schema-based-editor>
       </div>
 
