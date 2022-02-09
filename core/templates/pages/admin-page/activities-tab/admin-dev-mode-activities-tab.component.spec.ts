@@ -310,20 +310,20 @@ describe('Admin dev mode activities tab', () => {
 
     it('should show error message when dummy opportunities' +
     'are not generated', async(() => {
-    component.numDummyOpsToGenerate = 2;
+      component.numDummyOpsToGenerate = 2;
 
-    spyOn(adminBackendApiService, 'generateDummyOpportunitiesAsync')
-      .and.returnValue(Promise.reject('Dummy opportunities not generated.'));
-    spyOn(component.setStatusMessage, 'emit');
+      spyOn(adminBackendApiService, 'generateDummyOpportunitiesAsync')
+        .and.returnValue(Promise.reject('Dummy opportunities not generated.'));
+      spyOn(component.setStatusMessage, 'emit');
 
-    component.generateDummyOpportunities();
+      component.generateDummyOpportunities();
 
-    expect(component.setStatusMessage.emit)
-      .toHaveBeenCalledWith('Processing...');
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
 
-    fixture.whenStable().then(() => {
-      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
-        'Server error: Dummy opportunities not generated.');
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Server error: Dummy opportunities not generated.');
       });
     }));
 
