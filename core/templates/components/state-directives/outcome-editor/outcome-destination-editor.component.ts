@@ -40,10 +40,8 @@ interface DestinationChoice {
 export class OutcomeDestinationEditorComponent implements OnInit {
   @Input() outcome: Outcome;
   @Input() outcomeHasFeedback: boolean;
-  @Output() addState:
-  EventEmitter<string> = new EventEmitter<string>();
-  @Output() getChanges:
-  EventEmitter<void> = new EventEmitter();
+  @Output() addState: EventEmitter<string> = new EventEmitter<string>();
+  @Output() getChanges: EventEmitter<void> = new EventEmitter();
   directiveSubscriptions: Subscription = new Subscription();
   canAddPrerequisiteSkill: boolean;
   canEditRefresherExplorationId: boolean;
