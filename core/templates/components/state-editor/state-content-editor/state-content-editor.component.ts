@@ -90,15 +90,15 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   isCardContentLengthLimitReached(): boolean {
-    var content = this.stateContentService.displayed.html;
+    let content = this.stateContentService.displayed.html;
     return (content.length > 4500);
   }
 
   isCardHeightLimitReached(): boolean {
-    var shadowPreviewCard = $(
+    let shadowPreviewCard = $(
       '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
     );
-    var height = shadowPreviewCard.height();
+    let height = shadowPreviewCard.height();
     return (height > 630);
   }
 
@@ -120,12 +120,12 @@ export class StateContentEditorComponent implements OnInit {
 
   onSaveContentButtonClicked(): void {
     this.editorFirstTimeEventsService.registerFirstSaveContentEvent();
-    var savedContent = this.stateContentService.savedMemento;
-    var contentHasChanged = (
+    let savedContent = this.stateContentService.savedMemento;
+    let contentHasChanged = (
       savedContent.html !==
       this.stateContentService.displayed.html);
     if (contentHasChanged) {
-      var contentId = this.stateContentService.displayed.contentId;
+      let contentId = this.stateContentService.displayed.contentId;
       this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit([contentId]);
     }
     this.saveContent();

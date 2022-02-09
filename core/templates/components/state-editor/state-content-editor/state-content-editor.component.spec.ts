@@ -84,7 +84,7 @@ describe('StateHintsEditorComponent', () => {
   it('should start with the content editor not being open', function() {
     component.ngOnInit();
 
-    expect(component.contentEditorIsOpen).toBe(false);
+    expect(component.contentEditorIsOpen).toBeFalse();
   });
 
   it('should save hint when external save event is triggered', fakeAsync(() => {
@@ -108,32 +108,32 @@ describe('StateHintsEditorComponent', () => {
     component.cardHeightLimitWarningIsShown = true;
     component.hideCardHeightLimitWarning();
 
-    expect(component.cardHeightLimitWarningIsShown).toBe(false);
+    expect(component.cardHeightLimitWarningIsShown).toBeFalse();
   });
 
   it('should show card height limit warning', function() {
     stateContentService.displayed = (
       _getContent('content', ''));
 
-    expect(component.isCardContentLengthLimitReached()).toBe(false);
+    expect(component.isCardContentLengthLimitReached()).toBeFalse();
   });
 
   it('should correctly handle no-op edits', function() {
     component.ngOnInit();
 
-    expect(component.contentEditorIsOpen).toBe(false);
+    expect(component.contentEditorIsOpen).toBeFalse();
     expect(stateContentService.savedMemento).toEqual(_getContent(
       'content', ''));
 
     component.openStateContentEditor();
 
-    expect(component.contentEditorIsOpen).toBe(true);
+    expect(component.contentEditorIsOpen).toBeTrue();
 
     stateContentService.displayed = (
       _getContent('content', ''));
     component.onSaveContentButtonClicked();
 
-    expect(component.contentEditorIsOpen).toBe(false);
+    expect(component.contentEditorIsOpen).toBeFalse();
     expect(changeListService.getChangeList()).toEqual([]);
   });
 
@@ -171,7 +171,7 @@ describe('StateHintsEditorComponent', () => {
 
     component.cancelEdit();
 
-    expect(component.contentEditorIsOpen).toBe(false);
+    expect(component.contentEditorIsOpen).toBeFalse();
     expect(stateContentService.savedMemento).toEqual(contentBeforeEdit);
     expect(stateContentService.displayed).toEqual(contentBeforeEdit);
   });
