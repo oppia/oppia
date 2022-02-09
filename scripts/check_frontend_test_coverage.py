@@ -52,7 +52,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'google-analytics.initializer.ts',
     'learner-answer-info.service.ts',
     'mathjax-bind.directive.ts',
-    'normalize-whitespace-punctuation-and-case.pipe.ts',
     'object-editor.directive.ts',
     'oppia-footer.component.ts',
     'oppia-interactive-music-notes-input.directive.ts',
@@ -65,10 +64,8 @@ NOT_FULLY_COVERED_FILENAMES = [
     'rule-type-selector.directive.ts',
     'select2-dropdown.directive.ts',
     'state-content-editor.directive.ts',
-    'state-interaction-editor.directive.ts',
     'story-node.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
-    'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
     'unit-test-utils.ajs.ts',
