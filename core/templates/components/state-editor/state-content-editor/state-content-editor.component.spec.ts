@@ -91,7 +91,7 @@ describe('StateHintsEditorComponent', () => {
     let onExternalSaveEmitter = new EventEmitter();
     spyOnProperty(externalSaveService, 'onExternalSave')
       .and.returnValue(onExternalSaveEmitter);
-    spyOn(component.onSaveStateContent, 'emit')
+    spyOn(component.saveStateContent, 'emit')
       .and.callThrough();
 
     component.ngOnInit();
@@ -100,7 +100,7 @@ describe('StateHintsEditorComponent', () => {
     onExternalSaveEmitter.emit();
     tick();
 
-    expect(component.onSaveStateContent.emit)
+    expect(component.saveStateContent.emit)
       .toHaveBeenCalled();
   }));
 
@@ -139,7 +139,7 @@ describe('StateHintsEditorComponent', () => {
 
   it('should check that content edits are saved correctly', function() {
     spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
-    spyOn(component.onSaveStateContent, 'emit');
+    spyOn(component.saveStateContent, 'emit');
 
     component.ngOnInit();
 
@@ -149,7 +149,7 @@ describe('StateHintsEditorComponent', () => {
     stateContentService.displayed = _getContent('content', 'babababa');
     component.onSaveContentButtonClicked();
 
-    expect(component.onSaveStateContent.emit)
+    expect(component.saveStateContent.emit)
       .toHaveBeenCalled();
 
     component.openStateContentEditor();
@@ -157,7 +157,7 @@ describe('StateHintsEditorComponent', () => {
       'content', 'And now for something completely different.');
     component.onSaveContentButtonClicked();
 
-    expect(component.onSaveStateContent.emit)
+    expect(component.saveStateContent.emit)
       .toHaveBeenCalled();
     expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
       .toHaveBeenCalled();
@@ -177,11 +177,11 @@ describe('StateHintsEditorComponent', () => {
   });
 
   it('should call the callback function on-save', function() {
-    spyOn(component.onSaveStateContent, 'emit');
+    spyOn(component.saveStateContent, 'emit');
 
     component.onSaveContentButtonClicked();
 
-    expect(component.onSaveStateContent.emit)
+    expect(component.saveStateContent.emit)
       .toHaveBeenCalled();
   });
 
