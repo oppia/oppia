@@ -232,7 +232,7 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         assert isinstance(retrieved_dict, dict)
         return retrieved_dict
     except (AssertionError, yaml.YAMLError) as e:
-        raise InvalidInputException(e)
+        raise InvalidInputException(e) from e
 
 
 def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> str:
