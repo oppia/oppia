@@ -169,20 +169,6 @@ describe('Add Or Update Solution Modal Component', () => {
       expect(component.tempAnsOption).toEqual('One');
     });
 
-    it('should get schema', () => {
-      expect(component.getSchema())
-        .toEqual(component.EXPLANATION_FORM_SCHEMA);
-    });
-
-    it('should update explanationHtml', () => {
-      component.data.explanationHtml = '<p>old value<p>';
-
-      let newHtml = '<p>new value<p>';
-      component.updateLocalHtml(newHtml);
-
-      expect(component.data.explanationHtml).toEqual(newHtml);
-    });
-
     it('should update the answerIsExclusive correctly', () => {
       component.tempAnsOption = 'The only';
 
