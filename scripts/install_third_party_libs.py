@@ -198,11 +198,25 @@ def ensure_pip_library_is_installed(package, version, path):
     """
     print('Checking if %s is installed in %s' % (package, path))
 
-    exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
+    if package.startswith('git+'):
+        exact_lib_path = os.path.join(
+            path,
+            '%s-%s' % (
+                package[package.rindex('/') + 1:package.index('.git')],
+                version
+            )
+        )
+    else:
+        exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
+
     if not os.path.exists(exact_lib_path):
         print('Installing %s' % package)
-        install_backend_python_libs.pip_install(
-            '%s==%s' % (package, version), exact_lib_path)
+        if package.startswith('git+'):
+            install_backend_python_libs.pip_install(
+                '%s@%s' % (package, version), exact_lib_path)
+        else:
+            install_backend_python_libs.pip_install(
+                '%s==%s' % (package, version), exact_lib_path)
 
 
 def ensure_system_python_libraries_are_installed(package, version):
