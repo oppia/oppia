@@ -35,8 +35,8 @@ from core.tests import test_utils
 
 
 EXPECTED_THREAD_KEYS = [
-    'status', 'original_author_username', 'state_name', 'summary', 'thread_id',
-    'subject', 'last_updated_msecs', 'message_count',
+    'status', 'original_author_username', 'state_name', 'summary',
+    'thread_id', 'subject', 'last_updated_msecs', 'message_count',
     'last_nonempty_message_text', 'last_nonempty_message_author']
 EXPECTED_MESSAGE_KEYS = [
     'author_username', 'created_on_msecs', 'entity_type', 'message_id',
