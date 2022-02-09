@@ -356,7 +356,7 @@ class GeneralPurposeLinter:
         try:
             file_content = self.file_cache.readlines(filepath)
         except Exception as e:
-            raise Exception('%s %s' % (filepath, e))
+            raise Exception('%s %s' % (filepath, e)) from e
         for index, regexp_to_check in enumerate(
                 pattern_list):
             if (any(filepath.endswith(
