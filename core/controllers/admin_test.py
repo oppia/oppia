@@ -911,6 +911,23 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             response['error'],
             'Cannot revoke privileges from the default super admin account')
 
+class GenerateDummyOpportunitiesTest(test_utils.GenericTestBase):
+    """Test the conditions for generation of dummy opportunities"""
+    def setUp(self):
+        super(GenerateDummyOpportunitiesTest, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+    
+    def test_generate_opportunities_with_valid_number(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_opportunities',
+                'num_dummy_ops_to_generate': 20
+            }, csrf_token=csrf_token)
+        generated_translation_ops = opportunity_services.get_translation_opportunities()
+        self.assertEqual(len(generated_translation_ops), 20)
+
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy explorations."""

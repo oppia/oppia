@@ -290,6 +290,24 @@ describe('Admin dev mode activities tab', () => {
       expect(adminBackendSpy).not.toHaveBeenCalled();
     });
 
+    it('should generate dummy opportunities', async(() => {
+      component.numDummyOpsToGenerate = 20;
+
+      spyOn(adminBackendApiService, 'generateDummyOpportunitiesAsync')
+        .and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateDummyOpportunities();
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Dummy opportunities generated successfully.');
+      });
+    }));
+
     it('should generate dummy explorations', async(() => {
       component.numDummyExpsToPublish = 1;
       component.numDummyExpsToGenerate = 2;

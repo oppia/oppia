@@ -57,6 +57,28 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+    <div class="container">
+      <h3>Generate dummy opportunities</h3>
+      <p>
+        Use this form to generate dummy opportunities with random interactions.
+      </p>
+      <span class="row">
+        <label for="label-target-opportunities-to-generate">Number of opportunities to generate</label>
+        <input class="form-control form-inline oppia-form-inline"
+               [(ngModel)]="numDummyOpsToGenerate"
+               placeholder="Opportunities to generate" type="number" min="0"
+               id="label-target-opportunities-to-generate">
+        <button type="button"
+                class="btn btn-primary oppia-generate-exploration-text"
+                (click)="generateDummyOpportunities()"
+                [disabled]="!numDummyOpsToGenerate">
+          Generate Opportunities
+        </button>
+      </span>
+    </div>
+  </mat-card>
+
+  <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
     <div class="container ml-0">
       <h3>Reload a single collection</h3>
       <div *ngFor="let collection of DEMO_COLLECTIONS"

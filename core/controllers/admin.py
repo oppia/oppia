@@ -86,6 +86,7 @@ class AdminHandler(base.BaseHandler):
                     'choices': [
                         'reload_exploration', 'reload_collection',
                         'generate_dummy_explorations', 'clear_search_index',
+                        'generate_dummy_opportunities',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
                         'save_config_properties', 'revert_config_property',
@@ -112,6 +113,12 @@ class AdminHandler(base.BaseHandler):
                 'default_value': None
             },
             'num_dummy_exps_to_generate': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            },
+            'num_dummy_ops_to_generate': {
                 'schema': {
                     'type': 'int'
                 },
@@ -233,6 +240,11 @@ class AdminHandler(base.BaseHandler):
                 else:
                     self._generate_dummy_explorations(
                         num_dummy_exps_to_generate, num_dummy_exps_to_publish)
+            elif action == 'generate_dummy_opportunities':
+                num_dummy_ops_to_generate = self.normalized_payload.get(
+                    'num_dummy_ops_to_generate')
+                self._generate_dummy_opportunities(
+                    num_dummy_ops_to_generate)
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
@@ -656,6 +668,186 @@ class AdminHandler(base.BaseHandler):
         else:
             raise Exception('Cannot generate dummy explorations in production.')
 
+    def _generate_dummy_opportunities(
+            self, num_dummy_ops_to_generate):
+        """Generates and publishes the given number of dummy opportunities.
+
+        Args:
+            num_dummy_ops_to_generate: int. Count of dummy opportunities to
+                be generated.
+
+        Raises:
+            Exception. Environment is not DEVMODE.
+        """
+
+        if constants.DEV_MODE:
+            logging.info(
+                '[ADMIN] %s generated %s number of dummy explorations' %
+                (self.user_id, num_dummy_ops_to_generate))
+
+            topic_id_1 = topic_fetchers.get_new_topic_id()
+            story_id = story_services.get_new_story_id()
+
+            topic_1 = topic_domain.Topic.create_default_topic(
+                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description')
+
+            topic_1.add_canonical_story(story_id)
+            topic_1.add_subtopic(1, 'Dummy Subtopic Title')
+
+            subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, topic_id_1))
+
+            story = story_domain.Story.create_default_story(
+                story_id, 'Help Jaime win the Arcade', 'Description',
+                topic_id_1, 'help-jamie-win-arcade')
+            
+            story_node_dicts = []
+
+            def create_dummy_interactions(state, dest):
+                state.update_interaction_id('TextInput')
+                state.update_interaction_customization_args({
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
+                        }
+                    },
+                    'rows': {'value': 1}
+                })
+
+                state.update_next_content_id_index(1)
+                state.update_linked_skill_id(None)
+                state.update_content(state_domain.SubtitledHtml('1', 'Content 1'))
+                recorded_voiceovers = state_domain.RecordedVoiceovers({})
+                written_translations = state_domain.WrittenTranslations({})
+                recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')
+                recorded_voiceovers.add_content_id_for_voiceover('1')
+                recorded_voiceovers.add_content_id_for_voiceover('default_outcome')
+                written_translations.add_content_id_for_translation('ca_placeholder_0')
+                written_translations.add_content_id_for_translation('1')
+                written_translations.add_content_id_for_translation('default_outcome')
+
+                state.update_recorded_voiceovers(recorded_voiceovers)
+                state.update_written_translations(written_translations)
+                solution = state_domain.Solution(
+                    'TextInput', False, 'Solution', state_domain.SubtitledHtml(
+                        'solution', '<p>This is a solution.</p>'))
+                hints_list = [
+                    state_domain.Hint(
+                        state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+                    )
+                ]
+
+                state.update_interaction_solution(solution)
+                state.update_interaction_hints(hints_list)
+                state.update_interaction_default_outcome(
+                    state_domain.Outcome(
+                        dest, state_domain.SubtitledHtml(
+                            'feedback_id', '<p>Dummy Feedback</p>'),
+                        True, [], None, None
+                    )
+                )
+            customization_args = {'recommendedExplorationIds' : {'value': []}}
+            new_end_state = state_domain.State.create_default_state('End')
+            new_end_state.update_interaction_id('EndExploration')
+            new_end_state.update_interaction_customization_args(customization_args)
+            new_end_state.update_interaction_default_outcome(None)
+
+            possible_titles = ['Hulk Neuroscience', 'Quantum Starks',
+                               'Wonder Anatomy',
+                               'Elvish, language',
+                               'The Science of Superheroes']
+            INTERACTIONNUMBER = 20
+            exploration_ids_to_publish = []
+            for i in range(num_dummy_ops_to_generate):
+                title = random.choice(possible_titles) + " " + str(i)
+                category = "Algorithms"
+                new_exploration_id = exp_fetchers.get_new_exploration_id()
+                exploration = exp_domain.Exploration.create_default_exploration(
+                    new_exploration_id, title=title, category=category,
+                    objective='Dummy Objective')
+
+                for i in range(INTERACTIONNUMBER):
+                    dest = 'Interaction' + str(i + 1)
+                    if i == 0:
+                        create_dummy_interactions(exploration.states['Introduction'], dest)
+                    else:
+                        if i == INTERACTIONNUMBER - 1:
+                            dest = 'End'
+                        cur_state = state_domain.State.create_default_state('Interaction' + str(i))
+                        exploration.states['Interaction' + str(i)] = cur_state
+                        create_dummy_interactions(cur_state, dest)
+
+                exploration.states['End'] = new_end_state
+                exp_services.save_new_exploration(self.user_id, exploration)
+                if i <= num_dummy_ops_to_generate - 1:
+                    exploration_ids_to_publish.append(new_exploration_id)
+                    rights_manager.publish_exploration(
+                        self.user, new_exploration_id)
+
+                exp_services.update_exploration(
+                self.user_id, new_exploration_id, [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'correctness_feedback_enabled',
+                    'new_value': True
+                })], 'Changed correctness_feedback_enabled.')
+                story_node_dicts.append({'exp_id': new_exploration_id, 'title':title, 'description': category })
+            exp_services.index_explorations_given_ids(
+                exploration_ids_to_publish)
+
+            def generate_dummy_story_nodes(node_id, exp_id, title, description):
+                """Generates and connects sequential story nodes.
+
+                Args:
+                    node_id: int. The node id.
+                    exp_id: str. The exploration id.
+                    title: str. The title of the story node.
+                    description: str. The description of the story node.
+                """
+
+                story.add_node(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    title)
+                story.update_node_description(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    description)
+                story.update_node_exploration_id(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
+
+                if node_id != len(story_node_dicts):
+                    story.update_node_destination_node_ids(
+                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                        ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
+
+                exp_services.update_exploration(
+                    self.user_id, exp_id, [exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'category',
+                        'new_value': 'Astronomy'
+                    })], 'Change category')
+
+            for i, story_node_dict in enumerate(story_node_dicts):
+                generate_dummy_story_nodes(i + 1, **story_node_dict)
+
+
+            story_services.save_new_story(self.user_id, story)
+            topic_services.save_new_topic(self.user_id, topic_1)
+
+            subtopic_page_services.save_subtopic_page(
+                self.user_id, subtopic_page, 'Added subtopic',
+                [topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Dummy Subtopic Title'
+                })]
+            )
+
+            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+            opportunity_services.add_new_exploration_opportunities(
+                story_id, exp_ids_in_story)
+        else:
+            raise Exception('Cannot generate dummy explorations in production.')
 
 class AdminRoleHandler(base.BaseHandler):
     """Handler for roles tab of admin page. Used to view and update roles."""

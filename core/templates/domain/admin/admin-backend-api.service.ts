@@ -458,6 +458,13 @@ export class AdminBackendApiService {
     });
   }
 
+  async generateDummyOpportunitiesAsync(
+    numDummyOpsToGenerate: number): Promise<void> {
+  return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+    action: 'generate_dummy_opportunities',
+    num_dummy_ops_to_generate: numDummyOpsToGenerate
+  });
+}
   async reloadExplorationAsync(explorationId: string):
   Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
