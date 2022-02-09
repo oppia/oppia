@@ -103,120 +103,124 @@ class RatioExpressionInputInteractionTests(test_utils.GenericTestBase):
             },
             'id': 'RatioExpressionInput'
         }
-        ratio_input_instance = (
+        ratio_expression_input = (
             interaction_registry.Registry.get_interaction_by_id(
                 'RatioExpressionInput'))
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(
                 interaction_dict))
-        ratio_input_proto = ratio_input_instance.to_android_ratio_input_proto(
-            interaction_domain.default_outcome,
-            interaction_domain.customization_args,
-            interaction_domain.solution,
-            interaction_domain.hints,
-            interaction_domain.answer_groups)
+        ratio_expression_input_proto = (
+            ratio_expression_input.to_android_ratio_expression_input_proto(
+                interaction_domain.default_outcome,
+                interaction_domain.customization_args,
+                interaction_domain.solution,
+                interaction_domain.hints,
+                interaction_domain.answer_groups))
 
+        ratio_expression_input_customization_args = (
+            ratio_expression_input_proto.customization_args)
         self.assertEqual(
-            ratio_input_proto.customization_args.placeholder.content_id,
+            ratio_expression_input_customization_args.placeholder.content_id,
             'ca_placeholder_0')
         self.assertEqual(
-            ratio_input_proto.customization_args.placeholder.text,
+            ratio_expression_input_customization_args.placeholder.text,
             '😍😍😍😍')
         self.assertEqual(
-            ratio_input_proto.customization_args.number_of_terms,
+            ratio_expression_input_customization_args.number_of_terms,
             1)
 
         self.assertEqual(
-            ratio_input_proto.hints[0].hint_content.content_id,
+            ratio_expression_input_proto.hints[0].hint_content.content_id,
             'hint_1')
         self.assertEqual(
-            ratio_input_proto.hints[0].hint_content.text,
+            ratio_expression_input_proto.hints[0].hint_content.text,
             '<p>This is a copyright character ©.</p>')
 
         self.assertEqual(
-            ratio_input_proto.default_outcome.destination_state,
+            ratio_expression_input_proto.default_outcome.destination_state,
             'Introduction')
         self.assertEqual(
-            ratio_input_proto.default_outcome.feedback.content_id,
+            ratio_expression_input_proto.default_outcome.feedback.content_id,
             'default_outcome')
         self.assertEqual(
-            ratio_input_proto.default_outcome.feedback.text,
+            ratio_expression_input_proto.default_outcome.feedback.text,
             '<p> Default Outcome </p>')
-        self.assertFalse(ratio_input_proto.default_outcome.labelled_as_correct)
+        self.assertFalse(
+            ratio_expression_input_proto.default_outcome.labelled_as_correct)
 
-        ratio_input_mis_skill = (
-            ratio_input_proto.answer_groups[0]
+        ratio_expression_input_tagged_mis_skill = (
+            ratio_expression_input_proto.answer_groups[0]
                 .base_answer_group.tagged_skill_misconception)
         self.assertEqual(
-            ratio_input_mis_skill.skill_id,
+            ratio_expression_input_tagged_mis_skill.skill_id,
             'skill_id')
         self.assertEqual(
-            ratio_input_mis_skill.misconception_id,
+            ratio_expression_input_tagged_mis_skill.misconception_id,
             'misconception_id')
 
-        ratio_input_answer_group = (
-            ratio_input_proto.answer_groups[0]
+        ratio_expression_input_answer_group = (
+            ratio_expression_input_proto.answer_groups[0]
                 .base_answer_group.outcome)
         self.assertEqual(
-            ratio_input_answer_group.destination_state,
+            ratio_expression_input_answer_group.destination_state,
             'abc')
-        self.assertTrue(ratio_input_answer_group.labelled_as_correct)
+        self.assertTrue(ratio_expression_input_answer_group.labelled_as_correct)
         self.assertEqual(
-            ratio_input_answer_group.feedback.content_id,
+            ratio_expression_input_answer_group.feedback.content_id,
             'feedback_2')
         self.assertEqual(
-            ratio_input_answer_group.feedback.text,
+            ratio_expression_input_answer_group.feedback.text,
             '<p>Feedback</p>')
 
-        ratio_input_solution = (
-            ratio_input_proto.solution.base_solution)
+        ratio_expression_input_solution = (
+            ratio_expression_input_proto.solution.base_solution)
         self.assertEqual(
-            ratio_input_solution.explanation.content_id,
+            ratio_expression_input_solution.explanation.content_id,
             'solution')
         self.assertEqual(
-            ratio_input_solution.explanation.text,
+            ratio_expression_input_solution.explanation.text,
             '<p>This is solution for ratio input.</p>')
 
         self.assertEqual(
-            ratio_input_proto.solution.correct_answer.components[0],
+            ratio_expression_input_proto.solution.correct_answer.components[0],
             1)
         self.assertEqual(
-            ratio_input_proto.solution.correct_answer.components[1],
+            ratio_expression_input_proto.solution.correct_answer.components[1],
             2)
 
-        ratio_input_rule_spec = (
-            ratio_input_proto.answer_groups[0]
+        ratio_expression_input_rule_spec = (
+            ratio_expression_input_proto.answer_groups[0]
                 .rule_specs[0].equals.input)
         self.assertEqual(
-            ratio_input_rule_spec.components[0],
+            ratio_expression_input_rule_spec.components[0],
             1)
         self.assertEqual(
-            ratio_input_rule_spec.components[1],
+            ratio_expression_input_rule_spec.components[1],
             2)
 
-        ratio_input_rule_spec = (
-            ratio_input_proto.answer_groups[0]
+        ratio_expression_input_rule_spec = (
+            ratio_expression_input_proto.answer_groups[0]
                 .rule_specs[1].is_equivalent.input)
         self.assertEqual(
-            ratio_input_rule_spec.components[0],
+            ratio_expression_input_rule_spec.components[0],
             1)
         self.assertEqual(
-            ratio_input_rule_spec.components[1],
+            ratio_expression_input_rule_spec.components[1],
             2)
 
-        ratio_input_rule_spec = (
-            ratio_input_proto.answer_groups[0]
+        ratio_expression_input_rule_spec = (
+            ratio_expression_input_proto.answer_groups[0]
                 .rule_specs[2].has_number_of_terms_equal_to)
         self.assertEqual(
-            ratio_input_rule_spec.input_term_count,
+            ratio_expression_input_rule_spec.input_term_count,
             1)
 
-        ratio_input_rule_spec = (
-            ratio_input_proto.answer_groups[0]
+        ratio_expression_input_rule_spec = (
+            ratio_expression_input_proto.answer_groups[0]
                 .rule_specs[3].has_specific_term_equal_to)
         self.assertEqual(
-            ratio_input_rule_spec.input_term_index,
+            ratio_expression_input_rule_spec.input_term_index,
             1)
         self.assertEqual(
-            ratio_input_rule_spec.input_expected_term_value,
+            ratio_expression_input_rule_spec.input_expected_term_value,
             2)

@@ -388,25 +388,25 @@ class FractionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _convert_has_integer_part_equal_rule_spec_to_proto(cls, interger_part):
+    def _convert_has_integer_part_equal_rule_spec_to_proto(cls, integer_part):
         """Creates a proto object for HasIntegerPartEqualToSpecDto.
 
         Args:
-            interger_part: int. The expected integer part.
+            integer_part: int. The expected integer part.
 
         Returns:
             HasIntegerPartEqualToSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.HasIntegerPartEqualToSpecDto(
-            input=interger_part
+            input=integer_part
         )
 
     @classmethod
-    def _convert_has_no_fractional_part_rule_spec_to_proto(cls, interger_part): # pylint: disable=unused-argument
+    def _convert_has_no_fractional_part_rule_spec_to_proto(cls, integer_part): # pylint: disable=unused-argument
         """Creates a proto object for HasNoFractionalPartSpecDto.
 
         Args:
-            interger_part: int. The expected integer part.
+            integer_part: int. The expected integer part.
 
         Returns:
             HasNoFractionalPartSpecDto. The proto object.

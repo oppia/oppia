@@ -58,7 +58,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
     }]
 
     @classmethod
-    def to_android_algebric_expression_proto(
+    def to_android_algebraic_expression_proto(
         cls, default_outcome, customization_args, solution, hints, answer_groups
     ):
         """Creates a AlgebraicExpressionInputInstanceDto proto object.
@@ -106,9 +106,9 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         custom_osk_letters_proto = (
             list(customization_args['customOskLetters'].value))
         frac_for_division = customization_args['useFractionForDivision'].value
-        algebric_expression_dto = state_pb2.AlgebraicExpressionInputInstanceDto
+        algebraic_expression_dto = state_pb2.AlgebraicExpressionInputInstanceDto
 
-        return algebric_expression_dto.CustomizationArgsDto(
+        return algebraic_expression_dto.CustomizationArgsDto(
             custom_osk_letters=custom_osk_letters_proto,
             use_fraction_for_division=frac_for_division
         )
@@ -157,7 +157,8 @@ class AlgebraicExpressionInput(base.BaseInteraction):
                 cls._convert_matches_exactly_rule_spec_to_proto),
             'IsEquivalentTo': cls._convert_is_equivalent_rule_spec_to_proto,
             'MatchesUpToTrivialManipulations': (
-                cls._convert_matches_upto_rule_spec_to_proto)
+                cls._convert_matches_up_to_trivial_manipulation_rule_spec_to_proto # pylint: disable=line-too-long
+            )
         }
 
         rule_type_to_proto_mapping = {
@@ -211,7 +212,9 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _convert_matches_upto_rule_spec_to_proto(cls, inputs):
+    def _convert_matches_up_to_trivial_manipulation_rule_spec_to_proto(
+        cls, inputs
+    ):
         """Creates a proto object for MatchesUpToTrivialManipulationsSpecDto.
 
         Args:

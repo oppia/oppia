@@ -13,56 +13,48 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the ItemSelectionInput short response.
+ * @fileoverview Directive for the ItemSelectionInput short response.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ShortResponseItemSelectionInputComponent } from './oppia-short-response-item-selection-input.component';
+describe('oppiaShortResponseItemSelectionInput', function() {
+  let ctrl = null;
 
-describe('ShortResponseItemSelectionInput', () => {
-  let component: ShortResponseItemSelectionInputComponent;
-  let fixture: ComponentFixture<ShortResponseItemSelectionInputComponent>;
-
-  class mockHtmlEscaperService {
-    escapedJsonToObj(answer: string): string {
-      return JSON.parse(answer);
+  let mockHtmlEscaperService = {
+    escapedJsonToObj: function(answer) {
+      return answer;
     }
-  }
+  };
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ShortResponseItemSelectionInputComponent],
-      providers: [
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('HtmlEscaperService', mockHtmlEscaperService);
+
+    $provide.value('$attrs', {
+      choices: [
         {
-          provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
-        }
+          _html: 'choice 1',
+          _contentId: 'ca_choices_1'
+        },
+        {
+          _html: 'choice 2',
+          _contentId: 'ca_choices_2'
+        },
+        {
+          _html: 'choice 3',
+          _contentId: 'ca_choices_3'
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
+      answer: [
+        'ca_choices_1'
+      ]
+    });
+  }));
+  beforeEach(angular.mock.inject(function($componentController) {
+    ctrl = $componentController('oppiaShortResponseItemSelectionInput');
   }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(ShortResponseItemSelectionInputComponent);
-    component = fixture.componentInstance;
-    component.answer = '["ca_choices_1"]';
-    component.choices = '[{' +
-      '"_html": "choice 1",' +
-      '"_contentId": "ca_choices_1"' +
-    '}, {' +
-      '"_html": "choice 2",' +
-      '"_contentId": "ca_choices_2"' +
-    '}, {' +
-      '"_html": "choice 3",' +
-      '"_contentId": "ca_choices_3"' +
-    '}]';
-  });
-
-  it('should initialise component when user submits answer', () => {
-    component.ngOnInit();
-
-    expect(component.responses).toEqual(['choice 1']);
+  it('should initialise the component when', () => {
+    ctrl.$onInit();
+    expect(ctrl.answer).toEqual(['choice 1']);
   });
 });

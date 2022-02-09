@@ -108,86 +108,102 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
             },
             'id': 'DragAndDropSortInput'
         }
-        drag_and_drop_instance = (
+        drag_and_drop_sort_input = (
             interaction_registry.Registry.get_interaction_by_id(
                 'DragAndDropSortInput'))
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(
                 interaction_dict))
-        drag_and_drop_proto = (
-            drag_and_drop_instance.to_android_drag_drop_input_proto(
+        drag_and_drop_sort_input_proto = (
+            drag_and_drop_sort_input.to_android_drag_and_drop_sort_input_proto(
                 interaction_domain.default_outcome,
                 interaction_domain.customization_args,
                 interaction_domain.solution,
                 interaction_domain.hints,
                 interaction_domain.answer_groups))
 
+        customization_args_proto = (
+            drag_and_drop_sort_input_proto.customization_args)
+        self.assertTrue(
+            customization_args_proto.allowMultipleItemsInSamePosition)
         self.assertEqual(
-            drag_and_drop_proto.default_outcome.destination_state,
+            customization_args_proto.choices[0].content_id,
+            'ca_choices_2')
+        self.assertEqual(
+            customization_args_proto.choices[0].text,
+            '<p>Choice 1</p>')
+
+        self.assertEqual(
+            drag_and_drop_sort_input_proto.default_outcome.destination_state,
             'abc')
         self.assertEqual(
-            drag_and_drop_proto.default_outcome.feedback.content_id,
+            drag_and_drop_sort_input_proto.default_outcome.feedback.content_id,
             'feedback_1')
         self.assertEqual(
-            drag_and_drop_proto.default_outcome.feedback.text,
+            drag_and_drop_sort_input_proto.default_outcome.feedback.text,
             'Correct Answer')
-        self.assertTrue(drag_and_drop_proto.default_outcome.labelled_as_correct)
+        self.assertTrue(
+            drag_and_drop_sort_input_proto.default_outcome.labelled_as_correct)
 
         self.assertEqual(
-            drag_and_drop_proto.hints[0].hint_content.content_id,
+            drag_and_drop_sort_input_proto.hints[0].hint_content.content_id,
             'hint_1')
         self.assertEqual(
-            drag_and_drop_proto.hints[0].hint_content.text,
+            drag_and_drop_sort_input_proto.hints[0].hint_content.text,
             '<p>This is a copyright character ©.</p>')
 
+        drag_and_drop_sort_input_base_solution_proto = (
+            drag_and_drop_sort_input_proto.solution.base_solution)
         self.assertEqual(
-            drag_and_drop_proto.solution.base_solution.explanation.content_id,
+            drag_and_drop_sort_input_base_solution_proto.explanation.content_id,
             'solution')
         self.assertEqual(
-            drag_and_drop_proto.solution.base_solution.explanation.text,
+            drag_and_drop_sort_input_base_solution_proto.explanation.text,
             'This is <i>solution</i> for state1')
 
+        drag_and_drop_sort_input_solution_correct_ans = (
+            drag_and_drop_sort_input_proto.solution.correct_answer)
         self.assertEqual(
-            drag_and_drop_proto.solution.correct_answer.content_id_sets[0]
+            drag_and_drop_sort_input_solution_correct_ans.content_id_sets[0]
                 .content_ids[0].content_id,
             '<p>Choice 1</p>')
 
-        drag_input_rule_spec = (
-            drag_and_drop_proto.answer_groups[0].rule_specs[0]
+        drag_and_drop_sort_input_rule_spec = (
+            drag_and_drop_sort_input_proto.answer_groups[0].rule_specs[0]
                 .is_equal_to_ordering.input)
         self.assertEqual(
-            drag_input_rule_spec.content_id_sets[0].content_ids[0]
-                .content_id,
+            drag_and_drop_sort_input_rule_spec.content_id_sets[0]
+                .content_ids[0].content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
-            drag_input_rule_spec.content_id_sets[0].content_ids[1]
-                .content_id,
+            drag_and_drop_sort_input_rule_spec.content_id_sets[0]
+                .content_ids[1].content_id,
             '<p>Choice 2</p>')
 
-        drag_input_rule_spec = (
-            drag_and_drop_proto.answer_groups[0].rule_specs[1]
+        drag_and_drop_sort_input_rule_spec = (
+            drag_and_drop_sort_input_proto.answer_groups[0].rule_specs[1]
                 .is_equal_to_ordering_with_one_item_at_incorrect_position.input)
         self.assertEqual(
-            drag_input_rule_spec.content_id_sets[0].content_ids[0]
+            drag_and_drop_sort_input_rule_spec.content_id_sets[0].content_ids[0]
                 .content_id,
             '<p>Choice 1</p>')
 
-        drag_input_rule_spec = (
-            drag_and_drop_proto.answer_groups[0].rule_specs[2]
+        drag_and_drop_sort_input_rule_spec = (
+            drag_and_drop_sort_input_proto.answer_groups[0].rule_specs[2]
                 .has_element_x_at_position_y)
         self.assertEqual(
-            drag_input_rule_spec.element.content_id,
+            drag_and_drop_sort_input_rule_spec.element.content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
-            drag_input_rule_spec.position,
+            drag_and_drop_sort_input_rule_spec.position,
             1)
 
-        drag_input_rule_spec = (
-            drag_and_drop_proto.answer_groups[0].rule_specs[3]
+        drag_and_drop_sort_input_rule_spec = (
+            drag_and_drop_sort_input_proto.answer_groups[0].rule_specs[3]
                 .has_element_x_before_element_y)
         self.assertEqual(
-            drag_input_rule_spec.considered_element.content_id,
+            drag_and_drop_sort_input_rule_spec.considered_element.content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
-            drag_input_rule_spec.later_element.content_id,
+            drag_and_drop_sort_input_rule_spec.later_element.content_id,
             '<p>Choice 2</p>')

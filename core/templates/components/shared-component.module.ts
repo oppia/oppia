@@ -116,10 +116,13 @@ import { HintEditorComponent } from 'components/state-directives/hint-editor/hin
 import { ResponseHeaderComponent } from './state-directives/response-header/response-header.component';
 import { StateHintsEditorComponent } from 'components/state-editor/state-hints-editor/state-hints-editor.component';
 import { ReviewMaterialEditorComponent } from './review-material-editor/review-material-editor.component';
+import { ConfirmLeaveModalComponent } from 'pages/exploration-editor-page/modal-templates/confirm-leave-modal.component';
+import { CustomizeInteractionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component';
 import { TagMisconceptionModalComponent } from './question-directives/question-misconception-editor/tag-misconception-modal-component';
 import { QuestionMisconceptionEditorComponent } from './question-directives/question-misconception-editor/question-misconception-editor.component';
 import { SolutionExplanationEditor } from './state-directives/solution-editor/solution-explanation-editor.component';
 import { SolutionEditor } from './state-directives/solution-editor/solution-editor.component';
+import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -175,6 +178,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
@@ -182,6 +186,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
+    CustomizeInteractionModalComponent,
     DeleteAnswerGroupModalComponent,
     DeleteHintModalComponent,
     DeleteInteractionModalComponent,
@@ -261,6 +266,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
+    StateSolutionEditorComponent
   ],
 
   entryComponents: [
@@ -269,6 +275,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ConceptCardComponent,
@@ -277,6 +284,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
+    CustomizeInteractionModalComponent,
     DeleteHintModalComponent,
     DeleteInteractionModalComponent,
     DeleteLastHintModalComponent,
@@ -350,7 +358,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TagMisconceptionModalComponent,
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
-    SolutionExplanationEditor
+    SolutionExplanationEditor,
+    StateSolutionEditorComponent
   ],
 
   exports: [
@@ -374,6 +383,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
@@ -381,6 +391,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
+    CustomizeInteractionModalComponent,
     DeleteAnswerGroupModalComponent,
     DeleteHintModalComponent,
     DeleteInteractionModalComponent,
@@ -454,7 +465,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TagMisconceptionModalComponent,
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
-    SolutionExplanationEditor
+    SolutionExplanationEditor,
+    StateSolutionEditorComponent
   ],
 })
 

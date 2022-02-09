@@ -201,7 +201,7 @@ class NumericInput(base.BaseInteraction):
         """Creates a EqualsSpecDto proto object.
 
         Args:
-            inputs: list. The input list.
+            inputs: dict. The input dict.
 
         Returns:
             EqualsSpecDto. The proto object.
@@ -219,7 +219,7 @@ class NumericInput(base.BaseInteraction):
         """Creates a IsLessThanSpecDto proto object.
 
         Args:
-            inputs: list. The input list.
+            inputs: dict. The input dict.
 
         Returns:
             IsLessThanSpecDto. The proto object.
@@ -237,7 +237,7 @@ class NumericInput(base.BaseInteraction):
         """Creates a IsGreaterThanSpecDto proto object.
 
         Args:
-            inputs: list. The input list.
+            inputs: dict. The input dict.
 
         Returns:
             IsGreaterThanSpecDto. The proto object.
@@ -257,7 +257,7 @@ class NumericInput(base.BaseInteraction):
         """Creates a IsLessThanOrEqualToSpecDto proto object.
 
         Args:
-            inputs: list. The input list.
+            inputs: dict. The input dict.
 
         Returns:
             IsLessThanOrEqualToSpecDto. The proto object.
@@ -277,7 +277,7 @@ class NumericInput(base.BaseInteraction):
         """Creates a IsGreaterThanOrEqualToSpecDto proto object.
 
         Args:
-            inputs: list. The input list.
+            inputs: dict. The input dict.
 
         Returns:
             IsGreaterThanOrEqualToSpecDto. The proto object.
@@ -297,7 +297,7 @@ class NumericInput(base.BaseInteraction):
         """Creates a IsInclusivelyBetweenSpecDto proto object.
 
         Args:
-            inputs: list. The input list.
+            inputs: dict. The input dict.
 
         Returns:
             IsInclusivelyBetweenSpecDto. The proto object.
@@ -321,7 +321,7 @@ class NumericInput(base.BaseInteraction):
         """Creates a IsWithinToleranceSpecDto proto object.
 
         Args:
-            inputs: list. The input list.
+            inputs: dict. The input dict.
 
         Returns:
             IsWithinToleranceSpecDto. The proto object.
@@ -330,12 +330,11 @@ class NumericInput(base.BaseInteraction):
         is_within_tolerance_proto = {}
         x = inputs['x']
         tol = inputs['tol']
-        if isinstance(x, (int, float)) and isinstance(tol, (int, float)):
-            is_within_tolerance_proto = (
-                numeric_rule_spec.IsWithinToleranceSpecDto(
-                    inputTolerance=tol,
-                    inputComparedValue=x
-                )
+        is_within_tolerance_proto = (
+            numeric_rule_spec.IsWithinToleranceSpecDto(
+                inputTolerance=tol,
+                inputComparedValue=x
             )
+        )
 
         return is_within_tolerance_proto

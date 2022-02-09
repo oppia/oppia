@@ -87,47 +87,46 @@ class MultipleChoiceInputInteractionTests(test_utils.GenericTestBase):
             'solution': {},
             'id': 'MultipleChoiceInput'
         }
-        multiple_choice_input_instance = (
+        multiple_choice_input = (
             interaction_registry.Registry.get_interaction_by_id(
                 'MultipleChoiceInput'))
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(
                 interaction_dict))
         multiple_choice_input_proto = (
-            multiple_choice_input_instance.to_android_multiple_choice_input_proto( # pylint: disable=line-too-long
+            multiple_choice_input.to_android_multiple_choice_input_proto(
                 interaction_domain.default_outcome,
                 interaction_domain.customization_args,
                 interaction_domain.hints,
                 interaction_domain.answer_groups))
 
-        multiple_choice_customization_args = (
+        multiple_choice_input_customization_args = (
             multiple_choice_input_proto.customization_args)
         self.assertEqual(
-            multiple_choice_customization_args.choices[0]
-                .content_id,
+            multiple_choice_input_customization_args.choices[0].content_id,
             'ca_choices_2')
         self.assertEqual(
-            multiple_choice_customization_args.choices[1]
-                .content_id,
+            multiple_choice_input_customization_args.choices[1].content_id,
             'ca_choices_3')
         self.assertEqual(
-            multiple_choice_customization_args.choices[0].text,
+            multiple_choice_input_customization_args.choices[0].text,
             '<p>Choice 1</p>')
         self.assertEqual(
-            multiple_choice_customization_args.choices[1].text,
+            multiple_choice_input_customization_args.choices[1].text,
             '<p>Choice 2</p>')
 
-        mutliple_choice_default_outcome = (
+        mutliple_choice_input_default_outcome = (
             multiple_choice_input_proto.default_outcome)
         self.assertEqual(
-            mutliple_choice_default_outcome.destination_state,
+            mutliple_choice_input_default_outcome.destination_state,
             'abc')
-        self.assertFalse(mutliple_choice_default_outcome.labelled_as_correct)
+        self.assertFalse(
+            mutliple_choice_input_default_outcome.labelled_as_correct)
         self.assertEqual(
-            mutliple_choice_default_outcome.feedback.content_id,
+            mutliple_choice_input_default_outcome.feedback.content_id,
             'feedback_1')
         self.assertEqual(
-            mutliple_choice_default_outcome.feedback.text,
+            mutliple_choice_input_default_outcome.feedback.text,
             'Correct Answer')
 
         self.assertEqual(

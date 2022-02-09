@@ -238,7 +238,7 @@ class ItemSelectionInput(base.BaseInteraction):
         """Creates a proto object for EqualsSpecDto.
 
         Args:
-            choice_list: list. Choice list to select from.
+            choice_list: list(str). Choice list to select from.
 
         Returns:
             EqualsSpecDto. The proto object.
@@ -253,7 +253,7 @@ class ItemSelectionInput(base.BaseInteraction):
         """Creates a proto object for ContainsAtLeastOneOfSpecDto.
 
         Args:
-            choice_list: list. Choice list to select from.
+            choice_list: list(str). Choice list to select from.
 
         Returns:
             ContainsAtLeastOneOfSpecDto. The proto object.
@@ -268,7 +268,7 @@ class ItemSelectionInput(base.BaseInteraction):
         """Creates a proto object for IsProperSubsetOfSpecDto.
 
         Args:
-            choice_list: list. Choice list to select from.
+            choice_list: list(str). Choice list to select from.
 
         Returns:
             IsProperSubsetOfSpecDto. The proto object.
@@ -285,7 +285,7 @@ class ItemSelectionInput(base.BaseInteraction):
         """Creates a proto object for DoesNotContainAtLeastOneOfSpecDto.
 
         Args:
-            choice_list: list. Choice list to select from.
+            choice_list: list(str). Choice list to select from.
 
         Returns:
             DoesNotContainAtLeastOneOfSpecDto. The proto object.
@@ -302,7 +302,7 @@ class ItemSelectionInput(base.BaseInteraction):
         """Creates a SetOfTranslatableHtmlContentIdsDto proto object.
 
         Args:
-            set_of_content_id: list. A list of
+            set_of_content_id: list(str). A list of
                 TranslatableHtmlContentId.
 
         Returns:

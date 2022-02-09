@@ -198,19 +198,19 @@ class ImageClickInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _convert_image_and_regions_to_proto(cls, image_and_regions_list):
+    def _convert_image_and_regions_to_proto(cls, image_and_regions_dict):
         """Creates a ImageWithRegionsDto proto object.
 
         Args:
-            image_and_regions_list: list. The list of
+            image_and_regions_dict: dict. The dict of
                 image and regions.
 
         Returns:
             ImageWithRegionsDto. The proto object.
         """
-        image_file_path = image_and_regions_list.value['imagePath']
+        image_file_path = image_and_regions_dict.value['imagePath']
         labeled_regions_list_proto = cls._convert_labeled_region_to_list_proto(
-            image_and_regions_list.value['labeledRegions'])
+            image_and_regions_dict.value['labeledRegions'])
 
         return objects_pb2.ImageWithRegionsDto(
             image_file_path=image_file_path,
@@ -222,7 +222,7 @@ class ImageClickInput(base.BaseInteraction):
         """Creates a LabeledRegionDto proto object list.
 
         Args:
-            labeled_regions_list: list. The list of
+            labeled_regions_list: list(LabeledRegion). The list of
                 lable regions.
 
         Returns:
@@ -245,8 +245,8 @@ class ImageClickInput(base.BaseInteraction):
 
         Args:
             label: str. The lable of the clicked region.
-            area: list. The area is the list of coordinates consists
-                of x,y points.
+            area: list(list(float)). The area is the list
+                of two sub list representing x and y coordinates.
 
         Returns:
             LabeledRegionDto. The LabeledRegionDto proto object.
@@ -264,8 +264,8 @@ class ImageClickInput(base.BaseInteraction):
         """Creates a NormalizedRectangle2dDto proto object.
 
         Args:
-            area: list. The area is the list of coordinates consists
-                of x,y points.
+            area: list(list(float)). The area is the list
+                of two sub list representing x and y coordinates.
 
         Returns:
             NormalizedRectangle2dDto. The proto object.
@@ -281,7 +281,7 @@ class ImageClickInput(base.BaseInteraction):
         """Creates a Point2dDto proto object.
 
         Args:
-            area: list. The area is the coordinates consists
+            area: list(float). The area is the list of coordinates consists
                 of x,y points.
 
         Returns:

@@ -55,7 +55,7 @@ var customizeInteraction = async function(
 var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
   var optionElements = elem.all(
-    by.css('.protractor-test-item-selection-input-container'));
+    by.repeater('choice in $ctrl.choices track by $index'));
   var optionsCount = await optionElements.count();
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
   for (var i = 0; i < optionsCount; i++) {

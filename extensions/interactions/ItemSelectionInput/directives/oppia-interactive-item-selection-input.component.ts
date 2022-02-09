@@ -13,138 +13,124 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the ItemSelectionInput interaction.
+ * @fileoverview Directive for the ItemSelectionInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-args-defs';
-import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
-import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+require('domain/utilities/browser-checker.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require(
+  'interactions/ItemSelectionInput/directives/' +
+  'item-selection-input-rules.service.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
 
-@Component({
-  selector: 'oppia-interactive-item-selection-input',
-  templateUrl: './item-selection-input-interaction.component.html',
-  styleUrls: []
-})
-export class InteractiveItemSelectionInputComponent implements OnInit {
-  @Input() choicesWithValue: string;
-  @Input() maxAllowableSelectionCountWithValue: string;
-  @Input() minAllowableSelectionCountWithValue: string;
-  choices: string[];
-  choicesValue: SubtitledHtml[];
-  displayCheckboxes: boolean;
-  maxAllowableSelectionCount: number;
-  minAllowableSelectionCount: number;
-  newQuestion: boolean;
-  notEnoughSelections: boolean;
-  preventAdditionalSelections: boolean;
-  selectionCount: number;
-  userSelections: {[key: string]: boolean};
+angular.module('oppia').component('oppiaInteractiveItemSelectionInput', {
+  template: require('./item-selection-input-interaction.component.html'),
+  controllerAs: '$ctrl',
+  controller: [
+    '$attrs', 'BrowserCheckerService',
+    'CurrentInteractionService',
+    'InteractionAttributesExtractorService',
+    'ItemSelectionInputRulesService',
+    function(
+        $attrs, BrowserCheckerService,
+        CurrentInteractionService,
+        InteractionAttributesExtractorService,
+        ItemSelectionInputRulesService) {
+      var ctrl = this;
+      ctrl.onToggleCheckbox = function() {
+        ctrl.newQuestion = false;
+        ctrl.selectionCount = Object.keys(ctrl.userSelections).filter(
+          function(obj) {
+            return ctrl.userSelections[obj];
+          }
+        ).length;
+        ctrl.preventAdditionalSelections = (
+          ctrl.selectionCount >= ctrl.maxAllowableSelectionCount);
+        ctrl.notEnoughSelections = (
+          ctrl.selectionCount < ctrl.minAllowableSelectionCount);
+      };
 
-  constructor(
-    private browserCheckerService: BrowserCheckerService,
-    private currentInteractionService: CurrentInteractionService,
-    private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService,
-    private itemSelectionInputRulesService: ItemSelectionInputRulesService) {}
+      ctrl.submitMultipleChoiceAnswer = function(event, index) {
+        // Deselect previously selected option.
+        var selectedElement = (
+          document.querySelector(
+            'button.multiple-choice-option.selected'));
+        if (selectedElement) {
+          selectedElement.classList.remove('selected');
+        }
+        // Selected current option.
+        event.currentTarget.classList.add('selected');
+        ctrl.userSelections = {};
+        ctrl.userSelections[ctrl.choices[index]] = true;
+        ctrl.notEnoughSelections = false;
+        if (!BrowserCheckerService.isMobileDevice()) {
+          ctrl.submitAnswer(ctrl.userSelections);
+        }
+      };
 
-  ngOnInit(): void {
-    const {
-      choices,
-      maxAllowableSelectionCount,
-      minAllowableSelectionCount
-    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
-      'ItemSelectionInput',
-      {
-        choicesWithValue: this.choicesWithValue,
-        maxAllowableSelectionCountWithValue:
-          this.maxAllowableSelectionCountWithValue,
-        minAllowableSelectionCountWithValue:
-          this.minAllowableSelectionCountWithValue
-      }
-    ) as ItemSelectionInputCustomizationArgs;
+      ctrl.submitAnswer = function() {
+        const getContentIdOfHtml = (html) => {
+          const {
+            choices
+          } = InteractionAttributesExtractorService.getValuesFromAttributes(
+            'ItemSelectionInput',
+            $attrs
+          );
 
-    this.choicesValue = choices.value;
-    this.choices = this.choicesValue.map(choice => choice.html);
-    this.maxAllowableSelectionCount = maxAllowableSelectionCount.value;
-    this.minAllowableSelectionCount = minAllowableSelectionCount.value;
+          return choices[ctrl.choices.indexOf(html)].contentId;
+        };
 
-    // The following is an associative array where the key is a choice
-    // (html) and the value is a boolean value indicating whether the
-    // choice was selected by the user (default is false).
-    this.userSelections = {};
+        const htmlAnswers = Object.keys(ctrl.userSelections).filter(
+          (obj) => ctrl.userSelections[obj]);
+        const answers = htmlAnswers.map(getContentIdOfHtml);
 
-    for (let i = 0; i < this.choices.length; i++) {
-      this.userSelections[this.choices[i]] = false;
+        CurrentInteractionService.onSubmit(
+          answers, ItemSelectionInputRulesService);
+      };
+
+      var validityCheckFn = function() {
+        return !ctrl.notEnoughSelections;
+      };
+      ctrl.$onInit = function() {
+        const {
+          choices,
+          maxAllowableSelectionCount,
+          minAllowableSelectionCount
+        } = InteractionAttributesExtractorService.getValuesFromAttributes(
+          'ItemSelectionInput',
+          $attrs
+        );
+        ctrl.choices = choices.map(choice => choice.html);
+        ctrl.maxAllowableSelectionCount = maxAllowableSelectionCount;
+        ctrl.minAllowableSelectionCount = minAllowableSelectionCount;
+
+        // The following is an associative array where the key is a choice
+        // (html) and the value is a boolean value indicating whether the
+        // choice was selected by the user (default is false).
+        ctrl.userSelections = {};
+
+        for (var i = 0; i < ctrl.choices.length; i++) {
+          ctrl.userSelections[ctrl.choices[i]] = false;
+        }
+
+        ctrl.displayCheckboxes = (ctrl.maxAllowableSelectionCount > 1);
+
+        // The following indicates that the number of answers is more than
+        // maxAllowableSelectionCount.
+        ctrl.preventAdditionalSelections = false;
+
+        // The following indicates that the number of answers is less than
+        // minAllowableSelectionCount.
+        ctrl.notEnoughSelections = (ctrl.minAllowableSelectionCount > 0);
+        CurrentInteractionService.registerCurrentInteraction(
+          ctrl.submitAnswer, validityCheckFn);
+      };
     }
-
-    this.displayCheckboxes = this.maxAllowableSelectionCount > 1;
-
-    // The following indicates that the number of answers is more than
-    // maxAllowableSelectionCount.
-    this.preventAdditionalSelections = false;
-
-    // The following indicates that the number of answers is less than
-    // minAllowableSelectionCount.
-    this.notEnoughSelections = this.minAllowableSelectionCount > 0;
-    this.currentInteractionService.registerCurrentInteraction(
-      this.submitAnswer.bind(this), this.validityCheckFn.bind(this));
-  }
-
-  onToggleCheckbox(): void {
-    this.newQuestion = false;
-    this.selectionCount = Object.keys(this.userSelections).filter(
-      (obj) => this.userSelections[obj]).length;
-    this.preventAdditionalSelections = (
-      this.selectionCount >= this.maxAllowableSelectionCount);
-    this.notEnoughSelections = (
-      this.selectionCount < this.minAllowableSelectionCount);
-  }
-
-  submitMultipleChoiceAnswer(event: MouseEvent, index: number): void {
-    event.preventDefault();
-    // Deselect previously selected option.
-    if ((event.currentTarget as HTMLDivElement).classList.contains(
-      'selected')) {
-      (event.currentTarget as HTMLDivElement).classList.remove('selected');
-    }
-    // Selected current option.
-    (event.currentTarget as HTMLDivElement).classList.add('selected');
-    this.userSelections = {};
-    this.userSelections[this.choices[index]] = true;
-    this.notEnoughSelections = false;
-    if (!this.browserCheckerService.isMobileDevice()) {
-      this.submitAnswer();
-    }
-  }
-
-  submitAnswer(): void {
-    const htmlAnswers = Object.keys(this.userSelections).filter(
-      (obj) => this.userSelections[obj]);
-    const answers = htmlAnswers.map(
-      html => this.choicesValue[this.choices.indexOf(html)].contentId);
-
-    this.currentInteractionService.onSubmit(
-      answers as unknown as string,
-      this.itemSelectionInputRulesService as unknown as
-      InteractionRulesService);
-  }
-
-  validityCheckFn(): boolean {
-    return !this.notEnoughSelections;
-  }
-}
-
-angular.module('oppia').directive(
-  'oppiaInteractiveItemSelectionInput', downgradeComponent({
-    component: InteractiveItemSelectionInputComponent
-  }) as angular.IDirectiveFactory);
+  ]
+});

@@ -106,8 +106,8 @@ class NumericExpressionInput(base.BaseInteraction):
 
         frac_for_division = customization_args['useFractionForDivision'].value
 
-        algebric_expression_dto = state_pb2.NumericExpressionInputInstanceDto
-        return algebric_expression_dto.CustomizationArgsDto(
+        numeraic_expression_dto = state_pb2.NumericExpressionInputInstanceDto
+        return numeraic_expression_dto.CustomizationArgsDto(
             placeholder=placeholder_proto,
             use_fraction_for_division=frac_for_division
         )
@@ -156,7 +156,8 @@ class NumericExpressionInput(base.BaseInteraction):
                 cls._convert_matches_exactly_rule_spec_to_proto),
             'IsEquivalentTo': cls._convert_is_equivalent_rule_spec_to_proto,
             'MatchesUpToTrivialManipulations': (
-                cls._convert_matches_upto_rule_spec_to_proto)
+                cls._convert_matches_up_to_trivial_manipulation_rule_spec_to_proto # pylint: disable=line-too-long
+            )
         }
 
         rule_type_to_proto_mapping = {
@@ -217,7 +218,9 @@ class NumericExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _convert_matches_upto_rule_spec_to_proto(cls, numeric_expression):
+    def _convert_matches_up_to_trivial_manipulation_rule_spec_to_proto(
+        cls, numeric_expression
+    ):
         """Creates a proto object for MatchesUpToTrivialManipulationsSpecDto.
 
         Args:

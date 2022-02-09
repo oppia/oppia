@@ -16,60 +16,50 @@
  * @fileoverview Unit tests for the NumberWithUnits response.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ResponseNumberWithUnitsComponent } from './oppia-response-number-with-units.component';
+require(
+  'interactions/NumberWithUnits/directives/' +
+  'oppia-response-number-with-units.component.ts');
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('ShortResponseRatioExpressionInput', () => {
-  let component: ResponseNumberWithUnitsComponent;
-  let fixture: ComponentFixture<ResponseNumberWithUnitsComponent>;
+describe('oppiaResponseNumberWithUnits', function() {
+  let ctrl = null;
 
-  class MockHtmlEscaperService {
-    escapedJsonToObj(answer: string): string {
-      return JSON.parse(answer);
+  let mockHtmlEscaperService = {
+    escapedJsonToObj: function(answer) {
+      return answer;
     }
-  }
+  };
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ResponseNumberWithUnitsComponent],
-      providers: [
-        {
-          provide: HtmlEscaperService,
-          useClass: MockHtmlEscaperService
+  importAllAngularServices();
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('HtmlEscaperService', mockHtmlEscaperService);
+
+    $provide.value('$attrs', {
+      answer: {
+        type: 'real',
+        real: 24,
+        fraction: {
+          isNegative: false,
+          wholeNumber: 0,
+          numerator: 0,
+          denominator: 1
         },
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
+        units: [
+          {
+            unit: 'km',
+            exponent: 1
+          }
+        ]
+      }
+    });
+  }));
+  beforeEach(angular.mock.inject(function($componentController) {
+    ctrl = $componentController('oppiaResponseNumberWithUnits');
   }));
 
-  beforeEach(() => {
-    fixture = (
-      TestBed.createComponent(ResponseNumberWithUnitsComponent));
-    component = fixture.componentInstance;
-  });
-
-  it('should initialise component when user submits answer', () => {
-    component.answer = '{' +
-      '"type": "real", ' +
-      '"real": 24, ' +
-      '"fraction": {' +
-        '"isNegative": false, ' +
-        '"wholeNumber": 0, ' +
-        '"numerator": 0, ' +
-        '"denominator": 1' +
-      '}, ' +
-      '"units": [' +
-        '{' +
-          '"unit": "km", ' +
-          '"exponent": 1' +
-        '}' +
-      ']' +
-    '}';
-
-    component.ngOnInit();
-
-    expect(component.responses).toEqual('24 km');
+  it('should initialise the component when user submits the answer', () => {
+    ctrl.$onInit();
+    expect(ctrl.answer).toEqual('24 km');
   });
 });

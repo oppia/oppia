@@ -287,86 +287,40 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertTrue(check_mock_function_calls['extractall_is_called'])
 
     def test_proto_file_compilation(self):
+        mock_proto_file_req = {
+            'mock_path': True
+        }
         with self.Popen_swap:
-            install_third_party_libs.compile_protobuf_files(
-                [(True, 'mock_path')])
+            install_third_party_libs.compile_protobuf_files(mock_proto_file_req)
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_proto_file_compilation_raises_exception_on_compile_errors(self):
+        mock_proto_file_req = {
+            'mock_path': True
+        }
         with self.Popen_error_swap:
             with self.assertRaisesRegex(
                 Exception, 'Error compiling proto files at mock_path'):
                 install_third_party_libs.compile_protobuf_files(
-                    [(True, 'mock_path')])
+                    mock_proto_file_req)
 
-    def test_move_all_proto_files_to_third_party(self):
+    def test_ensure_pip_library_is_installed(self):
         check_function_calls = {
-            'move_is_called': False,
-            'rmtree_is_called': False
+            'pip_install_is_called': False
         }
         def mock_exists(unused_path):
             return False
-        def mock_move(unused_source_path, unused_destination_path):
-            check_function_calls['move_is_called'] = True
-        def mock_rmtree(unused_path):
-            check_function_calls['rmtree_is_called'] = True
+        def mock_pip_install(unused_versioned_package, unused_path):
+            check_function_calls['pip_install_is_called'] = True
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
-
-        oppia_proto_api_path = (
-            os.path.join(
-                common.THIRD_PARTY_DIR,
-                'oppia-proto-api-8f3cde883c31785438e80656a5b6bb26bd01b6a1'))
-        os.mkdir(os.path.join(oppia_proto_api_path, 'org'))
-        with exists_swap:
-            self.assertTrue(os.path.isdir(
-                os.path.join(oppia_proto_api_path, 'org')))
-
-        move_swap = self.swap(shutil, 'move', mock_move)
-        with move_swap:
-            install_third_party_libs.move_all_proto_files_to_third_party()
-            rmtree_swap = self.swap(shutil, 'rmtree', mock_rmtree)
-            with rmtree_swap:
-                self.assertFalse(os.path.isdir(
-                    os.path.join(oppia_proto_api_path, 'org')))
-
-    def test_ensure_pip_library_is_installed_with_regular_package(self):
-        exists_swap = self.swap_with_checks(
-            os.path,
-            'exists',
-            lambda _: False,
-            expected_args=[('path/package-1.1.0',)]
-        )
-        pip_install_swap = self.swap_with_checks(
-            install_backend_python_libs,
-            'pip_install',
-            lambda _, __: None,
-            expected_args=[('package==1.1.0', 'path/package-1.1.0')]
-        )
+        pip_install_swap = self.swap(
+            install_backend_python_libs, 'pip_install', mock_pip_install)
 
         with exists_swap, pip_install_swap:
             install_third_party_libs.ensure_pip_library_is_installed(
-                'package', '1.1.0', 'path')
-
-    def test_ensure_pip_library_is_installed_with_git_repo_package(self):
-        exists_swap = self.swap_with_checks(
-            os.path,
-            'exists',
-            lambda _: False,
-            expected_args=[('path/package-1.1.0',)]
-        )
-        pip_install_swap = self.swap_with_checks(
-            install_backend_python_libs,
-            'pip_install',
-            lambda _, __: None,
-            expected_args=[(
-                'git+https://aaa.com/package.git@1.1.0', 'path/package-1.1.0'
-            )]
-        )
-
-        with exists_swap, pip_install_swap:
-            install_third_party_libs.ensure_pip_library_is_installed(
-                'git+https://aaa.com/package.git', '1.1.0', 'path')
+                'package', 'version', 'path')
+        self.assertTrue(check_function_calls['pip_install_is_called'])
 
     def test_function_calls(self):
         check_function_calls = {
