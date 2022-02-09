@@ -23,7 +23,6 @@ import os
 import re
 from unittest import mock
 
-from core import python_utils
 from core.constants import constants
 from core.domain import auth_domain
 from core.domain import param_domain
@@ -454,7 +453,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
     def test_swap_to_always_raise_with_error(self):
         obj = mock.Mock()
-        obj.func = lambda: python_utils.divide(1, 0)
+        obj.func = lambda: 1 // 0
 
         with self.assertRaisesRegex(
             ZeroDivisionError, 'integer division or modulo by zero'
