@@ -40,6 +40,7 @@ export class ExplorationHtmlFormatterService {
     'CodeRepl',
     'Continue',
     'EndExploration',
+    'DragAndDropSortInput',
     'FractionInput',
     'GraphInput',
     'ImageClickInput',

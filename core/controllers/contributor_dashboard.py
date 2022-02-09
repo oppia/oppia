@@ -420,9 +420,10 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
         content_ids = []
         try:
             content_ids = json.loads(content_ids_string)
-        except:
+        except Exception as e:
             raise self.InvalidInputException(
-                'Improperly formatted content_ids: %s' % content_ids_string)
+                'Improperly formatted content_ids: %s' % content_ids_string
+            ) from e
 
         target_language_code = self.normalized_request.get(
             'target_language_code')

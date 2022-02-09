@@ -34,6 +34,7 @@ export class InteractionAttributesExtractorService {
   private readonly migratedInteractions: string[] = [
     'Continue',
     'EndExploration',
+    'DragAndDropSortInput',
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
