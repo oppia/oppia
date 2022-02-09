@@ -140,8 +140,8 @@ def install_buf_and_protoc():
         with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:
             zfile.extractall(path=PROTOC_DIR)
         os.remove(os.path.join(BUF_DIR, protoc_file))
-    except Exception:
-        raise Exception('Error installing protoc binary')
+    except Exception as e:
+        raise Exception('Error installing protoc binary') from e
     common.recursive_chmod(buf_path, 0o744)
     common.recursive_chmod(protoc_path, 0o744)
 
