@@ -277,7 +277,7 @@ def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
         try:
             schema_utils.normalize_against_schema(value, schema)
         except Exception as e:
-            raise AssertionError(e)
+            raise AssertionError(e) from e
 
     # Check that the id corresponds to a valid normalizer function.
     validator_fn = schema_utils.get_validator(validator['id'])

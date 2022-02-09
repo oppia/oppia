@@ -63,9 +63,9 @@ def main(args=None):
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
                 'google-cloud-sdk-364.0.0-linux-x86_64.tar.gz',
                 filename='gcloud-sdk.tar.gz')
-        except Exception:
+        except Exception as e:
             print('Error downloading Google Cloud SDK. Exiting.')
-            raise Exception('Error downloading Google Cloud SDK.')
+            raise Exception('Error downloading Google Cloud SDK.') from e
         print('Download complete. Installing Google Cloud SDK...')
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(

@@ -390,7 +390,7 @@ def validate_explorations_for_story(exp_ids, strict):
                 logging.exception(
                     'Exploration validation failed for exploration with ID: '
                     '%s. Error: %s' % (exp_id, e))
-                raise Exception(e)
+                raise Exception(e) from e
 
     return validation_error_messages
 
