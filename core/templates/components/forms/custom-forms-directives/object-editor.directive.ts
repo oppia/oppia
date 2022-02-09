@@ -64,7 +64,7 @@ angular.module('oppia').directive('objectEditor', [
           'graph',
           'html',
           'image-with-regions',
-          'int-editor',
+          'int',
           'list-of-sets-of-translatable-html-content-ids',
           'list-of-tabs',
           'list-of-unicode-string',

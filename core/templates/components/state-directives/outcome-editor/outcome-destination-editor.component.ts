@@ -188,8 +188,7 @@ angular.module('oppia').component('outcomeDestinationEditor', {
           $rootScope.$applyAsync();
         });
 
-        ctrl.explorationAndSkillIdPattern =
-          EXPLORATION_AND_SKILL_ID_PATTERN;
+        ctrl.explorationAndSkillIdPattern = EXPLORATION_AND_SKILL_ID_PATTERN;
         ctrl.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
         ctrl.destChoices = [];
       };
