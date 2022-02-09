@@ -64,7 +64,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'rule-type-selector.directive.ts',
     'select2-dropdown.directive.ts',
     'state-content-editor.directive.ts',
-    'state-interaction-editor.directive.ts',
     'story-node.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
