@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -71,13 +70,14 @@ class SkillMasteryDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.InvalidInputException('Invalid skill ID %s' % skill_id)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(
+                'Invalid skill ID %s' % skill_id) from e
 
         try:
             skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
-            raise self.PageNotFoundException(e)
+            raise self.PageNotFoundException(e) from e
 
         degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
             self.user_id, skill_ids)
@@ -103,9 +103,9 @@ class SkillMasteryDataHandler(base.BaseHandler):
         for skill_id in skill_ids:
             try:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-            except utils.ValidationError:
+            except utils.ValidationError as e:
                 raise self.InvalidInputException(
-                    'Invalid skill ID %s' % skill_id)
+                    'Invalid skill ID %s' % skill_id) from e
 
             if current_degrees_of_mastery[skill_id] is None:
                 current_degrees_of_mastery[skill_id] = 0.0
@@ -121,7 +121,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
         try:
             skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
-            raise self.PageNotFoundException(e)
+            raise self.PageNotFoundException(e) from e
 
         skill_services.create_multi_user_skill_mastery(
             self.user_id, new_degrees_of_mastery)
@@ -173,9 +173,8 @@ class SubtopicMasteryDataHandler(base.BaseHandler):
                 if skill_mastery_dict:
                     # Subtopic mastery is average of skill masteries.
                     subtopic_mastery_dict[topic.id][subtopic.id] = (
-                        python_utils.divide(
-                            sum(skill_mastery_dict.values()),
-                            len(skill_mastery_dict)))
+                        sum(skill_mastery_dict.values()) /
+                        len(skill_mastery_dict))
 
         self.values.update({
             'subtopic_mastery_dict': subtopic_mastery_dict

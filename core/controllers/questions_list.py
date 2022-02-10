@@ -48,16 +48,17 @@ class QuestionsListHandler(base.BaseHandler):
         """Handles GET requests."""
         try:
             offset = int(self.request.get('offset'))
-        except Exception:
-            raise self.InvalidInputException('Invalid offset')
+        except Exception as e:
+            raise self.InvalidInputException('Invalid offset') from e
 
         skill_ids = comma_separated_skill_ids.split(',')
         skill_ids = list(set(skill_ids))
 
         try:
             _require_valid_skill_ids(skill_ids)
-        except utils.ValidationError:
-            raise self.InvalidInputException('Invalid skill id')
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(
+                'Invalid skill id') from e
 
         try:
             skill_fetchers.get_multi_skills(skill_ids)
