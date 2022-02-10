@@ -128,7 +128,11 @@ describe('RTE parser service', () => {
     let node = new DummyHtmlElement();    
     expect(() => {
       rteParserService.constructFromDomParser(node)
-    }).toThrowError('');
+    }).toThrow(new Error(
+      'tagName is undefined.\n' +
+      'body: <dummy-element></dummy-element>\n ' +
+      'node: <dummy-element></dummy-element>'
+    ));
   });
 
   // Noninteractive components are easily identified by the oppia-noninteractive

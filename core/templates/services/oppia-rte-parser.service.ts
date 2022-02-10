@@ -82,7 +82,7 @@ export class OppiaRteParserService {
     const dfs = (node: HTMLElement): OppiaRteNode => {
       if (!node.tagName) {
         throw new Error(
-          'tagName is undefined.' +
+          'tagName is undefined.\n' +
           `body: ${ body.outerHTML }\n node: ${ node.outerHTML }`);
       }
       const tagName = node.tagName.toLowerCase();
