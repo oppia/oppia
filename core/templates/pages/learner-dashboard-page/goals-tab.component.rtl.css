@@ -220,10 +220,10 @@
 .oppia-three-dots-dropdown-container {
   color: #555;
   cursor: pointer;
-  float: right;
+  float: left;
   font-size: 13px;
   height: 24px;
-  margin-right: 13px;
+  margin-left: 13px;
   position: relative;
   width: 24px;
 }
@@ -233,7 +233,7 @@
   box-shadow: 0 0 4px rgb(0 0 0 / 25%);
   padding: 10px;
   position: absolute;
-  right: 20px;
+  left: 20px;
   top: 20px;
   width: 100px;
 }
@@ -242,7 +242,7 @@
 }
 .oppia-three-dots-dropdown span {
   font-size: 14px;
-  padding-left: 10px;
+  padding-right: 10px;
 }
 .oppia-trash-button {
   text-align: center;
