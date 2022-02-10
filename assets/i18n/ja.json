@@ -162,6 +162,7 @@
 	"I18N_INTERACTIONS_SET_INPUT_NO_ANSWER": "解答がありません。",
 	"I18N_INTERACTIONS_SUBMIT": "提出",
 	"I18N_LANGUAGE_FOOTER_VIEW_IN": "Oppiaの表示言語：",
+	"I18N_LEARNER_DASHBOARD_ALL": "すべて",
 	"I18N_LEARNER_DASHBOARD_ALL_GOALS_SECTION": "目標を編集",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_GOALS_SECTION": "達成した目標",
 	"I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION": "中断したところから続行",
@@ -175,6 +176,7 @@
 	"I18N_LEARNER_DASHBOARD_PROGRESS_SECTION": "進捗",
 	"I18N_LEARNER_DASHBOARD_REMOVE_BUTTON": "除去",
 	"I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION": "ストーリーが完成しました",
+	"I18N_LEARNER_DASHBOARD_VIEW": "表示",
 	"I18N_LIBRARY_ALL_CATEGORIES": "すべてのカテゴリー",
 	"I18N_LIBRARY_ALL_CATEGORIES_SELECTED": "すべてのカテゴリーが選択済み",
 	"I18N_LIBRARY_ALL_LANGUAGES": "すべての言語",
@@ -246,6 +248,7 @@
 	"I18N_LICENSE_PAGE_PARAGRAPH_2": "Oppiaを支えているソフトウェアはオープンソースで、<a href=\"https://github.com/oppia/oppia/\" class=\"inline-links\">コード</a>は<a href=\"https://www.apache.org/licenses/\" class=\"inline-links\">Apache 2.0</a>ライセンスで提供されています。",
 	"I18N_LICENSE_TERMS_HEADING": "ライセンス条項",
 	"I18N_MODAL_CANCEL_BUTTON": "キャンセル",
+	"I18N_NO": "いいえ",
 	"I18N_ONE_SUBSCRIBER_TEXT": "サブスクライブしている人は1人です。",
 	"I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "パートナーシップ",
 	"I18N_PLAYBOOK_COMMUNITY_GUIDELINES_HEADING": "コミュニティーガイドライン",
@@ -404,6 +407,7 @@
 	"I18N_SPLASH_TITLE": "すべての人に無料の教育",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "サブスクライブする",
 	"I18N_TOPIC_C4fqwrvqWpRm_TITLE": "乗算",
+	"I18N_TOPIC_TITLE": "トピック",
 	"I18N_TOPNAV_ABOUT": "このサイトについて",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Oppiaについて",
 	"I18N_TOPNAV_ADMIN_PAGE": "管理者用ページ",
@@ -422,5 +426,6 @@
 	"I18N_TOPNAV_SIGN_IN": "サインイン",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Teach with Oppia",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "サブスクライブしている人は合計<[totalSubscribers]>人です。",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "サブスクライブ解除"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "サブスクライブ解除",
+	"I18N_YES": "はい"
 }
