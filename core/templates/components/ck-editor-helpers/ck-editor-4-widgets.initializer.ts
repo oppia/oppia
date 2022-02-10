@@ -152,7 +152,7 @@ export class CkEditorInitializerService {
                     if (widgetShouldBeRemoved) {
                       var newWidgetSelector = (
                         '[data-cke-widget-id="' + that.id + '"]');
-                      if(newWidgetSelector !== null){
+                      if (newWidgetSelector !== null) {
                         var widgetElement = editor.editable().findOne(
                           newWidgetSelector);
                         if (widgetElement) {
