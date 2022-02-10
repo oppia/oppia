@@ -3255,7 +3255,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertFalse(fs.isfile(filepath))
 
         # Read raw image for testing.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
@@ -3314,7 +3314,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
         # Read raw image for testing.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
