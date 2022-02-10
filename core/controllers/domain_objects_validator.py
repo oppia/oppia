@@ -294,22 +294,6 @@ def validate_suggestion_images(files):
     return files
 
 
-def validate_params_dict(params):
-    """validates params data type
-
-    Args:
-        params: dict. Data that needs to be validated.
-
-    Returns:
-        dict. Returns the params argument in dict form.
-    """
-    if not isinstance(params, dict):
-        raise Exception('Excepted dict, received %s' % params)
-    # The params argument do not represent any domain class, hence dict form of
-    # the data is returned from here.
-    return params
-
-
 def validate_topic_and_sub_topic_change(change_dict):
     """Validates Topic or Subtopic change.
 
