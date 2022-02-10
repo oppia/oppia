@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core import utils
 from core.domain import translation_domain
 from core.tests import test_utils
@@ -39,8 +40,7 @@ class DummyTranslatableObjectWithTwoParams(
 
     def _register_all_translatable_fields(self) -> None:
         self._register_translatable_field(
-            translation_domain.TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            feconf.TranslatableContentFormat.UNICODE_STRING,
             'content_id_1',
             self.param1)
         self._register_translatable_object(self.param2)
@@ -60,8 +60,7 @@ class DummyTranslatableObjectWithSingleParam(
 
     def _register_all_translatable_fields(self) -> None:
         self._register_translatable_field(
-            translation_domain.TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            feconf.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
             self.param3)
 
@@ -81,13 +80,11 @@ class DummyTranslatableObject(translation_domain.BaseTranslatableObject):
 
     def _register_all_translatable_fields(self) -> None:
         self._register_translatable_field(
-            translation_domain.TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            feconf.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
             self.param1)
         self._register_translatable_field(
-            translation_domain.TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            feconf.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
             self.param2)
 
@@ -127,23 +124,19 @@ class DummyTranslatableObjectWithFourParams(
 
     def _register_all_translatable_fields(self) -> None:
         self._register_translatable_field(
-            translation_domain.TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            feconf.TranslatableContentFormat.UNICODE_STRING,
             'content_id_1',
             self.param1)
         self._register_translatable_field(
-            translation_domain.TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            feconf.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
             self.param2)
         self._register_translatable_field(
-            translation_domain.TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            feconf.TranslatableContentFormat.UNICODE_STRING,
             'content_id_3',
             self.param3)
         self._register_translatable_field(
-            translation_domain.TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            feconf.TranslatableContentFormat.UNICODE_STRING,
             'content_id_4',
             self.param4)
 
@@ -188,18 +181,19 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             Exception, 'Must be implemented in subclasses.'):
             translatable_object.get_translatable_fields()
 
-    def test_get_all_contents_which_needs_translations_method(self) -> None:
+    def test_get_all_contents_which_need_translations_method(self) -> None:
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
                 'My name is Nikhil.', True)
         }
         entity_translations = translation_domain.EntityTranslation(
-            'exp_id', 'exploration', 1, 'en', translation_dict)
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
 
         translatable_object = DummyTranslatableObjectWithFourParams(
             'My name is jack.', 'My name is jhon.', 'My name is Nikhil.', '')
         contents_which_need_translation = (
-            translatable_object.get_all_contents_which_needs_translations(
+            translatable_object.get_all_contents_which_need_translations(
                 entity_translations))
 
         expected_list_of_contents_which_need_translataion = [
@@ -225,7 +219,8 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
                 'My name is Nikhil.', False)
         }
         entity_translations = translation_domain.EntityTranslation(
-            'exp_id', 'exploration', 1, 'en', translation_dict)
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
 
         self.assertEqual(entity_translations.entity_id, 'exp_id')
         self.assertEqual(entity_translations.entity_type, 'exploration')
@@ -246,25 +241,21 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
         translatable_content = translation_domain.TranslatableContent(
             'content_id_1',
             'My name is Jhon.',
-            translation_domain.TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_HTML
+            feconf.TranslatableContentFormat.HTML
         )
 
         self.assertEqual(translatable_content.content_id, 'content_id_1')
         self.assertEqual(translatable_content.content, 'My name is Jhon.')
         self.assertEqual(
             translatable_content.content_type,
-            translation_domain.TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_HTML)
+            feconf.TranslatableContentFormat.HTML)
 
     def test_from_dict_method_of_translatable_content_class(self) -> None:
         translatable_content = (
                 translation_domain.TranslatableContent.from_dict({
                 'content_id': 'content_id_1',
                 'content': 'My name is Jhon.',
-                'content_type': translation_domain
-                .TranslatableContentPossibleDataTypes
-                .TRANSLATABLE_CONTENT_FORMAT_HTML
+                'content_type': feconf.TranslatableContentFormat.HTML
             })
         )
 
@@ -272,23 +263,18 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(translatable_content.content, 'My name is Jhon.')
         self.assertEqual(
             translatable_content.content_type,
-            translation_domain.TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_HTML)
+            feconf.TranslatableContentFormat.HTML)
 
     def test_to_dict_method_of_translatable_content_class(self) -> None:
         translatable_content_dict = {
             'content_id': 'content_id_1',
             'content': 'My name is Jhon.',
-            'content_type': translation_domain
-            .TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_HTML
+            'content_type': feconf.TranslatableContentFormat.HTML
         }
         translatable_content = translation_domain.TranslatableContent(
             'content_id_1',
             'My name is Jhon.',
-            translation_domain
-            .TranslatableContentPossibleDataTypes
-            .TRANSLATABLE_CONTENT_FORMAT_HTML
+            feconf.TranslatableContentFormat.HTML
         )
 
         self.assertEqual(
