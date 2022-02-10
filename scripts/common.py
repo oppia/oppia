@@ -312,7 +312,7 @@ def get_remote_alias(remote_urls):
     if remote_alias is None:
         raise Exception(
             'ERROR: There is no existing remote alias for the %s repo.'
-            % remote_url)
+            % ', '.join(remote_urls))
 
     return remote_alias
 

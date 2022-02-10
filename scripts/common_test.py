@@ -245,7 +245,7 @@ class CommonTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
             Exception,
-            'ERROR: There is no existing remote alias for the url3 repo.'
+            'ERROR: There is no existing remote alias for the url3, url4 repo.'
         ):
             common.get_remote_alias(['url3', 'url4'])
 
