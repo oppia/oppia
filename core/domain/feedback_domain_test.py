@@ -21,6 +21,7 @@ import datetime
 from core import feconf
 from core import utils
 from core.domain import feedback_domain
+from core.domain import feedback_services
 from core.tests import test_utils
 
 from typing import Dict
@@ -161,3 +162,58 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             observed_feedback_message_reference.to_dict(),
             expected_feedback_message_reference)
+
+
+class FullyQualifiedMessageIdentifierDomainUnitTests(
+    test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super(FullyQualifiedMessageIdentifierDomainUnitTests, self).setUp()
+        self.exp_id = 'exp'
+        self.message_id = 'message'
+        self.thread_id = 'exp.thread'
+        self.Message_Identifier = (
+            feedback_domain.FullyQualifiedMessageIdentifier(
+                self.thread_id, self.message_id
+            ))
+
+    def test_initialize(self):
+        self.assertEqual(
+            self.Message_Identifier.message_id,
+            self.message_id
+        )
+        self.assertEqual(
+            self.Message_Identifier.thread_id,
+            self.thread_id
+        )
+
+
+class FeedbackThreadSummaryDomainUnitTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super(FeedbackThreadSummaryDomainUnitTests, self).setUp()
+        self.exp_id = 'exp'
+        self.message_id = 'message'
+        self.thread_id = 'exp.thread'
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_valid_exploration(self.exp_id, self.owner_id)
+        self.thread_id_1 = (feedback_services.create_thread(
+            'exploration', self.exp_id, self.owner_id,
+            'A subject', 'Random text'
+        ))
+        self.thread_id_2 = (feedback_services.create_thread(
+            'exploration', self.exp_id, self.owner_id,
+            'Another subject', 'Another Random text'
+        ))
+
+    def test_to_dict(self):
+        thread_ids = [self.thread_id_1, self.thread_id_2]
+        thread_summeries = (feedback_services.get_exp_thread_summaries(
+            self.owner_id,
+            thread_ids))[0]
+        for i in thread_summeries:
+            self.assertIn(
+                (i.to_dict())['thread_id'],
+                thread_ids
+            )
