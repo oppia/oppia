@@ -617,8 +617,9 @@ class ExplorationStartEventHandler(base.BaseHandler):
         'POST': {
             'params': {
                 'schema': {
-                    'type': 'dict',
-                    'properties': []
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_params_dict),
                 }
             },
             'session_id': {
@@ -1116,8 +1117,8 @@ class RecommendationsHandler(base.BaseHandler):
         try:
             author_recommended_exp_ids = json.loads(self.request.get(
                 'stringified_author_recommended_ids'))
-        except Exception:
-            raise self.PageNotFoundException
+        except Exception as e:
+            raise self.PageNotFoundException from e
 
         system_recommended_exp_ids = []
         next_exp_id = None
