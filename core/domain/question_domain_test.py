@@ -16,11 +16,13 @@
 
 from __future__ import annotations
 
+import copy
 import datetime
 import re
 
 from core import feconf
 from core import utils
+from core.domain import customization_args_util
 from core.domain import question_domain
 from core.domain import state_domain
 from core.tests import test_utils
@@ -54,7 +56,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is without cmd key.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'Missing cmd key in change dict',
             callableObj=question_domain.QuestionChange,
@@ -65,7 +67,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is with wrong cmd value.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'Command wrong is not allowed',
             callableObj=question_domain.QuestionChange,
@@ -76,7 +78,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is with missing attributes in cmd.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'The following required attributes are present: new_value',
             callableObj=question_domain.QuestionChange,
@@ -91,7 +93,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is with extra attributes in cmd.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'The following extra attributes are present: invalid',
             callableObj=question_domain.QuestionChange,
@@ -102,7 +104,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when cmd is update_question_property and wrong property_name is given.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd update_question_property: '
                 'wrong is not allowed'),
@@ -212,7 +214,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange
         object when change_dict is without cmd key.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'Missing cmd key in change dict',
             callableObj=question_domain.QuestionSuggestionChange,
@@ -223,7 +225,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with wrong cmd value.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'Command wrong is not allowed',
             callableObj=question_domain.QuestionSuggestionChange,
@@ -234,7 +236,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with missing attributes in cmd.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'The following required attributes are present: new_value',
             callableObj=question_domain.QuestionSuggestionChange,
@@ -248,7 +250,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with extra attributes in cmd.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'The following extra attributes are present: invalid',
             callableObj=question_domain.QuestionSuggestionChange,
@@ -315,7 +317,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the skill passes strict validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring
         ):
             self.question.validate()
@@ -528,6 +530,1189 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             self.question.question_state_data.to_dict()
         )
 
+    def test_question_state_dict_conversion_from_v27_to_v28(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        test_data = question_data['recorded_voiceovers']
+        question_data['content_ids_to_audio_translations'] = (
+            test_data['voiceovers_mapping'])
+
+        # Removing 'recorded_voiceovers' from question_data.
+        del question_data['recorded_voiceovers']
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 27
+        }
+
+        self.assertNotIn('recorded_voiceovers', test_value['state'])
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 28)
+        self.assertIn('recorded_voiceovers', test_value['state'])
+        self.assertEqual(
+            test_value['state']['recorded_voiceovers'], test_data)
+
+    def test_question_state_dict_conversion_from_v28_to_v29(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        # Removing 'solicit_answer_details' from question_data.
+        del question_data['solicit_answer_details']
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 28
+        }
+
+        self.assertNotIn('solicit_answer_details', test_value['state'])
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 29)
+        self.assertIn('solicit_answer_details', test_value['state'])
+        self.assertEqual(
+            test_value['state']['solicit_answer_details'], False)
+
+    def test_question_state_dict_conversion_from_v29_to_v30(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['answer_groups'] = [
+            {
+                'tagged_misconception_id': 1
+            }
+        ]
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 29
+        }
+
+        self.assertIn(
+            'tagged_misconception_id',
+            test_value['state']['interaction']['answer_groups'][0]
+        )
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 30)
+        self.assertNotIn(
+            'tagged_misconception_id',
+            test_value['state']['interaction']['answer_groups'][0]
+        )
+        self.assertIn(
+            'tagged_skill_misconception_id',
+            test_value['state']['interaction']['answer_groups'][0]
+        )
+        self.assertIsNone(test_value['state']['interaction'][
+            'answer_groups'][0]['tagged_skill_misconception_id'])
+
+    def test_question_state_dict_conversion_from_v30_to_v31(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['recorded_voiceovers']['voiceovers_mapping'] = {
+            'content': {
+                'audio_metadata': {}
+            }
+        }
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 30
+        }
+
+        self.assertNotIn(
+            'duration_secs',
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'][
+                'content']['audio_metadata']
+        )
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 31)
+        self.assertIn(
+            'duration_secs',
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'][
+                'content']['audio_metadata']
+        )
+        self.assertEqual(
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'][
+                'content']['audio_metadata']['duration_secs'],
+            0.0
+        )
+
+    def test_question_state_dict_conversion_from_v31_to_v32(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'SetInput'
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 31
+        }
+
+        self.assertEqual(
+            question_data['interaction']['customization_args'], {})
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 32)
+        self.assertEqual(
+            question_data['interaction']['customization_args'],
+            {
+                'buttonText': {
+                    'value': 'Add item'
+                }
+            }
+        )
+
+    def test_question_state_dict_conversion_from_v32_to_v33(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'MultipleChoiceInput'
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 32
+        }
+
+        self.assertEqual(
+            question_data['interaction']['customization_args'], {})
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 33)
+        self.assertEqual(
+            question_data['interaction']['customization_args'],
+            {
+                'showChoicesInShuffledOrder': {
+                    'value': True
+                }
+            }
+        )
+
+    def test_question_state_dict_conversion_from_v33_to_v34(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['content']['html'] = '<br/>'
+        question_data['interaction']['default_outcome'][
+            'feedback']['html'] = '<br/>'
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 33
+        }
+
+        self.assertEqual(
+            test_value['state']['content']['html'], '<br/>')
+        self.assertEqual(
+            test_value['state']['interaction']['default_outcome'][
+                'feedback']['html'],
+            '<br/>'
+        )
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 34)
+        self.assertEqual(
+            test_value['state']['content']['html'], '<br>')
+        self.assertEqual(
+            test_value['state']['interaction']['default_outcome'][
+                'feedback']['html'],
+            '<br>'
+        )
+
+    def test_question_state_dict_conversion_from_v34_to_v35(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'MathExpressionInput'
+        question_data['interaction']['solution'] = {
+            'answer_is_exclusive': False,
+            'correct_answer': {
+                'ascii': '1'
+            },
+            'explanation': {
+                'content_id': 'temp_id',
+                'html': '<p>This is a solution.</p>'
+            }
+        }
+        question_data['interaction']['answer_groups'] = [
+            {
+                'rule_specs': [{
+                    'inputs': {
+                        'x': '1',
+                        'y': None
+                    },
+                    'rule_type': None
+                }],
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'temp_id'
+                    }
+                },
+            },
+            {
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'x+1',
+                        'y': None
+                    },
+                    'rule_type': None
+                }],
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'temp_id_2'
+                    }
+                },
+            },
+            {
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'x=1',
+                        'y': None
+                    },
+                    'rule_type': None
+                }],
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'temp_id_3'
+                    }
+                },
+            },
+            {
+                'rule_specs': [],
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'temp_id_4'
+                    }
+                },
+            }
+        ]
+        question_data['recorded_voiceovers']['voiceovers_mapping'] = {
+            'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
+        }
+        question_data['written_translations']['translations_mapping'] = {
+            'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
+        }
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 34
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 35)
+        self.assertEqual(
+            test_value['state']['interaction']['id'],
+            'MathEquationInput'
+        )
+        self.assertEqual(
+            test_value['state']['recorded_voiceovers'][
+                'voiceovers_mapping'],
+            {'temp_id_3': {}}
+        )
+        self.assertEqual(
+           test_value['state']['written_translations'][
+               'translations_mapping'],
+            {'temp_id_3': {}}
+        )
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'rule_specs'][0]['inputs']['y'],
+            'both'
+        )
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'rule_specs'][0]['rule_type'],
+            'MatchesExactlyWith'
+        )
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'outcome']['feedback']['content_id'],
+            'temp_id_3'
+        )
+        self.assertNotIn(
+            'ascii',
+            test_value['state']['interaction']['solution']['correct_answer']
+        )
+
+        # Testing with only AlgebraicExpressionInput i.e ('x': 'x+1').
+        test_value['state']['interaction']['id'] = 'MathExpressionInput'
+        test_value['state']['interaction']['solution'] = {
+            'answer_is_exclusive': False,
+            'correct_answer': {
+                'ascii': '1'
+            },
+            'explanation': {
+                'content_id': 'temp_id',
+                'html': '<p>This is a solution.</p>'
+            }
+        }
+        test_value['state']['interaction']['answer_groups'] = [
+            {
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'x+1',
+                        'y': None
+                    },
+                    'rule_type': None
+                }],
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'temp_id'
+                    }
+                },
+            }
+        ]
+        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {
+            'temp_id': {}
+        }
+        test_value['state']['written_translations']['translations_mapping'] = {
+            'temp_id': {}
+        }
+        test_value['state_schema_version'] = 34
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 35)
+        self.assertEqual(
+            test_value['state']['interaction']['id'],
+            'AlgebraicExpressionInput'
+        )
+        self.assertNotIn(
+            'ascii',
+            test_value['state']['interaction']['solution']['correct_answer']
+        )
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'rule_specs'][0]['rule_type'],
+            'MatchesExactlyWith'
+        )
+
+        # Testing with only NumericExpressionInput i.e ('x': '1').
+        test_value['state']['interaction']['id'] = 'MathExpressionInput'
+        test_value['state']['interaction']['solution'] = {
+            'answer_is_exclusive': False,
+            'correct_answer': {
+                'ascii': '1'
+            },
+            'explanation': {
+                'content_id': 'temp_id',
+                'html': '<p>This is a solution.</p>'
+            }
+        }
+        test_value['state']['interaction']['answer_groups'] = [
+            {
+                'rule_specs': [{
+                    'inputs': {
+                        'x': '1',
+                        'y': None
+                    },
+                    'rule_type': None
+                }],
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'temp_id'
+                    }
+                },
+            }
+        ]
+        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {
+            'temp_id': {}
+        }
+        test_value['state']['written_translations']['translations_mapping'] = {
+            'temp_id': {}
+        }
+        test_value['state_schema_version'] = 34
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 35)
+        self.assertEqual(
+            test_value['state']['interaction']['id'],
+            'NumericExpressionInput'
+        )
+        self.assertNotIn(
+            'ascii',
+            test_value['state']['interaction']['solution']['correct_answer']
+        )
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'rule_specs'][0]['rule_type'],
+            'MatchesExactlyWith'
+        )
+
+    def test_question_state_dict_conversion_from_v35_to_v36(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['written_translations']['translations_mapping'] = {
+            'temp_id_1': {
+                'en': {
+                    'html': 'html_body_1'
+                }
+            },
+            'temp_id_2': {
+                'en': {
+                    'html': 'html_body_2'
+                }
+            }
+        }
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 35
+        }
+
+        self.assertEqual(test_value['state']['next_content_id_index'], 0)
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 36)
+        self.assertEqual(test_value['state']['next_content_id_index'], 3)
+
+        t_map = test_value['state']['written_translations'][
+            'translations_mapping']
+        self.assertEqual(t_map['temp_id_1']['en']['data_format'], 'html')
+        self.assertEqual(t_map['temp_id_2']['en']['data_format'], 'html')
+        self.assertEqual(
+            t_map['temp_id_1']['en']['translation'], 'html_body_1')
+        self.assertEqual(
+            t_map['temp_id_2']['en']['translation'], 'html_body_2')
+        self.assertNotIn('html', t_map['temp_id_1']['en'])
+        self.assertNotIn('html', t_map['temp_id_2']['en'])
+
+        # Testing with interaction id 'PencilCodeEditor'.
+        test_value['state']['interaction']['id'] = 'PencilCodeEditor'
+        test_value['state']['interaction']['customization_args'] = {
+            'initial_code': {}
+        }
+        test_value['state']['written_translations']['translations_mapping'] = {
+            'temp_id_1': {
+                'en': {
+                    'html': 'html_body_1'
+                }
+            },
+            'temp_id_2': {
+                'en': {
+                    'html': 'html_body_2'
+                }
+            }
+        }
+        test_value['state_schema_version'] = 35
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 36)
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'],
+            {'initialCode': {}}
+        )
+        self.assertEqual(
+            test_value['state']['written_translations']['translations_mapping'],
+            {
+                'temp_id_1': {
+                    'en': {'data_format': 'html', 'translation': 'html_body_1'}
+                },
+                'temp_id_2': {
+                    'en': {'data_format': 'html', 'translation': 'html_body_2'}
+                }
+            }
+        )
+
+        # Testing with interaction id 'TextInput'.
+        test_value['state']['interaction']['id'] = 'TextInput'
+        test_value['state']['interaction']['customization_args'] = {
+            'placeholder': {
+                'value': 'temp_value_1'
+            }
+        }
+        test_value['state']['written_translations']['translations_mapping'] = {
+            'temp_id_1': {
+                'en': {
+                    'html': 'html_body_1'
+                }
+            },
+            'temp_id_2': {
+                'en': {
+                    'html': 'html_body_2'
+                }
+            }
+        }
+        test_value['state_schema_version'] = 35
+
+        with self.swap_to_always_return(
+            customization_args_util, 'validate_customization_args_and_values',
+            value=True):
+            question_domain.Question.update_state_from_model(
+                test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 36)
+
+        # Testing with interaction id 'MultipleChoiceInput'.
+        test_value['state']['interaction']['id'] = 'MultipleChoiceInput'
+        test_value['state']['interaction']['customization_args'] = {
+            'choices': {
+                'value': 'value_1'
+            }
+        }
+        test_value['state']['written_translations']['translations_mapping'] = {
+            'temp_id_1': {
+                'en': {
+                    'html': 'html_body_1'
+                }
+            },
+            'temp_id_2': {
+                'en': {
+                    'html': 'html_body_2'
+                }
+            }
+        }
+        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
+        test_value['state_schema_version'] = 35
+
+        with self.swap_to_always_return(
+            customization_args_util, 'validate_customization_args_and_values',
+            value=True):
+            question_domain.Question.update_state_from_model(
+                test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 36)
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'],
+            {
+                'choices': {
+                    'value': [
+                        {'content_id': 'ca_choices_3', 'html': 'v'},
+                        {'content_id': 'ca_choices_4', 'html': 'a'},
+                        {'content_id': 'ca_choices_5', 'html': 'l'},
+                        {'content_id': 'ca_choices_6', 'html': 'u'},
+                        {'content_id': 'ca_choices_7', 'html': 'e'},
+                        {'content_id': 'ca_choices_8', 'html': '_'},
+                        {'content_id': 'ca_choices_9', 'html': '1'}
+                    ]
+                },
+                'showChoicesInShuffledOrder': {'value': True}
+            }
+        )
+        self.assertEqual(
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
+            {
+                'ca_choices_3': {}, 'ca_choices_4': {}, 'ca_choices_5': {},
+                'ca_choices_6': {}, 'ca_choices_7': {}, 'ca_choices_8': {},
+                'ca_choices_9': {}
+            }
+        )
+        self.assertEqual(
+            test_value['state']['written_translations']['translations_mapping'],
+            {
+                'temp_id_1': {
+                    'en': {'data_format': 'html', 'translation': 'html_body_1'}
+                },
+                'temp_id_2': {
+                    'en': {'data_format': 'html', 'translation': 'html_body_2'}
+                },
+                'ca_choices_3': {}, 'ca_choices_4': {}, 'ca_choices_5': {},
+                'ca_choices_6': {}, 'ca_choices_7': {}, 'ca_choices_8': {},
+                'ca_choices_9': {}
+            }
+        )
+
+        # Testing with interaction id 'ItemSelectionInput'.
+        test_value['state']['interaction']['id'] = 'ItemSelectionInput'
+        test_value['state']['interaction']['customization_args'] = {}
+        test_value['state']['written_translations']['translations_mapping'] = {
+            'temp_id_1': {
+                'en': {
+                    'html': 'html_body_1'
+                }
+            },
+            'temp_id_2': {
+                'en': {
+                    'html': 'html_body_2'
+                }
+            }
+        }
+        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
+        test_value['state_schema_version'] = 35
+
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'], {}
+        )
+
+        with self.swap_to_always_return(
+            customization_args_util, 'validate_customization_args_and_values',
+            value=True):
+            question_domain.Question.update_state_from_model(
+                test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 36)
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'],
+            {
+                'choices': {
+                    'value': [{'content_id': 'ca_choices_3', 'html': ''}]
+                },
+                'maxAllowableSelectionCount': {'value': 1},
+                'minAllowableSelectionCount': {'value': 1}
+            }
+        )
+        self.assertEqual(
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
+            {'ca_choices_3': {}}
+        )
+        self.assertEqual(
+            test_value['state']['written_translations']['translations_mapping'],
+            {
+                'temp_id_1': {
+                    'en': {'data_format': 'html', 'translation': 'html_body_1'}
+                },
+                'temp_id_2': {
+                    'en': {'data_format': 'html', 'translation': 'html_body_2'}
+                },
+                'ca_choices_3': {}
+            }
+        )
+
+    def test_question_state_dict_conversion_from_v36_to_v37(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'TextInput'
+        question_data['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'rule_type': 'CaseSensitiveEquals'
+            }]
+        }]
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 36
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 37)
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'rule_specs'][0]['rule_type'],
+            'Equals'
+        )
+
+    def test_question_state_dict_conversion_from_v37_to_v38(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'MathEquationInput'
+        question_data['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'variable=pi'
+                }
+            }]
+        }]
+        question_data['interaction']['customization_args'] = {}
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 37
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 38)
+        self.assertEqual(
+            question_data['interaction']['customization_args'],
+            {
+                'customOskLetters': {
+                    'value': ['a', 'b', 'e', 'i', 'l', 'r', 'v', 'π']
+                }
+            }
+        )
+
+    def test_question_state_dict_conversion_from_v38_to_v39(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'NumericExpressionInput'
+        question_data['interaction']['customization_args'] = {}
+        question_data['recorded_voiceovers']['voiceovers_mapping'] = {}
+        question_data['written_translations']['translations_mapping'] = {}
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 38
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 39)
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'],
+            {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': (
+                            'Type an expression here, using only numbers.')
+                    }
+                }
+            }
+        )
+        self.assertEqual(
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
+            {'ca_placeholder_0': {}}
+        )
+        self.assertEqual(
+            test_value['state']['written_translations']['translations_mapping'],
+            {'ca_placeholder_0': {}}
+        )
+
+    def test_question_state_dict_conversion_from_v39_to_v40(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'TextInput'
+        question_data['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'variable=pi'
+                },
+                'rule_type': 'standard'
+            }]
+        }]
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 39
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 40)
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'rule_specs'][0],
+            {
+                'rule_type': 'standard',
+                'inputs': {'x': ['variable=pi']}
+            }
+        )
+
+    def test_question_state_dict_conversion_from_v40_to_v41(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'TextInput'
+        question_data['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'rule_type': 'standard',
+                'inputs': {
+                    'x': 'text'
+                },
+            }]
+        }]
+        question_data['next_content_id_index'] = 0
+        question_data['recorded_voiceovers']['voiceovers_mapping'] = {}
+        question_data['written_translations']['translations_mapping'] = {}
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 40
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 41)
+        self.assertEqual(test_value['state']['next_content_id_index'], 1)
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'rule_specs'][0]['inputs']['x'],
+            {
+                'contentId': 'rule_input_0',
+                'normalizedStrSet': 'text'
+            }
+        )
+        self.assertEqual(
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
+            {'rule_input_0': {}}
+        )
+        self.assertEqual(
+            test_value['state']['written_translations']['translations_mapping'],
+            {'rule_input_0': {}}
+        )
+
+        # Testing with interaction id 'SetInput'.
+        test_value['state']['interaction']['id'] = 'SetInput'
+        test_value['state']['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'rule_type': 'standard',
+                'inputs': {
+                    'x': 'text'
+                },
+            }]
+        }]
+        test_value['state']['next_content_id_index'] = 0
+        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
+        test_value['state']['written_translations']['translations_mapping'] = {}
+        test_value['state_schema_version'] = 40
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 41)
+        self.assertEqual(test_value['state']['next_content_id_index'], 1)
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'rule_specs'][0]['inputs']['x'],
+            {
+                'contentId': 'rule_input_0',
+                'unicodeStrSet': 'text'
+            }
+        )
+        self.assertEqual(
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
+            {'rule_input_0': {}}
+        )
+        self.assertEqual(
+            test_value['state']['written_translations']['translations_mapping'],
+            {'rule_input_0': {}}
+        )
+
+    def test_question_state_dict_conversion_from_v41_to_v42(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'ItemSelectionInput'
+        question_data['interaction']['solution'] = {
+            'correct_answer': ['correct_value']
+        }
+        question_data['interaction']['customization_args'] = {
+            'choices': {
+                'value': [
+                    {'html': 'correct_value', 'content_id': 'content_id_1'},
+                    {'html': 'value_2', 'content_id': 'content_id_2'},
+                    {'html': 'value_3', 'content_id': 'content_id_3'}
+                ]
+            }
+        }
+        question_data['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': ['correct_value'],
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }]
+        }]
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 41
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 42)
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'rule_specs'][0]['inputs']['x'],
+            ['content_id_1']
+        )
+        self.assertEqual(
+            test_value['state']['interaction']['solution'],
+            {'correct_answer': ['content_id_1']}
+        )
+
+        # Testing with invalid 'x' input.
+        test_value['state']['interaction']['id'] = 'ItemSelectionInput'
+        test_value['state']['interaction']['solution'] = {
+            'correct_answer': ['correct_value']
+        }
+        test_value['state']['interaction']['customization_args'] = {
+            'choices': {
+                'value': [
+                    {'html': 'correct_value', 'content_id': 'content_id_1'},
+                ]
+            }
+        }
+        test_value['state']['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': ['invalid_value'],
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }]
+        }]
+        test_value['state_schema_version'] = 41
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 42)
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'rule_specs'][0]['inputs']['x'],
+            ['invalid_content_id']
+        )
+        self.assertEqual(
+            test_value['state']['interaction']['solution'],
+            {'correct_answer': ['content_id_1']}
+        )
+
+        # Testing with interaction id 'DragAndDropSortInput'.
+        test_value['state']['interaction']['id'] = 'DragAndDropSortInput'
+        test_value['state']['interaction']['solution'] = {
+            'correct_answer': [['correct_value']]
+        }
+        test_value['state']['interaction']['customization_args'] = {
+            'choices': {
+                'value': [
+                    {'html': 'correct_value', 'content_id': 'content_id_1'},
+                    {'html': 'value_2', 'content_id': 'content_id_2'},
+                    {'html': 'value_3', 'content_id': 'content_id_3'}
+                ]
+            }
+        }
+        test_value['state']['interaction']['answer_groups'] = [{
+            'rule_specs': [
+                {
+                    'inputs': {
+                        'x': [['value_2']],
+                    },
+                    'rule_type': 'IsEqualToOrdering'
+                },
+                {
+                    'inputs': {
+                        'x': 'correct_value',
+                    },
+                    'rule_type': 'HasElementXAtPositionY'
+                },
+                {
+                    'inputs': {
+                        'x': 'correct_value',
+                        'y': 'value_3'
+                    },
+                    'rule_type': 'HasElementXBeforeElementY'
+                }
+            ]
+        }]
+        test_value['state_schema_version'] = 41
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 42)
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0],
+            {
+                'rule_specs': [
+                    {
+                        'inputs': {
+                            'x': [['content_id_2']]
+                        },
+                        'rule_type': 'IsEqualToOrdering'
+                    },
+                    {
+                        'inputs': {'x': 'content_id_1'},
+                        'rule_type': 'HasElementXAtPositionY'
+                    },
+                    {
+                        'inputs': {
+                            'x': 'content_id_1',
+                            'y': 'content_id_3'
+                        },
+                        'rule_type': 'HasElementXBeforeElementY'
+                    }
+                ]
+            }
+        )
+        self.assertEqual(
+            test_value['state']['interaction']['solution'],
+            {'correct_answer': [['content_id_1']]}
+        )
+
+    def test_question_state_dict_conversion_from_v42_to_v43(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'NumericExpressionInput'
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 42
+        }
+
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'],
+            {}
+        )
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 43)
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'],
+            {
+                'useFractionForDivision': {
+                    'value': True
+                }
+            }
+        )
+
+    def test_question_state_dict_conversion_from_v43_to_v44(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+        del question_data['card_is_checkpoint']
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 43
+        }
+
+        self.assertNotIn('card_is_checkpoint', test_value['state'])
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 44)
+        self.assertEqual(test_value['state']['card_is_checkpoint'], False)
+
+    def test_question_state_dict_conversion_from_v44_to_v45(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+        del question_data['linked_skill_id']
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 44
+        }
+
+        self.assertNotIn('linked_skill_id', test_value['state'])
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 45)
+        self.assertIsNone(test_value['state']['linked_skill_id'])
+
+    def test_question_state_dict_conversion_from_v45_to_v46(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 45
+        }
+
+        initial_json = copy.deepcopy(test_value['state'])
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 46)
+        self.assertEqual(test_value['state'], initial_json)
+
+    def test_question_state_dict_conversion_from_v46_to_v47(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['content']['html'] = (
+            '<oppia-noninteractive-svgdiagram '
+            'svg_filename-with-value="filename.svg">'
+            '</oppia-noninteractive-svgdiagram>'
+        )
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 46
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 47)
+        self.assertEqual(
+            test_value['state']['content']['html'],
+            '<oppia-noninteractive-image '
+            'caption-with-value="&amp;quot;&amp;quot;" '
+            'filepath-with-value="filename.svg">'
+            '</oppia-noninteractive-image>'
+        )
+
+    def test_question_state_dict_conversion_from_v47_to_v48(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['content']['html'] = '&nbsp;'
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 47
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 48)
+        self.assertEqual(test_value['state']['content']['html'], ' ')
+
+    def test_question_state_dict_conversion_from_v48_to_v49(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'NumericInput'
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 48
+        }
+
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'],
+            {}
+        )
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 49)
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'],
+            {
+                'requireNonnegativeInput': {
+                    'value': False
+                }
+            }
+        )
+
 
 class QuestionSummaryTest(test_utils.GenericTestBase):
     """Test for Question Summary object."""
@@ -569,34 +1754,34 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
 
     def test_validation_with_invalid_id(self):
         self.observed_object.id = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected id to be a string, received 1'):
             self.observed_object.validate()
 
     def test_validation_with_invalid_interaction_id(self):
         self.observed_object.interaction_id = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected interaction id to be a string, received 1'):
             self.observed_object.validate()
 
     def test_validation_with_invalid_question_content(self):
         self.observed_object.question_content = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected question content to be a string, received 1'):
             self.observed_object.validate()
 
     def test_validation_with_invalid_created_on(self):
         self.observed_object.created_on = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected created on to be a datetime, received 1'):
             self.observed_object.validate()
 
     def test_validation_with_invalid_last_updated(self):
         self.observed_object.last_updated = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected last updated to be a datetime, received 1'):
             self.observed_object.validate()
@@ -606,7 +1791,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         misconception_ids value is an invalid list.
         """
         self.observed_object.misconception_ids = ['Test', 1]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             re.escape(
                 'Expected misconception ids to be a list of strings, '
@@ -618,7 +1803,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         misconception_ids value is an invalid type.
         """
         self.observed_object.misconception_ids = 123
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected misconception ids to be a list of strings, '
             'received 123'):

@@ -137,7 +137,7 @@ def _get_requirements_file_contents():
             if not line or line.startswith('#'):
                 continue
 
-            elif line.startswith('git'):
+            if line.startswith('git'):
                 match = GIT_DIRECT_URL_REQUIREMENT_PATTERN.match(line)
                 if not match:
                     raise Exception(
@@ -432,7 +432,7 @@ def verify_pip_is_installed():
             print(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
-        raise ImportError('Error importing pip: %s' % e)
+        raise ImportError('Error importing pip: %s' % e) from e
     else:
         if pip.__version__ != OPPIA_REQUIRED_PIP_VERSION:
             common.print_each_string_after_two_new_lines([

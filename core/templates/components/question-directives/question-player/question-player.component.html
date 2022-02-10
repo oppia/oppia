@@ -19,7 +19,7 @@
       </div>
     </div>
     <div class="oppia-question-player-body">
-      <conversation-skin question-player-config="$ctrl.questionPlayerConfig"></conversation-skin>
+      <oppia-conversation-skin [question-player-config]="$ctrl.questionPlayerConfig"></oppia-conversation-skin>
       <attribution-guide></attribution-guide>
     </div>
   </div>
@@ -45,7 +45,7 @@
         <h3 class="oppia-result-detail-header" translate="I18N_QUESTION_PLAYER_LEARN_MORE_ABOUT_SCORE"></h3>
 
         <div class="skill-score-body">
-          <div class="score" ng-repeat="(skillId, scorePerSkill) in $ctrl.scorePerSkillMapping">
+          <div class="score" ng-repeat="(skillId, scorePerSkill) in $ctrl.scorePerSkillMapping" ng-if="scorePerSkill.total > 0">
             <div class="list-item" ng-click="$ctrl.openSkillMasteryModal(skillId)"><[scorePerSkill.description]></div>
             <div class="score-outer d-flex justify-content-between align-items-center">
               <div class="oppia-skill-score-container">
@@ -62,6 +62,7 @@
             <span class="score-final score-recieved"><[$ctrl.finalCorrect.toFixed(2)]></span>
             <span class="score-final">/ <[$ctrl.allQuestions]></span>
           </div>
+          <div class="score-calculation-text">This score is based on the number of hints you used and incorrect answers you entered during this session.</div>
         </div>
 
         <button class="btn btn-secondary oppia-review-and-retry-button oppia-review-and-retry-button-text mt-4"
@@ -179,11 +180,11 @@
   }
 
   .oppia-result-header, .oppia-result-body {
-    background-color: #FFF;
+    background-color: #fff;
   }
 
   .oppia-question-result-header {
-    color: #015C53;
+    color: #015c53;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 30px;
     font-style: normal;
@@ -220,7 +221,7 @@
   }
 
   .oppia-question-player-container .action-button-inner {
-    color: #FFF;
+    color: #fff;
     text-align: center;
     vertical-align: center;
   }
@@ -247,7 +248,7 @@
   .oppia-question-player-container .review-lowest-scored-skill-inner {
     background-color: rgb(32, 93, 134);
     border-radius: 5px;
-    color: #FFF;
+    color: #fff;
     cursor: pointer;
     font-weight: 500;
     margin: 10px 0;
@@ -260,14 +261,14 @@
   }
 
   .oppia-question-player-container .learn-more {
-    color: #0D48A1;
+    color: #0d48a1;
     margin-top: -15px;
   }
 
   .oppia-question-player-container .my-dashboard-inner {
     background-color: rgb(0, 100, 92);
     border-radius: 5px;
-    color: #FFF;
+    color: #fff;
     cursor: pointer;
     font-weight: 500;
     margin: 10px 0;
@@ -277,7 +278,7 @@
   .oppia-question-player-container .new-session-inner {
     background-color: rgb(197, 95, 69);
     border-radius: 5px;
-    color: #FFF;
+    color: #fff;
     cursor: pointer;
     font-weight: 500;
     margin: 10px 0;
@@ -285,7 +286,7 @@
   }
 
   .oppia-question-player-container .oppia-question-player-card {
-    background: #FFF;
+    background: #fff;
     border-radius: 4px;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
     height: 100px;
@@ -305,7 +306,7 @@
   }
 
   .oppia-question-player-container .oppia-question-player-header {
-    color: #015C53;
+    color: #015c53;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
     font-style: normal;
@@ -317,15 +318,15 @@
   }
 
   .oppia-question-player-container .oppia-question-player-progress {
-    background: #FFF;
-    border: 2px solid #0D48A1;
+    background: #fff;
+    border: 2px solid #0d48a1;
     box-sizing: border-box;
     height: 20px;
     margin: 10px 25px 0;
   }
 
   .oppia-question-player-progress .current-progress {
-    background: #0D48A1;
+    background: #0d48a1;
     height: 16px;
   }
 
@@ -334,7 +335,7 @@
   }
 
   .oppia-question-player-container .skill-score-table {
-    background: #FFF;
+    background: #fff;
     border: 1px solid rgba(0, 0, 0, 0.25);
     box-sizing: border-box;
     height: 10px;
@@ -369,11 +370,17 @@
   }
 
   .oppia-skill-score-container {
-    background-color: #FFF;
+    background-color: #fff;
     border: 1px solid rgba(0, 0, 0, 0.25);
     border-radius: 20px;
     height: 17px;
     width: 80%;
+  }
+
+  .score-calculation-text {
+    font-size: 0.9em;
+    margin: 30px 0 -20px 0;
+    text-align: right;
   }
 
   .list-item {
@@ -451,6 +458,10 @@
 
   .score-final {
     font-size: 16px;
+  }
+
+  .score-calculation-text {
+    text-align: center;
   }
 }
 

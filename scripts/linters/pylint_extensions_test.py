@@ -2010,9 +2010,26 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         # The spaces are included on purpose so that we properly test
         # the input sanitization.
         self.checker_test_object.checker.config.forbidden_imports = (
-            '  core.storage: core.domain  ',
-            'core.domain  : core.controllers',
-            'core.controllers: core.platform  |  core.storage '
+            (
+                '*core.controllers*:\n'
+                '    import core.platform*   |  \n'
+                '    import core.storage*\n'
+            ),
+            (
+                '*core.domain*:import core.controllers*'
+            ),
+            (
+                '   *core.storage*:import    core.domain*   '
+            ),
+            (
+                '*core.domain.*_domain:\n'
+                '    from core.domain    import    *_service*   |\n'
+                '    from   core.domain import *_cleaner|\n'
+                '      from core.domain import *_registry |\n'
+                '    from core.domain import *_fetchers  |\n'
+                '    from core.domain import *_manager |\n'
+                '       from core.platform import   models'
+            )
         )
         self.checker_test_object.checker.open()
 
@@ -2020,13 +2037,14 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         node_err_import = astroid.extract_node(
             """
             import core.domain.activity_domain #@
-        """)
+            """
+        )
         node_err_import.root().name = 'oppia.core.storage.topic'
         with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_import,
-                args=('domain', 'storage'),
+                args=('core.domain*', '*core.storage*'),
             ),
         ):
             self.checker_test_object.checker.visit_import(node_err_import)
@@ -2050,7 +2068,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_importfrom,
-                args=('domain', 'storage'),
+                args=('core.domain*', '*core.storage*'),
             )
         ):
             self.checker_test_object.checker.visit_importfrom(
@@ -2076,7 +2094,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_import,
-                args=('controllers', 'domain'),
+                args=('core.controllers*', '*core.domain*'),
             ),
         ):
             self.checker_test_object.checker.visit_import(node_err_import)
@@ -2094,13 +2112,14 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         node_err_importfrom = astroid.extract_node(
             """
             from core.controllers import acl_decorators #@
-        """)
+            """
+        )
         node_err_importfrom.root().name = 'oppia.core.domain'
         with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_importfrom,
-                args=('controllers', 'domain'),
+                args=('core.controllers*', '*core.domain*'),
             )
         ):
             self.checker_test_object.checker.visit_importfrom(
@@ -2116,6 +2135,60 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_importfrom(
                 node_no_err_importfrom)
 
+    def test_forbid_service_import_in_domain_file(self):
+        node_err_import = astroid.extract_node(
+            """
+            import core.domain.exp_services #@
+            """
+        )
+        node_err_import.root().name = 'oppia.core.domain.exp_domain'
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='invalid-import-from',
+                node=node_err_import,
+                args=('*_service*', 'core.domain', '*core.domain.*_domain'),
+            ),
+        ):
+            self.checker_test_object.checker.visit_import(node_err_import)
+
+    def test_allow_domain_file_import_in_domain_file(self):
+        node_no_err_import = astroid.extract_node(
+            """
+            import core.domain.collection_domain #@
+            """
+        )
+        node_no_err_import.root().name = 'oppia.core.domain.topic_domain'
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_import(node_no_err_import)
+
+    def test_forbid_cleaner_from_import_in_domain_file(self):
+        node_err_importfrom = astroid.extract_node(
+            """
+            from core.domain import html_cleaner #@
+            """
+        )
+        node_err_importfrom.root().name = 'oppia.core.domain.collection_domain'
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='invalid-import-from',
+                node=node_err_importfrom,
+                args=('*_cleaner', 'core.domain', '*core.domain.*_domain'),
+            )
+        ):
+            self.checker_test_object.checker.visit_importfrom(
+                node_err_importfrom)
+
+    def test_allow_domain_file_from_import_in_domain_file(self):
+        node_no_err_importfrom = astroid.extract_node(
+            """
+            from core.domain import exp_domain #@
+            """
+        )
+        node_no_err_importfrom.root().name = 'oppia.core.domain.story_domain'
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_importfrom(
+                node_no_err_importfrom)
+
     def test_forbid_platform_import_in_controllers_module(self):
         node_err_import = astroid.extract_node(
             """
@@ -2126,7 +2199,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_import,
-                args=('platform', 'controllers'),
+                args=('core.platform*', '*core.controllers*'),
             )
         ):
             self.checker_test_object.checker.visit_import(node_err_import)
@@ -2141,7 +2214,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_import,
-                args=('storage', 'controllers'),
+                args=('core.storage*', '*core.controllers*'),
             )
         ):
             self.checker_test_object.checker.visit_import(node_err_import)
@@ -2165,7 +2238,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_no_err_importfrom,
-                args=('platform', 'controllers'),
+                args=('core.platform*', '*core.controllers*'),
             )
         ):
             self.checker_test_object.checker.visit_importfrom(
@@ -2181,7 +2254,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_no_err_importfrom,
-                args=('storage', 'controllers'),
+                args=('core.storage*', '*core.controllers*'),
             )
         ):
             self.checker_test_object.checker.visit_importfrom(
@@ -2264,44 +2337,6 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
         with checker_test_object.assertNoMessages():
             temp_file.close()
-
-
-class DivisionOperatorCheckerTests(unittest.TestCase):
-
-    def setUp(self):
-        super(DivisionOperatorCheckerTests, self).setUp()
-        self.checker_test_object = testutils.CheckerTestCase()
-        self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DivisionOperatorChecker)
-        self.checker_test_object.setup_method()
-
-    def test_division_operator_with_spaces(self):
-        node_division_operator_with_spaces = astroid.extract_node(
-            u"""
-            a / b #@
-            """)
-
-        message = testutils.Message(
-            msg_id='division-operator-used',
-            node=node_division_operator_with_spaces)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_binop(
-                node_division_operator_with_spaces)
-
-    def test_division_operator_without_spaces(self):
-        node_division_operator_without_spaces = astroid.extract_node(
-            u"""
-            a/b #@
-            """)
-
-        message = testutils.Message(
-            msg_id='division-operator-used',
-            node=node_division_operator_without_spaces)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_binop(
-                node_division_operator_without_spaces)
 
 
 class SingleLineCommentCheckerTests(unittest.TestCase):

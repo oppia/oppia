@@ -27,6 +27,8 @@ angular.module('oppia').directive('schemaBasedHtmlViewer', [
       template: require(
         'components/forms/schema-viewers/' +
         'schema-based-html-viewer.directive.html'),
-      restrict: 'E'
+      restrict: 'E',
+      controllerAs: '$ctrl',
+      controller: [function() {}]
     };
   }]);

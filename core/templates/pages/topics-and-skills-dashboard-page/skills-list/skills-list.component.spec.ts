@@ -181,8 +181,8 @@ describe('Skills List Component', () => {
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     error: boolean = false;
-    onTopicsAndSkillsDashboardReinitialized: EventEmitter<boolean> =
-    new EventEmitter();
+    onTopicsAndSkillsDashboardReinitialized: EventEmitter<boolean> = (
+      new EventEmitter());
     mergeSkillsAsync(skillId: string, supersedingSkillId: string) {
       return {
         then: (

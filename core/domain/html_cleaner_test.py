@@ -40,7 +40,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         self.assertTrue(
             html_cleaner.filter_a('a', 'title', 'http://www.oppia.com'))
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The filter_a method should only be used for a tags.'):
             html_cleaner.filter_a('link', 'href', 'http://www.oppia.com')
 

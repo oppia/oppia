@@ -35,6 +35,11 @@ import { ActivityDict,
   LibraryPageBackendApiService,
   SummaryDict } from './services/library-page-backend-api.service';
 
+interface mobileLibraryGroupProperties {
+  inCollapsedState: boolean;
+  buttonText: string;
+}
+
 @Component({
   selector: 'oppia-library-page',
   templateUrl: './library-page.component.html'
@@ -52,6 +57,7 @@ export class LibraryPageComponent {
   tileDisplayCount: number = 0;
   activeGroupIndex: number;
   libraryGroups: SummaryDict[];
+  mobileLibraryGroupsProperties: mobileLibraryGroupProperties[];
   leftmostCardIndices: number[] = [];
   currentPath: string;
   pageMode: string;
@@ -92,6 +98,10 @@ export class LibraryPageComponent {
   }
 
   initCarousels(): void {
+    if (this.libraryWindowIsNarrow) {
+      return;
+    }
+
     // This prevents unnecessary execution of this method immediately
     // after a window resize event is fired.
     if (!this.libraryGroups) {
@@ -107,7 +117,8 @@ export class LibraryPageComponent {
       this.MAX_NUM_TILES_PER_ROW);
 
     $('.oppia-library-carousel').css({
-      width: (this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX) + 'px'
+      'max-width': (
+        this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX) + 'px'
     });
 
     // The following determines whether to enable left scroll after
@@ -213,7 +224,29 @@ export class LibraryPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  toggleButtonText(idx: number): void {
+    if (this.mobileLibraryGroupsProperties[idx].buttonText === 'See More') {
+      this.mobileLibraryGroupsProperties[idx].buttonText = 'Collapse Section';
+    } else {
+      this.mobileLibraryGroupsProperties[idx].buttonText = 'See More';
+    }
+  }
+
+  toggleCardContainerHeightInMobileView(idx: number): void {
+    this.mobileLibraryGroupsProperties[idx].inCollapsedState =
+      !this.mobileLibraryGroupsProperties[idx].inCollapsedState;
+    this.toggleButtonText(idx);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   ngOnInit(): void {
+    let libraryWindowCutoffPx = 536;
+    this.libraryWindowIsNarrow = (
+      this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+
     this.loaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
     this.bannerImageFilename = this.possibleBannerFilenames[
       Math.floor(Math.random() * this.possibleBannerFilenames.length)];
@@ -246,6 +279,10 @@ export class LibraryPageComponent {
     // Keeps track of the index of the left-most visible card of each
     // group.
     this.leftmostCardIndices = [];
+
+    // Keeps track of the state of each library group when in mobile view
+    // i.e. if they are in a collapsed state or not.
+    this.mobileLibraryGroupsProperties = [];
 
     if (this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP) {
       let pathnameArray = (
@@ -329,11 +366,13 @@ export class LibraryPageComponent {
           setTimeout(() => {
             let actualWidth = $('oppia-exploration-summary-tile').width();
             if (actualWidth &&
-              actualWidth !== AppConstants.LIBRARY_TILE_WIDTH_PX) {
+              (actualWidth !== AppConstants.LIBRARY_TILE_WIDTH_PX &&
+               actualWidth !== AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX)) {
               this.loggerService.error(
-                'The actual width of tile is different than the ' +
-                'expected width. Actual size: ' + actualWidth +
-                ', Expected size: ' + AppConstants.LIBRARY_TILE_WIDTH_PX);
+                'The actual width of tile is different than either of the ' +
+                'expected widths. Actual size: ' + actualWidth +
+                ', Expected sizes: ' + AppConstants.LIBRARY_TILE_WIDTH_PX +
+                '/' + AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX);
             }
           }, 3000);
           // The following initializes the tracker to have all
@@ -343,12 +382,17 @@ export class LibraryPageComponent {
           for (let i = 0; i < this.libraryGroups.length; i++) {
             this.leftmostCardIndices.push(0);
           }
+          // The following initializes the array so that every group
+          // (in mobile view) loads in with a limit on the number of cards
+          // displayed, and with the button text being "See More".
+          for (let i = 0; i < this.libraryGroups.length; i++) {
+            this.mobileLibraryGroupsProperties.push({
+              inCollapsedState: true,
+              buttonText: 'See More'
+            });
+          }
         });
     }
-
-    let libraryWindowCutoffPx = 530;
-    this.libraryWindowIsNarrow = (
-      this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
     this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
       .subscribe(evt => {

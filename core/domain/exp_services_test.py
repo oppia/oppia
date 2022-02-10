@@ -277,7 +277,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         )
         self.assertEqual(exp_services.get_interaction_id_for_state(
             self.EXP_0_ID, 'Introduction'), 'MultipleChoiceInput')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'There exist no state in the exploration'):
             exp_services.get_interaction_id_for_state(
                 self.EXP_0_ID, 'Fake state name')
@@ -551,7 +551,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             count_at_least_editable_exploration_summaries(self.owner_id), 1)
 
         exp_services.delete_exploration(self.owner_id, self.EXP_0_ID)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_0_id '
             'not found'):
@@ -608,12 +608,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_0_id '
             'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_1_id '
             'not found'):
@@ -684,7 +684,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_0_id '
             'not found'):
@@ -708,12 +708,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID], force_deletion=True)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_0_id '
             'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_1_id '
             'not found'):
@@ -743,7 +743,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_0_id '
             'not found'):
@@ -1000,7 +1000,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_that_default_exploration_fails_strict_validation(self):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_0_ID)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'This state does not have any interaction specified.'
             ):
@@ -1183,7 +1183,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'category': 'category 1',
             }])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             re.escape(
                 'Exploration(id=exp_id_1, version=1, states_schema_version=3) '
@@ -1215,8 +1215,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
             exploration.validate(strict=True)
 
             duration = datetime.datetime.utcnow() - start_time
-            processing_time = duration.seconds + python_utils.divide(
-                duration.microseconds, 1E6)
+            processing_time = duration.seconds + (duration.microseconds / 1E6)
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)' %
                 (exploration.title, processing_time))
@@ -1231,12 +1230,12 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
             exp_models.ExplorationModel.get_exploration_count(), 0)
 
     def test_load_demo_with_invalid_demo_exploration_id_raises_error(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Invalid demo exploration id invalid_exploration_id'):
             exp_services.load_demo('invalid_exploration_id')
 
     def test_delete_demo_with_invalid_demo_exploration_id_raises_error(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Invalid demo exploration id invalid_exploration_id'):
             exp_services.delete_demo('invalid_exploration_id')
 
@@ -1603,7 +1602,7 @@ title: Title
             self.DEFAULT_OUTCOME_AUDIO_FILE,
             self.HINT_AUDIO_FILE, self.SOLUTION_AUDIO_FILE)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Invalid YAML file: missing schema version'):
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.owner_id, yaml_with_no_schema_version, self.EXP_ID, None)
@@ -2777,7 +2776,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_invalid_param_changes(self):
         """Check that updates cannot be made to non-existent parameters."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             r'The parameter with name \'myParam\' .* does not exist .*'
         ):
@@ -2797,7 +2796,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'name': 'all',
             'generator_id': 'RandomSelector'
         }]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             re.escape(
                 'The parameter name \'all\' is reserved. Please choose '
@@ -2818,7 +2817,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exp_services._save_exploration(self.owner_id, exploration, '', [])  # pylint: disable=protected-access
 
         self.param_changes[0]['generator_id'] = 'fake'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid generator ID'
         ):
             exp_services.update_exploration(
@@ -2989,7 +2988,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'Add state name')
 
         self.interaction_default_outcome['dest'] = 'State 2'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'Editing interaction handlers is no longer supported'
             ):
@@ -3157,7 +3156,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_state_invalid_state(self):
         """Test that rule destination states cannot be non-existent."""
         self.interaction_answer_groups[0]['outcome']['dest'] = 'INVALID'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The destination INVALID is not a valid state'
             ):
@@ -3196,7 +3195,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test that parameters in rules must have the correct type."""
         self.interaction_answer_groups[0]['rule_specs'][0][
             'inputs']['x'] = 'abc'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Value has the wrong type. It should be a NonnegativeInt. '
             'The value is abc'
@@ -3728,7 +3727,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, (
                 'Expected solicit_answer_details to be a bool, received ')):
             exp_services.update_exploration(
@@ -3758,7 +3757,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list)
         self.assertTrue(changes_are_mergeable)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, (
                 'Expected solicit_answer_details to be a bool, received ')):
             exp_services.update_exploration(
@@ -3883,7 +3882,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.card_is_checkpoint, True)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, (
                 'Expected card_is_checkpoint to be a bool, received ')):
             exp_services.update_exploration(
@@ -3912,7 +3911,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list)
         self.assertTrue(changes_are_mergeable)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, (
                 'Expected card_is_checkpoint to be a bool, received ')):
             exp_services.update_exploration(
@@ -3932,7 +3931,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_content_missing_key(self):
         """Test that missing keys in content yield an error."""
-        with self.assertRaisesRegexp(KeyError, 'content_id'):
+        with self.assertRaisesRegex(KeyError, 'content_id'):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID, _get_change_list(
                     self.init_state_name, 'content', {
@@ -4000,7 +3999,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_written_translations_with_list_fails(self):
         """Test update content translation with a list fails."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected written_translations to be a dict, received '):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID, _get_change_list(
@@ -4042,7 +4041,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'version %s, received %s' % (
                 latest_schema_version, not_latest_schema_version)
         )
-        with self.assertRaisesRegexp(Exception, exception_string):
+        with self.assertRaisesRegex(Exception, exception_string):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID, migration_change_list,
                 'Ran Exploration Migration job.')
@@ -4076,7 +4075,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
         """Check published explorations demand commit messages."""
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Exploration is public so expected a commit message but received '
             'none.'
@@ -4218,7 +4217,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             snapshots_metadata[1]['created_on_ms'])
 
         # Using the old version of the exploration should raise an error.
-        with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
+        with self.assertRaisesRegex(Exception, 'version 1, which is too old'):
             exp_services._save_exploration(  # pylint: disable=protected-access
                 second_committer_id, v1_exploration, '', [])
 
@@ -4330,7 +4329,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Perform an invalid action: delete a state that does not exist. This
         # should not create a new version.
-        with self.assertRaisesRegexp(ValueError, 'does not exist'):
+        with self.assertRaisesRegex(ValueError, 'does not exist'):
             exploration.delete_state('invalid_state_name')
 
         # Now delete the new state.
@@ -4402,7 +4401,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # It is not possible to revert from anything other than the most
         # current version.
-        with self.assertRaisesRegexp(Exception, 'too old'):
+        with self.assertRaisesRegex(Exception, 'too old'):
             exp_services.revert_exploration(
                 'committer_id_v4', self.EXP_0_ID, 2, 1)
 
@@ -4515,7 +4514,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state'
         }]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: Trying to find change list from version %s '
             'of exploration to version %s.'
@@ -4672,7 +4671,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             exp_services.delete_exploration(self.albert_id, self.EXP_ID_1)
 
             # This commit should not be recorded.
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception, 'This exploration cannot be published'
                 ):
                 rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
@@ -4683,7 +4682,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
     def test_get_next_page_of_all_non_private_commits_with_invalid_max_age(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'max_age must be a datetime.timedelta instance. or None.'):
             exp_services.get_next_page_of_all_non_private_commits(
@@ -4878,7 +4877,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
     def test_get_demo_exploration_components_with_invalid_path_raises_error(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Unrecognized file path: invalid_path'):
             exp_services.get_demo_exploration_components('invalid_path')
 
@@ -5043,6 +5042,23 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self._check_contributors_summary(
             self.EXP_ID_1, {self.albert_id: 1})
 
+    def test_regenerate_summary_with_new_contributor_with_invalid_exp_id(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        with logging_swap:
+            exp_services.regenerate_exploration_summary_with_new_contributor(
+                'dummy_id', self.albert_id)
+
+        self.assertEqual(
+            observed_log_messages,
+            ['Could not find exploration with ID dummy_id']
+        )
+
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
@@ -5111,7 +5127,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'This exploration cannot be published'
             ):
             rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
@@ -5316,7 +5332,7 @@ title: Old Title
                 'category': 'category',
             }])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v41-v%d exploration state schemas at '
             'present.' % feconf.CURRENT_STATE_SCHEMA_VERSION):
@@ -5348,7 +5364,7 @@ title: Old Title
         exploration_model = exp_models.ExplorationModel.get('exp_id')
         exploration_model.version = 0
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: trying to update version 0 of exploration '
             'from version 1. Please reload the page and try again.'):
@@ -5365,7 +5381,7 @@ title: Old Title
         exploration_model = exp_models.ExplorationModel.get('exp_id')
         exploration_model.version = 0
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Invalid commit message for suggestion.'):
             exp_services.update_exploration(
                 'user_id', 'exp_id', [exp_domain.ExplorationChange({
@@ -5380,7 +5396,7 @@ title: Old Title
         exploration_model = exp_models.ExplorationModel.get('exp_id')
         exploration_model.version = 0
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Commit messages for non-suggestions may not start with'):
             exp_services.update_exploration(
@@ -5935,7 +5951,7 @@ title: Old Title
             }
         }
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected hints_list to be a list.*'):
             hints_update = exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -5980,7 +5996,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 1, change_list)
         self.assertTrue(changes_are_mergeable)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected hints_list to be a list.*'):
             exp_services.update_exploration(
                 self.albert_id, self.NEW_EXP_ID, change_list,
@@ -6022,7 +6038,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 1, change_list)
         self.assertTrue(changes_are_mergeable)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected hints_list to be a list.*'):
             exp_services.update_exploration(
                 self.albert_id, self.NEW_EXP_ID, change_list,
@@ -6133,7 +6149,7 @@ title: Old Title
     def test_cannot_update_recorded_voiceovers_with_invalid_type(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected recorded_voiceovers to be a dict'):
             exp_services.update_exploration(
                 self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
@@ -6164,7 +6180,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 1, change_list)
         self.assertTrue(changes_are_mergeable)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected recorded_voiceovers to be a dict'):
             exp_services.update_exploration(
                 self.albert_id, self.NEW_EXP_ID, change_list,
@@ -6176,7 +6192,7 @@ title: Old Title
         exploration_model = exp_models.ExplorationModel.get('exp_id')
         exploration_model.version = 0
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: trying to update version 0 of exploration '
             'from version 1. Please reload the page and try again.'):

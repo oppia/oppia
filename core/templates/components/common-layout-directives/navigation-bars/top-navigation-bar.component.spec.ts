@@ -302,6 +302,15 @@ describe('TopNavigationBarComponent', () => {
     expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
   }));
 
+  it('should navigate to a particular page', fakeAsync(()=>{
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToPage('/about');
+    tick();
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
+  }));
+
   it('should registers classroom header click event when user clicks' +
     ' on \'Basic Mathematics\'', () => {
     spyOn(siteAnalyticsService, 'registerClassroomHeaderClickEvent');
@@ -504,35 +513,70 @@ describe('TopNavigationBarComponent', () => {
     spyOn(component, 'getDropdownOffset')
       .withArgs('.learn-tab', 688).and.returnValue(-10)
       .withArgs('.learn-tab', 300).and.returnValue(-10)
+      .withArgs('.donate-tab', 286).and.returnValue(-10)
       .withArgs('.get-involved', 574).and.returnValue(-10);
 
     expect(component.learnDropdownOffset).toBe(0);
     expect(component.getInvolvedMenuOffset).toBe(0);
+    expect(component.donateMenuOffset).toBe(0);
 
     component.ngAfterViewChecked();
     tick();
 
     expect(component.learnDropdownOffset).toBe(-10);
     expect(component.getInvolvedMenuOffset).toBe(-10);
+    expect(component.donateMenuOffset).toBe(-10);
   }));
 
-  it('should check if classroom data is fetched', fakeAsync(() => {
-    spyOn(component, 'truncateNavbar').and.stub();
-    component.CLASSROOM_PROMOS_ARE_ENABLED = true;
-    spyOn(
-      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync').
-      and.resolveTo(true);
-    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValue(Promise.resolve());
-    let array: CreatorTopicSummary[] = [];
-    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
-    spyOn(
-      classroomBackendApiService, 'fetchClassroomDataAsync')
-      .and.resolveTo(classroomData);
+  it('should fetch classroom data when classroomPromos are enabled',
+    fakeAsync(() => {
+      spyOn(
+        classroomBackendApiService,
+        'fetchClassroomPromosAreEnabledStatusAsync').
+        and.resolveTo(true);
+      spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+        .and.returnValue(Promise.resolve());
 
-    component.ngOnInit();
-    tick();
+      let cData1: CreatorTopicSummary = new CreatorTopicSummary(
+        'dummy', 'addition', 3, 3, 3, 3, 1,
+        'en', 'dummy', 1, 1, 1, 1, true,
+        true, 'math', 'public/img.webp', 'red', 'add');
+      let cData2: CreatorTopicSummary = new CreatorTopicSummary(
+        'dummy2', 'division', 2, 2, 3, 3, 0,
+        'es', 'dummy2', 1, 1, 1, 1, true,
+        true, 'math', 'public/img1.png', 'green', 'div');
 
-    expect(component.classroomData).toEqual(array);
-  }));
+      let array: CreatorTopicSummary[] = [cData1, cData2];
+      let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+      let topicTitlesTranslationKeys: string[] =
+        ['I18N_TOPIC_dummy_TITLE', 'I18N_TOPIC_dummy2_TITLE'];
+      spyOn(
+        classroomBackendApiService, 'fetchClassroomDataAsync')
+        .and.resolveTo(classroomData);
+      spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
+
+      component.ngOnInit();
+
+      tick();
+
+      expect(component.classroomData).toEqual(array);
+      expect(component.topicTitlesTranslationKeys).toEqual(
+        topicTitlesTranslationKeys);
+      expect(siteAnalyticsService.registerClassroomPageViewed)
+        .toHaveBeenCalled();
+    }));
+
+  it('should check whether hacky translations are displayed or not', () => {
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValues(false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValues(false, false);
+
+    let hackyStoryTitleTranslationIsDisplayed =
+      component.isHackyTopicTitleTranslationDisplayed(0);
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
+    hackyStoryTitleTranslationIsDisplayed =
+      component.isHackyTopicTitleTranslationDisplayed(0);
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+  });
 });

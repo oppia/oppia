@@ -382,22 +382,19 @@ describe('OutcomeEditorComponent', () => {
     expect(ctrl.savedOutcome.missingPrerequisiteSkillId).toBe('SkillId');
   });
 
-  it('should check if outcome feedback has length of atmost 1000 characters',
-    () => {
-      let text = 'Feedback Text ';
+  it('should check if outcome feedback exceeds 10000 characters', () => {
+    ctrl.outcome = {
+      feedback: {
+        _html: 'a'.repeat(10000)
+      }
+    };
+    expect(ctrl.isFeedbackLengthExceeded()).toBe(false);
 
-      ctrl.outcome = {
-        feedback: {
-          _html: '<p> ' + text + ' </p>'
-        }
-      };
-      expect(ctrl.isFeedbackLengthExceeded()).toBe(false);
-
-      ctrl.outcome = {
-        feedback: {
-          _html: '<p> ' + text.repeat(75) + ' </p>'
-        }
-      };
-      expect(ctrl.isFeedbackLengthExceeded()).toBe(true);
-    });
+    ctrl.outcome = {
+      feedback: {
+        _html: 'a'.repeat(10001)
+      }
+    };
+    expect(ctrl.isFeedbackLengthExceeded()).toBe(true);
+  });
 });

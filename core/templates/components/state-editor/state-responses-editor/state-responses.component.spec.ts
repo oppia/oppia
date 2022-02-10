@@ -415,7 +415,7 @@ describe('StateResponsesComponent', () => {
     spyOn(StateEditorService, 'getMisconceptionsBySkill')
       .and.returnValue({
         skill1: [misconceptionObjectFactory.create(
-          'm1', 'Misconception 1', 'note', '', false)]
+          1, 'Misconception 1', 'note', '', false)]
       });
 
     expect($scope.misconceptionsBySkill).toBe(undefined);
@@ -426,7 +426,7 @@ describe('StateResponsesComponent', () => {
 
     expect($scope.misconceptionsBySkill).toEqual({
       skill1: [misconceptionObjectFactory.create(
-        'm1', 'Misconception 1', 'note', '', false)]
+        1, 'Misconception 1', 'note', '', false)]
     });
     expect($scope.containsOptionalMisconceptions).toBe(true);
 
@@ -787,28 +787,40 @@ describe('StateResponsesComponent', () => {
     ' on delete button', () => {
     spyOn(ngbModal, 'open').and.callThrough();
 
-    $scope.deleteAnswerGroup(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    $scope.deleteAnswerGroup(value);
 
     expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should delete answer group after modal is opened', () => {
     spyOn(ResponsesService, 'deleteAnswerGroup').and.callFake(
-      (index, callback) => {
+      (number: string, callback: () => void) => {
         callback();
-      }
-    );
+      });
+    spyOn($rootScope, '$apply').and.callThrough();
     spyOn(ngbModal, 'open').and.returnValue(
       {
         result: $q.resolve()
       } as NgbModalRef
     );
 
-    $scope.deleteAnswerGroup(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    $scope.deleteAnswerGroup(value);
     $scope.$apply();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(ResponsesService.deleteAnswerGroup).toHaveBeenCalled();
+    expect($rootScope.$apply).toHaveBeenCalled();
+    expect(ResponsesService.deleteAnswerGroup)
+      .toHaveBeenCalled();
   });
 
   it('should clear warnings when delete answer group modal is closed', () => {
@@ -819,7 +831,12 @@ describe('StateResponsesComponent', () => {
       } as NgbModalRef
     );
 
-    $scope.deleteAnswerGroup(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    $scope.deleteAnswerGroup(value);
     $scope.$apply();
 
     expect(AlertsService.clearWarnings).toHaveBeenCalledTimes(2);
@@ -933,6 +950,13 @@ describe('StateResponsesComponent', () => {
         outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
         [], '0'), '1', {}, true))
       .toBe('[Answer] Feedback text');
+
+    expect($scope.summarizeAnswerGroup(
+      answerGroupObjectFactory.createNew(
+        [],
+        outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
+        [], '0'), '1', {}, false))
+      .toBe('[Answer ] Feedback text');
   });
 
   it('should get summary default outcome when outcome is linear', () => {
@@ -1021,9 +1045,9 @@ describe('StateResponsesComponent', () => {
     $scope.misconceptionsBySkill = {
       skill1: [
         misconceptionObjectFactory.create(
-          'm1', 'Misconception 1', 'note', '', false),
+          1, 'Misconception 1', 'note', '', false),
         misconceptionObjectFactory.create(
-          'm2', 'Misconception 2', 'note', '', true)
+          2, 'Misconception 2', 'note', '', true)
       ]
     };
 
