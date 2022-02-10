@@ -98,7 +98,7 @@ class ExplorationConversionError(Exception):
 def open_file(
     filename: str,
     mode: TextModeTypes,
-    encoding: Union[str, None] = 'utf-8',
+    encoding: str = 'utf-8',
     newline: Union[str, None] = None
 ) -> IO[str]: ...
 
