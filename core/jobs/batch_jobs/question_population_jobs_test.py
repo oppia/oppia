@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import caching_services
 from core.domain import question_domain
 from core.domain import state_domain
 from core.jobs import job_test_utils
