@@ -1,5 +1,124 @@
 This file contains a summary of changes to the Oppia code base.
 
+v3.2.3 (10 Feb 2022)
+------------------------
+Learner/Creator Pages
+* Fix #14693: Allows changing thumbnail background color. (#14783)
+* Fix #14426: Resolved Multiple Choice Options Shuffling Between Attempts (#14777)
+* Fix #14694: Stack skill name label and radio button container properly and add text explaining score calculation on the practice session results page (#14716)
+* Fix #14683: Learner dashboard minor UI fixes for mobile view (#14688)
+* Fix #14667: Adds I18N keys for preference page (#14685)
+* Fixes unnecessary underlining on hover and focus on the top navigation bar (#14608)
+* Changing the login overlay to have the new UI (#14607)
+* Fix #14431: Resolves all navbar related fixes for rtl languages (#14559)
+* Fix #14084: Allow resize image to 200%; Surface exp role editor error (#14557)
+* Fix #14397 : Contributors page not found (#14540)
+* Fix #14530: Change question-editor-container's position so it moves up when screen is scrolled (#14535)
+* Change layout of exploration and collection cards on community-library for mobile UI (#14527)
+* Fix #13680 Remove voice artists' role in the description text (#14463)
+* Fix #14188: Fix the Score Circle on the results page so it animates properly (#14452)
+* Implemented new navbar : Home navbar menu item (#14438)
+* Fix #11898: Align social-media icons (#14436)
+* Fix #14389: Increase HTML length validation check limits (#14391)
+* Fix #14255 Added extra space at bottom of the story editor page (#14381)
+* Implemented new UI for the 'Get Involved' Tab of the top navbar and fixes issue with keyboard navigation (#14345)
+* Fix part of #14085: Making math interactions consistent with the android definitions. (#14197)
+
+Data handling
+* Fix #14751: Allow int in float ininstance checks (#14758)
+* Fix translation stats job (#14554)
+* Fix part of #13162: Add backend test and schema to validate StoryUrlFragmentHandler class arguments (#14489)
+* Fix part of #14351: Extended Schema validator (#14465)
+* Fix part of #13162: Add schema for ReviewableSuggestionsHandler (#14407)
+* Add skill and story migration jobs (#14361)
+*  Fix Part of #13162: Add argument schema for ProfileHandler, SignupHandler classes (#14257)
+
+Contributor Pages
+* Fix #14669: Translation modal and other UI fixes in Contributor Dashboard Page (#14680)
+* Fix #14519: Contributor profile page UI fixes (#14562)
+* Fix #14230: Strip whitespace when comparing translation content html and exploration content html (#14396)
+
+Developer UX
+* Fix parts of #12912: Enables `useless-object-inheritance` (#14551)
+* Fix part of #12912: Enables no-else-break pylint check  (#14474)
+* Upgrade libraries (#14430)
+* Updates cron time for pending review notification (#14364)
+* Upgrade libraries (#14236)
+
+Python Migration
+* Fix part of #14419: Refactor ValidationModes class and values (#14592)
+* Fix part of #13956: remove python_utils.create_enum (#14301)
+* Script for auto extending index.yaml (#14293)
+
+Bug fixes
+* Remove submodule (#14568) (#14569)
+* Fixed #14510: Fixed working of delete answer group modal component (#14516)
+* FE Flake in Router Service (#14318)
+* Fixes few server errors and addresses some follow-up comments from #14352 (#14518)
+
+Translations
+* Routine update of translations. (#14789)
+* Imlementation of Hacky translations for the all classroom related pages (#14631)
+* Routine update of translations. (#14570)
+
+Automated QA Team
+* Fix part of #14219: Increasing backend test coverage of `core.controllers.library_test` to 100% (#14545)
+* Fix part of #14219: Increasing backend test coverage of `core.controllers.questions_list_test` to 100% (#14538)
+* Fix part of #14219: Increasing Backend Test Coverage of `extensions.rich_text_components.components_test` to 100% (#14528)
+* Fix #14525: Fix incorrect error of no backend tests (#14526)
+* Fix part of #14219: Write tests to fix 100% per file coverage for collection_domain.py (#14499)
+* Fix part of #14219: 100% per-file backend test coverage for base.py (#14495)
+* Fix part of #14219: Add a test to complete gae_models coverage (#14466)
+* Fix part of #14219: Add tests to completely cover scripts/common.py (#14442)
+* Fix part of #14187: Cover current-interaction and language-util services fully (#14434)
+* Add e2e test to prevent supplemental cards regression (#14320)
+* Add frontend test for schema-based-html-viewer.directive.ts (#14205)
+
+Typing
+* Added strict checking for more files (#14539)
+* Fix part of #10474 : Make typescript checks strict for base-components/base.module.ts (#14513)
+* Fix part of #10474 : Make typescript checks strict for editable-topic-backend-api.service.ts (#14459)
+* Fix part of #14033: Type annotate improvements and feedback domain files (#14445)
+* Fix part of #14033: Type annotate Classifier and Classroom domain (#14369)
+* Fix part of #10474: Make typescript checks strict for core/templates/components/graph-services/graph-layout.service.ts file (#14311)
+* Fix #14231: Added required strict typescript checks to import question-player-state-service  (#14274)
+
+Angular Migration
+* Fix #14514: Remove dead code for voiceover tab on contributor dashboard page. (#14517)
+* Fix #14502 & Fix part of #9749: use one modal for save-pending-changes-modal. (#14509)
+* Fix #14501 & Fix Part of #9749: skill-prerequisite-skills-editor solved data not showing issue and moved it from angularJs to angular (#14505)
+* Fixed part of #9749: Migrated skill-rubrics-editor component (#14500)
+* Fixed part of #9749: Migrated Add-Worked Editor directive to component (#14490)
+* Fix part of issue #9749: migrate forms-templates from AngularJS to Angular (#14488)
+* Fixed part of #9749: Migrated misconception editor directive (#14487)
+* Fix part of #9749: Migrated Add-worked-example and delete worked example modal (#14477)
+* Fix part of #9749: Migrate save-pending-changes-modal.template (#14476)
+* Fix part of #8472: Migrates exploration correctness feedback, exploration param changes, exploration param specs services. (#14475)
+* Fix part of #9749: Migrate to skill-editor-save-modal.component (#14470)
+* Fixed part of #9749: Migrated Add Misconception modal (#14467)
+* Fix Part of #9749: Migrate delete-hint-modal.template, delete-interaction-modal.template, delete-last-hint-modal.template, delete-solution-modal.template into component (#14454)
+* Fix part of #9749: Migrates topic-editor-send-mail, topic-editor-save, delete story modal (#14451)
+* Fixed part of #9749: Migrated preview set parameter modal (#14435)
+* Fix part of 9749: Migrate delete-answer-group-modal.template (#14429)
+* Fixed part of #9749: Migrated revert-exploration-modal component (#14421)
+* Fix part of issue #9749: migrate translation-tab TranslationTabBusyModal, DeleteAudioTranslationModal from angularjs to angular (#14411)
+* Fix part of issue #9749: migrate welcome translation modal from angularjs to angular (#14410)
+* Fixed part of #9749: Migrated add-hint-modal component (#14401)
+* Fix part of issue #9749: migrate preview-summary-tile-modal to angular component and some services (#14388)
+* Fix a part of #14278 : Exploration rights Service  small important change in code (#14387)
+* Fixed part of #8472: Migrated confirm-state-modal component (#14377)
+* Fixed part of #8472: Migrated topic-editor-save-modal to Angular component (#14363)
+* Migrate and encapsulate logic from conversation skin directive to ratings-and-recommendations component. (#14049)
+* Fix Part of #9749: Migrates Creator-Dashboard-Page to Angular (#13906)
+
+Release team
+* Add notes to the release coordinator page (#14472)
+* Fix problems in pre push hook (#14457)
+
+Miscellaneous
+* Fix #13162: Add schema and introduce new approach for saving multiple images in suggestion handler. (#14063)
+
+
 v3.2.2 (05 Jan 2022)
 ------------------------
 Learner/Creator Pages
