@@ -3556,7 +3556,9 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         review_swap = self.swap_to_always_return(
             suggestion_services, 'can_user_review_category', True)
-        with testapp_swap, review_swap:
+        editing_rights_swap = self.swap_to_always_return(
+            rights_manager, 'check_can_edit_activity', value=True)
+        with testapp_swap, review_swap, editing_rights_swap:
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, self.suggestion_id_1))
@@ -3569,7 +3571,9 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         translation_review_swap = self.swap_to_always_return(
             user_services, 'can_review_translation_suggestions', value=True)
-        with testapp_swap, translation_review_swap:
+        editing_rights_swap = self.swap_to_always_return(
+            rights_manager, 'check_can_edit_activity', value=True)
+        with testapp_swap, translation_review_swap, editing_rights_swap:
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, self.suggestion_id_2))
