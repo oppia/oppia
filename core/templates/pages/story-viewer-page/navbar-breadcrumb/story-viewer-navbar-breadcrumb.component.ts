@@ -73,6 +73,7 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
+
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
