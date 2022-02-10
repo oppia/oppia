@@ -30,7 +30,7 @@ from typing_extensions import TypedDict
 
 # This TypedDict is used only to create the TypedDict below, because we want
 # to mark some attributes as optional.
-class _ValidCmdAttributeSpecsAttributeDictNotTotal(TypedDict, total=False):
+class _ValidCmdDictNotTotal(TypedDict, total=False):
     """Dictionary representing a non-required part
     of valid commands specs."""
 
@@ -38,8 +38,8 @@ class _ValidCmdAttributeSpecsAttributeDictNotTotal(TypedDict, total=False):
     deprecated_values: Dict[str, List[str]]
 
 
-class ValidCmdAttributeSpecsAttributeDicts(
-    _ValidCmdAttributeSpecsAttributeDictNotTotal,
+class ValidCmdDict(
+    _ValidCmdDictNotTotal,
     total=False
 ):
     """Dictionary representing valid commands specs."""
@@ -1333,7 +1333,7 @@ ALLOWED_ACTIVITY_STATUS = [
     constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC]
 
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
-COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdAttributeSpecsAttributeDicts] = [{
+COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
@@ -1376,7 +1376,7 @@ COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdAttributeSpecsAttributeDicts] = [{
 }]
 
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[
-    ValidCmdAttributeSpecsAttributeDicts
+    ValidCmdDict
 ] = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
 )
@@ -1421,7 +1421,7 @@ ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
 TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[
-    ValidCmdAttributeSpecsAttributeDicts
+    ValidCmdDict
 ] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
