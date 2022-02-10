@@ -208,7 +208,7 @@ class FeedbackThreadSummaryDomainUnitTests(test_utils.GenericTestBase):
             self.owner_id,
             thread_ids)[0][0].to_dict()
         thread = feedback_services.get_thread(self.thread_id) # type: ignore[no-untyped-call]
-        expected_thread_summary_dict: Dict[str, str] = {
+        expected_thread_summary_dict = {
             'status': thread.status,
             'original_author_id': thread.original_author_id,
             'last_updated_msecs': (
