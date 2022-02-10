@@ -403,6 +403,7 @@ describe('Translation tab component', function() {
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', fakeAsync(() => {
     ctrl.$onInit();
+    $scope.$apply();
 
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished')
       .and.stub();
