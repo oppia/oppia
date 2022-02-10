@@ -21,6 +21,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -144,15 +145,55 @@ class SkillRightsHandler(base.BaseHandler):
 class EditableSkillDataHandler(base.BaseHandler):
     """A data handler for skills which supports writing."""
 
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int'
+                }
+            },
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
+                    }]
+                }
+            },
+            'change_dicts': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'validation_method': (
+                            domain_objects_validator.
+                            validate_skill_change
+                        )
+                    }
+                }
+            }
+        },
+        'DELETE': {}
+    }
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_valid_skill_id'
+                }]
+            }
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self, skill_id):
         """Populates the data on the individual skill page."""
-        try:
-            skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.PageNotFoundException('Invalid skill id.')
 
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
@@ -197,24 +238,17 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_skill
     def put(self, skill_id):
         """Updates properties of the given skill."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
         if skill is None:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
-        version = self.payload.get('version')
+        version = self.normalized_payload.get('version')
         _require_valid_version(version, skill.version)
 
-        commit_message = self.payload.get('commit_message')
+        commit_message = self.normalized_payload.get('commit_message')
 
-        if (commit_message is not None and
-                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
-            raise self.InvalidInputException(
-                'Commit messages must be at most %s characters long.'
-                % constants.MAX_COMMIT_MESSAGE_LENGTH)
-
-        change_dicts = self.payload.get('change_dicts')
+        change_dicts = self.normalized_payload.get('change_dicts')
         change_list = [
             skill_domain.SkillChange(change_dict)
             for change_dict in change_dicts
@@ -236,7 +270,6 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_skill
     def delete(self, skill_id):
         """Handles Delete requests."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
 
         skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
 

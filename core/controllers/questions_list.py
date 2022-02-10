@@ -116,6 +116,21 @@ class QuestionCountDataHandler(base.BaseHandler):
     skill ids.
     """
 
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'comma_separated_skill_ids': {
+            'schema': {
+                'type': 'basestring',
+                 'validators': [{
+                    'id': 'is_valid_comma_separated_skill_ids'
+                }]
+            }
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
@@ -123,11 +138,6 @@ class QuestionCountDataHandler(base.BaseHandler):
         """Handles GET requests."""
         skill_ids = comma_separated_skill_ids.split(',')
         skill_ids = list(set(skill_ids))
-
-        try:
-            _require_valid_skill_ids(skill_ids)
-        except utils.ValidationError:
-            raise self.InvalidInputException('Invalid skill id')
 
         total_question_count = (
             question_services.get_total_question_count_for_skill_ids(skill_ids))

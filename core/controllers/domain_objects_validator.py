@@ -29,6 +29,7 @@ from core.domain import exp_domain
 from core.domain import image_validation_services
 from core.domain import question_domain
 from core.domain import state_domain
+from core.domain import skill_domain
 from core.domain import topic_domain
 
 from typing import Dict, Optional, Union
@@ -309,6 +310,25 @@ def validate_params_dict(params):
     # the data is returned from here.
     return params
 
+def validate_skill_change(change_dict):
+    """Validates Skill change.
+
+    Args:
+        change_dict: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns the validated change_dict.
+    """
+    allowed_commands = [
+        command['name'] for command in skill_domain.SkillChange.ALLOWED_COMMANDS
+    ]
+
+    if change_dict.get('cmd', None) not in allowed_commands:
+        raise base.BaseHandler.InvalidInputException(
+            '%s cmd is not allowed.' % change_dict.get('cmd', None)
+        )
+
+    return change_dict
 
 def validate_topic_and_sub_topic_change(change_dict):
     """Validates Topic or Subtopic change.
@@ -329,3 +349,4 @@ def validate_topic_and_sub_topic_change(change_dict):
         )
 
     return change_dict
+
