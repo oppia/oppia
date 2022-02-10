@@ -138,7 +138,6 @@ def normalize_against_schema(
             )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
-        schema_value_type = schema[SCHEMA_KEY_VALUES]
         normalized_obj = {}
         for key, value in obj.items():
             normalized_key = normalize_against_schema(
@@ -146,7 +145,7 @@ def normalize_against_schema(
                 global_validators=global_validators
             )
             normalized_obj[normalized_key] = normalize_against_schema(
-                value, schema_value_type[SCHEMA_KEY_SCHEMA],
+                value, schema[SCHEMA_KEY_VALUES][SCHEMA_KEY_SCHEMA],
                 global_validators=global_validators
             )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:

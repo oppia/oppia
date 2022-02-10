@@ -617,9 +617,17 @@ class ExplorationStartEventHandler(base.BaseHandler):
         'POST': {
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params_dict),
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                         'schema': {
+                             'type': 'int'
+                         }
+                    }
                 }
             },
             'session_id': {
@@ -818,11 +826,19 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             },
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params_dict),
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                         'schema': {
+                             'type': 'int'
+                         }
+                    }
                 }
-            }
+            },
         }
     }
 
@@ -922,11 +938,19 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             },
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params_dict),
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                         'schema': {
+                             'type': 'int'
+                         }
+                    }
                 }
-            }
+            },
         }
     }
 
