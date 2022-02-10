@@ -170,7 +170,7 @@ class FullyQualifiedMessageIdentifierDomainUnitTests(
     def setUp(self) -> None:
         super(FullyQualifiedMessageIdentifierDomainUnitTests, self).setUp()
         self.exp_id = 'exp'
-        self.message_id = 'message'
+        self.message_id = 1
         self.thread_id = 'exp.thread'
         self.Message_Identifier = (
             feedback_domain.FullyQualifiedMessageIdentifier(
@@ -196,13 +196,13 @@ class FeedbackThreadSummaryDomainUnitTests(test_utils.GenericTestBase):
         self.message_id = 'message'
         self.thread_id = 'exp.thread'
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_valid_exploration(self.exp_id, self.owner_id)
-        self.thread_id_1 = (feedback_services.create_thread(
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
+        self.save_new_valid_exploration(self.exp_id, self.owner_id) # type: ignore[no-untyped-call]
+        self.thread_id_1 = (feedback_services.create_thread( # type: ignore[no-untyped-call]
             'exploration', self.exp_id, self.owner_id,
             'A subject', 'Random text'
         ))
-        self.thread_id_2 = (feedback_services.create_thread(
+        self.thread_id_2 = (feedback_services.create_thread( # type: ignore[no-untyped-call]
             'exploration', self.exp_id, self.owner_id,
             'Another subject', 'Another Random text'
         ))
