@@ -167,7 +167,7 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 class FullyQualifiedMessageIdentifierDomainUnitTests(
     test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(FullyQualifiedMessageIdentifierDomainUnitTests, self).setUp()
         self.exp_id = 'exp'
         self.message_id = 'message'
@@ -177,7 +177,7 @@ class FullyQualifiedMessageIdentifierDomainUnitTests(
                 self.thread_id, self.message_id
             ))
 
-    def test_initialize(self):
+    def test_initialize(self) -> None:
         self.assertEqual(
             self.Message_Identifier.message_id,
             self.message_id
@@ -190,7 +190,7 @@ class FullyQualifiedMessageIdentifierDomainUnitTests(
 
 class FeedbackThreadSummaryDomainUnitTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(FeedbackThreadSummaryDomainUnitTests, self).setUp()
         self.exp_id = 'exp'
         self.message_id = 'message'
@@ -207,7 +207,7 @@ class FeedbackThreadSummaryDomainUnitTests(test_utils.GenericTestBase):
             'Another subject', 'Another Random text'
         ))
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         thread_ids = [self.thread_id_1, self.thread_id_2]
         thread_summeries = (feedback_services.get_exp_thread_summaries(
             self.owner_id,
