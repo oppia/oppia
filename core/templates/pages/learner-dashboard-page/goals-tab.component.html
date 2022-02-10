@@ -8,8 +8,15 @@
           <i class="fa fa-caret-right" aria-hidden="true" *ngIf="!currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
           <i class="fa fa-caret-down" aria-hidden="true" *ngIf="currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
         </div>
-        <div class="oppia-trash-button" (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
-          <i class="fa fa-trash"></i>
+        <div #dropdown class="oppia-three-dots-dropdown-container" 
+             (click)="toggleThreeDotsDropdown()">
+          <i class="fa fa-ellipsis-v"></i>
+          <div *ngIf="showThreeDotsDropdown" class="oppia-three-dots-dropdown">
+            <div class="oppia-trash-button" (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
+              <i class="fa fa-trash"></i>
+              <span>{{'I18N_LEARNER_DASHBOARD_REMOVE_BUTTON' | translate}}</span>
+            </div>
+          </div>
         </div>
         <label class="oppia-current-goals-topic-name protractor-test-topic-name-in-current-goals">
           Learn {{topic.name}}
@@ -288,14 +295,35 @@
   .oppia-story-summary-card {
     display: inline-block;
   }
-  .oppia-trash-button {
+  .oppia-three-dots-dropdown-container {
     color: #555;
     cursor: pointer;
     float: right;
     font-size: 13px;
     height: 24px;
     margin-right: 13px;
+    position: relative;
     width: 24px;
+  }
+  .oppia-three-dots-dropdown {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgb(0 0 0 / 25%);
+    padding: 10px;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 100px;
+  }
+  .oppia-three-dots-dropdown:hover {
+    background-color: #f5f5f5;
+  }
+  .oppia-three-dots-dropdown span {
+    font-size: 14px;
+    padding-left: 10px;
+  }
+  .oppia-trash-button {
+    text-align: center;
   }
   @media screen and (max-width: 1200px) {
     .oppia-checkbox {
@@ -317,7 +345,7 @@
     .oppia-goals-story-name {
       width: 250px;
     }
-    .oppia-trash-button {
+    .oppia-three-dots-dropdown {
       margin-right: 3px;
     }
     .oppia-current-goals-content {
