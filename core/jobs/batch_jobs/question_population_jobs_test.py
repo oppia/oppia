@@ -78,41 +78,6 @@ class PopulateQuestionWithAndroidProtoSizeInBytesJobTests(
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
-    def test_broken_cache_is_reported(self) -> None:
-        cache_swap = self.swap_to_always_raise(
-            caching_services, 'delete_multi', Exception('cache deletion error'))
-
-        question_model = self.create_model(
-            question_models.QuestionModel,
-            id=self.QUESTION_ID,
-            question_state_data=self.state.to_dict(),
-            language_code='en',
-            version=1,
-            linked_skill_ids=['test_skill1', 'test_skill2'],
-            question_state_data_schema_version=48,
-            inapplicable_skill_misconception_ids=['skillid12345-1']
-        )
-        question_model.update_timestamps()
-        question_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create question', [{
-            'cmd': question_domain.CMD_CREATE_NEW
-        }])
-
-        with cache_swap:
-            self.assert_job_output_is([
-                job_run_result.JobRunResult(
-                    stdout='QUESTION PROCESSED SUCCESS: 1'),
-                job_run_result.JobRunResult(
-                    stderr='CACHE DELETION ERROR: "cache deletion error": 1'),
-                job_run_result.JobRunResult(
-                    stdout='QUESTION POPULATED WITH '
-                    'android_proto_size_in_bytes SUCCESS: 1')
-            ])
-
-        migrated_question_model = question_models.QuestionModel.get(
-            self.QUESTION_ID)
-        self.assertEqual(
-            migrated_question_model.android_proto_size_in_bytes, 219)
-
     def test_unmigrated_question_is_migrated(self) -> None:
         question_model = self.create_model(
             question_models.QuestionModel,
@@ -134,9 +99,7 @@ class PopulateQuestionWithAndroidProtoSizeInBytesJobTests(
                 stdout='QUESTION PROCESSED SUCCESS: 1'),
             job_run_result.JobRunResult(
                 stdout='QUESTION POPULATED WITH android_proto_size_in_bytes'
-                ' SUCCESS: 1'),
-            job_run_result.JobRunResult(
-                stdout='CACHE DELETION SUCCESS: 1')
+                ' SUCCESS: 1')
         ])
 
         migrated_question_model = question_models.QuestionModel.get(

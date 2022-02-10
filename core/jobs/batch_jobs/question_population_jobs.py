@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.domain import caching_services
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
@@ -144,30 +143,6 @@ class PopulateQuestionWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
             })
             yield (question.id, question_change)
 
-    @staticmethod
-    def _delete_question_from_cache(
-        question: question_domain.Question
-    ) -> result.Result[str, Exception]:
-        """Deletes question from cache.
-
-        Args:
-            question: Question. The question
-                which should be deleted from cache.
-
-        Returns:
-            Result(str, Exception). The id of the question when the deletion
-            was successful or Exception when the deletion failed.
-        """
-        try:
-            caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_QUESTION,
-                None,
-                [question.id]
-            )
-            return result.Ok(question.id)
-        except Exception as e:
-            return result.Err(e)
-
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the question
         android_proto_size_in_bytes field population.
@@ -256,16 +231,6 @@ class PopulateQuestionWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
                     'QUESTION POPULATED WITH android_proto_size_in_bytes'))
         )
 
-        cache_deletion_job_run_results = (
-            question_objects_list
-            | 'Delete question from cache' >> beam.Map(
-                lambda question_object: (
-                    self._delete_question_from_cache(
-                        question_object['question'])))
-            | 'Generate results for cache deletion' >> (
-                job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
-        )
-
         question_models_to_put = (
             question_objects_list
             | 'Generate question models to put' >> beam.FlatMap(
@@ -283,7 +248,6 @@ class PopulateQuestionWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
 
         return (
             (
-                cache_deletion_job_run_results,
                 migrated_question_job_run_results,
                 question_objects_list_job_run_results
             )

@@ -74,12 +74,6 @@ CACHE_NAMESPACE_STORY: Final = 'story'
 # string; this sub-namespace stores the latest version of the topic.
 CACHE_NAMESPACE_TOPIC: Final = 'topic'
 # This namespace supports sub-namespaces which are identified by the stringified
-# version number of the explorations within the sub-namespace. The value for
-# each key in this namespace should be a serialized representation of an
-# Exploration. There is also a special sub-namespace represented by the empty
-# string; this sub-namespace stores the latest version of the exploration.
-CACHE_NAMESPACE_QUESTION: Final = 'question'
-# This namespace supports sub-namespaces which are identified by the stringified
 # version number of the topics within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Platform Parameter. This namespace does not support sub-namespaces.
