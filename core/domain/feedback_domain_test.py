@@ -172,18 +172,17 @@ class FullyQualifiedMessageIdentifierDomainUnitTests(
         self.exp_id = 'exp'
         self.message_id = 1
         self.thread_id = 'exp.thread'
-        self.Message_Identifier = (
-            feedback_domain.FullyQualifiedMessageIdentifier(
-                self.thread_id, self.message_id
-            ))
 
     def test_initialize(self) -> None:
+        message_identifier = feedback_domain.FullyQualifiedMessageIdentifier(
+                self.thread_id, self.message_id
+            )
         self.assertEqual(
-            self.Message_Identifier.message_id,
+            message_identifier.message_id,
             self.message_id
         )
         self.assertEqual(
-            self.Message_Identifier.thread_id,
+            message_identifier.thread_id,
             self.thread_id
         )
 
@@ -197,23 +196,34 @@ class FeedbackThreadSummaryDomainUnitTests(test_utils.GenericTestBase):
         self.thread_id = 'exp.thread'
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
-        self.save_new_valid_exploration(self.exp_id, self.owner_id) # type: ignore[no-untyped-call]
-        self.thread_id_1 = (feedback_services.create_thread( # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_valid_exploration(self.exp_id, self.owner_id) # type: ignore[no-untyped-call]
+        self.thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
             'exploration', self.exp_id, self.owner_id,
             'A subject', 'Random text'
-        ))
-        self.thread_id_2 = (feedback_services.create_thread( # type: ignore[no-untyped-call]
-            'exploration', self.exp_id, self.owner_id,
-            'Another subject', 'Another Random text'
-        ))
+        )
 
     def test_to_dict(self) -> None:
-        thread_ids = [self.thread_id_1, self.thread_id_2]
-        thread_summeries = (feedback_services.get_exp_thread_summaries( # type: ignore[no-untyped-call]
+        thread_ids = [self.thread_id]
+        thread_summary_dict = feedback_services.get_exp_thread_summaries( # type: ignore[no-untyped-call]
             self.owner_id,
-            thread_ids))[0]
-        for i in thread_summeries:
-            self.assertIn(
-                (i.to_dict())['thread_id'],
-                thread_ids
-            )
+            thread_ids)[0][0].to_dict()
+        thread = feedback_services.get_thread(self.thread_id) # type: ignore[no-untyped-call]
+        expected_thread_summary_dict: Dict[str, str] = {
+            'status': thread.status,
+            'original_author_id': thread.original_author_id,
+            'last_updated_msecs': (
+                utils.get_time_in_millisecs(thread.last_updated)),
+            'last_message_text': thread.last_nonempty_message_text,
+            'total_message_count': thread.message_count,
+            'last_message_is_read': True,
+            'second_last_message_is_read': False,
+            'author_last_message': 'owner',
+            'author_second_last_message': None,
+            'exploration_title': self.exploration.title,
+            'exploration_id': self.exp_id,
+            'thread_id': self.thread_id
+        }
+        self.assertDictEqual(
+            expected_thread_summary_dict,
+            thread_summary_dict
+        )
