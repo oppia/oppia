@@ -560,18 +560,26 @@ export class TopicEditorStateService {
    * has been successfully updated.
    */
   updateExistenceOfTopicUrlFragment(
-      topicUrlFragment: string, successCallback: () => void): void {
+      topicUrlFragment: string,
+      successCallback: () => void,
+      errorCallback: () => void
+  ): void {
     this.editableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
       topicUrlFragment).then((topicUrlFragmentExists) => {
       this._setTopicWithUrlFragmentExists(topicUrlFragmentExists);
       if (successCallback) {
         successCallback();
       }
-    }, (error) => {
-      this.alertsService.addWarning(
-        error ||
-        'There was an error when checking if the topic url fragment ' +
-        'exists for another topic.');
+    }, (errorResponse) => {
+      if (errorCallback) {
+        errorCallback();
+      }
+      if (errorResponse.status !== 400) {
+        this.alertsService.addWarning(
+          errorResponse.message ||
+          'There was an error when checking if the topic url fragment ' +
+          'exists for another topic.');
+      }
     });
   }
 
