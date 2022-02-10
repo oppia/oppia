@@ -50,10 +50,10 @@ class SubtopicPageChange(change_domain.BaseChange):
 
     # The allowed list of subtopic page properties which can be used in
     # update_subtopic_page_property command.
-    SUBTOPIC_PAGE_PROPERTIES = (
+    SUBTOPIC_PAGE_PROPERTIES = [
         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
-        SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS)
+        SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS]
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,

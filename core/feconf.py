@@ -24,7 +24,7 @@ import os
 
 from core.constants import constants
 
-from typing import Dict, List
+from typing import Dict, List, Union, Tuple, Any
 from typing_extensions import TypedDict
 
 
@@ -879,6 +879,7 @@ CUSTOM_VOLUNTEERS_LANDING_PAGE_URL = '/volunteers'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
+EXPLORATION_IMAGE_UPLOAD_PREFIX = '/createhandler/imageupload'
 EXPLORATION_FEATURES_PREFIX = '/explorehandler/features'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_LEARNER_ANSWER_DETAILS = (
