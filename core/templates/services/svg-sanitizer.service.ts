@@ -154,6 +154,36 @@ export class SvgSanitizerService {
     return { tags: invalidTags, attrs: invalidAttrs };
   }
 
+  parseDataURI(dataURI: string): Document {
+    // Convert base64/URLEncoded data component to raw binary data
+    // held in a string.
+    let svgString = atob(dataURI.split(',')[1]);
+    let domParser = new DOMParser();
+    let doc = domParser.parseFromString(svgString, 'image/svg+xml');
+    return doc;
+  }
+
+  removeTagsAndAttributes(
+      svg: Document, valuesToBeRemoved?: { tags: string[]; attrs: string[] }
+  ): Document {
+    let tagsToBeRemoved = valuesToBeRemoved.tags;
+    let attrsToBeRemoved = valuesToBeRemoved.attrs;
+    svg.querySelectorAll('*').forEach((node) => {
+      let nodeTagName: string = node.tagName.toLowerCase();
+      if (tagsToBeRemoved.indexOf(nodeTagName) !== -1) {
+        svg.removeChild(node);
+      } else {
+        for (let i = 0; i < node.attributes.length; i++) {
+          let nodeAttrName: string = node.attributes[i].name.toLowerCase();
+          if (attrsToBeRemoved.indexOf(nodeAttrName) !== -1) {
+            node.removeAttribute(nodeAttrName);
+          }
+        }
+      }
+    });
+    return svg;
+  }
+
   getInvalidSvgTagsAndAttrs(
       svg: Document
   ): { tags: string[]; attrs: string[] } {
@@ -161,13 +191,8 @@ export class SvgSanitizerService {
   }
 
   getInvalidSvgTagsAndAttrsFromDataUri(
-      dataURI: string
-  ): { tags: string[]; attrs: string[] } {
-    // Convert base64/URLEncoded data component to raw binary data
-    // held in a string.
-    let svgString = atob(dataURI.split(',')[1]);
-    let domParser = new DOMParser();
-    let doc = domParser.parseFromString(svgString, 'image/svg+xml');
+      dataURI: string): { tags: string[]; attrs: string[] } {
+    let doc = this.parseDataURI(dataURI);
     return this._getInvalidSvgTagsAndAttrs(doc);
   }
 

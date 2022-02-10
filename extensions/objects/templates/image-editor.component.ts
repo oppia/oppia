@@ -989,20 +989,15 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       // https://github.com/cure53/DOMPurify
       // Complete list of valid SVG attributes is present at
       // 'assets/constants.ts'.
-      const svgString = atob(imageDataURI.split(',')[1]);
-      let domParser = new DOMParser();
-      let doc = domParser.parseFromString(svgString, 'image/svg+xml');
-      doc.querySelectorAll('*').forEach((node) => {
-        if (node.tagName.toLowerCase() === 'svg') {
-          node.removeAttribute('data-name');
-        }
-      });
+      let svg = this.svgSanitizerService.removeTagsAndAttributes(
+        this.svgSanitizerService.parseDataURI(imageDataURI),
+        {tags: [], attrs: ['data-name']}
+      );
       imageDataURI = (
         'data:image/svg+xml;base64,' +
-        btoa(unescape(encodeURIComponent(doc.documentElement.outerHTML))));
+        btoa(unescape(encodeURIComponent(svg.documentElement.outerHTML))));
       this.invalidTagsAndAttributes = (
-        this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
-          imageDataURI));
+        this.svgSanitizerService.getInvalidSvgTagsAndAttrs(svg));
       const tags = this.invalidTagsAndAttributes.tags;
       const attrs = this.invalidTagsAndAttributes.attrs;
       if (tags.length === 0 && attrs.length === 0) {
