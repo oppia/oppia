@@ -209,7 +209,7 @@ class FeedbackThreadSummaryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         thread_ids = [self.thread_id_1, self.thread_id_2]
-        thread_summeries = (feedback_services.get_exp_thread_summaries(
+        thread_summeries = (feedback_services.get_exp_thread_summaries( # type: ignore[no-untyped-call]
             self.owner_id,
             thread_ids))[0]
         for i in thread_summeries:
