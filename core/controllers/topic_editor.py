@@ -25,7 +25,6 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import domain_objects_validator
 from core.domain import classroom_services
 from core.domain import email_manager
 from core.domain import fs_services
@@ -311,10 +310,7 @@ class EditableTopicDataHandler(base.BaseHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            domain_objects_validator.
-                            validate_topic_and_sub_topic_change
-                        )
+                        'object_class': topic_domain.TopicChange
                     }
                 }
             }
