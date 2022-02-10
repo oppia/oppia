@@ -67,8 +67,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
-            None, False, ['skill_id_2']
-        )
+            None, False, ['skill_id_2'],
+            created_on=datetime.datetime.now(),
+            last_updated=datetime.datetime.now())
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the skill passes strict validation."""
@@ -99,6 +100,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         misconception_name = 'This string is smaller than 50'
         self.skill.update_misconception_name(0, misconception_name)
         self.skill.validate()
+        with self.assertRaisesRegex(
+            ValueError,
+            'There is no misconception with the given id.'
+        ):
+            self.skill.update_misconception_name(1, misconception_name)
         misconception_name = (
             'etiam non quam lacus suspendisse faucibus interdum posuere lorem '
             'ipsum dolor sit amet consectetur adipiscing elit duis tristique '
@@ -107,6 +113,149 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Misconception name should be less than 100 chars'
         )
+        self.assertEqual(self.skill.get_incremented_misconception_id(0), 1)
+
+    def test_update_contents_from_model(self):
+        for i in range(3):
+            versioned_skill_contents = {
+            'schema_version': i + 1,
+            'skill_contents': self.skill.to_dict()['skill_contents']
+            }
+            self.skill.update_skill_contents_from_model(
+                versioned_skill_contents,
+                versioned_skill_contents['schema_version']
+            )
+            self.skill.validate()
+        for i in range(4):
+            versioned_misconceptions = {
+                'schema_version': i + 1,
+                'misconceptions': self.skill.to_dict()['misconceptions']
+            }
+            self.skill.update_misconceptions_from_model(
+                versioned_misconceptions,
+                versioned_misconceptions['schema_version']
+            )
+            self.skill.validate()
+
+    def test_update_misconception_feedback(self):
+        feedback = '<p>new_feedback</p>'
+        self.skill.update_misconception_feedback(
+            0, feedback)
+        self.skill.validate()
+        self.assertEqual(self.skill.misconceptions[0].feedback, feedback)
+        with self.assertRaisesRegex(
+            ValueError,
+            'There is no misconception with the given id.'
+        ):
+            self.skill.update_misconception_feedback(1, feedback)
+
+    def test_update_misconception_notes(self):
+        new_notes = '<p>Update notes</p>'
+        self.skill.update_misconception_notes(
+            0, new_notes)
+        self.skill.validate()
+        self.assertEqual(self.skill.misconceptions[0].notes, new_notes)
+        with self.assertRaisesRegex(
+            ValueError,
+            'There is no misconception with the given id.'
+        ):
+            self.skill.update_misconception_notes(1, new_notes)
+
+    def test_update_misconception_must_be_addressed(self):
+        must_be_addressed = False
+        self.skill.update_misconception_must_be_addressed(
+            0, must_be_addressed)
+        self.skill.validate()
+        self.assertEqual(
+            self.skill.misconceptions[0].must_be_addressed,
+            must_be_addressed
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            'There is no misconception with the given id.'
+        ):
+            self.skill.update_misconception_must_be_addressed(
+                1, must_be_addressed)
+
+    def test_delete_misconceptions(self):
+        self.skill.delete_misconception(0)
+        self.assertEqual(len(self.skill.misconceptions), 0)
+        with self.assertRaisesRegex(
+            ValueError,
+            'There is no misconception with the given id.'
+        ):
+            self.skill.delete_misconception(0)
+
+    def test_add_misconception(self):
+        misconception = skill_domain.Misconception(
+            self.MISCONCEPTION_ID + 1, 'name_2', '<p>notes_2</p>',
+            '<p>default_feedback_2</p>', True)
+        self.skill.add_misconception(misconception)
+        self.skill.validate()
+        self.assertEqual(self.skill.misconceptions[1], misconception)
+
+    def test_delete_prerequisite_skill(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            'The skill to remove is not a prerequisite skill.'
+        ):
+            self.skill.delete_prerequisite_skill('some_id')
+        self.skill.delete_prerequisite_skill('skill_id_2')
+        self.assertEqual(len(self.skill.prerequisite_skill_ids), 0)
+
+    def test_add_prerequisite_skill(self):
+        self.skill.add_prerequisite_skill('skill_id_3')
+        self.assertEqual(len(self.skill.prerequisite_skill_ids), 2)
+        self.assertEqual(self.skill.prerequisite_skill_ids[1], 'skill_id_3')
+        with self.assertRaisesRegex(
+            ValueError,
+            'The skill is already a prerequisite skill.'
+        ):
+            self.skill.add_prerequisite_skill('skill_id_2')
+
+    def test__find_prerequisite_skill_id_index(self):
+        # Disabling pylint protected access because this is a test.
+        self.assertEqual(
+            self.skill._find_prerequisite_skill_id_index('skill_id_2'), # pylint: disable=protected-access
+            0
+        )
+        self.assertEqual(
+            self.skill._find_prerequisite_skill_id_index('skill_id_3'), # pylint: disable=protected-access
+            None
+        )
+
+    def test_update_explanation(self):
+        new_explanation = state_domain.SubtitledHtml(
+            '1',
+            '<p>New Explanation</p>'
+        )
+        self.skill.update_explanation(new_explanation)
+        self.skill.validate()
+        self.assertEqual(
+            self.skill.skill_contents.explanation,
+            new_explanation
+        )
+
+    def test_update_rubric(self):
+        difficulty = constants.SKILL_DIFFICULTIES[0]
+        explanations = ['explanation1']
+        self.skill.update_rubric(difficulty, explanations)
+        with self.assertRaisesRegex(
+            ValueError,
+            'There is no rubric for the given difficulty.'
+        ):
+            self.skill.update_rubric('difficulty', explanations)
+
+    def test_updates_on_skill(self):
+        self.skill.update_description('Update Description')
+        self.skill.update_language_code('de')
+        self.skill.update_superseding_skill_id('1')
+        self.skill.record_that_all_questions_are_merged(True)
+        self.skill.validate()
+        self.assertEqual(self.skill.description, 'Update Description')
+        self.assertEqual(self.skill.language_code, 'de')
+        self.assertEqual(self.skill.superseding_skill_id, '1')
+        self.assertEqual(self.skill.all_questions_merged, True)
 
     def test_valid_misconception_must_be_addressed(self):
         self.skill.validate()
@@ -518,6 +667,14 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 {'explanations': ['explanation2']}
             ]
         })
+        for i in range(1, 4):
+            versioned_rubrics = {
+                'schema_version': i + 1,
+                'rubrics': self.skill.to_dict()['rubrics']
+            }
+            skill_domain.Skill.update_rubrics_from_model(
+                versioned_rubrics, i + 1)
+            self.skill.validate()
 
 
 class SkillChangeTests(test_utils.GenericTestBase):

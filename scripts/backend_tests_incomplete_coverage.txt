@@ -18,7 +18,6 @@ core.domain.stats_services_test
 core.domain.value_generators_domain_test
 core.domain.summary_services_test
 core.domain.interaction_registry_test
-core.domain.skill_domain_test
 core.domain.auth_services_test
 core.domain.opportunity_services_test
 core.domain.feedback_domain_test
