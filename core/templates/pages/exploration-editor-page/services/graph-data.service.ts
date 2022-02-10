@@ -16,46 +16,51 @@
  * @fileoverview Service for computing graph data.
  */
 
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-init-state-name.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('services/compute-graph.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('GraphDataService', [
-  'ComputeGraphService', 'ExplorationInitStateNameService',
-  'ExplorationStatesService',
-  function(
-      ComputeGraphService, ExplorationInitStateNameService,
-      ExplorationStatesService) {
-    var _graphData = null;
-    var _recomputeGraphData = function() {
-      if (!ExplorationInitStateNameService.savedMemento) {
-        return;
-      }
+import cloneDeep from 'lodash/cloneDeep';
 
-      var states = ExplorationStatesService.getStates();
-      var initStateId = ExplorationInitStateNameService.savedMemento;
-      _graphData = ComputeGraphService.compute(initStateId, states);
-    };
+import { ComputeGraphService, GraphData } from 'services/compute-graph.service';
+import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 
-    return {
-      recompute: function() {
-        _recomputeGraphData();
-      },
-      /**
-       * @return graphData - Directed graph visualization input. This object
-       * includes the following keys:
-       * - nodes: Objects with keys of nodeids and values of node names.
-       * - links: list of objects. Each object represents a directed link
-       *    between two nodes, and has keys 'source' and 'target', the values
-       *    of which are the names of the corresponding nodes.
-       * - initStateName: the name of the initial state.
-       * - finalStateName: the name of the final state.
-       */
-      getGraphData: function() {
-        return angular.copy(_graphData);
-      }
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class GraphDataService {
+  _graphData: GraphData | null = null;
+
+  constructor(
+    private computeGraphService: ComputeGraphService,
+    private explorationInitStateNameService: ExplorationInitStateNameService,
+    private explorationStatesService: ExplorationStatesService
+  ) {}
+
+  recompute(): void {
+    if (!this.explorationInitStateNameService.savedMemento) {
+      return;
+    }
+
+    let states = this.explorationStatesService.getStates();
+    let initStateId = this.explorationInitStateNameService.savedMemento;
+    this._graphData = this.computeGraphService.compute(initStateId, states);
   }
-]);
+
+  /**
+   * @return graphData - Directed graph visualization input. This object
+   * includes the following keys:
+   * - nodes: Objects with keys of nodeids and values of node names.
+   * - links: list of objects. Each object represents a directed link
+   *    between two nodes, and has keys 'source' and 'target', the values
+   *    of which are the names of the corresponding nodes.
+   * - initStateName: the name of the initial state.
+   * - finalStateName: the name of the final state.
+   */
+  getGraphData(): GraphData {
+    return cloneDeep(this._graphData);
+  }
+}
+
+angular.module('oppia').factory(
+  'GraphDataService', downgradeInjectable(GraphDataService));

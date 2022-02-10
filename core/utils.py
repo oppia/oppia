@@ -232,7 +232,7 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         assert isinstance(retrieved_dict, dict)
         return retrieved_dict
     except (AssertionError, yaml.YAMLError) as e:
-        raise InvalidInputException(e)
+        raise InvalidInputException(e) from e
 
 
 def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> str:
@@ -508,7 +508,7 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
         float. The time in milliseconds since the Epoch.
     """
     msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
-    return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0) # type: ignore[no-any-return, no-untyped-call]
+    return msecs + (datetime_obj.microsecond / 1000.0)
 
 
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
@@ -563,7 +563,7 @@ def get_human_readable_time_string(time_msec: float) -> str:
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
     return time.strftime(
-        '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0))) # type: ignore[arg-type, no-untyped-call]
+        '%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
 
 
 def create_string_from_largest_unit_in_timedelta(

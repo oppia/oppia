@@ -29,56 +29,64 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
 export class NormalizeWhitespacePunctuationAndCasePipe
 implements PipeTransform {
   transform(input: string): string {
-    if (typeof input === 'string') {
-      let isAlphanumeric = function(character: string) {
-        return 'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
-          character.toLowerCase()) !== -1;
-      };
-      let isAdditionalChars = function(character: string) {
-        return '/@$!{}()'.indexOf(
-          character) !== -1;   //more additional characters can be included as per demand
-      };
 
-      input = input.trim();
-      let inputLines = input.split('\n');
-      let resultLines = [];
-      for (let i: number = 0; i < inputLines.length; i++) {
-        let result = '';
+    let isAlphanumeric = function(character: string) {
+      return 'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
+        character.toLowerCase()) !== -1;
+    };
+    let isAdditionalChars = function(character: string) {
+      return '/@$!{}()'.indexOf(
+        character) !== -1;   //more additional characters can be included as per demand
+    };
 
-        let inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
-        for (let j: number = 0; j < inputLine.length; j++) {
-          let currentChar: string = inputLine.charAt(j).toLowerCase();
-          if (currentChar === ' ') {
-            if (j > 0 && j < inputLine.length - 1 &&
-                                isAlphanumeric(inputLine.charAt(j - 1)) &&
-                                isAlphanumeric(inputLine.charAt(j + 1))) {
-              result += currentChar;
-            }
-            else
-            {
-              if(j > 0 && j < inputLine.length - 1 && !isAlphanumeric(inputLine.charAt(j - 1)))
-              {
-                result = result.slice(0,j-1);
-                result += currentChar;
-              }
-              else if(j > 0 && j < inputLine.length - 1 && !isAlphanumeric(inputLine.charAt(j + 1)) && isAdditionalChars(inputLine.charAt(j + 1)))
-              {
-                result += currentChar;
-              }
-            }
-          } else {
+    input = input.trim();
+    let inputLines = input.split('\n');
+    let resultLines = [];
+    for (let i: number = 0; i < inputLines.length; i++) {
+      let result = '';
+      let inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
+      for (let j: number = 0; j < inputLine.length; j++) {
+        let currentChar: string = inputLine.charAt(j).toLowerCase();
+        if (currentChar === ' ') {
+          if (j > 0 && j < inputLine.length - 1 &&
+                              isAlphanumeric(inputLine.charAt(j - 1)) &&
+                              isAlphanumeric(inputLine.charAt(j + 1))) {
             result += currentChar;
           }
-        }
+          else
+          {
+            if(j > 0 && j < inputLine.length - 1 && !isAlphanumeric(inputLine.charAt(j - 1)))
+            {
+              result = result.slice(0,j-1);
+              result += currentChar;
+            }
+            else if(j > 0 && j < inputLine.length - 1 && !isAlphanumeric(inputLine.charAt(j + 1)) && isAdditionalChars(inputLine.charAt(j + 1)))
+            {
+              result += currentChar;
+            }
+          }
+        } else {
+          let inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
+          for (let j: number = 0; j < inputLine.length; j++) {
+            let currentChar: string = inputLine.charAt(j).toLowerCase();
+            if (currentChar === ' ') {
+              if (j > 0 && j < inputLine.length - 1 &&
+                                  isAlphanumeric(inputLine.charAt(j - 1)) &&
+                                  isAlphanumeric(inputLine.charAt(j + 1))) {
 
-        if (result) {
-          resultLines.push(result);
+                result += currentChar;
+              }
+            } else {
+              result += currentChar;
+            }
+          }
+
+          if (result) {
+            resultLines.push(result);
+          }
         }
       }
-
-      return resultLines.join('\n');
-    } else {
-      return input;
     }
+    return resultLines.join('\n');
   }
 }
