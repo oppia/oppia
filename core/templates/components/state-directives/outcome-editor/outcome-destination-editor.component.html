@@ -28,7 +28,7 @@
   </form>
   <p [hidden]="newStateNameForm.form.valid ||  outcomeNewStateName === undefined" class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
 
-  <div *ngIf="isSelfLoop() && canEditRefresherExplorationId" class="oppia-id-text">
+  <div *ngIf="isSelfLoop() && canEditRefresherExplorationId && outcome.refresherExplorationId != null" class="oppia-id-text">
     <b>Refresher exploration ID (optional):</b>
     <input type="text"
            class="form-control protractor-test-add-refresher-exploration-id"
@@ -36,6 +36,9 @@
            [pattern]="explorationAndSkillIdPattern"
            tabindex="0"
            [attr.aria-invalid]="false">
+           <div class="refresher-error-message">
+            Refresher exploration id should be removed.
+           </div>
   </div>
   <div class="oppia-id-text" *ngIf="canAddPrerequisiteSkill">
     <b>Prerequisite skill ID (optional):&nbsp;</b>
@@ -72,7 +75,7 @@
   .oppia-prerequisite-explanation-text {
     font-size: 0.8em;
   }
-  outcome-destination-editor .refresher-error-message {
+  .refresher-error-message {
     color: #f00;
     display: block;
     font-size: 0.8em;
