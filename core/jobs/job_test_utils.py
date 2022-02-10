@@ -275,23 +275,23 @@ def decorate_beam_errors() -> Iterator[None]:
         if match:
             groupdict = match.groupdict()
         else:
-            raise AssertionError(exception_message)
+            raise AssertionError(exception_message) from exception
 
         unexpected_elements = groupdict.get('unexpected', None)
         try:
             unexpected_elements = (
                 ast.literal_eval(unexpected_elements)
                 if unexpected_elements else None)
-        except (SyntaxError, ValueError):
-            raise AssertionError(exception_message)
+        except (SyntaxError, ValueError) as e:
+            raise AssertionError(exception_message) from e
 
         missing_elements = groupdict.get('missing', None)
         try:
             missing_elements = (
                 ast.literal_eval(missing_elements)
                 if missing_elements else None)
-        except (SyntaxError, ValueError):
-            raise AssertionError(exception_message)
+        except (SyntaxError, ValueError) as e:
+            raise AssertionError(exception_message) from e
 
         error_lines = [
             'failed %s' % match.group('context'),
@@ -306,4 +306,4 @@ def decorate_beam_errors() -> Iterator[None]:
             error_lines.append('Missing:')
             error_lines.extend('    %r' % e for e in missing_elements)
         error_lines.append('')
-        raise AssertionError('\n'.join(error_lines))
+        raise AssertionError('\n'.join(error_lines)) from exception
