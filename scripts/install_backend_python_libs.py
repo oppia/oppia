@@ -431,7 +431,7 @@ def verify_pip_is_installed():
             print(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
-        raise ImportError('Error importing pip: %s' % e)
+        raise ImportError('Error importing pip: %s' % e) from e
     else:
         if pip.__version__ != OPPIA_REQUIRED_PIP_VERSION:
             common.print_each_string_after_two_new_lines([

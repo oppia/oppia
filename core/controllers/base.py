@@ -440,10 +440,10 @@ class BaseHandler(webapp2.RequestHandler):
         try:
             schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
                 request_method]
-        except Exception:
+        except Exception as e:
             raise NotImplementedError(
                 'Missing schema for %s method in %s handler class.' % (
-                    request_method, handler_class_name))
+                    request_method, handler_class_name)) from e
 
         allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
         normalized_arg_values, errors = (

@@ -5041,6 +5041,23 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self._check_contributors_summary(
             self.EXP_ID_1, {self.albert_id: 1})
 
+    def test_regenerate_summary_with_new_contributor_with_invalid_exp_id(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        with logging_swap:
+            exp_services.regenerate_exploration_summary_with_new_contributor(
+                'dummy_id', self.albert_id)
+
+        self.assertEqual(
+            observed_log_messages,
+            ['Could not find exploration with ID dummy_id']
+        )
+
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
