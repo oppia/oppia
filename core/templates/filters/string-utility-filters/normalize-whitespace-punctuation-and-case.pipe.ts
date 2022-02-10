@@ -25,18 +25,18 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-@Pipe({name: 'normalizeWhitespacePunctuationAndCase'})
+@Pipe({ name: 'normalizeWhitespacePunctuationAndCase' })
 export class NormalizeWhitespacePunctuationAndCasePipe
-implements PipeTransform {
+  implements PipeTransform {
   transform(input: string): string {
 
-    let isAlphanumeric = function(character: string) {
+    let isAlphanumeric = function (character: string) {
       return 'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
         character.toLowerCase()) !== -1;
     };
-    let isAdditionalChars = function(character: string) {
-      return '/@$!{}()'.indexOf(
-        character) !== -1;   //more additional characters can be included as per demand
+    let isAdditionalChars = function (character: string) {
+      return '/@$!{}()'.indexOf(   // More additional characters can be included as per demand
+        character) !== -1;
     };
 
     input = input.trim();
@@ -49,19 +49,14 @@ implements PipeTransform {
         let currentChar: string = inputLine.charAt(j).toLowerCase();
         if (currentChar === ' ') {
           if (j > 0 && j < inputLine.length - 1 &&
-                              isAlphanumeric(inputLine.charAt(j - 1)) &&
-                              isAlphanumeric(inputLine.charAt(j + 1))) {
+            isAlphanumeric(inputLine.charAt(j - 1)) &&
+            isAlphanumeric(inputLine.charAt(j + 1))) {
             result += currentChar;
-          }
-          else
-          {
-            if(j > 0 && j < inputLine.length - 1 && !isAlphanumeric(inputLine.charAt(j - 1)))
-            {
-              result = result.slice(0,j-1);
+          } else {
+            if (j > 0 && j < inputLine.length - 1 && !isAlphanumeric(inputLine.charAt(j - 1))) {
+              result = result.slice(0, j - 1);
               result += currentChar;
-            }
-            else if(j > 0 && j < inputLine.length - 1 && !isAlphanumeric(inputLine.charAt(j + 1)) && isAdditionalChars(inputLine.charAt(j + 1)))
-            {
+            } else if (j > 0 && j < inputLine.length - 1 && !isAlphanumeric(inputLine.charAt(j + 1)) && isAdditionalChars(inputLine.charAt(j + 1))) {
               result += currentChar;
             }
           }
@@ -71,8 +66,8 @@ implements PipeTransform {
             let currentChar: string = inputLine.charAt(j).toLowerCase();
             if (currentChar === ' ') {
               if (j > 0 && j < inputLine.length - 1 &&
-                                  isAlphanumeric(inputLine.charAt(j - 1)) &&
-                                  isAlphanumeric(inputLine.charAt(j + 1))) {
+                isAlphanumeric(inputLine.charAt(j - 1)) &&
+                isAlphanumeric(inputLine.charAt(j + 1))) {
 
                 result += currentChar;
               }
