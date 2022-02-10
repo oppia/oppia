@@ -119,7 +119,8 @@ export class LibraryPageComponent {
       this.MAX_NUM_TILES_PER_ROW);
 
     $('.oppia-library-carousel').css({
-      width: (this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX) + 'px'
+      'max-width': (
+        this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX) + 'px'
     });
 
     // The following determines whether to enable left scroll after
@@ -237,6 +238,10 @@ export class LibraryPageComponent {
     this.mobileLibraryGroupsProperties[idx].inCollapsedState =
       !this.mobileLibraryGroupsProperties[idx].inCollapsedState;
     this.toggleButtonText(idx);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnInit(): void {

@@ -27,6 +27,7 @@ import { LearnerDashboardPageConstants } from './learner-dashboard-page.constant
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
  @Component({
    selector: 'oppia-goals-tab',
@@ -36,6 +37,7 @@ export class GoalsTabComponent implements OnInit {
   constructor(
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardActivityBackendApiService: (
       LearnerDashboardActivityBackendApiService),
     private deviceInfoService: DeviceInfoService) {
@@ -124,6 +126,10 @@ export class GoalsTabComponent implements OnInit {
     } else {
       return this.topicToIndexMapping.NEITHER;
     }
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   getStaticImageUrl(imagePath: string): string {

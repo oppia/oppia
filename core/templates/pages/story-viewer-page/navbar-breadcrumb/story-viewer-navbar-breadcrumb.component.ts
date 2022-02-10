@@ -23,6 +23,7 @@ import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-b
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-story-viewer-navbar-breadcrumb',
@@ -36,6 +37,7 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   classroomUrlFragment: string;
   storyUrlFragment: string;
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService
@@ -70,6 +72,9 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
 

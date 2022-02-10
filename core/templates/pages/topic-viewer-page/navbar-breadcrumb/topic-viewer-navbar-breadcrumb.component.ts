@@ -24,6 +24,7 @@ import { ReadOnlyTopic } from
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'topic-viewer-navbar-breadcrumb',
@@ -34,6 +35,7 @@ export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
   topicName: string = '';
   constructor(
     private topicViewerBackendApiService: TopicViewerBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlService: UrlService
   ) {}
 
@@ -44,6 +46,10 @@ export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
       (readOnlyTopic: ReadOnlyTopic) => {
         this.topicName = readOnlyTopic.getTopicName();
       });
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
 angular.module('oppia').directive(
