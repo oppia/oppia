@@ -28,7 +28,6 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import image_validation_services
 from core.domain import question_domain
-from core.domain import skill_domain
 from core.domain import state_domain
 from core.domain import topic_domain
 
