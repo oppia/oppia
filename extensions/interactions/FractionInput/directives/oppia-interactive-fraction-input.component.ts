@@ -50,7 +50,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   allowNonzeroIntegerPart: boolean = true;
   customPlaceholder: string = '';
   FORM_ERROR_TYPE: string = 'FRACTION_FORMAT_ERROR';
-  errorMessage: string = '';
+  errorMessageI18nKey: string = '';
   answer: string = '';
   isValid: boolean = true;
   answerChanged: Subject<string> = new Subject<string>();
@@ -91,20 +91,23 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
       const FRACTION_REGEX =
         /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
       if (INVALID_CHARS_LENGTH_REGEX.test(newValue)) {
-        this.errorMessage = (
-          ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_CHARS_LENGTH);
+        this.errorMessageI18nKey = (
+          ObjectsDomainConstants.
+            FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS_LENGTH);
         this.isValid = false;
       } else if (INVALID_CHARS_REGEX.test(newValue)) {
-        this.errorMessage = (
-          ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_CHARS);
+        this.errorMessageI18nKey = (
+          ObjectsDomainConstants.
+            FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS);
         this.isValid = false;
       } else if (!(FRACTION_REGEX.test(newValue) ||
           PARTIAL_FRACTION_REGEX.test(newValue))) {
-        this.errorMessage = (
-          ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_FORMAT);
+        this.errorMessageI18nKey = (
+          ObjectsDomainConstants.
+            FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT);
         this.isValid = false;
       } else {
-        this.errorMessage = '';
+        this.errorMessageI18nKey = '';
         this.isValid = true;
       }
       this.currentInteractionService.updateViewWithNewAnswer();
@@ -164,22 +167,18 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
       if (this.requireSimplestForm &&
         !(fraction.toString() === fraction.convertToSimplestForm().toString())
       ) {
-        this.errorMessage = (
-          'Please enter an answer in simplest form ' +
-          '(e.g., 1/3 instead of 2/6).');
+        this.errorMessageI18nKey = 'I18N_INTERACTIONS_FRACTIONS_SIMPLEST_FORM';
         this.isValid = false;
       } else if (
         !this.allowImproperFraction && fraction.isImproperFraction()) {
-        this.errorMessage = (
-          'Please enter an answer with a "proper" fractional part ' +
-          '(e.g., 1 2/3 instead of 5/3).');
+        this.errorMessageI18nKey = (
+          'I18N_INTERACTIONS_FRACTIONS_PROPER_FRACTION');
         this.isValid = false;
       } else if (
         !this.allowNonzeroIntegerPart &&
           fraction.hasNonzeroIntegerPart()) {
-        this.errorMessage = (
-          'Please enter your answer as a fraction (e.g., 5/3 instead ' +
-          'of 1 2/3).');
+        this.errorMessageI18nKey = (
+          'I18N_INTERACTIONS_FRACTIONS_NON_MIXED');
         this.isValid = false;
       } else {
         this.currentInteractionService.onSubmit(
@@ -187,7 +186,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
           this.fractionInputRulesService as unknown as InteractionRulesService);
       }
     } catch (parsingError) {
-      this.errorMessage = parsingError.message;
+      this.errorMessageI18nKey = parsingError.message;
       this.isValid = false;
     }
   }

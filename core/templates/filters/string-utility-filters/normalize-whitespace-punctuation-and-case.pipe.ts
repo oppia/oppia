@@ -80,10 +80,9 @@ implements PipeTransform {
               result += currentChar;
             }
           }
-
-          if (result) {
-            resultLines.push(result);
-          }
+        }
+        if (result) {
+          resultLines.push(result);
         }
       }
     }
