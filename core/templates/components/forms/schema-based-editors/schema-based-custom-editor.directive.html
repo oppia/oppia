@@ -1,2 +1,16 @@
-<object-editor obj-type="<[$ctrl.schema.obj_type]>" schema="$ctrl.schema" value="$ctrl.localValue" always-editable="true">
-</object-editor>
+<form #hybridForm="ngForm">
+  <object-editor [objType]="schema.obj_type"
+                 [schema]="schema"
+                 [ngModel]="localValue"
+                 (ngModelChange)="updateValue($event)"
+                 [alwaysEditable]="true"
+                 name="objectEditor"
+                 [form]="form">
+  </object-editor>
+</form>
+<style>
+  .validity-form-input-element {
+      height: 0;
+      width: 0;
+  }
+</style>

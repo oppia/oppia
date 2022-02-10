@@ -28,7 +28,7 @@
       <div class="oppia-rule-details-header">
         <strong>Hint # {{indexPlusOne}} is...</strong>
         <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
-        <schema-based-editor [schema]="getSchema.bind(this)"
+        <schema-based-editor [schema]="getSchema()"
                              [localValue]="hint.hintContent._html"
                              (localValueChange)="updateHintContentHtml($event)">
         </schema-based-editor>

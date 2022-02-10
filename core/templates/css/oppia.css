@@ -936,7 +936,7 @@ textarea {
   box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
   font-size: 14px;
   margin: 2px 0 0;
-  max-width: 220px;
+  max-width: 245px;
   min-width: 160px;
   padding: 5px 0;
 }
@@ -1935,6 +1935,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-rte-viewer > p:first-child {
+  margin-left: 15px;
   margin-top: 0;
 }
 .oppia-rte-viewer > p:last-child {
@@ -4515,6 +4516,9 @@ div.oppia-issues-learner-action {
   split into multiple lines in the link text in the editor and shouldn't be
   removed.
 */
+.cke_widget_inline.cke_widget_oppiaskillreview {
+  display: inline;
+}
 .cke_widget_inline.cke_widget_oppialink {
   display: inline;
 }

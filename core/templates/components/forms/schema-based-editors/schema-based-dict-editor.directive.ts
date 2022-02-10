@@ -16,45 +16,92 @@
  * @fileoverview Directive for a schema-based editor for dicts.
  */
 
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { IdGenerationService } from 'services/id-generation.service';
 
-require('services/id-generation.service.ts');
-require('services/nested-directives-recursion-timeout-prevention.service.ts');
+@Component({
+  selector: 'schema-based-dict-editor',
+  templateUrl: './schema-based-dict-editor.directive.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedDictEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedDictEditorComponent),
+    },
+  ]
+})
 
-angular.module('oppia').directive('schemaBasedDictEditor', [
-  'NestedDirectivesRecursionTimeoutPreventionService',
-  function(NestedDirectivesRecursionTimeoutPreventionService) {
-    return {
-      scope: {
-        localValue: '=',
-        isDisabled: '&',
-        // Read-only property. An object whose keys and values are the dict
-        // properties and the corresponding schemas.
-        propertySchemas: '&',
-        labelForFocusTarget: '&'
-      },
-      template: require('./schema-based-dict-editor.directive.html'),
-      restrict: 'E',
-      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: [
-        '$scope', 'IdGenerationService',
-        function($scope, IdGenerationService) {
-          var ctrl = this;
-          $scope.getHumanReadablePropertyDescription = function(property) {
-            return property.description || '[' + property.name + ']';
-          };
+export class SchemaBasedDictEditorComponent
+implements ControlValueAccessor, OnInit, Validator {
+  localValue;
+  @Input() disabled;
+  @Input() propertySchemas;
+  @Input() labelForFocusTarget;
+  fieldIds: Record<string, string> = {};
+  JSON = JSON;
+  onChange: (val: unknown) => void = () => {};
+  constructor(private idGenerationService: IdGenerationService) { }
 
-          ctrl.$onInit = function() {
-            $scope.fieldIds = {};
-            for (var i = 0; i < $scope.propertySchemas().length; i++) {
-              // Generate random IDs for each field.
-              $scope.fieldIds[$scope.propertySchemas()[i].name] = (
-                IdGenerationService.generateNewId());
-            }
-          };
-        }
-      ]
-    };
+  // Implemented as a part of ControlValueAccessor interface.
+  writeValue(value: unknown): void {
+    this.localValue = value;
   }
-]);
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (val: unknown) => void): void {
+    this.onChange = fn;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnTouched(): void {
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
+  }
+
+  ngOnInit(): void {
+    this.fieldIds = {};
+    for (let i = 0; i < this.propertySchemas.length; i++) {
+      // Generate random IDs for each field.
+      this.fieldIds[this.propertySchemas[i].name] = (
+        this.idGenerationService.generateNewId());
+    }
+  }
+
+  updateValue(value: unknown, name: string): void {
+    this.localValue[name] = value;
+    this.onChange(this.localValue);
+  }
+
+  getSchema(index: number): unknown {
+    const schema = this.propertySchemas[index].schema;
+    return schema;
+  }
+
+  getLabelForFocusTarget(): string {
+    return this.labelForFocusTarget;
+  }
+
+  getEmptyString(): '' {
+    return '';
+  }
+
+  getHumanReadablePropertyDescription(
+      property: {description: string; name: string}
+  ): string {
+    return property.description || '[' + property.name + ']';
+  }
+}
+
+angular.module('oppia').directive('schemaBasedDictEditor', downgradeComponent({
+  component: SchemaBasedDictEditorComponent
+}));

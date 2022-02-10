@@ -32,7 +32,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { SearchService } from 'services/search.service';
 import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { AppConstants } from 'app.constants';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -62,6 +62,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   supportedSiteLanguages!: LanguageInfo[];
   currentLanguageText!: string;
   classroomData: CreatorTopicSummary[] = [];
+  topicTitlesTranslationKeys: string[] = [];
   learnDropdownOffset: number = 0;
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
@@ -195,11 +196,22 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
                 this.classroomData = classroomData.getTopicSummaries();
                 this.classroomBackendApiService.onInitializeTranslation.emit();
                 this.siteAnalyticsService.registerClassroomPageViewed();
+                // Store hacky tranlation keys of topics.
+                for (let i = 0; i < this.classroomData.length; i++) {
+                  let topicSummary = this.classroomData[i];
+                  let hackyTopicTranslationKey = (
+                    this.i18nLanguageCodeService.getTopicTranslationKey(
+                      topicSummary.getId(), TranslationKeyType.TITLE
+                    )
+                  );
+                  this.topicTitlesTranslationKeys.push(
+                    hackyTopicTranslationKey
+                  );
+                }
               });
           });
         }
       });
-
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
     // first save a reference to that context in a variable, and then use that
@@ -422,6 +434,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }, 150);
   }
 
+  navigateToPage(url: string): void {
+    this.windowRef.nativeWindow.location.href = url;
+  }
+
   /**
    * Checks if i18n has been run.
    * If i18n has not yet run, the <a> and <span> tags will have
@@ -484,6 +500,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         }
       }
     }
+  }
+
+  isHackyTopicTitleTranslationDisplayed(index: number): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.topicTitlesTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 
   ngOnDestroy(): void {

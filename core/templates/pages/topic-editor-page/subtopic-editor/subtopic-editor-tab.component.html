@@ -84,7 +84,8 @@
             <div ng-if="$ctrl.schemaEditorIsShown">
               <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
                                    class="protractor-test-edit-subtopic-page-contents"
-                                   local-value="$ctrl.htmlData">
+                                   ng-model="$ctrl.htmlData"
+                                   ng-model-change="$applyAsync()">
               </schema-based-editor>
               <div class="text-right pt-3">
                 <button class="btn btn-outline-dark" ng-click="$ctrl.cancelHtmlDataChange()">Cancel</button>
@@ -101,6 +102,7 @@
               <strong>Thumbnail Image*</strong>
             </p>
             <oppia-thumbnail-uploader [filename]="$ctrl.subtopic.getThumbnailFilename()"
+                                      [useLocalStorage]="false"
                                       (update-filename)="$ctrl.updateSubtopicThumbnailFilename($event)"
                                       [bg-color]="$ctrl.subtopic.getThumbnailBgColor()"
                                       (update-bg-color)="$ctrl.updateSubtopicThumbnailBgColor($event)"

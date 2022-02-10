@@ -67,6 +67,7 @@
           <div class="protractor-test-story-node-thumbnail">
             <label class="form-heading">Thumbnail Image*</label>
             <oppia-thumbnail-uploader [filename]="getThumbnailFilename()"
+                                      [use-local-storage]="false"
                                       (update-filename)="updateThumbnailFilename($event)"
                                       [bg-color]="getThumbnailBgColor()"
                                       (update-bg-color)="updateThumbnailBgColor($event)"
@@ -120,8 +121,9 @@
             <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18" aria-label="Unfinalize outline">check_box</i>
             <div tabindex="-1" ng-blur="toggleChapterOutlineButtons()" ng-click="toggleChapterOutlineButtons()">
               <schema-based-editor id="storyNodeOutline"
-                                   schema="OUTLINE_SCHEMA"
-                                   local-value="editableOutline">
+                                   [schema]="OUTLINE_SCHEMA"
+                                   ng-model="editableOutline"
+                                   ng-model-change="$applyAsync()">
               </schema-based-editor>
               <div class="save-button-container" ng-if="chapterOutlineButtonsAreShown">
                 <button class="btn btn-default">Cancel</button>

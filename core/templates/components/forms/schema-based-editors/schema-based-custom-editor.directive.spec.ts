@@ -15,23 +15,3 @@
 /**
  * @fileoverview Unit tests for schema-based editor for custom values
  */
-
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-require('./schema-based-custom-editor.directive');
-require('services/nested-directives-recursion-timeout-prevention.service.ts');
-
-describe('schema based custom editor directive', () => {
-  let directive = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $rootScope) {
-    directive = $injector.get('schemaBasedCustomEditorDirective');
-    $injector.get('NestedDirectivesRecursionTimeoutPreventionService');
-    $rootScope.$new();
-  }));
-
-  it('should be defined', () => {
-    expect(directive).toBeDefined();
-  });
-});

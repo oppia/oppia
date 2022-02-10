@@ -32,7 +32,7 @@
     </div>
 
     <div ng-if="feedbackEditorIsOpen">
-      <oppia-outcome-feedback-editor [outcome]="tmpOutcome">
+      <oppia-outcome-feedback-editor [outcome]="tmpOutcome" (outcome-change)="$applyAsync()">
       </oppia-outcome-feedback-editor>
     </div>
     <div ng-if="isFeedbackLengthExceeded(tmpOutcome)" class="oppia-length-validation-error">

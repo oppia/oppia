@@ -1,44 +1,59 @@
-<span ng-model="$ctrl.localValue" ui-validate="'$ctrl.validate($value, $ctrl.uiConfig())'">
-  <span ng-form="$ctrl.floatForm">
-    <span ng-if="!expressionMode">
-      <input type="number" step="any" autocomplete="off" ng-model="$ctrl.localValue" class="form-control display-inline oppia-float-form-input protractor-test-float-form-input"
-             name="floatValue" ng-attr-placeholder="<['I18N_FORMS_TYPE_NUMBER' | translate]>"
-             focus-on="<[$ctrl.labelForFocusTarget()]>" ng-keypress="$ctrl.onKeypress($event)"
-             apply-validation validators="$ctrl.validators()" min="<[$ctrl.minValue]>"
-             ng-blur="$ctrl.onBlur()" ng-focus="$ctrl.onFocus()"
-             ng-change="$ctrl.generateErrors()">
-
-      <span class="oppia-form-error oppia-numeric-input-error" ng-if="$ctrl.errorString">
-        <[$ctrl.errorString]>
+<div class="schema-based-float-editor">
+  <form #floatform="ngForm">
+    <span *ngIf="!expressionMode">
+      <input type="number"
+             step="any"
+             ngControl="floatValue"
+             autocomplete="off"
+             [ngModel]="localValue"
+             (ngModelChange)="updateLocalValue($event)"
+             class="form-control display-inline oppia-float-form-input protractor-test-float-form-input"
+             name="floatValue"
+             attr.placeholder="{{'I18N_FORMS_TYPE_NUMBER' | translate}}"
+             [oppiaFocusOn]="labelForFocusTarget"
+             (keypress)="onKeypress($event)"
+             applyValidation [validators]="validators"
+             (blur)="onBlur()" (focus)="onFocus()">
+      <span *ngIf="errorString" class="oppia-form-error oppia-numeric-input-error">
+        {{errorString}}
       </span>
-      <span ng-if="$ctrl.hasLoaded && !$ctrl.isUserCurrentlyTyping && $ctrl.hasFocusedAtLeastOnce"
-            class="position-absolute oppia-form-container"
-            tabindex="-1" focus-on="<[$ctrl.labelForErrorFocusTarget]>">
-        <span ng-if="$ctrl.floatForm.floatValue.$error.isFloat && $ctrl.floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_INVALID_DECIMAL"></span>
-        <span ng-if="!$ctrl.floatForm.floatValue.$error.isFloat && $ctrl.floatForm.floatValue.$error.isAtLeast"
-              class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_LEAST" translate-values="{minValue: minValue}">
+      <span *ngIf="hasLoaded && !isUserCurrentlyTyping && hasFocusedAtLeastOnce"
+            class="oppia-form-container"
+            tabindex="-1"
+            [oppiaFocusOn]="labelForErrorFocusTarget">
+        <span *ngIf="floatForm.form.controls.floatValue.errors?.isFloat"
+              class="oppia-form-error"
+              aria-live="assertive"
+              [innerHTML]="'I18N_FORMS_TYPE_NUMBER_INVALID_DECIMAL' | translate">
         </span>
-        <span ng-if="!$ctrl.floatForm.floatValue.$error.isFloat && $ctrl.floatForm.floatValue.$error.isAtMost"
-              class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_MOST" translate-values="{maxValue: maxValue}">
+        <span *ngIf="errorString && !floatForm.form.controls.floatValue.errors?.isFloat && floatForm.form.controls.floatValue.errors?.isAtLeast"
+              class="oppia-form-error"
+              aria-live="assertive"
+              [innerHTML]="'I18N_FORMS_TYPE_NUMBER_AT_LEAST' | translate:{minValue: getMinValue()}">
+        </span>
+        <span *ngIf="errorString && !floatForm.form.controls.floatValue.errors?.isFloat && floatForm.form.controls.floatValue.errors?.isAtMost"
+              class="oppia-form-error"
+              aria-live="assertive"
+              [innerHTML]="'I18N_FORMS_TYPE_NUMBER_AT_MOST' | translate:{maxValue: getMaxValue()}">
         </span>
       </span>
     </span>
-  </span>
-</span>
+  </form>
+</div>
 
 <style>
-  schema-based-float-editor .oppia-numeric-input-error {
+  .schema-based-float-editor .oppia-numeric-input-error {
     margin-top: 10px;
   }
-  schema-based-float-editor input.oppia-float-form-input {
+  .schema-based-float-editor input.oppia-float-form-input {
     -moz-appearance: textfield;
   }
-  schema-based-float-editor input.oppia-float-form-input::-webkit-outer-spin-button,
-  schema-based-float-editor input.oppia-float-form-input::-webkit-inner-spin-button {
+  .schema-based-float-editor input.oppia-float-form-input::-webkit-outer-spin-button,
+  .schema-based-float-editor input.oppia-float-form-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
-  schema-based-float-editor .oppia-form-container {
+  .schema-based-float-editor .oppia-form-container {
     font-size: 0.85em;
   }
 </style>

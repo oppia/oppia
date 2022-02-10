@@ -46,8 +46,9 @@
         </div>
         <div class="description-editor protractor-test-subtopic-description-editor" *ngIf="schemaEditorIsShown">
           <div class="oppia-editor-card-body" >
-            <schema-based-editor [schema]="getSchema.bind(this)"
+            <schema-based-editor [schema]="getSchema()"
                                  class="protractor-test-create-subtopic-page-content"
+                                 [localValue]="htmlData"
                                  (localValueChange)="localValueChange($event)">
             </schema-based-editor>
           </div>
@@ -64,6 +65,7 @@
       <div class="thumbnail-editor protractor-test-subtopic-thumbnail protractor-test-photo-button create-new-subtopic-input-field">
         <strong>Thubmnail Image*</strong>
         <oppia-thumbnail-uploader (updateFilename)="updateSubtopicThumbnailFilename($event)"
+                                  [useLocalStorage]="false"
                                   [bgColor]="editableThumbnailBgColor"
                                   (updateBgColor)="updateSubtopicThumbnailBgColor($event)"
                                   [allowedBgColors]="allowedBgColors"
