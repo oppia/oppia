@@ -165,20 +165,12 @@ export class ExplorationStatesService {
         contentIds.add(answerGroup.outcome.feedback.contentId);
         answerGroup.rules.forEach((rule) => {
           Object.keys(rule.inputs).forEach(inputName => {
-            if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
-              // The above if condition also passes for
-              // TranslatableHtmlContentId but these type of do not
-              // have contentId property in their rule.inputs object.
-              if (rule.inputs[inputName] !== null) {
-                if (rule.inputs[inputName].hasOwnProperty('contentId')) {
-                  contentIds.add(rule.inputs[inputName].contentId);
-                } else {
-                  // This is TranslatableHtmlContentId case where the
-                  // rule.inputs[inputName] is an string which itself is
-                  // a contentId.
-                  contentIds.add(rule.inputs[inputName]);
-                }
-              }
+            const ruleInput = rule.inputs[inputName];
+            // All rules input types which are translatable are subclasses of
+            // BaseTranslatableObject having dict structure with contentId
+            // as a key.
+            if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+              contentIds.add(ruleInput.contentId);
             }
           });
         });
