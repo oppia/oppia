@@ -42,9 +42,6 @@ def _require_valid_version(version_from_payload, skill_version):
     Raises:
         Exception. Invalid input.
     """
-    if version_from_payload is None:
-        raise base.BaseHandler.InvalidInputException(
-            'Invalid POST request: a version must be specified.')
 
     if version_from_payload != skill_version:
         raise base.BaseHandler.InvalidInputException(
@@ -187,6 +184,49 @@ class EditableSkillDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'change_dicts': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': skill_domain.SkillChange
+                    }
+                }
+            }
+        },
+        'DELETE': {}
+    }
+
     @acl_decorators.open_access
     def get(self, skill_id):
         """Populates the data on the individual skill page."""
@@ -293,8 +333,9 @@ class SkillDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.PageNotFoundException('Invalid skill id.')
+        except utils.ValidationError as e:
+            raise self.PageNotFoundException(
+                'Invalid skill id.') from e
         try:
             skills = skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:

@@ -39,6 +39,10 @@ class MockI18nLanguageCodeService {
     return 'en';
   }
 
+  isCurrentLanguageRTL() {
+    return true;
+  }
+
   get onI18nLanguageCodeChange() {
     return this.codeChangeEventEmitter;
   }
@@ -101,6 +105,10 @@ describe('Splash Page', () => {
   it('should get static image url', function() {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should record analytics when Browse Lessons is clicked', function() {
