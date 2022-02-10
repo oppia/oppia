@@ -625,7 +625,7 @@ class ExplorationStartEventHandler(base.BaseHandler):
                     },
                     'values': {
                          'schema': {
-                             'type': 'int'
+                             'type': 'basestring'
                          }
                     }
                 }
@@ -834,7 +834,7 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
                     },
                     'values': {
                          'schema': {
-                             'type': 'int'
+                             'type': 'basestring'
                          }
                     }
                 }
@@ -946,7 +946,7 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
                     },
                     'values': {
                          'schema': {
-                             'type': 'int'
+                             'type': 'basestring'
                          }
                     }
                 }
