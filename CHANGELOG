@@ -31,7 +31,7 @@ Data handling
 * Fix part of #14351: Extended Schema validator (#14465)
 * Fix part of #13162: Add schema for ReviewableSuggestionsHandler (#14407)
 * Add skill and story migration jobs (#14361)
-*  Fix Part of #13162: Add argument schema for ProfileHandler, SignupHandler classes (#14257)
+* Fix Part of #13162: Add argument schema for ProfileHandler, SignupHandler classes (#14257)
 
 Contributor Pages
 * Fix #14669: Translation modal and other UI fixes in Contributor Dashboard Page (#14680)
