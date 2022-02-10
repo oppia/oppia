@@ -36,11 +36,63 @@ jobs:
       - uses: ./.github/actions/install-oppia-dependencies
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      - name: Run frontend tests
-        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
-      - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "A frontend test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+      - name: Run frontend tests-1
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-2
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-3
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-4
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-5
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-6
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-7
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-8
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-9
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-10
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-11
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-12
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-13
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-14
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-15
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-16
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-17
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-18
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-19
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: Run frontend tests-20
+        if: ${{ always() }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install
