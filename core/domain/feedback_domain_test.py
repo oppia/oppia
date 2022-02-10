@@ -167,7 +167,7 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 class FullyQualifiedMessageIdentifierDomainUnitTests(
     test_utils.GenericTestBase):
 
-    def setUp(self) -> None:
+    def setUp(self):
         super(FullyQualifiedMessageIdentifierDomainUnitTests, self).setUp()
         self.exp_id = 'exp'
         self.message_id = 'message'
@@ -190,7 +190,7 @@ class FullyQualifiedMessageIdentifierDomainUnitTests(
 
 class FeedbackThreadSummaryDomainUnitTests(test_utils.GenericTestBase):
 
-    def setUp(self) -> None:
+    def setUp(self):
         super(FeedbackThreadSummaryDomainUnitTests, self).setUp()
         self.exp_id = 'exp'
         self.message_id = 'message'
