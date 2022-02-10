@@ -40,8 +40,7 @@ class EntityTranslationsModel(base_models.BaseModel):
 
     # The id of the corresponding entity.
     entity_id = datastore_services.StringProperty(required=True, indexed=True)
-    # The type of the corresponding entity, supporting new translation
-    # architecture.
+    # The type of the corresponding entity.
     entity_type = datastore_services.StringProperty(
         required=True, indexed=True, choices=[
             feconf.ENTITY_TYPE_EXPLORATION,
