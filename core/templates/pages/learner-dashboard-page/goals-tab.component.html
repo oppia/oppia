@@ -8,7 +8,7 @@
           <i class="fa fa-caret-right" aria-hidden="true" *ngIf="!currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
           <i class="fa fa-caret-down" aria-hidden="true" *ngIf="currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
         </div>
-        <div #dropdown class="oppia-three-dots-dropdown-container" 
+        <div #dropdown class="oppia-three-dots-dropdown-container"
              (click)="toggleThreeDotsDropdown()">
           <i class="fa fa-ellipsis-v"></i>
           <div *ngIf="showThreeDotsDropdown" class="oppia-three-dots-dropdown">

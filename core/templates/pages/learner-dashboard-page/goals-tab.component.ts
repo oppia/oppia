@@ -174,7 +174,7 @@ export class GoalsTabComponent implements OnInit {
     }
   }
 
-  toggleThreeDotsDropdown() {
+  toggleThreeDotsDropdown(): void {
     this.showThreeDotsDropdown = !this.showThreeDotsDropdown;
   }
 
