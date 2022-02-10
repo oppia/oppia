@@ -126,12 +126,19 @@ describe('Subtopic viewer page', function() {
     pageTitleService = TestBed.inject(PageTitleService);
     contextService = TestBed.inject(ContextService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     alertsService = TestBed.inject(AlertsService);
     subtopicViewerBackendApiService = TestBed.inject(
       SubtopicViewerBackendApiService);
     urlService = TestBed.inject(UrlService);
     loaderService = TestBed.inject(LoaderService);
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should succesfully get subtopic data and set context with next subtopic' +

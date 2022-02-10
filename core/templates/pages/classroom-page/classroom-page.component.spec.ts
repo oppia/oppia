@@ -88,13 +88,20 @@ describe('Classroom Page Component', () => {
     pageTitleService = TestBed.inject(PageTitleService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     alertsService = TestBed.inject(AlertsService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService);
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should create', () => {
     expect(component).toBeDefined();
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should provide static image url', () => {

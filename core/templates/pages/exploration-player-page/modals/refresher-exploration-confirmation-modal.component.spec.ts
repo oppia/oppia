@@ -24,6 +24,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { RefresherExplorationConfirmationModal } from './refresher-exploration-confirmation-modal.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Refresher Exploration Confirmation Modal', () => {
   let fixture: ComponentFixture<RefresherExplorationConfirmationModal>;
@@ -53,6 +54,7 @@ describe('Refresher Exploration Confirmation Modal', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
+        MockTranslatePipe,
         RefresherExplorationConfirmationModal
       ],
       providers: [

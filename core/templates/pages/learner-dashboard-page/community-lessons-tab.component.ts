@@ -26,6 +26,7 @@ import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { AppConstants } from 'app.constants';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { Subscription } from 'rxjs';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
  @Component({
    selector: 'oppia-community-lessons-tab',
@@ -35,6 +36,7 @@ export class CommunityLessonsTabComponent {
   constructor(
     private learnerDashboardActivityBackendApiService: (
       LearnerDashboardActivityBackendApiService),
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService) {
   }
   @Input() incompleteExplorationsList: LearnerExplorationSummary[];
@@ -162,6 +164,10 @@ export class CommunityLessonsTabComponent {
     this.pageNumberInCommunityLessons = 1;
     this.startIndexInCommunityLessons = 0;
     this.endIndexInCommunityLessons = 3;
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   getLessonType(tile: LearnerExplorationSummary | CollectionSummary): string {

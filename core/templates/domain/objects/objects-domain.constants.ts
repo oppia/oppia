@@ -17,25 +17,19 @@
  */
 
 export const ObjectsDomainConstants = {
-  FRACTION_PARSING_ERRORS: {
-    INVALID_CHARS_LENGTH:
-      'None of the numbers in the fraction should have more than 7 digits',
-    INVALID_CHARS:
-      'Please only use numerical digits, spaces or forward slashes (/)',
-    INVALID_FORMAT:
-      'Please enter a valid fraction (e.g., 5/3 or 1 2/3)',
-    DIVISION_BY_ZERO: 'Please do not put 0 in the denominator'
+  FRACTION_PARSING_ERROR_I18N_KEYS: {
+    INVALID_CHARS_LENGTH: 'I18N_INTERACTIONS_FRACTIONS_INVALID_CHARS_LENGTH',
+    INVALID_CHARS: 'I18N_INTERACTIONS_FRACTIONS_INVALID_CHARS',
+    INVALID_FORMAT: 'I18N_INTERACTIONS_FRACTIONS_INVALID_FORMAT',
+    DIVISION_BY_ZERO: 'I18N_INTERACTIONS_FRACTIONS_DIVISION_BY_ZERO'
   },
 
-  NUMBER_WITH_UNITS_PARSING_ERRORS: {
-    INVALID_VALUE:
-      'Please ensure that value is either a fraction or a number',
-    INVALID_CURRENCY:
-      'Please enter a valid currency (e.g., $5 or Rs 5)',
-    INVALID_CURRENCY_FORMAT: 'Please write currency units at the beginning',
-    INVALID_UNIT_CHARS:
-      'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, ' +
-      '/, -'
+  NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS: {
+    INVALID_VALUE: 'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_VALUE',
+    INVALID_CURRENCY: 'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY',
+    INVALID_CURRENCY_FORMAT:
+      'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY_FORMAT',
+    INVALID_UNIT_CHARS: 'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_UNIT_CHARS'
   },
 
   CURRENCY_UNITS: {
@@ -65,20 +59,12 @@ export const ObjectsDomainConstants = {
     }
   },
 
-  RATIO_PARSING_ERRORS: {
-    INVALID_COLONS:
-      'Your answer has multiple colons (:) next to each other.',
-    INVALID_CHARS:
-      'Please write a ratio that consists of digits separated by colons' +
-      '(e.g. 1:2 or 1:2:3).',
-    INVALID_FORMAT:
-      'Please enter a valid ratio (e.g. 1:2 or 1:2:3).',
-    NON_INTEGER_ELEMENTS:
-      'For this question, each element in your ratio should be a whole ' +
-      'number (not a fraction or a decimal).',
-    INCLUDES_ZERO:
-      'Ratios cannot have 0 as a element.',
-    EMPTY_STRING:
-      'Please enter a valid ratio (e.g. 1:2 or 1:2:3).',
+  RATIO_PARSING_ERROR_I18N_KEYS: {
+    INVALID_COLONS: 'I18N_INTERACTIONS_RATIO_INVALID_COLONS',
+    INVALID_CHARS: 'I18N_INTERACTIONS_RATIO_INVALID_CHARS',
+    INVALID_FORMAT: 'I18N_INTERACTIONS_RATIO_INVALID_FORMAT',
+    NON_INTEGER_ELEMENTS: 'I18N_INTERACTIONS_RATIO_NON_INTEGER_ELEMENTS',
+    INCLUDES_ZERO: 'I18N_INTERACTIONS_RATIO_INCLUDES_ZERO',
+    EMPTY_STRING: 'I18N_INTERACTIONS_RATIO_EMPTY_STRING',
   }
 } as const;

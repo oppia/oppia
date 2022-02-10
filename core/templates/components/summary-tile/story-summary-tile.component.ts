@@ -62,11 +62,11 @@ export class StorySummaryTileComponent implements OnInit {
   EXPLORE_PAGE_PREFIX = '/explore/';
 
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private assetsBackendApiService: AssetsBackendApiService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
   checkTabletView(): boolean {
@@ -103,6 +103,10 @@ export class StorySummaryTileComponent implements OnInit {
 
   isChapterCompleted(title: string): boolean {
     return this.storySummary.isNodeCompleted(title);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   isPreviousChapterCompleted(index: number): boolean {

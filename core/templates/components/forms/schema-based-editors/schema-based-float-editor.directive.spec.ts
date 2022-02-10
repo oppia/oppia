@@ -67,7 +67,7 @@ describe('Schema Based Float Editor Directive', () => {
     expect(ctrl.hasLoaded).toBe(undefined);
     expect(ctrl.isUserCurrentlyTyping).toBe(undefined);
     expect(ctrl.hasFocusedAtLeastOnce).toBe(undefined);
-    expect(ctrl.errorString).toBe(undefined);
+    expect(ctrl.errorStringI18nKey).toBe(undefined);
     expect(ctrl.localValue).toBe(undefined);
     expect(ctrl.checkRequireNonnegativeInputValue).toBe(undefined);
 
@@ -77,7 +77,7 @@ describe('Schema Based Float Editor Directive', () => {
     expect(ctrl.hasLoaded).toBe(true);
     expect(ctrl.isUserCurrentlyTyping).toBe(false);
     expect(ctrl.hasFocusedAtLeastOnce).toBe(false);
-    expect(ctrl.errorString).toBe('');
+    expect(ctrl.errorStringI18nKey).toBe('');
     expect(ctrl.localValue).toBe(0.0);
     expect(ctrl.checkRequireNonnegativeInputValue).toBe(false);
     expect(ctrl.uiConfig().checkRequireNonnegativeInput).toBe(false);
@@ -161,11 +161,9 @@ describe('Schema Based Float Editor Directive', () => {
 
   it('should generate error for wrong input', () => {
     ctrl.localValue = null;
-
     ctrl.generateErrors();
 
-    expect(ctrl.errorString)
-      .toBe(
-        'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+    expect(ctrl.errorStringI18nKey)
+      .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
   });
 });

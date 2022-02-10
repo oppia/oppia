@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.rtl.css" as="style">
+
 <div class="stories-list">
   <div class="oppia-stories-list-container">
     <mat-card class="oppia-page-card oppia-long-text" [ngClass]="checkTabletView() ? 'm-0': 'mat-card-margin-desktop'">
@@ -27,67 +30,6 @@
     </mat-card>
   </div>
 </div>
-
-<style>
-  .tab-title {
-    color: #017a70;
-    font-weight: lighter;
-    margin: .83em 0 0.3em 0;
-  }
-
-  .story-info-container {
-    padding-top: 4vh;
-  }
-
-  .stories-can-play {
-    display: inline-block;
-    font-size: 1.4em;
-    font-weight: 500;
-    margin-top: 0.5em;
-    padding-bottom: 15px;
-  }
-
-  .topic-description {
-    border-bottom: 1px solid #7b7b7b;
-    font-size: 1.1em;
-    padding-bottom: 2vh;
-  }
-
-  .oppia-stories-list-container .oppia-page-card {
-    border-radius: 0.25em;
-    padding-bottom: 7.5vh;
-    width: 704px;
-  }
-
-  .mat-card-margin-desktop {
-    margin-top: 10em;
-  }
-
-  @media(max-width: 1024px) {
-    .oppia-stories-list-container .oppia-page-card {
-      width: 80vw;
-    }
-  }
-
-  @media(max-width: 768px) {
-    .oppia-stories-list-container .oppia-page-card {
-      padding: 8em 24px 64px 24px;
-      width: 100%;
-    }
-
-    .story-info-container {
-      padding-top: 0;
-    }
-  }
-
-  @media(max-width: 500px) {
-    .oppia-stories-list-container .oppia-page-card {
-      padding: 12em 24px 64px 24px;
-      width: 100%;
-    }
-
-    .story-info-container {
-      padding-top: 0;
-    }
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.rtl.css">

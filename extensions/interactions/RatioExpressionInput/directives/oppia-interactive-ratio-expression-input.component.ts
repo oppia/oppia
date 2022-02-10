@@ -47,7 +47,7 @@ export class InteractiveRatioExpressionInputComponent
   expectedNumberOfTerms: number;
   placeholder: string;
   FORM_ERROR_TYPE: string = 'RATIO_EXPRESSION_INPUT_FORMAT_ERROR';
-  errorMessage: string = '';
+  errorMessageI18nKey: string = '';
   answer: string = '';
   isValid: boolean = true;
   answerChanged: Subject<string> = new Subject<string>();
@@ -69,7 +69,7 @@ export class InteractiveRatioExpressionInputComponent
       // Only emit if value is different from previous value.
       distinctUntilChanged()
     ).subscribe(newValue => {
-      this.errorMessage = '';
+      this.errorMessageI18nKey = '';
       this.isValid = true;
       this.currentInteractionService.updateViewWithNewAnswer();
     }));
@@ -115,12 +115,9 @@ export class InteractiveRatioExpressionInputComponent
         ratioExpression.getNumberOfTerms() !== this.expectedNumberOfTerms &&
         this.expectedNumberOfTerms !== 0
       ) {
-        throw new Error(
-          'The creator has specified the number of terms in ' +
-          `the answer to be ${this.expectedNumberOfTerms}.`
-        );
+        throw new Error('I18N_INTERACTIONS_TERMS_LIMIT');
       }
-      this.errorMessage = '';
+      this.errorMessageI18nKey = '';
       this.isValid = true;
       // TODO(#13015): Remove use of unknown as a type.
       this.currentInteractionService.onSubmit(
@@ -128,7 +125,7 @@ export class InteractiveRatioExpressionInputComponent
         this.ratioExpressionInputRulesService as unknown as
         InteractionRulesService);
     } catch (parsingError) {
-      this.errorMessage = parsingError.message;
+      this.errorMessageI18nKey = parsingError.message;
       this.isValid = false;
     }
   }

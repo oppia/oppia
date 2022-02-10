@@ -1,0 +1,15 @@
+{
+    "options": {
+        "autoRename": false,
+        "autoRenameStrict": false,
+        "blacklist":{},
+        "clean": true,
+        "greedy": false,
+        "processUrls": false,
+        "stringMap":[],
+        "useCalc": false,
+        "aliases":{}
+    },
+    "plugins": [ ],
+    "map": false
+}

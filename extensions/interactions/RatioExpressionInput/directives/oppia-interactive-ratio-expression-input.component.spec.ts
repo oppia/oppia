@@ -22,6 +22,7 @@ import { InteractiveRatioExpressionInputComponent } from './oppia-interactive-ra
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('InteractiveRatioExpressionInput', () => {
   let component: InteractiveRatioExpressionInputComponent;
@@ -53,7 +54,10 @@ describe('InteractiveRatioExpressionInput', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [InteractiveRatioExpressionInputComponent],
+      declarations: [
+        InteractiveRatioExpressionInputComponent,
+        MockTranslatePipe
+      ],
       imports: [],
       providers: [
         {
@@ -77,7 +81,7 @@ describe('InteractiveRatioExpressionInput', () => {
       component = fixture.componentInstance;
       component.numberOfTermsWithValue = '3';
       component.placeholderWithValue = 'Enter ratio here';
-      component.errorMessage = '';
+      component.errorMessageI18nKey = '';
       component.labelForFocusTarget = 'label';
       component.answer = '';
       component.isValid = true;
@@ -102,8 +106,8 @@ describe('InteractiveRatioExpressionInput', () => {
       component.isValid = false;
       spyOn(currentInteractionService, 'onSubmit');
       component.submitAnswer();
-      expect(component.errorMessage).toEqual(
-        'The creator has specified the number of terms in the answer to be 3.');
+      expect(component.errorMessageI18nKey).toEqual(
+        'I18N_INTERACTIONS_TERMS_LIMIT');
       expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
       expect(component.isAnswerValid()).toBe(false);
     });
@@ -127,7 +131,7 @@ describe('InteractiveRatioExpressionInput', () => {
       component = fixture.componentInstance;
       component.numberOfTermsWithValue = '3';
       component.placeholderWithValue = 'Enter ratio here';
-      component.errorMessage = '';
+      component.errorMessageI18nKey = '';
       component.labelForFocusTarget = 'label';
       component.answer = '';
       component.savedSolution = [1, 2, 3];
@@ -145,12 +149,12 @@ describe('InteractiveRatioExpressionInput', () => {
       component.answerValueChanged();
       component.answer = '1:2:3';
       component.isValid = false;
-      component.errorMessage = 'error';
+      component.errorMessageI18nKey = 'error';
 
       component.answerValueChanged();
       tick(150);
 
-      expect(component.errorMessage).toBe('');
+      expect(component.errorMessageI18nKey).toBe('');
       expect(component.isValid).toBe(true);
     }));
 

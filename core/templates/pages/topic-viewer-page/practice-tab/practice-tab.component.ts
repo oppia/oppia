@@ -28,6 +28,7 @@ import { PracticeSessionPageConstants } from
   'pages/practice-session-page/practice-session-page.constants';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'practice-tab',
@@ -55,6 +56,7 @@ export class PracticeTabComponent implements OnInit {
   questionsStatusCallIsComplete: boolean = true;
 
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private questionBackendApiService: QuestionBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
@@ -88,6 +90,10 @@ export class PracticeTabComponent implements OnInit {
       this.classroomUrlFragment = (
         this.urlService.getClassroomUrlFragmentFromLearnerUrl());
     }
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   isStartButtonDisabled(): boolean {

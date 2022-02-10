@@ -741,3 +741,4 @@
 /core/controllers/android_e2e_config*.py @seanlip
 /core/android_validation_constants*.py @seanlip
 /extensions/interactions/rule_templates.json @seanlip
+/.rtlcssrc @aks681

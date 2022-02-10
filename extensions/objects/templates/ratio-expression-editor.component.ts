@@ -35,7 +35,7 @@ export class RatioExpressionEditorComponent implements OnInit {
   @Input() value!: number[];
   @Output() valueChanged = new EventEmitter();
   localValue!: { label: string };
-  warningText: string = '';
+  warningTextI18nKey: string = '';
   eventBusGroup: EventBusGroup;
 
   constructor(private eventBusService: EventBusService) {
@@ -56,7 +56,7 @@ export class RatioExpressionEditorComponent implements OnInit {
     try {
       this.value = Ratio.fromRawInputString(value).components;
       this.valueChanged.emit(this.value);
-      this.warningText = '';
+      this.warningTextI18nKey = '';
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
         modalId: this.modalId,
         value: false
@@ -64,7 +64,7 @@ export class RatioExpressionEditorComponent implements OnInit {
       return true;
     } catch (parsingError: unknown) {
       if (parsingError instanceof Error) {
-        this.warningText = parsingError.message;
+        this.warningTextI18nKey = parsingError.message;
       }
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
         modalId: this.modalId,

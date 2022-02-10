@@ -10,7 +10,7 @@
          [placeholder]="placeholder">
 
   <div class="oppia-form-error oppia-ratio-expression-input-error">
-    {{errorMessage}}
+    {{ errorMessageI18nKey | translate: { termsCount: expectedNumberOfTerms } }}
   </div>
 </form>
 
