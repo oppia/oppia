@@ -172,16 +172,20 @@ class MathEquationInput(base.BaseInteraction):
                     matches_upTo_trivial_manipulations=x))
         }
 
+        # As MathEquationInputInstanceDto does not contain all the
+        # rules, a check is necessary to create proto for only those rules
+        # which are required in proto creation.
         for rule_spec in rule_specs_list:
             rule_type = rule_spec.rule_type
-            rule_proto = (
-                rule_type_to_proto_func_mapping[rule_type](
-                    rule_spec.inputs
+            if rule_type in rule_type_to_proto_func_mapping:
+                rule_proto = (
+                    rule_type_to_proto_func_mapping[rule_type](
+                        rule_spec.inputs
+                    )
                 )
-            )
-            rule_specs_list_proto.append(
-                rule_type_to_proto_mapping[rule_type](rule_proto)
-            )
+                rule_specs_list_proto.append(
+                    rule_type_to_proto_mapping[rule_type](rule_proto)
+                )
 
         return rule_specs_list_proto
 

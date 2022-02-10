@@ -66,6 +66,11 @@ class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
                     'inputs': {
                         'x': '1000 + 200 + 30 + 4 + 0.5 + 0.06'
                     }
+                }, {
+                    'rule_type': 'ContainsSomeOf',
+                    'inputs': {
+                        'x': '1000 + 200 + 30 + 4 + 0.5 + 0.06'
+                    }
                 }],
                 'training_data': [],
                 'tagged_skill_misconception_id': 'skill_id-misconception_id'

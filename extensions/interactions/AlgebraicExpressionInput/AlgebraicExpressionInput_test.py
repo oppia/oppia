@@ -63,6 +63,11 @@ class AlgebraicExpressionInputInteractionTests(test_utils.GenericTestBase):
                     'inputs': {
                         'x': 'pi*r^2'
                     }
+                }, {
+                    'rule_type': 'ContainsSomeOf',
+                    'inputs': {
+                        'x': 'pi*r^2'
+                    }
                 }],
                 'training_data': [],
                 'tagged_skill_misconception_id': 'skill_id-misconception_id'

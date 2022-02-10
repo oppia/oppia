@@ -180,6 +180,9 @@ def compile_protobuf_files(proto_files_paths):
     # See: https://github.com/protocolbuffers/protobuf/issues/1491
     compiled_protobuf_dir = (
         pathlib.Path(os.path.join(common.CURR_DIR, 'proto_files')))
+    # Generate __init__.py files in the directory. This is needed because we
+    # want the proto_files to be undrestood as a Python package.
+    pathlib.Path(os.path.join(compiled_protobuf_dir, '__init__.py')).touch()
     for p in compiled_protobuf_dir.iterdir():
         if p.suffix == '.py':
             common.inplace_replace_file(

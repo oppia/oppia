@@ -64,6 +64,11 @@ class MathEquationInputInteractionTests(test_utils.GenericTestBase):
                     'inputs': {
                         'x': 'a+b=c'
                     }
+                }, {
+                    'rule_type': 'ContainsSomeOf',
+                    'inputs': {
+                        'x': 'a+b=c'
+                    }
                 }],
                 'training_data': [],
                 'tagged_skill_misconception_id': 'skill_id-misconception_id'
