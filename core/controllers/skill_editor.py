@@ -21,7 +21,6 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import domain_objects_validator
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -167,10 +166,7 @@ class EditableSkillDataHandler(base.BaseHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            domain_objects_validator.
-                            validate_skill_change
-                        )
+                        'object_class': skill_domain.SkillChange
                     }
                 }
             }

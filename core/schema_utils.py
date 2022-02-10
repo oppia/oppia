@@ -682,25 +682,6 @@ class _Validators:
         return True
 
     @staticmethod
-    def is_valid_comma_separated_skill_ids(obj: str) -> bool:
-        """Checks whether the given obj (str) is valid.
-
-        Args:
-            obj: str. The skill ids to validate.
-
-        Returns:
-            bool. Whether the given object contains valid skill ids.
-        """
-
-        try:
-            skill_ids = list(set(obj.split(',')))
-            for skill_id in skill_ids:
-                skill_domain.Skill.require_valid_skill_id(skill_id) # type: ignore[no-untyped-call]
-            return True
-        except utils.ValidationError:
-            return False
-
-    @staticmethod
     def is_valid_username_string(obj: str) -> bool:
         """Checks if the given obj (a string) is a valid username string.
 

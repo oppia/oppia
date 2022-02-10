@@ -25,7 +25,6 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import domain_objects_validator
 from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import image_validation_services
@@ -199,10 +198,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            domain_objects_validator.
-                            validate_suggestion_change
-                        )
+                        'object_class': question_domain.QuestionChange
                     }
                 }
             }
@@ -213,7 +209,11 @@ class EditableQuestionDataHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'question_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         }
     }
@@ -248,7 +248,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
 
         for change in change_list:
             if (
-                change.cmd ==
+                    change.cmd ==
                     question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION):
                 raise self.InvalidInputException
 

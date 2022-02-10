@@ -123,10 +123,8 @@ class QuestionCountDataHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'comma_separated_skill_ids': {
             'schema': {
-                'type': 'basestring',
-                 'validators': [{
-                    'id': 'is_valid_comma_separated_skill_ids'
-                }]
+                'type': 'custom',
+                'obj_type': 'JsonEncodedInString'
             }
         }
     }

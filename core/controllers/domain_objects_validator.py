@@ -311,27 +311,6 @@ def validate_params_dict(params):
     return params
 
 
-def validate_skill_change(change_dict):
-    """Validates Skill change.
-
-    Args:
-        change_dict: dict. Data that needs to be validated.
-
-    Returns:
-        dict. Returns the validated change_dict.
-    """
-    allowed_commands = [
-        command['name'] for command in skill_domain.SkillChange.ALLOWED_COMMANDS
-    ]
-
-    if change_dict.get('cmd', None) not in allowed_commands:
-        raise base.BaseHandler.InvalidInputException(
-            '%s cmd is not allowed.' % change_dict.get('cmd', None)
-        )
-
-    return change_dict
-
-
 def validate_topic_and_sub_topic_change(change_dict):
     """Validates Topic or Subtopic change.
 
