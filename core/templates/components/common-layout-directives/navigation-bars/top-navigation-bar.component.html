@@ -494,7 +494,8 @@
     <li ngbDropdown
         *ngIf="!userIsLoggedIn && username !== ''"
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
-      <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info">
+      <div [ngStyle]="isLanguageRTL() ? {'margin-left': '10px'} : {'margin-right': '10px'}"
+           class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info">
         <button ngbDropdownToggle
                 class="btn dropdown-toggle oppia-navbar-button protractor-mobile-test-login"
                 (click)="onLoginButtonClicked()">
