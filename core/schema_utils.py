@@ -695,7 +695,7 @@ class _Validators:
         try:
             skill_ids = list(set(obj.split(',')))
             for skill_id in skill_ids:
-                skill_domain.Skill.require_valid_skill_id(skill_id)
+                skill_domain.Skill.require_valid_skill_id(skill_id) # type: ignore[no-untyped-call]
             return True
         except utils.ValidationError:
             return False
@@ -729,7 +729,7 @@ class _Validators:
         """
 
         try:
-            skill_domain.Skill.require_valid_skill_id(obj)
+            skill_domain.Skill.require_valid_skill_id(obj) # type: ignore[no-untyped-call]
             return True
         except utils.ValidationError:
             return False
