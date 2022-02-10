@@ -35,8 +35,8 @@ from core import utils
 from core.constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
-from core.domain import user_domain
 from core.domain import skill_domain
+from core.domain import user_domain
 from typing import Any, Callable, Dict, List, Optional, cast
 
 SCHEMA_KEY_ITEMS = 'items'
@@ -682,23 +682,6 @@ class _Validators:
         return True
 
     @staticmethod
-    def is_valid_username_string(obj: str) -> bool:
-        """Checks if the given obj (a string) is a valid username string.
-
-        Args:
-            obj: str. The string to verify.
-
-        Returns:
-            bool. Whether the given object is a valid username string.
-        """
-
-        try:
-            user_domain.UserSettings.require_valid_username(obj)
-            return True
-        except utils.ValidationError:
-            return False
-
-    @staticmethod
     def is_valid_comma_separated_skill_ids(obj: str) -> bool:
         """Checks whether the given obj (str) is valid.
 
@@ -718,6 +701,23 @@ class _Validators:
             return False
 
     @staticmethod
+    def is_valid_username_string(obj: str) -> bool:
+        """Checks if the given obj (a string) is a valid username string.
+
+        Args:
+            obj: str. The string to verify.
+
+        Returns:
+            bool. Whether the given object is a valid username string.
+        """
+
+        try:
+            user_domain.UserSettings.require_valid_username(obj)
+            return True
+        except utils.ValidationError:
+            return False
+
+    @staticmethod
     def is_valid_skill_id(obj: str) -> bool:
         """Checks whether the given obj is valid.
 
@@ -729,8 +729,7 @@ class _Validators:
         """
 
         try:
-            skill_domain.Skill.require_valid_skill_id(obj) 
+            skill_domain.Skill.require_valid_skill_id(obj)
             return True
         except utils.ValidationError:
             return False
-
