@@ -145,15 +145,10 @@
                       <span class="material-icons arrow-forward">arrow_forward</span>
                     </div>
                   </div>
-                  <a *ngIf="userIsLoggedIn"
-                     (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                     class="nav-item-bottom-link-logged"
-                     href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
-                    <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
                   <div *ngIf="userIsLoggedIn"
                        (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                        class="nav-item-bottom-link-logged">
-                    <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_2' | translate }}</span>
+                    <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
                     <span class="material-icons arrow-forward">arrow_forward</span>
                   </div>
                 </a>
