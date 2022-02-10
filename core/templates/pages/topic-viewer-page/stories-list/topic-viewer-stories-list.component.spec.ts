@@ -50,6 +50,10 @@ describe('Topic Viewer Stories List Component', () => {
     component.topicDescription = 'Topic Description';
     component.topicId = 'topicId';
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should initialize properties after successfully', () => {
@@ -90,5 +94,9 @@ describe('Topic Viewer Stories List Component', () => {
 
     widthSpy.and.returnValue(800);
     expect(component.checkTabletView()).toBe(false);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 });
