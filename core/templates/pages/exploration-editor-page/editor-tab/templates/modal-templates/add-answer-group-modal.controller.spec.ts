@@ -163,6 +163,7 @@ describe('Add Answer Group Modal Controller', function() {
 
   it('should save answer group response when closing the modal', function() {
     $scope.saveResponse(null);
+    $scope.getChanges();
 
     expect(saveOutcomeDestDetailsSpy).toHaveBeenCalled();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
