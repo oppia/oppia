@@ -114,6 +114,23 @@ describe('RTE parser service', () => {
     });
   });
 
+  it('should throw an error if parsing fails', () => {
+    class DummyHtmlElement extends HTMLElement {
+      constructor() {
+        super();
+      }
+      get tagName() {
+        return undefined;
+      };
+    }
+    customElements.define('dummy-element', DummyHtmlElement);
+
+    let node = new DummyHtmlElement();    
+    expect(() => {
+      rteParserService.constructFromDomParser(node)
+    }).toThrowError('');
+  });
+
   // Noninteractive components are easily identified by the oppia-noninteractive
   // prefix. Some would try and fool this by using custom selectors that start
   // by the prefix. In that case, the code will throw an error.
