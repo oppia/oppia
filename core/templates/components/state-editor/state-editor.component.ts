@@ -134,10 +134,6 @@ angular.module('oppia').component('stateEditor', {
         $scope.conceptCardIsShown = !$scope.conceptCardIsShown;
       };
 
-      $scope.updateView = function() {
-        $scope.$applyAsync();
-      };
-
       ctrl.$onInit = function() {
         $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
           '/avatar/oppia_avatar_100px.svg');

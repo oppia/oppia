@@ -183,8 +183,4 @@ describe('StateEditorComponent', () => {
 
     expect($rootScope.$applyAsync).toHaveBeenCalled();
   });
-
-  it ('should update View when content save', function() {
-    $scope.updateView();
-  });
 });
