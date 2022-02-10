@@ -73,7 +73,12 @@ def start_subprocess_for_result_with_input(cmd, css):
     task = subprocess.Popen(
         cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
-    out, err = task.communicate(input=css)
+    # A pylint error is thrown here sporadically in Github Actions on unexpected
+    # keyword argument 'input'. This could be related to another pylint error
+    # W0622 - Redefining built-in 'input', which was encountered when testing
+    # this function. Since, 'input' is the correct parameter here and it is
+    # expected, this error is ignored.
+    out, err = task.communicate(input=css) # pylint: disable=unexpected-keyword-arg
     return out, err
 
 

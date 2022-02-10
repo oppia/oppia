@@ -76,7 +76,7 @@ class RtlCSSTests(test_utils.GenericTestBase):
             # The disable=W0622 is for the error - Redefining built-in 'input'
             # which is not applicable here as this class is only sued for
             # mocking.
-            def communicate(self, input): # pylint: disable=missing-docstring disable=W0622
+            def communicate(self, input): # pylint: disable=missing-docstring disable=redefined-builtin
                 return input, None
 
         def mock_popen_with_std_in(  # pylint: disable=unused-argument
