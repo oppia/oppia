@@ -77,7 +77,6 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
 
     def _register_all_translatable_fields(self) -> None:
         """Registers all of translatable field/objects in the answer group."""
-
         if self.outcome is not None:
             self._register_translatable_object(self.outcome)
         for rule_spec in self.rule_specs:
@@ -284,9 +283,8 @@ class Hint(translation_domain.BaseTranslatableObject):
 
     def _register_all_translatable_fields(self) -> None:
         """Registers all of the translatable fields/objects in the hint."""
-
         self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+            feconf.TranslatableContentFormat.HTML,
             self.hint_content.content_id,
             self.hint_content.html)
 
@@ -372,9 +370,8 @@ class Solution(translation_domain.BaseTranslatableObject):
 
     def _register_all_translatable_fields(self) -> None:
         """Registers all of the translatable fields/objects in the solution."""
-
         self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+            feconf.TranslatableContentFormat.HTML,
             self.explanation.content_id,
             self.explanation.html)
 
@@ -535,8 +532,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             self._register_translatable_object(self.default_outcome)
         for answer_group in self.answer_groups:
             self._register_translatable_object(answer_group)
-        for ca_dict in self.customization_args.values():
-            self._register_translatable_object(ca_dict)
+        for customization_arg in self.customization_args.values():
+            self._register_translatable_object(customization_arg)
         for hint in self.hints:
             self._register_translatable_object(hint)
         if self.solution is not None:
@@ -992,7 +989,6 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         """Registers all of the translatable fields/objects in the interaction
         customization args.
         """
-
         subtitled_htmls = self.get_subtitled_html()
         for subtitled_html in subtitled_htmls:
             html_string = subtitled_html.html
@@ -1000,15 +996,14 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             # numbers. See issue #13055.
             if not html_string.isnumeric():
                 self._register_translatable_field(
-                    translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+                    feconf.TranslatableContentFormat.HTML,
                     subtitled_html.content_id,
                     html_string)
 
         subtitled_unicodes = self.get_subtitled_unicode()
         for subtitled_unicode in subtitled_unicodes:
             self._register_translatable_field(
-                translation_domain
-                .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+                feconf.TranslatableContentFormat.UNICODE_STRING,
                 subtitled_unicode.content_id,
                 subtitled_unicode.unicode_str)
 
@@ -1350,9 +1345,8 @@ class Outcome(translation_domain.BaseTranslatableObject):
 
     def _register_all_translatable_fields(self) -> None:
         """Registers all of the translatable fields/objects in the outcome."""
-
         self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+            feconf.TranslatableContentFormat.HTML,
             self.feedback.content_id,
             self.feedback.html)
 
@@ -2133,18 +2127,15 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
 
     def _register_all_translatable_fields(self) -> None:
         """Registers all of the translatable fields/objects in the rule spec."""
-
         for input_value in self.inputs.values():
             if 'normalizedStrSet' in input_value:
                 self._register_translatable_field(
-                    translation_domain
-                    .TRANSLATABLE_CONTENT_FORMAT_SET_OF_NORMALIZED_STRING,
+                    feconf.TranslatableContentFormat.SET_OF_NORMALIZED_STRING,
                     input_value['contentId'],
                     input_value['normalizedStrSet'])
             if 'unicodeStrSet' in input_value:
                 self._register_translatable_field(
-                    translation_domain
-                    .TRANSLATABLE_CONTENT_FORMAT_SET_OF_UNICODE_STRING,
+                    feconf.TranslatableContentFormat.SET_OF_UNICODE_STRING,
                     input_value['contentId'],
                     input_value['unicodeStrSet'])
 
@@ -2584,9 +2575,8 @@ class State(translation_domain.BaseTranslatableObject):
 
     def _register_all_translatable_fields(self) -> None:
         """Registers all of the translatable fields/objects in the state."""
-
         self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+            feconf.TranslatableContentFormat.HTML,
             self.content.content_id,
             self.content.html)
         self._register_translatable_object(self.interaction)

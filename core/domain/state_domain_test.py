@@ -4477,29 +4477,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_get_translatable_fields_for_hints(self):
         """Get all translatable fields for hints."""
 
-        state = state_domain.State.create_default_state('state_1')
-        state_hint_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state_1</p>'
-                )
-            ),
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state_1</p>'
-                )
-            ),
-        ]
-        state.update_interaction_hints(state_hint_list)
+        hint = state_domain.Hint(state_domain.SubtitledHtml(
+            'hint_1', '<p>Hello, this is html1 for state_1</p>'))
+
         translatable_contents = [
             translatable_content.content
             for translatable_content in
-            state.get_translatable_fields().values()
+            hint.get_translatable_fields().values()
         ]
         self.assertItemsEqual(
             translatable_contents, [
-                '<p>Hello, this is html1 for state_1</p>',
-                '<p>Hello, this is html2 for state_1</p>',
+                '<p>Hello, this is html1 for state_1</p>'
             ])
 
 
