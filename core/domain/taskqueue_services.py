@@ -84,11 +84,11 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
     }
     try:
         json.dumps(payload)
-    except TypeError:
+    except TypeError as e:
         raise ValueError(
             'The args or kwargs passed to the deferred call with '
             'function_identifier, %s, are not json serializable.' %
-            fn_identifier)
+            fn_identifier) from e
     # This is a workaround for a known python bug.
     # See https://bugs.python.org/issue7980
     datetime.datetime.strptime('', '')
@@ -111,9 +111,10 @@ def enqueue_task(url, params, countdown):
     """
     try:
         json.dumps(params)
-    except TypeError:
+    except TypeError as e:
         raise ValueError(
-            'The params added to the email task call cannot be json serialized')
+            'The params added to the email task call cannot be json serialized'
+        ) from e
     scheduled_datetime = datetime.datetime.utcnow() + datetime.timedelta(
         seconds=countdown)
     platform_taskqueue_services.create_http_task(

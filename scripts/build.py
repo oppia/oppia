@@ -923,8 +923,9 @@ def _execute_tasks(tasks, batch_size=24):
             currently_running_tasks.append(task)
             try:
                 task.start()
-            except RuntimeError:
-                raise OSError('threads can only be started once')
+            except RuntimeError as e:
+                raise OSError(
+                    'threads can only be started once') from e
 
 
 def generate_build_tasks_to_build_all_files_in_directory(source, target):

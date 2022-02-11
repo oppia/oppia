@@ -377,10 +377,10 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
         repo_fork.get_git_ref('heads/%s' % target_branch).delete()
     except github.UnknownObjectException:
         pass
-    except Exception:
+    except Exception as e:
         raise Exception(
             'Please ensure that %s branch is deleted before '
-            're-running the script' % target_branch)
+            're-running the script' % target_branch) from e
 
 
 def create_branch(

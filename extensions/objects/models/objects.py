@@ -747,8 +747,8 @@ class CheckedProof(BaseObject):
                 assert isinstance(raw['error_message'], str)
                 assert isinstance(raw['error_line_number'], int)
             return copy.deepcopy(raw)
-        except Exception:
-            raise TypeError('Cannot convert to checked proof %s' % raw)
+        except Exception as e:
+            raise TypeError('Cannot convert to checked proof %s' % raw) from e
 
 
 class Graph(BaseObject):
@@ -864,8 +864,8 @@ class Graph(BaseObject):
                 )
             assert len(set(edge_pairs)) == len(edge_pairs)
 
-        except Exception:
-            raise TypeError('Cannot convert to graph %s' % raw)
+        except Exception as e:
+            raise TypeError('Cannot convert to graph %s' % raw) from e
 
         return raw
 
@@ -968,8 +968,9 @@ class NormalizedRectangle2D(BaseObject):
             raw[1][0] = clamp(raw[1][0])
             raw[1][1] = clamp(raw[1][1])
 
-        except Exception:
-            raise TypeError('Cannot convert to Normalized Rectangle %s' % raw)
+        except Exception as e:
+            raise TypeError(
+                'Cannot convert to Normalized Rectangle %s' % raw) from e
 
         return raw
 

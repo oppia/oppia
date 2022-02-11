@@ -487,7 +487,7 @@ class Server:
         except socket.error as err:
             raise RuntimeError(
                 'Failed to bind socket {}. Error: {}'.format(path, err)
-            )
+            ) from err
         sock.listen(self.max_backlog)
         return sock
 
