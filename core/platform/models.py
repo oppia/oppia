@@ -31,7 +31,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models  # pylint: disable=unused-import
 
 # Constant for valid model names.
-NAMES = feconf.NAMES
+NAMES = feconf.VALID_MODEL_NAMES
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
