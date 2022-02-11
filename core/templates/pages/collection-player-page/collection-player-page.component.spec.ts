@@ -142,7 +142,7 @@ describe('Collection player page component', () => {
       },
       {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
-        left: '395px',
+        left: '390px',
         top: '145px',
         thumbnailBgColor: '#cd672b'
       },
@@ -154,7 +154,7 @@ describe('Collection player page component', () => {
       },
       {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
-        left: '55px',
+        left: '60px',
         top: '365px',
         thumbnailBgColor: '#cd672b'
       },
@@ -166,7 +166,7 @@ describe('Collection player page component', () => {
       },
       {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
-        left: '395px',
+        left: '390px',
         top: '585px',
         thumbnailBgColor: '#cd672b'
       }
@@ -214,15 +214,15 @@ describe('Collection player page component', () => {
     'when calling \'getExplorationTitlePosition\'', () => {
     // Case 1.
     let result = component.getExplorationTitlePosition(2);
-    expect(result).toBe('8px');
+    expect(result).toBe('-13px');
 
     // Case 2.
     result = component.getExplorationTitlePosition(1);
-    expect(result).toBe('30px');
+    expect(result).toBe('40px');
 
     // Case 3.
     result = component.getExplorationTitlePosition(3);
-    expect(result).toBe('-40px');
+    expect(result).toBe('-55px');
   });
 
   it('should return exploration url given exploration id', () => {
