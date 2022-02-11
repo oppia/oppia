@@ -160,6 +160,29 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
     expect(component.initValues).toEqual([1, 2, 2, 3]);
   });
 
+  it('should throw an error while initializing when choices are not provided',
+    () => {
+      const errorMessage = (
+        'TypeError: Cannot read properties of undefined (reading \'choices\')' +
+        '\nAdditional debug info:\n' +
+        'This object editor is related to ' +
+        'editing \'Drag And Drop Sort\' interaction responses. ' +
+        'This component is called and recieves data from ' +
+        'object-editor.directive.ts which in turn is called and ' +
+        'recieves data from rule-editor.component.ts.\n' +
+        'Possible files to look for while debugging: \n' +
+        '1. object-editor.directive.ts\n' +
+        '2. rule-editor.component.ts\n' +
+        '3. responses.service.ts\n' +
+        'Also, this error does not occur frequently and ' +
+        'mostly occurs on production. Hence, use --prod ' +
+        'flag while debugging.'
+      );
+
+      component.initArgs = undefined;
+      expect(() => component.ngOnInit()).toThrowError(errorMessage);
+    });
+
   it('should rearrage choices when user changes position of choices', () => {
     component.choices = [
       {

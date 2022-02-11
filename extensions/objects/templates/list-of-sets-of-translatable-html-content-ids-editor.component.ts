@@ -142,7 +142,31 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
 
   ngOnInit(): void {
     this.initValues = [];
-    this.choices = this.initArgs.choices;
+    try {
+      this.choices = this.initArgs.choices;
+    } catch (err) {
+      // NOTE: This try-catch block is added to
+      // track the issue #14708. However, the error does not
+      // seem to occur anymore. This block adds some
+      // additional details to the error message to debug the error
+      // if it occurs again.
+      const additionalDetails = (
+        '\nAdditional debug info:\n' +
+        'This object editor is related to ' +
+        'editing \'Drag And Drop Sort\' interaction responses. ' +
+        'This component is called and recieves data from ' +
+        'object-editor.directive.ts which in turn is called and ' +
+        'recieves data from rule-editor.component.ts.\n' +
+        'Possible files to look for while debugging: \n' +
+        '1. object-editor.directive.ts\n' +
+        '2. rule-editor.component.ts\n' +
+        '3. responses.service.ts\n' +
+        'Also, this error does not occur frequently and ' +
+        'mostly occurs on production. Hence, use --prod ' +
+        'flag while debugging.'
+      );
+      throw new Error(err + additionalDetails);
+    }
 
     // Initialize the default values.
     if (this.value[0] === undefined || this.value[0].length === 0) {
