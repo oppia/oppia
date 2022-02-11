@@ -480,4 +480,44 @@ describe('Collection model', () => {
     expect(_sampleCollection).not.toBe(secondCollection);
     expect(_sampleCollection).toEqual(secondCollection);
   });
+
+  it('should be able to swap 2 nodes of the collection and ' +
+      'update the exploration id to node index map',
+  () => {
+    let expId0 = 'exp_id0';
+    let expId1 = 'exp_id1';
+
+    _addCollectionNode(expId0);
+    _addCollectionNode(expId1);
+
+    // Before swapping.
+    expect(_sampleCollection.nodes[0].getExplorationId()).toEqual(expId0);
+    expect(_sampleCollection.nodes[1].getExplorationId()).toEqual(expId1);
+    expect(_sampleCollection.explorationIdToNodeIndexMap[expId0]).toEqual(0);
+    expect(_sampleCollection.explorationIdToNodeIndexMap[expId1]).toEqual(1);
+
+    // Return false if invalid index is provided.
+    expect(_sampleCollection.swapCollectionNodes(0, 6)).toBeFalse();
+    expect(_sampleCollection.swapCollectionNodes(5, 1)).toBeFalse();
+    expect(_sampleCollection.swapCollectionNodes(-1, 1)).toBeFalse();
+    expect(_sampleCollection.swapCollectionNodes(0, -1)).toBeFalse();
+
+    // Do the swapping if valid indices are provided.
+    _sampleCollection.swapCollectionNodes(0, 1);
+
+    expect(_sampleCollection.nodes[0].getExplorationId()).toEqual(expId1);
+    expect(_sampleCollection.nodes[1].getExplorationId()).toEqual(expId0);
+    expect(_sampleCollection.explorationIdToNodeIndexMap[expId0]).toEqual(1);
+    expect(_sampleCollection.explorationIdToNodeIndexMap[expId1]).toEqual(0);
+  });
+
+  it('should be able to get the starting collection node', () => {
+    // Return null when no node is added.
+    expect(_sampleCollection.getStartingCollectionNode()).toBeNull();
+
+    _addCollectionNode('exp_id0');
+
+    expect(_sampleCollection.getStartingCollectionNode()).toEqual(
+      _sampleCollection.nodes[0]);
+  });
 });
