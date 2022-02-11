@@ -206,13 +206,12 @@ export class NumericInputValidationService {
     return warningsList;
   }
   // Returns 'undefined' when no error occurs.
-  // requireNonnegativeInput refer to non-negative input value
   getErrorStringI18nKey(
       value: number, requireNonnegativeInput: boolean
   ): string | undefined {
     let stringValue = null;
     // Value of sign is '-' if value of number is negative,
-    // '' if non-negative
+    // '' if non-negative.
     let sign = value < 0 ? '-' : '';
 
     // Convert exponential notation to decimal number.
@@ -223,7 +222,6 @@ export class NumericInputValidationService {
     // exponential form.
     if (numberParts.length === 1) {
       stringValue = numberParts[0];
-
     } else {
       let exponentialValueToString = '';
       // Mantissa is the part of exponential number before the 'e' or 'E'.

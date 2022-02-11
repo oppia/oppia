@@ -32,9 +32,10 @@ class MockTranslateService {
         'The answer should be greater than or equal to zero. ' +
         'It should not contain symbol(-).');
     } else if (
-        key === 'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS') {
+      key === 'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS') {
       return (
-        'The answer can contain at most 15 digits (0-9) excluding symbols (. or -).');
+        'The answer can contain at most 15 digits (0-9) ' +
+        'excluding symbols (. or -).');
     }
   }
 }
