@@ -532,10 +532,7 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
-    Supported_Languages = [
-        'en', 'pt-br', 'ar', 'hi', 'es', 'bn', 'fr', 'id',
-        'uk', 'sk', 'nl', 'kab', 'vi', 'tr', 'zh-hans', 'zh-hant'
-    ]
+    languages = list(map(lambda x: x['id'], constants.SUPPORTED_SITE_LANGUAGES))
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
@@ -543,7 +540,7 @@ class SiteLanguageHandler(base.BaseHandler):
             'site_language_code': {
                 'schema': {
                     'type': 'basestring',
-                    'enum': Supported_Languages
+                    'choices': languages
                 }
             }
         }
