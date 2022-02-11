@@ -98,7 +98,7 @@ implements ControlValueAccessor, OnInit, Validator {
       localValue !== undefined &&
       localValue !== null &&
       localValue !== '' &&
-      this.numericInputValidationService.getErrorString(
+      this.numericInputValidationService.getErrorStringI18nKey(
         +localValue, checkRequireNonnegativeInputValue as boolean
       ) === undefined)
     ;

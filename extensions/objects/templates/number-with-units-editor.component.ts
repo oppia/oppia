@@ -37,7 +37,7 @@ export class NumberWithUnitsEditorComponent implements OnInit {
   @Input() value!: NumberWithUnitsAnswer | null;
   @Output() valueChanged = new EventEmitter();
   numberWithUnitsString!: string;
-  errorMessage: string = '';
+  errorMessageI18nKey: string = '';
   eventBusGroup: EventBusGroup;
 
   constructor(
@@ -72,7 +72,7 @@ export class NumberWithUnitsEditorComponent implements OnInit {
         modalId: this.modalId
       }));
       if (parsingError instanceof Error) {
-        this.errorMessage = parsingError.message;
+        this.errorMessageI18nKey = parsingError.message;
       }
     }
   }
