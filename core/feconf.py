@@ -24,7 +24,7 @@ import os
 
 from core.constants import constants
 
-from typing import Dict, List
+from typing import Dict, List, Sequence
 from typing_extensions import TypedDict
 
 
@@ -34,14 +34,11 @@ class _ValidCmdDictNotTotal(TypedDict, total=False):
     """Dictionary representing a non-required part
     of valid commands specs."""
 
-    allowed_values: Dict[str, List[str]]
+    allowed_values: Dict[str, Sequence[str]]
     deprecated_values: Dict[str, List[str]]
 
 
-class ValidCmdDict(
-    _ValidCmdDictNotTotal,
-    total=False
-):
+class ValidCmdDict(_ValidCmdDictNotTotal, total=False):
     """Dictionary representing valid commands specs."""
 
     name: str

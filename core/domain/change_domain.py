@@ -25,9 +25,6 @@ from core import utils
 
 from typing import Any, Dict, List
 
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
-
 
 def validate_cmd(
     cmd_name: str,
@@ -125,9 +122,7 @@ class BaseChange:
 
     # This is a list of common commands which is valid for all subclasses.
     # This should not be overriden by subclasses.
-    COMMON_ALLOWED_COMMANDS: List[
-        feconf.ValidCmdDict
-    ] = [{
+    COMMON_ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
         'name': feconf.CMD_DELETE_COMMIT,
         'required_attribute_names': [],
         'optional_attribute_names': [],
@@ -258,6 +253,8 @@ class BaseChange:
         # to verify that the domain object is correct.
         self.validate_dict(self.to_dict())
 
+    # Here we use Any, because we don't know what exactly will getattr
+    # return, as change_domain can have a differing structure.
     def __getattr__(self, name: str) -> Any:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
