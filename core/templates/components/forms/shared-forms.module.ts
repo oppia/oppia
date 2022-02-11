@@ -34,7 +34,7 @@ import { DirectivesModule } from 'directives/directives.module';
 import { SchemaBasedIntEditorComponent } from './schema-based-editors/schema-based-int-editor.directive';
 import { ApplyValidationDirective } from './custom-forms-directives/apply-validation.directive';
 import { MatInputModule } from '@angular/material/input';
-import { SchemaBasedFloatEditorComponent } from './schema-based-editors/schema-based-float-editor.directive';
+import { SchemaBasedFloatEditorComponent } from './schema-based-editors/schema-based-float-editor.component';
 import { SchemaBasedBoolEditorComponent } from './schema-based-editors/schema-based-bool-editor.directive';
 import { SchemaBasedChoicesEditorComponent } from './schema-based-editors/schema-based-choices-editor.directive';
 import { SchemaBasedCustomEditorComponent } from './schema-based-editors/schema-based-custom-editor.directive';

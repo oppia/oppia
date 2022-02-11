@@ -25,7 +25,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 @Component({
   selector: 'schema-based-float-editor',
-  templateUrl: './schema-based-float-editor.directive.html',
+  templateUrl: './schema-based-float-editor.component.html',
   styleUrls: [],
   providers: [
     {
