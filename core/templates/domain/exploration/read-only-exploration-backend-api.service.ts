@@ -83,7 +83,8 @@ export class ReadOnlyExplorationBackendApiService {
     return this._explorationCache.hasOwnProperty(explorationId);
   }
 
-  private _getExplorationUrl(explorationId: string, version: number): string {
+  private _getExplorationUrl(explorationId: string, version: number | null):
+    string {
     if (version) {
       return this.urlInterpolationService.interpolateUrl(
         AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
@@ -110,7 +111,7 @@ export class ReadOnlyExplorationBackendApiService {
    * is called instead, if present. The rejection callback function is
    * passed any data returned by the backend in the case of an error.
    */
-  async fetchExplorationAsync(explorationId: string, version: number):
+  async fetchExplorationAsync(explorationId: string, version: number | null):
     Promise<FetchExplorationBackendResponse> {
     return this._fetchExplorationAsync(explorationId, version);
   }

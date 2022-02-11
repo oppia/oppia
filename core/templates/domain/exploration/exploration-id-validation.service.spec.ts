@@ -146,4 +146,36 @@ describe('Exploration id validation service', () => {
     expect(successHandler).toHaveBeenCalledWith(true);
     expect(failHandler).not.toHaveBeenCalled();
   }));
+
+  it('should determine correctness feedback state when it is ' +
+    'enabled for the exploration', fakeAsync(() => {
+    const explorationId = '0';
+    const requestUrl = '/explorehandler/init/' + explorationId;
+
+    explorationIdValidationService.isCorrectnessFeedbackEnabled(explorationId)
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({correctness_feedback_enabled: true});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(true);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should determine correctness feedback state when it is ' +
+    'disabled for the exploration', fakeAsync(() => {
+    const explorationId = '0';
+    const requestUrl = '/explorehandler/init/' + explorationId;
+
+    explorationIdValidationService.isCorrectnessFeedbackEnabled(explorationId)
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({correctness_feedback_enabled: false});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(false);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

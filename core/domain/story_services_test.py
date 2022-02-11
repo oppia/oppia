@@ -1257,10 +1257,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
-                'Invalid language es found for exploration with ID exp_id_1.'])
+                'Invalid language es found for exploration with ID exp_id_1.'
+                ' This language is not supported for explorations in a story'
+                ' on the mobile app.'])
         with self.assertRaisesRegex(
             Exception, 'Invalid language es found for exploration with '
-            'ID exp_id_1'):
+            'ID exp_id_1. This language is not supported for explorations '
+            'in a story on the mobile app.'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1287,11 +1290,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
-                'Expected all explorations to have correctness feedback '
-                'enabled. Invalid exploration: exp_id_1'])
+                'Expected all explorations in a story to '
+                'have correctness feedback enabled. Invalid '
+                'exploration: exp_id_1'])
         with self.assertRaisesRegex(
-            Exception, 'Expected all explorations to have correctness feedback '
-            'enabled. Invalid exploration: exp_id_1'):
+            Exception, 'Expected all explorations in a story to '
+            'have correctness feedback enabled. Invalid exploration: exp_id_1'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1319,10 +1323,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             validation_error_messages, [
                 'Invalid interaction GraphInput in exploration with ID: '
-                'exp_id_1.'])
+                'exp_id_1. This interaction is not supported for explorations '
+                'in a story on the mobile app.'])
         with self.assertRaisesRegex(
             Exception, 'Invalid interaction GraphInput in exploration with '
-            'ID: exp_id_1'):
+            'ID: exp_id_1. This interaction is not supported for explorations '
+            'in a story on the mobile app.'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1363,11 +1369,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
-                'Exploration with ID: exp_id_1 contains exploration '
-                'recommendations in its EndExploration interaction.'])
+                'Explorations in a story are not expected to contain '
+                'exploration recommendations. Exploration with ID: exp_id_1 '
+                'contains exploration recommendations in its EndExploration '
+                'interaction.'])
         with self.assertRaisesRegex(
-            Exception, 'Exploration with ID: exp_id_1 contains exploration '
-            'recommendations in its EndExploration interaction.'):
+            Exception, 'Explorations in a story are not expected to contain '
+            'exploration recommendations. Exploration with ID: exp_id_1 '
+            'contains exploration recommendations in its EndExploration '
+            'interaction.'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1411,10 +1421,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             validation_error_messages, [
                 'RTE content in state Introduction of exploration with '
-                'ID exp_id_1 is not supported on mobile.'])
+                'ID exp_id_1 is not supported on mobile for explorations '
+                'in a story.'])
         with self.assertRaisesRegex(
             Exception, 'RTE content in state Introduction of exploration with '
-            'ID exp_id_1 is not supported on mobile.'):
+            'ID exp_id_1 is not supported on mobile for explorations '
+            'in a story.'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1451,11 +1463,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
-                'Expected no exploration to have parameter values in'
-                ' it. Invalid exploration: exp_id_1'])
+                'Expected no exploration in a story to have parameter '
+                'values in it. Invalid exploration: exp_id_1'])
         with self.assertRaisesRegex(
-            Exception, 'Expected no exploration to have parameter values in'
-            ' it. Invalid exploration: exp_id_1'):
+            Exception, 'Expected no exploration in a story to have parameter '
+            'values in it. Invalid exploration: exp_id_1'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1492,8 +1504,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         with self.assertRaisesRegex(
-            Exception, 'Expected no exploration to have parameter values in'
-            ' it. Invalid exploration: exp_id_2'):
+            Exception, 'Expected no exploration in a story to have parameter '
+            'values in it. Invalid exploration: exp_id_2'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 

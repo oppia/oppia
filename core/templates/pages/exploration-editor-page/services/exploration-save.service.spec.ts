@@ -376,6 +376,12 @@ describe('Exploration save service ' +
   let $uibModal = null;
   let $rootScope = null;
   let explorationSaveService = null;
+  let alertsService = null;
+  let errorResponse = {
+    error: {
+      error: 'Error Message'
+    }
+  };
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
@@ -388,7 +394,7 @@ describe('Exploration save service ' +
           provide: ExplorationDataService,
           useValue: {
             save(changeList, message, successCb, errorCb) {
-              errorCb();
+              errorCb(errorResponse);
             }
           }
         },
@@ -410,6 +416,7 @@ describe('Exploration save service ' +
     explorationSaveService = $injector.get('ExplorationSaveService');
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
+    alertsService = $injector.get('AlertsService');
   }));
 
   it('should call error callback', fakeAsync(function() {
@@ -420,6 +427,7 @@ describe('Exploration save service ' +
         opened: Promise.resolve(),
         result: Promise.resolve(['1'])
       });
+    let alertsServiceSpy = spyOn(alertsService, 'addWarning');
 
     explorationSaveService.showPublishExplorationModal(
       successCb, errorCb);
@@ -433,6 +441,7 @@ describe('Exploration save service ' +
 
     expect(errorCb).toHaveBeenCalled();
     expect(modalSpy).toHaveBeenCalled();
+    expect(alertsServiceSpy).toHaveBeenCalled();
   }));
 });
 
