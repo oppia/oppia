@@ -2203,7 +2203,7 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
                 'state_name': 'state_name',
                 'version': version,
                 'params': {
-                    'test_param1': 1
+                    'test_param1': '1'
                 },
                 'session_id': 'session_id'
             }
@@ -2220,7 +2220,7 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(model.session_id, 'session_id')
         self.assertEqual(model.exploration_version, version)
         self.assertEqual(model.params, {
-            'test_param1': 1
+            'test_param1': '1'
         })
         self.assertEqual(model.play_type, feconf.PLAY_TYPE_NORMAL)
 
