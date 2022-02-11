@@ -25,7 +25,6 @@ import os
 import urllib
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.tests import test_utils
@@ -693,17 +692,13 @@ class UtilsTests(test_utils.GenericTestBase):
         dt = datetime.datetime(2020, 6, 15)
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
-            dt,
-            datetime.datetime.fromtimestamp(
-                python_utils.divide(msecs, 1000.0))) # type: ignore[no-untyped-call]
+            dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
 
     def test_get_time_in_millisecs_with_complicated_time(self) -> None:
         dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
-            dt,
-            datetime.datetime.fromtimestamp(
-                python_utils.divide(msecs, 1000.0))) # type: ignore[no-untyped-call]
+            dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
 
     def test_grouper(self) -> None:
         self.assertEqual(
