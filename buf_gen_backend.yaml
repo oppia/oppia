@@ -1,0 +1,16 @@
+# This is the configuration file for the `buf generate` command.
+# The below configuration tells to generate only python code for the
+# proto files and put it into the proto_files directory in the root folder.
+# By default, the `buf generate` command will take `buf.gen.yaml` file as the
+# configuration file.
+
+# If we want to pass this configuration file in the `buf generate` command, we
+# have to use the `--template` option in the command:
+#     `buf generate PROTO_FILES_PATH --template buf_gen_backend.yaml`
+
+# To get more understanding about proto files and buf check out the wiki here:
+# https://github.com/oppia/oppia/wiki/Protocol-buffers
+version: v1beta1
+plugins:
+  - name: python
+    out: proto_files

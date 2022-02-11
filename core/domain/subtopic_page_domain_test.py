@@ -269,6 +269,285 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             % feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
             self.subtopic_page.validate()
 
+    def test_android_proto_size_calculation_is_correct(self):
+        """Test proto size calculation function."""
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id, self.topic_id))
+        self.assertEqual(subtopic_page.android_proto_size_in_bytes, 30)
+
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content1': {
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.1
+                    },
+                    'hi': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    },
+                    'fr': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.1
+                    },
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    },
+                    'fr': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    }
+                }
+            }
+        }
+        written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': '<p>English</p>',
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'data_format': 'unicode',
+                        'translation': '<p>Hindi</p>',
+                        'needs_update': True
+                    },
+                    'fr': {
+                        'data_format': 'html',
+                        'translation': '<p>French</p>',
+                        'needs_update': True
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>Hindi</p>',
+                        'needs_update': True
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation': '<p>English</p>',
+                        'needs_update': True
+                    },
+                    'fr': {
+                        'data_format': 'unicode',
+                        'translation': '<p>French</p>',
+                        'needs_update': True
+                    }
+                }
+            }
+        }
+        subtopic_page_contents_dict = {
+            'subtitled_html': {
+                'html': '<p>test</p>',
+                'content_id': 'content'
+            },
+            'recorded_voiceovers': recorded_voiceovers_dict,
+            'written_translations': written_translations_dict
+        }
+        subtopic_page.page_contents = (
+            subtopic_page_domain.SubtopicPageContents.from_dict(
+                subtopic_page_contents_dict))
+
+        self.assertEqual(subtopic_page.android_proto_size_in_bytes, 314)
+
+    def test_android_proto_conversion_is_correct(self):
+        """Test subtopic proto is correct."""
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id, self.topic_id))
+
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content1': {
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.1
+                    },
+                    'hi': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    },
+                    'fr': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.1
+                    },
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    },
+                    'fr': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    }
+                }
+            }
+        }
+        written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': '<p>English</p>',
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'data_format': 'unicode',
+                        'translation': '<p>Hindi</p>',
+                        'needs_update': True
+                    },
+                    'fr': {
+                        'data_format': 'html',
+                        'translation': '<p>French</p>',
+                        'needs_update': True
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>Hindi</p>',
+                        'needs_update': True
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation': '<p>English</p>',
+                        'needs_update': True
+                    },
+                    'fr': {
+                        'data_format': 'unicode',
+                        'translation': '<p>French</p>',
+                        'needs_update': True
+                    }
+                }
+            }
+        }
+        subtopic_page_contents_dict = {
+            'subtitled_html': {
+                'html': '<p>test</p>',
+                'content_id': 'content'
+            },
+            'recorded_voiceovers': recorded_voiceovers_dict,
+            'written_translations': written_translations_dict
+        }
+        subtopic_page.page_contents = (
+            subtopic_page_domain.SubtopicPageContents.from_dict(
+                subtopic_page_contents_dict))
+
+        sutopic_page_proto = subtopic_page.to_android_subtopic_page_proto()
+        self.assertEqual(sutopic_page_proto.id.topic_id, self.topic_id)
+        self.assertEqual(sutopic_page_proto.id.subtopic_id, '1')
+        self.assertEqual(sutopic_page_proto.content.content_id, 'content')
+        self.assertEqual(sutopic_page_proto.content.text, '<p>test</p>')
+
+        recorded_voiceovers_proto = sutopic_page_proto.recorded_voiceovers
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[0].language, 1)
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[0]
+            .voiceover_content_mapping['content1'].filename, 'xyz.mp3')
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[0]
+            .voiceover_content_mapping['content1'].file_size_bytes, 123)
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[0]
+            .voiceover_content_mapping['content1'].duration_secs,
+            1.100000023841858)
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[0]
+            .voiceover_content_mapping['feedback_1'].filename, 'xyz.mp3')
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[0]
+            .voiceover_content_mapping['feedback_1'].file_size_bytes, 123)
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[0]
+            .voiceover_content_mapping['feedback_1'].duration_secs,
+            1.2999999523162842)
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[1].language, 3)
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[1]
+            .voiceover_content_mapping['content1'].filename, 'abc.mp3')
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[1]
+            .voiceover_content_mapping['content1'].file_size_bytes, 1234)
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[1]
+            .voiceover_content_mapping['content1'].duration_secs,
+            1.2999999523162842)
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[1]
+            .voiceover_content_mapping['feedback_1'].filename, 'xyz.mp3')
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[1]
+            .voiceover_content_mapping['feedback_1'].file_size_bytes, 123)
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[1]
+            .voiceover_content_mapping['feedback_1'].duration_secs,
+            1.100000023841858)
+
+        written_translations_proto = sutopic_page_proto.written_translations
+        self.assertEqual(
+            written_translations_proto.translation_language_mapping[0].language,
+            1)
+        self.assertEqual(
+            written_translations_proto.translation_language_mapping[0]
+            .translation_content_mapping['content1']
+            .translatable_text.translation, '<p>English</p>')
+        self.assertEqual(
+            written_translations_proto.translation_language_mapping[0]
+            .translation_content_mapping['feedback_1']
+            .translatable_text.translation, '<p>English</p>')
+        self.assertEqual(
+            written_translations_proto.translation_language_mapping[1].language,
+            3)
+        self.assertEqual(
+            written_translations_proto.translation_language_mapping[1]
+            .translation_content_mapping['content1']
+            .translatable_text.translation, '<p>Hindi</p>')
+        self.assertEqual(
+            written_translations_proto.translation_language_mapping[1]
+            .translation_content_mapping['feedback_1']
+            .translatable_text.translation, '<p>Hindi</p>')
+
 
 class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):

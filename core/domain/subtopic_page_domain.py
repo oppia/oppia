@@ -23,6 +23,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
+from proto_files import revision_card_pb2
 
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
@@ -32,6 +33,7 @@ from core.domain import html_validation_service  # pylint: disable=invalid-impor
 SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML = 'page_contents_html'
 SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO = 'page_contents_audio'
 SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS = 'page_written_translations'
+SUBTOPIC_PAGE_PROPERTY_ANDROID_PROTO_SIZE_IN_BYTES = 'android_proto_size_in_bytes'
 
 CMD_CREATE_NEW = 'create_new'
 # These take additional 'property_name' and 'new_value' parameters and,
@@ -53,7 +55,8 @@ class SubtopicPageChange(change_domain.BaseChange):
     SUBTOPIC_PAGE_PROPERTIES = (
         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
-        SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS)
+        SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS,
+        SUBTOPIC_PAGE_PROPERTY_ANDROID_PROTO_SIZE_IN_BYTES)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -174,6 +177,83 @@ class SubtopicPage:
         self.page_contents_schema_version = page_contents_schema_version
         self.language_code = language_code
         self.version = version
+        self._cached_android_proto_size_is_stale = True
+        self._cached_android_proto_size_in_bytes = 0
+
+    # This property is only meant to be used for oppia-android.
+    # This property gives the information about the proto size in bytes of the
+    # subtopic, which is used in the oppia-android application.
+    @property
+    def android_proto_size_in_bytes(self):
+        """Returns the most up-to-date size of the subtopic proto,
+        recomputing from scratch if necessary.
+
+        Returns:
+            int. The size of the subtopic's Android proto representation,
+            in bytes.
+        """
+        if self._cached_android_proto_size_is_stale:
+            self._cached_android_proto_size_in_bytes = self.get_proto_size()
+            self._cached_android_proto_size_is_stale = False
+
+        return self._cached_android_proto_size_in_bytes
+
+    def __setattr__(self, attrname, new_value):
+        """Set _cached_android_proto_size_is_stale to True every time
+        the Subtopic object is updated.
+
+        Args:
+            attrname: str. The name of the Subtopic class attribute.
+            new_value: *. The value of the attribute on which
+                function is called.
+        """
+
+        # If the value of _cached_android_proto_size_in_bytes or
+        # _cached_android_proto_size_is_stale gets updated, we don't want to
+        # recompute the subtopic's proto size. These attributes are
+        # both supporting attributes which aren't included in the
+        # proto size calculation.
+        if attrname not in (
+            '_cached_android_proto_size_in_bytes',
+            '_cached_android_proto_size_is_stale'
+        ):
+            self._cached_android_proto_size_is_stale = True
+        super().__setattr__(attrname, new_value)
+
+    def to_android_subtopic_page_proto(self):
+        """Returns a proto representation of the subtopic object.
+
+        Returns:
+            RevisionCardDto. The proto object.
+        """
+        topic_id, subtopic_id = self.id.split('-')
+        subtopic_page_proto = revision_card_pb2.SubtopicPageIdDto(
+            topic_id=topic_id,
+            subtopic_id=subtopic_id
+        )
+
+        content_proto = (
+            self.page_contents.subtitled_html.to_android_content_proto())
+        recorded_voiceovers_proto = (
+            self.page_contents.recorded_voiceovers.to_android_recorded_voiceovers_proto())
+
+        written_translations_proto = (
+            self.page_contents.written_translations.to_android_written_translations_proto())
+
+        return revision_card_pb2.RevisionCardDto(
+            id=subtopic_page_proto,
+            content=content_proto,
+            recorded_voiceovers=recorded_voiceovers_proto,
+            written_translations=written_translations_proto
+        )
+
+    def get_proto_size(self):
+        """Calculate the byte size of the proto object.
+
+        Returns:
+            int. The byte size of the proto object.
+        """
+        return int(self.to_android_subtopic_page_proto().ByteSize())
 
     def to_dict(self):
         """Returns a dict representing this SubtopicPage domain object.

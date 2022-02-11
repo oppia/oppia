@@ -90,6 +90,8 @@ OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
+THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR = os.path.join(
+    THIRD_PARTY_DIR, 'oppia-proto-api-6c3b65a9e0bc79ea9f7db484288ed77063498ce6')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-364.0.0', 'google-cloud-sdk')
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
