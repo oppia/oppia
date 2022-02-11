@@ -8,11 +8,11 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 .oppia-subtopic-viewer-container .next-subtopic-section {
-  margin-top: 30px;
+  margin-top: 32px;
 }
 
 .oppia-subtopic-summary-tile-container {
-  margin-left: 50px;
+  margin-left: 48px;
   margin-top: 80px;
 }
 
@@ -26,11 +26,11 @@
 .oppia-subtopic-title {
   color: #00645c;
   font-family: Capriola, Roboto, Arial, sans-serif;
-  font-size: 3em;
-  margin-bottom: 25px;
-  margin-right: 50px;
+  font-size: 32px;
+  margin-bottom: 24px;
+  margin-right: 48px;
+  padding-left: 48px;
   margin-top: 0;
-  padding-top: 66.5px;
   text-align: right;
 }
 .oppia-subtopic-viewer-container-card {
@@ -43,8 +43,7 @@
   margin: 0 auto;
   max-width: 880px;
   min-height: 500px;
-  padding-bottom: 100px;
-  padding-top: 30px;
+  padding: 72px 48px 48px 48px;
   position: relative;
   text-decoration: none;
 }
@@ -59,11 +58,11 @@
   border-radius: 4px;
   color: rgb(51, 51, 51);
   font-family: Roboto, Arial, sans-serif;
-  font-size: 1.4em;
+  font-size: 16px;
   margin-right: 50px;
   margin-left: 50px;
   margin-top: 4vh;
-  padding: 40px 50px;
+  padding: 32px 48px 48px 48px;
   width: calc(100% - 100px);
 }
 .oppia-subtopic-viewer-next-subtopic-summary {
