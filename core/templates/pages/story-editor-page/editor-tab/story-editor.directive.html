@@ -89,6 +89,7 @@
             <div class="story-thumbnail protractor-test-story-thumbnail">
               <label class="form-heading">Thumbnail Image*</label>
               <oppia-thumbnail-uploader [filename]="story.getThumbnailFilename()"
+                                        [use-local-storage]="false"
                                         (update-filename)="updateStoryThumbnailFilename($event)"
                                         [bg-color]="story.getThumbnailBgColor()"
                                         (update-bg-color)="updateStoryThumbnailBgColor($event)"
@@ -124,10 +125,13 @@
                 <div ng-if="notesEditorIsShown" class="protractor-test-story-notes-rte">
                   <schema-based-editor schema="NOTES_SCHEMA" local-value="editableNotes">
                   </schema-based-editor>
+                  <div ng-if="editableNotes.length > 4000" class="story-length-validation-error">
+                    The notes length is too long. Please make it under 4000 characters.
+                  </div>
                   <div class="editor-buttons">
                     <button type="button"
                             class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-story-notes-button"
-                            ng-disabled="!editableNotes"
+                            ng-disabled="!editableNotes || editableNotes.length > 4000"
                             ng-click="updateNotes(editableNotes)">
                       Save
                     </button>
@@ -228,6 +232,17 @@
 </div>
 
 <style>
+  .story-length-validation-error {
+    align-items: center;
+    background-color: #f8d7da;
+    border: 0.0625rem solid #dc3545;
+    border-radius: 0.25rem;
+    color: #dc3545;
+    display: flex;
+    justify-content: center;
+    padding: 0.25rem;
+  }
+
   story-editor .no-chapters-message {
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 18px;

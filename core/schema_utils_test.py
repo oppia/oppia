@@ -32,6 +32,8 @@ SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
 SCHEMA_KEY_PROPERTIES = schema_utils.SCHEMA_KEY_PROPERTIES
 SCHEMA_KEY_TYPE = schema_utils.SCHEMA_KEY_TYPE
+SCHEMA_KEY_KEYS = schema_utils.SCHEMA_KEY_KEYS
+SCHEMA_KEY_VALUES = schema_utils.SCHEMA_KEY_VALUES
 SCHEMA_KEY_POST_NORMALIZERS = schema_utils.SCHEMA_KEY_POST_NORMALIZERS
 SCHEMA_KEY_CHOICES = schema_utils.SCHEMA_KEY_CHOICES
 SCHEMA_KEY_NAME = schema_utils.SCHEMA_KEY_NAME
@@ -62,6 +64,8 @@ SCHEMA_TYPE_BOOL = schema_utils.SCHEMA_TYPE_BOOL
 # in the relevant extensions/objects/models/objects.py class.
 SCHEMA_TYPE_CUSTOM = schema_utils.SCHEMA_TYPE_CUSTOM
 SCHEMA_TYPE_DICT = schema_utils.SCHEMA_TYPE_DICT
+SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS = (
+    schema_utils.SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS)
 SCHEMA_TYPE_FLOAT = schema_utils.SCHEMA_TYPE_FLOAT
 SCHEMA_TYPE_HTML = schema_utils.SCHEMA_TYPE_HTML
 SCHEMA_TYPE_INT = schema_utils.SCHEMA_TYPE_INT
@@ -73,7 +77,8 @@ SCHEMA_TYPE_OBJECT_DICT = schema_utils.SCHEMA_TYPE_OBJECT_DICT
 ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_BOOL, SCHEMA_TYPE_CUSTOM, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT,
     SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_BASESTRING,
-    SCHEMA_TYPE_UNICODE, SCHEMA_TYPE_UNICODE_OR_NONE, SCHEMA_TYPE_OBJECT_DICT]
+    SCHEMA_TYPE_UNICODE, SCHEMA_TYPE_UNICODE_OR_NONE, SCHEMA_TYPE_OBJECT_DICT,
+    SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS]
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'MathExpressionContent', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
@@ -131,6 +136,7 @@ UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
 VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
     SCHEMA_TYPE_BOOL: {},
     SCHEMA_TYPE_DICT: {},
+    SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS: {},
     SCHEMA_TYPE_FLOAT: {
         'is_at_least': {
             'min_value': {
@@ -388,6 +394,24 @@ def validate_schema(schema: Dict[str, Any]) -> None:
                     prop[SCHEMA_KEY_DESCRIPTION], str), (
                         'Expected %s, got %s' % (
                             str, prop[SCHEMA_KEY_DESCRIPTION]))
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS:
+        _validate_dict_keys(
+            schema,
+            [SCHEMA_KEY_TYPE, SCHEMA_KEY_KEYS, SCHEMA_KEY_VALUES],
+            OPTIONAL_SCHEMA_KEYS
+        )
+        items = [SCHEMA_KEY_VALUES, SCHEMA_KEY_KEYS]
+        for item in items:
+            assert isinstance(schema[item], dict), (
+                'Expected dict, got %s' % (schema[item])
+            )
+            _validate_dict_keys(
+                schema[item],
+                [SCHEMA_KEY_SCHEMA],
+                OPTIONAL_SCHEMA_KEYS
+            )
+            schema_item = schema[item]
+            validate_schema(schema_item[SCHEMA_KEY_SCHEMA])
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
         _validate_dict_keys(
             schema,
@@ -538,6 +562,32 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             ),
             (
                 {
+                    'type': 'variable_keys_dict',
+                    'keys': 1,
+                    'values': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    }
+                },
+                'Expected dict, got 1'
+            ),
+            (
+                {
+                    'type': 'variable_keys_dict',
+                    'fake_arg': 'value',
+                    'values': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    }
+                },
+                'Missing keys: {\'type\': \'variable_keys_dict\', '
+                '\'fake_arg\': \'value\', \'values\': {\'schema\': '
+                '{\'type\': \'basestring\'}}}'
+            ),
+            (
+                {
                     'type': 'unicode',
                     'validators': [{
                         'id': 'fake_validator',
@@ -614,6 +664,18 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                     'type': 'unicode'
                 }
             }]
+        }, {
+            'type': 'variable_keys_dict',
+            'keys': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'values': {
+                'schema': {
+                    'type': 'float'
+                }
+            }
         }, {
             'type': 'list',
             'items': {
@@ -1160,6 +1222,55 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             (None, 'Expected dict, received None'),
             (123, 'Expected dict, received 123'),
             ('abc', 'Expected dict, received abc')]
+
+        self.check_normalization(
+            schema, mappings, invalid_values_with_error_messages)
+
+    def test_dict_with_variable_key_schema(self) -> None:
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS,
+            'keys': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'values': {
+                'schema': {
+                    'type': schema_utils.SCHEMA_TYPE_LIST,
+                    'items': {
+                        'type': schema_utils.SCHEMA_TYPE_INT
+                    },
+                    'len': 2
+                }
+            }
+        }
+
+        mappings = [({
+                'skills_id1': [1.2, 3],
+                'skills_id2': [2.0, 0]
+            }, {
+                'skills_id1': [1, 3],
+                'skills_id2': [2, 0]
+            }), ({
+                'skills_id1': ['45', 2],
+                'skills_id2': [23, 3]
+            }, {
+                'skills_id1': [45, 2],
+                'skills_id2': [23, 3]
+            }), ({
+                'skills_id1': [1, 2],
+                'skills_id2': [2, 3]
+            }, {
+                'skills_id1': [1, 2],
+                'skills_id2': [2, 3]
+            })]
+        invalid_values_with_error_messages = [
+            ([1, 2], re.escape('Expected dict, received [1, 2]')),
+            ({1: 2, 'topic_id1': 3}, 'Expected string, received 1'),
+            ({'topics_id1': 1}, 'Expected list, received 1'),
+            (None, 'Expected dict, received None'),
+            ({'skill_id1': [45, 2, 34]}, 'Expected length of 2 got 3')
+        ]
 
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)

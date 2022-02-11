@@ -93,6 +93,8 @@ export class AnswerClassificationService {
     } else {
       this.alertsService.addWarning(
         'Something went wrong with the exploration.');
+      throw new Error(
+        'No defaultOutcome was available to classify the answer.');
     }
   }
 

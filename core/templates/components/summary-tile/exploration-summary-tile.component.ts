@@ -30,6 +30,7 @@ import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { Subscription } from 'rxjs';
 import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-exploration-summary-tile',
@@ -85,6 +86,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   avgRating!: number | null;
   thumbnailIcon!: string;
   mobileCardToBeShown: boolean = false;
+  expTitleTranslationKey!: string;
+  expObjectiveTranslationKey!: string;
 
   constructor(
     private ratingComputationService: RatingComputationService,
@@ -94,6 +97,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     private dateTimeFormatService: DateTimeFormatService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
@@ -137,6 +141,14 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     this.relativeLastUpdatedDateTime = this.getRelativeLastUpdatedDateTime();
     this.avgRating = this.getAverageRating();
     this.thumbnailIcon = this.getCompleteThumbnailIconUrl();
+    this.expTitleTranslationKey = (
+      this.i18nLanguageCodeService.getExplorationTranslationKey(
+        this.explorationId, TranslationKeyType.TITLE)
+    );
+    this.expObjectiveTranslationKey = (
+      this.i18nLanguageCodeService.getExplorationTranslationKey(
+        this.explorationId, TranslationKeyType.DESCRIPTION)
+    );
   }
 
   ngOnDestroy(): void {
@@ -236,6 +248,22 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   getCompleteThumbnailIconUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(
       this.thumbnailIconUrl);
+  }
+
+  isHackyExpTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.expTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyExpObjectiveTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.expObjectiveTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

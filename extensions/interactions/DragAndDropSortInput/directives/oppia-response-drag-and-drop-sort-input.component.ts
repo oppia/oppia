@@ -16,24 +16,42 @@
  * @fileoverview Component for the DragAndDropSortInput response.
  */
 
-require('services/html-escaper.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { DragAndDropAnswer } from 'interactions/answer-defs';
 
-angular.module('oppia').component('oppiaResponseDragAndDropSortInput', {
-  template: require('./drag-and-drop-sort-input-response.component.html'),
-  controllerAs: '$ctrl',
-  controller: ['$attrs', 'HtmlEscaperService',
-    function($attrs, HtmlEscaperService) {
-      var ctrl = this;
-      ctrl.chooseItemType = (index) => {
-        return (
-          index === 0 ?
-          'drag-and-drop-response-item' :
-          'drag-and-drop-response-subitem'
-        );
-      };
-      ctrl.$onInit = function() {
-        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.isAnswerLengthGreaterThanZero = ctrl.answer.length > 0;
-      };
-    }]
-});
+@Component({
+  selector: 'oppia-response-drag-and-drop-sort-input',
+  templateUrl: './drag-and-drop-sort-input-response.component.html',
+  styleUrls: []
+})
+export class ResponseDragAndDropSortInputComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() answer!: string;
+  isAnswerLengthGreaterThanZero: boolean;
+  responseList: DragAndDropAnswer;
+
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
+
+  ngOnInit(): void {
+    this.responseList = this.htmlEscaperService.escapedJsonToObj(
+      this.answer) as DragAndDropAnswer;
+    this.isAnswerLengthGreaterThanZero = this.responseList.length > 0;
+  }
+
+  chooseItemType(index: number): string {
+    return (
+      index === 0 ?
+      'drag-and-drop-response-item' :
+      'drag-and-drop-response-subitem'
+    );
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaResponseDragAndDropSortInput', downgradeComponent({
+    component: ResponseDragAndDropSortInputComponent
+  }) as angular.IDirectiveFactory);

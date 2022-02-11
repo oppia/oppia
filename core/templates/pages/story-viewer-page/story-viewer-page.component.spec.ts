@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for storyViewerPage.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { StoryNode } from 'domain/story/story-node.model';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerPageComponent } from './story-viewer-page.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { UserService } from 'services/user.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
@@ -31,7 +31,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockAssetsBackendApiService {
   getThumbnailUrlForPreview() {
@@ -49,6 +49,7 @@ describe('Story Viewer Page component', () => {
   let userService: UserService = null;
   let pageTitleService = null;
   let windowRef: WindowRef;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
   let _samplePlaythroughObject = null;
   const UserInfoObject = {
     roles: ['USER_ROLE'],
@@ -83,6 +84,7 @@ describe('Story Viewer Page component', () => {
     alertsService = TestBed.get(AlertsService);
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
     windowRef = TestBed.get(WindowRef);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     let fixture = TestBed.createComponent(StoryViewerPageComponent);
     component = fixture.componentInstance;
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
@@ -481,4 +483,63 @@ describe('Story Viewer Page component', () => {
       expect(component.thumbnailFilename === '');
       expect(component.iconUrl === '');
     }));
+
+  it('should close the login overlay', fakeAsync(()=>{
+    spyOn(component, 'hideLoginOverlay').and.callThrough();
+
+    expect(component.showLoginOverlay).toEqual(true);
+
+    component.hideLoginOverlay();
+    tick();
+
+    expect(component.showLoginOverlay).toEqual(false);
+  }));
+
+  it('should set focus on skip button', fakeAsync(()=>{
+    let target = document.createElement('div');
+    target.classList.add('target');
+
+    let nonTarget = document.createElement('div');
+    nonTarget.classList.add('test');
+
+    let overlay = new ElementRef(document.createElement('div'));
+    let button = new ElementRef(document.createElement('button'));
+
+    component.skipButton = button;
+    component.overlay = overlay;
+    component.showLoginOverlay = true;
+
+    spyOn(component, 'focusSkipButton').and.callThrough();
+    spyOn(component.skipButton.nativeElement, 'focus');
+    spyOn(target, 'closest').and.returnValue(nonTarget);
+
+    component.focusSkipButton(target, true);
+    tick();
+
+    expect(component.skipButton.nativeElement.focus).not.toHaveBeenCalled();
+
+    component.focusSkipButton(target, false);
+    tick();
+
+    expect(component.skipButton.nativeElement.focus).toHaveBeenCalled();
+  }));
+  it('should check if hacky translation is displayed correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValues(false, true, false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValues(false, false, true, false);
+
+    let hackyStoryTitleTranslationIsDisplayed =
+      component.isHackyStoryTitleTranslationDisplayed();
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
+    let hackyStoryDescTranslationIsDisplayed =
+      component.isHackyStoryDescTranslationDisplayed();
+    expect(hackyStoryDescTranslationIsDisplayed).toBe(true);
+    let hackyStoryNodeTitleTranslationIsDisplayed =
+      component.isHackyStoryNodeTitleTranslationDisplayed(0);
+    expect(hackyStoryNodeTitleTranslationIsDisplayed).toBe(false);
+    let hackyStoryNodeDescTranslationIsDisplayed =
+      component.isHackyStoryNodeDescTranslationDisplayed(0);
+    expect(hackyStoryNodeDescTranslationIsDisplayed).toBe(true);
+  });
 });

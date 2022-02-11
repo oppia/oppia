@@ -104,7 +104,7 @@ export class KeyboardShortcutService {
 
 
   bindNavigationShortcuts(): void {
-    Mousetrap.bind('ctrl+0', () => {
+    Mousetrap.bind('ctrl+6', () => {
       this.windowRef.nativeWindow.location.href = '/get-started';
     });
 

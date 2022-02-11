@@ -77,7 +77,10 @@ export class RubricsEditorComponent {
     ui_config: {}};
   rubricsOptions!: RubricsOptions[];
   rubric!: Rubric;
-
+  maximumNumberofExplanations!:number;
+  maximumCharacterLengthOfExplanation!:number;
+  MEDIUM_EXPLANATION_INDEX!:number;
+  
   constructor(
     private skillCreationService: SkillCreationService,
     private changeDetectorRef: ChangeDetectorRef
@@ -101,6 +104,29 @@ export class RubricsEditorComponent {
 
   isExplanationValid(difficulty: string, index: number): boolean {
     return Boolean(this.editableExplanations[difficulty][index]);
+  }
+
+  isExplanationLengthValid(difficulty: string, idx: number): boolean {
+    return this.editableExplanations[difficulty][idx].length <=
+    this.maximumCharacterLengthOfExplanation;
+  }
+
+  isMediumLevelExplanationValid(): boolean {
+    // Checking if medium level rubrics have at least one explantion.
+    return (
+      this.rubrics[this.MEDIUM_EXPLANATION_INDEX] &&
+      this.rubrics[this.MEDIUM_EXPLANATION_INDEX].getExplanations().length >=
+      1);
+  }
+
+  hasReachedExplanationCountLimit(): boolean {
+    let totalExplanations: number = 0;
+    for (let difficulty in this.editableExplanations) {
+      if (this.editableExplanations[difficulty]) {
+        totalExplanations += this.editableExplanations[difficulty].length;
+      }
+    }
+    return totalExplanations >= this.maximumNumberofExplanations;
   }
 
   updateExplanation($event: string, idx: number): void {
@@ -190,7 +216,7 @@ export class RubricsEditorComponent {
         Array(explanations.length).fill(false));
       this.editableExplanations[difficulty] = [...explanations];
     }
-    this.selectedRubricIndex;
+
     this.rubricsOptions = [
       {id: 0, difficulty: 'Easy'},
       {id: 1, difficulty: 'Medium'},
