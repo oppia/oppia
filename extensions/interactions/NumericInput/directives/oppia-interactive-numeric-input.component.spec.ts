@@ -27,13 +27,14 @@ import { TranslateService } from '@ngx-translate/core';
 
 class MockTranslateService {
   instant(key: string): string {
-    if (key === 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1') {
+    if (key === 'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO') {
       return (
-        'The answer should be greater than or equal to zero and can contain ' +
-        'at most 15 digits (0-9) or symbols(.).');
-    } else if (key === 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2') {
+        'The answer should be greater than or equal to zero. ' +
+        'It should not contain symbol(-).');
+    } else if (
+        key === 'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS') {
       return (
-        'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+        'The answer can contain at most 15 digits (0-9) excluding symbols (. or -).');
     }
   }
 }
