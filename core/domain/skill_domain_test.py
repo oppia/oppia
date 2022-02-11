@@ -139,7 +139,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 'worked_examples': [
                     {
                         'question': {
-                            'html':'<p>A Question</p>'
+                            'html': '<p>A Question</p>'
                         },
                         'explanation': {
                             'html': '<p>An explanation</p>'
@@ -228,29 +228,39 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             versioned_misconceptions['misconceptions'][0]['must_be_addressed'],
             True
         )
-        versioned_misconceptions['misconceptions'][0]['feedback'] = '<p>Feedback</p>'
-        '<oppia-noninteractive-math raw_latex-with-valu'
-        'e="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
-        expected_feedback = '<p>Feedback</p>'
-        '<oppia-noninteractive-math math_content-with-v'
-        'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
-        '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
-        ';quot;}"></oppia-noninteractive-math>'
-        
+        versioned_misconceptions['misconceptions'][0]['feedback'] = (
+            '<p>'
+            'Feedback</p>'
+            '<oppia-noninteractive-math raw_latex-with-valu'
+            'e="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+        )
+        expected_feedback = (
+            '<p>Feedback</p>'
+            '<oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
+            ';quot;}"></oppia-noninteractive-math>'
+        )
         self.skill.update_misconceptions_from_model(
             versioned_misconceptions,
             versioned_misconceptions['schema_version']
         )
         self.skill.validate()
         self.assertEqual(versioned_misconceptions['schema_version'], 3)
-        self.assertEqual(versioned_misconceptions['misconceptions'][0]['feedback'], expected_feedback)
+        self.assertEqual(
+            versioned_misconceptions['misconceptions'][0]['feedback'],
+            expected_feedback
+        )
         self.skill.update_misconceptions_from_model(
             versioned_misconceptions,
             versioned_misconceptions['schema_version']
         )
         self.skill.validate()
         self.assertEqual(versioned_misconceptions['schema_version'], 4)
-        versioned_misconceptions['misconceptions'][0]['feedback'] = '<span>feedback&nbsp;</span>'
+        versioned_misconceptions['misconceptions'][0]['feedback'] = (
+            '<span>'
+            'feedback&nbsp;</span>'
+        )
         self.skill.update_misconceptions_from_model(
             versioned_misconceptions,
             versioned_misconceptions['schema_version']
@@ -791,7 +801,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 {'explanations': ['explanation2']}
             ]
         })
-        versioned_rubrics['rubrics'][0]['explanations']= [
+        versioned_rubrics['rubrics'][0]['explanations'] = [
         '<p>Explanation</p>'
         '<oppia-noninteractive-math raw_latex-with-valu'
         'e="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
@@ -804,22 +814,26 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'rubrics': [
                 {
                     'explanations': [
-                        '<p>Explanation</p>'
-                        '<oppia-noninteractive-math math_content-with-v'
-                        'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
-                        '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
-                        ';quot;}"></oppia-noninteractive-math>'
+                        (
+                            '<p>Explanation</p>'
+                            '<oppia-noninteractive-math math_content-with-v'
+                            'alue="{&amp;quot;raw_latex&amp;quot;:'
+                            ' &amp;quot;+,-,-,'
+                            '+&amp;quot;, &amp;quot;svg_filename'
+                            '&amp;quot;: &amp;quot;&amp'
+                            ';quot;}"></oppia-noninteractive-math>'
+                        )
                     ]
                  },
                 {'explanations': ['explanation2']}
             ]
         })
-        versioned_rubrics['rubrics'][0]['explanations']= [
-        '<oppia-noninteractive-svgdiagram '
-        'svg_filename-with-value="&amp;quot;img1.svg&amp;quot;"'
-        ' alt-with-value="&amp;quot;Image&amp;quot;">'
-        '</oppia-noninteractive-svgdiagram>'
-        ]
+        versioned_rubrics['rubrics'][0]['explanations'] = [(
+            '<oppia-noninteractive-svgdiagram '
+            'svg_filename-with-value="&amp;quot;img1.svg&amp;quot;"'
+            ' alt-with-value="&amp;quot;Image&amp;quot;">'
+            '</oppia-noninteractive-svgdiagram>'
+        )]
         skill_domain.Skill.update_rubrics_from_model(
             versioned_rubrics, 3)
         self.skill.validate()
@@ -838,7 +852,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 {'explanations': ['explanation2']}
             ]
         })
-        versioned_rubrics['rubrics'][0]['explanations']= [
+        versioned_rubrics['rubrics'][0]['explanations'] = [
             '<span>explanation&nbsp;</span>']
         skill_domain.Skill.update_rubrics_from_model(
             versioned_rubrics, 4)
@@ -852,6 +866,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 {'explanations': ['explanation2']}
             ]
         })
+
 
 class SkillChangeTests(test_utils.GenericTestBase):
 
