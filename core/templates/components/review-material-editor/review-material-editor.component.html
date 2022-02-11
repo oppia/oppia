@@ -21,7 +21,7 @@
 
 <div *ngIf="conceptCardExplanationEditorIsShown">
   <schema-based-editor class="protractor-test-concept-card-text"
-                       [schema]="getSchema.bind(this)"
+                       [schema]="getSchema()"
                        [localValue]="editableExplanation"
                        (localValueChange)="updateLocalExp($event)">
   </schema-based-editor>

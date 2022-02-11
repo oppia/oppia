@@ -16,104 +16,91 @@
  * @fileoverview Directive for general schema-based editors.
  */
 
-require(
-  'components/forms/custom-forms-directives/apply-validation.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-bool-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-choices-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-custom-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-dict-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-float-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-html-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-list-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-unicode-editor.directive.ts');
-require('components/forms/validators/has-length-at-least.filter.ts');
-require('components/forms/validators/has-length-at-most.filter.ts');
-require('components/forms/validators/is-at-least.filter.ts');
-require('components/forms/validators/is-at-most.filter.ts');
-require('components/forms/validators/is-float.filter.ts');
-require('components/forms/validators/is-integer.filter.ts');
-require('components/forms/validators/is-nonempty.filter.ts');
-require('components/forms/validators/is-url-fragment.filter.ts');
-require('components/forms/validators/is-regex-matched.filter.ts');
-
-angular.module('oppia').directive('schemaBasedEditor', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        schema: '&',
-        isDisabled: '&',
-        notRequired: '&',
-        localValue: '=',
-        labelForFocusTarget: '&',
-        onInputBlur: '=',
-        onInputFocus: '=',
-        headersEnabled: '&',
-      },
-      template: require('./schema-based-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$rootScope', function($rootScope) {
-          let ctrl = this;
-          ctrl.$onInit = function() {
-            /**
-             * $rootScope.$applyAsync() is called here to fix the change
-             * detection issue with moderator page. Please refer #12602.
-             * If you are using this directive as an example for the
-             * usage of UpgradeComponent. This call is not mandatory.
-             */
-            $rootScope.$applyAsync();
-          };
-        }]
-    };
-  }]);
-
-import { Directive, ElementRef, Injector, Input, Output, EventEmitter } from '@angular/core';
-import { UpgradeComponent } from '@angular/upgrade/static';
+import { Input, Output, EventEmitter, Component, forwardRef, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors, NgForm } from '@angular/forms';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Schema } from 'services/schema-default-value.service';
-// Allow $scope to be provided to parent Component.
-export const ScopeProvider = {
-  deps: ['$injector'],
-  provide: '$scope',
-  useFactory: (injector: Injector): void => injector.get('$rootScope').$new(),
-};
-@Directive({
+const INVALID = 'INVALID';
+@Component({
   selector: 'schema-based-editor',
-  providers: [ScopeProvider]
+  templateUrl: './schema-based-editor.directive.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedEditorComponent),
+    },
+  ]
 })
-export class SchemaBasedEditorDirective extends UpgradeComponent {
-  @Input() schema: () => Schema;
-  @Input() isDisabled: () => boolean;
-  @Input() localValue;
-  @Output() localValueChange: EventEmitter<unknown> = new EventEmitter();
-  @Input() labelForFocusTarget: () => string;
-  @Input() onInputBlur: () => void;
-  @Input() onInputFocus: () => void;
+export class SchemaBasedEditorComponent
+implements AfterViewInit, ControlValueAccessor, Validator {
+  @ViewChild('hybridForm') frm: NgForm;
+  _localValue;
+  @Input() schema: Schema;
+  @Input() disabled: boolean;
+  @Input() labelForFocusTarget: string;
+  @Output() inputBlur = new EventEmitter();
+  @Output() inputFocus = new EventEmitter();
   @Input() headersEnabled;
-  @Input() notRequired: () => boolean;
+  @Input() notRequired: boolean;
+  onChange: (val: unknown) => void = () => {};
+  get localValue(): unknown {
+    return this._localValue;
+  }
 
-  constructor(
-      elementRef: ElementRef,
-      injector: Injector) {
-    super('schemaBasedEditor', elementRef, injector);
+  @Input() set localValue(val: unknown) {
+    this._localValue = val;
+    this.onChange(val);
+    this.localValueChange.emit(val);
+  }
+
+  @Output() localValueChange = new EventEmitter();
+  constructor(private elementRef: ElementRef) { }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  writeValue(value: unknown): void {
+    if (value === null) {
+      return;
+    }
+    this.localValue = value;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (val: unknown) => void): void {
+    this.onChange = fn;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnTouched(): void {
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
+  }
+
+  ngAfterViewInit(): void {
+    let form: angular.IFormController = angular.element(
+      this.elementRef.nativeElement).controller('form');
+    this.frm.statusChanges.subscribe((x) => {
+      if (form === null || form === undefined) {
+        return;
+      }
+      if (x === INVALID) {
+        form.$setValidity('schema', false, form);
+      } else {
+        form.$setValidity('schema', true, form);
+      }
+    });
   }
 }
+
+
+angular.module('oppia').directive('schemaBasedEditor', downgradeComponent({
+  component: SchemaBasedEditorComponent
+}));

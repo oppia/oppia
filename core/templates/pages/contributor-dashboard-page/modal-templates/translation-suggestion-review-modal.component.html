@@ -44,20 +44,17 @@
               {{ item }}
             </li>
           </ul>
-          <schema-based-editor [schema]="getHtmlSchema.bind(this)"
+          <schema-based-editor [schema]="HTML_SCHEMA"
                                *ngIf="startedEditing && isHtmlContent"
-                               [localValue]="editedContent.html"
-                               (localValueChange)="updateHtml($event)">
+                               [(ngModel)]="editedContent.html">
           </schema-based-editor>
-          <schema-based-editor [schema]="getUnicodeSchema.bind(this)"
+          <schema-based-editor [schema]="UNICODE_SCHEMA"
                                *ngIf="startedEditing && isUnicodeContent"
-                               [localValue]="editedContent.html"
-                               (localValueChange)="updateHtml($event)">
+                               [(ngModel)]="editedContent.html">
           </schema-based-editor>
-          <schema-based-editor [schema]="getSetOfStringsSchema.bind(this)"
+          <schema-based-editor [schema]="SET_OF_STRINGS_SCHEMA"
                                *ngIf="startedEditing && isSetOfStringsContent"
-                               [localValue]="editedContent.html"
-                               (localValueChange)="updateHtml($event)">
+                               [(ngModel)]="editedContent.html">
           </schema-based-editor>
         </div>
         <div class="oppia-translation-review-edit-buttons">

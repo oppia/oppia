@@ -72,6 +72,8 @@ import { SubtitledUnicodeEditorComponent } from './templates/subtitled-unicode-e
 import { TranslatableHtmlContentIdEditorComponent } from './templates/translatable-html-content-id.component';
 import { TranslatableSetOfNormalizedStringEditorComponent } from './templates/translatable-set-of-normalized-string-editor.component';
 import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/translatable-set-of-unicode-string-editor.component';
+import { ParameterNameEditorComponent } from './templates/parameter-name-editor.component';
+
 import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
@@ -117,6 +119,7 @@ import { TranslateModule } from '@ngx-translate/core';
     NormalizedStringEditorComponent,
     NumberWithUnitsEditorComponent,
     NumericExpressionEditorComponent,
+    ParameterNameEditorComponent,
     PositionOfTermsEditorComponent,
     PositiveIntEditorComponent,
     RatioExpressionEditorComponent,
@@ -159,6 +162,7 @@ import { TranslateModule } from '@ngx-translate/core';
     NormalizedStringEditorComponent,
     NumberWithUnitsEditorComponent,
     NumericExpressionEditorComponent,
+    ParameterNameEditorComponent,
     PositionOfTermsEditorComponent,
     PositiveIntEditorComponent,
     RatioExpressionEditorComponent,
@@ -201,6 +205,7 @@ import { TranslateModule } from '@ngx-translate/core';
     NormalizedStringEditorComponent,
     NumberWithUnitsEditorComponent,
     NumericExpressionEditorComponent,
+    ParameterNameEditorComponent,
     PositionOfTermsEditorComponent,
     PositiveIntEditorComponent,
     RatioExpressionEditorComponent,

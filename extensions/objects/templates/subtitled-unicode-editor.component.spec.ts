@@ -19,6 +19,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledUnicodeEditorComponent } from './subtitled-unicode-editor.component';
 
 describe('SubtitledUnicodeEditorComponent', () => {
@@ -49,13 +50,11 @@ describe('SubtitledUnicodeEditorComponent', () => {
     const detectChangesSpy =
       spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
     spyOn(component.valueChanged, 'emit');
-    component.value = {
-      _unicode: 'value'
-    };
+    component.value = new SubtitledUnicode('value', null);
 
     component.updateValue('new value');
 
-    expect(component.value._unicode).toBe('new value');
+    expect(component.value.unicode).toBe('new value');
     expect(component.valueChanged.emit).toHaveBeenCalledWith({
       _unicode: 'new value'
     });
@@ -68,13 +67,11 @@ describe('SubtitledUnicodeEditorComponent', () => {
     const detectChangesSpy =
       spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
     spyOn(component.valueChanged, 'emit');
-    component.value = {
-      _unicode: 'value'
-    };
+    component.value = new SubtitledUnicode('value', null);
 
     component.updateValue('value');
 
-    expect(component.value._unicode).toBe('value');
+    expect(component.value.unicode).toBe('value');
     expect(component.valueChanged.emit).not.toHaveBeenCalledWith({
       _unicode: 'value'
     });

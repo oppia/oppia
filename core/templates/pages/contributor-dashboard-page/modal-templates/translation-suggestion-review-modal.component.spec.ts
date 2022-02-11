@@ -674,41 +674,5 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.editedContent = editedContent;
       component.ngOnInit();
     });
-
-    it('should get html schema', () => {
-      expect(component.getHtmlSchema()).toEqual({
-        type: 'html',
-      });
-    });
-
-    it('should get unicode schema', () => {
-      expect(component.getUnicodeSchema()).toEqual({
-        type: 'unicode'
-      });
-    });
-
-    it('should get set of strings schema', () => {
-      expect(component.getSetOfStringsSchema()).toEqual({
-        type: 'list',
-        items: {
-          type: 'unicode'
-        }
-      });
-    });
-
-    it('should invoke change detection when html is updated', () => {
-      component.editedContent.html = 'old';
-      spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
-      component.updateHtml('new');
-      expect(component.editedContent.html).toEqual('new');
-    });
-
-    it('should not invoke change detection when html is not updated', () => {
-      component.editedContent.html = 'old';
-      spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
-      component.updateHtml('old');
-      expect(component.editedContent.html).toEqual('old');
-      expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
-    });
   });
 });

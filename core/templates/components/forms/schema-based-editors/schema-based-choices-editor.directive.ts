@@ -15,35 +15,71 @@
 /**
  * @fileoverview Directive for a schema-based editor for multiple choice.
  */
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('services/nested-directives-recursion-timeout-prevention.service.ts');
+@Component({
+  selector: 'schema-based-choices-editor',
+  templateUrl: './schema-based-choices-editor.directive.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedChoicesEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedChoicesEditorComponent),
+    },
+  ]
+})
+export class SchemaBasedChoicesEditorComponent
+implements ControlValueAccessor, OnInit, Validator {
+  localValue;
+  @Input() disabled;
+  // The choices for the object's value.
+  @Input() choices;
+  // The schema for this object.
+  // TODO(sll): Validate each choice against the schema.
+  @Input() schema;
+  onChange: (val: unknown) => void = () => {};
+  constructor() { }
 
-angular.module('oppia').directive('schemaBasedChoicesEditor', [
-  'NestedDirectivesRecursionTimeoutPreventionService',
-  function(NestedDirectivesRecursionTimeoutPreventionService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        localValue: '=',
-        // The choices for the object's value.
-        choices: '&',
-        // The schema for this object.
-        // TODO(sll): Validate each choice against the schema.
-        schema: '&',
-        isDisabled: '&'
-      },
-      template: require('./schema-based-choices-editor.directive.html'),
-      controllerAs: '$ctrl',
-      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: [function() {
-        var ctrl = this;
-        ctrl.getReadonlySchema = function() {
-          var readonlySchema = angular.copy(ctrl.schema());
-          delete readonlySchema.choices;
-          return readonlySchema;
-        };
-      }]
-    };
+  // Implemented as a part of ControlValueAccessor interface.
+  writeValue(value: unknown): void {
+    this.localValue = value;
   }
-]);
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (val: unknown) => void): void {
+    this.onChange = fn;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnTouched(): void {
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
+  }
+
+  updateValue(val: boolean): void {
+    if (this.localValue === val) {
+      return;
+    }
+    this.localValue = val;
+    this.onChange(val);
+  }
+
+  ngOnInit(): void { }
+}
+
+angular.module('oppia').directive(
+  'schemaBasedChoicesEditor',
+  downgradeComponent({
+    component: SchemaBasedChoicesEditorComponent
+  })
+);

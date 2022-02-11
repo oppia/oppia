@@ -15,21 +15,3 @@
 /**
  * @fileoverview Unit tests for Schema Based Bool Editor Directive
  */
-
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-require('./schema-based-bool-editor.directive');
-
-describe('schema based bool editor directive', () => {
-  let directive = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $rootScope) {
-    directive = $injector.get('schemaBasedBoolEditorDirective');
-    $rootScope.$new();
-  }));
-
-  it('should be defined', () => {
-    expect(directive).toBeDefined();
-  });
-});

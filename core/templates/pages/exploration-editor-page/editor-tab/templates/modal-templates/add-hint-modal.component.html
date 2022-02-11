@@ -9,7 +9,7 @@
     <div class="oppia-rule-details-header">
       <strong>Hint #{{ hintIndex }} is...</strong>
       <schema-based-editor class="protractor-test-hint-text"
-                           [schema]="getSchema.bind(this)"
+                           [schema]="getSchema()"
                            [localValue]="this.tmpHint"
                            (localValueChange)="this.updateLocalHint($event)">
       </schema-based-editor>

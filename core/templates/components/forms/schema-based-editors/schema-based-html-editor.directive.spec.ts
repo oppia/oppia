@@ -15,33 +15,3 @@
 /**
  * @fileoverview Unit tests for Schema Based Html Editor Directive
  */
-
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
-describe('Schema Based Html Editor Directive', () => {
-  let ctrl = null;
-  let $rootScope = null;
-  let $scope = null;
-  let directive = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
-  beforeEach(angular.mock.inject(function($injector) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    directive = $injector.get('schemaBasedHtmlEditorDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
-      $scope: $scope
-    });
-  }));
-
-  it('should update local value', () => {
-    expect(ctrl.localValue).toBe(undefined);
-
-    ctrl.updateValue('<p> HTML </p>');
-
-    expect(ctrl.localValue).toBe('<p> HTML </p>');
-  });
-});

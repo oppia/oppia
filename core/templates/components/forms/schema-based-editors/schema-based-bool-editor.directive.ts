@@ -16,18 +16,64 @@
  * @fileoverview Directive for a schema-based editor for booleans.
  */
 
-angular.module('oppia').directive('schemaBasedBoolEditor', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        localValue: '=',
-        isDisabled: '&',
-        labelForFocusTarget: '&'
-      },
-      template: require('./schema-based-bool-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+@Component({
+  selector: 'schema-based-bool-editor',
+  templateUrl: './schema-based-bool-editor.directive.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedBoolEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedBoolEditorComponent),
+    },
+  ]
+})
+export class SchemaBasedBoolEditorComponent
+implements ControlValueAccessor, OnInit, Validator {
+  localValue;
+  @Input() disabled: boolean;
+  @Input() labelForFocusTarget: string;
+  onChange: (val: unknown) => void = () => {};
+  constructor() { }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  writeValue(value: unknown): void {
+    this.localValue = value;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (val: unknown) => void): void {
+    this.onChange = fn;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnTouched(): void {
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
+  }
+
+  ngOnInit(): void { }
+
+  updateValue(val: boolean): void {
+    if (this.localValue === val) {
+      return;
+    }
+    this.localValue = val;
+    this.onChange(val);
+  }
+}
+
+angular.module('oppia').directive('schemaBasedBoolEditor', downgradeComponent({
+  component: SchemaBasedBoolEditorComponent
+}) as angular.IDirectiveFactory);
