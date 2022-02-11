@@ -495,7 +495,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
             'answer': {
                 'schema': {
                     'type': 'multiple',
-                    'options': ['int', 'basestring', 'dict']
+                    'options': ['int', 'basestring', 'variable_keys_dict']
                 }
             },
             'client_time_spent_in_secs': {

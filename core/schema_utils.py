@@ -108,10 +108,11 @@ def normalize_against_schema(
         name = type(obj).__name__
         if name == 'str':
             name = 'basestring'
+        elif name == 'dict':
+            name = 'variable_keys_dict'
         assert (name in schema[SCHEMA_KEY_OPTIONS]), (
             '%s, type %s is not present in options %s' %
             (obj, name, schema[SCHEMA_KEY_OPTIONS]))
-        normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj
