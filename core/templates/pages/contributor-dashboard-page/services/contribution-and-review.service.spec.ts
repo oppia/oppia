@@ -13,96 +13,385 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests that the contribution-and-review service is working as
- * expected.
+ * @fileoverview Unit tests for contribution and review service
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// UserService.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ContributionAndReviewService } from './contribution-and-review.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ContributionAndReviewBackendApiService }
+  from './contribution-and-review-backend-api.service';
+import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 
-require(
-  'pages/contributor-dashboard-page/services/' +
-  'contribution-and-review.service.ts');
+describe('Contribution and review service', () => {
+  let cars: ContributionAndReviewService;
+  let carbas: ContributionAndReviewBackendApiService;
 
-describe('ContributionAndReviewService', function() {
-  var ContributionAndReviewService, $httpBackend;
-  var suggestion1;
-  var opportunityDict1;
-  var mockSuggestionsBackendObject;
-  var expectedSuggestionDict;
-  var onSuccess;
+  const suggestion1 = {
+    suggestion_id: 'suggestion_id_1',
+    target_id: 'skill_id_1',
+  } as SuggestionBackendDict;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  const opportunityDict1 = {
+    skill_id: 'skill_id_1',
+    skill_description: 'skill_description_1',
+  };
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ContributionAndReviewService = $injector.get(
-      'ContributionAndReviewService');
-    $httpBackend = $injector.get('$httpBackend');
+  const suggestionsBackendObject = {
+    suggestions: [
+      suggestion1
+    ],
+    target_id_to_opportunity_dict: {
+      skill_id_1: opportunityDict1,
+    },
+  };
 
-    suggestion1 = {
-      suggestion_id: 'suggestion_id_1',
-      target_id: 'skill_id_1',
+  const expectedSuggestionDict = {
+    suggestion: suggestion1,
+    details: suggestionsBackendObject
+      .target_id_to_opportunity_dict.skill_id_1
+  };
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        UrlInterpolationService,
+        ContributionAndReviewBackendApiService
+      ]
+    });
+    cars = TestBed.inject(ContributionAndReviewService);
+    carbas = TestBed.inject(ContributionAndReviewBackendApiService);
+  });
+
+  describe('getUserCreatedQuestionSuggestionsAsync', () => {
+    it('should return available question suggestions and opportunity details',
+      () => {
+        spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
+          Promise.resolve(suggestionsBackendObject));
+
+        cars.getUserCreatedQuestionSuggestionsAsync()
+          .then((suggestionIdToSuggestions) => {
+            expect(suggestionIdToSuggestions.suggestion_id_1)
+              .toEqual(expectedSuggestionDict);
+          });
+
+        expect(carbas.fetchSuggestionsAsync).toHaveBeenCalled();
+      });
+  });
+
+  describe('getReviewableQuestionSuggestionsAsync', () => {
+    it('should return available question suggestions and opportunity details',
+      () => {
+        spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
+          Promise.resolve(suggestionsBackendObject));
+
+        cars.getReviewableQuestionSuggestionsAsync()
+          .then((suggestionIdToSuggestions) => {
+            expect(suggestionIdToSuggestions.suggestion_id_1)
+              .toEqual(expectedSuggestionDict);
+          });
+
+        expect(carbas.fetchSuggestionsAsync).toHaveBeenCalled();
+      });
+  });
+
+  describe('getUserCreatedTranslationSuggestionsAsync', () => {
+    it('should return translation suggestions and opportunity details',
+      () => {
+        spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
+          Promise.resolve(suggestionsBackendObject));
+
+        cars.getUserCreatedTranslationSuggestionsAsync()
+          .then((suggestionIdToSuggestions) => {
+            expect(suggestionIdToSuggestions.suggestion_id_1)
+              .toEqual(expectedSuggestionDict);
+          });
+
+        expect(carbas.fetchSuggestionsAsync).toHaveBeenCalled();
+      });
+  });
+
+  describe('getReviewableTranslationSuggestionsAsync', () => {
+    it('should return translation suggestions and opportunity details',
+      () => {
+        spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
+          Promise.resolve(suggestionsBackendObject));
+
+        cars.getReviewableTranslationSuggestionsAsync()
+          .then((suggestionIdToSuggestions) => {
+            expect(suggestionIdToSuggestions.suggestion_id_1)
+              .toEqual(expectedSuggestionDict);
+          });
+
+        expect(carbas.fetchSuggestionsAsync).toHaveBeenCalled();
+      });
+  });
+
+  describe('reviewExplorationSuggestion', () => {
+    const requestBody = {
+      action: 'accept',
+      review_message: 'review message',
+      commit_message: 'commit message'
     };
-    opportunityDict1 = {
-      skill_id: 'skill_id_1',
-      skill_description: 'skill_description_1',
+
+    let onSuccess: jasmine.Spy<(suggestionId: string) => void>;
+    let onFailure: jasmine.Spy<(error: unknown) => void>;
+
+    beforeEach(() => {
+      onSuccess = jasmine.createSpy(
+        'onSuccess', (suggestionId: string) => {});
+      onFailure = jasmine.createSpy('onFailure', (error) => {});
+    });
+
+    it('should call onSuccess function on' +
+    'resolving suggestion to exploration correctly', fakeAsync(() => {
+      spyOn(carbas, 'reviewExplorationSuggestionAsync')
+        .and.returnValue(Promise.resolve());
+
+      cars.reviewExplorationSuggestion(
+        'abc', 'pqr', 'accept', 'review message', 'commit message',
+        onSuccess, onFailure
+      );
+      tick();
+
+      expect(carbas.reviewExplorationSuggestionAsync).toHaveBeenCalledWith(
+        'abc', 'pqr', requestBody);
+      expect(onSuccess).toHaveBeenCalledWith('pqr');
+      expect(onFailure).not.toHaveBeenCalled();
+    }));
+
+    it('should call onFailure function when' +
+    'resolving suggestion to exploration fails', fakeAsync(() => {
+      spyOn(carbas, 'reviewExplorationSuggestionAsync').and
+        .returnValue(Promise.reject());
+
+      cars.reviewExplorationSuggestion(
+        'abc', 'pqr', 'accept', 'review message', 'commit message',
+        onSuccess, onFailure
+      );
+      tick();
+
+      expect(carbas.reviewExplorationSuggestionAsync).toHaveBeenCalledWith(
+        'abc', 'pqr', requestBody);
+      expect(onSuccess).not.toHaveBeenCalled();
+      expect(onFailure).toHaveBeenCalled();
+    }));
+  });
+
+  describe('reviewSkillSuggestion', () => {
+    const requestBody = {
+      action: 'accept',
+      review_message: 'review message',
+      skill_difficulty: 'easy'
     };
-    mockSuggestionsBackendObject = {
-      suggestions: [
-        suggestion1
-      ],
-      target_id_to_opportunity_dict: {
-        skill_id_1: opportunityDict1,
+
+    let onSuccess: jasmine.Spy<(suggestionId: string) => void>;
+    let onFailure: jasmine.Spy<() => void>;
+
+    beforeEach(() => {
+      onSuccess = jasmine.createSpy(
+        'onSuccess', (suggestionId: string) => {});
+      onFailure = jasmine.createSpy('onFailure', () => {});
+    });
+
+    it('should call onSuccess function on' +
+    'resolving suggestion to skill correctly', fakeAsync(() => {
+      spyOn(
+        carbas, 'reviewSkillSuggestionAsync'
+      ).and.returnValue(Promise.resolve());
+
+      cars.reviewSkillSuggestion(
+        'abc', 'pqr', 'accept', 'review message', 'easy', onSuccess, onFailure);
+      tick();
+
+      expect(carbas.reviewSkillSuggestionAsync)
+        .toHaveBeenCalledWith('abc', 'pqr', requestBody);
+      expect(onSuccess).toHaveBeenCalledWith('pqr');
+      expect(onFailure).not.toHaveBeenCalled();
+    }));
+
+    it('should call onFailure function when' +
+    'resolving suggestion to skill fails', fakeAsync(() => {
+      spyOn(
+        carbas, 'reviewSkillSuggestionAsync'
+      ).and.returnValue(Promise.reject());
+
+      cars.reviewSkillSuggestion(
+        'abc', 'pqr', 'accept', 'review message', 'easy', onSuccess, onFailure);
+      tick();
+
+      expect(carbas.reviewSkillSuggestionAsync)
+        .toHaveBeenCalledWith('abc', 'pqr', requestBody);
+      expect(onSuccess).not.toHaveBeenCalled();
+      expect(onFailure).toHaveBeenCalled();
+    }));
+  });
+
+  describe('updateTranslationSuggestionAsync', () => {
+    const requestBody = {
+      translation_html: '<p>In English</p>'
+    };
+
+    let onSuccess: jasmine.Spy<() => void>;
+    let onFailure: jasmine.Spy<(error: unknown) => void>;
+
+    beforeEach(() => {
+      onSuccess = jasmine.createSpy(
+        'onSuccess', () => {});
+      onFailure = jasmine.createSpy('onFailure', (error) => {});
+    });
+
+    it('should call onSuccess function when' +
+    'updateTranslationSuggestionAsync succeeds', fakeAsync(() => {
+      spyOn(carbas, 'updateTranslationSuggestionAsync').and
+        .returnValue(Promise.resolve());
+
+      cars.updateTranslationSuggestionAsync(
+        'pqr', '<p>In English</p>', onSuccess, onFailure);
+      tick();
+
+      expect(carbas.updateTranslationSuggestionAsync)
+        .toHaveBeenCalledWith('pqr', requestBody);
+      expect(onSuccess).toHaveBeenCalled();
+      expect(onFailure).not.toHaveBeenCalled();
+    }));
+
+    it('should call onFailure function when' +
+    'updateTranslationSuggestionAsync fails', fakeAsync(() => {
+      spyOn(carbas, 'updateTranslationSuggestionAsync').and
+        .returnValue(Promise.reject());
+
+      cars.updateTranslationSuggestionAsync(
+        'pqr', '<p>In English</p>', onSuccess, onFailure);
+      tick();
+
+      expect(carbas.updateTranslationSuggestionAsync)
+        .toHaveBeenCalledWith('pqr', requestBody);
+      expect(onSuccess).not.toHaveBeenCalled();
+      expect(onFailure).toHaveBeenCalled();
+    }));
+  });
+
+  describe('updateQuestionSuggestionAsync', () => {
+    const questionStateData = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
       },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
+        default_outcome: {
+          dest: 'new state',
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        hints: [],
+        solution: {
+          answer_is_exclusive: false,
+          correct_answer: 'answer',
+          explanation: {
+            content_id: 'solution',
+            html: '<p>This is an explanation.</p>'
+          }
+        },
+        id: 'TextInput'
+      },
+      linked_skill_id: null,
+      next_content_id_index: 0,
+      param_changes: [],
+      solicit_answer_details: false,
+      card_is_checkpoint: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
     };
-    expectedSuggestionDict = {
-      suggestion: suggestion1,
-      details: opportunityDict1,
+
+    const payload = {
+      skill_difficulty: 'easy',
+      question_state_data: questionStateData
     };
-  }));
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  });
+    const imagesData = [{
+      filename: 'image1.png',
+      imageBlob: new Blob()
+    }];
 
-  describe('getUserCreatedQuestionSuggestionsAsync', function() {
-    it('should return available question suggestions and opportunity details',
-      function() {
-        $httpBackend.expect(
-          'GET', '/getsubmittedsuggestions/skill/add_question').respond(
-          200, mockSuggestionsBackendObject);
+    const requestBody = new FormData();
+    requestBody.append('payload', JSON.stringify(payload));
+    imagesData.forEach(obj => {
+      if (obj.imageBlob !== null) {
+        requestBody.append(obj.filename, obj.imageBlob);
+      }
+    });
 
-        ContributionAndReviewService.getUserCreatedQuestionSuggestionsAsync(
-        ).then(function(suggestionIdToSuggestions) {
-          expect(suggestionIdToSuggestions.suggestion_id_1).toEqual(
-            expectedSuggestionDict);
-        });
-        $httpBackend.flush();
-      });
-  });
+    let onSuccess: jasmine.Spy<(suggestionId: string) => void>;
+    let onFailure: jasmine.Spy<(suggestionId: string) => void>;
 
-  describe('getReviewableQuestionSuggestionsAsync', function() {
-    it('should return available question suggestions and opportunity details',
-      function() {
-        $httpBackend.expect(
-          'GET', '/getreviewablesuggestions/skill/add_question').respond(
-          200, mockSuggestionsBackendObject);
+    beforeEach(() => {
+      onSuccess = jasmine.createSpy(
+        'onSuccess', (suggestionId: string) => {});
+      onFailure = jasmine.createSpy(
+        'onFailure', (suggestionId: string) => {});
+    });
 
-        ContributionAndReviewService.getReviewableQuestionSuggestionsAsync(
-          onSuccess).then(function(suggestionIdToSuggestions) {
-          expect(suggestionIdToSuggestions.suggestion_id_1).toEqual(
-            expectedSuggestionDict);
-        });
-        $httpBackend.flush();
-      });
+    it('should call onSuccess function when' +
+    'updateQuestionSuggestionAsync succeeds', fakeAsync(() =>{
+      spyOn(carbas, 'updateQuestionSuggestionAsync').and
+        .returnValue(Promise.resolve());
+
+      cars.updateQuestionSuggestionAsync(
+        'pqr', 'easy', questionStateData,
+        imagesData, onSuccess, onFailure);
+      tick();
+
+      expect(carbas.updateQuestionSuggestionAsync)
+        .toHaveBeenCalledWith('pqr', requestBody);
+      expect(onSuccess).toHaveBeenCalledWith('pqr');
+      expect(onFailure).not.toHaveBeenCalled();
+    }));
+
+    it('should call onFailure function when' +
+    'updateQuestionSuggestionAsync fails', fakeAsync(() =>{
+      spyOn(carbas, 'updateQuestionSuggestionAsync').and
+        .returnValue(Promise.reject());
+
+      cars.updateQuestionSuggestionAsync(
+        'pqr', 'easy', questionStateData,
+        imagesData, onSuccess, onFailure);
+      tick();
+
+      expect(carbas.updateQuestionSuggestionAsync)
+        .toHaveBeenCalledWith('pqr', requestBody);
+      expect(onSuccess).not.toHaveBeenCalled();
+      expect(onFailure).toHaveBeenCalledWith('pqr');
+    }));
   });
 });
