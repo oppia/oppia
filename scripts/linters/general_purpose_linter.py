@@ -41,7 +41,7 @@ EXCLUDED_PATHS = (
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
     'core/templates/google-analytics.initializer.ts',
-    'extensions/classifiers/proto/*',
+    'extensions/classifiers/proto/*', '*.rtl.css',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
@@ -356,7 +356,7 @@ class GeneralPurposeLinter:
         try:
             file_content = self.file_cache.readlines(filepath)
         except Exception as e:
-            raise Exception('%s %s' % (filepath, e))
+            raise Exception('%s %s' % (filepath, e)) from e
         for index, regexp_to_check in enumerate(
                 pattern_list):
             if (any(filepath.endswith(
