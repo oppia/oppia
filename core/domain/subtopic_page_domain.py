@@ -234,11 +234,14 @@ class SubtopicPage:
 
         content_proto = (
             self.page_contents.subtitled_html.to_android_content_proto())
-        recorded_voiceovers_proto = (
-            self.page_contents.recorded_voiceovers.to_android_recorded_voiceovers_proto()) # pylint: disable=line-too-long
 
+        recorded_voiceovers = self.page_contents.recorded_voiceovers
+        recorded_voiceovers_proto = (
+            recorded_voiceovers.to_android_recorded_voiceovers_proto())
+
+        written_translations = self.page_contents.written_translations
         written_translations_proto = (
-            self.page_contents.written_translations.to_android_written_translations_proto()) # pylint: disable=line-too-long
+            written_translations.to_android_written_translations_proto())
 
         return revision_card_pb2.RevisionCardDto(
             id=subtopic_page_proto,

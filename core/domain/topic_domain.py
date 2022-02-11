@@ -390,6 +390,10 @@ class Subtopic:
         self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.url_fragment = url_fragment
 
+    @classmethod
+    def to_android_subtopic_proto(self):
+
+
     def to_dict(self) -> SubtopicDict:
         """Returns a dict representing this Subtopic domain object.
 
