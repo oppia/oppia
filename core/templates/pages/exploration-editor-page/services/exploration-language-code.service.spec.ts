@@ -50,7 +50,11 @@ describe('Exploration Language Code Service', () => {
     expect(elcs._isValid('en')).toBe(true);
 
     spyOn(cs, 'isExplorationLinkedToStory').and.returnValue(true);
-    expect(elcs.getSupportedContentLanguages().length).toBe(1);
+    expect(elcs.getSupportedContentLanguages().length).toBe(5);
     expect(elcs.getSupportedContentLanguages()[0].code).toBe('en');
+    expect(elcs.getSupportedContentLanguages()[1].code).toBe('hi-en');
+    expect(elcs.getSupportedContentLanguages()[2].code).toBe('ar');
+    expect(elcs.getSupportedContentLanguages()[3].code).toBe('hi');
+    expect(elcs.getSupportedContentLanguages()[4].code).toBe('pt-br');
   });
 });
