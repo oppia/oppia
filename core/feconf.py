@@ -24,7 +24,7 @@ import os
 
 from core.constants import constants
 
-from typing import Dict, List, Sequence
+from typing import Dict, List
 from typing_extensions import TypedDict
 
 
