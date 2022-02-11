@@ -212,7 +212,8 @@ def normalize_against_schema(
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
         # TODO(#14028): Use just one type.
         assert isinstance(obj, (str, bytes)), (
-            'Expected unicode string, received %s, schema %s' % (obj,sch))
+            'Expected unicode string, received %s, schema %s'
+            % (obj,schema))
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
