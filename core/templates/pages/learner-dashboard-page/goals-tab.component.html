@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-dashboard-page/goals-tab.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-dashboard-page/goals-tab.component.rtl.css" as="style">
+
 <div class="oppia-goals-box protractor-test-current-goals-section" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}">
   <p class="oppia-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION' | translate">
   </p>
@@ -11,11 +14,11 @@
         <div class="oppia-trash-button" (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
           <i class="fa fa-trash"></i>
         </div>
-        <label class="oppia-current-goals-topic-name protractor-test-topic-name-in-current-goals">
-          Learn {{topic.name}}
+        <label class="oppia-current-goals-topic-name protractor-test-topic-name-in-current-goals" (click)="toggleStory(i)">
+          <span [innerHTML]="'I18N_LEARN_TOPIC' | translate: { topicName: topic.name }"></span>
         </label>
         <p class="oppia-goals-story-name">
-          Complete a story in '{{topic.name}}'
+          <span [innerHTML]="'I18N_COMPLETE_STORY' | translate: { topicName: topic.name }"></span>
         </p>
         <div *ngIf="currentGoalsStoryIsShown[i]">
           <div *ngFor="let story of topic.canonicalStorySummaryDicts" class="oppia-story-summary-card">
@@ -36,13 +39,15 @@
   <p class="oppia-edit-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_ALL_GOALS_SECTION' | translate"> </p>
   <span class="oppia-input-box-subtitle">
     <em>
-      Limit of {{MAX_CURRENT_GOALS_LENGTH}} goals
+      <span [innerHTML]="'I18N_GOAL_LIMIT' | translate: { limit: MAX_CURRENT_GOALS_LENGTH }"></span>
     </em>
   </span>
   <div class="oppia-edit-goals-subheading">
-    <img [src]="pawImageUrl" alt="paw image" class="oppia-svg-paw-image">
-    <p class="oppia-edit-goals-topic-title">Topic</p>
-    <p class="oppia-edit-goals-learn-title">Learn</p>
+    <img [src]="pawImageUrl"
+         alt="paw image"
+         class="oppia-svg-paw-image">
+    <p class="oppia-edit-goals-topic-title"><span [innerHTML]="'I18N_TOPIC_TITLE' | translate"></span></p>
+    <p class="oppia-edit-goals-learn-title"><span [innerHTML]="'I18N_TOPIC_LEARN' | translate"></span></p>
   </div>
   <div *ngFor="let topic of editGoals; let i = index">
     <div class="oppia-edit-goals-content">
@@ -67,11 +72,11 @@
         <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image">
         <a [href]="completedGoalsTopicPageUrl[i]"
            class="oppia-completed-goals-topic-name protractor-test-completed-goals-topic-name">
-          Learnt {{topic.name}}
+          <span [innerHTML]="'I18N_LEARNT_TOPIC' | translate: { topicName: topic.name }"></span>
         </a>
         <div *ngFor="let story of topic.storyTitles">
           <p class="oppia-goals-story-name">
-            Completed {{story}}
+            <span [innerHTML]="'I18N_COMPLETED_STORY' | translate: { story: story }"></span>
           </p>
         </div>
       </div>
@@ -85,6 +90,7 @@
 <style>
   .oppia-arrow-button {
     color: #00645c;
+    cursor: pointer;
     float: left;
     height: 44px;
     position: relative;
@@ -162,6 +168,7 @@
   }
   .oppia-current-goals-topic-name {
     color: #333;
+    cursor: pointer;
     display: inline-block;
     font-size: 19px;
     font-weight: 100;
@@ -420,3 +427,6 @@
     }
   }
 </style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/goals-tab.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/goals-tab.component.rtl.css">
