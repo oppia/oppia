@@ -34,7 +34,7 @@ class _ValidCmdDictNotTotal(TypedDict, total=False):
     """Dictionary representing a non-required part
     of valid commands specs."""
 
-    allowed_values: Dict[str, Sequence[str]]
+    allowed_values: Dict[str, List[str]]
     deprecated_values: Dict[str, List[str]]
 
 
