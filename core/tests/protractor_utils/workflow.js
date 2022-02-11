@@ -174,6 +174,7 @@ var createAndPublishExploration = async function(
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
   }
+  await explorationEditorSettingsTab.enableCorrectnessFeedback();
   await explorationEditorPage.saveChanges();
   await publishExploration();
 };
