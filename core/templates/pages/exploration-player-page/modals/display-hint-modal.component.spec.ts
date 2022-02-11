@@ -118,6 +118,7 @@ describe('Display hint modal', () => {
     spyOn(audioTranslationManagerService, 'setSecondaryAudioTranslations');
     spyOn(audioPlayerService.onAutoplayAudio, 'emit');
 
+    componentInstance.index = 0;
     componentInstance.ngOnInit();
 
     expect(componentInstance.hint).toEqual(hint);
