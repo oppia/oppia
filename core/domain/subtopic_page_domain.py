@@ -33,7 +33,7 @@ from core.domain import html_validation_service  # pylint: disable=invalid-impor
 SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML = 'page_contents_html'
 SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO = 'page_contents_audio'
 SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS = 'page_written_translations'
-SUBTOPIC_PAGE_PROPERTY_ANDROID_PROTO_SIZE_IN_BYTES = 'android_proto_size_in_bytes'
+SUBTOPIC_PAGE_PROPERTY_ANDROID_PROTO_SIZE_IN_BYTES = 'android_proto_size_in_bytes' # pylint: disable=line-too-long
 
 CMD_CREATE_NEW = 'create_new'
 # These take additional 'property_name' and 'new_value' parameters and,
@@ -235,10 +235,10 @@ class SubtopicPage:
         content_proto = (
             self.page_contents.subtitled_html.to_android_content_proto())
         recorded_voiceovers_proto = (
-            self.page_contents.recorded_voiceovers.to_android_recorded_voiceovers_proto())
+            self.page_contents.recorded_voiceovers.to_android_recorded_voiceovers_proto()) # pylint: disable=line-too-long
 
         written_translations_proto = (
-            self.page_contents.written_translations.to_android_written_translations_proto())
+            self.page_contents.written_translations.to_android_written_translations_proto()) # pylint: disable=line-too-long
 
         return revision_card_pb2.RevisionCardDto(
             id=subtopic_page_proto,
