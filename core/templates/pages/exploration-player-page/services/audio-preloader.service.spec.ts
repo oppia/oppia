@@ -24,7 +24,7 @@ import { AudioPreloaderService } from 'pages/exploration-player-page/services/au
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { ContextService } from 'services/context.service';
 
-fdescribe('Audio preloader service', () => {
+describe('Audio preloader service', () => {
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
