@@ -135,6 +135,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.activeMenuName = this.navigationService.activeMenuName;
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   // Update the description, numSelections and summary fields of the
   // relevant entry of selectionDetails.
   updateSelectionDetails(itemsType: string): void {

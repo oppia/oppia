@@ -52,7 +52,12 @@ export class ProfilePageComponent {
     value: '',
     helpText: ''
   };
+<<<<<<< HEAD
   usernameIsLong!: boolean ;
+=======
+
+  usernameIsLong: boolean;
+>>>>>>> develop
   userBio: string = '';
   userDisplayedStatistics: UserDisplayedStatistic[] = [];
   userEditedExplorations: LearnerExplorationSummary[] = [];

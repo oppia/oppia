@@ -41,6 +41,7 @@ class MockWindowRef {
     },
     gtag: () => {}
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -168,7 +169,7 @@ describe('ExplorationCreationService', () => {
       spyOn($, 'ajax').and.callFake((options: Promise) => {
         let d = $.Deferred();
         d.resolve(
-          options.dataFilter(')]}\',\n{"explorationId": "expId"}')
+          options.dataFilter(')]}\',\n{"exploration_id": "expId"}')
         );
         return d.promise();
       });
