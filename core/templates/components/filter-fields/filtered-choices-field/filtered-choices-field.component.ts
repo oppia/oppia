@@ -33,6 +33,7 @@ export class FilteredChoicesFieldComponent {
   @Input() noEntriesFoundLabel: string = 'No matches found';
   @Output() selectionChange: EventEmitter<string> = (
     new EventEmitter());
+
   filteredChoices!: string[];
 
   ngOnInit(): void {

@@ -83,6 +83,7 @@ export class UnassignSkillFromTopicsModalComponent
       this.selectedTopicNames.push(topicId);
     }
   }
+
   close(): void {
     for (let index in this.selectedTopicNames) {
       this.selectedTopics.push(

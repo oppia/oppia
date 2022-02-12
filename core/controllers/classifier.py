@@ -136,12 +136,12 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
             exploration = exp_fetchers.get_exploration_by_id(
                 exploration_id, version=exp_version)
             interaction_id = exploration.states[state_name].interaction.id
-        except:
+        except Exception as e:
             raise self.InvalidInputException(
                 'Entity for exploration with id %s, version %s and state %s '
                 'not found.' % (
                     exploration_id, self.normalized_request.get(
-                        'exploration_version'), state_name))
+                        'exploration_version'), state_name)) from e
 
         if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
             raise self.PageNotFoundException(
