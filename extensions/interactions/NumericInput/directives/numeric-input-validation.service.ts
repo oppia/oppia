@@ -205,8 +205,9 @@ export class NumericInputValidationService {
 
     return warningsList;
   }
+
   // Returns 'undefined' when no error occurs.
-  getErrorString(
+  getErrorStringI18nKey(
       value: number, customizationArgs: boolean
   ): string | undefined {
     let stringValue = null;
@@ -240,11 +241,9 @@ export class NumericInputValidationService {
       customizationArgs &&
       (stringValueRegExp === null || stringValueRegExp.length > 15)
     ) {
-      return 'The answer should be greater than or equal to zero and ' +
-      'can contain at most 15 digits (0-9) or symbols(.).';
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1';
     } else if (stringValueRegExp === null || stringValueRegExp.length > 15) {
-      return 'The answer can contain at most 15 digits (0-9) or symbols ' +
-        '(. or -).';
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2';
     }
   }
 }
