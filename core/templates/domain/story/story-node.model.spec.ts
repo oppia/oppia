@@ -318,4 +318,8 @@ describe('Story node model', () => {
 
     expect(_sampleStoryNode.getThumbnailBgColor()).toEqual('#fff');
   });
+
+  it('should return false when nodeId is not a string', () => {
+    expect(_sampleStoryNode._checkValidNodeId(undefined)).toEqual(false);
+  });
 });
