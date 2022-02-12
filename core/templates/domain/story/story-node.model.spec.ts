@@ -320,6 +320,19 @@ describe('Story node model', () => {
   });
 
   it('should return false when nodeId is not a string', () => {
+    /*
+    Using @ts-ignore comment to ignore typescript error and
+    test return value to be false if node id is not a string.
+    */
+    // @ts-ignore
+    expect(_sampleStoryNode._checkValidNodeId({})).toEqual(false);
+    // @ts-ignore
+    expect(_sampleStoryNode._checkValidNodeId([])).toEqual(false);
+    // @ts-ignore
     expect(_sampleStoryNode._checkValidNodeId(undefined)).toEqual(false);
+    // @ts-ignore
+    expect(_sampleStoryNode._checkValidNodeId(true)).toEqual(false);
+    // @ts-ignore
+    expect(_sampleStoryNode._checkValidNodeId(23)).toEqual(false);
   });
 });
