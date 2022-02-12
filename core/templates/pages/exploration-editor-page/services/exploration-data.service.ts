@@ -206,7 +206,7 @@ export class ExplorationDataService {
       successCallback: (
         isDraftVersionvalid: boolean,
         draftChanges: ExplorationChange[]) => void,
-      errorCallback: () => void): void {
+      errorCallback: (errorResponse?: object) => void): void {
     this.editableExplorationBackendApiService.updateExplorationAsync(
       this.explorationId,
     this.data ? this.data.version : null,
@@ -219,9 +219,9 @@ export class ExplorationDataService {
             response.is_version_of_draft_valid,
             response.draft_changes);
         }
-      }, () => {
+      }, (response) => {
         if (errorCallback) {
-          errorCallback();
+          errorCallback(response);
         }
       }
     );
