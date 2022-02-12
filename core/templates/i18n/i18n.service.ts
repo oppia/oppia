@@ -38,6 +38,7 @@ interface LanguageInfo {
 export class I18nService {
   private _directionChangeEventEmitter: EventEmitter<string> = (
     new EventEmitter<string>());
+
   url!: URL;
   // Check that local storage exists and works as expected.
   // If it does storage stores the localStorage object,
