@@ -30,9 +30,11 @@ export class BackgroundMaskService {
   isMaskActive(): boolean {
     return this.maskIsActive;
   }
+
   activateMask(): void {
     this.maskIsActive = true;
   }
+
   deactivateMask(): void {
     this.maskIsActive = false;
   }

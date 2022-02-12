@@ -92,6 +92,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     ADD_VERTEX: 2,
     DELETE: 3
   };
+
   // Styling functions.
   DELETE_COLOR = 'red';
   HOVER_COLOR = 'aqua';
@@ -122,6 +123,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     mouseDragStartX: 0,
     mouseDragStartY: 0
   };
+
   selectedEdgeWeightValue: number | string;
   buttons: GraphButton[] = [];
   private vizContainer: SVGSVGElement[];
@@ -491,6 +493,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       this.beginEditEdgeWeight(index);
     }
   }
+
   onClickEdgeWeight(index: number): void {
     if (this.graph.isWeighted && this.canEditEdgeWeight) {
       this.beginEditEdgeWeight(index);

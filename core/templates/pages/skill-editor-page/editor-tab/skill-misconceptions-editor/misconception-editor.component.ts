@@ -57,6 +57,7 @@ export class MisconceptionEditorComponent implements OnInit {
     type: 'html',
     ui_config: {}
   };
+
   FEEDBACK_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {

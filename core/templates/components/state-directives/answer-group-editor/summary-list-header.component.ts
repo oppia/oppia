@@ -39,6 +39,7 @@ export class SummaryListHeaderComponent {
   @Input() isActive: boolean = false;
   @Output() summaryDelete:
     EventEmitter<DeleteSummaryEventData> = (new EventEmitter());
+
   @Input() isDeleteAvailable: boolean = false;
   @Input() numItems!: number;
 

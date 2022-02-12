@@ -33,6 +33,7 @@ export class NewlyCreatedTopic {
     this.description = description;
     this.urlFragment = urlFragment;
   }
+
   /**
    * @returns {Boolean} - A boolean indicating if the topic is valid.
    */

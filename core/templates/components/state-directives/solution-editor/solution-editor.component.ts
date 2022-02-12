@@ -38,6 +38,7 @@ export class SolutionEditor implements OnInit {
   @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
     EventEmitter<string[]> = new EventEmitter();
+
   @Output() openSolutionEditorModal: EventEmitter<void> = new EventEmitter();
 
   isEditable: boolean;

@@ -33,6 +33,7 @@ class MockRouterService {
   get onRefreshStatisticsTab() {
     return this.refreshStatisticsTabEventEmitter;
   }
+
   set refreshStatisticsTabEmitter(val) {
     this.refreshStatisticsTabEventEmitter = val;
   }

@@ -40,6 +40,7 @@ export class UserService {
   // enough rights to review translations, voiceover and questions.
   private userContributionRightsInfo:
     UserContributionRightsDataBackendDict | null = null;
+
   // This property will be null when the user is not logged in.
   private userInfo: UserInfo | null = null;
   private returnUrl = '';

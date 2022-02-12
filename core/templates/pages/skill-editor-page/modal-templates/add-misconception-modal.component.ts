@@ -45,11 +45,13 @@ export class AddMisconceptionModalComponent
   misconceptionNameIsDuplicate: boolean;
   MAX_CHARS_IN_MISCONCEPTION_NAME: number = (
     AppConstants.MAX_CHARS_IN_MISCONCEPTION_NAME);
+
   MISCONCEPTION_PROPERTY_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
       startupFocusEnabled: false
     }};
+
   MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {

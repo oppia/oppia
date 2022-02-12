@@ -52,6 +52,7 @@ export class ProfilePageComponent {
     value: '',
     helpText: ''
   };
+
   usernameIsLong: boolean;
   userBio: string = '';
   userDisplayedStatistics: UserDisplayedStatistic[] = [];

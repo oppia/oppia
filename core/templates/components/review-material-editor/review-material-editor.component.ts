@@ -38,6 +38,7 @@ export class ReviewMaterialEditorComponent implements OnInit {
   @Input() bindableDict: BindableDict;
   @Output() onSaveExplanation:
     EventEmitter<SubtitledHtml> = (new EventEmitter());
+
   explanationMemento: string;
   editableExplanation: string;
   conceptCardExplanationEditorIsShown: boolean;

@@ -53,10 +53,13 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   currentStateName: string = null;
   ENABLE_PREREQUISITE_SKILLS: boolean = (
     AppConstants.ENABLE_PREREQUISITE_SKILLS);
+
   EXPLORATION_AND_SKILL_ID_PATTERN: RegExp = (
     AppConstants.EXPLORATION_AND_SKILL_ID_PATTERN);
+
   MAX_STATE_NAME_LENGTH: number = (
     AppConstants.MAX_STATE_NAME_LENGTH);
+
   PLACEHOLDER_OUTCOME_DEST: string = (
     AppConstants.PLACEHOLDER_OUTCOME_DEST);
 

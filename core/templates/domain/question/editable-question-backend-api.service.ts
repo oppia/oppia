@@ -96,6 +96,7 @@ export class EditableQuestionBackendApiService {
         });
     });
   }
+
   private async _fetchQuestionAsync(
       questionId: string,
       successCallback: (value: FetchQuestionResponse) => void,
@@ -125,6 +126,7 @@ export class EditableQuestionBackendApiService {
           });
     });
   }
+
   private async _updateQuestionAsync(
       questionId: string,
       questionVersion: string,

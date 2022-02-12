@@ -59,6 +59,7 @@ export class StateEditorService {
   private _stateEditorInitializedEventEmitter = new EventEmitter<State>();
   private _stateEditorDirectiveInitializedEventEmitter =
     new EventEmitter<void>();
+
   private _interactionEditorInitializedEventEmitter = new EventEmitter<void>();
   private _showTranslationTabBusyModalEventEmitter = new EventEmitter<void>();
   private _refreshStateTranslationEventEmitter = new EventEmitter<void>();
@@ -66,6 +67,7 @@ export class StateEditorService {
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
   private _handleCustomArgsUpdateEventEmitter =
     new EventEmitter<AnswerChoice[]>();
+
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 

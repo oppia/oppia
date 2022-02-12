@@ -37,6 +37,7 @@ export class PreferredSiteLanguageSelectorComponent {
   @Input() entity!: string;
   @Output() preferredLanguageCodeChange: EventEmitter<string> = (
     new EventEmitter());
+
   filteredChoices!: Language[];
 
   ngOnInit(): void {

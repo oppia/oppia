@@ -51,6 +51,7 @@ export class DateTimeFormatService {
       return dayjs(date).format('MM/DD/YY');
     }
   }
+
   /**
    * This function converts a millisecond date to a date in the
    * format 'MMM D HH:mm A' along with time.
@@ -78,6 +79,7 @@ export class DateTimeFormatService {
     // Dayjs will return Monday, January 18, 2021 at 12:30 PM.
     return dayjs(date).format('dddd, MMMM D, YYYY [at] h:mm A');
   }
+
   /**
    * This function converts a millisecond date to a date string, using locale
    * conventions.
@@ -88,6 +90,7 @@ export class DateTimeFormatService {
     let date = new Date(millisSinceEpoch);
     return date.toLocaleDateString();
   }
+
   /**
    * This function returns whether the date is at most one week before the
    * current date.
@@ -99,6 +102,7 @@ export class DateTimeFormatService {
     let ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
     return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
   }
+
   /**
    * This function returns the relative time from now.
    * @param {number} millisSinceEpoch - milliseconds since Epoch

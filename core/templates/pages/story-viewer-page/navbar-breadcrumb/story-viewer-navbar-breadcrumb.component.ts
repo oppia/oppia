@@ -69,9 +69,11 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
         this.storyTitle = storyDataObject.title;
       });
   }
+
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
+
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }

@@ -52,6 +52,7 @@ describe('BannerComponent', () => {
         postMessage: () => {}
       }
     };
+
     get nativeWindow() {
       return this._window;
     }

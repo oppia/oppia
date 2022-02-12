@@ -65,6 +65,7 @@ implements OnInit, OnDestroy {
         this.topicName = storyDataObject.topicName;
       });
   }
+
   ngOnDestroy(): void {
     return this.directiveSubscriptions.unsubscribe();
   }

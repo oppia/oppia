@@ -39,6 +39,7 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
   ) {
     super(alertsService, changeListService, loggerService);
   }
+
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   getSupportedContentLanguages() {
     if (this.contextService.isExplorationLinkedToStory()) {
@@ -46,6 +47,7 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
     }
     return constants.SUPPORTED_CONTENT_LANGUAGES;
   }
+
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   getCurrentLanguageDescription() {
     for (var i = 0; i < constants.SUPPORTED_CONTENT_LANGUAGES.length; i++) {
@@ -54,6 +56,7 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
       }
     }
   }
+
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   _isValid(value) {
     return constants.SUPPORTED_CONTENT_LANGUAGES.some((elt) => {

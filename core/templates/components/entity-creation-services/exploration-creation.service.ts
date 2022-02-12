@@ -73,6 +73,7 @@ export class ExplorationCreationService {
         this.explorationCreationInProgress = false;
       });
   }
+
   showUploadExplorationModal(): void {
     this.alertsService.clearWarnings();
     this.ngbModal.open(

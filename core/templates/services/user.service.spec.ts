@@ -35,6 +35,7 @@ class MockWindowRef {
       pathname: 'home'
     }
   };
+
   get nativeWindow() {
     return this._window;
   }

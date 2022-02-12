@@ -28,6 +28,7 @@ export class WindowRef {
   _window(): Window {
     return window;
   }
+
   /**
   * @returns The global native browser window object.
   */

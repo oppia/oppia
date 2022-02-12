@@ -45,6 +45,7 @@ export class ResponseInteractiveMapComponent implements OnInit {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
+
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private urlInterpolationService: UrlInterpolationService

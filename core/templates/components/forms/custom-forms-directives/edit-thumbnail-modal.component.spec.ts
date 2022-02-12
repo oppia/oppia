@@ -56,6 +56,7 @@ describe('Edit Thumbnail Modal Component', () => {
         return 'Fake onload executed';
       };
     }
+
     readAsDataURL(file: File) {
       this.onload();
       return 'The file is loaded';
@@ -70,6 +71,7 @@ describe('Edit Thumbnail Modal Component', () => {
         return 'Fake onload executed';
       };
     }
+
     set src(url: string) {
       this.onload();
     }

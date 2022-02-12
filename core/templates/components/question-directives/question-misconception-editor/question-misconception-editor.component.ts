@@ -49,8 +49,10 @@ interface TaggedMisconception {
 export class QuestionMisconceptionEditorComponent implements OnInit {
   @Output() saveAnswerGroupFeedback:
     EventEmitter<Outcome> = (new EventEmitter());
+
   @Output() saveTaggedMisconception:
     EventEmitter<TaggedMisconception> = (new EventEmitter());
+
   @Input() outcome: Outcome;
   @Input() isEditable: boolean;
   @Input() rules: Rule;

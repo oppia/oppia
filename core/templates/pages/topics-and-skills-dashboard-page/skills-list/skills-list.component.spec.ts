@@ -199,6 +199,7 @@ describe('Skills List Component', () => {
     error: boolean = false;
     onTopicsAndSkillsDashboardReinitialized: EventEmitter<boolean> = (
       new EventEmitter());
+
     mergeSkillsAsync(skillId: string, supersedingSkillId: string) {
       return {
         then: (

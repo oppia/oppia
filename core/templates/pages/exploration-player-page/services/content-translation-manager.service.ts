@@ -52,6 +52,7 @@ export class ContentTranslationManagerService {
   private explorationLanguageCode!: string;
   private onStateCardContentUpdateEmitter: EventEmitter<void> = (
     new EventEmitter());
+
   // The 'originalTranscript' is a copy of the transcript in the exploration
   // language in it's initial state.
   private originalTranscript: StateCard[] = [];

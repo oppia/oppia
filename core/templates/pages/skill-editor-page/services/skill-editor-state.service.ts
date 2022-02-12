@@ -73,6 +73,7 @@ export class SkillEditorStateService {
     current: [],
     others: []
   };
+
   private _skillChangedEventEmitter = new EventEmitter();
 
   private _setSkill = (skill: Skill) => {
@@ -174,6 +175,7 @@ export class SkillEditorStateService {
         this._skillIsBeingLoaded = false;
       });
   }
+
   /**
    * Returns whether this service is currently attempting to load the
    * skill maintained by this service.
@@ -191,6 +193,7 @@ export class SkillEditorStateService {
   getGroupedSkillSummaries(): GroupedSkillSummaries {
     return cloneDeep(this._groupedSkillSummaries);
   }
+
   /**
      * Returns whether a skill has yet been loaded using either
      * loadSkill().
@@ -198,6 +201,7 @@ export class SkillEditorStateService {
   hasLoadedSkill(): boolean {
     return this._skillIsInitialized;
   }
+
   /**
    * Returns the current skill to be shared among the skill
    * editor. Please note any changes to this skill will be propogated
@@ -209,6 +213,7 @@ export class SkillEditorStateService {
   getSkill(): Skill {
     return this._skill;
   }
+
   /**
    * Attempts to save the current skill given a commit message. This
    * function cannot be called until after a skill has been initialized
@@ -247,6 +252,7 @@ export class SkillEditorStateService {
       });
     return true;
   }
+
   /**
    * Returns any validation issues associated with the current
    * skill.
@@ -254,6 +260,7 @@ export class SkillEditorStateService {
   getSkillValidationIssues(): string[] {
     return this._skill.getValidationIssues();
   }
+
   /**
    * Checks if the skill description exists and updates class
    * variable. `create-new-skill-modal.controller` will search

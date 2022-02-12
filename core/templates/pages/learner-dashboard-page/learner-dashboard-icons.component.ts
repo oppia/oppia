@@ -49,6 +49,7 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   get activityActive(): boolean {
     return this.activityIsCurrentlyHoveredOver;
   }
+
   set activityActive(hoverState: boolean) {
     this.activityIsCurrentlyHoveredOver = hoverState;
   }

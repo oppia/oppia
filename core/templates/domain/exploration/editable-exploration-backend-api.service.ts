@@ -35,6 +35,7 @@ export class EditableExplorationBackendApiService {
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
     private urlInterpolationService: UrlInterpolationService) {}
+
   private async _fetchExplorationAsync(
       explorationId: string,
       applyDraft: boolean): Promise<ExplorationBackendDict> {

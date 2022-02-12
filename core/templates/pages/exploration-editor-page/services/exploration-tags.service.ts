@@ -36,6 +36,7 @@ export class ExplorationTagsService extends ExplorationPropertyService {
   ) {
     super(alertsService, changeListService, loggerService);
   }
+
   /**
     *@param {string} value - tag array to be normalized
     *(white spaces removed and '+' replaced with ' ')
@@ -49,6 +50,7 @@ export class ExplorationTagsService extends ExplorationPropertyService {
     // TODO(sll): Prevent duplicate tags from being added.
     return value;
   }
+
   /**
     *@param {string} value -tag array to be matched with TAG_REGEX
     *@return {boolean} -whether or not all tags match TAG_REGEX

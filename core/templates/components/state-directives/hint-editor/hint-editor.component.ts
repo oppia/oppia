@@ -40,6 +40,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
   @Input() indexPlusOne!: number;
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
     new EventEmitter<string[]>();
+
   @Output() saveHint = new EventEmitter<void>();
 
   directiveSubscriptions = new Subscription();

@@ -58,12 +58,14 @@ export class MusicNotesInputRulesService {
       MusicNotesInputRulesService._convertSequenceToMidi(answer),
       MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
   }
+
   IsLongerThan(
       answer: MusicNotesAnswer[],
       inputs: {k: number}): boolean {
     return MusicNotesInputRulesService._convertSequenceToMidi(
       answer).length > inputs.k;
   }
+
   // TODO(wxy): Validate that inputs.a <= inputs.b.
   HasLengthInclusivelyBetween(
       answer: MusicNotesAnswer[],
@@ -73,6 +75,7 @@ export class MusicNotesInputRulesService {
       MusicNotesInputRulesService._convertSequenceToMidi(answer).length);
     return answerLength >= inputs.a && answerLength <= inputs.b;
   }
+
   IsEqualToExceptFor(
       answer: MusicNotesAnswer[],
       inputs: { x: MusicNotesAnswer[]; k: number }
@@ -93,6 +96,7 @@ export class MusicNotesInputRulesService {
     });
     return numWrongNotes <= inputs.k;
   }
+
   IsTranspositionOf(
       answer: MusicNotesAnswer[],
       inputs: { x: MusicNotesAnswer[]; y: number }
@@ -108,6 +112,7 @@ export class MusicNotesInputRulesService {
       return targetSequence[index] + inputs.y === noteValue;
     });
   }
+
   IsTranspositionOfExceptFor(
       answer: MusicNotesAnswer[],
       inputs: { x: MusicNotesAnswer[]; y: number; k: number }

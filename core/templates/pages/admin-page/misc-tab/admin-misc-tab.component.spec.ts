@@ -52,6 +52,7 @@ class MockReaderObject {
       return 'Fake onload executed';
     };
   }
+
   readAsText(file) {
     this.onload({target: {result: 'result'}});
     return 'The file is loaded';

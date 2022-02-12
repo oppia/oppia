@@ -97,6 +97,7 @@ export class ConversationSkinComponent {
 
   CONTINUE_BUTTON_FOCUS_LABEL = (
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
+
   isLoggedIn: boolean;
   storyNodeIdToAdd: string;
   inStoryMode: boolean = false;
@@ -116,6 +117,7 @@ export class ConversationSkinComponent {
   upcomingInlineInteractionHtml;
   DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+
   // If the exploration is iframed, send data to its parent about
   // its height so that the parent can be resized as necessary.
   lastRequestedHeight: number = 0;

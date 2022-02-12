@@ -164,6 +164,7 @@ export class CollectionRightsBackendApiService {
       collectionRights: CollectionRights): void {
     this.collectionRightsCache[collectionId] = collectionRights;
   }
+
   /**
    * Updates a collection's rights to be have public learner access, given
    * its ID and version.

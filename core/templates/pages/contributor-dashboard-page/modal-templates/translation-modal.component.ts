@@ -75,9 +75,11 @@ export class TranslationError {
   get hasDuplicateDescriptions(): boolean {
     return this._hasDuplicateDescriptions;
   }
+
   get hasDuplicateAltTexts(): boolean {
     return this._hasDuplicateAltTexts;
   }
+
   get hasUntranslatedElements(): boolean {
     return this._hasUntranslatedElements;
   }
@@ -105,6 +107,7 @@ export class TranslationModalComponent {
     'type': string;
     'ui_config': UiConfig;
   };
+
   UNICODE_SCHEMA: UnicodeSchema = { type: 'unicode' };
   SET_OF_STRINGS_SCHEMA: ListSchema = {
     type: 'list',
@@ -112,6 +115,7 @@ export class TranslationModalComponent {
       type: 'unicode'
     }
   };
+
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
   activeLanguageCode: string;
   isActiveLanguageReviewer: boolean = false;

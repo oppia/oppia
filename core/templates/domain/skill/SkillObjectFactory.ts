@@ -80,6 +80,7 @@ export class Skill {
     this._supersedingSkillId = supersedingSkillId;
     this._prerequisiteSkillIds = prerequisiteSkillIds;
   }
+
   copyFromSkill(skill: Skill): void {
     this._id = skill.getId();
     this._description = skill.getDescription();
@@ -234,6 +235,7 @@ export class Skill {
       prerequisite_skill_ids: this._prerequisiteSkillIds
     };
   }
+
   getValidationIssues(): string[] {
     var issues = [];
     if (this.getConceptCard().getExplanation().html === '') {

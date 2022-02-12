@@ -34,6 +34,7 @@ export class RealEditorComponent implements OnInit {
   schema: RealSchema = {
     type: 'float'
   };
+
   constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   getSchema(): RealSchema {

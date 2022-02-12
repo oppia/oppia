@@ -45,6 +45,7 @@ class MockWindowRef {
       }
     }
   };
+
   get nativeWindow() {
     return this._window;
   }
