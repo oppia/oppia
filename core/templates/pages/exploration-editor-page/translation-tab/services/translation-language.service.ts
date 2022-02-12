@@ -34,6 +34,7 @@ export class TranslationLanguageService {
   private activeLanguageCode!: string;
   private allAudioLanguageCodes: string[] = (
     this.languageUtilService.getAllVoiceoverLanguageCodes());
+
   private _activeLanguageChangedEventEmitter = new EventEmitter<void>();
 
   constructor(
