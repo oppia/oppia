@@ -550,6 +550,7 @@ class UserInfoHandler(base.BaseHandler):
     """Provides info about user. If user is not logged in,
     return dict containing false as logged in status.
     """
+    
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {}
