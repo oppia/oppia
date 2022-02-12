@@ -321,8 +321,9 @@ describe('Story node model', () => {
 
   it('should return false when nodeId is not a string', () => {
     var nodeId = {}
-    // This throws "false". We need to suppress this error because we
-    // are testing that typeof nodeId is not a string.
+    // This throws "TS2345". We need to suppress this error because
+    // we are testing that _checkValidNodeId return false when
+    // typeof nodeId is not a string.
     // @ts-ignore
     expect(_sampleStoryNode._checkValidNodeId(nodeId)).toEqual(false);
   });
