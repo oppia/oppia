@@ -43,7 +43,7 @@ import { SchemaBasedHtmlEditorComponent } from './schema-based-editors/schema-ba
 import { OppiaCkEditor4Module } from 'components/ck-editor-helpers/ckeditor4.module';
 import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
-import { SchemaBasedListEditorComponent } from './schema-based-editors/schema-based-list-editor.directive';
+import { SchemaBasedListEditorComponent } from './schema-based-editors/schema-based-list-editor.component';
 import { SchemaBasedExpressionEditorComponent } from './schema-based-editors/schema-based-expression-editor.directive';
 import { SchemaBasedUnicodeEditor } from './schema-based-editors/schema-based-unicode-editor.directive';
 import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';

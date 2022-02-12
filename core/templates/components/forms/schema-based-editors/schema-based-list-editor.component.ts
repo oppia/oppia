@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for lists.
+ * @fileoverview Component for a schema-based editor for lists.
  */
 
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
@@ -25,6 +25,7 @@ import { Schema, SchemaDefaultValue, SchemaDefaultValueService } from 'services/
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { SchemaUndefinedLastElementService } from 'services/schema-undefined-last-element.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+
 interface OppiaValidator {
   id: string;
   'min_value': number;
@@ -33,7 +34,7 @@ interface OppiaValidator {
 
 @Component({
   selector: 'schema-based-list-editor',
-  templateUrl: './schema-based-list-editor.directive.html',
+  templateUrl: './schema-based-list-editor.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
