@@ -90,7 +90,7 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
     }
 
     this.topicEditorStateService.updateExistenceOfTopicName(
-      this.newlyCreatedTopic.name, () => {
+      this.newlyCreatedTopic.name.trim(), () => {
         this.topicNameExists = (
           this.topicEditorStateService.getTopicWithNameExists());
       }
