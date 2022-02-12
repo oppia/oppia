@@ -322,7 +322,7 @@ describe('State Graph Visualization directive', function() {
       });
     });
 
-  it('should throw error when nodeId is undefined', function(){
+  it('should throw error when nodeId is undefined', function() {
     $scope.currentStateId = () => undefined;
     $scope.centerAtCurrentState = false;
     expect(() => ctrl.onInit()).toThrowError(TypeError);
