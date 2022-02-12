@@ -48,6 +48,7 @@ class MockReaderObject {
       return 'Fake onload executed';
     };
   }
+
   readAsDataURL(file) {
     this.onload();
     return 'The file is loaded';
