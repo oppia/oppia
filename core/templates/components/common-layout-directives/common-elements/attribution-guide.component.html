@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/common-elements/attribution-guide.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/common-elements/attribution-guide.component.rtl.css" as="style">
+
 <div class="oppia-attribution-guide" *ngIf="!checkMobileView()">
   <div class="oppia-cc-icon oppia-transition-200" *ngIf="!deviceUsedIsMobile && !iframed">
     <div class="oppia-neutral-element protractor-test-neutral-element"></div>
