@@ -23,6 +23,8 @@ from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_title_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
+from core import feconf
+from core.constants import constants
 
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -35,9 +37,12 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
     EXPLORATION_ID_3 = '3'
-    STATE_1 = state_domain.State.create_default_state('ABC')
-    STATE_2 = state_domain.State.create_default_state('DEF')
-    STATE_3 = state_domain.State.create_default_state('GHI')
+    STATE_1 = state_domain.State.create_default_state(
+        feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
+    STATE_2 = state_domain.State.create_default_state(
+        feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
+    STATE_3 = state_domain.State.create_default_state(
+        feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
 
     def setUp(self):
         super().setUp()
@@ -47,10 +52,19 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_1,
             title='titleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-            category='Algebra',
-            tags='Topic',
-            init_state_name='Introduction1',
-            states={'Introduction1': self.STATE_1}
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_1}
         )
 
         # This is an valid model with title length lesser than 36.
@@ -58,10 +72,19 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_2,
             title='title',
-            category='Algebra',
-            tags='Topic',
-            init_state_name='Introduction2',
-            states={'Introduction2': self.STATE_2}
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_2}
         )
 
         # This is an invalid model with title length greater than 36.
@@ -69,16 +92,23 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_3,
             title='titleeeeeeeeeeeeeabcdefghijklmnopqrstuv',
-            category='Category',
-            tags='Topic',
-            init_state_name='Introduction3',
-            states={'Introduction3': self.STATE_3}
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_3}
         )
 
     def test_run_with_no_models(self) -> None:
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 0')
-        ])
+        self.assert_job_output_is([])
 
     def test_run_with_single_valid_model(self) -> None:
         self.put_multi([self.exp_2])
