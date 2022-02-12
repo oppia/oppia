@@ -95,4 +95,13 @@ describe('Exploration Title Editor directive', function() {
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'xyzz');
   });
+
+  it('should unsubscribe when component is destroyed', () => {
+    const unsubscribeSpy =
+      spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+
+    ctrl.$onDestroy();
+
+    expect(unsubscribeSpy).toHaveBeenCalled();
+  });
 });

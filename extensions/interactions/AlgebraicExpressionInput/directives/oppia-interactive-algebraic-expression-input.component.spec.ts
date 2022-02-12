@@ -104,6 +104,14 @@ describe('AlgebraicExpressionInputInteractive', () => {
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
+  it('should determine when the component is destroyed', () => {
+    component.ngOnInit();
+    expect(component.viewIsDestroyed).toBe(false);
+
+    component.ngOnDestroy();
+    expect(component.viewIsDestroyed).toBe(true);
+  });
+
   it('should not submit the answer if invalid', () => {
     component.hasBeenTouched = true;
     // Invalid answer.
