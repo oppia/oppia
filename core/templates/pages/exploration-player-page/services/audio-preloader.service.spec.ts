@@ -397,7 +397,7 @@ describe('Audio preloader service', () => {
     audioPreloaderService.clearMostRecentlyRequestedAudioFilename();
     expect(audioPreloaderService.getMostRecentlyRequestedAudioFilename())
       .toEqual(null);
-    var filename = 'test_file'
+    var filename = 'test_file';
     audioPreloaderService.setMostRecentlyRequestedAudioFilename(filename);
     expect(audioPreloaderService.getMostRecentlyRequestedAudioFilename())
       .toEqual(filename);
