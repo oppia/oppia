@@ -62,7 +62,7 @@ implements ControlValueAccessor, Validator, OnInit {
   }
 
   localValueChange(value: unknown): void {
-    if (value === this.localValueChange) {
+    if (value === this.localValue) {
       return;
     }
     this.localValue = value;

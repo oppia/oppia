@@ -15,3 +15,59 @@
 /**
  * @fileoverview Unit tests for Schema Based Bool Editor Directive
  */
+
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { SchemaBasedBoolEditorComponent } from './schema-based-bool-editor.directive';
+
+describe('Schema Based Bool Editor Component', () => {
+  let component: SchemaBasedBoolEditorComponent;
+  let fixture: ComponentFixture<SchemaBasedBoolEditorComponent>;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [FormsModule],
+      declarations: [
+        SchemaBasedBoolEditorComponent
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SchemaBasedBoolEditorComponent);
+    component = fixture.componentInstance;
+
+    component.ngOnInit();
+    component.registerOnTouched();
+    component.registerOnChange(null);
+    component.onChange = (val: boolean) => {
+      return;
+    };
+  });
+
+  it('should get empty object on validating', () => {
+    expect(component.validate(null)).toEqual({});
+  });
+
+  it('should overwrite local value', () => {
+    expect(component.localValue).toBe(undefined);
+
+    component.writeValue(true);
+
+    expect(component.localValue).toBeTrue();
+  });
+
+  it('should update local value', () => {
+    component.localValue = false;
+
+    component.updateValue(false);
+
+    expect(component.localValue).toBeFalse();
+
+    component.updateValue(true);
+
+    expect(component.localValue).toBeTrue();
+  });
+});

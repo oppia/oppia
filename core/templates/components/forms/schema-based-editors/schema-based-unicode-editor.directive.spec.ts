@@ -15,3 +15,168 @@
 /**
  * @fileoverview Unit tests for Schema Based Unicode Editor Directive
  */
+
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { SchemaBasedUnicodeEditor } from './schema-based-unicode-editor.directive';
+
+describe('Schema Based Unicode Editor', () => {
+  let component: SchemaBasedUnicodeEditor;
+  let fixture: ComponentFixture<SchemaBasedUnicodeEditor>;
+  let deviceInfoService: DeviceInfoService;
+  let schemaFormSubmittedService: SchemaFormSubmittedService;
+  let stateCustomizationArgsService: StateCustomizationArgsService;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        FormsModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useClass: TranslateFakeLoader
+          }
+        })
+      ],
+      declarations: [
+        SchemaBasedUnicodeEditor
+      ],
+      providers: [
+        DeviceInfoService,
+        FocusManagerService,
+        SchemaFormSubmittedService,
+        StateCustomizationArgsService,
+        TranslateService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SchemaBasedUnicodeEditor);
+    component = fixture.componentInstance;
+    deviceInfoService = TestBed.inject(DeviceInfoService);
+    schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
+    stateCustomizationArgsService = (
+      TestBed.inject(StateCustomizationArgsService));
+
+    component.uiConfig = {
+      rows: ['Row 1', 'Row 2'],
+      placeholder: 'Placeholder text',
+      coding_mode: 'python',
+    };
+    component.disabled = true;
+    component.registerOnTouched(null);
+    component.registerOnChange(null);
+    component.onChange = (val: string) => {
+      return;
+    };
+
+    spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
+  });
+
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
+  it('should instantiate codemirror on initialization', fakeAsync(() => {
+    component.ngOnInit();
+
+    expect(component.codemirrorStatus).toBeFalse();
+    tick(200);
+
+    expect(component.codemirrorOptions.indentWithTabs).toBeFalse();
+    expect(component.codemirrorOptions.lineNumbers).toBeTrue();
+    expect(component.codemirrorOptions.readOnly).toBe('nocursor');
+    expect(component.codemirrorOptions.mode).toBe('python');
+    expect(component.codemirrorStatus).toBeTrue();
+  }));
+
+  it('should flip the codemirror status flag when form view is opened',
+    fakeAsync(() => {
+      let onSchemaBasedFormsShownEmitter = new EventEmitter();
+      spyOnProperty(stateCustomizationArgsService, 'onSchemaBasedFormsShown')
+        .and.returnValue(onSchemaBasedFormsShownEmitter);
+
+      component.ngOnInit();
+      tick(200);
+
+      expect(component.codemirrorStatus).toBeTrue();
+
+      onSchemaBasedFormsShownEmitter.emit();
+      tick(200);
+
+      expect(component.codemirrorStatus).toBeFalse();
+    }));
+
+  it('should get empty object on validating', () => {
+    expect(component.validate(null)).toEqual({});
+  });
+
+  it('should overwrite local value', () => {
+    expect(component.localValue).toBe(undefined);
+
+    component.writeValue('val');
+
+    expect(component.localValue).toBe('val');
+  });
+
+  it('should update local value', () => {
+    component.localValue = 'old value';
+
+    component.updateLocalValue('new value');
+
+    expect(component.localValue).toBe('new value');
+  });
+
+  it('should get coding mode', () => {
+    expect(component.getCodingMode()).toBe('python');
+
+    component.uiConfig = undefined;
+
+    expect(component.getCodingMode()).toBe(null);
+  });
+
+  it('should get the number of rows', () => {
+    expect(component.getRows()).toEqual(['Row 1', 'Row 2']);
+
+    component.uiConfig = undefined;
+
+    expect(component.getRows()).toBe(null);
+  });
+
+  it('should get the placeholder value', () => {
+    expect(component.getPlaceholder()).toBe('Placeholder text');
+
+    component.uiConfig = {
+      rows: ['Row 1', 'Row 2'],
+      placeholder: '',
+      coding_mode: 'python',
+    };
+
+    expect(component.getPlaceholder()).toBe(
+      'I18N_PLAYER_DEFAULT_MOBILE_PLACEHOLDER');
+
+    component.uiConfig = undefined;
+
+    expect(component.getPlaceholder()).toBe('');
+  });
+
+  it('should submit form on keypress', () => {
+    spyOn(schemaFormSubmittedService.onSubmittedSchemaBasedForm, 'emit');
+    let evt = new KeyboardEvent('', {
+      keyCode: 13
+    });
+
+    component.onKeypress(evt);
+
+    expect(schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit)
+      .toHaveBeenCalled();
+  });
+});

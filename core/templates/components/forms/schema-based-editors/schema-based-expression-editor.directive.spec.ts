@@ -15,3 +15,75 @@
 /**
  * @fileoverview Unit tests for Schema Based Editor Directive
  */
+
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { SchemaBasedExpressionEditorComponent } from './schema-based-expression-editor.directive';
+
+describe('Schema Based Expression Editor Component', () => {
+  let component: SchemaBasedExpressionEditorComponent;
+  let fixture: ComponentFixture<SchemaBasedExpressionEditorComponent>;
+  let focusManagerService: FocusManagerService;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        SchemaBasedExpressionEditorComponent
+      ],
+      providers: [
+        FocusManagerService,
+        SchemaFormSubmittedService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SchemaBasedExpressionEditorComponent);
+    component = fixture.componentInstance;
+    focusManagerService = TestBed.inject(FocusManagerService);
+
+    component.registerOnTouched();
+    component.registerOnChange(null);
+    component.onChange = (val: boolean) => {
+      return;
+    };
+  });
+
+  it('should get empty object on validating', () => {
+    expect(component.validate(null)).toEqual({});
+  });
+
+  it('should overwrite local value', () => {
+    expect(component.localValue).toBe(undefined);
+
+    component.writeValue(true);
+
+    expect(component.localValue).toBeTrue();
+  });
+
+  it('should initialize the schema', fakeAsync(() => {
+    spyOn(focusManagerService, 'setFocusWithoutScroll');
+
+    component.ngOnInit();
+    tick();
+
+    expect(focusManagerService.setFocusWithoutScroll).toHaveBeenCalled();
+  }));
+
+  it('should update local value', () => {
+    component.localValue = false;
+
+    component.localValueChange(false);
+
+    expect(component.localValue).toBeFalse();
+
+    component.localValueChange(true);
+
+    expect(component.localValue).toBeTrue();
+  });
+});

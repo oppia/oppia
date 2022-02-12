@@ -15,3 +15,61 @@
 /**
  * @fileoverview Unit tests for Schema Based Html Editor Directive
  */
+
+import { FormsModule } from '@angular/forms';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { SchemaBasedHtmlEditorComponent } from './schema-based-html-editor.directive';
+
+describe('Schema Based Html Editor Component', () => {
+  let component: SchemaBasedHtmlEditorComponent;
+  let fixture: ComponentFixture<SchemaBasedHtmlEditorComponent>;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [FormsModule],
+      declarations: [
+        SchemaBasedHtmlEditorComponent
+      ],
+      providers: [
+        FocusManagerService,
+        SchemaFormSubmittedService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SchemaBasedHtmlEditorComponent);
+    component = fixture.componentInstance;
+
+    component.ngOnInit();
+    component.registerOnTouched();
+    component.registerOnChange(null);
+    component.onChange = (val: boolean) => {
+      return;
+    };
+  });
+
+  it('should get empty object on validating', () => {
+    expect(component.validate(null)).toEqual({});
+  });
+
+  it('should overwrite local value', () => {
+    expect(component.localValue).toBe(undefined);
+
+    component.writeValue(true);
+
+    expect(component.localValue).toBeTrue();
+  });
+
+  it('should update local value', () => {
+    spyOn(component, 'onChange');
+
+    component.updateValue('<p> HTML </p>');
+
+    expect(component.onChange).toHaveBeenCalledWith('<p> HTML </p>');
+  });
+});
