@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

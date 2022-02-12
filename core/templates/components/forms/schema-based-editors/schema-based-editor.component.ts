@@ -23,7 +23,7 @@ import { Schema } from 'services/schema-default-value.service';
 const INVALID = 'INVALID';
 @Component({
   selector: 'schema-based-editor',
-  templateUrl: './schema-based-editor.directive.html',
+  templateUrl: './schema-based-editor.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

@@ -48,7 +48,7 @@ require(
   'components/forms/schema-based-editors/' +
   'schema-based-dict-editor.directive.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-expression-editor.directive.ts');
