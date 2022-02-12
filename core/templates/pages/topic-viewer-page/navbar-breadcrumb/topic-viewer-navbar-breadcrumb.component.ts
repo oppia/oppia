@@ -38,6 +38,7 @@ export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlService: UrlService
   ) {}
+
   ngOnInit(): void {
     this.topicViewerBackendApiService.fetchTopicDataAsync(
       this.urlService.getTopicUrlFragmentFromLearnerUrl(),
