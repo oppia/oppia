@@ -3186,7 +3186,7 @@ class State:
                 solicit_answer_details for the state.
 
         Raises:
-            Exception. The 'solicit_answer_details' is not of type bool.
+            Exception. The argument is not of type bool.
         """
         if not isinstance(solicit_answer_details, bool):
             raise Exception(
@@ -3202,7 +3202,7 @@ class State:
                 card_is_checkpoint for the state.
 
         Raises:
-            Exception. The 'card_is_checkpoint' is not of type bool.
+            Exception. The argument is not of type bool.
         """
         if not isinstance(card_is_checkpoint, bool):
             raise Exception(

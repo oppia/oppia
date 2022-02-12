@@ -209,7 +209,7 @@ def cancel_job(beam_job_run_model: beam_job_models.BeamJobRunModel) -> None:
         beam_job_run_model: BeamJobRunModel. The model to update.
 
     Raises:
-        ValueError. The dataflow_job_id is None.
+        ValueError. The given model has no job ID.
     """
     job_id = beam_job_run_model.dataflow_job_id
     if job_id is None:

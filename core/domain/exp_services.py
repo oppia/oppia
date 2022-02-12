@@ -1750,7 +1750,9 @@ def get_composite_change_list(exp_id, from_version, to_version):
         consisting of changes from from_version to to_version.
 
     Raises:
-        Exception. If the value of from_version is greater than to_version.
+        Exception. The version of the exploration from where we want to start
+            the change list is less than the version till which we want
+            the change list.
     """
     if from_version > to_version:
         raise Exception(

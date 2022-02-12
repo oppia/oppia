@@ -45,7 +45,7 @@ class JobRunResult:
 
         Raises:
             ValueError. Both stdout and stderr are empty.
-            ValueError. JobRunResult exceeds MAX_OUTPUT_BYTES bytes.
+            ValueError. JobRunResult exceeds maximum limit.
         """
         if not stdout and not stderr:
             raise ValueError('JobRunResult instances must not be empty')
