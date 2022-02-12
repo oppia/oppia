@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.rtl.css" as="style">
+
 <div class="subtopics-list">
   <div class="oppia-subtopics-list-container">
     <mat-card class="oppia-page-card oppia-long-text">
@@ -32,97 +35,6 @@
     </mat-card>
   </div>
 </div>
-<style>
-  .oppia-page-card.oppia-long-text {
-    padding: 30px 30px 30px 40px;
-    width: 50vw;
-  }
-
-  .oppia-page-card {
-    margin-top: 10em;
-  }
-
-  .tab-title {
-    color: #00645c;
-    margin: .83em 0;
-  }
-
-  .subtopic-subheading {
-    color: #6c757d;
-    font-family: Roboto, Arial, sans-serif;
-    font-size: 1.2em;
-    margin-bottom: 2.5vh;
-  }
-
-  .subtopics-container {
-    display: grid;
-    grid-gap: 20px;
-    grid-row-gap: 2vh;
-    grid-template-columns: 1fr 1fr 1fr;
-    justify-content: space-between;
-    margin-top: 40px;
-  }
-
-  .subtopic-summary-tile {
-    margin-right: 2vw;
-  }
-
-  @media(max-width: 1280px) {
-    .oppia-page-card.oppia-long-text {
-      width: 60vw;
-    }
-
-    .subtopics-container {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-  }
-
-  @media(max-width: 1024px) {
-    .oppia-page-card.oppia-long-text {
-      width: 65vw;
-    }
-
-    .subtopics-container {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-  }
-
-  @media(max-width: 940px) {
-    .oppia-page-card.oppia-long-text {
-      width: 70vw;
-    }
-  }
-
-  @media(max-width: 880px) {
-    .oppia-page-card.oppia-long-text {
-      width: 75vw;
-    }
-  }
-
-  @media(max-width: 820px) {
-    .oppia-page-card.oppia-long-text {
-      width: 80vw;
-    }
-  }
-
-  @media(max-width: 680px) {
-    .oppia-page-card.oppia-long-text {
-      width: 90vw;
-    }
-  }
-
-  @media(max-width: 500px) {
-    .oppia-page-card.oppia-long-text {
-      padding: 50px 25px;
-      width: 100vw;
-    }
-
-    .subtopics-container {
-      display: grid;
-      grid-column-gap: 30px;
-      grid-row-gap: 10px;
-      grid-template-columns: 1fr 1fr;
-      justify-content: space-between;
-    }
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.rtl.css">
