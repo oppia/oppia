@@ -154,10 +154,12 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   get data(): FilepathData {
     return this._data;
   }
+
   set data(value: FilepathData) {
     this._data = value;
     this.validate(this._data);
   }
+
   cropAreaXWhenLastDown: number;
   cropAreaYWhenLastDown: number;
 
