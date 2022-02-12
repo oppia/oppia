@@ -32,8 +32,10 @@ export class AdminMiscTabComponent {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
   DATA_EXTRACTION_QUERY_HANDLER_URL: string = (
     '/explorationdataextractionhandler');
+
   irreversibleActionMessage: string = (
     'This action is irreversible. Are you sure?');
+
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
   showDataExtractionQueryStatus: boolean;
   dataExtractionQueryStatusMessage: string;

@@ -33,6 +33,7 @@ export class ProfileLinkImageBackendApiService {
   constructor(
     private http: HttpClient
   ) {}
+
   // This function will return a 'null' Promise in the following cases:
   // 1. The user is not logged in
   // 2. The user didn't upload a profile picture
