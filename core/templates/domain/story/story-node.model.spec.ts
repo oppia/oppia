@@ -320,7 +320,7 @@ describe('Story node model', () => {
   });
 
   it('should return false when nodeId is not a string', () => {
-    var nodeId = {}
+    var nodeId = {};
     // This throws "TS2345". We need to suppress this error because
     // we are testing that _checkValidNodeId return false when
     // typeof nodeId is not a string.
