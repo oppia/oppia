@@ -181,7 +181,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
                   origTranslations[0] = (
                     dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
                     nodeData[$scope.currentStateId()].width / 2);
-                } catch (e: TypeError) {
+                } catch (error) {
                   error.message +=
                   `\ncurrentStateId(): ${ $scope.currentStateId() }` +
                   `\nnodeData: ${ nodeData }`;
