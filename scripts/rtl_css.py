@@ -65,7 +65,8 @@ css_files_list = [
     'core/templates/pages/topic-viewer-page/stories-list/'
     'topic-viewer-stories-list.component.css',
     'core/templates/pages/library-page/search-bar/search-bar.component.css',
-    'core/templates/components/button-directives/hint-and-solution-buttons.css'
+    'core/templates/components/button-directives/hint-and-solution-buttons.css',
+    'core/templates/components/common-layout-directives/common-elements/attribution-guide.component.css'
 ]
 
 
