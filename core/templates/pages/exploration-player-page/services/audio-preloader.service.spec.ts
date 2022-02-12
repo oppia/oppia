@@ -315,6 +315,7 @@ describe('Audio preloader service', () => {
 
   beforeEach(() => {
     audioPreloaderService = TestBed.get(AudioPreloaderService);
+    audioPreloaderService.setAudioLoadedCallback((_: string): void => {});
     audioTranslationLanguageService = (
       TestBed.get(AudioTranslationLanguageService));
     explorationObjectFactory = TestBed.get(ExplorationObjectFactory);
@@ -390,5 +391,15 @@ describe('Audio preloader service', () => {
     httpTestingController.expectOne(requestUrl4);
     expect(audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading())
       .toEqual(['en-3.mp3', 'en-4.mp3']);
+  });
+
+  it('should properly set most recently requested audio filename', () => {
+    audioPreloaderService.clearMostRecentlyRequestedAudioFilename();
+    expect(audioPreloaderService.getMostRecentlyRequestedAudioFilename())
+      .toEqual(null);
+    var filename = 'test_file'
+    audioPreloaderService.setMostRecentlyRequestedAudioFilename(filename);
+    expect(audioPreloaderService.getMostRecentlyRequestedAudioFilename())
+      .toEqual(filename);
   });
 });
