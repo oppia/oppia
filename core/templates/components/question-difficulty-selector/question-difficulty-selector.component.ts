@@ -38,6 +38,7 @@ export class QuestionDifficultySelectorComponent {
   @Input() skillWithDifficulty!: SkillDifficulty;
   @Output() skillWithDifficultyChange: EventEmitter<SkillDifficulty> = (
     new EventEmitter());
+
   availableDifficultyValues: number[] = [];
 
   ngOnInit(): void {
