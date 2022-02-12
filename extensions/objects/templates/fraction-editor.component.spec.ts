@@ -17,14 +17,14 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FractionEditorComponent } from './fraction-editor.component';
 
 describe('FractionEditorComponent', () => {
   let component: FractionEditorComponent;
   let fixture: ComponentFixture<FractionEditorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [FractionEditorComponent],
       schemas: [NO_ERRORS_SCHEMA]

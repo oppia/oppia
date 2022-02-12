@@ -20,7 +20,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.directive';
+import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.component';
 
 @Component({
   selector: 'oppia-schema-based-editor',

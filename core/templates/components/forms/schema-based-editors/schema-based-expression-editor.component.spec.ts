@@ -13,27 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Schema Based Int Editor Directive
+ * @fileoverview Unit tests for Schema Based Editor Directive
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { SchemaBasedIntEditorComponent } from './schema-based-int-editor.directive';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { SchemaBasedExpressionEditorComponent } from './schema-based-expression-editor.component';
 
-describe('Schema Based Int Editor Component', () => {
-  let component: SchemaBasedIntEditorComponent;
-  let fixture: ComponentFixture<SchemaBasedIntEditorComponent>;
+describe('Schema Based Expression Editor Component', () => {
+  let component: SchemaBasedExpressionEditorComponent;
+  let fixture: ComponentFixture<SchemaBasedExpressionEditorComponent>;
   let focusManagerService: FocusManagerService;
-  let schemaFormSubmittedService: SchemaFormSubmittedService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule],
+      imports: [HttpClientTestingModule],
       declarations: [
-        SchemaBasedIntEditorComponent
+        SchemaBasedExpressionEditorComponent
       ],
       providers: [
         FocusManagerService,
@@ -44,12 +43,10 @@ describe('Schema Based Int Editor Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SchemaBasedIntEditorComponent);
+    fixture = TestBed.createComponent(SchemaBasedExpressionEditorComponent);
     component = fixture.componentInstance;
     focusManagerService = TestBed.inject(FocusManagerService);
-    schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
 
-    component.labelForFocusTarget = {};
     component.registerOnTouched();
     component.registerOnChange(null);
     component.onChange = (val: boolean) => {
@@ -61,18 +58,6 @@ describe('Schema Based Int Editor Component', () => {
     expect(component.validate(null)).toEqual({});
   });
 
-  it('should set local value on initialization and set focus' +
-    ' on the input field', fakeAsync(() => {
-    spyOn(focusManagerService, 'setFocusWithoutScroll');
-    expect(component.localValue).toBe(undefined);
-
-    component.ngOnInit();
-    tick(50);
-
-    expect(component.localValue).toBe(0);
-    expect(focusManagerService.setFocusWithoutScroll).toHaveBeenCalled();
-  }));
-
   it('should overwrite local value', () => {
     expect(component.localValue).toBe(undefined);
 
@@ -81,27 +66,24 @@ describe('Schema Based Int Editor Component', () => {
     expect(component.localValue).toBeTrue();
   });
 
+  it('should initialize the schema', fakeAsync(() => {
+    spyOn(focusManagerService, 'setFocusWithoutScroll');
+
+    component.ngOnInit();
+    tick();
+
+    expect(focusManagerService.setFocusWithoutScroll).toHaveBeenCalled();
+  }));
+
   it('should update local value', () => {
     component.localValue = false;
 
-    component.updateValue(false);
+    component.localValueChange(false);
 
     expect(component.localValue).toBeFalse();
 
-    component.updateValue(true);
+    component.localValueChange(true);
 
     expect(component.localValue).toBeTrue();
-  });
-
-  it('should submit form on key press', () => {
-    spyOn(schemaFormSubmittedService.onSubmittedSchemaBasedForm, 'emit');
-    let evt = new KeyboardEvent('', {
-      keyCode: 13
-    });
-
-    component.onKeypress(evt);
-
-    expect(schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit)
-      .toHaveBeenCalled();
   });
 });

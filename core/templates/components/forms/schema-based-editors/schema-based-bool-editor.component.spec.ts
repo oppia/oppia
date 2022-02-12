@@ -19,7 +19,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { SchemaBasedBoolEditorComponent } from './schema-based-bool-editor.directive';
+import { SchemaBasedBoolEditorComponent } from './schema-based-bool-editor.component';
 
 describe('Schema Based Bool Editor Component', () => {
   let component: SchemaBasedBoolEditorComponent;

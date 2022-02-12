@@ -34,22 +34,6 @@ export class SubtitledUnicodeEditorComponent {
     type: 'unicode',
   };
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
-
-  updateValue(val: string): void {
-    if (this.value) {
-      if (this.value.unicode === val) {
-        return;
-      }
-
-      this.value.unicode = val;
-      this.valueChanged.emit(this.value);
-      this.changeDetectorRef.detectChanges();
-    }
-  }
-
-  getSchema(): { type: string } {
-    return this.schema;
-  }
 }
 
 angular.module('oppia').directive('subtitledUnicodeEditor', downgradeComponent({

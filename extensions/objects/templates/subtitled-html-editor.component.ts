@@ -50,21 +50,6 @@ export class SubtitledHtmlEditorComponent implements OnInit {
       ui_config: uiConfig
     };
   }
-
-  getSchema(): SubtitledHtmlEditorSchema {
-    return this.SCHEMA;
-  }
-
-  updateValue(newValue: string): void {
-    if (this.value) {
-      if (this.value.html === newValue) {
-        return;
-      }
-      this.value.html = newValue;
-      this.valueChanged.emit(this.value);
-      this.changeDetectorRef.detectChanges();
-    }
-  }
 }
 
 angular.module('oppia').directive('subtitledHtmlEditor', downgradeComponent({

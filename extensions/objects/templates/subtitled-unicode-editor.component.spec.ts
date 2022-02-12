@@ -17,9 +17,7 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ChangeDetectorRef } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledUnicodeEditorComponent } from './subtitled-unicode-editor.component';
 
 describe('SubtitledUnicodeEditorComponent', () => {
@@ -38,43 +36,7 @@ describe('SubtitledUnicodeEditorComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should return schema when called', () => {
-    expect(component.getSchema()).toEqual({
-      type: 'unicode',
-    });
-  });
-
-  it('should update value when user enters a new value', () => {
-    const changeDetectorRef =
-      fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
-    spyOn(component.valueChanged, 'emit');
-    component.value = new SubtitledUnicode('value', null);
-
-    component.updateValue('new value');
-
-    expect(component.value.unicode).toBe('new value');
-    expect(component.valueChanged.emit).toHaveBeenCalledWith({
-      _unicode: 'new value'
-    });
-    expect(detectChangesSpy).toHaveBeenCalled();
-  });
-
-  it('should not update value when user does not enter a new value', () => {
-    const changeDetectorRef =
-      fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
-    spyOn(component.valueChanged, 'emit');
-    component.value = new SubtitledUnicode('value', null);
-
-    component.updateValue('value');
-
-    expect(component.value.unicode).toBe('value');
-    expect(component.valueChanged.emit).not.toHaveBeenCalledWith({
-      _unicode: 'value'
-    });
-    expect(detectChangesSpy).not.toHaveBeenCalled();
+  it('should intialize the component', () => {
+    expect(component).toBeDefined();
   });
 });

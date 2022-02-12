@@ -1,4 +1,3 @@
-<schema-based-editor [schema]="getSchema()"
-                     [localValue]="value ? value._unicode: ''"
-                     (localValueChange)="updateValue($event)">
+<schema-based-editor [schema]="schema"
+                     [(localValue)]="value ? value._unicode: ''">
 </schema-based-editor>

@@ -24,7 +24,7 @@ import { StateCustomizationArgsService } from 'components/state-editor/state-edi
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { SchemaBasedUnicodeEditor } from './schema-based-unicode-editor.directive';
+import { SchemaBasedUnicodeEditor } from './schema-based-unicode-editor.component';
 
 describe('Schema Based Unicode Editor', () => {
   let component: SchemaBasedUnicodeEditor;

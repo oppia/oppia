@@ -13,26 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Schema Based Editor Directive
+ * @fileoverview Unit tests for Schema Based Html Editor Directive
  */
 
+import { FormsModule } from '@angular/forms';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
-import { SchemaBasedExpressionEditorComponent } from './schema-based-expression-editor.directive';
+import { SchemaBasedHtmlEditorComponent } from './schema-based-html-editor.component';
 
-describe('Schema Based Expression Editor Component', () => {
-  let component: SchemaBasedExpressionEditorComponent;
-  let fixture: ComponentFixture<SchemaBasedExpressionEditorComponent>;
-  let focusManagerService: FocusManagerService;
+describe('Schema Based Html Editor Component', () => {
+  let component: SchemaBasedHtmlEditorComponent;
+  let fixture: ComponentFixture<SchemaBasedHtmlEditorComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [FormsModule],
       declarations: [
-        SchemaBasedExpressionEditorComponent
+        SchemaBasedHtmlEditorComponent
       ],
       providers: [
         FocusManagerService,
@@ -43,10 +42,10 @@ describe('Schema Based Expression Editor Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SchemaBasedExpressionEditorComponent);
+    fixture = TestBed.createComponent(SchemaBasedHtmlEditorComponent);
     component = fixture.componentInstance;
-    focusManagerService = TestBed.inject(FocusManagerService);
 
+    component.ngOnInit();
     component.registerOnTouched();
     component.registerOnChange(null);
     component.onChange = (val: boolean) => {
@@ -66,24 +65,11 @@ describe('Schema Based Expression Editor Component', () => {
     expect(component.localValue).toBeTrue();
   });
 
-  it('should initialize the schema', fakeAsync(() => {
-    spyOn(focusManagerService, 'setFocusWithoutScroll');
-
-    component.ngOnInit();
-    tick();
-
-    expect(focusManagerService.setFocusWithoutScroll).toHaveBeenCalled();
-  }));
-
   it('should update local value', () => {
-    component.localValue = false;
+    spyOn(component, 'onChange');
 
-    component.localValueChange(false);
+    component.updateValue('<p> HTML </p>');
 
-    expect(component.localValue).toBeFalse();
-
-    component.localValueChange(true);
-
-    expect(component.localValue).toBeTrue();
+    expect(component.onChange).toHaveBeenCalledWith('<p> HTML </p>');
   });
 });

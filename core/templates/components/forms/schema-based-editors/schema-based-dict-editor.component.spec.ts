@@ -20,7 +20,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.directive';
+import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.component';
 import { IdGenerationService } from 'services/id-generation.service';
 
 describe('Schema Based Dict Editor Component', () => {
