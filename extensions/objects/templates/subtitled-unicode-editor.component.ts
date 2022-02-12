@@ -33,6 +33,7 @@ export class SubtitledUnicodeEditorComponent {
   schema: { type: string } = {
     type: 'unicode',
   };
+
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   updateValue(val: string): void {

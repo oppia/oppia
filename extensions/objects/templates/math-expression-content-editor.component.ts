@@ -139,6 +139,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
       }
     });
   }
+
   // This method cleans the SVG string and generates a filename before
   // the SVG can be saved to the backend in the RteHelperModalController.
   // The method doesn't save the SVG to the backend, it just updates

@@ -123,6 +123,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   private convertCoordsToFraction(coords: number[], dimensions: number[]) {
     return [coords[0] / dimensions[0], coords[1] / dimensions[1]];
   }
+
   // Convert to and from region area (which is stored as a fraction of
   // image width and height) and actual width and height.
   private regionAreaFromCornerAndDimensions(
@@ -307,12 +308,14 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     // Message to displayed when there is an error.
     this.errorText = '';
   }
+
   // Use these two functions to get the calculated image width and
   // height.
   getImageWidth(): number {
     const width = this._calculateImageDimensions().width;
     return isNaN(width) ? 0 : width;
   }
+
   getImageHeight(): number {
     const height = this._calculateImageDimensions().height;
     return isNaN(height) ? 0 : height;

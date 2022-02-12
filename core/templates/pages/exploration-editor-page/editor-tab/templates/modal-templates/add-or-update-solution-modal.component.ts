@@ -59,9 +59,11 @@ export class AddOrUpdateSolutionModalComponent
   tempAnsOption: string;
   COMPONENT_NAME_SOLUTION: string = (
     AppConstants.COMPONENT_NAME_SOLUTION);
+
   EMPTY_SOLUTION_DATA: SolutionInterface;
   SOLUTION_EDITOR_FOCUS_LABEL: string = (
     'currentCorrectAnswerEditorHtmlForSolutionEditor');
+
   EXPLANATION_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {
