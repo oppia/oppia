@@ -479,6 +479,8 @@
     "core/templates/pages/topics-and-skills-dashboard-page/modals/delete-skill-modal.component.spec.ts",
     "core/templates/pages/topics-and-skills-dashboard-page/modals/unassign-skill-from-topics-modal.component.ts",
     "core/templates/pages/topics-and-skills-dashboard-page/modals/unassign-skill-from-topics-modal.component.spec.ts",
+    "core/templates/pages/topics-and-skills-dashboard-page/skills-list/skills-list.component.ts",
+    "core/templates/pages/topics-and-skills-dashboard-page/skills-list/skills-list.component.spec.ts",
     "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants.ts",
     "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service.ts",
     "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service.spec.ts",
