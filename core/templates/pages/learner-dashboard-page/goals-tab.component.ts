@@ -42,6 +42,7 @@ export class GoalsTabComponent implements OnInit {
       LearnerDashboardActivityBackendApiService),
     private deviceInfoService: DeviceInfoService) {
   }
+
   @Input() currentGoals: LearnerTopicSummary[];
   @Input() editGoals: LearnerTopicSummary[];
   @Input() completedGoals: LearnerTopicSummary[];
@@ -65,6 +66,7 @@ export class GoalsTabComponent implements OnInit {
     COMPLETED: 1,
     NEITHER: 2
   };
+
   activityType: string = constants.ACTIVITY_TYPE_LEARN_TOPIC;
   editGoalsTopicPageUrl: string[] = [];
   completedGoalsTopicPageUrl: string[] = [];
@@ -77,6 +79,7 @@ export class GoalsTabComponent implements OnInit {
   ngOnInit(): void {
     this.MAX_CURRENT_GOALS_LENGTH = constants.MAX_CURRENT_GOALS_COUNT;
     this.currentGoalsStoryIsShown = [];
+    this.currentGoalsStoryIsShown[0] = true;
     this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
     this.bookImageUrl = this.getStaticImageUrl(
       '/learner_dashboard/book_icon.png');
