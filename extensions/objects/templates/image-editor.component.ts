@@ -617,16 +617,11 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     this.userIsResizingCropArea = false;
   }
 
-  getMainContainerDynamicStyles(): string {
-    const width = this.OUTPUT_IMAGE_MAX_WIDTH_PX;
-    return 'width: ' + width + 'px';
-  }
-
   getImageContainerDynamicStyles(): string {
     if (this.data.mode === this.MODE_EMPTY) {
-      return 'border: 1px dotted #888';
+      return 'border: 1px dotted #888; width: 100%';
     } else {
-      return 'border: none';
+      return 'border: none; width: ' + this.OUTPUT_IMAGE_MAX_WIDTH_PX + 'px';
     }
   }
 
