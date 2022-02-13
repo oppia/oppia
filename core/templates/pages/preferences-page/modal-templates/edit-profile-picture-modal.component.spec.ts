@@ -24,11 +24,13 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { EditProfilePictureModalComponent } from './edit-profile-picture-modal.component';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { of } from 'rxjs';
 
 describe('Edit Profile Picture Modal Component', () => {
   let fixture: ComponentFixture<EditProfilePictureModalComponent>;
   let componentInstance: EditProfilePictureModalComponent;
   let windowDimensionsService: WindowDimensionsService;
+  let resizeEvent = new Event('resize');
 
   class MockChangeDetectorRef {
     detectChanges(): void {}
@@ -46,7 +48,14 @@ describe('Edit Profile Picture Modal Component', () => {
         {
           provide: ChangeDetectorRef,
           useClass: MockChangeDetectorRef
-        }
+        },
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
+          }
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -54,6 +63,7 @@ describe('Edit Profile Picture Modal Component', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(EditProfilePictureModalComponent);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     componentInstance = fixture.componentInstance;
   });
 
