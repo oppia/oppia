@@ -669,8 +669,9 @@ class InteractionInstance:
         try:
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 self.id)
-        except KeyError:
-            raise utils.ValidationError('Invalid interaction id: %s' % self.id)
+        except KeyError as e:
+            raise utils.ValidationError(
+                'Invalid interaction id: %s' % self.id) from e
 
         self._validate_customization_args()
 
@@ -733,11 +734,12 @@ class InteractionInstance:
                         self.customization_args[
                             ca_name].to_customization_arg_dict()
                     )
-                except AttributeError:
+                except AttributeError as e:
                     raise utils.ValidationError(
                         'Expected customization arg value to be a '
                         'InteractionCustomizationArg domain object, '
-                        'received %s' % self.customization_args[ca_name])
+                        'received %s' % self.customization_args[ca_name]
+                    ) from e
 
         interaction = interaction_registry.Registry.get_interaction_by_id(
             self.id)
@@ -3022,11 +3024,11 @@ class State:
 
                         try:
                             normalized_param = param_type.normalize(value)
-                        except Exception:
+                        except Exception as e:
                             raise Exception(
                                 'Value has the wrong type. It should be a %s. '
                                 'The value is %s' %
-                                (param_type.__name__, value))
+                                (param_type.__name__, value)) from e
 
                     rule_inputs[param_name] = normalized_param
 
