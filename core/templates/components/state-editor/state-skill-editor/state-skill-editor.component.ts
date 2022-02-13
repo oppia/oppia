@@ -31,6 +31,7 @@ import { StateLinkedSkillIdService } from '../state-editor-properties-services/s
 import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 
 @Component({
   selector: 'state-skill-editor',
@@ -46,6 +47,7 @@ export class StateSkillEditorComponent implements OnInit {
   categorizedSkills: SkillsCategorizedByTopics = null;
   untriagedSkillSummaries: SkillSummary[] = null;
   skillEditorIsShown: boolean = true;
+  skillName: string = null;
 
   constructor(
     private topicsAndSkillsDashboardBackendApiService: (
@@ -55,7 +57,8 @@ export class StateSkillEditorComponent implements OnInit {
     private windowDimensionsService: WindowDimensionsService,
     private stateLinkedSkillIdService: StateLinkedSkillIdService,
     private urlInterpolationService: UrlInterpolationService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private skillBackendApiService: SkillBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -65,6 +68,13 @@ export class StateSkillEditorComponent implements OnInit {
         this.categorizedSkills = response.categorizedSkillsDict;
         this.untriagedSkillSummaries = response.untriagedSkillSummaries;
       });
+    if (this.stateLinkedSkillIdService.displayed) {
+      this.skillBackendApiService.fetchSkillAsync(
+        this.stateLinkedSkillIdService.displayed
+      ).then((skill) => {
+        this.skillName = skill.skill._description;
+      });
+    }
   }
 
   addSkill(): void {
@@ -88,6 +98,7 @@ export class StateSkillEditorComponent implements OnInit {
     modalRef.componentInstance.untriagedSkillSummaries = (
       this.untriagedSkillSummaries);
     modalRef.result.then((result) => {
+      this.skillName = result.description;
       this.stateLinkedSkillIdService.displayed = result.id;
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(result.id);

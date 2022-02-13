@@ -23,10 +23,10 @@
       CHANGE SKILL
     </button>
   </mat-card-actions>
-  <mat-card-actions class="skill-description-card" *ngIf="skillEditorIsShown && stateLinkedSkillIdService.displayed">
+  <mat-card-actions class="skill-description-card" *ngIf="skillEditorIsShown && stateLinkedSkillIdService.displayed && skillName">
     <a [href]="getSkillEditorUrl()"
        target="_blank" rel="noopener"
-       class="skill-link">{{stateLinkedSkillIdService.displayed}}
+       class="skill-link">{{skillName}}
     </a>
     <span class="oppia-delete-response-button oppia-transition-200" (click)="deleteSkill()">
       <i class="material-icons md-18 skill-delete-button">&#xE5CD;</i>
