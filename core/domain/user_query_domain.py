@@ -31,6 +31,10 @@ attribute_names = [ # pylint: disable=invalid-name
         predicate['backend_attr'] for predicate in (
             constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
+# We cannot inject dynamic data (attribute_names) into namedtuple (UserQueryParams) 
+# without raising mypy error. Therefore , we need to silence these errors explicitly
+# using # type: ignore[misc] for now.
+# For more information : https://github.com/python/mypy/issues/848
 UserQueryParams = collections.namedtuple( # type: ignore[misc] # pylint: disable=invalid-name
         'UserQueryParams',
         attribute_names,
