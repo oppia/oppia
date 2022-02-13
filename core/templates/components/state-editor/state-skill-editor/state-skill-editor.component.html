@@ -9,14 +9,14 @@
       <i class="fa fa-caret-up" *ngIf="skillEditorIsShown" aria-hidden="true"></i>
     </mat-card-actions>
   </mat-card-header>
-  <mat-card-actions class="oppia-skill-button-container" *ngIf="skillEditorIsShown && !stateLinkedSkillIdService.displayed">
+  <mat-card-actions class="oppia-skill-button-container" *ngIf="skillEditorIsShown && !stateLinkedSkillIdService.displayed && isEditableByUser">
     <button type="button"
             class="btn btn-primary oppia-add-skill-button"
             (click)="addSkill()">
       + ADD SKILL
     </button>
   </mat-card-actions>
-  <mat-card-actions class="oppia-skill-button-container" *ngIf="skillEditorIsShown && stateLinkedSkillIdService.displayed">
+  <mat-card-actions class="oppia-skill-button-container" *ngIf="skillEditorIsShown && stateLinkedSkillIdService.displayed && isEditableByUser">
     <button type="button"
             class="btn btn-primary oppia-change-skill-button"
             (click)="addSkill()">
@@ -28,7 +28,11 @@
        target="_blank" rel="noopener"
        class="skill-link">{{skillName}}
     </a>
-    <span class="oppia-delete-response-button oppia-transition-200" (click)="deleteSkill()">
+    <span 
+      class="oppia-delete-response-button oppia-transition-200" 
+      (click)="deleteSkill()"
+      *ngIf="isEditableByUser"
+    >
       <i class="material-icons md-18 skill-delete-button">&#xE5CD;</i>
     </span>
   </mat-card-actions>

@@ -32,6 +32,7 @@ import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-pag
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { UserService } from 'services/user.service';
 
 @Component({
   selector: 'state-skill-editor',
@@ -48,6 +49,7 @@ export class StateSkillEditorComponent implements OnInit {
   untriagedSkillSummaries: SkillSummary[] = null;
   skillEditorIsShown: boolean = true;
   skillName: string = null;
+  isEditableByUser: boolean = false;
 
   constructor(
     private topicsAndSkillsDashboardBackendApiService: (
@@ -58,15 +60,26 @@ export class StateSkillEditorComponent implements OnInit {
     private stateLinkedSkillIdService: StateLinkedSkillIdService,
     private urlInterpolationService: UrlInterpolationService,
     private ngbModal: NgbModal,
-    private skillBackendApiService: SkillBackendApiService
+    private skillBackendApiService: SkillBackendApiService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
     this.skillEditorIsShown = (!this.windowDimensionsService.isWindowNarrow());
-    this.topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-      .then((response: TopicsAndSkillDashboardData) => {
-        this.categorizedSkills = response.categorizedSkillsDict;
-        this.untriagedSkillSummaries = response.untriagedSkillSummaries;
+    this.userService.getUserInfoAsync()
+      .then((userInfo) => {
+        this.isEditableByUser = (
+          userInfo.isLoggedIn() &&
+          (userInfo.isCurriculumAdmin() || userInfo.isTopicManager())
+        );
+        if (this.isEditableByUser) {
+          this.topicsAndSkillsDashboardBackendApiService
+            .fetchDashboardDataAsync()
+            .then((response: TopicsAndSkillDashboardData) => {
+              this.categorizedSkills = response.categorizedSkillsDict;
+              this.untriagedSkillSummaries = response.untriagedSkillSummaries;
+            });
+        }
       });
     if (this.stateLinkedSkillIdService.displayed) {
       this.skillBackendApiService.fetchSkillAsync(
