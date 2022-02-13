@@ -19,26 +19,39 @@
 from __future__ import annotations
 
 import collections
+import datetime
 
 from core import feconf
 from core import utils
 from core.constants import constants
 
-attribute_names = [ # pylint: disable=invalid-name
-    predicate['backend_attr'] for predicate in (
-        constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
+from typing import List, Union
 
-UserQueryParams = collections.namedtuple( # pylint: disable=invalid-name
-    'UserQueryParams', attribute_names, defaults=(None,) * len(attribute_names))
+attribute_names = [ # pylint: disable=invalid-name
+        predicate['backend_attr'] for predicate in (
+            constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
+
+UserQueryParams = collections.namedtuple( # type: ignore[misc] # pylint: disable=invalid-name
+        'UserQueryParams',
+        attribute_names,
+        defaults=(None,) * len(attribute_names) # type: ignore[misc]
+        )
 
 
 class UserQuery:
     """Domain object for the UserQueryModel."""
 
     def __init__(
-            self, query_id, query_params, submitter_id, query_status, user_ids,
-            sent_email_model_id=None, created_on=None, deleted=False
-    ):
+            self,
+            query_id: str,
+            query_params: UserQueryParams,
+            submitter_id: str,
+            query_status: str,
+            user_ids: List[str],
+            sent_email_model_id: Union[str, None]=None,
+            created_on: Union[datetime.datetime, None]=None,
+            deleted: bool=False
+        ) -> None:
         """Create user query domain object.
 
         Args:
@@ -62,7 +75,7 @@ class UserQuery:
         self.created_on = created_on
         self.deleted = deleted
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the UserQuery.
 
         Raises:
@@ -123,7 +136,12 @@ class UserQuery:
                 % self.sent_email_model_id)
 
     @classmethod
-    def create_default(cls, query_id, query_params, submitter_id):
+    def create_default(
+            cls,
+            query_id: str,
+            query_params: UserQueryParams,
+            submitter_id: str
+        ) -> UserQuery:
         """Create default user query.
 
         Args:
@@ -139,7 +157,7 @@ class UserQuery:
             feconf.USER_QUERY_STATUS_PROCESSING, []
         )
 
-    def archive(self, sent_email_model_id=None):
+    def archive(self, sent_email_model_id: Union[str, None]=None) -> None:
         """Archive the query.
 
         Args:
