@@ -322,6 +322,12 @@ describe('State Graph Visualization directive', function() {
       });
     });
 
+  it('should throw error when nodeId is undefined', function() {
+    $scope.currentStateId = () => undefined;
+    $scope.centerAtCurrentState = false;
+    expect(() => ctrl.$onInit()).toThrowError(TypeError);
+  });
+
   it('should redraw graph when resizing page', function() {
     expect($scope.graphLoaded).toBe(false);
 
