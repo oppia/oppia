@@ -23,10 +23,12 @@ import Cropper from 'cropperjs';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { EditProfilePictureModalComponent } from './edit-profile-picture-modal.component';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 describe('Edit Profile Picture Modal Component', () => {
   let fixture: ComponentFixture<EditProfilePictureModalComponent>;
   let componentInstance: EditProfilePictureModalComponent;
+  let windowDimensionsService: WindowDimensionsService;
 
   class MockChangeDetectorRef {
     detectChanges(): void {}
@@ -59,11 +61,27 @@ describe('Edit Profile Picture Modal Component', () => {
     expect(componentInstance).toBeDefined();
   });
 
-  it('should initialize cropper', () => {
+  it('should initialize cropper when window is not narrow', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow')
+      .and.returnValue(false);
     fixture.detectChanges();
     componentInstance.croppableImageRef = (
       new ElementRef(document.createElement('img')));
+
     componentInstance.initializeCropper();
+
+    expect(componentInstance.cropper).toBeDefined();
+  });
+
+  it('should initialize cropper when window is narrow', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow')
+      .and.returnValue(true);
+    fixture.detectChanges();
+    componentInstance.croppableImageRef = (
+      new ElementRef(document.createElement('img')));
+
+    componentInstance.initializeCropper();
+
     expect(componentInstance.cropper).toBeDefined();
   });
 
