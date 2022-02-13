@@ -88,6 +88,7 @@ export class ExplorationDiffService {
   _resetMaxId(): void {
     this._maxId = 0;
   }
+
   _generateNewId(): number {
     this._maxId++;
     return this._maxId;
