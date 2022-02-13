@@ -35,7 +35,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   uploadedImage: SafeResourceUrl | null = null;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
-  windowIsNarrow: boolean;
+  windowIsNarrow: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
   // 'cropper' is initialized before it is to be used, hence we need to do
   // non-null assertion, for more information see
