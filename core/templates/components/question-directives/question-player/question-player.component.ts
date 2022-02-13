@@ -43,7 +43,7 @@ require(
   'schema-based-choices-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-custom-editor.directive.ts');
+  'schema-based-custom-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-dict-editor.directive.ts');
