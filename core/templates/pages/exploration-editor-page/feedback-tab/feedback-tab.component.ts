@@ -91,6 +91,7 @@ angular.module('oppia').component('feedbackTab', {
         if (ctrl.threadIsStale) {
           ctrl.fetchUpdatedThreads();
         }
+        ctrl.$onInit();
       };
 
       ctrl.showCreateThreadModal = function() {
@@ -101,6 +102,7 @@ angular.module('oppia').component('feedbackTab', {
             result.newThreadSubject, result.newThreadText)
         ).then(() => {
           ctrl.clearActiveThread();
+          ctrl.$onInit();
           AlertsService.addSuccessMessage('Feedback thread created.');
         },
         () => {
