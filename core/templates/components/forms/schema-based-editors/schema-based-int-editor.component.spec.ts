@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Schema Based Int Editor Directive
+ * @fileoverview Unit tests for Schema Based Int Editor Component
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';

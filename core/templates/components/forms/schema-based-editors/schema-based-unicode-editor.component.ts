@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for unicode strings.
+ * @fileoverview Component for a schema-based editor for unicode strings.
  */
 
 require('third-party-imports/ui-codemirror.import.ts');
@@ -37,7 +37,7 @@ interface OppiaValidator {
 
 @Component({
   selector: 'schema-based-unicode-editor',
-  templateUrl: './schema-based-unicode-editor.directive.html',
+  templateUrl: './schema-based-unicode-editor.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

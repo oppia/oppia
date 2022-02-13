@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for booleans.
+ * @fileoverview Component for a schema-based editor for booleans.
  */
 
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
@@ -22,7 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-bool-editor',
-  templateUrl: './schema-based-bool-editor.directive.html',
+  templateUrl: './schema-based-bool-editor.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

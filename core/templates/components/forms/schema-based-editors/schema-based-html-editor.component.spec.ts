@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Schema Based Html Editor Directive
+ * @fileoverview Unit tests for Schema Based Html Editor Component
  */
 
 import { FormsModule } from '@angular/forms';

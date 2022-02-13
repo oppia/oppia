@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for expressions.
+ * @fileoverview Component for a schema-based editor for expressions.
  */
 
 import { Component, Input, OnInit } from '@angular/core';
@@ -24,7 +24,7 @@ import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.compo
 
 @Component({
   selector: 'oppia-schema-based-editor',
-  templateUrl: './schema-based-expression-editor.directive.html'
+  templateUrl: './schema-based-expression-editor.component.html'
 })
 export class SchemaBasedExpressionEditorComponent
 implements ControlValueAccessor, Validator, OnInit {

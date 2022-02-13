@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Schema Based Unicode Editor Directive
+ * @fileoverview Unit tests for Schema Based Unicode Editor Component
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';

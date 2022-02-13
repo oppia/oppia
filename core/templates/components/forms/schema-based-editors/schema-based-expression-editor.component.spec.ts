@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Schema Based Editor Directive
+ * @fileoverview Unit tests for Schema Based Editor Component
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';

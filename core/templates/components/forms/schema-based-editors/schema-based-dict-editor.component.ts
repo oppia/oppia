@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for dicts.
+ * @fileoverview Component for a schema-based editor for dicts.
  */
 
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
@@ -23,7 +23,7 @@ import { IdGenerationService } from 'services/id-generation.service';
 
 @Component({
   selector: 'schema-based-dict-editor',
-  templateUrl: './schema-based-dict-editor.directive.html',
+  templateUrl: './schema-based-dict-editor.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

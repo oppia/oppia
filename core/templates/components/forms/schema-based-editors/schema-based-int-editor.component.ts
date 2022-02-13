@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for integers.
+ * @fileoverview Component for a schema-based editor for integers.
  */
 
 import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
@@ -24,7 +24,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 @Component({
   selector: 'schema-based-int-editor',
-  templateUrl: './schema-based-int-editor.directive.html',
+  templateUrl: './schema-based-int-editor.component.html',
   styleUrls: [],
   providers: [
     {
