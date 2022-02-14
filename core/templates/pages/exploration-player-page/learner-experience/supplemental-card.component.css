@@ -10,17 +10,21 @@
 
 /*rtl:raw:
 .conversation-skin-help-card {
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.24), 0 1px 3px rgba(0,0,0,0.12);
   left: 0;
+  min-height: 50px;
+  opacity: 1;
+  padding: 12px;
   right: auto;
+  text-align: left;
+  transition: all 350ms;
+  z-index: 1001;
 }
 */
 
 /*rtl:begin:remove*/
-.conversation-skin-help-card {
-  right: 12px;
-}
-/*rtl:end:remove*/
-
 .conversation-skin-help-card {
   background: #fff;
   border-radius: 2px;
@@ -31,6 +35,7 @@
   min-height: 50px;
   opacity: 1;
   padding: 12px;
+  right: 12px;
   text-align: left;
   transition: all 350ms;
   /* The z-index value of leaflet map attribution is 1000, to make it go lower
@@ -38,6 +43,7 @@
   */
   z-index: 1001;
 }
+/*rtl:end:remove*/
 
 /*rtl:begin:ignore*/
 .conversation-skin-help-card.ng-enter,

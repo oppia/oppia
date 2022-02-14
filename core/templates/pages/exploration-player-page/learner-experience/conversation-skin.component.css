@@ -104,8 +104,8 @@ otherwise they will interfere with the iframed conversation skin directive. */
 /*rtl:end:ignore*/
 
 .conversation-skin-supplemental-nav-submit-button.oppia-learner-confirm-button {
-  right: 8px;
   left: auto;
+  right: 8px;
 }
 
 .conversation-skin-supplemental-nav {

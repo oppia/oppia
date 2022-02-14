@@ -88,17 +88,31 @@
 	color: #888;
 }
 
-/*rtl:begin:ignore*/
+/*rtl:begin:remove*/
 .oppia-exploration-footer .author-profile-text {
 	cursor: default;
 	font-size: 13px;
 	line-height: 1.5;
 	margin: 12px 0 17px 0;
 	padding-left: 6px;
+  text-align: left;
 	text-overflow: clip;
 	white-space: nowrap;
 }
-/*rtl:end:ignore*/
+/*rtl:end:remove*/
+
+/*rtl:begin:raw*/
+.oppia-exploration-footer .author-profile-text {
+	cursor: default;
+	font-size: 13px;
+	line-height: 1.5;
+	margin: 12px 0 17px 0;
+	padding-left: 6px;
+  text-align: right;
+	text-overflow: clip;
+	white-space: nowrap;
+}
+/*rtl:end:raw*/
 
 .oppia-exploration-footer .author-profile-text {
 	text-align: left;
