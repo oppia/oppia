@@ -2117,15 +2117,13 @@ title: A title
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID))
         fs.commit('image/abc.png', raw_image)
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        zf = zipfile.ZipFile(zip_file_output)
-
-        self.assertEqual(
-            zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
-        # Read function returns bytes, so we need to decode them before
-        # we compare.
-        self.assertEqual(
-            zf.open('A title.yaml').read().decode('utf-8'),
-            self.SAMPLE_YAML_CONTENT)
+        with zipfile.ZipFile(zip_file_output) as zf:
+            self.assertEqual(
+                zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
+            # Read function returns bytes, so we need to decode them before
+            # we compare.
+            with zf.open('A title.yaml').read().decode('utf-8') as yaml_content:
+                self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
 
     def test_export_to_zip_file_with_unpublished_exploration(self):
         """Test the export_to_zip_file() method."""
@@ -2133,9 +2131,8 @@ title: A title
             self.EXP_0_ID, self.owner_id, title='')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        zf = zipfile.ZipFile(zip_file_output)
-
-        self.assertEqual(zf.namelist(), ['Unpublished_exploration.yaml'])
+        with zipfile.ZipFile(zip_file_output) as zf:
+            self.assertEqual(zf.namelist(), ['Unpublished_exploration.yaml'])
 
     def test_export_to_zip_file_with_assets(self):
         """Test exporting an exploration with assets to a zip file."""
@@ -2215,16 +2212,18 @@ title: A title
         fs.commit('audio/cafe.mp3', raw_audio)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        zf = zipfile.ZipFile(zip_file_output)
+        with zipfile.ZipFile(zip_file_output) as zf:
 
-        self.assertEqual(
-            zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
-        # Read function returns bytes, so we need to decode them before
-        # we compare.
-        self.assertEqual(
-            zf.open('A title.yaml').read().decode('utf-8'),
-            self.SAMPLE_YAML_CONTENT)
-        self.assertEqual(zf.open('assets/image/abc.png').read(), raw_image)
+            self.assertEqual(
+                zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
+            # Read function returns bytes, so we need to decode them before
+            # we compare.
+            with zf.open('A title.yaml').read().decode('utf-8') as yaml_content:
+                self.assertEqual(
+                    yaml_content,
+                    self.SAMPLE_YAML_CONTENT)
+            with zf.open('assets/image/abc.png').read() as image:
+                self.assertEqual(image, raw_image)
 
     def test_export_by_versions(self):
         """Test export_to_zip_file() for different versions."""
@@ -2309,22 +2308,24 @@ title: A title
         # Download version 2.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_0_ID, version=2)
-        zf = zipfile.ZipFile(zip_file_output)
-        # Read function returns bytes, so we need to decode them before
-        # we compare.
-        self.assertEqual(
-            zf.open('A title.yaml').read().decode('utf-8'),
-            self.SAMPLE_YAML_CONTENT)
+        with zipfile.ZipFile(zip_file_output) as zf:
+            # Read function returns bytes, so we need to decode them before
+            # we compare.
+            with zf.open('A title.yaml').read().decode('utf-8') as yaml_content:
+                self.assertEqual(
+                    yaml_content,
+                    self.SAMPLE_YAML_CONTENT)
 
         # Download version 3.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_0_ID, version=3)
-        zf = zipfile.ZipFile(zip_file_output)
-        # Read function returns bytes, so we need to decode them before
-        # we compare.
-        self.assertEqual(
-            zf.open('A title.yaml').read().decode('utf-8'),
-            self.UPDATED_YAML_CONTENT)
+        with zipfile.ZipFile(zip_file_output) as zf:
+            # Read function returns bytes, so we need to decode them before
+            # we compare.
+            with zf.open('A title.yaml').read().decode('utf-8') as yaml_content:
+                self.assertEqual(
+                    yaml_content,
+                    self.UPDATED_YAML_CONTENT)
 
 
 class YAMLExportUnitTests(ExplorationServicesUnitTests):
