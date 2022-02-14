@@ -13,227 +13,210 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the concept card editor.
+ * @fileoverview Component for the concept card editor.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require(
-  'components/review-material-editor/review-material-editor.component.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('directives/angular-html-bind.directive.ts');
-require(
-  'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
-  'worked-example-editor.component.ts');
-require(
-  'pages/skill-editor-page/editor-tab/skill-preview-modal.controller.ts');
-
-require('domain/skill/skill-update.service.ts');
-require('domain/skill/WorkedExampleObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('filters/string-utility-filters/capitalize.filter.ts');
-require('filters/format-rte-preview.filter.ts');
-require('pages/skill-editor-page/services/skill-editor-state.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/generate-content-id.service.ts');
-
-require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
-
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import { WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AddWorkedExampleModalComponent } from 'pages/skill-editor-page/modal-templates/add-worked-example.component';
 import { DeleteWorkedExampleComponent } from 'pages/skill-editor-page/modal-templates/delete-worked-example-modal.component';
-import { Subscription } from 'rxjs';
+import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { PageTitleService } from 'services/page-title.service';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { SkillPreviewModalComponent } from '../skill-preview-modal.component';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 
-angular.module('oppia').component('skillConceptCardEditor', {
-  bindings: {},
-  template: require('./skill-concept-card-editor.component.html'),
-  controller: [
-    '$filter', '$rootScope', '$scope', '$uibModal',
-    'GenerateContentIdService',
-    'NgbModal', 'PageTitleService', 'SkillEditorStateService',
-    'SkillUpdateService', 'UrlInterpolationService',
-    'WindowDimensionsService', 'WorkedExampleObjectFactory',
-    'COMPONENT_NAME_WORKED_EXAMPLE',
-    function(
-        $filter, $rootScope, $scope, $uibModal,
-        GenerateContentIdService, NgbModal, PageTitleService,
-        SkillEditorStateService,
-        SkillUpdateService, UrlInterpolationService,
-        WindowDimensionsService, WorkedExampleObjectFactory,
-        COMPONENT_NAME_WORKED_EXAMPLE) {
-      var ctrl = this;
+@Component({
+  selector: 'oppia-skill-concept-card-editor',
+  templateUrl: './skill-concept-card-editor.component.html'
+})
+export class SkillConceptCardEditorComponent implements OnInit {
+  directiveSubscriptions: Subscription = new Subscription();
+  isEditable: boolean;
+  skill: Skill;
+  skillEditorCardIsShown: boolean;
+  workedExamplesListIsShown: boolean;
+  bindableFieldsDict;
+  WORKED_EXAMPLES_SORTABLE_OPTIONS;
+  activeWorkedExampleIndex: number;
+  COMPONENT_NAME_WORKED_EXAMPLE;
 
-      $scope.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
+  constructor(
+    private formatRtePreviewPipe: FormatRtePreviewPipe,
+    private generateContentIdService: GenerateContentIdService,
+    private ngbModal: NgbModal,
+    private pageTitleService: PageTitleService,
+    private skillEditorStateService: SkillEditorStateService,
+    private skillUpdateService: SkillUpdateService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowDimensionsService: WindowDimensionsService,
+    private workedExampleObjectFactory: WorkedExampleObjectFactory,
+  ) {}
 
-      ctrl.directiveSubscriptions = new Subscription();
-      var initBindableFieldsDict = function() {
-        PageTitleService.setNavbarSubtitleForMobileView(
-          SkillEditorStateService.getSkill().getDescription());
-        $scope.bindableFieldsDict = {
-          displayedConceptCardExplanation:
-            $scope.skill.getConceptCard().getExplanation().html,
-          displayedWorkedExamples:
-            $scope.skill.getConceptCard().getWorkedExamples()
-        };
-      };
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
 
-      $scope.isEditable = function() {
-        return true;
-      };
+  initBindableFieldsDict(): void {
+    this.pageTitleService.setNavbarSubtitleForMobileView(
+      this.skillEditorStateService.getSkill().getDescription());
+    this.bindableFieldsDict = {
+      displayedConceptCardExplanation:
+        this.skill.getConceptCard().getExplanation().html,
+      displayedWorkedExamples:
+        this.skill.getConceptCard().getWorkedExamples()
+    };
+  }
 
-      $scope.onSaveExplanation = function(explanationObject) {
-        SkillUpdateService.setConceptCardExplanation(
-          $scope.skill, explanationObject);
-        initBindableFieldsDict();
-        // TODO(#8521): Remove the use of $rootScope.$apply()
-        // once the controller is migrated to angular.
-        $rootScope.$apply();
-      };
+  onSaveExplanation(explanationObject: SubtitledHtml): void {
+    this.skillUpdateService.setConceptCardExplanation(
+      this.skill, explanationObject);
+    this.initBindableFieldsDict();
+  }
 
-      $scope.changeActiveWorkedExampleIndex = function(idx) {
-        if (idx === $scope.activeWorkedExampleIndex) {
-          $scope.bindableFieldsDict.displayedWorkedExamples =
-            $scope.skill.getConceptCard().getWorkedExamples();
-          $scope.activeWorkedExampleIndex = null;
-        } else {
-          $scope.activeWorkedExampleIndex = idx;
-        }
-      };
-
-      $scope.deleteWorkedExample = function(index, evt) {
-        NgbModal.open(DeleteWorkedExampleComponent, {
-          backdrop: 'static'
-        }).result.then(function() {
-          SkillUpdateService.deleteWorkedExample($scope.skill, index);
-          $scope.bindableFieldsDict.displayedWorkedExamples =
-            $scope.skill.getConceptCard().getWorkedExamples();
-          $scope.activeWorkedExampleIndex = null;
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$apply();
-        }, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
-
-      $scope.getWorkedExampleSummary = function(workedExampleQuestion) {
-        return $filter('formatRtePreview')(workedExampleQuestion);
-      };
-
-      $scope.openAddWorkedExampleModal = function() {
-        NgbModal.open(AddWorkedExampleModalComponent, {
-          backdrop: 'static'
-        }).result.then(function(result) {
-          var newExample = WorkedExampleObjectFactory.create(
-            SubtitledHtml.createDefault(
-              result.workedExampleQuestionHtml,
-              GenerateContentIdService.getNextId(
-                $scope.skill.getConceptCard().getRecordedVoiceovers(
-                ).getAllContentIds(),
-                COMPONENT_NAME_WORKED_EXAMPLE.QUESTION)),
-            SubtitledHtml.createDefault(
-              result.workedExampleExplanationHtml,
-              GenerateContentIdService.getNextId(
-                $scope.skill.getConceptCard().getRecordedVoiceovers(
-                ).getAllContentIds(),
-                COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION))
-          );
-          SkillUpdateService.addWorkedExample(
-            $scope.skill, newExample);
-          $scope.bindableFieldsDict.displayedWorkedExamples =
-            $scope.skill.getConceptCard().getWorkedExamples();
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$apply();
-        }, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
-
-      $scope.showSkillPreview = function() {
-        var skillDescription = (
-          SkillEditorStateService.getSkill().getDescription());
-        var skillExplanation = (
-          $scope.bindableFieldsDict.displayedConceptCardExplanation);
-        var skillWorkedExamples = (
-          $scope.bindableFieldsDict.displayedWorkedExamples);
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/skill-editor-page/editor-tab/' +
-            'skill-preview-modal.template.html'),
-          backdrop: true,
-          resolve: {
-            skillDescription: () => skillDescription,
-            skillExplanation: () => skillExplanation,
-            skillWorkedExamples: () => skillWorkedExamples
-          },
-          controller: 'SkillPreviewModalController'
-        }).result.then(() => {}, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
-
-      $scope.toggleWorkedExampleList = function() {
-        if (WindowDimensionsService.isWindowNarrow()) {
-          $scope.workedExamplesListIsShown = (
-            !$scope.workedExamplesListIsShown);
-        }
-      };
-
-      $scope.toggleSkillEditorCard = function() {
-        if (WindowDimensionsService.isWindowNarrow()) {
-          $scope.skillEditorCardIsShown = !$scope.skillEditorCardIsShown;
-        }
-      };
-
-      ctrl.$onInit = function() {
-        $scope.skill = SkillEditorStateService.getSkill();
-        initBindableFieldsDict();
-        $scope.skillEditorCardIsShown = true;
-        $scope.workedExamplesListIsShown = (
-          !WindowDimensionsService.isWindowNarrow());
-        ctrl.directiveSubscriptions.add(
-          SkillEditorStateService.onSkillChange.subscribe(
-            () => initBindableFieldsDict())
-        );
-
-        // When the page is scrolled so that the top of the page is above
-        // the browser viewport, there are some bugs in the positioning of
-        // the helper. This is a bug in jQueryUI that has not been fixed
-        // yet. For more details, see http://stackoverflow.com/q/5791886
-        $scope.WORKED_EXAMPLES_SORTABLE_OPTIONS = {
-          axis: 'y',
-          cursor: 'move',
-          handle: '.oppia-worked-example-sort-handle',
-          items: '.oppia-sortable-worked-example',
-          revert: 100,
-          tolerance: 'pointer',
-          start: function(e, ui) {
-            $scope.activeWorkedExampleIndex = null;
-            ui.placeholder.height(ui.item.height());
-          },
-          stop: function() {
-            var newWorkedExamples =
-              $scope.bindableFieldsDict.displayedWorkedExamples;
-            SkillUpdateService.updateWorkedExamples(
-              $scope.skill, newWorkedExamples);
-          }
-        };
-      };
-
-      $scope.$on('$destroy', function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      });
+  changeActiveWorkedExampleIndex(idx: number): void {
+    if (idx === this.activeWorkedExampleIndex) {
+      this.bindableFieldsDict.displayedWorkedExamples =
+        this.skill.getConceptCard().getWorkedExamples();
+      this.activeWorkedExampleIndex = null;
+    } else {
+      this.activeWorkedExampleIndex = idx;
     }
-  ]
-});
+  }
+
+  deleteWorkedExample(index: number, evt: string): void {
+    this.ngbModal.open(DeleteWorkedExampleComponent, {
+      backdrop: 'static'
+    }).result.then(() => {
+      this.skillUpdateService.deleteWorkedExample(this.skill, index);
+      this.bindableFieldsDict.displayedWorkedExamples =
+        this.skill.getConceptCard().getWorkedExamples();
+      this.activeWorkedExampleIndex = null;
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  getWorkedExampleSummary(workedExampleQuestion: string): string {
+    const summary = this.formatRtePreviewPipe.transform(
+      workedExampleQuestion);
+    return summary;
+  }
+
+  openAddWorkedExampleModal(): void {
+    this.ngbModal.open(AddWorkedExampleModalComponent, {
+      backdrop: 'static'
+    }).result.then((result) => {
+      let newExample = this.workedExampleObjectFactory.create(
+        SubtitledHtml.createDefault(
+          result.workedExampleQuestionHtml,
+          this.generateContentIdService.getNextId(
+            this.skill.getConceptCard().getRecordedVoiceovers(
+            ).getAllContentIds(),
+            this.COMPONENT_NAME_WORKED_EXAMPLE.QUESTION)),
+        SubtitledHtml.createDefault(
+          result.workedExampleExplanationHtml,
+          this.generateContentIdService.getNextId(
+            this.skill.getConceptCard().getRecordedVoiceovers(
+            ).getAllContentIds(),
+            this.COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION))
+      );
+      this.skillUpdateService.addWorkedExample(
+        this.skill, newExample);
+      this.bindableFieldsDict.displayedWorkedExamples =
+        this.skill.getConceptCard().getWorkedExamples();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  showSkillPreview(): void {
+    let skillDescription = (
+      this.skillEditorStateService.getSkill().getDescription());
+    let skillExplanation = (
+      this.bindableFieldsDict.displayedConceptCardExplanation);
+    let skillWorkedExamples = (
+      this.bindableFieldsDict.displayedWorkedExamples);
+    const modalInstance: NgbModalRef = this.ngbModal.open(
+      SkillPreviewModalComponent, {
+        backdrop: true,
+      });
+    modalInstance.componentInstance.skillDescription = skillDescription;
+    modalInstance.componentInstance.skillExplanation = skillExplanation;
+    modalInstance.componentInstance.skillWorkedExamples = skillWorkedExamples;
+    modalInstance.result.then(() => {}, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  toggleWorkedExampleList(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.workedExamplesListIsShown = (
+        !this.workedExamplesListIsShown);
+    }
+  }
+
+  toggleSkillEditorCard(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.skillEditorCardIsShown = !this.skillEditorCardIsShown;
+    }
+  }
+
+  ngOnInit(): void {
+    this.isEditable = true;
+    this.skill = this.skillEditorStateService.getSkill();
+    this.initBindableFieldsDict();
+    this.skillEditorCardIsShown = true;
+    this.workedExamplesListIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
+    this.directiveSubscriptions.add(
+      this.skillEditorStateService.onSkillChange.subscribe(
+        () => this.initBindableFieldsDict())
+    );
+
+    // When the page is scrolled so that the top of the page is above
+    // the browser viewport, there are some bugs in the positioning of
+    // the helper. This is a bug in jQueryUI that has not been fixed
+    // yet. For more details, see http://stackoverflow.com/q/5791886
+    this.WORKED_EXAMPLES_SORTABLE_OPTIONS = {
+      axis: 'y',
+      cursor: 'move',
+      handle: '.oppia-worked-example-sort-handle',
+      items: '.oppia-sortable-worked-example',
+      revert: 100,
+      tolerance: 'pointer',
+      start: (e, ui) => {
+        this.activeWorkedExampleIndex = null;
+        ui.placeholder.height(ui.item.height());
+      },
+      stop: () => {
+        let newWorkedExamples =
+          this.bindableFieldsDict.displayedWorkedExamples;
+        this.skillUpdateService.updateWorkedExamples(
+          this.skill, newWorkedExamples);
+      }
+    };
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaSkillConceptCardEditor',
+  downgradeComponent({component: SkillConceptCardEditorComponent}));
+

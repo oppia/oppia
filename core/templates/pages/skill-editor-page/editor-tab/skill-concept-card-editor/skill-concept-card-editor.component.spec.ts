@@ -14,42 +14,36 @@
 
 
 /**
- * @fileoverview Unit tests for the skill editor main tab Component.
+ * @fileoverview Unit tests for the skill editor main tab component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { EventEmitter } from '@angular/core';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { SkillConceptCardEditorComponent } from './skill-concept-card-editor.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-// ^^^ This block is to be removed.
 
 class MockNgbModalRef {
   componentInstance = {};
 }
 
-describe('Skill editor main tab Component', function() {
-  let $scope = null;
-  let ctrl = null;
-  let $rootScope = null;
-  let $q = null;
-  let $uibModal = null;
+describe('Skill Concept Card Editor Component', () => {
+  let component: SkillConceptCardEditorComponent;
+  let fixture: ComponentFixture<SkillConceptCardEditorComponent>;
   let ngbModal: NgbModal;
-  let skillEditorStateService: SkillEditorStateService = null;
-  let skillUpdateService: SkillUpdateService = null;
-  let windowDimensionsService: WindowDimensionsService = null;
+  let skillEditorStateService: SkillEditorStateService;
+  let skillUpdateService: SkillUpdateService;
   let urlInterpolationService: UrlInterpolationService;
+  let windowDimensionsService: WindowDimensionsService;
   let mockEventEmitter = new EventEmitter();
 
   let mockUi = {
@@ -65,37 +59,33 @@ describe('Skill editor main tab Component', function() {
     }
   };
 
-  let sampleSkill: Skill = null;
+  let sampleSkill: Skill;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        SkillConceptCardEditorComponent
+      ],
+      providers: [
+        SkillEditorStateService,
+        SkillUpdateService,
+        WindowDimensionsService,
+        UrlInterpolationService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  importAllAngularServices();
-
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
-
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $uibModal = $injector.get('$uibModal');
+    fixture = TestBed.createComponent(SkillConceptCardEditorComponent);
+    component = fixture.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
-    $q = $injector.get('$q');
-    skillEditorStateService = $injector.get('SkillEditorStateService');
-    skillUpdateService = $injector.get('SkillUpdateService');
-    windowDimensionsService = $injector.get('WindowDimensionsService');
-    urlInterpolationService = $injector.get('UrlInterpolationService');
+    skillEditorStateService = TestBed.inject(SkillEditorStateService);
+    skillUpdateService = TestBed.inject(SkillUpdateService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+
     const conceptCard = new ConceptCard(
       SubtitledHtml.createDefault(
         'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
@@ -112,43 +102,37 @@ describe('Skill editor main tab Component', function() {
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOnProperty(skillEditorStateService, 'onSkillChange')
       .and.returnValue(mockEventEmitter);
+  });
 
-    ctrl = $componentController('skillConceptCardEditor', {
-      $rootScope: $scope,
-      $scope: $scope,
-      NgbModal: ngbModal,
-    });
-  }));
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
 
-  it('should set properties when initialized', function() {
-    expect($scope.WORKED_EXAMPLES_SORTABLE_OPTIONS).toBe(undefined);
+  it('should set properties when initialized', () => {
+    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS).toBe(undefined);
 
-    ctrl.$onInit();
+    component.ngOnInit();
     mockEventEmitter.emit();
-    $scope.WORKED_EXAMPLES_SORTABLE_OPTIONS.start(null, mockUi);
-    $scope.WORKED_EXAMPLES_SORTABLE_OPTIONS.stop();
+    component.WORKED_EXAMPLES_SORTABLE_OPTIONS.start(null, mockUi);
+    component.WORKED_EXAMPLES_SORTABLE_OPTIONS.stop();
 
-    expect($scope.WORKED_EXAMPLES_SORTABLE_OPTIONS.axis).toBe('y');
-    expect($scope.WORKED_EXAMPLES_SORTABLE_OPTIONS.cursor).toBe('move');
-    expect($scope.WORKED_EXAMPLES_SORTABLE_OPTIONS.handle).toBe(
+    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS.axis).toBe('y');
+    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS.cursor).toBe('move');
+    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS.handle).toBe(
       '.oppia-worked-example-sort-handle');
-    expect($scope.WORKED_EXAMPLES_SORTABLE_OPTIONS.items).toBe(
+    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS.items).toBe(
       '.oppia-sortable-worked-example');
-    expect($scope.WORKED_EXAMPLES_SORTABLE_OPTIONS.revert).toBe(100);
-    expect($scope.WORKED_EXAMPLES_SORTABLE_OPTIONS.tolerance).toBe('pointer');
+    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS.revert).toBe(100);
+    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS.tolerance).toBe(
+      'pointer');
   });
 
   it('should get static image url when calling ' +
-    '\getStaticImageUrl\'', function() {
+    '\getStaticImageUrl\'', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('imagePath');
-    let result = $scope.getStaticImageUrl('/imagePath');
 
-    expect(result).toBe('imagePath');
-  });
-
-  it('should always return true when calling \'isEditable\'', () => {
-    expect($scope.isEditable()).toBe(true);
+    expect(component.getStaticImageUrl('/imagePath')).toBe('imagePath');
   });
 
   it('should update skill on saving explanation ' +
@@ -156,27 +140,27 @@ describe('Skill editor main tab Component', function() {
     let updateSpy = spyOn(skillUpdateService, 'setConceptCardExplanation')
       .and.returnValue(null);
 
-    ctrl.$onInit();
-    $scope.onSaveExplanation({});
+    component.ngOnInit();
+    component.onSaveExplanation({});
 
     expect(updateSpy).toHaveBeenCalled();
   });
 
   it('should change current index when calling ' +
-    '\changeActiveWorkedExampleIndex\'', function() {
-    ctrl.$onInit();
+    '\changeActiveWorkedExampleIndex\'', () => {
+    component.ngOnInit();
 
     // Case: 1
     // If we try to update new index same as old index
     // it should set index value to null.
-    $scope.activeWorkedExampleIndex = 2;
-    $scope.changeActiveWorkedExampleIndex(2);
-    expect($scope.activeWorkedExampleIndex).toBe(null);
+    component.activeWorkedExampleIndex = 2;
+    component.changeActiveWorkedExampleIndex(2);
+    expect(component.activeWorkedExampleIndex).toBe(null);
 
     // Case: 2
     // It should set new index as current index.
-    $scope.changeActiveWorkedExampleIndex(3);
-    expect($scope.activeWorkedExampleIndex).toBe(3);
+    component.changeActiveWorkedExampleIndex(3);
+    expect(component.activeWorkedExampleIndex).toBe(3);
   });
 
   it('should open delete worked example modal when ' +
@@ -188,10 +172,9 @@ describe('Skill editor main tab Component', function() {
     let deleteWorkedExampleSpy = spyOn(
       skillUpdateService, 'deleteWorkedExample').and.returnValue(null);
 
-    ctrl.$onInit();
-    $scope.deleteWorkedExample();
+    component.ngOnInit();
+    component.deleteWorkedExample();
     tick();
-    $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
     expect(deleteWorkedExampleSpy).toHaveBeenCalled();
@@ -206,10 +189,9 @@ describe('Skill editor main tab Component', function() {
     let deleteWorkedExampleSpy = spyOn(
       skillUpdateService, 'deleteWorkedExample').and.returnValue(null);
 
-    ctrl.$onInit();
-    $scope.deleteWorkedExample();
+    component.ngOnInit();
+    component.deleteWorkedExample();
     tick();
-    $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
     expect(deleteWorkedExampleSpy).not.toHaveBeenCalled();
@@ -227,10 +209,10 @@ describe('Skill editor main tab Component', function() {
     let addWorkedExampleSpy = spyOn(
       skillUpdateService, 'addWorkedExample').and.returnValue(null);
 
-    ctrl.$onInit();
-    $scope.openAddWorkedExampleModal();
+    component.ngOnInit();
+    component.openAddWorkedExampleModal();
     tick();
-    $rootScope.$apply();
+    tick();
 
     expect(modalSpy).toHaveBeenCalled();
     expect(addWorkedExampleSpy).toHaveBeenCalled();
@@ -245,54 +227,54 @@ describe('Skill editor main tab Component', function() {
     let addWorkedExampleSpy = spyOn(
       skillUpdateService, 'addWorkedExample').and.returnValue(null);
 
-    ctrl.$onInit();
-    $scope.openAddWorkedExampleModal();
-    $rootScope.$apply();
+    component.ngOnInit();
+    component.openAddWorkedExampleModal();
+    tick();
 
     expect(modalSpy).toHaveBeenCalled();
     expect(addWorkedExampleSpy).not.toHaveBeenCalled();
   }));
 
   it('should open show skill preview modal when ' +
-    'clicking on preview button', function() {
-    let modalSpy = spyOn($uibModal, 'open').and.callThrough();
+    'clicking on preview button', fakeAsync(() => {
+    let modalSpy = spyOn(ngbModal, 'open').and.callThrough();
 
-    ctrl.$onInit();
-    $scope.showSkillPreview();
-    $rootScope.$apply();
+    component.ngOnInit();
+    component.showSkillPreview();
+    tick();
 
     expect(modalSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should toggle worked example list when calling ' +
-    '\toggleWorkedExampleList\'', function() {
-    $scope.workedExamplesListIsShown = true;
+    '\toggleWorkedExampleList\'', () => {
+    component.workedExamplesListIsShown = true;
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);
 
-    $scope.toggleWorkedExampleList();
-    expect($scope.workedExamplesListIsShown).toBe(false);
+    component.toggleWorkedExampleList();
+    expect(component.workedExamplesListIsShown).toBe(false);
 
-    $scope.toggleWorkedExampleList();
-    expect($scope.workedExamplesListIsShown).toBe(true);
+    component.toggleWorkedExampleList();
+    expect(component.workedExamplesListIsShown).toBe(true);
   });
 
   it('should toggle skill editor card when calling ' +
-    '\toggleSkillEditorCard\'', function() {
-    $scope.skillEditorCardIsShown = true;
+    '\toggleSkillEditorCard\'', () => {
+    component.skillEditorCardIsShown = true;
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);
 
-    $scope.toggleSkillEditorCard();
-    expect($scope.skillEditorCardIsShown).toBe(false);
+    component.toggleSkillEditorCard();
+    expect(component.skillEditorCardIsShown).toBe(false);
 
-    $scope.toggleSkillEditorCard();
-    expect($scope.skillEditorCardIsShown).toBe(true);
+    component.toggleSkillEditorCard();
+    expect(component.skillEditorCardIsShown).toBe(true);
   });
 
   it('should format given worked example summary html content' +
     'when calling \'getWorkedExampleSummary\'', () => {
-    let result = $scope.getWorkedExampleSummary('<p>Worked Example</p>');
+    let result = component.getWorkedExampleSummary('<p>Worked Example</p>');
 
     expect(result).toBe('Worked Example');
   });

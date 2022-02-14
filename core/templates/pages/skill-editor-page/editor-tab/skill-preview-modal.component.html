@@ -1,13 +1,13 @@
 <div class="skill-preview-modal">
-  <h3 class="skill-preview-modal-title"><[skillDescription]></h3>
+  <h3 class="skill-preview-modal-title">{{ skillDescription }}</h3>
   <div class="skill-preview-modal-content">
-    <angular-html-bind html-data="skillExplanation"></angular-html-bind>
+    <angular-html-bind-wrapper [htmlData]="skillExplanation"></angular-html-bind-wrapper>
   </div>
-  <div ng-if="skillWorkedExamples.length">
+  <div *ngIf="skillWorkedExamples.length">
     <h3>Worked Examples: </h3>
-    <div ng-repeat="example in skillWorkedExamples" class="skill-preview-examples">
-      <angular-html-bind class="worked-example-question" html-data="example.getQuestion().html"></angular-html-bind>
-      <angular-html-bind html-data="example.getExplanation().html"></angular-html-bind>
+    <div *ngFor="let example of skillWorkedExamples" class="skill-preview-examples">
+      <angular-html-bind-wrapper class="worked-example-question" [htmlData]="example.getQuestion().html"></angular-html-bind-wrapper>
+      <angular-html-bind-wrapper [htmlData]="example.getExplanation().html"></angular-html-bind-wrapper>
     </div>
   </div>
 </div>

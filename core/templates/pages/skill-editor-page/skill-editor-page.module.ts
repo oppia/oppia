@@ -41,6 +41,8 @@ import { SkillRubricsEditorComponent } from './editor-tab/skill-rubrics-editor/s
 import { AddMisconceptionModalComponent } from './modal-templates/add-misconception-modal.component';
 import { SkillEditorSaveModalComponent } from './modal-templates/skill-editor-save-modal.component';
 import { SkillMisconceptionsEditorComponent } from './editor-tab/skill-misconceptions-editor/skill-misconceptions-editor.component';
+import { SkillPreviewModalComponent } from './editor-tab/skill-preview-modal.component';
+import { SkillConceptCardEditorComponent } from './editor-tab/skill-concept-card-editor/skill-concept-card-editor.component';
 
 @NgModule({
   imports: [
@@ -53,9 +55,11 @@ import { SkillMisconceptionsEditorComponent } from './editor-tab/skill-misconcep
   ],
   declarations: [
     DeleteMisconceptionModalComponent,
+    SkillConceptCardEditorComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
     SkillPrerequisiteSkillsEditorComponent,
+    SkillPreviewModalComponent,
     SkillEditorSaveModalComponent,
     WorkedExampleEditorComponent,
     MisconceptionEditorComponent,
@@ -67,9 +71,11 @@ import { SkillMisconceptionsEditorComponent } from './editor-tab/skill-misconcep
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
+    SkillConceptCardEditorComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
     SkillPrerequisiteSkillsEditorComponent,
+    SkillPreviewModalComponent,
     SkillEditorSaveModalComponent,
     WorkedExampleEditorComponent,
     MisconceptionEditorComponent,
