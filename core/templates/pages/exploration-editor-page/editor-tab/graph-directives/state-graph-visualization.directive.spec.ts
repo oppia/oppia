@@ -63,7 +63,7 @@ require(
   'state-graph-visualization.directive.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 
-describe('State Graph Visualization directive', function() {
+fdescribe('State Graph Visualization directive', function() {
   var ctrl = null;
   var $element = null;
   var $flushPendingTasks = null;
@@ -234,7 +234,7 @@ describe('State Graph Visualization directive', function() {
     ctrl.$onDestroy();
   });
 
-  describe('when graph is redrawn',
+  fdescribe('when graph is redrawn',
     function() {
       beforeEach(function() {
         angular.element(window).triggerHandler('resize');
@@ -320,13 +320,14 @@ describe('State Graph Visualization directive', function() {
         expect($scope.getNodeErrorMessage('This is a label for node 1')).toBe(
           nodeErrorMessage);
       });
-    });
 
-  it('should throw error when nodeId is undefined', function() {
-    $scope.currentStateId = () => undefined;
-    $scope.centerAtCurrentState = false;
-    expect(() => ctrl.$onInit()).toThrowError(TypeError);
-  });
+      it('should throw error when nodeId is undefined', () => {
+        $scope.currentStateId = () => undefined;
+        $scope.centerAtCurrentState = true;
+        $scope.allowPanning = false;
+        expect(() => $scope.drawGraph()).toThrowError(TypeError);
+      });
+    });
 
   it('should redraw graph when resizing page', function() {
     expect($scope.graphLoaded).toBe(false);
