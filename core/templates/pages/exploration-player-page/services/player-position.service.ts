@@ -39,6 +39,7 @@ export class PlayerPositionService {
   private _newCardAvailableEventEmitter = new EventEmitter<void>();
   private _helpCardAvailableEventEmitter =
     new EventEmitter<HelpCardEventResponse>();
+
   private _newCardOpenedEventEmitter = new EventEmitter<StateCard>();
 
   // The following property is initialized using the class methods.
