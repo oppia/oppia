@@ -139,6 +139,7 @@ export class ExplorationDraft {
     this.draftChanges = draftChanges;
     this.draftChangeListId = draftChangeListId;
   }
+
   /**
    * Checks whether the draft object has been overwritten by another
    * draft which has been committed to the back-end. If the supplied draft id

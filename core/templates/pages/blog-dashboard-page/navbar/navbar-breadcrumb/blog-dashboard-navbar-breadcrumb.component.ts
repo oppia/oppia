@@ -33,6 +33,7 @@ implements OnInit, OnDestroy {
   constructor(
     private blogDashboardPageService: BlogDashboardPageService,
   ) {}
+
   ngOnInit(): void {
     this.activeTab = this.blogDashboardPageService.activeTab;
     this.directiveSubscriptions.add(

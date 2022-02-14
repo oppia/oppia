@@ -122,7 +122,9 @@ import { TagMisconceptionModalComponent } from './question-directives/question-m
 import { QuestionMisconceptionEditorComponent } from './question-directives/question-misconception-editor/question-misconception-editor.component';
 import { SolutionExplanationEditor } from './state-directives/solution-editor/solution-explanation-editor.component';
 import { SolutionEditor } from './state-directives/solution-editor/solution-editor.component';
+import { OutcomeDestinationEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
 import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
+import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -212,6 +214,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
+    OutcomeDestinationEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
@@ -266,7 +269,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
-    StateSolutionEditorComponent
+    StateSolutionEditorComponent,
+    StateInteractionEditorComponent
   ],
 
   entryComponents: [
@@ -314,6 +318,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
     LearnerAnswerInfoCard,
+    OutcomeDestinationEditorComponent,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
@@ -359,7 +364,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
-    StateSolutionEditorComponent
+    StateSolutionEditorComponent,
+    StateInteractionEditorComponent
   ],
 
   exports: [
@@ -422,6 +428,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
+    OutcomeDestinationEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
     SearchBarComponent,
@@ -466,7 +473,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
-    StateSolutionEditorComponent
+    StateSolutionEditorComponent,
+    StateInteractionEditorComponent,
   ],
 })
 

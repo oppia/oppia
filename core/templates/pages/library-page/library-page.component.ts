@@ -47,6 +47,7 @@ interface mobileLibraryGroupProperties {
 export class LibraryPageComponent {
   possibleBannerFilenames = [
     'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
+
   // If the value below is changed, the following CSS values in
   // oppia.css must be changed:
   // - .oppia-exp-summary-tiles-container: max-width
@@ -71,6 +72,7 @@ export class LibraryPageComponent {
     explorations: {},
     collections: {}
   };
+
   libraryWindowIsNarrow: boolean;
   resizeSubscription: Subscription;
 
@@ -117,7 +119,8 @@ export class LibraryPageComponent {
       this.MAX_NUM_TILES_PER_ROW);
 
     $('.oppia-library-carousel').css({
-      width: (this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX) + 'px'
+      'max-width': (
+        this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX) + 'px'
     });
 
     // The following determines whether to enable left scroll after
@@ -235,6 +238,10 @@ export class LibraryPageComponent {
     this.mobileLibraryGroupsProperties[idx].inCollapsedState =
       !this.mobileLibraryGroupsProperties[idx].inCollapsedState;
     this.toggleButtonText(idx);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnInit(): void {
