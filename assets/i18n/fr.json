@@ -455,7 +455,7 @@
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY": "Veuillez saisir une devise monétaire valide (par exemple, « $5 » ou « Rs 5 »)",
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY_FORMAT": "Veuillez écrire les unités de devises monétaire au début",
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_UNIT_CHARS": "Veuillez vous assurer que l’unité ne contient que des chiffres, des lettres ou des symboles parmi « ( ) * ^ / - »",
-	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_VALUE": "Veuillez vous assurer que la valeur est soit une fraction, soit un nombre simple",
+	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_VALUE": "Veuillez vous assurer que la valeur est soit une fraction, soit un nombre simple.",
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "Formats possibles des unités",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1": "La réponse devrait être supérieure ou égale à zéro et ne doit pas contenir plus de 15 chiffres (de 0 à 9) ou symboles ( . ).",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2": "La réponse ne doit pas contenir plus de 15 chiffres (de 0 à 9) ou symboles ( . ou - ).",
