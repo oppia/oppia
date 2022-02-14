@@ -73,7 +73,8 @@ css_files_list = [
     'core/templates/pages/exploration-player-page/learner-experience/supplemental-card.component.css',
     'core/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.css',
     'core/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.css',
-    'core/templates/pages/exploration-player-page/layout-directives/progress-nav.component.css'
+    'core/templates/pages/exploration-player-page/layout-directives/progress-nav.component.css',
+    'core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.css'
 ]
 
 
