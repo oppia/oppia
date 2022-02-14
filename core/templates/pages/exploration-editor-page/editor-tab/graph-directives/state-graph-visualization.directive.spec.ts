@@ -63,7 +63,7 @@ require(
   'state-graph-visualization.directive.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 
-fdescribe('State Graph Visualization directive', function() {
+describe('State Graph Visualization directive', function() {
   var ctrl = null;
   var $element = null;
   var $flushPendingTasks = null;
@@ -234,7 +234,7 @@ fdescribe('State Graph Visualization directive', function() {
     ctrl.$onDestroy();
   });
 
-  fdescribe('when graph is redrawn',
+  describe('when graph is redrawn',
     function() {
       beforeEach(function() {
         angular.element(window).triggerHandler('resize');
