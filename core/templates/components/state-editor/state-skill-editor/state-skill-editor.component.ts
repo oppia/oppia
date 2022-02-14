@@ -39,8 +39,10 @@ import { downgradeComponent } from '@angular/upgrade/static';
 export class StateSkillEditorComponent implements OnInit {
   @Output() onSaveLinkedSkillId: EventEmitter<string> = (
     new EventEmitter<string>());
+
   @Output() onSaveStateContent: EventEmitter<string> = (
     new EventEmitter<string>());
+
   categorizedSkills: SkillsCategorizedByTopics = null;
   untriagedSkillSummaries: SkillSummary[] = null;
   skillEditorIsShown: boolean = true;

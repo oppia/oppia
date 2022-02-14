@@ -91,6 +91,7 @@ describe('Exploration data service', function() {
         }
       });
     }
+
     async updateExplorationAsync() {
       return new Promise((resolve, reject) => {
         if (this.resolve) {

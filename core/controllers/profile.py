@@ -472,6 +472,11 @@ class ExportAccountHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
@@ -543,8 +548,12 @@ class SiteLanguageHandler(base.BaseHandler):
 
 class UserInfoHandler(base.BaseHandler):
     """Provides info about user. If user is not logged in,
-    return dict containing false as logged in status.
-    """
+    return dict containing false as logged in status."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
