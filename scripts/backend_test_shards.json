@@ -125,7 +125,8 @@
         "core.platform.app_identity.gae_app_identity_services_test",
         "core.storage.topic.gae_models_test",
         "scripts.release_scripts.cut_release_or_hotfix_branch_test",
-        "scripts.linters.css_linter_test"
+        "scripts.linters.css_linter_test",
+        "scripts.rtl_css_test"
     ],
     "3": [
         "core.controllers.incoming_app_feedback_report_test",
