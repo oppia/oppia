@@ -140,7 +140,11 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         change_list = self.normalized_payload.get('change_list')
 
         collection_services.update_collection(
-            self.user_id, collection_id, change_list, commit_message)
+            self.user_id,
+            collection_id,
+            [change.to_dict() for change in change_list],
+            commit_message
+        )
 
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
