@@ -43,12 +43,12 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'status': u'open',
             'state_name': u'a_state_name',
             'summary': 'test summary',
-            'original_author_username': self.VIEWER_USERNAME,
+            'original_author_id': self.viewer_id,
             'message_count': 1,
             'subject': u'a subject',
             'last_updated_msecs': utils.get_time_in_millisecs(fake_date),
             'last_nonempty_message_text': 'last message',
-            'last_nonempty_message_author': self.VIEWER_USERNAME,
+            'last_nonempty_message_author_id': self.viewer_id,
         }
         observed_thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
@@ -105,7 +105,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         expected_message_dict: feedback_domain.FeedbackMessageDict = {
-            'author_username': self.OWNER_USERNAME,
+            'author_id': self.owner_id,
             'created_on_msecs': utils.get_time_in_millisecs(fake_date),
             'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
             'entity_id': self.EXP_ID,
