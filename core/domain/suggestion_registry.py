@@ -425,13 +425,9 @@ class SuggestionEditStateContent(BaseSuggestion):
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         old_content = (
             exploration.states[self.change.state_name].content.to_dict())
-        new_value = change.new_value
-
+        
         change.old_value = old_content
-        change.new_value = {
-            "content_id": change.old_value['content_id'],
-            "html": new_value
-        }
+        change.new_value['content_id'] = old_content['content_id']
 
         return [change]
 
