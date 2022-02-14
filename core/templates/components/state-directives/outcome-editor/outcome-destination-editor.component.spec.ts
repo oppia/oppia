@@ -103,7 +103,11 @@ describe('Outcome Destination Editor', () => {
     expect(component.canAddPrerequisiteSkill).toBeFalse();
     expect(component.canEditRefresherExplorationId).toBeNull();
     expect(component.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s-]+$/);
+<<<<<<< HEAD
     expect(component.destChoices).toEqual([{
+=======
+    expect(component.destinationChoices).toEqual([{
+>>>>>>> upstream/develop
       id: null,
       text: '(try again)'
     }, {
@@ -221,7 +225,11 @@ describe('Outcome Destination Editor', () => {
     component.ngOnInit();
     tick(10);
 
+<<<<<<< HEAD
     expect(component.destChoices).toEqual([{
+=======
+    expect(component.destinationChoices).toEqual([{
+>>>>>>> upstream/develop
       id: null,
       text: '(try again)'
     }, {
@@ -241,7 +249,11 @@ describe('Outcome Destination Editor', () => {
     onStateNamesChangedEmitter.emit();
     tick(10);
 
+<<<<<<< HEAD
     expect(component.destChoices).toEqual([{
+=======
+    expect(component.destinationChoices).toEqual([{
+>>>>>>> upstream/develop
       id: null,
       text: '(try again)'
     }, {

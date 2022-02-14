@@ -28,7 +28,11 @@ import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
+<<<<<<< HEAD
 interface DestChoices {
+=======
+interface DestinationChoice {
+>>>>>>> upstream/develop
   id: string;
   text: string;
 }
@@ -40,25 +44,44 @@ interface DestChoices {
 export class OutcomeDestinationEditorComponent implements OnInit {
   @Input() outcome: Outcome;
   @Input() outcomeHasFeedback: boolean;
+<<<<<<< HEAD
   @Output() addState:
   EventEmitter<string> = new EventEmitter<string>();
   @Output() getChanges:
   EventEmitter<void> = new EventEmitter();
+=======
+  @Output() addState: EventEmitter<string> = new EventEmitter<string>();
+  @Output() getChanges: EventEmitter<void> = new EventEmitter();
+>>>>>>> upstream/develop
   directiveSubscriptions: Subscription = new Subscription();
   canAddPrerequisiteSkill: boolean;
   canEditRefresherExplorationId: boolean;
   explorationAndSkillIdPattern: RegExp;
   newStateNamePattern: RegExp;
+<<<<<<< HEAD
   destChoices: DestChoices[];
+=======
+  destinationChoices: DestinationChoice[];
+>>>>>>> upstream/develop
   maxLen: number;
   outcomeNewStateName: string;
   currentStateName: string = null;
   ENABLE_PREREQUISITE_SKILLS: boolean = (
     AppConstants.ENABLE_PREREQUISITE_SKILLS);
+<<<<<<< HEAD
   EXPLORATION_AND_SKILL_ID_PATTERN: RegExp = (
     AppConstants.EXPLORATION_AND_SKILL_ID_PATTERN);
   MAX_STATE_NAME_LENGTH: number = (
     AppConstants.MAX_STATE_NAME_LENGTH);
+=======
+
+  EXPLORATION_AND_SKILL_ID_PATTERN: RegExp = (
+    AppConstants.EXPLORATION_AND_SKILL_ID_PATTERN);
+
+  MAX_STATE_NAME_LENGTH: number = (
+    AppConstants.MAX_STATE_NAME_LENGTH);
+
+>>>>>>> upstream/develop
   PLACEHOLDER_OUTCOME_DEST: string = (
     AppConstants.PLACEHOLDER_OUTCOME_DEST);
 
@@ -100,7 +123,11 @@ export class OutcomeDestinationEditorComponent implements OnInit {
       // This is a list of objects, each with an ID and name. These
       // represent all states, as well as an option to create a
       // new state.
+<<<<<<< HEAD
       this.destChoices = [{
+=======
+      this.destinationChoices = [{
+>>>>>>> upstream/develop
         id: (questionModeEnabled ? null : this.currentStateName),
         text: '(try again)'
       }];
@@ -153,7 +180,11 @@ export class OutcomeDestinationEditorComponent implements OnInit {
 
       for (let i = 0; i < stateNames.length; i++) {
         if (stateNames[i] !== this.currentStateName) {
+<<<<<<< HEAD
           this.destChoices.push({
+=======
+          this.destinationChoices.push({
+>>>>>>> upstream/develop
             id: stateNames[i],
             text: stateNames[i]
           });
@@ -161,7 +192,11 @@ export class OutcomeDestinationEditorComponent implements OnInit {
       }
 
       if (!questionModeEnabled) {
+<<<<<<< HEAD
         this.destChoices.push({
+=======
+        this.destinationChoices.push({
+>>>>>>> upstream/develop
           id: this.PLACEHOLDER_OUTCOME_DEST,
           text: 'A New Card Called...'
         });
@@ -209,7 +244,11 @@ export class OutcomeDestinationEditorComponent implements OnInit {
     this.explorationAndSkillIdPattern = (
       this.EXPLORATION_AND_SKILL_ID_PATTERN);
     this.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
+<<<<<<< HEAD
     this.destChoices = [];
+=======
+    this.destinationChoices = [];
+>>>>>>> upstream/develop
   }
 
   ngOnDestroy(): void {

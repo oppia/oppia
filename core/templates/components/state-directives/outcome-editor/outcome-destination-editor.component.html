@@ -8,7 +8,11 @@
       <select class="form-control oppia-form-control"
               [(ngModel)]="outcome.dest"
               (ngModelChange)="onDestSelectorChange()">
+<<<<<<< HEAD
         <option *ngFor="let choice of destChoices" [value]="choice.id">{{ choice.text }}</option>
+=======
+        <option *ngFor="let choice of destinationChoices" [value]="choice.id">{{ choice.text }}</option>
+>>>>>>> upstream/develop
       </select>
     </span>
   </div>
