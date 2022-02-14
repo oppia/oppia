@@ -71,7 +71,8 @@ css_files_list = [
     'extensions/interactions/GraphInput/directives/graph-input-interaction.component.css',
     'core/templates/pages/exploration-player-page/learner-experience/tutor-card.component.css',
     'core/templates/pages/exploration-player-page/learner-experience/supplemental-card.component.css',
-    'core/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.css'
+    'core/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.css',
+    'core/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.css'
 ]
 
 
