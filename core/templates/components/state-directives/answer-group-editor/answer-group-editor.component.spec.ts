@@ -408,13 +408,23 @@ describe('AnswerGroupEditorComponent', () => {
     StateInteractionIdService.savedMemento = 'InvalidInteraction';
     ctrl.rules = [];
     ctrl.rules.push(
-      new Rule('dummyRule', {
+      new Rule('dummyRule1', {
         x: {
           contentId: null,
           normalizedStrSet: []
         }
       }, {
-        x: 'dummyInputType'
+        x: 'dummyInputType1'
+      })
+    );
+    ctrl.rules.push(
+      new Rule('dummyRule2', {
+        x: {
+          contentId: null,
+          normalizedStrSet: []
+        }
+      }, {
+        x: 'dummyInputType2'
       })
     );
     var rulesString = '';
