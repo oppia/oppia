@@ -600,8 +600,7 @@ def inplace_replace_file(
             replacements that should be made. When None no check is done.
 
     Raises:
-        ValueError. The number of replacements that should be made exceeds
-            the total number.
+        ValueError. Wrong number of replacements.
         Exception. The content failed to get replaced.
     """
     backup_filename = '%s.bak' % filename

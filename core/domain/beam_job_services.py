@@ -78,7 +78,7 @@ def cancel_beam_job(job_id: str) -> beam_job_domain.BeamJobRun:
         BeamJobRun. Metadata about the updated run's execution.
 
     Raises:
-        ValueError. Job ID does not exist.
+        ValueError. Job does not exist.
     """
     beam_job_run_model = (
         beam_job_models.BeamJobRunModel.get(job_id, strict=False))

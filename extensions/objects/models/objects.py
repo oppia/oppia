@@ -1619,7 +1619,7 @@ class JsonEncodedInString(BaseObject):
             which we want to load from json.
 
         Raises:
-            Exception. Given strings are not of type str.
+            Exception. Given arg is not of type str.
         """
         if not isinstance(raw, str):
             raise Exception('Expected string received %s of type %s' % (

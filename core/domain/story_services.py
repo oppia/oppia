@@ -550,7 +550,7 @@ def update_story(
     Raises:
         ValueError. Expected a commit message but received None.
         ValidationError. Exploration is already linked to a different story.
-        ValidationError. Story url Fragment is not unique across the site.
+        ValidationError. Story url fragment is not unique across the site.
     """
     if not commit_message:
         raise ValueError('Expected a commit message but received none.')

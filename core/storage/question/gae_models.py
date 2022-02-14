@@ -442,7 +442,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             it links to.
 
         Raises:
-            Exception. The number of ids of skills exceeds 20.
+            Exception. The number of skill IDs exceeds 20.
         """
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             raise Exception('Please keep the number of skill IDs below 20.')
@@ -586,7 +586,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             it links to.
 
         Raises:
-            Exception. The number of ids of skills exceeds 20.
+            Exception. The number of skill IDs exceeds 20.
         """
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             raise Exception('Please keep the number of skill IDs below 20.')

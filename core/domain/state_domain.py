@@ -167,9 +167,9 @@ class AnswerGroup:
             list(str). The list of all html content strings in the interaction.
 
         Raises:
-            Exception. If the Rule spec has invalid format.
-            Exception. If the Rule spec has no valid input variable
-                with html in it.
+            Exception. The Rule spec has an invalid format.
+            Exception. The Rule spec has no valid input variable
+                with HTML in it.
         """
         html_list = []
 
@@ -432,7 +432,7 @@ class Solution:
             dict. The converted Solution dict.
 
         Raises:
-            Exception. If the Solution dict has invalid answer type.
+            Exception. The Solution dict has an invalid answer type.
         """
         if interaction_id is None:
             return solution_dict
@@ -2185,9 +2185,9 @@ class RuleSpec:
             dict. The converted Rule Spec dict.
 
         Raises:
-            Exception. If the Rule spec has invalid format.
-            Exception. If the Rule spec has no valid input variable
-                with html in it.
+            Exception. The Rule spec has an invalid format.
+            Exception. The Rule spec has no valid input variable
+                with HTML in it.
         """
         # TODO(#9413): Find a way to include a reference to the interaction
         # type in the Draft change lists.

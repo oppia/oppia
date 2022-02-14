@@ -282,7 +282,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             feconf.DEFAULT_SUGGESTION_QUERY_LIMIT suggestions.
 
         Raises:
-            Exception. The field to be queried is not supported.
+            Exception. The field cannot be queried.
         """
         query = cls.query()
         for (field, value) in query_fields_and_values:

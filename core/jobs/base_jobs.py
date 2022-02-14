@@ -106,7 +106,7 @@ class JobMetaclass(type):
         Raises:
             TypeError. The given name is already in use.
             TypeError. The given name must end with "Job".
-            TypeError. The given name must inherit from JobBase.
+            TypeError. The class with the given name must inherit from JobBase.
         """
         if name in cls._JOB_REGISTRY:
             collision = cls._JOB_REGISTRY[name]

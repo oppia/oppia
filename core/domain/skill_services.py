@@ -448,7 +448,7 @@ def replace_skill_id_in_all_topics(user_id, old_skill_id, new_skill_id):
         new_skill_id: str. The new skill id.
 
     Raises:
-        Exception. The new skill ID already present.
+        Exception. The new skill already present.
     """
     all_topics = topic_fetchers.get_all_topics()
     for topic in all_topics:
@@ -636,7 +636,7 @@ def apply_change_list(skill_id, change_list, committer_id):
         Skill. The resulting skill domain object.
 
     Raises:
-        Exception. If the user does not have enough rights to edit the
+        Exception. The user does not have enough rights to edit the
             skill description.
         Exception. Invalid change dict.
     """
