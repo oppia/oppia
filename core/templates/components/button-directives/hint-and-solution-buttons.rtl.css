@@ -106,42 +106,42 @@
 }
 
 @media screen and (max-width: 768px) {
-.hint-box-add-ons .close {
-  bottom: 10px;
-  font-size: 22px;
-  left: -5px;
-  margin: 0 10px;
-  position: fixed;
-}
+  .hint-box-add-ons .close {
+    bottom: 10px;
+    font-size: 22px;
+    left: -5px;
+    margin: 0 10px;
+    position: fixed;
+  }
 
-.hint-box-add-ons {
-  left: -58px;
-}
+  .hint-box-add-ons {
+    left: -58px;
+  }
 
-.hint-box-add-ons::before {
-  margin-left: -142px;
-}
+  .hint-box-add-ons::before {
+    margin-left: -142px;
+  }
 
-.hint-box-add-ons::after {
-  margin-left: -140px;
-}
+  .hint-box-add-ons::after {
+    margin-left: -140px;
+  }
 
-.hint-box {
-  font-size: 14px;
-  text-align: right;
-  width: 325px;
-}
+  .hint-box {
+    font-size: 14px;
+    text-align: right;
+    width: 325px;
+  }
 
-.hint-container {
-  position: absolute;
-  left: 0;
-}
+  .hint-container {
+    position: absolute;
+    left: 0;
+  }
 
-.oppia-hint-and-solution-buttons ul {
-  bottom: -17px;
-  padding: 0 10px;
-  position: fixed;
-}
+  .oppia-hint-and-solution-buttons ul {
+    bottom: -17px;
+    padding: 0 10px;
+    position: fixed;
+  }
 }
 
 .oppia-hint-and-solution-buttons ul {

@@ -78,19 +78,16 @@
   background-color: #eee;
   color: #888;
 }
+
 .oppia-exploration-footer .author-profile-text {
   cursor: default;
   font-size: 13px;
   line-height: 1.5;
   margin: 12px 0 17px 0;
-  padding-right: 6px;
-  text-align: left;
+  padding-left: 6px;
+  text-align: right;
   text-overflow: clip;
   white-space: nowrap;
-}
-
-.oppia-exploration-footer .author-profile-text {
-  text-align: right;
 }
 
 .oppia-exploration-footer .author-profile-text.not-hovered {

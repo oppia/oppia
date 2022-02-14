@@ -66,15 +66,24 @@ css_files_list = [
     'topic-viewer-stories-list.component.css',
     'core/templates/pages/library-page/search-bar/search-bar.component.css',
     'core/templates/components/button-directives/hint-and-solution-buttons.css',
-    'core/templates/components/common-layout-directives/common-elements/attribution-guide.component.css',
-    'core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css',
-    'extensions/interactions/GraphInput/directives/graph-input-interaction.component.css',
-    'core/templates/pages/exploration-player-page/learner-experience/tutor-card.component.css',
-    'core/templates/pages/exploration-player-page/learner-experience/supplemental-card.component.css',
-    'core/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.css',
-    'core/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.css',
-    'core/templates/pages/exploration-player-page/layout-directives/progress-nav.component.css',
-    'core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.css'
+    'core/templates/components/common-layout-directives/common-elements/'
+    'attribution-guide.component.css',
+    'core/templates/components/common-layout-directives/navigation-bars/'
+    'top-navigation-bar.component.css',
+    'extensions/interactions/GraphInput/directives/'
+    'graph-input-interaction.component.css',
+    'core/templates/pages/exploration-player-page/learner-experience/'
+    'tutor-card.component.css',
+    'core/templates/pages/exploration-player-page/learner-experience/'
+    'supplemental-card.component.css',
+    'core/templates/pages/exploration-player-page/learner-experience/'
+    'input-response-pair.component.css',
+    'core/templates/pages/exploration-player-page/learner-experience/'
+    'conversation-skin.component.css',
+    'core/templates/pages/exploration-player-page/layout-directives/'
+    'progress-nav.component.css',
+    'core/templates/pages/exploration-player-page/layout-directives/'
+    'exploration-footer.component.css'
 ]
 
 

@@ -126,66 +126,66 @@
 }
 
 @media screen and (max-width: 768px) {
-/*rtl:raw:
-.hint-box-add-ons .close {
-  bottom: 10px;
-  font-size: 22px;
-  left: -5px;
-  margin: 0 10px;
-  position: fixed;
-}
+  /*rtl:raw:
+  .hint-box-add-ons .close {
+    bottom: 10px;
+    font-size: 22px;
+    left: -5px;
+    margin: 0 10px;
+    position: fixed;
+  }
 
-.hint-box-add-ons {
-  left: -58px;
-}
+  .hint-box-add-ons {
+    left: -58px;
+  }
 
-.hint-box-add-ons::before {
-  margin-left: -142px;
-}
+  .hint-box-add-ons::before {
+    margin-left: -142px;
+  }
 
-.hint-box-add-ons::after {
-  margin-left: -140px;
-}
-*/
+  .hint-box-add-ons::after {
+    margin-left: -140px;
+  }
+  */
 
-/*rtl:begin:remove*/
-.hint-box-add-ons .close {
-  bottom: 10px;
-  font-size: 22px;
-  left: 295px;
-  margin: 0 10px;
-  position: fixed;
-}
+  /*rtl:begin:remove*/
+  .hint-box-add-ons .close {
+    bottom: 10px;
+    font-size: 22px;
+    left: 295px;
+    margin: 0 10px;
+    position: fixed;
+  }
 
-.hint-box-add-ons {
-  left: -18px;
-}
+  .hint-box-add-ons {
+    left: -18px;
+  }
 
-.hint-box-add-ons::before {
-  margin-left: 125px;
-}
+  .hint-box-add-ons::before {
+    margin-left: 125px;
+  }
 
-.hint-box-add-ons::after {
-  margin-left: 127px;
-}
-/*rtl:end:remove*/
+  .hint-box-add-ons::after {
+    margin-left: 127px;
+  }
+  /*rtl:end:remove*/
 
-.hint-box {
-  font-size: 14px;
-  text-align: left;
-  width: 325px;
-}
+  .hint-box {
+    font-size: 14px;
+    text-align: left;
+    width: 325px;
+  }
 
-.hint-container {
-  position: absolute;
-  right: 0;
-}
+  .hint-container {
+    position: absolute;
+    right: 0;
+  }
 
-.oppia-hint-and-solution-buttons ul {
-  bottom: -17px;
-  padding: 0 10px;
-  position: fixed;
-}
+  .oppia-hint-and-solution-buttons ul {
+    bottom: -17px;
+    padding: 0 10px;
+    position: fixed;
+  }
 }
 
 .oppia-hint-and-solution-buttons ul {

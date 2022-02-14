@@ -101,7 +101,7 @@
 }
 /*rtl:end:remove*/
 
-/*rtl:begin:raw*/
+/*rtl:raw:
 .oppia-exploration-footer .author-profile-text {
   cursor: default;
   font-size: 13px;
@@ -112,11 +112,7 @@
   text-overflow: clip;
   white-space: nowrap;
 }
-/*rtl:end:raw*/
-
-.oppia-exploration-footer .author-profile-text {
-  text-align: left;
-}
+*/
 
 .oppia-exploration-footer .author-profile-text.not-hovered {
   color: #fff;

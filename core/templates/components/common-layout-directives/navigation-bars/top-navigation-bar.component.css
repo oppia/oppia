@@ -186,6 +186,11 @@
 }
 /*rtl:end:ignore*/
 
+.learn-dropdown-menu .nav-item-right {
+  min-width: 300px;
+  padding: 32px;
+}
+
 .learn-dropdown-menu .nav-item-left:hover,
 .learn-dropdown-menu .nav-item-right:hover,
 .learn-dropdown-menu .nav-item-left:focus,
@@ -206,10 +211,6 @@
   font-size: 16px;
   font-weight: 500;
   line-height: 18.75px;
-}
-.learn-dropdown-menu .nav-item-right {
-  min-width: 300px;
-  padding: 32px;
 }
 .learn-dropdown-menu .nav-content {
   color: #767676;
