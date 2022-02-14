@@ -68,7 +68,9 @@ css_files_list = [
     'core/templates/components/button-directives/hint-and-solution-buttons.css',
     'core/templates/components/common-layout-directives/common-elements/attribution-guide.component.css',
     'core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css',
-    'extensions/interactions/GraphInput/directives/graph-input-interaction.component.css'
+    'extensions/interactions/GraphInput/directives/graph-input-interaction.component.css',
+    'core/templates/pages/exploration-player-page/learner-experience/tutor-card.component.css',
+    'core/templates/pages/exploration-player-page/learner-experience/supplemental-card.component.css'
 ]
 
 
