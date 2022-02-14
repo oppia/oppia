@@ -305,7 +305,16 @@ angular.module('oppia').component('answerGroupEditor', {
       ctrl.isCurrentInteractionTrainable = function() {
         var interactionId = ctrl.getCurrentInteractionId();
         if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
-          throw new Error('Invalid interaction id');
+          var rulesString = '';
+          for (var i = 0; i < ctrl.rules.length; i++) {
+            rulesString = rulesString + ctrl.rules[i].type;
+            if (i !== ctrl.rules.length - 1) {
+              rulesString = rulesString + ', ';
+            }
+          }
+          throw new Error(
+            'Invalid interaction id - ' + interactionId +
+            '. Answer group rules: ' + rulesString);
         }
         return INTERACTION_SPECS[interactionId].is_trainable;
       };
