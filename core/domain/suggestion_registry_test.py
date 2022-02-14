@@ -113,7 +113,38 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
             ' convert_html_in_suggestion_change.'):
             self.base_suggestion.convert_html_in_suggestion_change(
                 conversion_fn)
+    
+    def test_suggestion_status_set_to_accepted(self):
+        self.base_suggestion.set_suggestion_status_to_accepted()
 
+        self.assertEqual(
+            self.base_suggestion.status,
+            suggestion_models.STATUS_ACCEPTED)
+
+    def test_suggestion_status_set_to_in_review(self):
+        self.base_suggestion.set_suggestion_status_to_in_review()
+
+        self.assertEqual(
+            self.base_suggestion.status,
+            suggestion_models.STATUS_IN_REVIEW)
+
+    def test_suggestion_status_set_to_rejected(self):
+        self.base_suggestion.set_suggestion_status_to_rejected()
+
+        self.assertEqual(
+            self.base_suggestion.status,
+            suggestion_models.STATUS_REJECTED)
+
+    def test_final_reviewer_id_set(self):
+        self.base_suggestion.set_final_reviewer_id('final_reviewer_id')
+
+        self.assertEqual(
+            self.base_suggestion.final_reviewer_id, 'final_reviewer_id')
+
+    def test_is_handled(self):
+        self.base_suggestion.status = suggestion_models.STATUS_ACCEPTED
+
+        self.assertTrue(self.base_suggestion.is_handled)
 
 class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
     """Tests for the SuggestionEditStateContent class."""
@@ -575,6 +606,37 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.pre_accept_validate()
 
+    def test_change_list_for_accepting_suggestion(self):
+        self.save_new_default_exploration('exp1', self.author_id)
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
+        print(exploration.states)
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], False, self.fake_date)
+
+        exp_services.update_exploration(
+            self.author_id, 'exp1', [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State A',
+                })
+            ], 'Added state')
+        suggestion.change.state_name = 'State A'
+
+        suggestion.accept(
+            'Accepted suggestion by translator: Add translation change.')
+
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
+        print(exploration.states)
+
+        self.assertEqual(2, 2)
+
     def test_populate_old_value_of_change_with_invalid_state(self):
         self.save_new_default_exploration('exp1', self.author_id)
         expected_suggestion_dict = self.suggestion_dict
@@ -594,6 +656,36 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.populate_old_value_of_change()
 
         self.assertIsNone(suggestion.change.old_value)
+
+    def test_populate_old_value_of_change_with_valid_state(self):
+        old_value = {
+            'content_id': 'content',
+            'html': '',
+        }
+
+        self.save_new_default_exploration('exp1', self.author_id)
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], False, self.fake_date)
+
+        exp_services.update_exploration(
+            self.author_id, 'exp1', [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State A',
+                })
+            ], 'Added state')
+        suggestion.change.state_name = 'State A'
+
+        suggestion.populate_old_value_of_change()
+
+        self.assertEqual(suggestion.change.old_value, old_value)
 
     def test_pre_update_validate_change_cmd(self):
         expected_suggestion_dict = self.suggestion_dict
