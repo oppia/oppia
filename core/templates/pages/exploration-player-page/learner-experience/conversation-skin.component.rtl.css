@@ -98,8 +98,8 @@ otherwise they will interfere with the iframed conversation skin directive. */
 }
 
 .conversation-skin-supplemental-nav-submit-button.oppia-learner-confirm-button {
-  left: 8px;
   right: auto;
+  left: 8px;
 }
 
 .conversation-skin-supplemental-nav {

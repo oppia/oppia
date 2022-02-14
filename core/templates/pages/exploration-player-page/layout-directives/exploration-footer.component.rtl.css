@@ -83,7 +83,8 @@
 	font-size: 13px;
 	line-height: 1.5;
 	margin: 12px 0 17px 0;
-	padding-left: 6px;
+	padding-right: 6px;
+  text-align: left;
 	text-overflow: clip;
 	white-space: nowrap;
 }
