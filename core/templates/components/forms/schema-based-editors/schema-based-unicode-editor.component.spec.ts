@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -86,13 +86,27 @@ describe('Schema Based Unicode Editor', () => {
   });
 
   it('should instantiate codemirror on initialization', fakeAsync(() => {
+    let cm = {
+      getOption: () => 2,
+      replaceSelection: () => {},
+      getDoc: () => {
+        return {
+          getCursor: () => {},
+          setCursor: () => {}
+        };
+      }
+    } as unknown as CodeMirror.Editor;
+    spyOn(cm, 'replaceSelection');
     component.ngOnInit();
 
     expect(component.codemirrorStatus).toBeFalse();
     tick(200);
 
+    component.codemirrorOptions.extraKeys.Tab(cm);
+
     expect(component.codemirrorOptions.indentWithTabs).toBeFalse();
     expect(component.codemirrorOptions.lineNumbers).toBeTrue();
+    expect(cm.replaceSelection).toHaveBeenCalled();
     expect(component.codemirrorOptions.readOnly).toBe('nocursor');
     expect(component.codemirrorOptions.mode).toBe('python');
     expect(component.codemirrorStatus).toBeTrue();
