@@ -406,6 +406,17 @@ describe('AnswerGroupEditorComponent', () => {
 
     // An error is thrown if an invalid interaction ID is passed.
     StateInteractionIdService.savedMemento = 'InvalidInteraction';
+    ctrl.rules = [];
+    ctrl.rules.push(
+      new Rule('dummyRule', {
+        x: {
+          contentId: null,
+          normalizedStrSet: []
+        }
+      }, {
+        x: 'dummyInputType'
+      })
+    );
     var rulesString = '';
     for (var i = 0; i < ctrl.rules.length; i++) {
       rulesString = rulesString + ctrl.rules[i].type;
@@ -416,7 +427,7 @@ describe('AnswerGroupEditorComponent', () => {
 
     expect(() => ctrl.isCurrentInteractionTrainable())
       .toThrowError(
-        'Invalid interaction id - InvalidInteraction. Answer Group rules: ' +
+        'Invalid interaction id - InvalidInteraction. Answer group rules: ' +
         rulesString);
   });
 
