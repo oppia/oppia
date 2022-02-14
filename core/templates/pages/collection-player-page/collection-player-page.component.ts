@@ -22,13 +22,11 @@ import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { UserService } from 'services/user.service';
 import { CollectionNode } from 'domain/collection/collection-node.model';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
 import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
@@ -100,11 +98,11 @@ export class CollectionPlayerPageComponent implements OnInit {
     private loaderService: LoaderService,
     private urlService: UrlService,
     private readOnlyCollectionBackendApiService:
-     ReadOnlyCollectionBackendApiService,
+      ReadOnlyCollectionBackendApiService,
     private pageTitleService: PageTitleService,
     private userService: UserService,
-    private windowRef: WindowRef,
-    private collectionPlayerBackendApiService: CollectionPlayerBackendApiService
+    private collectionPlayerBackendApiService:
+      CollectionPlayerBackendApiService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -250,11 +248,11 @@ export class CollectionPlayerPageComponent implements OnInit {
 
   getExplorationTitlePosition(index: number): string {
     if (index % 2 === 0) {
-      return '8px';
+      return '-13px';
     } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
-      return '30px';
+      return '40px';
     } else if ((index + 1) % 4 === 0) {
-      return '-40px';
+      return '-55px';
     }
   }
 
@@ -288,11 +286,10 @@ export class CollectionPlayerPageComponent implements OnInit {
       collectionId
     ).then((collectionSummary) => {
       summary = collectionSummary;
+      if (summary) {
+        this.collectionSummary = summary.summaries[0];
+      }
     });
-
-    if (summary) {
-      this.collectionSummary = summary.summaries[0];
-    }
   }
 
   updateCollection(collection: Collection): void {
@@ -320,20 +317,12 @@ export class CollectionPlayerPageComponent implements OnInit {
     this.ICON_Y_INITIAL_PX = 35;
     this.ICON_Y_INCREMENT_PX = 110;
     this.ICON_X_MIDDLE_PX = 225;
-    this.ICON_X_LEFT_PX = 55;
-    this.ICON_X_RIGHT_PX = 395;
+    this.ICON_X_LEFT_PX = 60;
+    this.ICON_X_RIGHT_PX = 390;
     this.svgHeight = this.MIN_HEIGHT_FOR_PATH_SVG_PX;
     this.nextExplorationId = null;
     this.whitelistedCollectionIdsForGuestProgress = (
       AppConstants.WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
-
-    // Touching anywhere outside the mobile preview should hide it.
-    document.addEventListener('touchstart', () => {
-      if (this.explorationCardIsShown === true) {
-        this.explorationCardIsShown = false;
-        this.scrollToLocation(this.elementToScrollTo);
-      }
-    });
 
     this.fetchSummaryAsync(this.collectionId);
 
@@ -349,27 +338,10 @@ export class CollectionPlayerPageComponent implements OnInit {
         // user is a guest, then either the defaults from the server
         // will be used or the user's local progress, if any has been
         // made and the collection is whitelisted.
-        let collectionAllowsGuestProgress = (
-          this.whitelistedCollectionIdsForGuestProgress.indexOf(
-            this.collectionId) !== -1);
         this.userService.getUserInfoAsync().then((userInfo) => {
           this.loaderService.hideLoadingScreen();
           this.isLoggedIn = userInfo.isLoggedIn();
-          if (!this.isLoggedIn && collectionAllowsGuestProgress &&
-              this.guestCollectionProgressService
-                .hasCompletedSomeExploration(this.collectionId)) {
-            let completedExplorationIds = (
-              this.guestCollectionProgressService
-                .getCompletedExplorationIds(this.collection));
-            let nextExplorationId = (
-              this.guestCollectionProgressService.getNextExplorationId(
-                this.collection, completedExplorationIds));
-            this.collectionPlaythrough = (
-              CollectionPlaythrough.create(
-                nextExplorationId, completedExplorationIds));
-          } else {
-            this.collectionPlaythrough = collection.getPlaythrough();
-          }
+          this.collectionPlaythrough = collection.getPlaythrough();
           this.nextExplorationId =
             this.collectionPlaythrough.getNextExplorationId();
         });

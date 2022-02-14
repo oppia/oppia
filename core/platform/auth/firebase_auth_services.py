@@ -553,14 +553,19 @@ def _get_auth_claims_from_session_cookie(
         return None
     try:
         claims = firebase_auth.verify_session_cookie(cookie, check_revoked=True)
-    except firebase_auth.ExpiredSessionCookieError:
-        raise auth_domain.StaleAuthSessionError('session has expired')
-    except firebase_auth.RevokedSessionCookieError:
-        raise auth_domain.StaleAuthSessionError('session has been revoked')
-    except firebase_auth.UserDisabledError:
-        raise auth_domain.UserDisabledError('user is being deleted')
-    except (firebase_exceptions.FirebaseError, ValueError) as error:
-        raise auth_domain.InvalidAuthSessionError('session invalid: %s' % error)
+    except firebase_auth.ExpiredSessionCookieError as e:
+        raise auth_domain.StaleAuthSessionError(
+            'session has expired') from e
+    except firebase_auth.RevokedSessionCookieError as e:
+        raise auth_domain.StaleAuthSessionError(
+            'session has been revoked') from e
+    except firebase_auth.UserDisabledError as e:
+        raise auth_domain.UserDisabledError(
+            'user is being deleted') from e
+    except (
+        firebase_exceptions.FirebaseError, ValueError) as error:
+        raise auth_domain.InvalidAuthSessionError(
+            'session invalid: %s' % error) from error
     else:
         return _create_auth_claims(claims)
 

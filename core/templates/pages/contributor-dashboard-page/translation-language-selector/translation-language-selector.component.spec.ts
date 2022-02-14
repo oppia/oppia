@@ -90,7 +90,7 @@ describe('Translation language selector', () => {
 
   it('should correctly initialize languageIdToDescription map', () => {
     expect(component.languageIdToDescription.en).toBe('English');
-    expect(component.languageIdToDescription.fr).toBe('French');
+    expect(component.languageIdToDescription.fr).toBe('français (French)');
   });
 
   it('should correctly fetch featured languages', async(() => {
@@ -193,6 +193,6 @@ describe('Translation language selector', () => {
 
       activeLanguageChangedEmitter.emit();
 
-      expect(component.languageSelection).toBe('French');
+      expect(component.languageSelection).toBe('français (French)');
     });
 });

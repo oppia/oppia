@@ -23,6 +23,16 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
+class MockNgbModalRef {
+  componentInstance: {
+    suggestionIdToContribution: null;
+    initialSuggestionId: null;
+    reviewable: null;
+    subheading: null;
+  };
+}
 
 describe('Contributions and review component', function() {
   var ctrl = null;
@@ -30,6 +40,7 @@ describe('Contributions and review component', function() {
   var $q = null;
   var $scope = null;
   var $uibModal = null;
+  let ngbModal: NgbModal = null;
   var contextService = null;
   var contributionAndReviewService = null;
   var contributionOpportunitiesService = null;
@@ -44,10 +55,21 @@ describe('Contributions and review component', function() {
   importAllAngularServices();
 
   describe('when user is allowed to review questions', function() {
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('NgbModal', {
+        open: () => {
+          return {
+            result: Promise.resolve()
+          };
+        }
+      });
+    }));
+
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
+      ngbModal = $injector.get('NgbModal');
       contributionAndReviewService = $injector.get(
         'ContributionAndReviewService');
       userService = $injector.get('UserService');
@@ -244,9 +266,12 @@ describe('Contributions and review component', function() {
 
     it('should remove resolved suggestions when suggestion ' +
       'modal is opened and remove button is clicked', fakeAsync(function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: Promise.resolve(['id1', 'id2'])
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(['id1', 'id2'])
+        } as NgbModalRef
+      );
       const removeSpy = spyOn(
         contributionOpportunitiesService.removeOpportunitiesEventEmitter,
         'emit').and.returnValue(null);
@@ -320,11 +345,22 @@ describe('Contributions and review component', function() {
   });
 
   describe('for the suggestion related to deleted opportunity', function() {
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('NgbModal', {
+        open: () => {
+          return {
+            result: Promise.resolve()
+          };
+        }
+      });
+    }));
+
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
+      ngbModal = $injector.get('NgbModal');
       contributionAndReviewService = $injector.get(
         'ContributionAndReviewService');
       contributionOpportunitiesService = $injector.get(
@@ -548,11 +584,22 @@ describe('Contributions and review component', function() {
 
   describe('when user is not allowed to review questions', function() {
     let fetchSkillSpy = null;
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('NgbModal', {
+        open: () => {
+          return {
+            result: Promise.resolve()
+          };
+        }
+      });
+    }));
+
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
+      ngbModal = $injector.get('NgbModal');
       contributionOpportunitiesService = $injector.get(
         'ContributionOpportunitiesService');
       contributionAndReviewService = $injector.get(
@@ -789,7 +836,7 @@ describe('Contributions and review component', function() {
     it('should not resolve suggestion to skill when dismissing show question' +
       ' suggestion modal', function() {
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
-      spyOn(contributionAndReviewService, 'resolveSuggestiontoSkill');
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject({})
       });
@@ -807,7 +854,7 @@ describe('Contributions and review component', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: Promise.resolve([])
       });
-      spyOn(contributionAndReviewService, 'resolveSuggestiontoSkill')
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion')
         .and.callFake((
             targetId, suggestionId, action, reviewMessage,
             skillDifficulty, resolveSuggestion, cb) => {
@@ -938,10 +985,21 @@ describe('Contributions and review component', function() {
 
   describe('when user is allowed to review questions and ' +
     'skill details are empty', function() {
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('NgbModal', {
+        open: () => {
+          return {
+            result: Promise.resolve()
+          };
+        }
+      });
+    }));
+
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
+      ngbModal = $injector.get('NgbModal');
       contributionAndReviewService = $injector.get(
         'ContributionAndReviewService');
       userService = $injector.get('UserService');
