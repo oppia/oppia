@@ -65,15 +65,20 @@ export class CreatorDashboardPageComponent {
   emptyDashboardImgUrl: string;
   getAverageRating: (
     (ratingFrequencies: ExplorationRatings) => number | null);
+
   SUBSCRIPTION_SORT_BY_KEYS =
     CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS;
+
   EXPLORATIONS_SORT_BY_KEYS =
     CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS;
+
   DEFAULT_EMPTY_TITLE = 'Untitled';
   HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS =
     CreatorDashboardConstants.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS;
+
   HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS =
     CreatorDashboardConstants.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS;
+
   DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD =
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
 

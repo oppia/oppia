@@ -57,6 +57,7 @@ export class StateHintsEditorComponent implements OnInit {
   @Output() onSaveSolution = new EventEmitter<Solution>();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
     new EventEmitter<string[]>();
+
   @Output() onSaveHints = new EventEmitter<Hint[]>();
 
   hintCardIsShown: boolean;
