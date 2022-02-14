@@ -4180,7 +4180,7 @@ title: Title
         """Tests the migration of ItemSelectionInput rule inputs."""
         sample_yaml_content = (
             """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
@@ -4296,7 +4296,7 @@ title: Title
 
         latest_sample_yaml_content = (
             """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
@@ -4939,7 +4939,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'param_specs': {},
             'language_code': 'en',
-            'correctness_feedback_enabled': False,
+            'correctness_feedback_enabled': True,
         })
 
 

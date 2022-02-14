@@ -49,11 +49,6 @@ describe('Enable correctness feedback and set correctness', function() {
     ['NumericInput', 3]
   ];
 
-  var enableCorrectnessFeedbackSetting = async function() {
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.enableCorrectnessFeedback();
-  };
-
   var testEnableCorrectnessInPlayerPage = async function() {
     await libraryPage.get();
     await libraryPage.findExploration(explorationTitle);
@@ -112,8 +107,6 @@ describe('Enable correctness feedback and set correctness', function() {
     await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
     await explorationEditorMainTab.moveToState('End');
     await explorationEditorMainTab.setInteraction('EndExploration');
-    // Turn on correctness feedback.
-    await enableCorrectnessFeedbackSetting();
 
     // Go back to mark the solution as correct.
     await explorationEditorPage.navigateToMainTab();
@@ -135,9 +128,6 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorPage.navigateToMainTab();
-
-    // Turn on correctness feedback first.
-    await enableCorrectnessFeedbackSetting();
 
     // Go to main tab to create interactions.
     await explorationEditorPage.navigateToMainTab();
@@ -177,8 +167,6 @@ describe('Enable correctness feedback and set correctness', function() {
       await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
       await explorationEditorSettingsTab.setLanguage('English');
       await explorationEditorPage.navigateToMainTab();
-      // Turn on correctness feedback first.
-      await enableCorrectnessFeedbackSetting();
 
       // Go back to main tab to create interactions.
       await explorationEditorPage.navigateToMainTab();
@@ -210,9 +198,6 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorPage.navigateToMainTab();
-
-    // Turn on correctness feedback first.
-    await enableCorrectnessFeedbackSetting();
 
     // Go to main tab to create interactions.
     await explorationEditorPage.navigateToMainTab();
