@@ -94,6 +94,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       keyCode: number;
       };
     };
+
   labelForClearingFocus!: string;
   sidebarIsShown: boolean = false;
   windowIsNarrow: boolean = false;
@@ -119,6 +120,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     'create', 'explore', 'collection', 'collection_editor',
     'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
     'story_editor', 'blog-dashboard'];
+
   currentWindowWidth = this.windowDimensionsService.getWidth();
   // The order of the elements in this array specifies the order in
   // which they will be hidden. Earlier elements will be hidden first.
@@ -130,6 +132,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   CLASSROOM_PROMOS_ARE_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg');
+
   navElementsVisibilityStatus: Record<string, boolean> = {};
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);

@@ -155,6 +155,7 @@ export class Exploration {
         INTERACTION_SPECS[interactionId as InteractionSpecsKey].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
+
   getStates(): States {
     return cloneDeep(this.states);
   }
