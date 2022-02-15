@@ -18,7 +18,7 @@
 
 
 import { StoryContents, StoryContentsBackendDict } from
-  'domain/story/storycontents-object.model';
+  'domain/story/story-contents-object.model';
 import { StoryNode } from './story-node.model';
 
 describe('Story contents object factory', () => {
