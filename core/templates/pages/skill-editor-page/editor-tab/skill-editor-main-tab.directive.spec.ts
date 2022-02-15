@@ -23,8 +23,14 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 // ^^^ This block is to be removed.
+
+class MockNgbModalRef {
+  componentInstance: {
+    body: 'xyz';
+  };
+}
 
 describe('Skill editor main tab directive', function() {
   var $scope = null;
@@ -78,7 +84,7 @@ describe('Skill editor main tab directive', function() {
     ctrl.$onInit();
   }));
 
-  it('should initialize the variables', function() {
+  it('should initialize the variables', () => {
     expect($scope.selectedTopic).toEqual(null);
     expect($scope.subtopicName).toEqual(null);
   });
@@ -103,10 +109,16 @@ describe('Skill editor main tab directive', function() {
     expect($scope.hasLoadedSkill()).toBe(true);
   });
 
-  it('should open save changes modal with ngbModal when unsaved changes are' +
+  it('should open save changes modal with $uibModal when unsaved changes are' +
   ' present', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    var modalSpy = spyOn(ngbModal, 'open').and.callThrough();
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve()
+      }) as NgbModalRef;
+    });
+
     $scope.createQuestion(),
     expect(modalSpy).toHaveBeenCalled();
   });
@@ -143,5 +155,13 @@ describe('Skill editor main tab directive', function() {
     ctrl.$onInit();
     $timeout.flush();
     expect(focusSpy).toHaveBeenCalled();
+  });
+
+  it('should update the changes', function() {
+    spyOn($rootScope, '$applyAsync');
+
+    $scope.getMisconceptionChange();
+
+    expect($rootScope.$applyAsync).toHaveBeenCalled();
   });
 });

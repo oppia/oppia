@@ -32,6 +32,13 @@ import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
 import { LoaderService } from 'services/loader.service';
 
+interface AssignedSkillTopicData {
+  [topicName: string]: string;
+}
+interface GroupedSkillSummaryDictionaries {
+  [topicName: string]: SkillSummaryBackendDict[];
+}
+
 export interface GroupedSkillSummaries {
   current: {
     id: string;
@@ -59,13 +66,14 @@ export class SkillEditorStateService {
   private _skill!: Skill;
   private _skillRights!: SkillRights;
   private _skillIsInitialized: boolean = false;
-  private assignedSkillTopicData = null;
+  private _assignedSkillTopicData: AssignedSkillTopicData | null = null;
   private _skillIsBeingLoaded: boolean = false;
   private _skillIsBeingSaved: boolean = false;
   private _groupedSkillSummaries: GroupedSkillSummaries = {
     current: [],
     others: []
   };
+
   private _skillChangedEventEmitter = new EventEmitter();
 
   private _setSkill = (skill: Skill) => {
@@ -86,7 +94,9 @@ export class SkillEditorStateService {
     this._setSkill(skill);
   };
 
-  private _updateGroupedSkillSummaries = (groupedSkillSummaries) => {
+  private _updateGroupedSkillSummaries = (
+      groupedSkillSummaries: GroupedSkillSummaryDictionaries
+  ) => {
     let topicName = null;
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
@@ -103,9 +113,11 @@ export class SkillEditorStateService {
         break;
       }
     }
-    for (let idx in groupedSkillSummaries[topicName]) {
-      this._groupedSkillSummaries.current.push(
-        groupedSkillSummaries[topicName][idx]);
+    if (topicName !== null) {
+      for (let idx in groupedSkillSummaries[topicName]) {
+        this._groupedSkillSummaries.current.push(
+          groupedSkillSummaries[topicName][idx]);
+      }
     }
     for (let name in groupedSkillSummaries) {
       if (name === topicName) {
@@ -148,7 +160,7 @@ export class SkillEditorStateService {
     Promise.all([skillDataPromise, skillRightsPromise]).then(
       ([newBackendSkillObject, newSkillRightsObject]) => {
         this._updateSkillRights(newSkillRightsObject);
-        this.assignedSkillTopicData = (
+        this._assignedSkillTopicData = (
           newBackendSkillObject.assignedSkillTopicData);
         this._updateSkill(newBackendSkillObject.skill);
         this._updateGroupedSkillSummaries(
@@ -163,6 +175,7 @@ export class SkillEditorStateService {
         this._skillIsBeingLoaded = false;
       });
   }
+
   /**
    * Returns whether this service is currently attempting to load the
    * skill maintained by this service.
@@ -171,13 +184,16 @@ export class SkillEditorStateService {
     return this._skillIsBeingLoaded;
   }
 
-  getAssignedSkillTopicData(): string {
-    return this.assignedSkillTopicData;
+  // 'getAssignedSkillTopicData()' will be return null if 'loadSkill()' did
+  // not yet initialize '_assignedSkillTopicData' or failed to initialize it.
+  getAssignedSkillTopicData(): AssignedSkillTopicData | null {
+    return this._assignedSkillTopicData;
   }
 
   getGroupedSkillSummaries(): GroupedSkillSummaries {
     return cloneDeep(this._groupedSkillSummaries);
   }
+
   /**
      * Returns whether a skill has yet been loaded using either
      * loadSkill().
@@ -185,6 +201,7 @@ export class SkillEditorStateService {
   hasLoadedSkill(): boolean {
     return this._skillIsInitialized;
   }
+
   /**
    * Returns the current skill to be shared among the skill
    * editor. Please note any changes to this skill will be propogated
@@ -196,6 +213,7 @@ export class SkillEditorStateService {
   getSkill(): Skill {
     return this._skill;
   }
+
   /**
    * Attempts to save the current skill given a commit message. This
    * function cannot be called until after a skill has been initialized
@@ -234,6 +252,7 @@ export class SkillEditorStateService {
       });
     return true;
   }
+
   /**
    * Returns any validation issues associated with the current
    * skill.
@@ -241,6 +260,7 @@ export class SkillEditorStateService {
   getSkillValidationIssues(): string[] {
     return this._skill.getValidationIssues();
   }
+
   /**
    * Checks if the skill description exists and updates class
    * variable. `create-new-skill-modal.controller` will search

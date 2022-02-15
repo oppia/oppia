@@ -369,7 +369,10 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
-DEFAULT_AUTO_TTS_ENABLED = True
+DEFAULT_AUTO_TTS_ENABLED = False
+# Whether new explorations should have correctness-feedback enabled
+# by default.
+DEFAULT_CORRECTNESS_FEEDBACK_ENABLED = True
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''
@@ -859,6 +862,7 @@ CUSTOM_VOLUNTEERS_LANDING_PAGE_URL = '/volunteers'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
+EXPLORATION_IMAGE_UPLOAD_PREFIX = '/createhandler/imageupload'
 EXPLORATION_FEATURES_PREFIX = '/explorehandler/features'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_LEARNER_ANSWER_DETAILS = (

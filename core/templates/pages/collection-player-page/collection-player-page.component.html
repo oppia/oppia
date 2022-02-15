@@ -2,7 +2,7 @@
   <background-banner></background-banner>
   <div *ngIf="!collection?.getCollectionNodeCount()" class="no-exploration-created">
     <div class="oppia-collection-path-section">
-      No Exploration has been added to this Collection.
+      {{ 'I18N_COLLECTION_PLAYER_PAGE_NO_EXPLORATION' | translate }}
     </div>
   </div>
   <div *ngIf="collection && collection?.getCollectionNodeCount()"
@@ -11,22 +11,23 @@
         class="oppia-page-heading" align="center">
       <span *ngIf="!collectionPlaythrough?.hasStartedCollection()"
             class="oppia-collection-player-title-font">
-            Begin {{ collection.getTitle() }}:
+            {{ 'I18N_COLLECTION_PLAYER_PAGE_BEGIN' | translate }} {{ collection.getTitle() }}:
       </span>
       <span *ngIf="collectionPlaythrough?.hasStartedCollection()"
             class="oppia-collection-player-title-font">
-            Continue {{ collection.getTitle() }}:
+            {{ 'I18N_COLLECTION_PLAYER_PAGE_CONTINUE' | translate }} {{ collection.getTitle() }}:
       </span>
     </h2>
     <h2 *ngIf="collectionPlaythrough?.hasFinishedCollection()"
         class="oppia-page-heading">
       <span>
-        You have finished the collection! Feel free to replay any explorations below.
+        {{ 'I18N_COLLECTION_PLAYER_PAGE_FINISHED' | translate }}
       </span>
     </h2>
     <div *ngIf="collection"
          class="oppia-collection-path-section">
       <svg width="540px"
+           [ngStyle]="{'margin-left': '10px'}"
            [attr.height]="svgHeight + 'px'"
            xmlns="http://www.w3.org/2000/svg">
         <path fill="none"
@@ -66,7 +67,7 @@
       <a *ngFor="let node of collection.getCollectionNodes();let index = index"
          [href]="getExplorationUrl(node?.getExplorationId())"
          [ngStyle]="{position: 'absolute', left: pathIconParameters[index].left, top: pathIconParameters[index].top}">
-        <div [ngStyle]="{width: '160px',position: 'absolute',left: getExplorationTitlePosition(index),color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '15px',bottom: '65%'}">
+        <div [ngStyle]="{width: '125px',position: 'absolute',left: getExplorationTitlePosition(index),color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '15px','text-align': 'center',bottom: '70%'}">
             {{ node.getExplorationTitle() }}
         </div>
 
@@ -234,7 +235,7 @@
         </div>
         <div class="title-section-mask objective oppia-activity-summary-tile-pre-hover-preview">
           <span>
-            Hover over an icon to preview an exploration.
+            {{ 'I18N_COLLECTION_PLAYER_PAGE_HOVER_MESSAGE' | translate }}
           </span>
         </div>
       </mat-card>

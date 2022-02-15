@@ -26,17 +26,20 @@ import re
 
 from core import android_validation_constants
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import customization_args_util
-from core.domain import html_cleaner
-from core.domain import interaction_registry
 from core.domain import param_domain
-from core.domain import rules_registry
-from core.domain import translatable_object_registry
 from extensions.objects.models import objects
+
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 
 class AnswerGroup:
@@ -666,8 +669,9 @@ class InteractionInstance:
         try:
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 self.id)
-        except KeyError:
-            raise utils.ValidationError('Invalid interaction id: %s' % self.id)
+        except KeyError as e:
+            raise utils.ValidationError(
+                'Invalid interaction id: %s' % self.id) from e
 
         self._validate_customization_args()
 
@@ -730,11 +734,12 @@ class InteractionInstance:
                         self.customization_args[
                             ca_name].to_customization_arg_dict()
                     )
-                except AttributeError:
+                except AttributeError as e:
                     raise utils.ValidationError(
                         'Expected customization arg value to be a '
                         'InteractionCustomizationArg domain object, '
-                        'received %s' % self.customization_args[ca_name])
+                        'received %s' % self.customization_args[ca_name]
+                    ) from e
 
         interaction = interaction_registry.Registry.get_interaction_by_id(
             self.id)
@@ -869,7 +874,7 @@ class InteractionInstance:
         # InteractionCustomizationArg helper functions.
         # Then, convert back to original dict format afterwards, at the end.
         customization_args = (
-            InteractionInstance
+            InteractionCustomizationArg
             .convert_cust_args_dict_to_cust_args_based_on_specs(
                 interaction_dict['customization_args'],
                 ca_specs_dict)
@@ -921,38 +926,9 @@ class InteractionInstance:
             interaction_id).to_dict()['customization_arg_specs']
 
         return (
-            InteractionInstance
+            InteractionCustomizationArg
             .convert_cust_args_dict_to_cust_args_based_on_specs(
                 customization_args_dict, ca_specs_dict))
-
-    @staticmethod
-    def convert_cust_args_dict_to_cust_args_based_on_specs(
-        ca_dict,
-        ca_specs_dict
-    ):
-        """Converts customization arguments dictionary to customization
-        arguments. This is done by converting each customization argument to a
-        InteractionCustomizationArg domain object.
-
-        Args:
-            ca_dict: dict. A dictionary of customization
-                argument name to a customization argument dict, which is a dict
-                of the single key 'value' to the value of the customization
-                argument.
-            ca_specs_dict: dict. A dictionary of customization argument specs.
-
-        Returns:
-            dict. A dictionary of customization argument names to the
-            InteractionCustomizationArg domain object's.
-        """
-        return {
-            spec['name']: (
-                InteractionCustomizationArg.from_customization_arg_dict(
-                    ca_dict[spec['name']],
-                    spec['schema']
-                )
-            ) for spec in ca_specs_dict
-        }
 
 
 class InteractionCustomizationArg:
@@ -1231,6 +1207,35 @@ class InteractionCustomizationArg:
 
         return result
 
+    @staticmethod
+    def convert_cust_args_dict_to_cust_args_based_on_specs(
+        ca_dict,
+        ca_specs_dict
+    ):
+        """Converts customization arguments dictionary to customization
+        arguments. This is done by converting each customization argument to a
+        InteractionCustomizationArg domain object.
+
+        Args:
+            ca_dict: dict. A dictionary of customization
+                argument name to a customization argument dict, which is a dict
+                of the single key 'value' to the value of the customization
+                argument.
+            ca_specs_dict: dict. A dictionary of customization argument specs.
+
+        Returns:
+            dict. A dictionary of customization argument names to the
+            InteractionCustomizationArg domain object's.
+        """
+        return {
+            spec['name']: (
+                InteractionCustomizationArg.from_customization_arg_dict(
+                    ca_dict[spec['name']],
+                    spec['schema']
+                )
+            ) for spec in ca_specs_dict
+        }
+
 
 class Outcome:
     """Value object representing an outcome of an interaction. An outcome
@@ -1460,7 +1465,7 @@ class Voiceover:
             raise utils.ValidationError(
                 'Expected needs_update to be a bool, received %s' %
                 self.needs_update)
-        if not isinstance(self.duration_secs, float):
+        if not isinstance(self.duration_secs, (float, int)):
             raise utils.ValidationError(
                 'Expected duration_secs to be a float, received %s' %
                 self.duration_secs)
@@ -1799,8 +1804,8 @@ class WrittenTranslations:
         if content_id in self.translations_mapping:
             raise Exception(
                 'The content_id %s already exist.' % content_id)
-        else:
-            self.translations_mapping[content_id] = {}
+
+        self.translations_mapping[content_id] = {}
 
     def delete_content_id_for_translation(self, content_id):
         """Deletes a content id from the content_translation dict.
@@ -1817,8 +1822,8 @@ class WrittenTranslations:
         if content_id not in self.translations_mapping:
             raise Exception(
                 'The content_id %s does not exist.' % content_id)
-        else:
-            self.translations_mapping.pop(content_id, None)
+
+        self.translations_mapping.pop(content_id, None)
 
     def get_all_html_content_strings(self):
         """Gets all html content strings used in the WrittenTranslations.
@@ -2031,8 +2036,8 @@ class RecordedVoiceovers:
         if content_id not in self.voiceovers_mapping:
             raise Exception(
                 'The content_id %s does not exist.' % content_id)
-        else:
-            self.voiceovers_mapping.pop(content_id, None)
+
+        self.voiceovers_mapping.pop(content_id, None)
 
 
 class RuleSpec:
@@ -2515,7 +2520,7 @@ class State:
         if not allow_null_interaction and self.interaction.id is None:
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
-        elif self.interaction.id is not None:
+        if self.interaction.id is not None:
             self.interaction.validate(exp_param_specs_dict)
 
         content_id_list = []
@@ -2725,7 +2730,7 @@ class State:
             logging.exception('Bad state dict: %s' % str(state_dict))
             raise e
 
-        return python_utils.yaml_from_dict(state.to_dict(), width=width)
+        return utils.yaml_from_dict(state.to_dict(), width=width)
 
     def get_translation_counts(self):
         """Return a dict representing the number of translations available in a
@@ -2782,30 +2787,27 @@ class State:
                 raise Exception(
                     'The content_id %s does not exist in recorded_voiceovers.'
                     % content_id)
-            elif not content_id in content_ids_for_text_translations:
+            if not content_id in content_ids_for_text_translations:
                 raise Exception(
                     'The content_id %s does not exist in written_translations.'
                     % content_id)
-            else:
-                self.recorded_voiceovers.delete_content_id_for_voiceover(
-                    content_id)
-                self.written_translations.delete_content_id_for_translation(
-                    content_id)
+
+            self.recorded_voiceovers.delete_content_id_for_voiceover(content_id)
+            self.written_translations.delete_content_id_for_translation(
+                content_id)
 
         for content_id in content_ids_to_add:
             if content_id in content_ids_for_voiceovers:
                 raise Exception(
                     'The content_id %s already exists in recorded_voiceovers'
                     % content_id)
-            elif content_id in content_ids_for_text_translations:
+            if content_id in content_ids_for_text_translations:
                 raise Exception(
                     'The content_id %s already exists in written_translations.'
                     % content_id)
-            else:
-                self.recorded_voiceovers.add_content_id_for_voiceover(
-                    content_id)
-                self.written_translations.add_content_id_for_translation(
-                    content_id)
+
+            self.recorded_voiceovers.add_content_id_for_voiceover(content_id)
+            self.written_translations.add_content_id_for_translation(content_id)
 
     def add_translation(self, content_id, language_code, translation_html):
         """Adds translation to a given content id in a specific language.
@@ -3022,11 +3024,11 @@ class State:
 
                         try:
                             normalized_param = param_type.normalize(value)
-                        except Exception:
+                        except Exception as e:
                             raise Exception(
                                 'Value has the wrong type. It should be a %s. '
                                 'The value is %s' %
-                                (param_type.__name__, value))
+                                (param_type.__name__, value)) from e
 
                     rule_inputs[param_name] = normalized_param
 
@@ -3524,8 +3526,9 @@ class State:
         else:
             ca_specs_dict = (
                 interaction_registry.Registry
-                .get_all_specs_for_state_schema_version_or_latest(
-                    state_schema_version
+                .get_all_specs_for_state_schema_version(
+                    state_schema_version,
+                    can_fetch_latest_specs=True
                 )[interaction_id]['customization_arg_specs']
             )
             state_dict['interaction'] = (

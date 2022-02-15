@@ -49,17 +49,17 @@ title: A title
 class CollectionChangeTests(test_utils.GenericTestBase):
 
     def test_collection_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             collection_domain.CollectionChange({'invalid': 'data'})
 
     def test_collection_change_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             collection_domain.CollectionChange({'cmd': 'invalid'})
 
     def test_collection_change_object_with_missing_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'exploration_id, new_value')):
@@ -70,7 +70,7 @@ class CollectionChangeTests(test_utils.GenericTestBase):
             })
 
     def test_collection_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             collection_domain.CollectionChange({
@@ -83,7 +83,7 @@ class CollectionChangeTests(test_utils.GenericTestBase):
             })
 
     def test_collection_change_object_with_invalid_collection_property(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd edit_collection_property: '
                 'invalid is not allowed')):
@@ -242,7 +242,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the collection passes strict validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.collection.validate()
 
@@ -392,6 +392,33 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'abcd')
         self.assertEqual(notdemo2.is_demo, False)
 
+    def test_update_title(self):
+        """Test update_title."""
+        self.assertEqual(self.collection.title, 'Title')
+        self.collection.update_title('new title')
+        self.assertEqual(self.collection.title, 'new title')
+
+    def test_update_category(self):
+        """Test update_category."""
+        self.collection.update_category('new category')
+        self.assertEqual(self.collection.category, 'new category')
+
+    def test_update_objective(self):
+        """Test update_objective."""
+        self.collection.update_objective('new objective')
+        self.assertEqual(self.collection.objective, 'new objective')
+
+    def test_update_language_code(self):
+        """Test update_language_code."""
+        self.collection.update_language_code('en')
+        self.assertEqual(self.collection.language_code, 'en')
+
+    def test_update_tags(self):
+        """Test update_tags."""
+        self.assertEqual(self.collection.tags, [])
+        self.collection.update_tags(['abc', 'def'])
+        self.assertEqual(self.collection.tags, ['abc', 'def'])
+
     def test_collection_export_import(self):
         """Test that to_dict and from_dict preserve all data within an
         collection.
@@ -416,7 +443,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.add_node('test_exp')
         self.assertEqual(len(collection.nodes), 1)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Exploration is already part of this collection: test_exp'
             ):
@@ -428,7 +455,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.swap_nodes(0, 1)
         self.assertEqual(collection.nodes[0].exploration_id, 'another_exp')
         self.assertEqual(collection.nodes[1].exploration_id, 'test_exp')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Both indices point to the same collection node.'
             ):
@@ -437,7 +464,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.delete_node('another_exp')
         self.assertEqual(len(collection.nodes), 1)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Exploration is not part of this collection: another_exp'
             ):
@@ -456,6 +483,13 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             versioned_collection_contents, 1)
 
         self.assertEqual(versioned_collection_contents['schema_version'], 2)
+        self.assertEqual(
+            versioned_collection_contents['collection_contents'], {})
+
+        collection_domain.Collection.update_collection_contents_from_model(
+            versioned_collection_contents, 2)
+
+        self.assertEqual(versioned_collection_contents['schema_version'], 3)
         self.assertEqual(
             versioned_collection_contents['collection_contents'], {})
 
@@ -495,7 +529,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'collection_contents': {}
         }
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Collection is version .+ but current collection schema version '
             'is %d' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
@@ -669,7 +703,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         self.assertEqual(yaml_content_2, yaml_content)
 
         # Should not be able to create a collection from no YAML content.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'Please ensure that you are uploading a YAML text file, '
             'not a zip file. The YAML parser returned the following error: '
@@ -683,7 +717,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 
         yaml_content = collection.to_yaml()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Invalid YAML file: no schema version specified.'):
             collection_domain.Collection.from_yaml(
                 self.COLLECTION_ID, yaml_content)
@@ -695,7 +729,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 
         yaml_content = collection.to_yaml()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1 to .+ collection YAML files at '
             'present.'):
@@ -953,66 +987,66 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_invalid_title(self):
         self.collection_summary.title = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected title to be a string, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_category(self):
         self.collection_summary.category = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected category to be a string, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_objective(self):
         self.collection_summary.objective = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected objective to be a string, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_missing_language_code(self):
         self.collection_summary.language_code = None
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'A language must be specified \\(in the \'Settings\' tab\\).'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_language_code(self):
         self.collection_summary.language_code = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected language code to be a string, received 1'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_unallowed_language_code(self):
         self.collection_summary.language_code = 'invalid'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language code: invalid'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_tags(self):
         self.collection_summary.tags = 'tags'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected tags to be a list, received tags'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_tag_in_tags(self):
         self.collection_summary.tags = ['tag', 2]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each tag to be a string, received \'2\''):
             self.collection_summary.validate()
 
     def test_validation_fails_with_empty_tag_in_tags(self):
         self.collection_summary.tags = ['', 'abc']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Tags should be non-empty'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_unallowed_characters_in_tag(self):
         self.collection_summary.tags = ['123', 'abc']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Tags should only contain lowercase '
                 'letters and spaces, received \'123\'')):
@@ -1020,21 +1054,21 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_whitespace_in_tag_start(self):
         self.collection_summary.tags = [' ab', 'abc']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Tags should not start or end with whitespace, received \' ab\''):
             self.collection_summary.validate()
 
     def test_validation_fails_with_whitespace_in_tag_end(self):
         self.collection_summary.tags = ['ab ', 'abc']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Tags should not start or end with whitespace, received \'ab \''):
             self.collection_summary.validate()
 
     def test_validation_fails_with_adjacent_whitespace_in_tag(self):
         self.collection_summary.tags = ['a   b', 'abc']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Adjacent whitespace in tags should '
                 'be collapsed, received \'a   b\'')):
@@ -1042,76 +1076,76 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_duplicate_tags(self):
         self.collection_summary.tags = ['abc', 'abc', 'ab']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected tags to be unique, but found duplicates'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_status(self):
         self.collection_summary.status = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected status to be string, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_community_owned(self):
         self.collection_summary.community_owned = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected community_owned to be bool, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_contributors_summary(self):
         self.collection_summary.contributors_summary = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected contributors_summary to be dict, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_owner_ids_type(self):
         self.collection_summary.owner_ids = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected owner_ids to be list, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_owner_id_in_owner_ids(self):
         self.collection_summary.owner_ids = ['1', 2, '3']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in owner_ids to be string, received 2'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_editor_ids_type(self):
         self.collection_summary.editor_ids = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected editor_ids to be list, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_editor_id_in_editor_ids(self):
         self.collection_summary.editor_ids = ['1', 2, '3']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in editor_ids to be string, received 2'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_viewer_ids_type(self):
         self.collection_summary.viewer_ids = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected viewer_ids to be list, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_viewer_id_in_viewer_ids(self):
         self.collection_summary.viewer_ids = ['1', 2, '3']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in viewer_ids to be string, received 2'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_contributor_ids_type(self):
         self.collection_summary.contributor_ids = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected contributor_ids to be list, received 0'):
             self.collection_summary.validate()
@@ -1119,7 +1153,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_invalid_contributor_id_in_contributor_ids(
             self):
         self.collection_summary.contributor_ids = ['1', 2, '3']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in contributor_ids to be string, received 2'):
             self.collection_summary.validate()
@@ -1132,6 +1166,16 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
             datetime.datetime.utcnow(), datetime.datetime.utcnow())
         self.assertFalse(self.collection_summary.is_private())
+
+    def test_is_editable_by(self):
+        self.assertTrue(self.collection_summary.is_editable_by('editor_id'))
+        self.assertTrue(self.collection_summary.is_editable_by('other_id'))
+        self.collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PUBLIC, False, ['owner_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
+        self.assertFalse(self.collection_summary.is_editable_by('other_id'))
 
     def test_is_solely_owned_by_user_one_owner(self):
         self.assertTrue(
@@ -1170,6 +1214,17 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             self.collection_summary.is_solely_owned_by_user('viewer_id'))
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('contributor_id'))
+
+    def test_does_user_have_any_role(self):
+        self.assertTrue(
+            self.collection_summary.does_user_have_any_role('owner_id')
+        )
+        self.assertTrue(
+            self.collection_summary.does_user_have_any_role('viewer_id')
+        )
+        self.assertFalse(
+            self.collection_summary.does_user_have_any_role('other_id')
+        )
 
     def test_add_new_contribution_for_user_adds_user_to_contributors(self):
         self.collection_summary.add_contribution_by_user('user_id')

@@ -17,13 +17,28 @@
  * changes to parameters.
  */
 
-require(
-  'pages/exploration-editor-page/services/exploration-property.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
+import { AlertsService } from 'services/alerts.service';
+import { ChangeListService } from './change-list.service';
+import { LoggerService } from 'services/contextual/logger.service';
 
-angular.module('oppia').factory('ExplorationParamChangesService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'param_changes';
-    return child;
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationParamChangesService extends
+  ExplorationPropertyService {
+  propertyName: string = 'param_changes';
+
+  constructor(
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService
+  ) {
+    super(alertsService, changeListService, loggerService);
   }
-]);
+}
+
+angular.module('oppia').factory('ExplorationParamChangesService',
+  downgradeInjectable(ExplorationParamChangesService));

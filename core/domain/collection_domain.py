@@ -28,7 +28,6 @@ import re
 import string
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
@@ -426,7 +425,7 @@ class Collection:
         # YAML representation.
         del collection_dict['id']
 
-        return python_utils.yaml_from_dict(collection_dict)
+        return utils.yaml_from_dict(collection_dict)
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):
@@ -1252,7 +1251,7 @@ class CollectionSummary:
                 'Expected contributors_summary to be dict, received %s' % (
                     self.contributors_summary))
 
-    def is_editable_by(self, user_id=None):
+    def is_editable_by(self, user_id):
         """Checks if a given user may edit the collection.
 
         Args:
@@ -1261,10 +1260,11 @@ class CollectionSummary:
         Returns:
             bool. Whether the given user may edit the collection.
         """
-        return user_id is not None and (
+        return (
             user_id in self.editor_ids
             or user_id in self.owner_ids
-            or self.community_owned)
+            or self.community_owned
+        )
 
     def is_private(self):
         """Checks whether the collection is private.

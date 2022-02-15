@@ -23,45 +23,36 @@ import json
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class SERVER_MODES(enum.Enum): # pylint: disable=invalid-name
+class ServerModes(enum.Enum):
     """Enum for server modes."""
 
-    dev = 'dev' # pylint: disable=invalid-name
-    test = 'test' # pylint: disable=invalid-name
-    prod = 'prod' # pylint: disable=invalid-name
+    DEV = 'dev'
+    TEST = 'test'
+    PROD = 'prod'
 
 
-FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
+FeatureStages = ServerModes
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class DATA_TYPES(enum.Enum): # pylint: disable=invalid-name
+class DataTypes(enum.Enum):
     """Enum for data types."""
 
-    bool = 'bool' # pylint: disable=invalid-name
-    string = 'string' # pylint: disable=invalid-name
-    number = 'number' # pylint: disable=invalid-name
+    BOOL = 'bool'
+    STRING = 'string'
+    NUMBER = 'number'
 
 
 ALLOWED_SERVER_MODES = [
-    SERVER_MODES.dev.value, SERVER_MODES.test.value, SERVER_MODES.prod.value]
+    ServerModes.DEV.value, ServerModes.TEST.value, ServerModes.PROD.value]
 ALLOWED_FEATURE_STAGES = [
-    FEATURE_STAGES.dev.value,
-    FEATURE_STAGES.test.value,
-    FEATURE_STAGES.prod.value
+    FeatureStages.DEV.value,
+    FeatureStages.TEST.value,
+    FeatureStages.PROD.value
 ]
 ALLOWED_PLATFORM_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES
 ALLOWED_BROWSER_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES
@@ -136,7 +127,7 @@ class EvaluationContext:
         """Returns the server mode of Oppia.
 
         Returns:
-            Enum(SERVER_MODES). The the server mode of Oppia,
+            Enum(ServerModes). The the server mode of Oppia,
             must be one of the following: dev, test, prod.
         """
         return self._server_mode
@@ -175,7 +166,8 @@ class EvaluationContext:
                 raise utils.ValidationError(
                     'Invalid version \'%s\', expected to match regexp %s.' % (
                         self._app_version, APP_VERSION_WITH_HASH_REGEXP))
-            elif (
+
+            if (
                     match.group(2) is not None and
                     match.group(2) not in ALLOWED_APP_VERSION_FLAVORS):
                 raise utils.ValidationError(
@@ -415,8 +407,7 @@ class PlatformParameterFilter:
         version_a = version_a.split('.')
         version_b = version_b.split('.')
 
-        for sub_version_a, sub_version_b in python_utils.ZIP(
-                version_a, version_b):
+        for sub_version_a, sub_version_b in zip(version_a, version_b):
             if int(sub_version_a) < int(sub_version_b):
                 return True
             elif int(sub_version_a) > int(sub_version_b):
@@ -574,9 +565,9 @@ class PlatformParameter:
     """Domain object for platform parameters."""
 
     DATA_TYPE_PREDICATES_DICT = {
-        DATA_TYPES.bool.value: lambda x: isinstance(x, bool),
-        DATA_TYPES.string.value: lambda x: isinstance(x, str),
-        DATA_TYPES.number.value: lambda x: isinstance(x, (float, int)),
+        DataTypes.BOOL.value: lambda x: isinstance(x, bool),
+        DataTypes.STRING.value: lambda x: isinstance(x, str),
+        DataTypes.NUMBER.value: lambda x: isinstance(x, (float, int)),
     }
 
     PARAMETER_NAME_REGEXP = r'^[A-Za-z0-9_]{1,100}$'
@@ -670,7 +661,7 @@ class PlatformParameter:
         """Returns the stage of the feature flag.
 
         Returns:
-            FEATURE_STAGES|None. The stage of the feature flag, None if the
+            FeatureStages|None. The stage of the feature flag, None if the
             parameter isn't a feature flag.
         """
         return self._feature_stage
@@ -747,7 +738,7 @@ class PlatformParameter:
         """Validates the PlatformParameter domain object that is a feature
         flag.
         """
-        if self._data_type != DATA_TYPES.bool.value:
+        if self._data_type != DataTypes.BOOL.value:
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
@@ -767,15 +758,16 @@ class PlatformParameter:
             for server_mode_filter in server_mode_filters:
                 server_modes = [
                     value for _, value in server_mode_filter.conditions]
-                if self._feature_stage == FEATURE_STAGES.dev.value:
+                if self._feature_stage == FeatureStages.DEV.value:
                     if (
-                            SERVER_MODES.test.value in server_modes or
-                            SERVER_MODES.prod.value in server_modes):
+                            ServerModes.TEST.value in server_modes or
+                            ServerModes.PROD.value in server_modes
+                    ):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
                             ' production environments.')
-                elif self._feature_stage == FEATURE_STAGES.test.value:
-                    if SERVER_MODES.prod.value in server_modes:
+                elif self._feature_stage == FeatureStages.TEST.value:
+                    if ServerModes.PROD.value in server_modes:
                         raise utils.ValidationError(
                             'Feature in test stage cannot be enabled in '
                             'production environment.')

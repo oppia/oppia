@@ -125,7 +125,8 @@
         "core.platform.app_identity.gae_app_identity_services_test",
         "core.storage.topic.gae_models_test",
         "scripts.release_scripts.cut_release_or_hotfix_branch_test",
-        "scripts.linters.css_linter_test"
+        "scripts.linters.css_linter_test",
+        "scripts.rtl_css_test"
     ],
     "3": [
         "core.controllers.incoming_app_feedback_report_test",
@@ -231,6 +232,7 @@
         "core.jobs.batch_jobs.suggestion_stats_computation_jobs_test",
         "core.jobs.batch_jobs.user_stats_computation_jobs_test",
         "core.jobs.batch_jobs.opportunity_management_jobs_test",
+        "core.jobs.batch_jobs.collection_info_jobs_test",
         "core.domain.image_validation_services_test",
         "core.storage.beam_job.gae_models_test",
         "scripts.linters.js_ts_linter_test",

@@ -27,14 +27,14 @@
 </md-card>
 
 <div ng-show="$ctrl.isInteractionShown()">
-  <state-interaction-editor on-save-state-content="$ctrl.onSaveStateContent"
-                            on-save-interaction-id="$ctrl.onSaveInteractionId"
-                            on-save-interaction-customization-args="$ctrl.onSaveInteractionCustomizationArgs"
-                            on-save-next-content-id-index="$ctrl.onSaveNextContentIdIndex"
-                            on-save-solution="$ctrl.onSaveSolution"
-                            recompute-graph="$ctrl.recomputeGraph"
-                            show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
-  </state-interaction-editor>
+  <oppia-state-interaction-editor (on-save-state-content)="$ctrl.onSaveStateContent($event)"
+                                  (on-save-interaction-id)="$ctrl.onSaveInteractionId($event)"
+                                  (on-save-interaction-customization-args)="$ctrl.onSaveInteractionCustomizationArgs($event)"
+                                  (on-save-next-content-id-index)="$ctrl.onSaveNextContentIdIndex($event)"
+                                  (on-save-solution)="$ctrl.onSaveSolution($event)"
+                                  (recompute-graph)="$ctrl.recomputeGraph()"
+                                  (mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+  </oppia-state-interaction-editor>
 </div>
 
 <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">
@@ -50,17 +50,18 @@
                    show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
   </state-responses>
   <div>
-    <state-hints-editor on-save-hints="$ctrl.onSaveHints"
-                        on-save-next-content-id-index="$ctrl.onSaveNextContentIdIndex"
-                        on-save-solution="$ctrl.onSaveSolution"
-                        show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
-    </state-hints-editor>
+    <oppia-state-hints-editor (on-save-next-content-id-index)="$ctrl.onSaveNextContentIdIndex($event)"
+                              (on-save-solution)="$ctrl.onSaveSolution($event)"
+                              (on-save-hints)="$ctrl.onSaveHints($event)"
+                              (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+    </oppia-state-hints-editor>
   </div>
   <div ng-if="currentInteractionCanHaveSolution">
-    <state-solution-editor on-save-solution="$ctrl.onSaveSolution"
-                           refresh-warnings="$ctrl.refreshWarnings"
-                           show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
-    </state-solution-editor>
+    <oppia-state-solution-editor (save-solution)="$ctrl.onSaveSolution($event)"
+                                 (refresh-warnings)="$ctrl.refreshWarnings()"
+                                 (get-solution-change)="getSolutionChange()"
+                                 (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+    </oppia-state-solution-editor>
   </div>
   <div ng-if="$ctrl.explorationIsLinkedToStory">
     <state-skill-editor (on-save-state-content)="$ctrl.onSaveStateContent($event)"

@@ -39,6 +39,7 @@ export class TopicsListComponent {
   @Input() selectedTopicIds: string;
   @Output() selectedTopicIdsChange: EventEmitter<string> = (
     new EventEmitter());
+
   directiveSubscriptions: Subscription = new Subscription();
   selectedIndex: string = null;
   TOPIC_HEADINGS: string[] = [

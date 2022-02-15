@@ -1,10 +1,26 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.rtl.css" as="style">
+
 <div class="stories-list">
   <div class="oppia-stories-list-container">
-    <mat-card class="oppia-page-card oppia-long-text">
-      <h2 class="tab-title">{{ topicName }}</h2>
+    <mat-card class="oppia-page-card oppia-long-text" [ngClass]="checkTabletView() ? 'm-0': 'mat-card-margin-desktop'">
+      <h2 class="tab-title">
+        <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+          {{ topicName }}
+        </span>
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+          {{ topicNameTranslationKey | translate }}
+        </span>
+      </h2>
       <div class="topic-description protractor-test-topic-description">
-        {{ topicDescription }}
+        <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+          {{ topicDescription }}
+        </span>
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+          {{ topicDescTranslationKey | translate }}
+        </span>
       </div>
+      <strong class="stories-can-play text-capitalize" *ngIf="checkTabletView()">{{'I18N_TOPIC_VIEWER_STORIES_HEAD' | translate}}</strong>
       <div *ngFor="let storySummary of canonicalStorySummaries" class="story-info-container">
         <oppia-story-summary-tile [classroomUrlFragment]="classroomUrlFragment"
                                   [storySummary]="storySummary"
@@ -14,39 +30,6 @@
     </mat-card>
   </div>
 </div>
-
-<style>
-  .tab-title {
-    margin: .83em 0 0.1em 0;
-  }
-
-  .story-info-container {
-    padding-top: 4vh;
-  }
-
-  .topic-description {
-    border-bottom: 1px solid #7B7B7B;
-    font-size: 1.1em;
-    padding-bottom: 2vh;
-  }
-
-  .oppia-stories-list-container .oppia-page-card {
-    border-radius: 0.25em;
-    margin-top: 10em;
-    padding-bottom: 7.5vh;
-    width: 704px;
-  }
-
-  @media(max-width: 1024px) {
-    .oppia-stories-list-container .oppia-page-card {
-      width: 80vw;
-    }
-  }
-
-  @media(max-width: 500px) {
-    .oppia-stories-list-container .oppia-page-card {
-      padding: 15px 24px 64px 24px;
-      width: 90vw;
-    }
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.rtl.css">

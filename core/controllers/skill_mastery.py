@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -33,29 +32,52 @@ class SkillMasteryDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'selected_skill_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            }
+        },
+        'PUT': {
+            'mastery_change_per_skill': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                         'schema': {
+                             'type': 'float'
+                         }
+                    }
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        comma_separated_skill_ids = (
-            self.request.get('comma_separated_skill_ids'))
-        if not comma_separated_skill_ids:
-            raise self.InvalidInputException(
-                'Expected request to contain parameter '
-                'comma_separated_skill_ids.')
-
-        skill_ids = comma_separated_skill_ids.split(',')
+        skill_ids = (
+            self.normalized_request.get('selected_skill_ids'))
 
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.InvalidInputException('Invalid skill ID %s' % skill_id)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(
+                'Invalid skill ID %s' % skill_id) from e
 
         try:
             skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
-            raise self.PageNotFoundException(e)
+            raise self.PageNotFoundException(e) from e
 
         degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
             self.user_id, skill_ids)
@@ -69,12 +91,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
     def put(self):
         """Handles PUT requests."""
         mastery_change_per_skill = (
-            self.payload.get('mastery_change_per_skill'))
-        if (not mastery_change_per_skill or
-                not isinstance(mastery_change_per_skill, dict)):
-            raise self.InvalidInputException(
-                'Expected payload to contain mastery_change_per_skill '
-                'as a dict.')
+            self.normalized_payload.get('mastery_change_per_skill'))
 
         skill_ids = list(mastery_change_per_skill.keys())
 
@@ -86,25 +103,9 @@ class SkillMasteryDataHandler(base.BaseHandler):
         for skill_id in skill_ids:
             try:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-            except utils.ValidationError:
+            except utils.ValidationError as e:
                 raise self.InvalidInputException(
-                    'Invalid skill ID %s' % skill_id)
-
-            # float(bool) will not raise an error.
-            if isinstance(mastery_change_per_skill[skill_id], bool):
-                raise self.InvalidInputException(
-                    'Expected degree of mastery of skill %s to be a number, '
-                    'received %s.'
-                    % (skill_id, mastery_change_per_skill[skill_id]))
-
-            try:
-                mastery_change_per_skill[skill_id] = (
-                    float(mastery_change_per_skill[skill_id]))
-            except (TypeError, ValueError):
-                raise self.InvalidInputException(
-                    'Expected degree of mastery of skill %s to be a number, '
-                    'received %s.'
-                    % (skill_id, mastery_change_per_skill[skill_id]))
+                    'Invalid skill ID %s' % skill_id) from e
 
             if current_degrees_of_mastery[skill_id] is None:
                 current_degrees_of_mastery[skill_id] = 0.0
@@ -120,7 +121,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
         try:
             skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
-            raise self.PageNotFoundException(e)
+            raise self.PageNotFoundException(e) from e
 
         skill_services.create_multi_user_skill_mastery(
             self.user_id, new_degrees_of_mastery)
@@ -135,9 +136,10 @@ class SubtopicMasteryDataHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'comma_separated_topic_ids': {
+            'selected_topic_ids': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
                 }
             }
         }
@@ -146,9 +148,7 @@ class SubtopicMasteryDataHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        comma_separated_topic_ids = (
-            self.request.get('comma_separated_topic_ids'))
-        topic_ids = comma_separated_topic_ids.split(',')
+        topic_ids = self.normalized_request.get('selected_topic_ids')
         topics = topic_fetchers.get_topics_by_ids(topic_ids)
         all_skill_ids = []
         subtopic_mastery_dict = {}
@@ -173,9 +173,8 @@ class SubtopicMasteryDataHandler(base.BaseHandler):
                 if skill_mastery_dict:
                     # Subtopic mastery is average of skill masteries.
                     subtopic_mastery_dict[topic.id][subtopic.id] = (
-                        python_utils.divide(
-                            sum(skill_mastery_dict.values()),
-                            len(skill_mastery_dict)))
+                        sum(skill_mastery_dict.values()) /
+                        len(skill_mastery_dict))
 
         self.values.update({
             'subtopic_mastery_dict': subtopic_mastery_dict

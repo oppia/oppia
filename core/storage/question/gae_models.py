@@ -20,7 +20,6 @@ import math
 import random
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.platform import models
@@ -362,7 +361,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_skill_link_id = cls.get_model_id(question_id, skill_id)
         if cls.get(question_skill_link_id, strict=False) is not None:
             raise Exception(
-                'The given question is already linked to given skill')
+                'The question with ID %s is already linked to skill %s' %
+                (question_id, skill_id))
 
         question_skill_link_model_instance = cls(
             id=question_skill_link_id,
@@ -448,8 +448,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             return []
 
         question_count_per_skill = int(
-            math.ceil(python_utils.divide( # type: ignore[no-untyped-call]
-                float(total_question_count), float(len(skill_ids)))))
+            math.ceil(float(total_question_count) / float(len(skill_ids))))
 
         question_skill_link_mapping = {}
 
@@ -591,8 +590,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         question_count_per_skill = int(
             math.ceil(
-                python_utils.divide( # type: ignore[no-untyped-call]
-                    float(total_question_count), float(len(skill_ids)))))
+                float(total_question_count) / float(len(skill_ids))))
         question_skill_link_models = []
         existing_question_ids = []
 

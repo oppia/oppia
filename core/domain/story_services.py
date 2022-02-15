@@ -390,7 +390,7 @@ def validate_explorations_for_story(exp_ids, strict):
                 logging.exception(
                     'Exploration validation failed for exploration with ID: '
                     '%s. Error: %s' % (exp_id, e))
-                raise Exception(e)
+                raise Exception(e) from e
 
     return validation_error_messages
 
@@ -475,7 +475,8 @@ def _save_story(
             'Unexpected error: trying to update version %s of story '
             'from version %s. Please reload the page and try again.'
             % (story_model.version, story.version))
-    elif story.version < story_model.version:
+
+    if story.version < story_model.version:
         raise Exception(
             'Trying to update version %s of story from version %s, '
             'which is too old. Please reload the page and try again.'

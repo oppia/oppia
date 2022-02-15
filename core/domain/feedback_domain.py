@@ -19,7 +19,6 @@ from __future__ import annotations
 import datetime
 
 from core import utils
-from core.domain import user_services
 
 from typing import Dict, List, Optional
 from typing_extensions import TypedDict
@@ -29,7 +28,7 @@ class FeedbackThreadDict(TypedDict):
     """Dict for FeedbackThread object."""
 
     last_updated_msecs: float
-    original_author_username: Optional[str]
+    original_author_id: str
     state_name: str
     status: str
     subject: str
@@ -37,13 +36,13 @@ class FeedbackThreadDict(TypedDict):
     thread_id: str
     message_count: int
     last_nonempty_message_text: Optional[str]
-    last_nonempty_message_author: Optional[str]
+    last_nonempty_message_author_id: Optional[str]
 
 
 class FeedbackMessageDict(TypedDict):
     """Dict for FeedbackMessage object."""
 
-    author_username: Optional[str]
+    author_id: str
     created_on_msecs: float
     entity_type: str
     entity_id: str
@@ -143,9 +142,7 @@ class FeedbackThread:
         return {
             'last_updated_msecs': (
                 utils.get_time_in_millisecs(self.last_updated)),
-            'original_author_username': (
-                user_services.get_username(self.original_author_id) # type: ignore[no-untyped-call]
-                if self.original_author_id else None),
+            'original_author_id': self.original_author_id,
             'state_name': self.state_name,
             'status': self.status,
             'subject': self.subject,
@@ -153,9 +150,8 @@ class FeedbackThread:
             'thread_id': self.id,
             'message_count': self.message_count,
             'last_nonempty_message_text': self.last_nonempty_message_text,
-            'last_nonempty_message_author': (
-                user_services.get_username(self.last_nonempty_message_author_id) # type: ignore[no-untyped-call]
-                if self.last_nonempty_message_author_id else None),
+            'last_nonempty_message_author_id': (
+                self.last_nonempty_message_author_id),
         }
 
     def _get_full_message_id(self, message_id: int) -> str:
@@ -254,9 +250,7 @@ class FeedbackMessage:
             dict. Dict representation of the FeedbackMessage object.
         """
         return {
-            'author_username': (
-                user_services.get_username(self.author_id) # type: ignore[no-untyped-call]
-                if self.author_id else None),
+            'author_id': self.author_id,
             'created_on_msecs': utils.get_time_in_millisecs(self.created_on),
             'entity_type': self.entity_type,
             'entity_id': self.entity_id,

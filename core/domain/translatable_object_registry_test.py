@@ -35,14 +35,14 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
         """Tests that trying to retrieve a non-translatable class raises an
         error.
         """
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             TypeError, 'not a valid translatable object class'):
             translatable_object_registry.Registry.get_object_class(
                 'Int')
 
     def test_fake_class_is_not_gettable(self):
         """Tests that trying to retrieve a fake class raises an error."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             TypeError, 'not a valid translatable object class'):
             translatable_object_registry.Registry.get_object_class('FakeClass')
 
@@ -51,12 +51,12 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
         registry.
         """
         assert getattr(objects, 'BaseObject')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             TypeError, 'not a valid translatable object class'):
             translatable_object_registry.Registry.get_object_class('BaseObject')
 
         assert getattr(objects, 'BaseTranslatableObject')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             TypeError, 'not a valid translatable object class'):
             translatable_object_registry.Registry.get_object_class(
                 'BaseTranslatableObject')
