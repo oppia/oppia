@@ -36,6 +36,11 @@ import { SkillPreviewModalComponent } from '../skill-preview-modal.component';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { AppConstants } from 'app.constants';
 
+interface BindableFieldDict {
+  displayedConceptCardExplanation: string;
+  displayedWorkedExamples: WorkedExample[];
+}
+
 @Component({
   selector: 'oppia-skill-concept-card-editor',
   templateUrl: './skill-concept-card-editor.component.html'
@@ -47,8 +52,7 @@ export class SkillConceptCardEditorComponent implements OnInit {
   skill: Skill;
   skillEditorCardIsShown: boolean;
   workedExamplesListIsShown: boolean;
-  bindableFieldsDict;
-  WORKED_EXAMPLES_SORTABLE_OPTIONS;
+  bindableFieldsDict: BindableFieldDict;
   activeWorkedExampleIndex: number;
   COMPONENT_NAME_WORKED_EXAMPLE = (
     AppConstants.COMPONENT_NAME_WORKED_EXAMPLE);
@@ -201,29 +205,6 @@ export class SkillConceptCardEditorComponent implements OnInit {
       this.skillEditorStateService.onSkillChange.subscribe(
         () => this.initBindableFieldsDict())
     );
-
-    // When the page is scrolled so that the top of the page is above
-    // the browser viewport, there are some bugs in the positioning of
-    // the helper. This is a bug in jQueryUI that has not been fixed
-    // yet. For more details, see http://stackoverflow.com/q/5791886
-    this.WORKED_EXAMPLES_SORTABLE_OPTIONS = {
-      axis: 'y',
-      cursor: 'move',
-      handle: '.oppia-worked-example-sort-handle',
-      items: '.oppia-sortable-worked-example',
-      revert: 100,
-      tolerance: 'pointer',
-      start: (e, ui) => {
-        this.activeWorkedExampleIndex = null;
-        ui.placeholder.height(ui.item.height());
-      },
-      stop: () => {
-        let newWorkedExamples =
-          this.bindableFieldsDict.displayedWorkedExamples;
-        this.skillUpdateService.updateWorkedExamples(
-          this.skill, newWorkedExamples);
-      }
-    };
   }
 
   ngOnDestroy(): void {
