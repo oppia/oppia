@@ -16,14 +16,10 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core import utils
 
 from typing import Dict, Optional
-
-from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
 
 USER_DELETION_SUCCESS = 'SUCCESS'
 USER_DELETION_ALREADY_DONE = 'ALREADY DONE'
@@ -95,6 +91,6 @@ class PendingDeletionRequest:
                 contains wrong key.
         """
         for key in self.pseudonymizable_entity_mappings.keys():
-            if key not in [name.value for name in models.NAMES]:
+            if key not in [name.value for name in feconf.VALID_MODEL_NAMES]:
                 raise utils.ValidationError(
                     'pseudonymizable_entity_mappings contain wrong key')
