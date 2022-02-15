@@ -122,7 +122,9 @@ var ListEditor = function(elem) {
   // NOTE: this returns a promise, not an integer.
   var _getLength = async function() {
     var items = (
-      await elem.all(by.repeater('item in localValue track by $index')));
+      await elem.all(by.id(
+        'protractor-test-schema-based-list-editor-table-row')).all(
+        by.tagName('tr')));
     return items.length;
   };
   // If objectType is specified this returns an editor for objects of that type
@@ -136,9 +138,10 @@ var ListEditor = function(elem) {
     await action.click('Add List Entry Button', addListEntryButton);
     if (objectType !== null) {
       return await getEditor(objectType)(
-        elem.element(
-          await by.repeater(
-            'item in localValue track by $index').row(listLength)));
+        elem.all(
+          by.css(
+            '.protractor-test-schema-based-list-editor-table-data'))
+          .get(listLength));
     }
   };
   var deleteItem = async function(index) {
@@ -152,8 +155,10 @@ var ListEditor = function(elem) {
 
   return {
     editItem: async function(index, objectType) {
-      var item = await elem.element(
-        await by.repeater('item in localValue track by $index').row(index));
+      var item = await elem.all(
+        by.css(
+          '.protractor-test-schema-based-list-editor-table-data'))
+        .get(index);
       var editor = getEditor(objectType);
       return await editor(item);
     },
@@ -161,8 +166,9 @@ var ListEditor = function(elem) {
     deleteItem: deleteItem,
     // This will add or delete list elements as necessary.
     setLength: async function(desiredLength) {
-      var startingLength = await elem.all(
-        await by.repeater('item in localValue track by $index')).count();
+      var startingLength = await elem.all(by.id(
+        'protractor-test-schema-based-list-editor-table-row')).all(
+        by.tagName('tr')).count();
       for (var i = startingLength; i < desiredLength; i++) {
         await addItem();
       }

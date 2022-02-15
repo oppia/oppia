@@ -20,8 +20,8 @@
 <div class="schema-based-list-editor">
   <form #listEditorForm="ngForm">
     <table class="w-100">
-      <tr *ngFor="let item of localValue; let idx = index">
-        <td>
+      <tr *ngFor="let item of localValue; let idx = index" id="protractor-test-schema-based-list-editor-table-row">
+        <td class="protractor-test-schema-based-list-editor-table-data">
           <schema-based-editor [schema]="itemSchema"
                                [disabled]="disabled"
                                [ngModel]="localValue[idx]"

@@ -36,6 +36,7 @@ implements OnInit, ControlValueAccessor, Validator {
   schema: RealSchema = {
     type: 'float'
   };
+
   onChange: (_: unknown) => void = () => {};
   onTouch: () => void = () => {};
   onValidatorChange: () => void = () => {};
