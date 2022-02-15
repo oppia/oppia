@@ -30,12 +30,15 @@ class MockTranslateService {
     if (key === 'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO') {
       return (
         'The answer should be greater than or equal to zero. ' +
-        'It should not contain symbol(-).');
+        'It should not contain minus symbol (-).'
+      );
     } else if (
-      key === 'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS') {
+      key === 'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS'
+    ) {
       return (
         'The answer can contain at most 15 digits (0-9) ' +
-        'excluding symbols (. or -).');
+        'excluding symbols (. or -).'
+      );
     }
   }
 }
