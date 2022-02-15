@@ -50,44 +50,42 @@
           These will be displayed one-by-one to the learner, in order, if they ask for them.
         </div>
         <div *ngIf="bindableFieldsDict.displayedWorkedExamples.length > 0">
-          <ul class="nav oppia-option-list nav-stacked nav-pills worked-examples-list"
-              role="tablist"
-              ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS"
-              [(ngModel)]="bindableFieldsDict.displayedWorkedExamples">
-            <li *ngFor="let workedExample of bindableFieldsDict.displayedWorkedExamples; let i = index"
-                [ngClass]="{'active': activeWorkedExampleIndex === i, 'last-element': i === bindableFieldsDict.displayedWorkedExamples.length - 1}"
-                class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection">
+          <div cdkDropList (cdkDropListDropped)="drop($event)"
+               class="nav oppia-option-list nav-stacked nav-pills worked-examples-list">
+            <div cdkDrag *ngFor="let workedExample of bindableFieldsDict.displayedWorkedExamples; let index = index"
+                 [ngClass]="{'active': activeWorkedExampleIndex === index, 'last-element': index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
+                 class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection">
               <span class="oppia-worked-example-sort-handle"
                     *ngIf="bindableFieldsDict.displayedWorkedExamples.length > 1"
                     (mousedown)="changeActiveWorkedExampleIndex(-1)">
                 <picture>
-                  <source type="image/webp" [srcset]="getStaticImageUrl('/general/drag_dots.webp')">
-                  <source type="image/png" [srcset]="getStaticImageUrl('/general/drag_dots.png')">
+                  <source type="image/webp" [src]="getStaticImageUrl('/general/drag_dots.webp')">
+                  <source type="image/png" [src]="getStaticImageUrl('/general/drag_dots.png')">
                   <img [src]="getStaticImageUrl('/general/drag_dots.png')" width="10">
                 </picture>
               </span>
-              <a (click)="changeActiveWorkedExampleIndex(i)"
-                 class="oppia-rule-tab protractor-test-worked-example-<[i]>"
-                 [ngClass]="{'oppia-rule-tab-active': activeWorkedExampleIndex === i}">
-                <oppia-summary-list-header [index]="i"
+              <a (click)="changeActiveWorkedExampleIndex(index)"
+                 class="oppia-rule-tab protractor-test-worked-example-{{ i }}"
+                 [ngClass]="{'oppia-rule-tab-active': activeWorkedExampleIndex === index}">
+                <oppia-summary-list-header [index]="index"
                                            [disableSorting]="bindableFieldsDict.displayedWorkedExamples.length === 1"
                                            [summary]="getWorkedExampleSummary(workedExample.getQuestion().html)"
                                            [shortSummary]="getWorkedExampleSummary(workedExample.getQuestion().html)"
-                                           [isActive]="i === activeWorkedExampleIndex"
+                                           [isActive]="index === activeWorkedExampleIndex"
                                            [isDeleteAvailable]="isEditable"
                                            (summaryDelete)="deleteWorkedExample()">
                 </oppia-summary-list-header>
               </a>
-              <div *ngIf="activeWorkedExampleIndex === i">
+              <div *ngIf="activeWorkedExampleIndex === index">
                 <div class="oppia-editor-card-section">
-                  <oppia-worked-example-editor [worked-example]="workedExample"
-                                               [index]="i"
+                  <oppia-worked-example-editor [workedExample]="workedExample"
+                                               [index]="index"
                                                [isEditable]="isEditable">
                   </oppia-worked-example-editor>
                 </div>
               </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
         <button type="button"
                 class="btn btn-add-skill-example skill-editor-add-btn protractor-test-add-worked-example"
@@ -99,6 +97,34 @@
   </div>
 </div>
 <style>
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+  .cdk-drag-preview {
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+  }
+  .oppia-worked-example-sort-handle {
+    padding-right: 4px;
+    position: absolute;
+    top: 9px;
+  }
+  .oppia-sortable-worked-example {
+    align-items: center;
+    cursor: pointer;
+    justify-content: space-between;
+    padding: 10px 8px;
+    position: relative;
+  }
+  .oppia-option-list.cdk-drop-list-dragging .oppia-sortable-worked-example:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
   .concept-card-subtitle {
     color: #595959;
     font-size: 13px;

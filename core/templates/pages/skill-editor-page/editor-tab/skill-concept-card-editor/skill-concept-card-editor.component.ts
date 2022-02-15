@@ -16,13 +16,14 @@
  * @fileoverview Component for the concept card editor.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { CdkDragSortEvent, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
+import { WorkedExample, WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AddWorkedExampleModalComponent } from 'pages/skill-editor-page/modal-templates/add-worked-example.component';
 import { DeleteWorkedExampleComponent } from 'pages/skill-editor-page/modal-templates/delete-worked-example-modal.component';
@@ -33,12 +34,15 @@ import { PageTitleService } from 'services/page-title.service';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { SkillPreviewModalComponent } from '../skill-preview-modal.component';
 import { Skill } from 'domain/skill/SkillObjectFactory';
+import { AppConstants } from 'app.constants';
+
 
 @Component({
   selector: 'oppia-skill-concept-card-editor',
   templateUrl: './skill-concept-card-editor.component.html'
 })
 export class SkillConceptCardEditorComponent implements OnInit {
+  @Output() getConceptCardChange = new EventEmitter();
   directiveSubscriptions: Subscription = new Subscription();
   isEditable: boolean;
   skill: Skill;
@@ -47,7 +51,8 @@ export class SkillConceptCardEditorComponent implements OnInit {
   bindableFieldsDict;
   WORKED_EXAMPLES_SORTABLE_OPTIONS;
   activeWorkedExampleIndex: number;
-  COMPONENT_NAME_WORKED_EXAMPLE;
+  COMPONENT_NAME_WORKED_EXAMPLE = (
+    AppConstants.COMPONENT_NAME_WORKED_EXAMPLE);
 
   constructor(
     private formatRtePreviewPipe: FormatRtePreviewPipe,
@@ -60,6 +65,12 @@ export class SkillConceptCardEditorComponent implements OnInit {
     private windowDimensionsService: WindowDimensionsService,
     private workedExampleObjectFactory: WorkedExampleObjectFactory,
   ) {}
+
+  drop(event: CdkDragSortEvent<WorkedExample[]>): void {
+    moveItemInArray(
+      this.bindableFieldsDict.displayedWorkedExamples, event.previousIndex,
+      event.currentIndex);
+  }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
@@ -100,6 +111,7 @@ export class SkillConceptCardEditorComponent implements OnInit {
       this.bindableFieldsDict.displayedWorkedExamples =
         this.skill.getConceptCard().getWorkedExamples();
       this.activeWorkedExampleIndex = null;
+      this.getConceptCardChange.emit();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -135,6 +147,7 @@ export class SkillConceptCardEditorComponent implements OnInit {
         this.skill, newExample);
       this.bindableFieldsDict.displayedWorkedExamples =
         this.skill.getConceptCard().getWorkedExamples();
+      this.getConceptCardChange.emit();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -219,4 +232,3 @@ export class SkillConceptCardEditorComponent implements OnInit {
 
 angular.module('oppia').directive('oppiaSkillConceptCardEditor',
   downgradeComponent({component: SkillConceptCardEditorComponent}));
-

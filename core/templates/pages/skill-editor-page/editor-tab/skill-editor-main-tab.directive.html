@@ -7,7 +7,7 @@
         </a>
         <span><[skill.getDescription()]></span>
       </p>
-      <oppia-skill-concept-card-editor></oppia-skill-concept-card-editor>
+      <oppia-skill-concept-card-editor (get-concept-card-change)="getConceptCardChange()"></oppia-skill-concept-card-editor>
       <oppia-skill-misconceptions-editor (get-misconceptions-change)="getMisconceptionChange()"></oppia-skill-misconceptions-editor>
       <oppia-skill-prerequisite-skills-editor></oppia-skill-prerequisite-skills-editor>
       <oppia-skill-rubrics-editor></oppia-skill-rubrics-editor>
