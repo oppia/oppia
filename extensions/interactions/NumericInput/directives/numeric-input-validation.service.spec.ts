@@ -337,10 +337,10 @@ describe('NumericInputValidationService', () => {
   it('should generate errors in the given input', () => {
     expect(
       validatorService.getErrorStringI18nKey(1200000000E+27, false)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
+      'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS');
     expect(
       validatorService.getErrorStringI18nKey(1200000000E-27, false)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
+      'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS');
     expect(
       validatorService.getErrorStringI18nKey(999999999999999, false)).toEqual(
       undefined);
@@ -360,7 +360,10 @@ describe('NumericInputValidationService', () => {
       validatorService.getErrorStringI18nKey(99999999999999, true)).toEqual(
       undefined);
     expect(
-      validatorService.getErrorStringI18nKey(9999999999999999, true)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1');
+      validatorService.getErrorStringI18nKey(-99999999999999, true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO');
+    expect(
+      validatorService.getErrorStringI18nKey(Number('wqw'), true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
   });
 });
