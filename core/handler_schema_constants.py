@@ -86,7 +86,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'UpdateQuestionSuggestionHandler',
     'UpdateTranslationSuggestionHandler',
     'UrlHandler',
-    'UserInfoHandler',
     'UserSubmittedSuggestionsHandler',
     'UsernameCheckHandler',
     'ValidateExplorationsHandler',
