@@ -65,7 +65,7 @@
                 </picture>
               </span>
               <a (click)="changeActiveWorkedExampleIndex(index)"
-                 class="oppia-rule-tab protractor-test-worked-example-{{ i }}"
+                 class="oppia-rule-tab protractor-test-worked-example-{{ index }}"
                  [ngClass]="{'oppia-rule-tab-active': activeWorkedExampleIndex === index}">
                 <oppia-summary-list-header [index]="index"
                                            [disableSorting]="bindableFieldsDict.displayedWorkedExamples.length === 1"
