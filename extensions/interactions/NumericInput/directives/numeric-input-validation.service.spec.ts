@@ -354,11 +354,14 @@ describe('NumericInputValidationService', () => {
 
   it('should generate errors in the given input', () => {
     expect(
-      validatorService.validateNumber(1200000000E+27, false)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
+      validatorService.validateNumber(-999999999, true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_3');
     expect(
-      validatorService.validateNumber(1200000000E-27, false)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
+      validatorService.validateNumber(1200000000e+27, false)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2_DOT');
+    expect(
+      validatorService.validateNumber(1200000000e-27, false, ',')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2_COMMA');
     expect(
       validatorService.validateNumber(999999999999999, false)).toEqual(
       undefined);
@@ -379,6 +382,6 @@ describe('NumericInputValidationService', () => {
       undefined);
     expect(
       validatorService.validateNumber(9999999999999999, true)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1');
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1');      
   });
 });

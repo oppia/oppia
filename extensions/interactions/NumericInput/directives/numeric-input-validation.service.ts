@@ -216,15 +216,15 @@ export class NumericInputValidationService {
     const extraExponent = /e.*e/g;
 
     if (value.includes(decimalSeparator) && !value.match(trailingDot)) {
-      return 'Trailing decimals are not allowed.';
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_4';
     } else if (value.match(twoDecimals)) {
-      return 'At most 1 decimal point should be present.';
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_5';
     } else if (value.includes('-') && !value.match(trailingMinus)) {
-      return 'Minus (-) sign is only allowed in beginning.';
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_6';
     } else if (value.includes('-') && value.match(extraMinus)) {
-      return 'At most 1 minus (-) sign should be present.';
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_7';
     } else if (value.includes('e') && value.match(extraExponent)) {
-      return 'At most 1 exponent sign (e) should be present.';
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_8';
     }
   }
 
@@ -233,7 +233,7 @@ export class NumericInputValidationService {
       value: number, customizationArgs: boolean, decimalSeparator: string = '.'
   ): string | undefined {
     if (customizationArgs && value < 0) {
-      return 'The answer must be greater than or equal to zero';
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_3';
     }
 
     let stringValue = null;
@@ -265,11 +265,13 @@ export class NumericInputValidationService {
     const stringValueRegExp = stringValue.match(/\d/g);
 
     if (stringValueRegExp === null) {
-      return 'The answer should be a valid number and can ' +
-      `contain at most 15 digits (0-9) or symbols(${decimalSeparator} or -).`;
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1';
     } else if (stringValueRegExp.length > 15) {
-      return 'The answer can contain at most 15 digits (0-9) or symbols ' +
-        `(${decimalSeparator} or -).`;
+      if(decimalSeparator === ','){
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2_COMMA';
+      } else {
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2_DOT';
+      }
     }
   }
 }
