@@ -24,10 +24,10 @@
       </div>
     </div>
   </div>
-  <button class="btn btn-default btn-show-preview" 
-          *ngIf="skillEditorCardIsShown" 
-          (click)="showSkillPreview()">
-      Preview Concept Card
+  <button class="btn btn-default btn-show-preview oppia-concept-card-preview-btn" 
+        *ngIf="skillEditorCardIsShown" 
+        (click)="showSkillPreview()">
+    Preview Concept Card
   </button>
 </div>
 
@@ -116,14 +116,21 @@
     top: 9px;
   }
   .oppia-sortable-worked-example {
+    background-color: #f6f6f6;
     align-items: center;
     cursor: pointer;
     justify-content: space-between;
     padding: 10px 8px;
     position: relative;
   }
+  .oppia-sortable-worked-example:hover {
+    background-color: #eee;
+  }
   .oppia-option-list.cdk-drop-list-dragging .oppia-sortable-worked-example:not(.cdk-drag-placeholder) {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .oppia-concept-card-preview-btn {
+    width: 100%;
   }
   .concept-card-subtitle {
     color: #595959;

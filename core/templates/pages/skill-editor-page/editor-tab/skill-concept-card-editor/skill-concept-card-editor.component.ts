@@ -36,13 +36,12 @@ import { SkillPreviewModalComponent } from '../skill-preview-modal.component';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { AppConstants } from 'app.constants';
 
-
 @Component({
   selector: 'oppia-skill-concept-card-editor',
   templateUrl: './skill-concept-card-editor.component.html'
 })
 export class SkillConceptCardEditorComponent implements OnInit {
-  @Output() getConceptCardChange = new EventEmitter();
+  @Output() getConceptCardChange: EventEmitter<void> = new EventEmitter();
   directiveSubscriptions: Subscription = new Subscription();
   isEditable: boolean;
   skill: Skill;
@@ -70,6 +69,9 @@ export class SkillConceptCardEditorComponent implements OnInit {
     moveItemInArray(
       this.bindableFieldsDict.displayedWorkedExamples, event.previousIndex,
       event.currentIndex);
+    this.skillUpdateService.updateWorkedExamples(
+      this.skill, this.bindableFieldsDict.displayedWorkedExamples);
+    this.getConceptCardChange.emit();
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -90,7 +92,6 @@ export class SkillConceptCardEditorComponent implements OnInit {
   onSaveExplanation(explanationObject: SubtitledHtml): void {
     this.skillUpdateService.setConceptCardExplanation(
       this.skill, explanationObject);
-    this.initBindableFieldsDict();
   }
 
   changeActiveWorkedExampleIndex(idx: number): void {
