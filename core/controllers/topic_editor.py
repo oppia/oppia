@@ -419,8 +419,7 @@ class EditableTopicDataHandler(base.BaseHandler):
                 topic_and_subtopic_page_change_list.append(
                     subtopic_page_domain.SubtopicPageChange(change.to_dict()))
             else:
-                topic_and_subtopic_page_change_list.append(
-                    topic_domain.TopicChange(change.to_dict()))
+                topic_and_subtopic_page_change_list.append(change)
         try:
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, topic_and_subtopic_page_change_list,
