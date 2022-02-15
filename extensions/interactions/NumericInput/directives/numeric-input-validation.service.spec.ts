@@ -336,19 +336,19 @@ describe('NumericInputValidationService', () => {
 
   it('should generate errors for string representation of the input', ()=>{
     expect(validatorService.validateNumericString('12.', '.')).toEqual(
-      'Trailing decimals are not allowed.'
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_4'
     );
     expect(validatorService.validateNumericString('12.22.1', '.')).toEqual(
-      'At most 1 decimal point should be present.'
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_5'
     );
     expect(validatorService.validateNumericString('12-', '.')).toEqual(
-      'Minus (-) sign is only allowed in beginning.'
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_6'
     );
     expect(validatorService.validateNumericString('--12', '.')).toEqual(
-      'At most 1 minus (-) sign should be present.'
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_7'
     );
     expect(validatorService.validateNumericString('12e12e', '.')).toEqual(
-      'At most 1 exponent sign (e) should be present.'
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_8'
     );
   });
 
@@ -380,8 +380,5 @@ describe('NumericInputValidationService', () => {
     expect(
       validatorService.validateNumber(99999999999999, true)).toEqual(
       undefined);
-    expect(
-      validatorService.validateNumber(9999999999999999, true)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1');
   });
 });
