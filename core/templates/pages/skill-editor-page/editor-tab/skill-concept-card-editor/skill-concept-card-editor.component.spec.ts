@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the skill editor main tab component.
  */
@@ -36,6 +35,14 @@ class MockNgbModalRef {
   componentInstance = {};
 }
 
+class MockNgbModalRefPreview {
+  componentInstance = {
+    skillDescription: null,
+    skillExplanation: null,
+    skillWorkedExamples: null,
+  };
+}
+
 describe('Skill Concept Card Editor Component', () => {
   let component: SkillConceptCardEditorComponent;
   let fixture: ComponentFixture<SkillConceptCardEditorComponent>;
@@ -45,20 +52,6 @@ describe('Skill Concept Card Editor Component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let windowDimensionsService: WindowDimensionsService;
   let mockEventEmitter = new EventEmitter();
-
-  let mockUi = {
-    placeholder: {
-      height() {
-        return;
-      }
-    },
-    item: {
-      height() {
-        return;
-      }
-    }
-  };
-
   let sampleSkill: Skill;
 
   beforeEach(waitForAsync(() => {
@@ -109,45 +102,51 @@ describe('Skill Concept Card Editor Component', () => {
   });
 
   it('should set properties when initialized', () => {
-    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS).toBe(undefined);
-
     component.ngOnInit();
     mockEventEmitter.emit();
-    component.WORKED_EXAMPLES_SORTABLE_OPTIONS.start(null, mockUi);
-    component.WORKED_EXAMPLES_SORTABLE_OPTIONS.stop();
+    fixture.detectChanges();
 
-    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS.axis).toBe('y');
-    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS.cursor).toBe('move');
-    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS.handle).toBe(
-      '.oppia-worked-example-sort-handle');
-    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS.items).toBe(
-      '.oppia-sortable-worked-example');
-    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS.revert).toBe(100);
-    expect(component.WORKED_EXAMPLES_SORTABLE_OPTIONS.tolerance).toBe(
-      'pointer');
+    expect(component.isEditable).toBe(true);
+    expect(component.skillEditorCardIsShown).toBe(true);
+    expect(component.skill).toBe(sampleSkill);
   });
 
-  it('should get static image url when calling ' +
-    '\getStaticImageUrl\'', () => {
+  it('should change list oder', () => {
+    component.ngOnInit();
+
+    const event = {
+      previousIndex: 1,
+      currentIndex: 2,
+      container: undefined,
+      item: undefined,
+    };
+    spyOn(skillUpdateService, 'updateWorkedExamples').and.callThrough();
+    spyOn(component.getConceptCardChange, 'emit').and.callThrough();
+
+    component.drop(event);
+
+    expect(skillUpdateService.updateWorkedExamples).toHaveBeenCalled();
+    expect(component.getConceptCardChange.emit).toHaveBeenCalled();
+  });
+
+  it('should return image url', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('imagePath');
 
     expect(component.getStaticImageUrl('/imagePath')).toBe('imagePath');
   });
 
-  it('should update skill on saving explanation ' +
-    'when calling \'onSaveExplanation\'', () => {
+  it('should update skill on saving explanation', () => {
     let updateSpy = spyOn(skillUpdateService, 'setConceptCardExplanation')
       .and.returnValue(null);
 
     component.ngOnInit();
-    component.onSaveExplanation({});
+    component.onSaveExplanation(null);
 
     expect(updateSpy).toHaveBeenCalled();
   });
 
-  it('should change current index when calling ' +
-    '\changeActiveWorkedExampleIndex\'', () => {
+  it('should change current index on calling', () => {
     component.ngOnInit();
 
     // Case: 1
@@ -155,11 +154,13 @@ describe('Skill Concept Card Editor Component', () => {
     // it should set index value to null.
     component.activeWorkedExampleIndex = 2;
     component.changeActiveWorkedExampleIndex(2);
+
     expect(component.activeWorkedExampleIndex).toBe(null);
 
     // Case: 2
     // It should set new index as current index.
     component.changeActiveWorkedExampleIndex(3);
+
     expect(component.activeWorkedExampleIndex).toBe(3);
   });
 
@@ -167,13 +168,13 @@ describe('Skill Concept Card Editor Component', () => {
     'clicking on delete button', fakeAsync(() => {
     let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: new MockNgbModalRef(),
-      result: $q.resolve()
+      result: Promise.resolve()
     } as NgbModalRef);
     let deleteWorkedExampleSpy = spyOn(
       skillUpdateService, 'deleteWorkedExample').and.returnValue(null);
 
     component.ngOnInit();
-    component.deleteWorkedExample();
+    component.deleteWorkedExample(0, '');
     tick();
 
     expect(modalSpy).toHaveBeenCalled();
@@ -190,7 +191,7 @@ describe('Skill Concept Card Editor Component', () => {
       skillUpdateService, 'deleteWorkedExample').and.returnValue(null);
 
     component.ngOnInit();
-    component.deleteWorkedExample();
+    component.deleteWorkedExample(0, '');
     tick();
 
     expect(modalSpy).toHaveBeenCalled();
@@ -201,7 +202,7 @@ describe('Skill Concept Card Editor Component', () => {
     'clicking on add button', fakeAsync(() => {
     let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: new MockNgbModalRef(),
-      result: $q.resolve({
+      result: Promise.resolve({
         workedExampleQuestionHtml: 'questionHtml',
         workedExampleExplanationHtml: 'explanationHtml'
       })
@@ -211,7 +212,6 @@ describe('Skill Concept Card Editor Component', () => {
 
     component.ngOnInit();
     component.openAddWorkedExampleModal();
-    tick();
     tick();
 
     expect(modalSpy).toHaveBeenCalled();
@@ -237,7 +237,10 @@ describe('Skill Concept Card Editor Component', () => {
 
   it('should open show skill preview modal when ' +
     'clicking on preview button', fakeAsync(() => {
-    let modalSpy = spyOn(ngbModal, 'open').and.callThrough();
+    let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: new MockNgbModalRefPreview(),
+      result: Promise.resolve()
+    } as NgbModalRef);
 
     component.ngOnInit();
     component.showSkillPreview();
@@ -246,34 +249,49 @@ describe('Skill Concept Card Editor Component', () => {
     expect(modalSpy).toHaveBeenCalled();
   }));
 
-  it('should toggle worked example list when calling ' +
-    '\toggleWorkedExampleList\'', () => {
+  it('should close show skill preview modal when ' +
+    'clicking on cancel button', fakeAsync(() => {
+    let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: new MockNgbModalRefPreview(),
+      result: Promise.reject()
+    } as NgbModalRef);
+
+    component.ngOnInit();
+    component.showSkillPreview();
+    tick();
+
+    expect(modalSpy).toHaveBeenCalled();
+  }));
+
+  it('should toggle worked example on clicking', () => {
     component.workedExamplesListIsShown = true;
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);
 
     component.toggleWorkedExampleList();
-    expect(component.workedExamplesListIsShown).toBe(false);
+
+    expect(component.workedExamplesListIsShown).toBeFalse();
 
     component.toggleWorkedExampleList();
-    expect(component.workedExamplesListIsShown).toBe(true);
+
+    expect(component.workedExamplesListIsShown).toBeTrue();
   });
 
-  it('should toggle skill editor card when calling ' +
-    '\toggleSkillEditorCard\'', () => {
+  it('should toggle skill editor card on clicking', () => {
     component.skillEditorCardIsShown = true;
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);
 
     component.toggleSkillEditorCard();
-    expect(component.skillEditorCardIsShown).toBe(false);
+
+    expect(component.skillEditorCardIsShown).toBeFalse();
 
     component.toggleSkillEditorCard();
-    expect(component.skillEditorCardIsShown).toBe(true);
+
+    expect(component.skillEditorCardIsShown).toBeTrue();
   });
 
-  it('should format given worked example summary html content' +
-    'when calling \'getWorkedExampleSummary\'', () => {
+  it('should format given worked example summary html content', () => {
     let result = component.getWorkedExampleSummary('<p>Worked Example</p>');
 
     expect(result).toBe('Worked Example');

@@ -203,7 +203,10 @@ export class SkillConceptCardEditorComponent implements OnInit {
       !this.windowDimensionsService.isWindowNarrow());
     this.directiveSubscriptions.add(
       this.skillEditorStateService.onSkillChange.subscribe(
-        () => this.initBindableFieldsDict())
+        () => {
+          this.initBindableFieldsDict();
+        }
+      )
     );
   }
 
@@ -213,4 +216,6 @@ export class SkillConceptCardEditorComponent implements OnInit {
 }
 
 angular.module('oppia').directive('oppiaSkillConceptCardEditor',
-  downgradeComponent({component: SkillConceptCardEditorComponent}));
+downgradeComponent({
+  component: SkillConceptCardEditorComponent
+}) as angular.IDirectiveFactory);
