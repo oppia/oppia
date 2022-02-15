@@ -17,7 +17,7 @@
  */
 
 import constants from 'assets/constants';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
@@ -42,12 +42,14 @@ export class GoalsTabComponent implements OnInit {
       LearnerDashboardActivityBackendApiService),
     private deviceInfoService: DeviceInfoService) {
   }
+
   @Input() currentGoals: LearnerTopicSummary[];
   @Input() editGoals: LearnerTopicSummary[];
   @Input() completedGoals: LearnerTopicSummary[];
   @Input() untrackedTopics: Record<string, LearnerTopicSummary[]>;
   @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
   @Input() learntToPartiallyLearntTopics: string[];
+  @ViewChild('dropdown', {'static': false}) dropdownRef;
   learnerDashboardActivityIds: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH: number;
   pawImageUrl: string = '';
@@ -64,12 +66,14 @@ export class GoalsTabComponent implements OnInit {
     COMPLETED: 1,
     NEITHER: 2
   };
+
   activityType: string = constants.ACTIVITY_TYPE_LEARN_TOPIC;
   editGoalsTopicPageUrl: string[] = [];
   completedGoalsTopicPageUrl: string[] = [];
   editGoalsTopicClassification: number[] = [];
   editGoalsTopicBelongToLearntToPartiallyLearntTopic: boolean[] = [];
   windowIsNarrow: boolean = false;
+  showThreeDotsDropdown: boolean = false;
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
@@ -176,6 +180,28 @@ export class GoalsTabComponent implements OnInit {
           }
         }
       }
+    }
+  }
+
+  toggleThreeDotsDropdown(): void {
+    this.showThreeDotsDropdown = !this.showThreeDotsDropdown;
+  }
+
+  /**
+   * Close dropdown when outside elements are clicked
+   * @param event mouse click event
+   */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const targetElement = event.target as HTMLElement;
+    if (!this.dropdownRef) {
+      return;
+    }
+    if (
+      targetElement &&
+      !this.dropdownRef.nativeElement.contains(targetElement)
+    ) {
+      this.showThreeDotsDropdown = false;
     }
   }
 
