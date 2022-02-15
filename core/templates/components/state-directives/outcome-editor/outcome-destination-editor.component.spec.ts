@@ -327,4 +327,16 @@ describe('Outcome Destination Editor', () => {
 
     expect(component.outcomeNewStateName).toBe('New State');
   });
+
+  it('should check refresherExplorationId is null or not', () => {
+    component.ngOnInit();
+    let refresherExplorationId = component.outcome.refresherExplorationId
+    refresherExplorationId = 'refresherExplorationId';
+
+    expect(component.isrefresherExplorationIdNull(refresherExplorationId)).toBeFalse();
+
+    refresherExplorationId = '';
+
+    expect(component.isrefresherExplorationIdNull(refresherExplorationId)).toBeTrue();
+  });
 });
