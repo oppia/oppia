@@ -240,20 +240,18 @@ class AdminHandler(base.BaseHandler):
                     'num_dummy_exps_to_generate')
                 num_dummy_exps_to_publish = self.normalized_payload.get(
                     'num_dummy_exps_to_publish')
-
                 if num_dummy_exps_to_generate < num_dummy_exps_to_publish:
                     raise self.InvalidInputException(
                         'Generate count cannot be less than publish count')
-                else:
-                    self._generate_dummy_explorations(
-                        num_dummy_exps_to_generate, num_dummy_exps_to_publish)
+                self._generate_dummy_explorations(
+                    num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif action == 'generate_dummy_opportunities':
                 num_dummy_ops_to_generate = self.normalized_payload.get(
                     'num_dummy_ops_to_generate')
-                num_dummy_interactions_to_generate = self.normalized_payload.get(
+                num_dummy_interactions = self.normalized_payload.get(
                     'num_dummy_interactions_to_generate')
                 self._generate_dummy_opportunities(
-                    num_dummy_ops_to_generate, num_dummy_interactions_to_generate)
+                    num_dummy_ops_to_generate, num_dummy_interactions)
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
@@ -678,6 +676,12 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot generate dummy explorations in production.')
 
     def _create_dummy_interactions(self, state, dest):
+        """Creates a dummy interaction and links it to a destination.
+
+        Args:
+            state: state_domain.State. Description.
+            dest: state_domain.State. Description.
+        """
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args({
             'placeholder': {
@@ -730,44 +734,45 @@ class AdminHandler(base.BaseHandler):
 
     def _generate_dummy_opportunities(
             self, num_dummy_ops_to_generate,
-            num_dummy_interactions_to_generate):
+            num_dummy_interactions):
         """Generates and publishes the given number of dummy opportunities.
 
         Args:
             num_dummy_ops_to_generate: int. Count of dummy opportunities to
                 be generated.
-            num_dummy_interactions_to_generate: int. Count of dummy
-                interactions to be generate
+            num_dummy_interactions: int. Count of dummy
+                interactions to be generate.
 
         Raises:
             Exception. Environment is not DEVMODE.
         """
+
         if constants.DEV_MODE:
             if story_services.does_story_exist_with_url_fragment(
                 'help-jamie-win-arcade'):
-                self._generate_dummy_opportunities_with_existing_topic( num_dummy_ops_to_generate,
-                num_dummy_interactions_to_generate, 'help-jamie-win-arcade')
+                self._generate_dummy_opportunities_with_existing_topic(
+                    num_dummy_ops_to_generate,
+                    num_dummy_interactions,
+                    'help-jamie-win-arcade')
             else:
                 self._generate_dummy_opportunities_without_existing_topic(
                     num_dummy_ops_to_generate,
-                    num_dummy_interactions_to_generate)
-
+                    num_dummy_interactions)
 
     def _generate_dummy_opportunities_without_existing_topic(
             self, num_dummy_ops_to_generate,
-            num_dummy_interactions_to_generate):
+            num_dummy_interactions):
         """Generates and publishes the given number of dummy opportunities.
 
         Args:
             num_dummy_ops_to_generate: int. Count of dummy opportunities to
                 be generated.
-            num_dummy_interactions_to_generate: int. Count of dummy
-                interactions to be generate
+            num_dummy_interactions: int. Count of dummy
+                interactions to be generate.
 
         Raises:
             Exception. Environment is not DEVMODE.
         """
-
         if constants.DEV_MODE:
             topic_id_1 = topic_fetchers.get_new_topic_id()
             story_id = story_services.get_new_story_id()
@@ -807,8 +812,8 @@ class AdminHandler(base.BaseHandler):
                     new_exploration_id, title=title, category=category,
                     objective='Dummy Objective')
 
-                for interaction in range(num_dummy_interactions_to_generate):
-                    if interaction == num_dummy_interactions_to_generate - 1:
+                for interaction in range(num_dummy_interactions):
+                    if interaction == num_dummy_interactions - 1:
                         dest = 'End'
                     else:
                         dest = 'Interaction' + str(interaction + 1)
@@ -816,11 +821,12 @@ class AdminHandler(base.BaseHandler):
                         self._create_dummy_interactions(
                             exp.states['Introduction'], dest)
                     else:
-                        if interaction == num_dummy_interactions_to_generate - 1:
+                        if interaction == num_dummy_interactions - 1:
                             dest = 'End'
                         cur_state = state_domain.State.create_default_state(
                             'Interaction' + str(interaction))
-                        exp.states['Interaction' + str(interaction)] = cur_state
+                        exp.states[
+                            'Interaction' + str(interaction)] = cur_state
                         self._create_dummy_interactions(cur_state, dest)
 
                 exp.states['End'] = new_end_state
@@ -901,14 +907,15 @@ class AdminHandler(base.BaseHandler):
 
     def _generate_dummy_opportunities_with_existing_topic(
             self, num_dummy_ops_to_generate,
-            num_dummy_interactions_to_generate, story_url_fragment):
+            num_dummy_interactions, story_url_fragment):
         """Generates and publishes the given number of dummy opportunities.
 
         Args:
             num_dummy_ops_to_generate: int. Count of dummy opportunities to
                 be generated.
-            num_dummy_interactions_to_generate: int. Count of dummy
-                interactions to be generate
+            num_dummy_interactions: int. Count of dummy
+                interactions to generate.
+            story_url_fragment: stringType. Story fragment of existing story.
 
         Raises:
             Exception. Environment is not DEVMODE.
@@ -937,7 +944,8 @@ class AdminHandler(base.BaseHandler):
                                 'The Science of Superheroes']
             exploration_ids_to_publish = []
             for opportunity in range(num_dummy_ops_to_generate):
-                title = random.choice(possible_titles) + '' + str(opportunity + len_nodes)
+                title = random.choice(possible_titles) + '' + str(
+                    opportunity + len_nodes)
                 category = 'Algorithms'
                 new_exploration_id = exp_fetchers.get_new_exploration_id()
                 exp_id_list.append(new_exploration_id)
@@ -945,8 +953,8 @@ class AdminHandler(base.BaseHandler):
                     new_exploration_id, title=title, category=category,
                     objective='Dummy Objective')
 
-                for interaction in range(num_dummy_interactions_to_generate):
-                    if interaction == num_dummy_interactions_to_generate - 1:
+                for interaction in range(num_dummy_interactions):
+                    if interaction == num_dummy_interactions - 1:
                         dest = 'End'
                     else:
                         dest = 'Interaction' + str(interaction + 1)
@@ -1015,10 +1023,6 @@ class AdminHandler(base.BaseHandler):
                     })], 'Change category')
 
             story_change_list = []
-            # [story_domain.StoryChange({
-            #     'cmd': 'add_story_node',
-            #     'node_id': 'node_1',
-            #     'title': 'Node1',
             for i, story_node_dict in enumerate(story_node_dicts):
                 generate_dummy_story_nodes(len_nodes + i + 1, **story_node_dict)
                 cur_node_id = 'node_' + str(len_nodes + i + 1)
@@ -1043,10 +1047,12 @@ class AdminHandler(base.BaseHandler):
                 }))
 
             topic_services.update_story_and_topic_summary(
-                self.user_id, story_id, story_change_list, 'adding more opportunities', topic_id )
+                self.user_id,
+                story_id,
+                story_change_list,
+                'adding more opportunities',
+                topic_id)
 
-            # exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
-            # print("EXPLORATION_ID: " + str(exp_ids_in_story))
             opportunity_services.add_new_exploration_opportunities(
                 story_id, exp_id_list)
         else:

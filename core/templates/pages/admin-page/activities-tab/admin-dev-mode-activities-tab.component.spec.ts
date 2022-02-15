@@ -311,7 +311,7 @@ describe('Admin dev mode activities tab', () => {
     it('should show error message when dummy opportunities' +
     'are not generated', async(() => {
       component.numDummyOpsToGenerate = 2;
-      component.numDummyInteractionsToGenerate = 5
+      component.numDummyInteractionsToGenerate = 5;
 
       spyOn(adminBackendApiService, 'generateDummyOpportunitiesAsync')
         .and.returnValue(Promise.reject('Dummy opportunities not generated.'));
