@@ -20,8 +20,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { I18nLanguageCodeService } from './i18n-language-code.service';
-import { ContentTranslationLanguageService } from 'pages/exploration-player-page/services/content-translation-language.service';
-import { ContextService } from './context.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,63 +27,21 @@ import { ContextService } from './context.service';
 export class NumberConversionService {
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private contentTranslationService: ContentTranslationLanguageService,
-    private contextService: ContextService
   ) {}
 
   currentDecimalSeparator(): string {
-    let pageContext = this.contextService.getPageContext();
+    const currentLanguage = this.i18nLanguageCodeService
+      .getCurrentI18nLanguageCode();
+    const supportedLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES;
+    let decimalSeparator: string = '.';
 
-    // Exploration Player.
-    if (pageContext === 'learner') {
-      const currentLanguage = this.contentTranslationService
-        .getCurrentContentLanguageCode();
-      const supportedLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES;
-      let decimalSeparator: string = '.';
-      for (let i of supportedLanguages) {
-        if (i.id === currentLanguage) {
-          decimalSeparator = i.decimal_separator;
-          break;
-        }
+    for (let i of supportedLanguages) {
+      if (i.id === currentLanguage) {
+        decimalSeparator = i.decimal_separator;
+        break;
       }
-      return decimalSeparator;
-    } else if (pageContext === 'editor') {// Exploration Editor.
-      // Preview tab.
-      let currentLanguage = this.contentTranslationService
-        .getCurrentContentLanguageCode();
-
-      // Editor tab.
-      // The defualt format (English) is used for the editor tab.
-      if (currentLanguage === undefined) {
-        return '.'; // Period is the decimal separator for English.
-      }
-
-      const supportedLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES;
-      let decimalSeparator: string = '.';
-      for (let i of supportedLanguages) {
-        if (i.id === currentLanguage) {
-          decimalSeparator = i.decimal_separator;
-          break;
-        }
-      }
-      return decimalSeparator;
-    } else if (pageContext === 'question_player') {
-      // Question Player.
-      const currentLanguage = this.i18nLanguageCodeService
-        .getCurrentI18nLanguageCode();
-      const supportedLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES;
-      let decimalSeparator: string = '.';
-      for (let i of supportedLanguages) {
-        if (i.id === currentLanguage) {
-          decimalSeparator = i.decimal_separator;
-          break;
-        }
-      }
-      return decimalSeparator;
-    } else {
-      // In all other cases return the default (English) decimal separator.
-      return '.';
     }
+    return decimalSeparator;
   }
 
   getInputValidationRegex(): RegExp {

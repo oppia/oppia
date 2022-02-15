@@ -62,7 +62,7 @@ export class InteractiveNumericInput implements OnInit {
       this.answer !== null &&
       this.answer !== '' &&
       isUndefined(
-        this.numericInputValidationService.getErrorStringI18nKey(
+        this.numericInputValidationService.validateNumber(
           this.answer, this.requireNonnegativeInput)));
   }
 

@@ -382,6 +382,6 @@ describe('NumericInputValidationService', () => {
       undefined);
     expect(
       validatorService.validateNumber(9999999999999999, true)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1');      
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1');
   });
 });

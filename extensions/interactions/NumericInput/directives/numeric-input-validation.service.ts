@@ -207,7 +207,8 @@ export class NumericInputValidationService {
   }
 
   // Returns 'undefined' when no error occurs.
-  validateNumericString(value: string, decimalSeparator: string): string | undefined {
+  validateNumericString(
+      value: string, decimalSeparator: string): string | undefined {
     value = value.toString().trim();
     const trailingDot = /[\.|\,|\u066B]\d/g;
     const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
@@ -267,7 +268,7 @@ export class NumericInputValidationService {
     if (stringValueRegExp === null) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1';
     } else if (stringValueRegExp.length > 15) {
-      if(decimalSeparator === ','){
+      if (decimalSeparator === ',') {
         return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2_COMMA';
       } else {
         return 'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2_DOT';

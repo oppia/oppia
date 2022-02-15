@@ -65,7 +65,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               localValue !== null &&
               localValue !== '' &&
               angular.isUndefined(
-                NumericInputValidationService.getErrorStringI18nKey(
+                NumericInputValidationService.validateNumber(
                   localValue, checkRequireNonnegativeInputValue)));
           };
 

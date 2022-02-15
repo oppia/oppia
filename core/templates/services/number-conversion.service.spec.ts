@@ -18,42 +18,30 @@
 
 import { NumberConversionService } from './number-conversion.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { ContentTranslationLanguageService } from 'pages/exploration-player-page/services/content-translation-language.service';
-import { ContextService } from './context.service';
 import { TestBed } from '@angular/core/testing';
 
 describe('NumberConversionService', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let ctls: ContentTranslationLanguageService;
-  let contextService: ContextService;
   let numberConversionService: NumberConversionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [NumberConversionService,
-        ContextService, I18nLanguageCodeService,
-        ContentTranslationLanguageService]
+        I18nLanguageCodeService]
     });
     numberConversionService = TestBed.inject(NumberConversionService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    ctls = TestBed.inject(ContentTranslationLanguageService);
-    contextService = TestBed.inject(ContextService);
   });
 
   it('should get the decimal separator depending on the page context', ()=>{
-    spyOn(contextService, 'getPageContext').and
-      .returnValues('question_player', 'learner', 'editor', 'editor');
     i18nLanguageCodeService.setI18nLanguageCode('en');
     expect(numberConversionService.currentDecimalSeparator()).toEqual('.');
 
-    ctls.setCurrentContentLanguageCode('fr');
+    i18nLanguageCodeService.setI18nLanguageCode('fr');
     expect(numberConversionService.currentDecimalSeparator()).toEqual(',');
 
-    ctls.setCurrentContentLanguageCode('ar');
+    i18nLanguageCodeService.setI18nLanguageCode('ar');
     expect(numberConversionService.currentDecimalSeparator()).toEqual(',');
-
-    ctls.setCurrentContentLanguageCode(undefined);
-    expect(numberConversionService.currentDecimalSeparator()).toEqual('.');
   });
 
   it('should return regex for numeric validation', ()=>{
