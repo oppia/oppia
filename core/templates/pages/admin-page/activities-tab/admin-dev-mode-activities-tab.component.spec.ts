@@ -292,11 +292,13 @@ describe('Admin dev mode activities tab', () => {
 
     it('should generate dummy opportunities', async(() => {
       component.numDummyOpsToGenerate = 20;
+      component.numDummyInteractionsToGenerate = 10
 
       spyOn(adminBackendApiService, 'generateDummyOpportunitiesAsync')
         .and.returnValue(Promise.resolve());
       spyOn(component.setStatusMessage, 'emit');
 
+      component.generateDummyOpportunities();
       component.generateDummyOpportunities();
 
       expect(component.setStatusMessage.emit)
@@ -317,6 +319,7 @@ describe('Admin dev mode activities tab', () => {
         .and.returnValue(Promise.reject('Dummy opportunities not generated.'));
       spyOn(component.setStatusMessage, 'emit');
 
+      component.generateDummyOpportunities();
       component.generateDummyOpportunities();
 
       expect(component.setStatusMessage.emit)
