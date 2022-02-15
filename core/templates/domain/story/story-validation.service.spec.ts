@@ -19,7 +19,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { StoryValidationService } from
   'domain/story/story-validation.service';
-import { StoryContents } from 'domain/story/storycontents-object.model';
+import { StoryContents } from 'domain/story/story-contents-object.model';
 
 describe('Story Validation Service', () => {
   let svs: StoryValidationService;

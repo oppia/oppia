@@ -30,7 +30,7 @@ import { StoryChange } from 'domain/editor/undo_redo/change.model';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { Story } from 'domain/story/StoryObjectFactory';
-import { StoryContents } from 'domain/story/storycontents-object.model';
+import { StoryContents } from 'domain/story/story-contents-object.model';
 import { StoryNode } from './story-node.model';
 
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;

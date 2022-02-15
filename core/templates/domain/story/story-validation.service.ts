@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { StoryContents } from 'domain/story/storycontents-object.model';
+import { StoryContents } from 'domain/story/story-contents-object.model';
 
 @Injectable({
   providedIn: 'root'

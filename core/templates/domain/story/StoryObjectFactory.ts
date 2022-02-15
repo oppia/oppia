@@ -25,7 +25,7 @@ import constants from 'assets/constants';
 import {
   StoryContentsBackendDict,
   StoryContents
-} from 'domain/story/storycontents-object.model';
+} from 'domain/story/story-contents-object.model';
 
 export interface StoryBackendDict {
   'id': string;
