@@ -205,8 +205,9 @@ export class NumericInputValidationService {
 
     return warningsList;
   }
+
   // Returns 'undefined' when no error occurs.
-  getError(value: string, decimalSeparator: string): string | undefined {
+  validateNumericString(value: string, decimalSeparator: string): string | undefined {
     value = value.toString().trim();
     const trailingDot = /[\.|\,|\u066B]\d/g;
     const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
@@ -228,7 +229,7 @@ export class NumericInputValidationService {
   }
 
   // Returns 'undefined' when no error occurs.
-  getErrorString(
+  validateNumber(
       value: number, customizationArgs: boolean, decimalSeparator: string = '.'
   ): string | undefined {
     if (customizationArgs && value < 0) {

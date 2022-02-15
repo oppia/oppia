@@ -73,7 +73,7 @@ describe('Schema Based Float Editor Directive', () => {
     expect(ctrl.hasLoaded).toBe(undefined);
     expect(ctrl.isUserCurrentlyTyping).toBe(undefined);
     expect(ctrl.hasFocusedAtLeastOnce).toBe(undefined);
-    expect(ctrl.errorString).toBe(undefined);
+    expect(ctrl.errorStringI18nKey).toBe(undefined);
     expect(ctrl.localValue).toBe(undefined);
     expect(ctrl.checkRequireNonnegativeInputValue).toBe(undefined);
 
@@ -83,7 +83,7 @@ describe('Schema Based Float Editor Directive', () => {
     expect(ctrl.hasLoaded).toBe(true);
     expect(ctrl.isUserCurrentlyTyping).toBe(false);
     expect(ctrl.hasFocusedAtLeastOnce).toBe(false);
-    expect(ctrl.errorString).toBe('');
+    expect(ctrl.errorStringI18nKey).toBe('');
     expect(ctrl.localValue).toBe(0.0);
     expect(ctrl.checkRequireNonnegativeInputValue).toBe(false);
     expect(ctrl.uiConfig().checkRequireNonnegativeInput).toBe(false);
@@ -167,7 +167,6 @@ describe('Schema Based Float Editor Directive', () => {
 
   it('should generate error for wrong input', () => {
     ctrl.localValue = null;
-
     ctrl.generateErrors();
 
     expect(ctrl.errorString)
@@ -214,7 +213,7 @@ describe('Schema Based Float Editor Directive', () => {
     ctrl.parseInput();
     expect(ctrl.localValue).toEqual(-120);
 
-    spyOn(validator, 'getError').and.returnValue('Error');
+    spyOn(validator, 'validateNumericString').and.returnValue('Error');
     ctrl.localStringValue = '--12';
     ctrl.parseInput();
     expect(ctrl.localValue).toEqual(null);

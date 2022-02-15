@@ -36,7 +36,6 @@ import { Warning } from 'interactions/base-interaction-validation.service';
 describe('NumericInputValidationService', () => {
   let validatorService: NumericInputValidationService;
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
-
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome,
     customizationArgs: NumericInputCustomizationArgs;
@@ -336,42 +335,50 @@ describe('NumericInputValidationService', () => {
     });
 
   it('should generate errors for string representation of the input', ()=>{
-    expect(validatorService.getError('12.', '.')).toEqual(
+    expect(validatorService.validateNumericString('12.', '.')).toEqual(
       'Trailing decimals are not allowed.'
     );
-    expect(validatorService.getError('12.22.1', '.')).toEqual(
+    expect(validatorService.validateNumericString('12.22.1', '.')).toEqual(
       'At most 1 decimal point should be present.'
     );
-    expect(validatorService.getError('12-', '.')).toEqual(
+    expect(validatorService.validateNumericString('12-', '.')).toEqual(
       'Minus (-) sign is only allowed in beginning.'
     );
-    expect(validatorService.getError('--12', '.')).toEqual(
+    expect(validatorService.validateNumericString('--12', '.')).toEqual(
       'At most 1 minus (-) sign should be present.'
     );
-    expect(validatorService.getError('12e12e', '.')).toEqual(
+    expect(validatorService.validateNumericString('12e12e', '.')).toEqual(
       'At most 1 exponent sign (e) should be present.'
     );
   });
 
   it('should generate errors in the given input', () => {
-    expect(validatorService.getErrorString(1200000000E+27, false)).toEqual(
-      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
-    expect(validatorService.getErrorString(1200000000E-27, false)).toEqual(
-      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
-    expect(validatorService.getErrorString(999999999999999, false)).toEqual(
+    expect(
+      validatorService.validateNumber(1200000000E+27, false)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
+    expect(
+      validatorService.validateNumber(1200000000E-27, false)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
+    expect(
+      validatorService.validateNumber(999999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(99.9999999999999, false)).toEqual(
+    expect(
+      validatorService.validateNumber(99.9999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(-9.9999999999999, false)).toEqual(
+    expect(
+      validatorService.validateNumber(-9.9999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(2.2, false)).toEqual(undefined);
-    expect(validatorService.getErrorString(-2.2, false)).toEqual(undefined);
-    expect(validatorService.getErrorString(34.56, false)).toEqual(undefined);
-    expect(validatorService.getErrorString(99999999999999, true)).toEqual(
+    expect(
+      validatorService.validateNumber(2.2, false)).toEqual(undefined);
+    expect(
+      validatorService.validateNumber(-2.2, false)).toEqual(undefined);
+    expect(
+      validatorService.validateNumber(34.56, false)).toEqual(undefined);
+    expect(
+      validatorService.validateNumber(99999999999999, true)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(9999999999999999, true)).toEqual(
-      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
-    expect(validatorService.getErrorString(-9, true)).toEqual(
-      'The answer must be greater than or equal to zero');
+    expect(
+      validatorService.validateNumber(9999999999999999, true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1');
   });
 });
