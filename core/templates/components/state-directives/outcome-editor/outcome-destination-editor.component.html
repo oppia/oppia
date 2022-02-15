@@ -28,7 +28,7 @@
   </form>
   <p [hidden]="newStateNameForm.form.valid ||  outcomeNewStateName === undefined" class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
 
-  <div *ngIf="isSelfLoop() && canEditRefresherExplorationId && !isrefresherExplorationIdNull(outcome.refresherExplorationId)" class="oppia-id-text">
+  <div *ngIf="isSelfLoop() && canEditRefresherExplorationId && !!outcome.refresherExplorationId" class="oppia-id-text">
     <b>Refresher exploration ID (optional):</b>
     <input type="text"
            class="form-control protractor-test-add-refresher-exploration-id"

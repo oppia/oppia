@@ -327,26 +327,4 @@ describe('Outcome Destination Editor', () => {
 
     expect(component.outcomeNewStateName).toBe('New State');
   });
-
-  it('should check refresherExplorationId is null or not', () => {
-    component.outcome = new Outcome(
-      'Hola',
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
-      false,
-      [],
-      null,
-      null,
-    );
-    component.outcome.refresherExplorationId = 'refresherExplorationId';
-    let refresherExplorationId_1 = component.outcome.refresherExplorationId;
-
-    expect(component.isrefresherExplorationIdNull(
-      refresherExplorationId_1)).toBeFalse();
-
-    component.outcome.refresherExplorationId = '';
-    let refresherExplorationId_2 = component.outcome.refresherExplorationId;
-
-    expect(component.isrefresherExplorationIdNull(
-      refresherExplorationId_2)).toBeTrue();
-  });
 });

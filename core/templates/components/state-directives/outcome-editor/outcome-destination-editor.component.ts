@@ -93,17 +93,6 @@ export class OutcomeDestinationEditorComponent implements OnInit {
     return this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST;
   }
 
-  isrefresherExplorationIdNull(refresherExplorationId: string): boolean {
-    if (refresherExplorationId === null) {
-      return true;
-    } else if (refresherExplorationId === '') {
-      this.outcome.refresherExplorationId = null;
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   updateOptionNames(): void {
     // The seTimeout is being used here to update the view.
     setTimeout(() => {
