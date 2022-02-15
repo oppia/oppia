@@ -26,39 +26,25 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var CollectionEditorPage =
-  require('../protractor_utils/CollectionEditorPage.js');
-var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
 
 describe('Full exploration editor', function() {
-  var adminPage = null;
-  var collectionEditorPage = null;
-  var creatorDashboardPage = null;
   var explorationEditorPage = null;
   var explorationPlayerPage = null;
   var libraryPage = null;
 
   var explorationEditorMainTab = null;
-  var explorationEditorSettingsTab = null;
-  var parentExplorationId = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
-    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
 
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
