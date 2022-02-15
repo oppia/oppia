@@ -460,10 +460,12 @@ export class AdminBackendApiService {
   }
 
   async generateDummyOpportunitiesAsync(
-      numDummyOpsToGenerate: number): Promise<void> {
+      numDummyOpsToGenerate: number,
+      numDummyInteractionsToGenerate: number): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_opportunities',
-      num_dummy_ops_to_generate: numDummyOpsToGenerate
+      num_dummy_ops_to_generate: numDummyOpsToGenerate,
+      num_dummy_interactions_to_generate: numDummyInteractionsToGenerate
     });
   }
   async reloadExplorationAsync(explorationId: string):

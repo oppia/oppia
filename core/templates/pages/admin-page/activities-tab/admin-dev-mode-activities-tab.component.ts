@@ -36,6 +36,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   numDummyExpsToPublish: number = 0;
   numDummyExpsToGenerate: number = 0;
   numDummyOpsToGenerate: number = 0;
+  numDummyInteractionsToGenerate: number = 0;
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
 
@@ -147,7 +148,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
     this.adminBackendApiService.generateDummyOpportunitiesAsync(
-      this.numDummyOpsToGenerate
+      this.numDummyOpsToGenerate, this.numDummyInteractionsToGenerate
     ).then(() => {
       this.setStatusMessage.emit(
         'Dummy opportunities generated successfully.');
