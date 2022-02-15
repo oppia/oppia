@@ -37,7 +37,7 @@
     "RELEASE_NOTES_URL": "https://docs.google.com/document/d/1pmcDNfM2KtmkZeYipuInC48RE5JfkSJWQYdIQAkD0hQ",
     "RELEASE_ROTA_URL": "https://github.com/oppia/oppia/wiki/Release-schedule-and-other-information#release-coordinators-and-qa-coordinators-for-upcoming-releases",
     "RELEASE_SUMMARY_FILEPATH": "../release_summary.md",
-    "REMOTE_URL": "git@github.com:oppia/oppia.git",
+    "REMOTE_URLS": ["git@github.com:oppia/oppia.git", "https://github.com/oppia/oppia.git"],
     "REPO_SPECIFIC_CHANGE_MODULE_TARGET": "scripts.release_scripts.repo_specific_changes_fetcher",
     "DEPLOYMENT_CONFIG_PATH": "core/feconf.py",
     "SCHEMA_VERSIONS_TO_JOBS_MAPPING": {

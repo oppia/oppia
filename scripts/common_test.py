@@ -236,7 +236,7 @@ class CommonTests(test_utils.GenericTestBase):
         with self.swap(
             subprocess, 'check_output', mock_check_output
         ):
-            self.assertEqual(common.get_remote_alias('url1'), 'remote1')
+            self.assertEqual(common.get_remote_alias(['url1']), 'remote1')
 
     def test_get_remote_alias_with_incorrect_alias(self):
         def mock_check_output(unused_cmd_tokens):
@@ -245,9 +245,9 @@ class CommonTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
             Exception,
-            'ERROR: There is no existing remote alias for the url3 repo.'
+            'ERROR: There is no existing remote alias for the url3, url4 repo.'
         ):
-            common.get_remote_alias('url3')
+            common.get_remote_alias(['url3', 'url4'])
 
     def test_verify_local_repo_is_clean_with_clean_repo(self):
         def mock_check_output(unused_cmd_tokens):

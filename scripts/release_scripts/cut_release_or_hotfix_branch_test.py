@@ -82,7 +82,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         def mock_verify_current_branch_name(unused_branch_name):
             self.check_function_calls[
                 'verify_current_branch_name_is_called'] = True
-        def mock_get_remote_alias(unused_remote_url):
+        def mock_get_remote_alias(unused_remote_urls):
             self.check_function_calls['get_remote_alias_is_called'] = True
             return 'upstream'
         def mock_check_call(cmd_tokens):
