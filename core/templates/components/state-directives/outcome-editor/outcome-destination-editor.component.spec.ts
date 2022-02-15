@@ -329,14 +329,24 @@ describe('Outcome Destination Editor', () => {
   });
 
   it('should check refresherExplorationId is null or not', () => {
-    component.ngOnInit();
-    let refresherExplorationId = component.outcome.refresherExplorationId
-    refresherExplorationId = 'refresherExplorationId';
+    component.outcome = new Outcome(
+      'Hola',
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      false,
+      [],
+      null,
+      null,
+    );
+    component.outcome.refresherExplorationId = 'refresherExplorationId';
+    let refresherExplorationId_1 = component.outcome.refresherExplorationId;
 
-    expect(component.isrefresherExplorationIdNull(refresherExplorationId)).toBeFalse();
+    expect(component.isrefresherExplorationIdNull(
+      refresherExplorationId_1)).toBeFalse();
 
-    refresherExplorationId = '';
+    component.outcome.refresherExplorationId = '';
+    let refresherExplorationId_2 = component.outcome.refresherExplorationId;
 
-    expect(component.isrefresherExplorationIdNull(refresherExplorationId)).toBeTrue();
+    expect(component.isrefresherExplorationIdNull(
+      refresherExplorationId_2)).toBeTrue();
   });
 });
