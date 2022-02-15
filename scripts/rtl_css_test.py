@@ -51,7 +51,7 @@ class RtlCSSTests(test_utils.GenericTestBase):
         popen_swap_without_stdin = self.swap(
             subprocess, 'Popen', mock_popen_without_std_in)
         expected_rtl_file_count = 0
-        pages_base_dir = os.path.join(os.getcwd(), 'core', 'templates')
+        pages_base_dir = os.path.join(os.getcwd(), 'core', 'extentions', 'templates')
         for _, _, files in os.walk(pages_base_dir):
             for file in files:
                 if file.endswith('.rtl.css'):
