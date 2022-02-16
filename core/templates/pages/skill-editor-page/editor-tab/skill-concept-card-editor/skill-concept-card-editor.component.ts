@@ -100,8 +100,8 @@ export class SkillConceptCardEditorComponent implements OnInit {
 
   changeActiveWorkedExampleIndex(idx: number): void {
     if (idx === this.activeWorkedExampleIndex) {
-      this.bindableFieldsDict.displayedWorkedExamples =
-        this.skill.getConceptCard().getWorkedExamples();
+      this.bindableFieldsDict.displayedWorkedExamples = (
+        this.skill.getConceptCard().getWorkedExamples());
       this.activeWorkedExampleIndex = null;
     } else {
       this.activeWorkedExampleIndex = idx;
@@ -150,8 +150,8 @@ export class SkillConceptCardEditorComponent implements OnInit {
       );
       this.skillUpdateService.addWorkedExample(
         this.skill, newExample);
-      this.bindableFieldsDict.displayedWorkedExamples =
-        this.skill.getConceptCard().getWorkedExamples();
+      this.bindableFieldsDict.displayedWorkedExamples = (
+        this.skill.getConceptCard().getWorkedExamples());
       this.getConceptCardChange.emit();
     }, () => {
       // Note to developers:
