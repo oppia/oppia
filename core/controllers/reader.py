@@ -456,6 +456,69 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
     """Tracks a learner submitting an answer."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'answer': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'Answer',
+                }
+            },
+            'params': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_params_dict
+                    ),
+                },
+                'default_value': None
+            },
+            'version': {
+                'schema': editor.SCHEMA_FOR_VERSION,
+                'default_value': None
+            },
+            'session_id': {'schema': {'type': 'unicode'}},
+            'client_time_spent_in_secs': {'schema': {'type': 'int'}},
+            'old_state_name': {
+                'schema': {
+                    'type': 'unicode',
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
+                }
+            },
+            'answer_group_index': {'schema': {'type': 'int'}},
+            'rule_spec_index': {'schema': {'type': 'int'}},
+            'classification_categorization': {
+                'schema': {
+                    'type': 'unicode',
+                    'choices': [
+                        'explicit',
+                        'training_data_match',
+                        'statistical_classifier',
+                        'default_outcome',
+                    ],
+                }
+            },
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
@@ -464,42 +527,54 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        old_state_name = self.payload.get('old_state_name')
+        old_state_name = self.normalized_payload.get('old_state_name')
         # The reader's answer.
-        answer = self.payload.get('answer')
+        answer = self.normalized_payload.get('answer')
         # Parameters associated with the learner.
-        params = self.payload.get('params', {})
+        params = self.normalized_payload.get('params', {})
         # The version of the exploration.
-        version = self.payload.get('version')
+        version = self.normalized_payload.get('version')
         if version is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Answer Submit')
-        session_id = self.payload.get('session_id')
-        client_time_spent_in_secs = self.payload.get(
-            'client_time_spent_in_secs')
+            raise self.InvalidInputException('NONE EXP VERSION: Answer Submit')
+        session_id = self.normalized_payload.get('session_id')
+        client_time_spent_in_secs = self.normalized_payload.get(
+            'client_time_spent_in_secs'
+        )
         # The answer group and rule spec indexes, which will be used to get
         # the rule spec string.
-        answer_group_index = self.payload.get('answer_group_index')
-        rule_spec_index = self.payload.get('rule_spec_index')
-        classification_categorization = self.payload.get(
-            'classification_categorization')
+        answer_group_index = self.normalized_payload.get('answer_group_index')
+        rule_spec_index = self.normalized_payload.get('rule_spec_index')
+        classification_categorization = self.normalized_payload.get(
+            'classification_categorization'
+        )
 
         exploration = exp_fetchers.get_exploration_by_id(
-            exploration_id, version=version)
+            exploration_id, version=version
+        )
 
         old_interaction = exploration.states[old_state_name].interaction
 
         old_interaction_instance = (
-            interaction_registry.Registry.get_interaction_by_id(
-                old_interaction.id))
-
+            interaction_registry.Registry
+                .get_interaction_by_id(
+                    old_interaction.id
+                )
+            )
         normalized_answer = old_interaction_instance.normalize_answer(answer)
 
         event_services.AnswerSubmissionEventHandler.record(
-            exploration_id, version, old_state_name,
+            exploration_id,
+            version,
+            old_state_name,
             exploration.states[old_state_name].interaction.id,
-            answer_group_index, rule_spec_index, classification_categorization,
-            session_id, client_time_spent_in_secs, params, normalized_answer)
+            answer_group_index,
+            rule_spec_index,
+            classification_categorization,
+            session_id,
+            client_time_spent_in_secs,
+            params,
+            normalized_answer,
+        )
         self.render_json({})
 
 
@@ -769,7 +844,6 @@ class SolutionHitEventHandler(base.BaseHandler):
 
 class ExplorationCompleteEventHandler(base.BaseHandler):
     """Tracks a learner completing an exploration.
-
     The state name recorded should be a state with a terminal interaction.
     """
 
@@ -873,7 +947,6 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
 
 class ExplorationMaybeLeaveHandler(base.BaseHandler):
     """Tracks a learner leaving an exploration without completing it.
-
     The state name recorded should be a state with a non-terminal interaction.
     """
 
@@ -1039,7 +1112,6 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
 
 class RatingHandler(base.BaseHandler):
     """Records the rating of an exploration submitted by a user.
-
     Note that this represents ratings submitted on completion of the
     exploration.
     """
