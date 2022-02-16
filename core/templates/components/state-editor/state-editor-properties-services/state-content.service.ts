@@ -34,6 +34,13 @@ export class StateContentService extends StatePropertyService<SubtitledHtml> {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveStateContent';
   }
+
+  displayed: SubtitledHtml = SubtitledHtml.createDefault('', 'content');
+  savedMemento: SubtitledHtml = SubtitledHtml.createDefault('', 'content');
+
+  init(stateName: string, value: SubtitledHtml): void {
+    super.init(stateName, value);
+  }
 }
 
 angular.module('oppia').factory(
