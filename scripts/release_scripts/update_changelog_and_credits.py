@@ -554,12 +554,6 @@ def main():
         'the emails of the form: %s.' % (
             constants.release_constants.RELEASE_SUMMARY_FILEPATH,
             constants.release_constants.INVALID_EMAIL_SUFFIX))
-    common.open_new_tab_in_browser_if_possible(
-        constants.release_constants.CREDITS_FORM_URL)
-    common.ask_user_to_confirm(
-        'Check the credits form and add any additional contributors '
-        'to the contributor list in the file: %s.' % (
-            constants.release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(
         'Categorize the PR titles in the Uncategorized section of the '
         'changelog in the file: %s, and arrange the changelog '

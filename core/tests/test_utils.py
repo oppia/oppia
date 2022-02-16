@@ -1748,10 +1748,10 @@ class GenericTestBase(AppEngineTestBase):
 
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 init_state_name: %s
 language_code: en
 objective: ''

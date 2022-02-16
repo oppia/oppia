@@ -35,12 +35,6 @@ from core.domain import subtopic_page_domain
 from typing import List, Optional
 from typing_extensions import TypedDict
 
-from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
-
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
@@ -1193,8 +1187,7 @@ class Topic:
         Returns:
             dict. The converted subtopic_dict.
         """
-        file_system_class = fs_services.get_entity_file_system_class()  # type: ignore[no-untyped-call]
-        fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_TOPIC, topic_id))
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
@@ -1354,8 +1347,7 @@ class Topic:
             Exception. The thumbnail does not exist for expected topic in
                 the filesystem.
         """
-        file_system_class = fs_services.get_entity_file_system_class()  # type: ignore[no-untyped-call]
-        fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_TOPIC, self.id))
 
         filepath = '%s/%s' % (
@@ -1566,8 +1558,7 @@ class Topic:
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
 
-        file_system_class = fs_services.get_entity_file_system_class()  # type: ignore[no-untyped-call]
-        fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_TOPIC, self.id))
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
@@ -1958,14 +1949,6 @@ class TopicSummary:
         }
 
 
-class TopicRightsDict(TypedDict):
-    """Dictionary that represents TopicRights."""
-
-    topic_id: str
-    manager_names: List[str]
-    topic_is_published: bool
-
-
 class TopicRights:
     """Domain object for topic rights."""
 
@@ -1987,20 +1970,6 @@ class TopicRights:
         self.id = topic_id
         self.manager_ids = manager_ids
         self.topic_is_published = topic_is_published
-
-    def to_dict(self) -> TopicRightsDict:
-        """Returns a dict suitable for use by the frontend.
-
-        Returns:
-            dict. A dict version of TopicRights suitable for use by the
-            frontend.
-        """
-        return {
-            'topic_id': self.id,
-            'manager_names': user_services.get_human_readable_user_ids( # type: ignore[no-untyped-call]
-                self.manager_ids),
-            'topic_is_published': self.topic_is_published
-        }
 
     def is_manager(self, user_id: str) -> bool:
         """Checks whether given user is a manager of the topic.
