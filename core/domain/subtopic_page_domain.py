@@ -129,6 +129,7 @@ class SubtopicPageContents:
             state_domain.WrittenTranslations.from_dict( # type: ignore[no-untyped-call]
                 {'translations_mapping': {content_id: {}}}))
 
+    @classmethod
     def to_dict(self) -> SubtopicPageContentsDict:
         """Returns a dict representing this SubtopicPageContents domain object.
 
@@ -218,6 +219,7 @@ class SubtopicPage:
         self.language_code = language_code
         self.version = version
 
+    @classmethod
     def to_dict(self) -> SubtopicPageDict:
         """Returns a dict representing this SubtopicPage domain object.
 
