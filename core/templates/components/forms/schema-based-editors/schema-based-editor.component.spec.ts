@@ -16,13 +16,12 @@
  * @fileoverview Unit tests for Schema Based Editor Component
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { SchemaBasedEditorComponent } from './schema-based-editor.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Schema based editor component', function() {
+describe('Schema based editor component', function() {
   let component: SchemaBasedEditorComponent;
   let fixture: ComponentFixture<SchemaBasedEditorComponent>;
 
@@ -50,6 +49,10 @@ fdescribe('Schema based editor component', function() {
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    fixture.destroy();
+  });
+
   it('should set component properties on initialization', fakeAsync(() => {
     let mockFunction = function(value: number) {
       return value;
@@ -73,12 +76,33 @@ fdescribe('Schema based editor component', function() {
     expect(component.localValue).toEqual(10);
   });
 
-  it('should set form validity', () => {
-    component.ngAfterViewInit();
+  it('should set form validity', fakeAsync(() => {
+    let mockEmitter = new EventEmitter();
+    let form = jasmine.createSpyObj(
+      'form', ['$setValidity']);
 
-    expect(component.localValue).toEqual(null);
+    spyOnProperty(component.frm, 'statusChanges')
+      .and.returnValue(mockEmitter);
+    spyOn(angular, 'element').and.returnValue(
+      // This throws "Type '{ top: number; }' is not assignable to type
+      // 'JQLite | Coordinates'". We need to suppress this error because
+      // angular element have more properties than offset and top.
+      // @ts-expect-error
+      {
+        controller: (formString: string) => {
+          return form;
+        }
+      }
+    );
+
+    component.ngAfterViewInit();
+    tick();
+    mockEmitter.emit('INVALID');
+    tick();
+    mockEmitter.emit();
 
     component.writeValue(10);
     expect(component.localValue).toEqual(10);
-  });
+    expect(form.$setValidity).toHaveBeenCalledTimes(2);
+  }));
 });
