@@ -51,7 +51,7 @@ implements ControlValueAccessor, OnInit, Validator {
   @ViewChild('floatform', {'static': true}) floatForm: NgForm;
   hasFocusedAtLeastOnce: boolean;
   isUserCurrentlyTyping: boolean;
-  errorString: string = '';
+  errorStringI18nKey: string = '';
   labelForErrorFocusTarget: string;
   hasLoaded: boolean;
   onChange: (value: number) => void = () => {};
@@ -98,7 +98,7 @@ implements ControlValueAccessor, OnInit, Validator {
       localValue !== undefined &&
       localValue !== null &&
       localValue !== '' &&
-      this.numericInputValidationService.getErrorString(
+      this.numericInputValidationService.getErrorStringI18nKey(
         +localValue, checkRequireNonnegativeInputValue as boolean
       ) === undefined)
     ;
@@ -114,7 +114,7 @@ implements ControlValueAccessor, OnInit, Validator {
     this.hasLoaded = false;
     this.isUserCurrentlyTyping = false;
     this.hasFocusedAtLeastOnce = false;
-    this.errorString = '';
+    this.errorStringI18nKey = '';
     this.labelForErrorFocusTarget = (
       this.focusManagerService.generateFocusLabel()
     );
@@ -169,8 +169,8 @@ implements ControlValueAccessor, OnInit, Validator {
   }
 
   generateErrors(): void {
-    this.errorString = (
-      this.numericInputValidationService.getErrorString(
+    this.errorStringI18nKey = (
+      this.numericInputValidationService.getErrorStringI18nKey(
         this.localValue, false));
   }
 
