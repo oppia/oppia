@@ -468,6 +468,7 @@ export class AdminBackendApiService {
       num_dummy_interactions_to_generate: numDummyInteractionsToGenerate
     });
   }
+
   async reloadExplorationAsync(explorationId: string):
   Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
