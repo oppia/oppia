@@ -28,6 +28,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as objects_validator
 from core.domain import email_manager
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
@@ -137,8 +138,7 @@ class ExplorationHandler(EditorHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            objects_validator.validate_exploration_change)
+                        'object_class': exp_domain.ExplorationChange
                     }
                 }
             }
@@ -1037,8 +1037,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            objects_validator.validate_exploration_change)
+                        'object_class': exp_domain.ExplorationChange
                     }
                 }
             }
