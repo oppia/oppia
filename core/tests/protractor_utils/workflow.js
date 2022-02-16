@@ -174,7 +174,6 @@ var createAndPublishExploration = async function(
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
   }
-  await explorationEditorSettingsTab.enableCorrectnessFeedback();
   await explorationEditorPage.saveChanges();
   await publishExploration();
 };
@@ -216,8 +215,8 @@ var createAndPublishTwoCardExploration = async function(
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
   }
-  if (correctnessFeedbackIsEnabled) {
-    await explorationEditorSettingsTab.enableCorrectnessFeedback();
+  if (!correctnessFeedbackIsEnabled) {
+    await explorationEditorSettingsTab.disableCorrectnessFeedback();
   }
   await explorationEditorPage.saveChanges();
   await publishExploration();
