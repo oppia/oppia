@@ -336,32 +336,32 @@ describe('NumericInputValidationService', () => {
 
   it('should generate errors for string representation of the input', ()=>{
     expect(validatorService.validateNumericString('12.', '.')).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_4'
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL'
     );
     expect(validatorService.validateNumericString('12.22.1', '.')).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_5'
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL'
     );
     expect(validatorService.validateNumericString('12-', '.')).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_6'
+      'I18N_INTERACTIONS_NUMERIC_INPUT_MINUS_AT_BEGINNING'
     );
     expect(validatorService.validateNumericString('--12', '.')).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_7'
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_MINUS'
     );
     expect(validatorService.validateNumericString('12e12e', '.')).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_8'
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_EXPONENT'
     );
   });
 
   it('should generate errors in the given input', () => {
     expect(
       validatorService.validateNumber(-999999999, true)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_3');
+      'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO');
     expect(
       validatorService.validateNumber(1200000000e+27, false)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2_DOT');
+      'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_DOT');
     expect(
       validatorService.validateNumber(1200000000e-27, false, ',')).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2_COMMA');
+      'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_COMMA');
     expect(
       validatorService.validateNumber(999999999999999, false)).toEqual(
       undefined);
@@ -380,5 +380,11 @@ describe('NumericInputValidationService', () => {
     expect(
       validatorService.validateNumber(99999999999999, true)).toEqual(
       undefined);
+    expect(
+      validatorService.validateNumber(-99999999999999, true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO');
+    expect(
+      validatorService.validateNumber(Number('wqw'), true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
   });
 });

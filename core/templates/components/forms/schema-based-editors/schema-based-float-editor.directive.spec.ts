@@ -170,7 +170,7 @@ describe('Schema Based Float Editor Directive', () => {
     ctrl.generateErrors();
 
     expect(ctrl.errorString)
-      .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1');
+      .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
   });
 
   it('should get current decimal separator', ()=>{
