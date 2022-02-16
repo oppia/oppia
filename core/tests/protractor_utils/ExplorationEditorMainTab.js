@@ -111,6 +111,8 @@ var ExplorationEditorMainTab = function() {
   var hintTextElement = element(by.css('.protractor-test-hint-text'));
   var explanationTextAreaElement = element(
     by.css('.protractor-test-explanation-textarea'));
+  var stateEditorTag = element(
+    by.css('.protractor-test-state-content-editor'));
 
   /*
    * Buttons
@@ -510,7 +512,6 @@ var ExplorationEditorMainTab = function() {
         fadeIn, 'Editor taking long to fade in');
     }
     await action.click('stateEditButton', stateEditButton);
-    var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
     var stateContentEditor = stateEditorTag.element(stateContentEditorLocator);
