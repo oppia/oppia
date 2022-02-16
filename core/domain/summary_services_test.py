@@ -455,6 +455,41 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
+    def test_get_displayable_collection_summary_dicts_matching_ids(self):
+        collection_id_1 = self.COLLECTION_ID + '_1'
+        self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
+        self.save_new_valid_collection(collection_id_1, self.owner_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, collection_id_1)
+        collection_id_list = [collection_id_1, self.COLLECTION_ID]
+        collection_summaries = (
+            summary_services.
+            get_displayable_collection_summary_dicts_matching_ids(
+                collection_id_list))
+        self.assertEqual(len(collection_summaries), 2)
+        for collection_summary in collection_summaries:
+            self.assertIn(collection_summary['id'], collection_id_list)
+
+    def test_get_learner_collection_dict_by_id_without_user_id(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+        mock_user = user_services.get_user_actions_info(None)
+        collection_dict = (
+            summary_services.get_learner_collection_dict_by_id(
+                self.COLLECTION_ID, mock_user)
+            )
+        self.assertEqual(
+            len(
+                collection_dict['playthrough_dict']
+                ['completed_exploration_ids']), 0)
+        self.assertEqual(
+            collection_dict['playthrough_dict']['next_exploration_id'],
+            self.EXP_ID
+        )
+
     def test_get_learner_dict_with_deleted_exp_fails_validation(self):
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
