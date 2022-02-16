@@ -44,6 +44,7 @@ export class StateContentEditorComponent implements OnInit {
   @Output() saveStateContent = new EventEmitter<SubtitledHtml>();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
     new EventEmitter<string[]>();
+
   @Input() stateContentPlaceholder: string;
   @Input() stateContentSaveButtonPlaceholder: string;
   cardHeightLimitWarningIsShown: boolean;
