@@ -202,10 +202,6 @@ httplib2==0.9.2
     #   oauth2client
 idna==2.10
     # via requests
-importlib-metadata==3.10.1
-    # via
-    #   pluggy
-    #   pytest
 iniconfig==1.1.1
     # via pytest
 libcst==0.3.21
@@ -220,7 +216,7 @@ mutagen==1.45.1
     # via -r requirements.in
 mypy-extensions==0.4.3
     # via typing-inspect
-numpy==1.20.2
+numpy==1.21.0
     # via
     #   apache-beam
     #   pyarrow
@@ -372,7 +368,6 @@ typing-extensions==3.10.0.2
     # via
     #   -r requirements.in
     #   apache-beam
-    #   importlib-metadata
     #   libcst
     #   typing-inspect
 typing-inspect==0.7.1
@@ -395,8 +390,6 @@ webencodings==0.5.1
     #   html5lib
 webob==1.8.7
     # via webapp2
-zipp==3.4.1
-    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
