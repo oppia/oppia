@@ -141,7 +141,6 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
         ]
         exp_model_2.update_timestamps()
 
-
         datastore_services.put_multi([exp_model_1, exp_model_2])
 
         self.assert_job_output_is([

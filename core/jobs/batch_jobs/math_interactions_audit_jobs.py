@@ -1,5 +1,3 @@
-# coding: utf-8
-#
 # Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,22 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Audit jobs for math interactions:
+"""Audit jobs for math interactions:
 (AlgebraicExpressionInput, NumericExpressionInput, MathEquationInput)
 """
 
 from __future__ import annotations
-from typing import List, Tuple
 
-from core.domain import exp_fetchers
-from core.feconf import MATH_INTERACTION_IDS
+from core import feconf
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+from typing import List, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -39,8 +35,7 @@ if MYPY: # pragma: no cover
 
 
 class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
-    """
-    Finds explorations that use at least one of the math interactions
+    """Finds explorations that use at least one of the math interactions
     and accumulates the output along with the rules.
 
     Expected output:
@@ -61,7 +56,7 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
         exp_models_filtered = (
             exp_models_pcoll
             | 'Filter Math ExplorationModels' >> beam.Filter(
-                self.filter_math_exploration_models
+                self.contains_math_interactions
             )
         )
 
@@ -75,7 +70,10 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
         exp_models_with_states_filtered = (
             exp_models_with_states
             | 'Filtering out states without math interactions' >> (
-                beam.Filter(self.filter_math_exploration_states)
+                beam.Filter(
+                    lambda tup: tup[2][
+                        'interaction']['id'] in feconf.MATH_INTERACTION_IDS
+                )
             )
         )
 
@@ -91,30 +89,49 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
             | 'Final output' >> beam.Map(job_run_result.JobRunResult.as_stdout)
         )
 
-    def get_number_of_states(self, model: exp_models.ExplorationModel) -> int:
-        exploration = exp_fetchers.get_exploration_from_model(model)
-        return len(exploration.states)
-
-    def filter_math_exploration_models(
+    def contains_math_interactions(
             self, model: exp_models.ExplorationModel) -> bool:
+        """Checks if the exploration contains any state with any of the
+        math interactions.
+
+        Args:
+            model: ExplorationModel. Model instance to be checked.
+
+        Returns:
+            bool. Whether the exploration contains math interactions.
+        """
         return any(
-            state_dict['interaction']['id'] in MATH_INTERACTION_IDS
+            state_dict['interaction']['id'] in feconf.MATH_INTERACTION_IDS
             for state_dict in model.states.values())
 
     def flat_map_exp_with_states(
             self,
             model: exp_models.ExplorationModel) -> List[Tuple[str, str, dict]]:
+        """Maps exploration model with it's states data.
+
+        Args:
+            model: ExplorationModel. Model instance to be mapped.
+
+        Returns:
+            List[Tuple[str, str, dict]]. List of tuples
+            (exp_id, state_name, state_dict).
+        """
         return [
             (model.id, state_name, state_dict)
             for state_name, state_dict in model.states.items()
         ]
 
-    def filter_math_exploration_states(
-            self, tup: Tuple[str, str, dict]) -> bool:
-        return tup[2]['interaction']['id'] in MATH_INTERACTION_IDS
-
     def map_with_rule_types(
             self, tup: Tuple[str, str, dict]) -> Tuple[str, str, List[str]]:
+        """Maps state tuple with it's rule types.
+
+        Args:
+            tup: Tuple[str, str, dict]. State tuple to be modified.
+
+        Returns:
+            Tuple[str, str, List[str]]. Mapped tuple
+            (exp_id, state_name, list of rules).
+        """
         answer_groups = tup[2]['interaction']['answer_groups']
         rule_types = []
         for answer_group in answer_groups:
