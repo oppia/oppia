@@ -528,7 +528,8 @@ class AdminHandler(base.BaseHandler):
 
             len_story = len(story_node_dicts)
             for i, story_node_dict in enumerate(story_node_dicts):
-                self._generate_dummy_story_nodes(story, len_story, i + 1, **story_node_dict)
+                self._generate_dummy_story_nodes(
+                    story, len_story, i + 1, **story_node_dict)
 
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
@@ -704,13 +705,19 @@ class AdminHandler(base.BaseHandler):
 
     def _generate_dummy_chapters(
         self, num_dummy_ops_to_generate,
-        num_dummy_interactions, starting_index):
-        """Generates the given number of dummy chapters
+        num_dummy_interactions, starting_chapter):
+        """generates the given number of dummy chapters.
+
         Args:
             num_dummy_ops_to_generate: int. Count of dummy opportunities to
                 be generated.
             num_dummy_interactions: int. Count of dummy
                 interactions to be generated.
+            starting_chapter: int. Starting number of chapters in
+                story.
+
+        Returns:
+            story_node_dicts. List. The list with story nodes dicts.
         """
         story_node_dicts = []
 
@@ -727,8 +734,8 @@ class AdminHandler(base.BaseHandler):
                             'The Science of Superheroes']
         exploration_ids_to_publish = []
         for opportunity in range(num_dummy_ops_to_generate):
-            title = random.choice(possible_titles) + '' + str(
-                opportunity + starting_index)
+            title = random.choice(possible_titles) + ' ' + str(
+                opportunity + starting_chapter)
             category = 'Algorithms'
             new_exploration_id = exp_fetchers.get_new_exploration_id()
             exp = exp_domain.Exploration.create_default_exploration(
@@ -769,11 +776,11 @@ class AdminHandler(base.BaseHandler):
             })], 'Changed correctness_feedback_enabled.')
             story_node_dicts.append(
                 {'exp_id': new_exploration_id,
-                    'title': title,
-                    'description': category})
+                 'title': title,
+                 'description': category})
         exp_services.index_explorations_given_ids(
             exploration_ids_to_publish)
-        
+
         return story_node_dicts
 
     def _generate_dummy_story_nodes(
@@ -781,6 +788,8 @@ class AdminHandler(base.BaseHandler):
         """Generates and connects sequential story nodes.
 
         Args:
+            story: story_domain. The story.
+            len_story: int. The number of story nodes in the story.
             node_id: int. The node id.
             exp_id: str. The exploration id.
             title: str. The title of the story node.
@@ -808,11 +817,11 @@ class AdminHandler(base.BaseHandler):
                 'new_value': 'Astronomy'
             })], 'Change category')
 
-
     def _generate_dummy_opportunities(
             self, num_dummy_ops_to_generate,
             num_dummy_interactions):
         """Generates and publishes the given number of dummy opportunities.
+
         Args:
             num_dummy_ops_to_generate: int. Count of dummy opportunities to
                 be generated.
@@ -871,9 +880,10 @@ class AdminHandler(base.BaseHandler):
                 num_dummy_ops_to_generate,
                 num_dummy_interactions, 0)
 
-            len_story = len(story_node_dict)
+            len_story = len(story_node_dicts)
             for i, story_node_dict in enumerate(story_node_dicts):
-                self._generate_dummy_story_nodes(story, len_story, i + 1, **story_node_dict)
+                self._generate_dummy_story_nodes(
+                    story, len_story, i + 1, **story_node_dict)
 
             story_services.save_new_story(self.user_id, story)
             topic_services.save_new_topic(self.user_id, topic_1)
@@ -924,8 +934,8 @@ class AdminHandler(base.BaseHandler):
             story_change_list = []
             len_story = len(story_node_dicts)
             for i, story_node_dict in enumerate(story_node_dicts):
-                self._generate_dummy_story_nodes(story, len_story,
-                    len_nodes + i + 1, **story_node_dict)
+                self._generate_dummy_story_nodes(
+                    story, len_story, len_nodes + i + 1, **story_node_dict)
                 cur_node_id = 'node_' + str(len_nodes + i + 1)
                 story_change_list.append(story_domain.StoryChange({
                     'cmd': 'add_story_node',
@@ -954,7 +964,8 @@ class AdminHandler(base.BaseHandler):
                 'adding more opportunities',
                 topic_id)
 
-            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()[len_nodes:]
+            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()[
+                len_nodes:]
             opportunity_services.add_new_exploration_opportunities(
                 story_id, exp_ids_in_story)
         else:
