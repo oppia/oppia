@@ -696,4 +696,3 @@ class _Validators:
             return True
         except utils.ValidationError:
             return False
-
