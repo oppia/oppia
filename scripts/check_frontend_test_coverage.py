@@ -40,7 +40,6 @@ EXCLUDED_DIRECTORIES = [
 NOT_FULLY_COVERED_FILENAMES = [
     'angular-html-bind.directive.ts',
     'App.ts',
-    'audio-preloader.service.ts',
     'Base.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
