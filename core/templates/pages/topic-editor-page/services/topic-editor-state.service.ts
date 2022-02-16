@@ -578,6 +578,13 @@ export class TopicEditorStateService {
       if (errorCallback) {
         errorCallback();
       }
+      /**
+       * This backend api service uses a HTTP link which is generated with
+       * the help of inputted url fragment. So, whenever a url fragment is
+       * entered against the specified reg-ex(or rules) wrong HTTP link is
+       * generated and causes server to respond with 400 error. Because
+       * server also checks for reg-ex match.
+       */
       if (errorResponse.status !== 400) {
         this.alertsService.addWarning(
           errorResponse.message ||
