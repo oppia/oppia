@@ -580,6 +580,10 @@ def main():
 
     release_summary_lines = get_release_summary_lines()
 
+    # Note to developers: If you edit any files apart from
+    # LIST_OF_FILEPATHS_TO_MODIFY in this script, please add it to this list
+    # so that it gets commited as part of the PR that is automatically
+    # generated.
     update_changelog(
         branch_name, release_summary_lines, current_release_version_number)
     update_authors(release_summary_lines)

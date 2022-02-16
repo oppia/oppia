@@ -257,7 +257,6 @@ def execute_branch_cut(target_version, hotfix_number):
     common.require_cwd_to_be_oppia()
     common.verify_local_repo_is_clean()
     common.verify_current_branch_name('develop')
-    common.update_branch_with_upstream()
 
     # Update the local repo.
     remote_alias = common.get_remote_alias(
@@ -297,6 +296,8 @@ def execute_branch_cut(target_version, hotfix_number):
             branch_to_cut_from = 'release-%s-hotfix-%s' % (
                 target_version, hotfix_number - 1)
         print('Cutting a new hotfix branch: %s' % new_branch_name)
+        subprocess.check_call(['git', 'checkout', branch_to_cut_from])
+        common.update_branch_with_upstream()
         subprocess.check_call([
             'git', 'checkout', '-b', new_branch_name, branch_to_cut_from])
     else:
