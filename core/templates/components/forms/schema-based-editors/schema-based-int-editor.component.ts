@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for integers.
+ * @fileoverview Component for a schema-based editor for integers.
  */
+
 import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -23,7 +24,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 @Component({
   selector: 'schema-based-int-editor',
-  templateUrl: './schema-based-int-editor.directive.html',
+  templateUrl: './schema-based-int-editor.component.html',
   styleUrls: [],
   providers: [
     {

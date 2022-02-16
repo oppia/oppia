@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,36 +13,41 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for booleans.
+ * @fileoverview Component for a schema-based editor for dicts.
  */
 
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { IdGenerationService } from 'services/id-generation.service';
 
 @Component({
-  selector: 'schema-based-bool-editor',
-  templateUrl: './schema-based-bool-editor.directive.html',
+  selector: 'schema-based-dict-editor',
+  templateUrl: './schema-based-dict-editor.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => SchemaBasedBoolEditorComponent),
+      useExisting: forwardRef(() => SchemaBasedDictEditorComponent),
       multi: true
     },
     {
       provide: NG_VALIDATORS,
       multi: true,
-      useExisting: forwardRef(() => SchemaBasedBoolEditorComponent),
+      useExisting: forwardRef(() => SchemaBasedDictEditorComponent),
     },
   ]
 })
-export class SchemaBasedBoolEditorComponent
+
+export class SchemaBasedDictEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
   localValue;
-  @Input() disabled: boolean;
-  @Input() labelForFocusTarget: string;
+  @Input() disabled;
+  @Input() propertySchemas;
+  @Input() labelForFocusTarget;
+  fieldIds: Record<string, string> = {};
+  JSON = JSON;
   onChange: (val: unknown) => void = () => {};
-  constructor() { }
+  constructor(private idGenerationService: IdGenerationService) { }
 
   // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: unknown): void {
@@ -63,17 +68,40 @@ implements ControlValueAccessor, OnInit, Validator {
     return {};
   }
 
-  ngOnInit(): void { }
-
-  updateValue(val: boolean): void {
-    if (this.localValue === val) {
-      return;
+  ngOnInit(): void {
+    this.fieldIds = {};
+    for (let i = 0; i < this.propertySchemas.length; i++) {
+      // Generate random IDs for each field.
+      this.fieldIds[this.propertySchemas[i].name] = (
+        this.idGenerationService.generateNewId());
     }
-    this.localValue = val;
-    this.onChange(val);
+  }
+
+  updateValue(value: unknown, name: string): void {
+    this.localValue[name] = value;
+    this.onChange(this.localValue);
+  }
+
+  getSchema(index: number): unknown {
+    const schema = this.propertySchemas[index].schema;
+    return schema;
+  }
+
+  getLabelForFocusTarget(): string {
+    return this.labelForFocusTarget;
+  }
+
+  getEmptyString(): '' {
+    return '';
+  }
+
+  getHumanReadablePropertyDescription(
+      property: {description: string; name: string}
+  ): string {
+    return property.description || '[' + property.name + ']';
   }
 }
 
-angular.module('oppia').directive('schemaBasedBoolEditor', downgradeComponent({
-  component: SchemaBasedBoolEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive('schemaBasedDictEditor', downgradeComponent({
+  component: SchemaBasedDictEditorComponent
+}));
