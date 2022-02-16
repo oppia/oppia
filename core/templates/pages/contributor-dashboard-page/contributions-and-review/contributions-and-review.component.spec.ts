@@ -184,6 +184,7 @@ describe('Contributions and review component', function() {
       ' initialized', function() {
       expect(ctrl.activeTabType).toBe('reviews');
       expect(ctrl.activeSuggestionType).toBe('add_question');
+      expect(ctrl.activeDropdownTabChoice).toBe('Review Questions');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(2);
@@ -734,6 +735,7 @@ describe('Contributions and review component', function() {
       ' initialized', function() {
       expect(ctrl.activeTabType).toBe('contributions');
       expect(ctrl.activeSuggestionType).toBe('add_question');
+      expect(ctrl.activeDropdownTabChoice).toBe('Questions');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(0);
@@ -787,7 +789,7 @@ describe('Contributions and review component', function() {
     it('should not resolve suggestion to skill when dismissing show question' +
       ' suggestion modal', function() {
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
-      spyOn(contributionAndReviewService, 'resolveSuggestiontoSkill');
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject({})
       });
@@ -805,7 +807,7 @@ describe('Contributions and review component', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: Promise.resolve([])
       });
-      spyOn(contributionAndReviewService, 'resolveSuggestiontoSkill')
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion')
         .and.callFake((
             targetId, suggestionId, action, reviewMessage,
             skillDifficulty, resolveSuggestion, cb) => {
@@ -842,6 +844,95 @@ describe('Contributions and review component', function() {
 
       ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
       ctrl.isActiveTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+    });
+
+    it('should toggle dropdown when it is clicked', function() {
+      ctrl.dropdownShown = false;
+
+      ctrl.toggleDropdown();
+      expect(ctrl.dropdownShown).toBe(true);
+
+      ctrl.toggleDropdown();
+      expect(ctrl.dropdownShown).toBe(false);
+    });
+
+    it('should set active dropdown choice correctly', function() {
+      ctrl.activeTabType = ctrl.TAB_TYPE_REVIEWS;
+      ctrl.activeSuggestionType = 'add_question';
+
+      expect(ctrl.getActiveDropdownTabChoice()).toBe('Review Questions');
+
+      ctrl.activeTabType = ctrl.TAB_TYPE_REVIEWS;
+      ctrl.activeSuggestionType = 'translate_content';
+
+      expect(ctrl.getActiveDropdownTabChoice()).toBe('Review Translations');
+
+      ctrl.activeTabType = ctrl.TAB_TYPE_CONTRIBUTIONS;
+      ctrl.activeSuggestionType = 'add_question';
+
+      expect(ctrl.getActiveDropdownTabChoice()).toBe('Questions');
+
+      ctrl.activeTabType = ctrl.TAB_TYPE_CONTRIBUTIONS;
+      ctrl.activeSuggestionType = 'translate_content';
+
+      expect(ctrl.getActiveDropdownTabChoice()).toBe('Translations');
+    });
+
+    it('should close dropdown when a click is made outside', function() {
+      const element = {
+        contains: function() {
+          return true;
+        }
+      };
+      const clickEvent = {
+        target: {}
+      };
+      const querySelectorSpy = spyOn(document, 'querySelector').and
+        .returnValue(null);
+      const elementContainsSpy = spyOn(element, 'contains').and
+        .returnValue(true);
+      ctrl.dropdownShown = true;
+
+      ctrl.closeDropdownWhenClickedOutside();
+      expect(querySelectorSpy).toHaveBeenCalled();
+      expect(elementContainsSpy).not.toHaveBeenCalled();
+      expect(ctrl.dropdownShown).toBe(true);
+
+      // This throws "Argument of type '{ contains: () => boolean; }' is not
+      // assignable to parameter of type 'Element'. Type '{ contains:
+      // () => boolean; }' is missing the following properties from type
+      // 'Element': attributes, classList, className, clientHeight, and 159
+      // more.". We need to suppress this error because only the properties
+      // provided in the element object are required for testing.
+      // @ts-expect-error
+      querySelectorSpy.and.returnValue(element);
+
+      ctrl.closeDropdownWhenClickedOutside(clickEvent);
+      expect(querySelectorSpy).toHaveBeenCalled();
+      expect(elementContainsSpy).toHaveBeenCalled();
+      expect(ctrl.dropdownShown).toBe(true);
+
+      elementContainsSpy.and.returnValue(false);
+
+      ctrl.closeDropdownWhenClickedOutside(clickEvent);
+      expect(ctrl.dropdownShown).toBe(false);
+    });
+
+    it('should return back when user click is made outside', function() {
+      const clickEvent = {
+        target: {}
+      };
+      spyOn(document, 'querySelector').and.returnValue(null);
+
+      ctrl.closeDropdownWhenClickedOutside(clickEvent);
+      expect(document.querySelector).toHaveBeenCalled();
+    });
+
+    it('should unbind event listener when onDestroy is called', function() {
+      const unbindSpy = spyOn($.fn, 'off');
+
+      ctrl.$onDestroy();
+      expect(unbindSpy).toHaveBeenCalled();
     });
   });
 

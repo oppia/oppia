@@ -549,7 +549,7 @@ angular.module('oppia').component('stateTranslation', {
           $scope.stateInteractionId ? (
             ExplorationHtmlFormatterService.getInteractionHtml(
               $scope.stateInteractionId,
-              $scope.stateInteractionCustomizationArgs, false, undefined, null)
+              $scope.stateInteractionCustomizationArgs, false, null, null)
           ) : '');
         $scope.interactionCustomizationArgTranslatableContent = (
           $scope.getInteractionCustomizationArgTranslatableContents(

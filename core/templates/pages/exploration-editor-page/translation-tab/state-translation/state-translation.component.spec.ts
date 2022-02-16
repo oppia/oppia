@@ -390,7 +390,15 @@ describe('State translation component', function() {
 
   var refreshStateTranslationEmitter = new EventEmitter();
   var showTranslationTabBusyModalEmitter = new EventEmitter();
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   importAllAngularServices();
 

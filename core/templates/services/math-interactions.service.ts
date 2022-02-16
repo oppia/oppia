@@ -96,6 +96,66 @@ export class MathInteractionsService {
     return errorMessage;
   }
 
+  isParenRedundant(
+      expressionString: string,
+      openingInd: number,
+      closingInd: number
+  ): boolean {
+    /*
+    Assumes that expressionString is syntactically valid.
+
+    Multiple consecutive parens are considered redundant. eg: for ((a - b))
+    the outer pair of parens are considered as redundant.
+    */
+    if ((closingInd + 2 < expressionString.length &&
+        expressionString[closingInd + 2] === '^') ||
+        (openingInd - 2 >= 0 &&
+        expressionString[openingInd - 2] === '^')) {
+      // Guppy adds redundant parens while using exponents, so we need to ignore
+      // them.
+      return false;
+    }
+    let leftParenIsRedundant = (
+      openingInd - 1 >= 0 && expressionString[openingInd - 1] === '(');
+    let rightParenIsRedundant = (
+      closingInd + 1 < expressionString.length &&
+      expressionString[closingInd + 1] === ')');
+    return leftParenIsRedundant && rightParenIsRedundant;
+  }
+
+  /**
+  * This function checks if an expression contains redundant params. It assumes
+  * that the expression will be syntactically valid.
+  * @param expressionString The math expression to be validated.
+  *
+  * @returns [boolean, string]. The boolean represents if the given expression
+  * contains any redundant params, and the string is the substring of the
+  * expression that contains redundant params.
+  */
+  containsRedundantParens(expressionString: string): [boolean, string] {
+    let stack: number[] = [];
+
+    for (let i = 0; i < expressionString.length; i++) {
+      let char = expressionString[i];
+      if (char === '(') {
+        // Hack to identify if this is the opening paren of a function call
+        // like sqrt(...). If so, we ignore that paren.
+        if (i > 0 && expressionString[i - 1].match(/[a-zA-Z]|\^/)) {
+          stack.push(-1);
+        } else {
+          stack.push(i);
+        }
+      } else if (char === ')') {
+        let openingInd = stack.pop() || 0;
+        if (openingInd !== -1 && this.isParenRedundant(
+          expressionString, openingInd, i)) {
+          return [true, expressionString.slice(openingInd - 1, i + 2)];
+        }
+      }
+    }
+    return [false, ''];
+  }
+
   _validateExpression(expressionString: string): boolean {
     expressionString = expressionString.replace(/\s/g, '');
     if (expressionString.length === 0) {
@@ -122,6 +182,19 @@ export class MathInteractionsService {
         'Your answer contains an invalid term: ' + invalidIntegers[0]);
       return false;
     }
+    let invalidMultiTerms = expressionString.match(/([a-zA-Z]+\d+)/g);
+    if (invalidMultiTerms !== null) {
+      let firstNumberIndex = invalidMultiTerms[0].search(/\d/);
+      let correctString = (
+        invalidMultiTerms[0].slice(firstNumberIndex) +
+        invalidMultiTerms[0].slice(0, firstNumberIndex));
+      this.warningText = (
+        'When multiplying, the variable should come after the number: ' +
+        correctString + '. Please update your answer and try again.'
+      );
+      return false;
+    }
+
     try {
       expressionString = this.insertMultiplicationSigns(expressionString);
       nerdamer(expressionString);
@@ -132,6 +205,35 @@ export class MathInteractionsService {
       }
       return false;
     }
+
+    if (expressionString.match(/\w\^((\w+\^)|(\(.*\^.*\)))/g)) {
+      this.warningText = (
+        'Your expression contains an exponent in an exponent ' +
+        'which is not supported.');
+      return false;
+    }
+
+    let exponents = expressionString.match(/\^((\([^\(\)]*\))|(\w+))/g);
+    if (exponents !== null) {
+      for (let exponent of exponents) {
+        exponent = exponent.replace(/^\^/g, '');
+        if (nerdamer(exponent).gt('5')) {
+          this.warningText = (
+            'Your expression contains an exponent with value greater than 5 ' +
+            'which is not supported.');
+          return false;
+        }
+      }
+    }
+
+    let [expressionContainsRedundantParens, errorString] = (
+      this.containsRedundantParens(expressionString));
+    if (expressionContainsRedundantParens) {
+      this.warningText = (
+        `Your expression contains redundant parentheses: ${errorString}.`);
+      return false;
+    }
+
     this.warningText = '';
     return true;
   }
@@ -160,12 +262,8 @@ export class MathInteractionsService {
         variablesList[i] = greekNameToSymbolMap[variablesList[i]];
       }
     }
-    if (variablesList.length === 0) {
-      this.warningText = 'It looks like you have entered only ' +
-      'numbers. Make sure to include the necessary variables' +
-      ' mentioned in the question.';
-      return false;
-    } else if (validVariablesList.length !== 0) {
+
+    if (validVariablesList.length !== 0) {
       for (let variable of variablesList) {
         if (validVariablesList.indexOf(variable) === -1) {
           this.warningText = (
@@ -307,6 +405,12 @@ export class MathInteractionsService {
       expressionString = expressionString.replace(new RegExp(
         '([a-zA-Z0-9\)])' + functionName, 'g'), '$1*' + functionName);
     }
+
+    // Inserting multiplication signs between digit and variable.
+    // For eg. 5w - z => 5*w - z.
+    expressionString = expressionString.replace(new RegExp(
+      '([0-9])([a-zA-Z])', 'g'), '$1*$2');
+
     // Inserting multiplication signs after closing parens.
     expressionString = expressionString.replace(/\)([^\*\+\/\-\^\)])/g, ')*$1');
     // Inserting multiplication signs before opening parens.
@@ -494,6 +598,11 @@ export class MathInteractionsService {
 
     // Checks if all terms have matched.
     return termsWithPlaceholders.length + inputTerms.length === 0;
+  }
+
+  containsAtLeastOneVariable(expressionString: string): boolean {
+    let variablesList = nerdamer(expressionString).variables();
+    return variablesList.length > 0;
   }
 }
 

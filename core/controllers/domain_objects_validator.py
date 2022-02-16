@@ -26,9 +26,47 @@ from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import image_validation_services
+from core.domain import question_domain
 from core.domain import state_domain
+from core.domain import topic_domain
 
 from typing import Dict, Optional, Union
+
+
+def validate_suggestion_change(obj):
+    """Validates Exploration or Question change.
+
+    Args:
+        obj: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns suggestion change dict after validation.
+    """
+    # No explicit call to validate_dict is required, because
+    # ExplorationChange or QuestionSuggestionChange calls
+    # validate method while initialization.
+    if obj.get('cmd') is None:
+        raise base.BaseHandler.InvalidInputException(
+            'Missing cmd key in change dict')
+
+    exp_change_commands = [
+        command['name'] for command in
+        exp_domain.ExplorationChange.ALLOWED_COMMANDS
+    ]
+    question_change_commands = [
+        command['name'] for command in
+        question_domain.QuestionChange.ALLOWED_COMMANDS
+    ]
+
+    if obj['cmd'] in exp_change_commands:
+        exp_domain.ExplorationChange(obj)
+    elif obj['cmd'] in question_change_commands:
+        question_domain.QuestionSuggestionChange(obj)
+    else:
+        raise base.BaseHandler.InvalidInputException(
+            '%s cmd is not allowed.' % obj['cmd'])
+    return obj
 
 
 def validate_exploration_change(obj):
@@ -59,7 +97,7 @@ def validate_new_config_property_values(new_config_property):
             raise Exception(
                 'config property name should be a string, received'
                 ': %s' % name)
-        config_property = config_domain.Registry.get_config_property(name) # type: ignore[no-untyped-call]
+        config_property = config_domain.Registry.get_config_property(name)
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 
@@ -91,7 +129,7 @@ def validate_change_dict_for_blog_post(change_dict):
             change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
-        list_of_default_tags = config_domain.Registry.get_config_property( # type: ignore[no-untyped-call]
+        list_of_default_tags = config_domain.Registry.get_config_property(
             'list_of_default_tags_for_blog_post').value
         if not all(tag in list_of_default_tags for tag in change_dict['tags']):
             raise Exception(
@@ -239,6 +277,23 @@ def validate_aggregated_stats(aggregated_stats):
     return aggregated_stats
 
 
+def validate_suggestion_images(files):
+    """Validates the files dict.
+
+    Args:
+        files: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns the dict after validation.
+    """
+    for filename, raw_image in files.items():
+        image_validation_services.validate_image_and_filename(
+            raw_image, filename)
+    # The files argument do not represent any domain class, hence dict form
+    # of the data is returned from here.
+    return files
+
+
 def validate_params_dict(params):
     """validates params data type
 
@@ -253,3 +308,24 @@ def validate_params_dict(params):
     # The params argument do not represent any domain class, hence dict form of
     # the data is returned from here.
     return params
+
+
+def validate_topic_and_sub_topic_change(change_dict):
+    """Validates Topic or Subtopic change.
+
+    Args:
+        change_dict: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns the validated change_dict.
+    """
+    allowed_commands = [
+        command['name'] for command in topic_domain.TopicChange.ALLOWED_COMMANDS
+    ]
+
+    if change_dict.get('cmd', None) not in allowed_commands:
+        raise base.BaseHandler.InvalidInputException(
+            '%s cmd is not allowed.' % change_dict.get('cmd', None)
+        )
+
+    return change_dict

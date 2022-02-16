@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import base64
 import os
 
 from core import feconf
@@ -51,7 +52,6 @@ from core.tests import test_utils
 
 class SuggestionUnitTests(test_utils.GenericTestBase):
 
-    IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
     ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
     EXP_ID = 'exp1'
     TRANSLATION_LANGUAGE_CODE = 'en'
@@ -171,7 +171,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'content_id': 'content',
                     'language_code': 'hi',
                     'content_html': '<p>old content html</p>',
-                    'translation_html': '<p>In Hindi</p>',
+                    'translation_html': '<p>In हिन्दी (Hindi)</p>',
                     'data_format': 'html'
                 },
                 'description': 'change to state 3',
@@ -695,7 +695,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         ) as f:
             raw_image = f.read()
         self.post_json(
-            '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
+            '%s/exploration/%s' % (
+                feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
             {'filename': 'img.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))
@@ -741,10 +742,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                         '</oppia-noninteractive-image>'),
                     'data_format': 'html'
                 },
-            }, csrf_token=csrf_token,
-            upload_files=(
-                ('translation_image.png', 'translation_image.png', raw_image), )
-            )
+                'description': 'test',
+                'files': {
+                    'translation_image.png': (
+                        base64.b64encode(raw_image).decode('utf-8'))
+                 },
+            },
+            csrf_token=csrf_token
+        )
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
@@ -926,12 +931,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     def test_update_suggestion_updates_question_suggestion_content(self):
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, self.author_id, description='description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
@@ -959,30 +961,34 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
-        question_state_data['content'][
-            'html'] = (
-                '<p>Updated question</p>'
-                '<oppia-noninteractive-image filepath-with-value='
-                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
-                'alt-with-value="&quot;Image&quot;">'
-                '</oppia-noninteractive-image>')
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
+        question_state_data['content']['html'] = (
+            '<p>Updated question</p>'
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>')
+        question_state_data['interaction']['solution'] = new_solution_dict
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb',
+            encoding=None
+        ) as f:
             raw_image = f.read()
 
-        self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
+        self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ), {
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6
-            }, csrf_token=csrf_token, upload_files=(
-                ('img.png', 'img.png', raw_image),))
+            },
+            csrf_token=csrf_token,
+            upload_files=(('img.png', 'img.png', raw_image),)
+        )
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
@@ -990,28 +996,23 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'question_state_data']
 
         self.assertEqual(
-            new_question_state_data['content'][
-                'html'],
-            (
-                '<p>Updated question</p>'
-                '<oppia-noninteractive-image filepath-with-value='
-                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
-                'alt-with-value="&quot;Image&quot;">'
-                '</oppia-noninteractive-image>'))
+            new_question_state_data['content']['html'],
+            '<p>Updated question</p>'
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>'
+        )
         self.assertEqual(
-            new_question_state_data['interaction'][
-                'solution'],
+            new_question_state_data['interaction']['solution'],
             new_solution_dict)
         self.logout()
 
     def test_cannot_update_question_with_invalid_skill_difficulty(self):
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, self.author_id, description='description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
@@ -1031,8 +1032,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
-        question_state_data['content'][
-            'html'] = '<p>Updated question</p>'
+        question_state_data['content']['html'] = '<p>Updated question</p>'
         new_solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
@@ -1041,18 +1041,23 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is the updated solution.</p>',
             },
         }
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
+        question_state_data['interaction']['solution'] = new_solution_dict
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
+        response = self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ),
+            {
                 'question_state_data': question_state_data,
                 'skill_difficulty': '0.6'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
 
         self.assertEqual(
             response['error'],
@@ -1061,12 +1066,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_update_question_without_state_data(self):
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, self.author_id, description='description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
@@ -1094,19 +1096,23 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
-        question_state_data['content'][
-            'html'] = '<p>Updated question</p>'
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
+        question_state_data['content']['html'] = '<p>Updated question</p>'
+        question_state_data['interaction']['solution'] = new_solution_dict
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
+        response = self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ),
+            {
                 'skill_difficulty': 0.6
-            }, csrf_token=csrf_token, expected_status_int=400)
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
 
         self.assertEqual(
             response['error'],
@@ -1118,9 +1124,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
@@ -1148,23 +1152,26 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
-        question_state_data['content'][
-            'html'] = '<p>Updated question</p>'
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
+        question_state_data['content']['html'] = '<p>Updated question</p>'
+        question_state_data['interaction']['solution'] = new_solution_dict
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
+        response = self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ),
+            {
                 'question_state_data': question_state_data
-            }, csrf_token=csrf_token, expected_status_int=400)
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
 
         self.assertEqual(
-            response['error'],
-            'The parameter \'skill_difficulty\' is missing.')
+            response['error'], 'The parameter \'skill_difficulty\' is missing.')
         self.logout()
 
     def test_cannot_update_already_handled_question(self):
@@ -1172,9 +1179,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
@@ -1205,25 +1210,31 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
-        question_state_data['content'][
-            'html'] = '<p>Updated question</p>'
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
+        question_state_data['content']['html'] = '<p>Updated question</p>'
+        question_state_data['interaction']['solution'] = new_solution_dict
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
+        response = self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ),
+            {
                 'question_state_data': question_state_data,
                 'skill_difficulty': '0.6'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
 
         self.assertEqual(
             response['error'],
             'The suggestion with id %s has been accepted or rejected' % (
-                suggestion.suggestion_id))
+                suggestion.suggestion_id
+            )
+        )
         self.logout()
 
     def test_cannot_update_question_when_provided_state_data_is_invalid(self):
@@ -1231,9 +1242,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
@@ -1256,12 +1265,18 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
+        self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ),
+            {
                 'question_state_data': invalid_question_state_data,
                 'skill_difficulty': '0.6'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
         self.logout()
 
     def test_suggestion_creation_when_images_are_not_provided(self):
@@ -1288,7 +1303,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         ) as f:
             raw_image = f.read()
         self.post_json(
-            '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
+            '%s/exploration/%s' % (
+                feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
             {'filename': 'img.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))
@@ -1330,11 +1346,11 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': valid_html,
                     'data_format': 'html'
                 },
+                'files': {'file.svg': None},
+                'description': 'test'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertIn(
-            'No image data provided for file with name file.svg.',
-            response_dict['error'])
+        self.assertIn('No image supplied', response_dict['error'])
         self.logout()
 
     def test_suggestion_creation_when_images_are_not_valid(self):
@@ -1361,7 +1377,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         ) as f:
             raw_image = f.read()
         self.post_json(
-            '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
+            '%s/exploration/%s' % (
+                feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
             {'filename': 'img.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))
@@ -1405,10 +1422,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': valid_html,
                     'data_format': 'html'
                 },
-            }, csrf_token=csrf_token,
-            upload_files=(
-                 ('file.svg', 'file.svg', large_image),),
-            expected_status_int=400)
+                'description': 'test',
+                'files': {'file.svg': large_image},
+            }, csrf_token=csrf_token, expected_status_int=400,
+        )
 
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
@@ -1742,8 +1759,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'Expected target_version_at_submission to be an int, '
-            'received <class \'str\'>'
+            'Schema validation for \'target_version_at_submission\' failed: '
+            'Could not convert str to int: invalid_target_version'
         )
         self.assertEqual(len(suggestions), 1)
         self.logout()
@@ -1793,9 +1810,12 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'skill_id': self.SKILL_ID,
                     'skill_difficulty': 0.3
                 },
-                'description': 'Add new question to skill'
-            }, csrf_token=csrf_token, upload_files=(
-                ('file.svg', 'file.svg', raw_image), ))
+                'description': 'Add new question to skill',
+                'files': {
+                    'file.svg': (
+                        base64.b64encode(raw_image).decode('utf-8'))
+                }
+            }, csrf_token=csrf_token,)
         self.logout()
 
 

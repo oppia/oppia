@@ -18,108 +18,135 @@
 
 import { Ratio } from 'domain/objects/ratio.model';
 
-require(
-  'interactions/interaction-attributes-extractor.service.ts');
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
-require(
-  'interactions/RatioExpressionInput/directives/' +
-  'ratio-expression-input-rules.service.ts');
-require('services/html-escaper.service.ts');
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-require('domain/objects/objects-domain.constants.ajs.ts');
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { RatioExpressionInputRulesService } from './ratio-expression-input-rules.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
-angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
-  template: require('./ratio-expression-input-interaction.component.html'),
-  bindings: {
-    savedSolution: '<'
-  },
-  controller: [
-    '$attrs', '$scope', 'CurrentInteractionService',
-    'InteractionAttributesExtractorService',
-    'RatioExpressionInputRulesService',
-    function(
-        $attrs, $scope, CurrentInteractionService,
-        InteractionAttributesExtractorService,
-        RatioExpressionInputRulesService) {
-      var ctrl = this;
-      var errorMessage = '';
-      // Label for errors caused whilst parsing ratio expression.
-      var FORM_ERROR_TYPE = 'RATIO_EXPRESSION_INPUT_FORMAT_ERROR';
-      ctrl.getWarningText = function() {
-        return errorMessage;
-      };
+import { RatioExpressionInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { RatioInputAnswer, InteractionAnswer } from 'interactions/answer-defs';
 
-      ctrl.submitAnswer = function(answer) {
-        try {
-          var ratioExpression =
-            Ratio.fromRawInputString(answer);
-          if (
-            (
-              ratioExpression.getNumberOfTerms() !==
-              ctrl.expectedNumberOfTerms) && (ctrl.expectedNumberOfTerms !== 0)
-          ) {
-            throw new Error(
-              'The creator has specified the number of terms in' +
-              ' the answer to be ' + ctrl.expectedNumberOfTerms + '.');
-          }
-          errorMessage = '';
-          ctrl.RatioExpressionInputForm.answer.$setValidity(
-            FORM_ERROR_TYPE, true);
-          CurrentInteractionService.onSubmit(
-            ratioExpression.getComponents(),
-            RatioExpressionInputRulesService);
-        } catch (parsingError) {
-          errorMessage = parsingError.message;
-          ctrl.RatioExpressionInputForm.answer.$setValidity(
-            FORM_ERROR_TYPE, false);
-        }
-      };
+@Component({
+  selector: 'oppia-interactive-ratio-expression-input',
+  templateUrl: './ratio-expression-input-interaction.component.html',
+  styleUrls: []
+})
+export class InteractiveRatioExpressionInputComponent
+  implements OnInit, OnDestroy {
+  @Input() placeholderWithValue: string;
+  @Input() numberOfTermsWithValue: string;
+  @Input() labelForFocusTarget: string;
+  @Input() savedSolution: InteractionAnswer;
+  componentSubscriptions: Subscription = new Subscription();
+  expectedNumberOfTerms: number;
+  placeholder: string;
+  FORM_ERROR_TYPE: string = 'RATIO_EXPRESSION_INPUT_FORMAT_ERROR';
+  errorMessage: string = '';
+  answer: string = '';
+  isValid: boolean = true;
+  answerChanged: Subject<string> = new Subject<string>();
+  RATIO_EXPRESSION_INPUT_FORM_SCHEMA = {
+    type: 'unicode',
+    ui_config: {}
+  };
 
-      ctrl.isAnswerValid = function() {
-        if (ctrl.RatioExpressionInputForm === undefined) {
-          return true;
-        }
-        return (
-          !ctrl.RatioExpressionInputForm.answer.$invalid && ctrl.answer !== '');
-      };
+  constructor(
+    private currentInteractionService: CurrentInteractionService,
+    private focusManagerService: FocusManagerService,
+    private interactionAttributesExtractorService:
+      InteractionAttributesExtractorService,
+    private ratioExpressionInputRulesService: RatioExpressionInputRulesService,
+  ) {
+    this.componentSubscriptions.add(this.answerChanged.pipe(
+      // Wait 150ms after the last event before emitting last event.
+      debounceTime(150),
+      // Only emit if value is different from previous value.
+      distinctUntilChanged()
+    ).subscribe(newValue => {
+      this.errorMessage = '';
+      this.isValid = true;
+      this.currentInteractionService.updateViewWithNewAnswer();
+    }));
+  }
 
-      var submitAnswerFn = function() {
-        ctrl.submitAnswer(ctrl.answer);
-      };
-
-      ctrl.$onInit = function() {
-        $scope.$watch('$ctrl.answer', function(newValue) {
-          errorMessage = '';
-          ctrl.RatioExpressionInputForm.answer.$setValidity(
-            FORM_ERROR_TYPE, true);
-        });
-        if (ctrl.savedSolution !== undefined) {
-          let savedSolution = ctrl.savedSolution;
-          savedSolution = Ratio.fromList(
-            savedSolution).toAnswerString();
-          ctrl.answer = savedSolution;
-        } else {
-          ctrl.answer = '';
-        }
-        ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-        var {
-          placeholder,
-          numberOfTerms
-        } = InteractionAttributesExtractorService.getValuesFromAttributes(
-          'RatioExpressionInput',
-          $attrs
-        );
-        ctrl.placeholder = placeholder.unicode;
-        ctrl.expectedNumberOfTerms = numberOfTerms;
-        ctrl.RATIO_EXPRESSION_INPUT_FORM_SCHEMA = {
-          type: 'unicode',
-          ui_config: {}
-        };
-
-        CurrentInteractionService.registerCurrentInteraction(
-          submitAnswerFn, ctrl.isAnswerValid);
-      };
+  ngOnInit(): void {
+    const {
+      placeholder,
+      numberOfTerms
+    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
+      'RatioExpressionInput',
+      {
+        placeholderWithValue: this.placeholderWithValue,
+        numberOfTermsWithValue: this.numberOfTermsWithValue
+      }
+    ) as RatioExpressionInputCustomizationArgs;
+    this.expectedNumberOfTerms = numberOfTerms.value;
+    this.placeholder = placeholder.value.unicode;
+    if (this.savedSolution !== undefined) {
+      let savedSolution = this.savedSolution;
+      savedSolution = Ratio.fromList(
+        savedSolution as RatioInputAnswer).toAnswerString();
+      this.answer = savedSolution;
+    } else {
+      this.answer = '';
     }
-  ]
-});
+    const submitAnswerFn = () => this.submitAnswer();
+    const isAnswerValid = () => this.isAnswerValid();
+    this.currentInteractionService.registerCurrentInteraction(
+      submitAnswerFn, isAnswerValid);
+
+    setTimeout(
+      () => {
+        let focusLabel: string = this.labelForFocusTarget;
+        this.focusManagerService.setFocusWithoutScroll(focusLabel);
+      }, 0);
+  }
+
+  submitAnswer(): void {
+    try {
+      const ratioExpression = Ratio.fromRawInputString(this.answer);
+      if (
+        ratioExpression.getNumberOfTerms() !== this.expectedNumberOfTerms &&
+        this.expectedNumberOfTerms !== 0
+      ) {
+        throw new Error(
+          'The creator has specified the number of terms in ' +
+          `the answer to be ${this.expectedNumberOfTerms}.`
+        );
+      }
+      this.errorMessage = '';
+      this.isValid = true;
+      // TODO(#13015): Remove use of unknown as a type.
+      this.currentInteractionService.onSubmit(
+        ratioExpression.getComponents() as unknown as string,
+        this.ratioExpressionInputRulesService as unknown as
+        InteractionRulesService);
+    } catch (parsingError) {
+      this.errorMessage = parsingError.message;
+      this.isValid = false;
+    }
+  }
+
+  isAnswerValid(): boolean {
+    return this.isValid && this.answer !== '';
+  }
+
+  answerValueChanged(): void {
+    this.answerChanged.next(this.answer);
+  }
+
+  ngOnDestroy(): void {
+    this.componentSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaInteractiveRatioExpressionInput', downgradeComponent({
+    component: InteractiveRatioExpressionInputComponent
+  }) as angular.IDirectiveFactory);

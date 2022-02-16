@@ -101,6 +101,7 @@
               <strong>Thumbnail Image*</strong>
             </p>
             <oppia-thumbnail-uploader [filename]="$ctrl.subtopic.getThumbnailFilename()"
+                                      [useLocalStorage]="false"
                                       (update-filename)="$ctrl.updateSubtopicThumbnailFilename($event)"
                                       [bg-color]="$ctrl.subtopic.getThumbnailBgColor()"
                                       (update-bg-color)="$ctrl.updateSubtopicThumbnailBgColor($event)"
@@ -292,7 +293,7 @@
   }
   .subtopic-content .add-skill-btn {
     background-color: #008098;
-    color: #FFF;
+    color: #fff;
     font-weight: bold;
     margin: 15px 0;
   }
@@ -318,7 +319,7 @@
   }
   .subtopic-content .entity-count {
     align-items: center;
-    background-color: #FFF;
+    background-color: #fff;
     border: 1px solid #aaaac1;
     border-radius: 6px;
     display: flex;
@@ -371,6 +372,7 @@
     padding: 6px 12px;
   }
   .subtopic-content .subtopic-skill-card {
+    margin-bottom: 30px;
     margin-top: 64px;
   }
   .subtopic-content .subtopic-card-heading {
@@ -420,6 +422,7 @@
     }
     .subtopic-content .subtopic-skill-card {
       display: block;
+      margin-bottom: 0;
       margin-top: 40px;
       padding: 0;
     }
