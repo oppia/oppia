@@ -1129,7 +1129,7 @@ describe('Admin backend api service', () => {
     let payload = {
       action: action,
       num_dummy_ops_to_generate: numDummyOpsToGenerate,
-      num_dummy_interactions_to_generate: numDummyInteractionsToGenerate
+      num_dummy_interactions: numDummyInteractionsToGenerate
     };
 
     abas.generateDummyOpportunitiesAsync(
