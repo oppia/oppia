@@ -31,6 +31,7 @@ class MockRouterService {
   get onRefreshSettingsTab() {
     return this.refreshSettingsTabEventEmitter;
   }
+
   set refreshSettingsTabEmitter(val) {
     this.refreshSettingsTabEventEmitter = val;
   }
