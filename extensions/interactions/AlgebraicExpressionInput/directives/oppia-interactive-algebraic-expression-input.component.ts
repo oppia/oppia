@@ -40,7 +40,7 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: []
 })
 export class AlgebraicExpressionInputInteractionComponent
-  implements OnInit, OnDestroy {
+    implements OnInit, OnDestroy {
   value: string = '';
   hasBeenTouched = false;
   viewIsDestroyed: boolean = false;
