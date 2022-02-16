@@ -57,6 +57,7 @@ export class MisconceptionEditorComponent implements OnInit {
     type: 'html',
     ui_config: {}
   };
+
   FEEDBACK_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
@@ -84,30 +85,6 @@ export class MisconceptionEditorComponent implements OnInit {
       misconceptionFeedback: this.misconception.getFeedback(),
       misconceptionMustBeAddressed: this.misconception.isMandatory()
     };
-  }
-
-  // Remove these function when the schema-based editor
-  // is migrated to Angular 2+.
-  getSchemaNotes(): MisconceptionFormSchema {
-    return this.NOTES_FORM_SCHEMA;
-  }
-
-  getSchemaFeedback(): MisconceptionFormSchema {
-    return this.FEEDBACK_FORM_SCHEMA;
-  }
-
-  updateLocalNotes($event: string): void {
-    if (this.container.misconceptionNotes !== $event) {
-      this.container.misconceptionNotes = $event;
-      this.changeDetectorRef.detectChanges();
-    }
-  }
-
-  updateLocalFeedback($event: string): void {
-    if (this.container.misconceptionFeedback !== $event) {
-      this.container.misconceptionFeedback = $event;
-      this.changeDetectorRef.detectChanges();
-    }
   }
 
   openNameEditor(): void {

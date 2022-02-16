@@ -79,6 +79,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   componentRe = (
     /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
   );
+
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
@@ -102,6 +103,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           }
         }));
   }
+
   ngOnChanges(changes: SimpleChanges): void {
     // Ckeditor 'change' event gets triggered when a user types. In the
     // change listener, value is set and it triggers the ngOnChanges
@@ -119,7 +121,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // components may change without re-rendering each of the components,
     // in such cases, it is sufficient to update the ckeditor instance manually
     // with the latest value.
-    let value = this.value;
+    let value = this.value ? this.value : '';
     // Refer to the note at the top of the file for the reason behind replace.
     value = value.replace(
       /<oppia-noninteractive-/g,
@@ -504,6 +506,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       }
     });
   }
+
   enableRTEicons(): void {
     this.componentsThatRequireInternet.forEach((name) => {
       let buttons = this.elementRef.nativeElement.getElementsByClassName(

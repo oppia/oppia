@@ -27,17 +27,37 @@ import { MaterialModule } from 'modules/material.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { CustomFormsComponentsModule } from './custom-forms-directives/custom-form-components.module';
-import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-editor.directive';
+import { SchemaBasedEditorComponent } from './schema-based-editors/schema-based-editor.directive';
 import { AudioSliderComponent } from './slider/audio-slider.component';
+import { ObjectEditorComponent } from './custom-forms-directives/object-editor.directive';
+import { DirectivesModule } from 'directives/directives.module';
+import { SchemaBasedIntEditorComponent } from './schema-based-editors/schema-based-int-editor.component';
+import { ApplyValidationDirective } from './custom-forms-directives/apply-validation.directive';
+import { MatInputModule } from '@angular/material/input';
+import { SchemaBasedFloatEditorComponent } from './schema-based-editors/schema-based-float-editor.directive';
+import { SchemaBasedBoolEditorComponent } from './schema-based-editors/schema-based-bool-editor.component';
+import { SchemaBasedChoicesEditorComponent } from './schema-based-editors/schema-based-choices-editor.directive';
+import { SchemaBasedCustomEditorComponent } from './schema-based-editors/schema-based-custom-editor.directive';
+import { SchemaBasedDictEditorComponent } from './schema-based-editors/schema-based-dict-editor.component';
+import { SchemaBasedHtmlEditorComponent } from './schema-based-editors/schema-based-html-editor.component';
+import { OppiaCkEditor4Module } from 'components/ck-editor-helpers/ckeditor4.module';
 import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
+import { SchemaBasedListEditorComponent } from './schema-based-editors/schema-based-list-editor.directive';
+import { SchemaBasedExpressionEditorComponent } from './schema-based-editors/schema-based-expression-editor.component';
+import { SchemaBasedUnicodeEditor } from './schema-based-editors/schema-based-unicode-editor.component';
+import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
 
 @NgModule({
   imports: [
     CommonModule,
+    CodeMirrorModule,
     CustomFormsComponentsModule,
+    OppiaCkEditor4Module,
+    DirectivesModule,
     DynamicContentModule,
     FormsModule,
+    MatInputModule,
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
@@ -47,19 +67,58 @@ import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-t
   ],
   declarations: [
     AudioSliderComponent,
+    ApplyValidationDirective,
+    SchemaBasedBoolEditorComponent,
+    SchemaBasedChoicesEditorComponent,
+    SchemaBasedCustomEditorComponent,
+    SchemaBasedDictEditorComponent,
+    SchemaBasedEditorComponent,
     MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
     MarkAudioAsNeedingUpdateModalComponent,
-    SchemaBasedEditorDirective,
+    SchemaBasedExpressionEditorComponent,
+    SchemaBasedFloatEditorComponent,
+    SchemaBasedHtmlEditorComponent,
+    SchemaBasedIntEditorComponent,
+    SchemaBasedListEditorComponent,
+    SchemaBasedUnicodeEditor,
+    ObjectEditorComponent
   ],
   entryComponents: [
     AudioSliderComponent,
+    SchemaBasedBoolEditorComponent,
+    SchemaBasedChoicesEditorComponent,
+    SchemaBasedCustomEditorComponent,
+    SchemaBasedDictEditorComponent,
+    SchemaBasedEditorComponent,
+    SchemaBasedExpressionEditorComponent,
+    SchemaBasedFloatEditorComponent,
+    SchemaBasedHtmlEditorComponent,
+    SchemaBasedIntEditorComponent,
+    SchemaBasedListEditorComponent,
+    SchemaBasedUnicodeEditor,
+    ObjectEditorComponent,
     MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
-    MarkAudioAsNeedingUpdateModalComponent
+    MarkAudioAsNeedingUpdateModalComponent,
+    // SchemaBasedEditorDirective,
   ],
   exports: [
     AudioSliderComponent,
+    ApplyValidationDirective,
     CustomFormsComponentsModule,
-    SchemaBasedEditorDirective
+    SchemaBasedBoolEditorComponent,
+    SchemaBasedChoicesEditorComponent,
+    SchemaBasedCustomEditorComponent,
+    SchemaBasedDictEditorComponent,
+    SchemaBasedEditorComponent,
+    SchemaBasedExpressionEditorComponent,
+    SchemaBasedFloatEditorComponent,
+    SchemaBasedHtmlEditorComponent,
+    SchemaBasedIntEditorComponent,
+    SchemaBasedListEditorComponent,
+    SchemaBasedUnicodeEditor,
+    MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
+    MarkAudioAsNeedingUpdateModalComponent,
+    ObjectEditorComponent
   ],
 })
 

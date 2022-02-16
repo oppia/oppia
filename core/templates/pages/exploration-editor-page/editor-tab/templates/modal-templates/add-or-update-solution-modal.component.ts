@@ -59,9 +59,11 @@ export class AddOrUpdateSolutionModalComponent
   tempAnsOption: string;
   COMPONENT_NAME_SOLUTION: string = (
     AppConstants.COMPONENT_NAME_SOLUTION);
+
   EMPTY_SOLUTION_DATA: SolutionInterface;
   SOLUTION_EDITOR_FOCUS_LABEL: string = (
     'currentCorrectAnswerEditorHtmlForSolutionEditor');
+
   EXPLANATION_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {
@@ -100,21 +102,8 @@ export class AddOrUpdateSolutionModalComponent
     return Boolean(solExplanation.length > 3000);
   }
 
-  // Remove this function once the schema based editor
-  // is migrated to Angular 8+.
-  getSchema(): HtmlFormSchema {
-    return this.EXPLANATION_FORM_SCHEMA;
-  }
-
   onAnswerChange(): void {
     this.data.answerIsExclusive = (this.tempAnsOption === this.ansOptions[0]);
-  }
-
-  updateLocalHtml($event: string): void {
-    if (this.data.explanationHtml !== $event) {
-      this.data.explanationHtml = $event;
-      this.changeDetectorRef.detectChanges();
-    }
   }
 
   isSubmitButtonDisabled(): boolean {
