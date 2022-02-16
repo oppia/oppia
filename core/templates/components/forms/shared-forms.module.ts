@@ -31,21 +31,21 @@ import { SchemaBasedEditorComponent } from './schema-based-editors/schema-based-
 import { AudioSliderComponent } from './slider/audio-slider.component';
 import { ObjectEditorComponent } from './custom-forms-directives/object-editor.directive';
 import { DirectivesModule } from 'directives/directives.module';
-import { SchemaBasedIntEditorComponent } from './schema-based-editors/schema-based-int-editor.directive';
+import { SchemaBasedIntEditorComponent } from './schema-based-editors/schema-based-int-editor.component';
 import { ApplyValidationDirective } from './custom-forms-directives/apply-validation.directive';
 import { MatInputModule } from '@angular/material/input';
 import { SchemaBasedFloatEditorComponent } from './schema-based-editors/schema-based-float-editor.component';
-import { SchemaBasedBoolEditorComponent } from './schema-based-editors/schema-based-bool-editor.directive';
+import { SchemaBasedBoolEditorComponent } from './schema-based-editors/schema-based-bool-editor.component';
 import { SchemaBasedChoicesEditorComponent } from './schema-based-editors/schema-based-choices-editor.directive';
 import { SchemaBasedCustomEditorComponent } from './schema-based-editors/schema-based-custom-editor.directive';
-import { SchemaBasedDictEditorComponent } from './schema-based-editors/schema-based-dict-editor.directive';
-import { SchemaBasedHtmlEditorComponent } from './schema-based-editors/schema-based-html-editor.directive';
+import { SchemaBasedDictEditorComponent } from './schema-based-editors/schema-based-dict-editor.component';
+import { SchemaBasedHtmlEditorComponent } from './schema-based-editors/schema-based-html-editor.component';
 import { OppiaCkEditor4Module } from 'components/ck-editor-helpers/ckeditor4.module';
 import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
 import { SchemaBasedListEditorComponent } from './schema-based-editors/schema-based-list-editor.directive';
-import { SchemaBasedExpressionEditorComponent } from './schema-based-editors/schema-based-expression-editor.directive';
-import { SchemaBasedUnicodeEditor } from './schema-based-editors/schema-based-unicode-editor.directive';
+import { SchemaBasedExpressionEditorComponent } from './schema-based-editors/schema-based-expression-editor.component';
+import { SchemaBasedUnicodeEditor } from './schema-based-editors/schema-based-unicode-editor.component';
 import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
 
 @NgModule({

@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,36 +13,34 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for HTML.
+ * @fileoverview Component for a schema-based editor for booleans.
  */
+
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, AbstractControl, ControlValueAccessor, ValidationErrors, Validator } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
-  selector: 'schema-based-html-editor',
-  templateUrl: './schema-based-html-editor.directive.html',
+  selector: 'schema-based-bool-editor',
+  templateUrl: './schema-based-bool-editor.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => SchemaBasedHtmlEditorComponent),
+      useExisting: forwardRef(() => SchemaBasedBoolEditorComponent),
       multi: true
     },
     {
       provide: NG_VALIDATORS,
       multi: true,
-      useExisting: forwardRef(() => SchemaBasedHtmlEditorComponent),
+      useExisting: forwardRef(() => SchemaBasedBoolEditorComponent),
     },
   ]
 })
-
-export class SchemaBasedHtmlEditorComponent
+export class SchemaBasedBoolEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
   localValue;
-  @Input() disabled;
-  @Input() labelForFocusTarget;
-  @Input() uiConfig;
-  @Input() headersEnabled;
+  @Input() disabled: boolean;
+  @Input() labelForFocusTarget: string;
   onChange: (val: unknown) => void = () => {};
   constructor() { }
 
@@ -67,14 +65,15 @@ implements ControlValueAccessor, OnInit, Validator {
 
   ngOnInit(): void { }
 
-  updateValue(value: string): void {
-    this.onChange(value);
-    setTimeout(() => {
-      this.onChange(value);
-    });
+  updateValue(val: boolean): void {
+    if (this.localValue === val) {
+      return;
+    }
+    this.localValue = val;
+    this.onChange(val);
   }
 }
 
-angular.module('oppia').directive('schemaBasedHtmlEditor', downgradeComponent({
-  component: SchemaBasedHtmlEditorComponent
-}));
+angular.module('oppia').directive('schemaBasedBoolEditor', downgradeComponent({
+  component: SchemaBasedBoolEditorComponent
+}) as angular.IDirectiveFactory);

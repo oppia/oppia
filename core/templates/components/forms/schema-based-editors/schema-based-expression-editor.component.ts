@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,18 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for expressions.
+ * @fileoverview Component for a schema-based editor for expressions.
  */
 
 import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.directive';
+import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.component';
 
 @Component({
   selector: 'oppia-schema-based-editor',
-  templateUrl: './schema-based-expression-editor.directive.html'
+  templateUrl: './schema-based-expression-editor.component.html'
 })
 export class SchemaBasedExpressionEditorComponent
 implements ControlValueAccessor, Validator, OnInit {
@@ -62,7 +62,7 @@ implements ControlValueAccessor, Validator, OnInit {
   }
 
   localValueChange(value: unknown): void {
-    if (value === this.localValueChange) {
+    if (value === this.localValue) {
       return;
     }
     this.localValue = value;
