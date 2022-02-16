@@ -61,15 +61,18 @@ export class TopicEditorStateService {
     current: [],
     others: []
   };
+
   private _skillCreationIsAllowed: boolean = false;
   private _classroomUrlFragment: string = 'staging';
   private _storySummariesInitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
+
   private _subtopicPageLoadedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
 
   private _topicInitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
+
   private _topicReinitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
 
@@ -520,6 +523,7 @@ export class TopicEditorStateService {
   get onTopicReinitialized(): EventEmitter<void> {
     return this._topicReinitializedEventEmitter;
   }
+
   /**
    * Returns the classroom name for the topic.
    */

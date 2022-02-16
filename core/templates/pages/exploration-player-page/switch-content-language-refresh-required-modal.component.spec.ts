@@ -40,6 +40,7 @@ class MockWindowRef {
       href: 'host.name:1234/explore/0'
     },
   };
+
   get nativeWindow() {
     return this._window;
   }

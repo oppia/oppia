@@ -189,7 +189,7 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
 
     UPGRADED_EXP_YAML = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
