@@ -51,10 +51,10 @@
         </div>
         <div *ngIf="bindableFieldsDict.displayedWorkedExamples.length > 0">
           <ul cdkDropList (cdkDropListDropped)="drop($event)"
-               class="nav oppia-option-list nav-stacked nav-pills worked-examples-list">
+              class="nav oppia-option-list nav-stacked nav-pills worked-examples-list">
             <li cdkDrag *ngFor="let workedExample of bindableFieldsDict.displayedWorkedExamples; let index = index"
-                 [ngClass]="{'active': activeWorkedExampleIndex === index, 'last-element': index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
-                 class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection">
+                [ngClass]="{'active': activeWorkedExampleIndex === index, 'last-element': index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
+                class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection">
               <span class="oppia-worked-example-sort-handle"
                     *ngIf="bindableFieldsDict.displayedWorkedExamples.length > 1"
                     (mousedown)="changeActiveWorkedExampleIndex(-1)">
