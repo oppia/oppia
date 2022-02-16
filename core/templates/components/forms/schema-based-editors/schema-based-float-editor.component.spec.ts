@@ -19,6 +19,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { FormControl, FormsModule } from '@angular/forms';
+import { NumericInputValidationService } from 'interactions/NumericInput/directives/numeric-input-validation.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -38,6 +39,7 @@ describe('Schema based float editor component', function() {
   let component: SchemaBasedFloatEditorComponent;
   let fixture: ComponentFixture<SchemaBasedFloatEditorComponent>;
   let schemaFormSubmittedService: SchemaFormSubmittedService;
+  let numericInputValidationService: NumericInputValidationService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -51,6 +53,7 @@ describe('Schema based float editor component', function() {
           provide: FocusManagerService,
           useClass: MockFocusManagerService
         },
+        NumericInputValidationService,
         SchemaFormSubmittedService
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -72,6 +75,8 @@ describe('Schema based float editor component', function() {
       }
     ];
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
+    numericInputValidationService =
+      TestBed.inject(NumericInputValidationService);
     fixture.detectChanges();
   });
 
@@ -168,11 +173,13 @@ describe('Schema based float editor component', function() {
   }));
 
   it('should generate error for wrong input', fakeAsync(() => {
+    spyOn(numericInputValidationService, 'getErrorStringI18nKey')
+      .and.returnValue('I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
     component.localValue = null;
     component.generateErrors();
 
     expect(component.errorStringI18nKey)
-      .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
+      .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
   }));
 
 

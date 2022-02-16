@@ -31,8 +31,6 @@ describe('Schema based editor component', function() {
       declarations: [
         SchemaBasedEditorComponent
       ],
-      providers: [
-      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
