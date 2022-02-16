@@ -176,7 +176,8 @@ class EditableSkillDataHandler(base.BaseHandler):
             'schema': {
                 'type': 'basestring',
                 'validators': [{
-                    'id': 'is_valid_skill_id'
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
                 }]
             }
         }
