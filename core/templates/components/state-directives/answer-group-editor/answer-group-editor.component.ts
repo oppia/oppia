@@ -255,8 +255,9 @@ angular.module('oppia').component('answerGroupEditor', {
 
       ctrl.saveRules = function() {
         if (ctrl.originalContentIdToContent !== undefined) {
-          const updatedContentIdToContent =
-            getTranslatableRulesContentIdToContentMap();
+          const updatedContentIdToContent = (
+            getTranslatableRulesContentIdToContentMap()
+          );
           const contentIdsWithModifiedContent = [];
           Object.keys(
             ctrl.originalContentIdToContent
@@ -294,8 +295,9 @@ angular.module('oppia').component('answerGroupEditor', {
           // The rule editor may not be opened in a read-only editor view.
           return;
         }
-        ctrl.originalContentIdToContent =
-          getTranslatableRulesContentIdToContentMap();
+        ctrl.originalContentIdToContent = (
+          getTranslatableRulesContentIdToContentMap()
+        );
         ctrl.rulesMemento = angular.copy(ctrl.rules);
         ctrl.changeActiveRuleIndex(index);
       };
