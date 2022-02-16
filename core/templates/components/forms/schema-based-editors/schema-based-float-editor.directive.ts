@@ -99,6 +99,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             // If input is empty, the number value should be null.
             if (ctrl.localStringValue === '') {
               ctrl.localValue = null;
+              // Clear errors if input is empty.
+              ctrl.errorStringI18nKey = undefined;
             } else {
               // Make sure number is in a correct format.
               let error = NumericInputValidationService
@@ -107,7 +109,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
                   ctrl.currentDecimalSeparator());
               if (error !== undefined) {
                 ctrl.localValue = null;
-                ctrl.errorString = error;
+                ctrl.errorStringI18nKey = error;
               } else { // Parse number if the string is in proper format.
                 // Exploration Player.
                 ctrl.localValue = NumberConversionService
@@ -137,7 +139,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           };
 
           ctrl.generateErrors = function() {
-            ctrl.errorString = (
+            ctrl.errorStringI18nKey = (
               NumericInputValidationService.validateNumber(
                 ctrl.localValue, ctrl.checkRequireNonnegativeInputValue,
                 ctrl.currentDecimalSeparator()));

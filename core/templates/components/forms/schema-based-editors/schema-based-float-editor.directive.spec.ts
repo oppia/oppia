@@ -169,7 +169,7 @@ describe('Schema Based Float Editor Directive', () => {
     ctrl.localValue = null;
     ctrl.generateErrors();
 
-    expect(ctrl.errorString)
+    expect(ctrl.errorStringI18nKey)
       .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
   });
 
@@ -215,6 +215,6 @@ describe('Schema Based Float Editor Directive', () => {
     ctrl.localStringValue = '--12';
     ctrl.parseInput();
     expect(ctrl.localValue).toEqual(null);
-    expect(ctrl.errorString).toEqual('Error');
+    expect(ctrl.errorStringI18nKey).toEqual('Error');
   });
 });

@@ -212,7 +212,7 @@ export class NumericInputValidationService {
     value = value.toString().trim();
     const trailingDot = /[\.|\,|\u066B]\d/g;
     const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
-    const trailingMinus = /^-/g;
+    const trailingMinus = /(^-)|(e-)/g;
     const extraMinus = /-.*-/g;
     const extraExponent = /e.*e/g;
 
