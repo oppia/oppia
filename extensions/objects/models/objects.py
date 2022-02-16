@@ -2,14 +2,14 @@
 #
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS-IS" BASIS,
+# distributed under the License is distributed on an 'AS-IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -1613,3 +1613,58 @@ class JsonEncodedInString(BaseObject):
             )
 
         return json.loads(raw)
+
+
+class Answer(BaseObject):
+    """Checks if the answer matches with relevant interaction answer type"""
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: str. Strings to be validated and normalized.
+
+        Returns:
+            *. Normalized `answer` against `unicode` or `variable_keys_dict`.
+        """
+        if isinstance(raw, dict):
+            return (
+                schema_utils.
+                normalize_against_schema(raw, cls.get_schema_dict())
+            )
+
+        raw = str(raw)
+        return schema_utils.normalize_against_schema(raw, cls.get_schema())
+
+    @classmethod
+    def get_schema_dict(cls):
+        """Returns the Answer object schema when it's a Python dict object.
+
+        Returns:
+            dict. The object schema.
+        """
+        return {
+            'type': 'variable_keys_dict',
+            'keys': {
+                'schema': {
+                    'type': 'basestring',
+                }
+            },
+            'values': {
+                'schema': {
+                    'type': 'basestring',
+                },
+            },
+        }
+
+    @classmethod
+    def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
+        return {
+            'type': 'unicode',
+        }
