@@ -68,13 +68,12 @@ class SuggestionHandler(base.BaseHandler):
                 }
             },
             'change': {
-               'schema': {
-                   'type': 'object_dict',
+                'schema': {
+                    'type': 'object_dict',
                     'validation_method': (
-                        domain_objects_validator.
-                        validate_suggestion_change
+                        domain_objects_validator.validate_suggestion_change
                     )
-               }
+                }
             },
             'description': {
                 'schema': {
