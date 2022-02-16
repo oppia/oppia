@@ -74,6 +74,7 @@ import { TranslatableSetOfNormalizedStringEditorComponent } from './templates/tr
 import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/translatable-set-of-unicode-string-editor.component';
 import { ParameterNameEditorComponent } from './templates/parameter-name-editor.component';
 
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -90,7 +91,8 @@ import { ParameterNameEditorComponent } from './templates/parameter-name-editor.
     MatCheckboxModule,
     NgbModalModule,
     NgbTooltipModule,
-    NgxTrimDirectiveModule
+    NgxTrimDirectiveModule,
+    TranslateModule
   ],
   declarations: [
     AlgebraicExpressionEditorComponent,

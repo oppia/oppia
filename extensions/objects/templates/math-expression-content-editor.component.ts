@@ -72,16 +72,18 @@ export class MathExpressionContentEditorComponent implements OnInit {
     // that an existing math expression is being edited. In this case, the
     // editor template can be initialised with the actual values instead of
     // default ones.
-    if (this.value.svg_filename && this.value.raw_latex) {
-      this.localValue.label = this.value.raw_latex;
-      this.value.mathExpressionSvgIsBeingProcessed = false;
-      this.convertLatexStringToSvg(this.localValue.label);
-    } else {
-      this.value.mathExpressionSvgIsBeingProcessed = true;
-    }
-    this.valueChanged.emit(this.value);
-    if (this.value && this.value.raw_latex) {
-      this.localValue.label = this.value.raw_latex;
+    if (this.value) {
+      if (this.value.svg_filename && this.value.raw_latex) {
+        this.localValue.label = this.value.raw_latex;
+        this.value.mathExpressionSvgIsBeingProcessed = false;
+        this.convertLatexStringToSvg(this.localValue.label);
+      } else {
+        this.value.mathExpressionSvgIsBeingProcessed = true;
+      }
+      this.valueChanged.emit(this.value);
+      if (this.value.raw_latex) {
+        this.localValue.label = this.value.raw_latex;
+      }
     }
     this.directiveSubscriptions.add(
       this.externalRteSaveService.onExternalRteSave.subscribe(() => {
@@ -137,6 +139,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
       }
     });
   }
+
   // This method cleans the SVG string and generates a filename before
   // the SVG can be saved to the backend in the RteHelperModalController.
   // The method doesn't save the SVG to the backend, it just updates

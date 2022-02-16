@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for unicode strings.
+ * @fileoverview Component for a schema-based editor for unicode strings.
  */
 
 require('third-party-imports/ui-codemirror.import.ts');
@@ -37,7 +37,7 @@ interface OppiaValidator {
 
 @Component({
   selector: 'schema-based-unicode-editor',
-  templateUrl: './schema-based-unicode-editor.directive.html',
+  templateUrl: './schema-based-unicode-editor.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -73,7 +73,7 @@ implements ControlValueAccessor, OnInit, Validator {
   } = {
     // Convert tabs to spaces.
       extraKeys: {
-        Tab: function(cm) {
+        Tab: (cm) => {
           var spaces = Array(
             cm.getOption('indentUnit') + 1).join(' ');
           cm.replaceSelection(spaces);

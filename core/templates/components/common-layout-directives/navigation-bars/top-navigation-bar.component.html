@@ -148,7 +148,7 @@
                   <div *ngIf="userIsLoggedIn"
                        (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                        class="nav-item-bottom-link-logged">
-                    <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_2' | translate }}</span>
+                    <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
                     <span class="material-icons arrow-forward">arrow_forward</span>
                   </div>
                 </a>
@@ -207,9 +207,11 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
                  href="https://medium.com/oppia-org"
+                 target="_blank"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">{{'I18N_TOPNAV_BLOG' | translate}}</span>
+                <span class="material-icons launch">launch</span>
               </a>
             </li>
           </ul>
@@ -494,7 +496,8 @@
     <li ngbDropdown
         *ngIf="!userIsLoggedIn && username !== ''"
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
-      <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info">
+      <div [ngStyle]="isLanguageRTL() ? {'margin-left': '10px'} : {'margin-right': '10px'}"
+           class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info">
         <button ngbDropdownToggle
                 class="btn dropdown-toggle oppia-navbar-button protractor-mobile-test-login"
                 (click)="onLoginButtonClicked()">
@@ -532,6 +535,10 @@
     color: #00645c;
     font-size: 14px;
     margin-left: 4px;
+  }
+  .launch {
+    font-size: 15px;
+    margin-left: 90px;
   }
   .underline:hover,
   .underline:focus {

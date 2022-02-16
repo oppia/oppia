@@ -116,6 +116,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       type: 'unicode'
     }
   };
+
   startedEditing: boolean = false;
   status: string;
   subheading: string;
