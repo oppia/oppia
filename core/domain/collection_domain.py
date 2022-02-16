@@ -26,11 +26,15 @@ from __future__ import annotations
 import json
 import re
 import string
+import datetime
 
 from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
+
+from typing import Any, Dict, List, Optional, Union
+from typing_extensions import TypedDict
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -164,6 +168,11 @@ class CollectionChange(change_domain.BaseChange):
         'user_id_attribute_names': []
     }]
 
+class CollectionNodeDict(TypedDict):
+    """Type for the collection node object"""
+
+    exploration_id: str
+
 
 class CollectionNode:
     """Domain object describing a node in the exploration graph of a
@@ -171,7 +180,7 @@ class CollectionNode:
     its exploration (its ID).
     """
 
-    def __init__(self, exploration_id):
+    def __init__(self, exploration_id: str) -> None:
         """Initializes a CollectionNode domain object.
 
         Args:
@@ -180,7 +189,7 @@ class CollectionNode:
         """
         self.exploration_id = exploration_id
 
-    def to_dict(self):
+    def to_dict(self) -> CollectionNodeDict:
         """Returns a dict representing this CollectionNode domain object.
 
         Returns:
@@ -193,7 +202,9 @@ class CollectionNode:
         }
 
     @classmethod
-    def from_dict(cls, node_dict):
+    def from_dict(
+        cls, node_dict: CollectionNodeDict
+    ) -> CollectionNode:
         """Return a CollectionNode domain object from a dict.
 
         Args:
@@ -204,7 +215,7 @@ class CollectionNode:
         """
         return cls(node_dict['exploration_id'])
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the collection node.
 
         Raises:
@@ -217,7 +228,7 @@ class CollectionNode:
                 self.exploration_id)
 
     @classmethod
-    def create_default_node(cls, exploration_id):
+    def create_default_node(cls, exploration_id: str) -> CollectionNode:
         """Returns a CollectionNode domain object with default values.
 
         Args:
@@ -229,14 +240,45 @@ class CollectionNode:
         """
         return cls(exploration_id)
 
+class CollectionDict(TypedDict, total = False):
+    """Type for the collection object"""
+
+    id: str
+    title: str
+    category: str
+    objective: str
+    language_code: str
+    tags: List[str]
+    schema_version: int
+    nodes: list[CollectionNodeDict]
+    version: int
+    created_on: Union[datetime.datetime, str, None]
+    last_updated: Union[datetime.datetime, str, None]
+
+class CollectionVersionDict(CollectionDict, total = False):
+    """Type for the collection Dict based on different versions"""
+
+    skills: Dict[str, Dict[str, Any]] # pending with Any typeannotations
+    next_skill_id: int
+    next_skill_index: int
 
 class Collection:
     """Domain object for an Oppia collection."""
 
     def __init__(
-            self, collection_id, title, category, objective,
-            language_code, tags, schema_version, nodes,
-            version, created_on=None, last_updated=None):
+        self,
+        collection_id: str,
+        title: str,
+        category: str,
+        objective: str,
+        language_code: str,
+        tags: List[str],
+        schema_version: int,
+        nodes: list[CollectionNode],
+        version: int,
+        created_on: Optional[datetime.datetime] = None,
+        last_updated: Optional[datetime.datetime] = None
+    ) -> None:
         """Constructs a new collection given all the information necessary to
         represent a collection.
 
@@ -281,7 +323,7 @@ class Collection:
         self.created_on = created_on
         self.last_updated = last_updated
 
-    def to_dict(self):
+    def to_dict(self) -> CollectionDict:
         """Returns a dict representing this Collection domain object.
 
         Returns:
@@ -302,10 +344,12 @@ class Collection:
 
     @classmethod
     def create_default_collection(
-            cls, collection_id, title=feconf.DEFAULT_COLLECTION_TITLE,
-            category=feconf.DEFAULT_COLLECTION_CATEGORY,
-            objective=feconf.DEFAULT_COLLECTION_OBJECTIVE,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        cls, collection_id: str,
+        title: str = feconf.DEFAULT_COLLECTION_TITLE,
+        category: str = feconf.DEFAULT_COLLECTION_CATEGORY,
+        objective: str = feconf.DEFAULT_COLLECTION_OBJECTIVE,
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE
+    ) -> Collection:
         """Returns a Collection domain object with default values.
 
         Args:
@@ -326,8 +370,12 @@ class Collection:
 
     @classmethod
     def from_dict(
-            cls, collection_dict, collection_version=0,
-            collection_created_on=None, collection_last_updated=None):
+        cls,
+        collection_dict: CollectionDict,
+        collection_version: int = 0,
+        collection_created_on: Optional[datetime.datetime] = None,
+        collection_last_updated: Optional[datetime.datetime] = None
+    ) -> Collection:
         """Return a Collection domain object from a dict.
 
         Args:
@@ -356,7 +404,7 @@ class Collection:
         return collection
 
     @classmethod
-    def deserialize(cls, json_string):
+    def deserialize(cls, json_string: str) -> Collection:
         """Returns a Collection domain object decoded from a JSON string.
 
         Args:
@@ -385,7 +433,7 @@ class Collection:
 
         return collection
 
-    def serialize(self):
+    def serialize(self) -> str:
         """Returns the object serialized as a JSON string.
 
         Returns:
@@ -413,7 +461,7 @@ class Collection:
 
         return json.dumps(collection_dict)
 
-    def to_yaml(self):
+    def to_yaml(self) -> str:
         """Convert the Collection domain object into YAML.
 
         Returns:
@@ -428,7 +476,9 @@ class Collection:
         return utils.yaml_from_dict(collection_dict)
 
     @classmethod
-    def _convert_v1_dict_to_v2_dict(cls, collection_dict):
+    def _convert_v1_dict_to_v2_dict(
+        cls, collection_dict: CollectionVersionDict
+    ) -> CollectionVersionDict:
         """Converts a v1 collection dict into a v2 collection dict.
 
         Adds a language code, and tags.
@@ -447,7 +497,9 @@ class Collection:
         return collection_dict
 
     @classmethod
-    def _convert_v2_dict_to_v3_dict(cls, collection_dict):
+    def _convert_v2_dict_to_v3_dict(
+        cls, collection_dict: CollectionVersionDict
+    ) -> CollectionVersionDict:
         """Converts a v2 collection dict into a v3 collection dict.
 
         This function does nothing as the collection structure is changed in
@@ -465,7 +517,9 @@ class Collection:
         return collection_dict
 
     @classmethod
-    def _convert_v3_dict_to_v4_dict(cls, collection_dict):
+    def _convert_v3_dict_to_v4_dict(
+        cls, collection_dict: CollectionVersionDict
+    ) -> CollectionVersionDict:
         """Converts a v3 collection dict into a v4 collection dict.
 
         This migrates the structure of skills, see the docstring in
@@ -482,7 +536,9 @@ class Collection:
         return collection_dict
 
     @classmethod
-    def _convert_v4_dict_to_v5_dict(cls, collection_dict):
+    def _convert_v4_dict_to_v5_dict(
+        cls, collection_dict: CollectionVersionDict
+    ) -> CollectionVersionDict:
         """Converts a v4 collection dict into a v5 collection dict.
 
         This changes the field name of next_skill_id to next_skill_index.
@@ -494,7 +550,9 @@ class Collection:
         return collection_dict
 
     @classmethod
-    def _convert_v5_dict_to_v6_dict(cls, collection_dict):
+    def _convert_v5_dict_to_v6_dict(
+        cls, collection_dict: CollectionVersionDict
+    ) -> CollectionVersionDict:
         """Converts a v5 collection dict into a v6 collection dict.
 
         This changes the structure of each node to not include skills as well
@@ -507,7 +565,7 @@ class Collection:
         return collection_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(cls, yaml_content):
+    def _migrate_to_latest_yaml_version(cls, yaml_content: str) -> str:
         """Return the YAML content of the collection in the latest schema
         format.
 
@@ -552,7 +610,7 @@ class Collection:
         return collection_dict
 
     @classmethod
-    def from_yaml(cls, collection_id, yaml_content):
+    def from_yaml(cls, collection_id: str, yaml_content: str) -> Collection:
         """Converts a YAML string to a Collection domain object.
 
         Args:
@@ -569,7 +627,8 @@ class Collection:
 
     @classmethod
     def _convert_collection_contents_v1_dict_to_v2_dict(
-            cls, collection_contents):
+        cls, collection_contents: CollectionVersionDict
+    ) -> CollectionVersionDict:
         """Converts from version 1 to 2. Does nothing since this migration only
         changes the language code.
 
@@ -584,7 +643,8 @@ class Collection:
 
     @classmethod
     def _convert_collection_contents_v2_dict_to_v3_dict(
-            cls, collection_contents):
+        cls, collection_contents: CollectionVersionDict
+    ) -> CollectionVersionDict:
         """Converts from version 2 to 3. Does nothing since the changes are
         handled while loading the collection.
 
@@ -599,7 +659,8 @@ class Collection:
 
     @classmethod
     def _convert_collection_contents_v3_dict_to_v4_dict(
-            cls, collection_contents):
+        cls, collection_contents: CollectionVersionDict
+    ) -> CollectionVersionDict:
         """Converts from version 3 to 4.
 
         Adds a skills dict and skill id counter. Migrates prerequisite_skills
@@ -648,7 +709,8 @@ class Collection:
 
     @classmethod
     def _convert_collection_contents_v4_dict_to_v5_dict(
-            cls, collection_contents):
+        cls, collection_contents: CollectionVersionDict
+    ) -> CollectionVersionDict:
         """Converts from version 4 to 5.
 
         Converts next_skill_id to next_skill_index, since next_skill_id isn't
@@ -669,7 +731,8 @@ class Collection:
 
     @classmethod
     def _convert_collection_contents_v5_dict_to_v6_dict(
-            cls, collection_contents):
+        cls, collection_contents: CollectionVersionDict
+    ) -> CollectionVersionDict:
         """Converts from version 5 to 6.
 
         Removes skills from collection node.
@@ -689,7 +752,9 @@ class Collection:
 
     @classmethod
     def update_collection_contents_from_model(
-            cls, versioned_collection_contents, current_version):
+            cls, current_version: int,
+            versioned_collection_contents: Dict[str, Union[int, CollectionVersionDict]],
+            ) -> None:
         """Converts the states blob contained in the given
         versioned_collection_contents dict from current_version to
         current_version + 1. Note that the versioned_collection_contents being
@@ -697,7 +762,7 @@ class Collection:
 
         Args:
             versioned_collection_contents: dict. A dict with two keys:
-                - schema_version: str. The schema version for the collection.
+                - schema_version: int. The schema version for the collection.
                 - collection_contents: dict. The dict comprising the collection
                     contents.
             current_version: int. The current collection schema version.
@@ -724,7 +789,7 @@ class Collection:
             versioned_collection_contents['collection_contents'])
 
     @property
-    def exploration_ids(self):
+    def exploration_ids(self) -> List[str]:
         """Returns a list of all the exploration IDs that are part of this
         collection.
 
@@ -734,7 +799,7 @@ class Collection:
         return [node.exploration_id for node in self.nodes]
 
     @property
-    def first_exploration_id(self):
+    def first_exploration_id(self) -> Optional[str]:
         """Returns the first element in the node list of the collection, which
            corresponds to the first node that the user would encounter, or if
            the collection is empty, returns None.
@@ -748,7 +813,7 @@ class Collection:
         else:
             return None
 
-    def get_next_exploration_id(self, completed_exp_ids):
+    def get_next_exploration_id(self, completed_exp_ids: List[str]) -> Optional[str]:
         """Returns the first exploration id in the collection that has not yet
            been completed by the learner, or if the collection is completed,
            returns None.
@@ -766,7 +831,9 @@ class Collection:
                 return exp_id
         return None
 
-    def get_next_exploration_id_in_sequence(self, current_exploration_id):
+    def get_next_exploration_id_in_sequence(
+        self, current_exploration_id: str
+    ) -> Optional[str]:
         """Returns the exploration ID of the node just after the node
            corresponding to the current exploration id. If the user is on the
            last node, None is returned.
@@ -789,7 +856,7 @@ class Collection:
         return exploration_just_unlocked
 
     @classmethod
-    def is_demo_collection_id(cls, collection_id):
+    def is_demo_collection_id(cls, collection_id: str) -> bool:
         """Whether the collection id is that of a demo collection.
 
         Args:
@@ -801,7 +868,7 @@ class Collection:
         return collection_id in feconf.DEMO_COLLECTIONS
 
     @property
-    def is_demo(self):
+    def is_demo(self) -> bool:
         """Whether the collection is one of the demo collections.
 
         Returs:
@@ -809,7 +876,7 @@ class Collection:
         """
         return self.is_demo_collection_id(self.id)
 
-    def update_title(self, title):
+    def update_title(self, title: str) -> None:
         """Updates the title of the collection.
 
         Args:
@@ -817,7 +884,7 @@ class Collection:
         """
         self.title = title
 
-    def update_category(self, category):
+    def update_category(self, category: str) -> None:
         """Updates the category of the collection.
 
         Args:
@@ -825,7 +892,7 @@ class Collection:
         """
         self.category = category
 
-    def update_objective(self, objective):
+    def update_objective(self, objective: str) -> None:
         """Updates the objective of the collection.
 
         Args:
@@ -833,7 +900,7 @@ class Collection:
         """
         self.objective = objective
 
-    def update_language_code(self, language_code):
+    def update_language_code(self, language_code: str) -> None:
         """Updates the language code of the collection.
 
         Args:
@@ -841,7 +908,7 @@ class Collection:
         """
         self.language_code = language_code
 
-    def update_tags(self, tags):
+    def update_tags(self, tags: List[str]) -> None:
         """Updates the tags of the collection.
 
         Args:
@@ -849,7 +916,7 @@ class Collection:
         """
         self.tags = tags
 
-    def _find_node(self, exploration_id):
+    def _find_node(self, exploration_id: str) -> Optional[int]:
         """Returns the index of the collection node with the given exploration
         id, or None if the exploration id is not in the nodes list.
 
@@ -865,7 +932,7 @@ class Collection:
                 return ind
         return None
 
-    def get_node(self, exploration_id):
+    def get_node(self, exploration_id: str) -> Optional[CollectionNode]:
         """Retrieves a collection node from the collection based on an
         exploration ID.
 
@@ -881,7 +948,7 @@ class Collection:
                 return node
         return None
 
-    def add_node(self, exploration_id):
+    def add_node(self, exploration_id: str) -> None:
         """Adds a new node to the collection; the new node represents the given
         exploration_id.
 
@@ -897,7 +964,7 @@ class Collection:
                 exploration_id)
         self.nodes.append(CollectionNode.create_default_node(exploration_id))
 
-    def swap_nodes(self, first_index, second_index):
+    def swap_nodes(self, first_index: int, second_index: int) -> None:
         """Swaps the values of 2 nodes in the collection.
 
         Args:
@@ -915,7 +982,7 @@ class Collection:
         self.nodes[first_index] = self.nodes[second_index]
         self.nodes[second_index] = temp
 
-    def delete_node(self, exploration_id):
+    def delete_node(self, exploration_id: str) -> None:
         """Deletes the node corresponding to the given exploration from the
         collection.
 
@@ -932,7 +999,7 @@ class Collection:
                 exploration_id)
         del self.nodes[node_index]
 
-    def validate(self, strict=True):
+    def validate(self, strict: bool = True) -> None:
         """Validates all properties of this collection and its constituents.
 
         Raises:
@@ -1049,16 +1116,50 @@ class Collection:
                     'Expected to have at least 1 exploration in the '
                     'collection.')
 
+class CollectionSummaryDict(TypedDict):
+    """Type for the collection summary object"""
+
+    id: str
+    title: str
+    category: str
+    objective: str
+    language_code: str
+    tags: List[str]
+    status: str
+    community_owned: bool
+    owner_ids: List[str]
+    editor_ids: List[str]
+    viewer_ids: List[str]
+    contributor_ids: List[str]
+    contributors_summary: Dict[str, str] # not confirm with this type
+    version: int
+    collection_model_created_on: datetime.datetime
+    collection_model_last_updated: datetime.datetime
+
 
 class CollectionSummary:
     """Domain object for an Oppia collection summary."""
 
     def __init__(
-            self, collection_id, title, category, objective, language_code,
-            tags, status, community_owned, owner_ids, editor_ids,
-            viewer_ids, contributor_ids, contributors_summary, version,
-            node_count, collection_model_created_on,
-            collection_model_last_updated):
+        self,
+        collection_id: str,
+        title: str, 
+        category: str, 
+        objective: str,
+        language_code: str,
+        tags: List[str],
+        status: str,
+        community_owned: bool,
+        owner_ids: List[str],
+        editor_ids: List[str],
+        viewer_ids: List[str],
+        contributor_ids: List[str],
+        contributors_summary: Dict[str, str], # not confirm with this type
+        version: int,
+        node_count: int,
+        collection_model_created_on: datetime.datetime,
+        collection_model_last_updated: datetime.datetime
+    ) -> None:
         """Constructs a CollectionSummary domain object.
 
         Args:
@@ -1105,7 +1206,7 @@ class CollectionSummary:
         self.collection_model_created_on = collection_model_created_on
         self.collection_model_last_updated = collection_model_last_updated
 
-    def to_dict(self):
+    def to_dict(self) -> CollectionSummaryDict:
         """Returns a dict representing this CollectionSummary domain object.
 
         Returns:
@@ -1130,7 +1231,7 @@ class CollectionSummary:
             'collection_model_last_updated': self.collection_model_last_updated
         }
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the CollectionSummary.
 
         Raises:
@@ -1251,7 +1352,7 @@ class CollectionSummary:
                 'Expected contributors_summary to be dict, received %s' % (
                     self.contributors_summary))
 
-    def is_editable_by(self, user_id):
+    def is_editable_by(self, user_id: str) -> bool:
         """Checks if a given user may edit the collection.
 
         Args:
@@ -1266,15 +1367,15 @@ class CollectionSummary:
             or self.community_owned
         )
 
-    def is_private(self):
+    def is_private(self) -> bool:
         """Checks whether the collection is private.
 
         Returns:
             bool. Whether the collection is private.
         """
-        return self.status == constants.ACTIVITY_STATUS_PRIVATE
+        return bool(self.status == constants.ACTIVITY_STATUS_PRIVATE)
 
-    def is_solely_owned_by_user(self, user_id):
+    def is_solely_owned_by_user(self, user_id: str) -> bool:
         """Checks whether the collection is solely owned by the user.
 
         Args:
@@ -1285,7 +1386,7 @@ class CollectionSummary:
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
 
-    def does_user_have_any_role(self, user_id):
+    def does_user_have_any_role(self, user_id: str) -> bool:
         """Checks if a given user has any role within the collection.
 
         Args:
@@ -1300,7 +1401,7 @@ class CollectionSummary:
             user_id in self.viewer_ids
         )
 
-    def add_contribution_by_user(self, contributor_id):
+    def add_contribution_by_user(self, contributor_id: str) -> None:
         """Add a new contributor to the contributors summary.
 
         Args:
