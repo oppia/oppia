@@ -40,7 +40,6 @@ EXCLUDED_DIRECTORIES = [
 NOT_FULLY_COVERED_FILENAMES = [
     'angular-html-bind.directive.ts',
     'App.ts',
-    'audio-preloader.service.ts',
     'Base.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
@@ -59,7 +58,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'question-update.service.ts',
     'rule-type-selector.directive.ts',
     'select2-dropdown.directive.ts',
-    'state-content-editor.directive.ts',
     'state-graph-visualization.directive.ts',
     'story-node.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
