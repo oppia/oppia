@@ -926,7 +926,8 @@ class GenerateDummyOpportunitiesTest(test_utils.GenericTestBase):
         self.post_json(
             '/adminhandler', {
                 'action': 'generate_dummy_opportunities',
-                'num_dummy_ops_to_generate': 20
+                'num_dummy_ops_to_generate': 20,
+                'num_dummy_interactions_to_generate': 10
             }, csrf_token=csrf_token)
         translation_ops = opportunity_services.get_translation_opportunities(
             None, 'hi', None)
