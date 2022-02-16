@@ -589,6 +589,7 @@ export class Topic {
 export class TopicObjectFactory {
   constructor(
       private storyReferenceObjectFactory: StoryReferenceObjectFactory) {}
+
   create(
       topicBackendDict: TopicBackendDict,
       skillIdToDescriptionDict: SkillIdToDescriptionMap): Topic {
