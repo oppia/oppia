@@ -40,7 +40,6 @@ core.storage.job.gae_models_test
 core.storage.base_model.gae_models_test
 core.schema_utils_test
 core.domain.story_services_test
-core.domain.exp_fetchers_test
 core.domain.topic_fetchers_test
 core.domain.classifier_domain_test
 core.domain.state_domain_test
