@@ -36,14 +36,14 @@ import { ApplyValidationDirective } from './custom-forms-directives/apply-valida
 import { MatInputModule } from '@angular/material/input';
 import { SchemaBasedFloatEditorComponent } from './schema-based-editors/schema-based-float-editor.directive';
 import { SchemaBasedBoolEditorComponent } from './schema-based-editors/schema-based-bool-editor.component';
-import { SchemaBasedChoicesEditorComponent } from './schema-based-editors/schema-based-choices-editor.directive';
-import { SchemaBasedCustomEditorComponent } from './schema-based-editors/schema-based-custom-editor.directive';
+import { SchemaBasedChoicesEditorComponent } from './schema-based-editors/schema-based-choices-editor.component';
+import { SchemaBasedCustomEditorComponent } from './schema-based-editors/schema-based-custom-editor.component';
 import { SchemaBasedDictEditorComponent } from './schema-based-editors/schema-based-dict-editor.component';
 import { SchemaBasedHtmlEditorComponent } from './schema-based-editors/schema-based-html-editor.component';
 import { OppiaCkEditor4Module } from 'components/ck-editor-helpers/ckeditor4.module';
 import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
-import { SchemaBasedListEditorComponent } from './schema-based-editors/schema-based-list-editor.directive';
+import { SchemaBasedListEditorComponent } from './schema-based-editors/schema-based-list-editor.component';
 import { SchemaBasedExpressionEditorComponent } from './schema-based-editors/schema-based-expression-editor.component';
 import { SchemaBasedUnicodeEditor } from './schema-based-editors/schema-based-unicode-editor.component';
 import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
