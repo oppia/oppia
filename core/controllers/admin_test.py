@@ -932,7 +932,7 @@ class GenerateSampleOpportunitiesTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
 
         translation_ops = opportunity_services.get_translation_opportunities(
-            None, 'hi', None)
+            'hi', None, None)
         self.assertEqual(len(translation_ops[0]), 20)
 
 
