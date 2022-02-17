@@ -33,53 +33,69 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Any, Dict, List, Optional, Union
-from typing_extensions import TypedDict
+from typing import Any, Dict, List, Optional, Tuple, Union
+from typing_extensions import Final, Literal, TypedDict
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
-COLLECTION_PROPERTY_TITLE = 'title'
-COLLECTION_PROPERTY_CATEGORY = 'category'
-COLLECTION_PROPERTY_OBJECTIVE = 'objective'
-COLLECTION_PROPERTY_LANGUAGE_CODE = 'language_code'
-COLLECTION_PROPERTY_TAGS = 'tags'
-COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
-COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids'
+COLLECTION_PROPERTY_TITLE: Final = 'title'
+COLLECTION_PROPERTY_CATEGORY: Final = 'category'
+COLLECTION_PROPERTY_OBJECTIVE: Final = 'objective'
+COLLECTION_PROPERTY_LANGUAGE_CODE: Final = 'language_code'
+COLLECTION_PROPERTY_TAGS: Final = 'tags'
+COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS: Final = (
+    'prerequisite_skill_ids')
+COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS: Final = 'acquired_skill_ids'
 # These node properties have been deprecated.
-COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skills'
-COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
+COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS: Final = 'prerequisite_skills'
+COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS: Final = 'acquired_skills'
 
 # This takes additional 'title' and 'category' parameters.
-CMD_CREATE_NEW = 'create_new'
+CMD_CREATE_NEW: Final = 'create_new'
 # This takes an additional 'exploration_id' parameter.
-CMD_ADD_COLLECTION_NODE = 'add_collection_node'
+CMD_ADD_COLLECTION_NODE: Final = 'add_collection_node'
 # This takes an additional 'exploration_id' parameter.
-CMD_DELETE_COLLECTION_NODE = 'delete_collection_node'
+CMD_DELETE_COLLECTION_NODE: Final = 'delete_collection_node'
 # This takes 2 parameters corresponding to the node indices to be swapped.
-CMD_SWAP_COLLECTION_NODES = 'swap_nodes'
+CMD_SWAP_COLLECTION_NODES: Final = 'swap_nodes'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
-CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
+CMD_EDIT_COLLECTION_PROPERTY: Final = 'edit_collection_property'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 # Currently, a node only has exploration_id as its parameter, if more
 # parameters are to be added, the following CMD should be used
 # for its changelists.
-CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
+CMD_EDIT_COLLECTION_NODE_PROPERTY: Final = 'edit_collection_node_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
-CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
+CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION: Final = 'migrate_schema_to_latest_version'
 # This takes an additional 'name' parameter.
-CMD_ADD_COLLECTION_SKILL = 'add_collection_skill'
+CMD_ADD_COLLECTION_SKILL: Final = 'add_collection_skill'
 # This takes an additional 'skill_id' parameter.
-CMD_DELETE_COLLECTION_SKILL = 'delete_collection_skill'
+CMD_DELETE_COLLECTION_SKILL: Final = 'delete_collection_skill'
 # This takes additional 'question_id' and 'skill_id' parameters.
-CMD_ADD_QUESTION_ID_TO_SKILL = 'add_question_id_to_skill'
+CMD_ADD_QUESTION_ID_TO_SKILL: Final = 'add_question_id_to_skill'
 # This takes additional 'question_id' and 'skill_id' parameters.
-CMD_REMOVE_QUESTION_ID_FROM_SKILL = 'remove_question_id_from_skill'
+CMD_REMOVE_QUESTION_ID_FROM_SKILL: Final = 'remove_question_id_from_skill'
 
 # Prefix for skill IDs. This should not be changed -- doing so will result in
 # backwards-compatibility issues.
-_SKILL_ID_PREFIX = 'skill'
+_SKILL_ID_PREFIX: Final = 'skill'
+
+CollectionPropertiesTuple = Tuple[
+    Literal['title'], Literal['category'],
+    Literal['objective'], Literal['language_code'],
+    Literal['tags']]
+
+
+class AllowedCommandDict(TypedDict, total=False):
+    """Type for the ALLOWED COMMAND Dict"""
+
+    name: str
+    required_attribute_names: List[str]
+    optional_attribute_names: List[str]
+    user_id_attribute_names: List[str]
+    allowed_values: Dict[str, CollectionPropertiesTuple]
 
 
 class CollectionChange(change_domain.BaseChange):
@@ -104,12 +120,12 @@ class CollectionChange(change_domain.BaseChange):
 
     # The allowed list of collection properties which can be used in
     # edit_collection_property command.
-    COLLECTION_PROPERTIES = (
+    COLLECTION_PROPERTIES: CollectionPropertiesTuple = (
         COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
         COLLECTION_PROPERTY_OBJECTIVE, COLLECTION_PROPERTY_LANGUAGE_CODE,
         COLLECTION_PROPERTY_TAGS)
 
-    ALLOWED_COMMANDS = [{
+    ALLOWED_COMMANDS: List[AllowedCommandDict] = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['category', 'title'],
         'optional_attribute_names': [],
