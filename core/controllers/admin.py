@@ -649,12 +649,12 @@ class AdminHandler(base.BaseHandler):
     def _generate_sample_opportunities(
             self, num_sample_ops,
             num_sample_interactions):
-        """Generates and publishes the given number of dummy opportunities.
+        """Generates and publishes the given number of sample opportunities.
 
         Args:
-            num_sample_ops: int. Count of dummy opportunities to
+            num_sample_ops: int. Count of sample opportunities to
                 be generated.
-            num_sample_interactions: int. Count of dummy
+            num_sample_interactions: int. Count of sample
                 interactions to be generated.
 
         Raises:
