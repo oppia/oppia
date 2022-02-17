@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for floats.
+ * @fileoverview Compoent for a schema-based editor for floats.
  */
 
 import { Component, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
@@ -25,7 +25,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 @Component({
   selector: 'schema-based-float-editor',
-  templateUrl: './schema-based-float-editor.directive.html',
+  templateUrl: './schema-based-float-editor.component.html',
   styleUrls: [],
   providers: [
     {
@@ -151,6 +151,7 @@ implements ControlValueAccessor, OnInit, Validator {
     this.isUserCurrentlyTyping = false;
     this.inputBlur.emit();
   }
+
   // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
   getMinValue(): number {
     for (var i = 0; i < this.validators.length; i++) {

@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for multiple choice.
+ * @fileoverview Component for a schema-based editor for multiple choice.
  */
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-choices-editor',
-  templateUrl: './schema-based-choices-editor.directive.html',
+  templateUrl: './schema-based-choices-editor.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
