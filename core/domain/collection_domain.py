@@ -168,10 +168,15 @@ class CollectionChange(change_domain.BaseChange):
         'user_id_attribute_names': []
     }]
 
-class CollectionNodeDict(TypedDict):
+class CollectionNodeDict(TypedDict, total = False):
     """Type for the collection node object"""
 
+    acquired_skills: List[str]
+    acquired_skill_ids: List[str]
     exploration_id: str
+    other_field: str
+    prerequisite_skills: List[str]
+    prerequisite_skill_ids: List[str]
 
 
 class CollectionNode:
@@ -258,9 +263,17 @@ class CollectionDict(TypedDict, total = False):
 class CollectionVersionDict(CollectionDict, total = False):
     """Type for the collection Dict based on different versions"""
 
-    skills: Dict[str, Dict[str, Any]] # pending with Any typeannotations
+    skills: Dict[str, Dict[str, Any]]
     next_skill_id: int
     next_skill_index: int
+
+
+class VersionedCollectionDict(TypedDict):
+    """Type for the versioned collection dict"""
+        
+    schema_version: int
+    collection_contents: CollectionVersionDict
+
 
 class Collection:
     """Domain object for an Oppia collection."""
@@ -473,7 +486,7 @@ class Collection:
         # YAML representation.
         del collection_dict['id']
 
-        return utils.yaml_from_dict(collection_dict)
+        return utils.yaml_from_dict(collection_dict) # type: ignore[arg-type]
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(
@@ -565,7 +578,7 @@ class Collection:
         return collection_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(cls, yaml_content: str) -> str:
+    def _migrate_to_latest_yaml_version(cls, yaml_content: str) -> CollectionDict:
         """Return the YAML content of the collection in the latest schema
         format.
 
@@ -573,8 +586,8 @@ class Collection:
             yaml_content: str. The YAML representation of the collection.
 
         Returns:
-            str. The YAML representation of the collection, in the latest
-            schema format.
+            Dict. The dictionary representation of the collection in which the latest 
+            YAML representation of the collection and latest schema format is used.
 
         Raises:
             InvalidInputException. The 'yaml_content' or the schema version
@@ -582,7 +595,7 @@ class Collection:
             Exception. The collection schema version is not valid.
         """
         try:
-            collection_dict = utils.dict_from_yaml(yaml_content)
+            collection_dict: CollectionDict = utils.dict_from_yaml(yaml_content) # type: ignore[assignment]
         except utils.InvalidInputException as e:
             raise utils.InvalidInputException(
                 'Please ensure that you are uploading a YAML text file, not '
@@ -752,9 +765,10 @@ class Collection:
 
     @classmethod
     def update_collection_contents_from_model(
-            cls, current_version: int,
-            versioned_collection_contents: Dict[str, Union[int, CollectionVersionDict]],
-            ) -> None:
+        cls,
+        versioned_collection_contents: VersionedCollectionDict,
+        current_version: int,
+    ) -> None:
         """Converts the states blob contained in the given
         versioned_collection_contents dict from current_version to
         current_version + 1. Note that the versioned_collection_contents being
@@ -1131,7 +1145,7 @@ class CollectionSummaryDict(TypedDict):
     editor_ids: List[str]
     viewer_ids: List[str]
     contributor_ids: List[str]
-    contributors_summary: Dict[str, str] # not confirm with this type
+    contributors_summary: Dict[str, int]
     version: int
     collection_model_created_on: datetime.datetime
     collection_model_last_updated: datetime.datetime
@@ -1154,7 +1168,7 @@ class CollectionSummary:
         editor_ids: List[str],
         viewer_ids: List[str],
         contributor_ids: List[str],
-        contributors_summary: Dict[str, str], # not confirm with this type
+        contributors_summary: Dict[str, int],
         version: int,
         node_count: int,
         collection_model_created_on: datetime.datetime,
