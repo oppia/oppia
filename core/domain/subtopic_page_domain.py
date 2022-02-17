@@ -43,6 +43,7 @@ CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property'
 
 WrittenTranslationsType = Dict[str, Dict[str, Dict[str, Dict[str, object]]]]
 
+
 class SubtopicPageChange(change_domain.BaseChange):
     """Domain object for changes made to subtopic_page object.
 
