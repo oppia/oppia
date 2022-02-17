@@ -1831,7 +1831,7 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     )
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
@@ -1939,7 +1939,7 @@ title: A title
 
     UPDATED_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
@@ -5708,7 +5708,7 @@ title: Old Title
 
     def test_update_exploration_auto_tts_enabled(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.auto_tts_enabled, True)
+        self.assertEqual(exploration.auto_tts_enabled, False)
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,

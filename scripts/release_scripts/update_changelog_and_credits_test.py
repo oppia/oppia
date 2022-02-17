@@ -606,7 +606,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_developer_names_gets_called': False,
             'get_release_summary_lines_gets_called': False,
             'create_branch_gets_called': False,
-            'open_new_tab_in_browser_if_possible_gets_called': False,
             'update_package_json_gets_called': False
         }
         expected_check_function_calls = {
@@ -618,7 +617,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_developer_names_gets_called': True,
             'get_release_summary_lines_gets_called': True,
             'create_branch_gets_called': True,
-            'open_new_tab_in_browser_if_possible_gets_called': True,
             'update_package_json_gets_called': True
         }
         def mock_get_organization(unused_self, unused_name):
@@ -651,9 +649,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             return 'y'
         def mock_get_repo(unused_self, unused_repo_name):
             return self.mock_repo
-        def mock_open_tab(unused_url):
-            check_function_calls[
-                'open_new_tab_in_browser_if_possible_gets_called'] = True
         def mock_update_version_in_config_files():
             check_function_calls['update_package_json_gets_called'] = True
 
@@ -686,15 +681,13 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
         get_org_repo_swap = self.swap(
             github.Organization.Organization, 'get_repo', mock_get_repo)
-        open_tab_swap = self.swap(
-            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         update_swap = self.swap(
             update_changelog_and_credits, 'update_version_in_config_files',
             mock_update_version_in_config_files)
 
         with self.branch_name_swap, self.release_summary_swap, self.args_swap:
             with self.getpass_swap, input_swap, check_prs_swap:
-                with remove_updates_swap, update_authors_swap, open_tab_swap:
+                with remove_updates_swap, update_authors_swap:
                     with update_changelog_swap, update_contributors_swap:
                         with update_developer_names_swap, get_lines_swap:
                             with create_branch_swap, get_repo_swap, update_swap:
