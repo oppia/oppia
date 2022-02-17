@@ -24,7 +24,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 
-from typing import Callable, Dict
+from typing import Any, Callable, Dict, Union
 from typing_extensions import TypedDict
 
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -76,9 +76,9 @@ class SubtopicPageChange(change_domain.BaseChange):
 class SubtopicPageContentsDict(TypedDict):
     """Dictionary representing the SubtopicPageContents object."""
 
-    subtitled_html: state_domain.SubtitledHtml().to_dict() # type: ignore[valid-type]
-    recorded_voiceovers: state_domain.RecordedVoiceovers().to_dict() # type: ignore[valid-type]
-    written_translations: state_domain.WrittenTranslations().to_dict() # type: ignore[valid-type]
+    subtitled_html: Dict[str, Union[str, None]]
+    recorded_voiceovers: Dict[str, Dict[str, Dict[str, Union[bool, int, str]]]]
+    written_translations: Dict[str, Dict[str, Dict[str, Union[bool, str]]]]
 
 
 class SubtopicPageContents:
