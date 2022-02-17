@@ -41,6 +41,7 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   profileUrl: string;
   logoutUrl: string = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE);
+
   profileDropdownIsActive: boolean = false;
   logoWebpImageSrc: string;
   logoPngImageSrc: string;
