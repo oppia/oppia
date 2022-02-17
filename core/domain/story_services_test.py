@@ -389,7 +389,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         expected_error_string = (
             'The skills with ids skill_4 were specified as prerequisites for '
             'Chapter Title 3, but were not taught in any chapter before it')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_string):
             story_services.validate_prerequisite_skills_in_story_contents(
                 self.topic.get_all_skill_ids(), self.story.story_contents)
@@ -447,7 +447,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_3)
         ]
         expected_error_string = 'Loops are not allowed in stories.'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_string):
             story_services.validate_prerequisite_skills_in_story_contents(
                 self.topic.get_all_skill_ids(), self.story.story_contents)
@@ -482,7 +482,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, (
                 'Expected story to only belong to a valid topic, but '
                 'found no topic with ID: %s' % topic_id)):
@@ -508,7 +508,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, (
                 'Expected story to belong to the topic %s, but it is '
                 'neither a part of the canonical stories or the '
@@ -562,7 +562,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_model.story_contents_schema_version = 0
         story_model.commit(self.USER_ID, 'change schema version', [])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d story schemas at '
             'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
@@ -590,7 +590,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Expected change to be of type StoryChange')
 
         with logging_swap, assert_raises_regexp_context_manager:
@@ -635,7 +635,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new_outline'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -652,7 +652,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'New description.'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Expected a commit message but received none.'):
             story_services.update_story(
@@ -963,7 +963,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': '0'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The exploration with ID 0 is already linked to story '
             'with ID %s' % self.STORY_ID):
@@ -981,7 +981,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': ['skill_id']
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1057,13 +1057,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'original'
         })]
         exception_message = 'Story Url Fragment is not unique across the site.'
-        with self.assertRaisesRegexp(Exception, exception_message):
+        with self.assertRaisesRegex(Exception, exception_message):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list,
                 'Updated story url_fragment.')
 
     def test_cannot_update_story_with_no_change_list(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: received an invalid change list when trying to '
             'save story'):
@@ -1082,7 +1082,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'invalid_exp_id'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected story to only reference valid explorations'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
@@ -1108,7 +1108,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 category='Category 1', correctness_feedback_enabled=True)
             self.publish_exploration(self.user_id_a, 'exp_id_1')
 
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception, 'Error in exploration'):
                 story_services.validate_explorations_for_story(
                     ['exp_id_1'], False)
@@ -1150,7 +1150,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'exp_id_1'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Exploration with ID exp_id_1 is not public'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
@@ -1168,7 +1168,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': None
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Story node with id node_1 does not contain an '
             'exploration id.'):
             story_services.update_story(
@@ -1228,7 +1228,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'All explorations in a story should be of the same category. '
                 'The explorations with ID exp_id_2 and exp_id_1 have different '
                 'categories.'])
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'All explorations in a story should be of the '
             'same category'):
             story_services.update_story(
@@ -1257,10 +1257,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
-                'Invalid language es found for exploration with ID exp_id_1.'])
-        with self.assertRaisesRegexp(
+                'Invalid language es found for exploration with ID exp_id_1.'
+                ' This language is not supported for explorations in a story'
+                ' on the mobile app.'])
+        with self.assertRaisesRegex(
             Exception, 'Invalid language es found for exploration with '
-            'ID exp_id_1'):
+            'ID exp_id_1. This language is not supported for explorations '
+            'in a story on the mobile app.'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1287,11 +1290,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
-                'Expected all explorations to have correctness feedback '
-                'enabled. Invalid exploration: exp_id_1'])
-        with self.assertRaisesRegexp(
-            Exception, 'Expected all explorations to have correctness feedback '
-            'enabled. Invalid exploration: exp_id_1'):
+                'Expected all explorations in a story to '
+                'have correctness feedback enabled. Invalid '
+                'exploration: exp_id_1'])
+        with self.assertRaisesRegex(
+            Exception, 'Expected all explorations in a story to '
+            'have correctness feedback enabled. Invalid exploration: exp_id_1'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1319,10 +1323,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             validation_error_messages, [
                 'Invalid interaction GraphInput in exploration with ID: '
-                'exp_id_1.'])
-        with self.assertRaisesRegexp(
+                'exp_id_1. This interaction is not supported for explorations '
+                'in a story on the mobile app.'])
+        with self.assertRaisesRegex(
             Exception, 'Invalid interaction GraphInput in exploration with '
-            'ID: exp_id_1'):
+            'ID: exp_id_1. This interaction is not supported for explorations '
+            'in a story on the mobile app.'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1363,11 +1369,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
-                'Exploration with ID: exp_id_1 contains exploration '
-                'recommendations in its EndExploration interaction.'])
-        with self.assertRaisesRegexp(
-            Exception, 'Exploration with ID: exp_id_1 contains exploration '
-            'recommendations in its EndExploration interaction.'):
+                'Explorations in a story are not expected to contain '
+                'exploration recommendations. Exploration with ID: exp_id_1 '
+                'contains exploration recommendations in its EndExploration '
+                'interaction.'])
+        with self.assertRaisesRegex(
+            Exception, 'Explorations in a story are not expected to contain '
+            'exploration recommendations. Exploration with ID: exp_id_1 '
+            'contains exploration recommendations in its EndExploration '
+            'interaction.'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1411,10 +1421,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             validation_error_messages, [
                 'RTE content in state Introduction of exploration with '
-                'ID exp_id_1 is not supported on mobile.'])
-        with self.assertRaisesRegexp(
+                'ID exp_id_1 is not supported on mobile for explorations '
+                'in a story.'])
+        with self.assertRaisesRegex(
             Exception, 'RTE content in state Introduction of exploration with '
-            'ID exp_id_1 is not supported on mobile.'):
+            'ID exp_id_1 is not supported on mobile for explorations '
+            'in a story.'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1451,11 +1463,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
-                'Expected no exploration to have parameter values in'
-                ' it. Invalid exploration: exp_id_1'])
-        with self.assertRaisesRegexp(
-            Exception, 'Expected no exploration to have parameter values in'
-            ' it. Invalid exploration: exp_id_1'):
+                'Expected no exploration in a story to have parameter '
+                'values in it. Invalid exploration: exp_id_1'])
+        with self.assertRaisesRegex(
+            Exception, 'Expected no exploration in a story to have parameter '
+            'values in it. Invalid exploration: exp_id_1'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1491,9 +1503,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        with self.assertRaisesRegexp(
-            Exception, 'Expected no exploration to have parameter values in'
-            ' it. Invalid exploration: exp_id_2'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected no exploration in a story to have parameter '
+            'values in it. Invalid exploration: exp_id_2'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1515,7 +1527,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_model.version = 0
         story_model.commit(self.user_id_a, 'Changed version', [])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: trying to update version 1 of story '
             'from version 2. Please reload the page and try again.'):
@@ -1526,7 +1538,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_model.version = 10
         story_model.commit(self.user_id_a, 'Changed version', [])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Trying to update version 11 of story from version 2, '
             'which is too old. Please reload the page and try again.'):
@@ -1572,7 +1584,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new_initial_node_id'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id new_initial_node_id is not part of this story'):
             story_services.update_story(
@@ -1614,7 +1626,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'exp_id'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1662,7 +1674,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'A node with exploration id exp_id already exists.'):
             story_services.update_story(
@@ -1679,7 +1691,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': []
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1697,7 +1709,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': []
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1712,7 +1724,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': ''
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1727,7 +1739,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new_value'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1743,7 +1755,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new_title'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1758,7 +1770,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new_description'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1775,7 +1787,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new_image.svg'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1792,7 +1804,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': '#F8BF74'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1805,7 +1817,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'node_id': 'invalid_node'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1848,7 +1860,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'node_id': self.NODE_ID_2
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The node with id %s is the starting node for the story, '
             'change the starting node before deleting it.' % self.NODE_ID_2):

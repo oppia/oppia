@@ -28,6 +28,7 @@ import { PracticeSessionPageConstants } from
   'pages/practice-session-page/practice-session-page.constants';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'practice-tab',
@@ -35,9 +36,12 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   styleUrls: []
 })
 export class PracticeTabComponent implements OnInit {
-  @Input() topicName: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() topicName!: string;
+  @Input() subtopicsList!: Subtopic[];
   @Input() startButtonIsDisabled: boolean = false;
-  @Input() subtopicsList: Subtopic[];
   @Input() displayArea: string = 'topicViewer';
   @Input() topicUrlFragment: string = '';
   @Input() classroomUrlFragment: string = '';
@@ -47,11 +51,12 @@ export class PracticeTabComponent implements OnInit {
   selectedSubtopicIndices: boolean[] = [];
   questionsAreAvailable: boolean = false;
   subtopicIds: number[] = [];
-  clientWidth: number;
+  clientWidth!: number;
   subtopicMasteryArray: number[] = [];
   questionsStatusCallIsComplete: boolean = true;
 
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private questionBackendApiService: QuestionBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
@@ -87,6 +92,10 @@ export class PracticeTabComponent implements OnInit {
     }
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   isStartButtonDisabled(): boolean {
     if (this.startButtonIsDisabled) {
       return true;
@@ -100,11 +109,11 @@ export class PracticeTabComponent implements OnInit {
   }
 
   checkIfQuestionsExist(subtopicIndices: boolean[]): void {
-    const skillIds = [];
+    const skillIds: string[] = [];
     this.questionsStatusCallIsComplete = false;
     for (let idx in subtopicIndices) {
       if (subtopicIndices[idx]) {
-        skillIds.push(this.availableSubtopics[idx].getSkillIds());
+        skillIds.push(...this.availableSubtopics[idx].getSkillIds());
       }
     }
     if (skillIds.length > 0) {

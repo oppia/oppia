@@ -25,31 +25,6 @@ from core.controllers import domain_objects_validator
 from core.tests import test_utils
 
 
-class ValidateExplorationChangeTests(test_utils.GenericTestBase):
-    """Tests to validate domain objects coming from API."""
-
-    def test_incorrect_object_raises_exception(self) -> None:
-        incorrect_change_dict = {
-            'old_value': '',
-            'property_name': 'title',
-            'new_value': 'newValue'
-        }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'Missing cmd key in change dict'):
-            domain_objects_validator.validate_exploration_change(
-                incorrect_change_dict)
-
-    def test_correct_object_do_not_raises_exception(self) -> None:
-        correct_change_dict = {
-            'cmd': 'edit_exploration_property',
-            'new_value': 'arbitary_new_value',
-            'old_value': '',
-            'property_name': 'title'
-        }
-        domain_objects_validator.validate_exploration_change(
-            correct_change_dict)
-
-
 class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
     """Tests to validate domain objects coming from frontend."""
 
@@ -62,7 +37,7 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
             'translation_html': '<p>In Hindi</p>',
             'data_format': 'html'
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Missing cmd key in change dict'
         ):
             domain_objects_validator.validate_suggestion_change(
@@ -77,7 +52,7 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
             'translation_html': '<p>In Hindi</p>',
             'data_format': 'html'
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, '%s cmd is not allowed.' % incorrect_change_dict['cmd']
         ):
             domain_objects_validator.validate_suggestion_change(
@@ -90,35 +65,10 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
-            'translation_html': '<p>In Hindi</p>',
+            'translation_html': '<p>In हिन्दी (Hindi)</p>',
             'data_format': 'html'
         }
         domain_objects_validator.validate_suggestion_change(
-            correct_change_dict)
-
-
-class ValidateCollectionChangeTests(test_utils.GenericTestBase):
-    """Tests to validate domain objects coming from API."""
-
-    def test_incorrect_object_raises_exception(self) -> None:
-        incorrect_change_dict = {
-            'old_value': '',
-            'property_name': 'title',
-            'new_value': 'newValue'
-        }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'Missing cmd key in change dict'):
-            domain_objects_validator.validate_collection_change(
-                incorrect_change_dict)
-
-    def test_correct_object_do_not_raises_exception(self) -> None:
-        correct_change_dict = {
-            'cmd': 'edit_collection_property',
-            'new_value': 'arbitary_new_value',
-            'old_value': '',
-            'property_name': 'title'
-        }
-        domain_objects_validator.validate_collection_change(
             correct_change_dict)
 
 
@@ -127,13 +77,13 @@ class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
 
     def test_invalid_object_raises_exception(self) -> None:
         config_properties = {'some_config_property': 20, }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'some_config_property do not have any schema.'):
             domain_objects_validator.validate_new_config_property_values(
                 config_properties)
 
         config_properties = {1234: 20, } # type: ignore[dict-item]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'config property name should be a string, received'
             ': %s' % 1234):
             domain_objects_validator.validate_new_config_property_values(
@@ -156,7 +106,7 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
             'title': 123,
             'tags': ['News'],
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Title should be a string'):
             domain_objects_validator.validate_change_dict_for_blog_post(
                 blog_post_change)
@@ -166,7 +116,7 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
             'title': 'Hello Bloggers',
             'tags': ['News', 'Some Tag'],
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Invalid tags provided. Tags not in default'
             ' tags list.'):
             domain_objects_validator.validate_change_dict_for_blog_post(
@@ -176,7 +126,7 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
             'title': 'Hello',
             'tags': ['News', 123], # type: ignore[list-item]
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Expected each tag in \'tags\' to be a string,'
             ' received: \'123\''):
             domain_objects_validator.validate_change_dict_for_blog_post(
@@ -272,7 +222,7 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
             'solicit_answer_details': False
         }
         # The error is representing the keyerror.
-        with self.assertRaisesRegexp(Exception, 'content'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'content'): # type: ignore[no-untyped-call]
             domain_objects_validator.validate_state_dict(invalid_state_dict)
 
 
@@ -281,7 +231,7 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
 
     def test_invalid_images_raises_exception(self) -> None:
         files = {'file.svg': None}
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'No image supplied'
         ):
             domain_objects_validator.validate_suggestion_images(files)
@@ -302,12 +252,12 @@ class ValidateParamsDict(test_utils.GenericTestBase):
 
     def test_invalid_type_raises_exception(self):
         incorrect_type = 13
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Excepted dict, received %s' % incorrect_type):
             domain_objects_validator.validate_params_dict(incorrect_type)
 
         incorrect_type = 'param1'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Excepted dict, received %s' % incorrect_type):
             domain_objects_validator.validate_params_dict(incorrect_type)
 

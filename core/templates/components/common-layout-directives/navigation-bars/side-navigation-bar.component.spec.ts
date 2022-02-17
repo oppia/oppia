@@ -32,6 +32,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -55,6 +56,7 @@ describe('Side Navigation Bar Component', () => {
   let sidebarStatusService: SidebarStatusService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let userService: UserService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   class MockUrlInterpolationService {
     getStaticImageUrl(imagePath: string): string {
@@ -98,6 +100,7 @@ describe('Side Navigation Bar Component', () => {
     componentInstance = fixture.componentInstance;
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     userService = TestBed.inject(UserService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   it('should create', () => {
@@ -178,19 +181,55 @@ describe('Side Navigation Bar Component', () => {
       expect(componentInstance.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
     }));
 
-  it('should check if classroom data is fetched when classroom promos enabled',
+  it('should fetch classroom data when classroomPromos are enabled',
     fakeAsync(() => {
-      componentInstance.CLASSROOM_PROMOS_ARE_ENABLED = true;
+      spyOn(
+        classroomBackendApiService,
+        'fetchClassroomPromosAreEnabledStatusAsync').
+        and.resolveTo(true);
       spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
         .and.returnValue(Promise.resolve());
-      let array: CreatorTopicSummary[] = [];
+
+      let cData1: CreatorTopicSummary = new CreatorTopicSummary(
+        'dummy', 'addition', 3, 3, 3, 3, 1,
+        'en', 'dummy', 1, 1, 1, 1, true,
+        true, 'math', 'public/img.webp', 'red', 'add');
+      let cData2: CreatorTopicSummary = new CreatorTopicSummary(
+        'dummy2', 'division', 2, 2, 3, 3, 0,
+        'es', 'dummy2', 1, 1, 1, 1, true,
+        true, 'math', 'public/img1.png', 'green', 'div');
+
+      let array: CreatorTopicSummary[] = [cData1, cData2];
       let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+      let topicTitlesTranslationKeys: string[] =
+        ['I18N_TOPIC_dummy_TITLE', 'I18N_TOPIC_dummy2_TITLE'];
       spyOn(
         classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.resolveTo(classroomData);
+      spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
 
-      componentInstance.ngAfterViewChecked();
+      componentInstance.ngOnInit();
+
       tick();
+
       expect(componentInstance.classroomData).toEqual(array);
+      expect(componentInstance.topicTitlesTranslationKeys).toEqual(
+        topicTitlesTranslationKeys);
+      expect(siteAnalyticsService.registerClassroomPageViewed)
+        .toHaveBeenCalled();
     }));
+
+  it('should check whether hacky translations are displayed or not', () => {
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValues(false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValues(false, false);
+
+    let hackyStoryTitleTranslationIsDisplayed =
+      componentInstance.isHackyTopicTitleTranslationDisplayed(0);
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
+    hackyStoryTitleTranslationIsDisplayed =
+      componentInstance.isHackyTopicTitleTranslationDisplayed(0);
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+  });
 });

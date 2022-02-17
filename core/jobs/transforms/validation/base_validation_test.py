@@ -264,7 +264,7 @@ class MockValidateModelDomainObjectInstancesWithNeutral(
         return MockDomainObject()
 
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return base_validation.VALIDATION_MODES.neutral
+        return base_validation.ValidationModes.NEUTRAL
 
 
 class MockValidateModelDomainObjectInstancesWithStrict(
@@ -273,7 +273,7 @@ class MockValidateModelDomainObjectInstancesWithStrict(
         return MockDomainObject()
 
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return base_validation.VALIDATION_MODES.strict
+        return base_validation.ValidationModes.STRICT
 
 
 class MockValidateModelDomainObjectInstancesWithNonStrict(
@@ -282,7 +282,7 @@ class MockValidateModelDomainObjectInstancesWithNonStrict(
         return MockDomainObject()
 
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return base_validation.VALIDATION_MODES.non_strict
+        return base_validation.ValidationModes.NON_STRICT
 
 
 class MockValidateModelDomainObjectInstancesWithInvalid(
@@ -557,7 +557,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             post_commit_status='',
             commit_cmds=[{}])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The _get_change_domain_class() method is missing from the '

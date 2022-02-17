@@ -742,7 +742,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'e="++--"></oppia-noninteractive-math>'
             )
         }]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, re.escape('Expecting value: line 1 column 1 (char 0)')
         ):
             html_validation_service.add_math_content_to_math_rte_components(
@@ -1248,3 +1248,40 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 html_validation_service.convert_svg_diagram_tags_to_image_tags(
                     test_case['html_content']),
                 test_case['expected_output'])
+
+    def test_fix_incorrectly_encoded_chars_replaces_incorrect_encodings(self):
+        test_cases = [
+            {
+                'html_string': '<p>This is <span>testing &nbsp;</span></p>',
+                'expected_output': '<p>This is <span>testing  </span></p>'
+            },
+            {
+                'html_string': '<p>This is <span>\t testing \n</span></p>',
+                'expected_output': '<p>This is <span> testing </span></p>'
+            },
+            {
+                'html_string': '<p>Hello this is <span>testing \xa0</span></p>',
+                'expected_output': '<p>Hello this is <span>testing  </span></p>'
+            },
+            {
+                'html_string': '<p>Hello this is <span>testing \xc2</span></p>',
+                'expected_output': '<p>Hello this is <span>testing </span></p>'
+            },
+            {
+                'html_string': '<p>Hello this is <span>testing \xe2\u2020\u2019'
+                ' \xe2\u20ac\u0153 \xe2\u02c6\u2030 \xe2\u2026\u02dc '
+                '\xe2\u20ac\u2122 \xe2\u02c6\u0161 \xe2\u02c6\u02c6 '
+                '\xe2\u2026\u2022 \xe2\u2026\u2122 \xe2\u20ac\u02dc '
+                '\xe2\u20ac\u201d \xe2\u20ac\u2039 \xe2\xcb\u2020\xe2\u20ac\xb0'
+                '</span></p>',
+                'expected_output': '<p>Hello this is <span>testing \u2192 '
+                '\u201c \u2209 \u2158 \u2019 \u221a \u2208 \u2155 \u2159 '
+                '\u2018 \u2014 \u200b \u2209</span></p>'
+            }
+        ]
+        for test_case in test_cases:
+            self.assertEqual(
+                html_validation_service.fix_incorrectly_encoded_chars(
+                    test_case['html_string']),
+                test_case['expected_output']
+            )

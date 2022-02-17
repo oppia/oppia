@@ -36,6 +36,7 @@ export class BlogDashboardPageService {
   private _blogPostData: null | BlogPostData = null;
   private _BLOG_POST_EDITOR_URL_TEMPLATE = (
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
+
   private _activeTab = 'main';
   private _blogPostAction: string = '';
   private _updateViewEventEmitter = new EventEmitter<void>();

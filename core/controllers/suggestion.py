@@ -68,13 +68,12 @@ class SuggestionHandler(base.BaseHandler):
                 }
             },
             'change': {
-               'schema': {
-                   'type': 'object_dict',
+                'schema': {
+                    'type': 'object_dict',
                     'validation_method': (
-                        domain_objects_validator.
-                        validate_suggestion_change
+                        domain_objects_validator.validate_suggestion_change
                     )
-               }
+                }
             },
             'description': {
                 'schema': {
@@ -114,11 +113,10 @@ class SuggestionHandler(base.BaseHandler):
         suggestion_change = suggestion.change
         if (
                 suggestion_change.cmd == 'add_written_translation' and
+                suggestion_change.data_format in
                 (
-                    suggestion_change.data_format ==
                     state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING or
-                    suggestion_change.data_format ==
+                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING,
                     state_domain.WrittenTranslation
                     .DATA_FORMAT_SET_OF_UNICODE_STRING
                 )
@@ -459,7 +457,7 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
         if suggestion.is_handled:
             raise self.InvalidInputException(
                 'The suggestion with id %s has been accepted or rejected'
-                % (suggestion_id)
+                % suggestion_id
             )
 
         if self.payload.get('skill_difficulty') is None:
@@ -467,7 +465,7 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
                 'The parameter \'skill_difficulty\' is missing.'
             )
 
-        if not isinstance(self.payload.get('skill_difficulty'), float):
+        if not isinstance(self.payload.get('skill_difficulty'), (float, int)):
             raise self.InvalidInputException(
                 'The parameter \'skill_difficulty\' should be a decimal.'
             )

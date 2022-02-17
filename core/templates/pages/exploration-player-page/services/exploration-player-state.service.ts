@@ -50,8 +50,10 @@ interface QuestionPlayerConfigDict {
 export class ExplorationPlayerStateService {
   private _totalQuestionsReceivedEventEmitter: EventEmitter<number> = (
     new EventEmitter());
+
   private _oppiaFeedbackAvailableEventEmitter: EventEmitter<void> = (
     new EventEmitter());
+
   currentEngineService: ExplorationEngineService | QuestionPlayerEngineService;
   explorationMode: string = ExplorationPlayerConstants.EXPLORATION_MODE.OTHER;
   editorPreviewMode: boolean;
@@ -59,8 +61,8 @@ export class ExplorationPlayerStateService {
   explorationId: string;
   version: number;
   storyUrlFragment: string;
-  private _playerStateChangeEventEmitter: EventEmitter<void> = (
-    new EventEmitter());
+  private _playerStateChangeEventEmitter: EventEmitter<string> = (
+    new EventEmitter<string>());
 
   constructor(
     private contextService: ContextService,
@@ -88,6 +90,7 @@ export class ExplorationPlayerStateService {
   ) {
     this.init();
   }
+
   init(): void {
     let pathnameArray = this.urlService.getPathname().split('/');
     let explorationContext = false;
@@ -354,7 +357,7 @@ export class ExplorationPlayerStateService {
     return this._totalQuestionsReceivedEventEmitter;
   }
 
-  get onPlayerStateChange(): EventEmitter<void> {
+  get onPlayerStateChange(): EventEmitter<string> {
     return this._playerStateChangeEventEmitter;
   }
 

@@ -24,16 +24,20 @@ import re
 from core import feconf
 from core import utils
 from core.domain import app_feedback_report_constants
-from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import topic_domain
-from core.platform import models
 
-from typing import Dict, Optional, Type, List, Any, Match # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Match, Optional
+
+from core.domain import exp_services  # pylint: disable=invalid-import-from # isort:skip
+from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -1270,7 +1274,7 @@ class LessonPlayerEntryPoint(EntryPoint):
         self.require_valid_entry_point_name(
             self.entry_point_name,
             app_feedback_report_constants.ENTRY_POINT.lesson_player)
-        topic_domain.Topic.require_valid_topic_id(self.topic_id) # type: ignore[no-untyped-call]
+        topic_domain.Topic.require_valid_topic_id(self.topic_id)
         story_domain.Story.require_valid_story_id(self.story_id) # type: ignore[no-untyped-call]
         self.require_valid_entry_point_exploration(
             self.exploration_id, self.story_id)
@@ -1316,7 +1320,7 @@ class RevisionCardEntryPoint(EntryPoint):
         self.require_valid_entry_point_name(
             self.entry_point_name,
             app_feedback_report_constants.ENTRY_POINT.revision_card)
-        topic_domain.Topic.require_valid_topic_id(self.topic_id) # type: ignore[no-untyped-call]
+        topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if not isinstance(self.subtopic_id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % (

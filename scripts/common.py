@@ -46,7 +46,7 @@ PYLINT_VERSION = '2.11.1'
 PYLINT_QUOTES_VERSION = '0.2.3'
 PYGITHUB_VERSION = '1.55'
 WEBTEST_VERSION = '3.0.0'
-PIP_TOOLS_VERSION = '6.4.0'
+PIP_TOOLS_VERSION = '6.5.0'
 GRPCIO_VERSION = '1.41.1'
 PROTOBUF_VERSION = '3.13.0'
 SETUPTOOLS_VERSION = '58.5.3'
@@ -297,18 +297,22 @@ def open_new_tab_in_browser_if_possible(url):
     input()
 
 
-def get_remote_alias(remote_url):
-    """Finds the correct alias for the given remote repository URL."""
+def get_remote_alias(remote_urls):
+    """Finds the correct alias for the given remote repository URLs."""
     git_remote_output = subprocess.check_output(
         ['git', 'remote', '-v']).decode('utf-8').split('\n')
     remote_alias = None
-    for line in git_remote_output:
-        if remote_url in line:
-            remote_alias = line.split()[0]
+    remote_url = None
+    for remote_url in remote_urls:
+        for line in git_remote_output:
+            if remote_url in line:
+                remote_alias = line.split()[0]
+        if remote_alias:
+            break
     if remote_alias is None:
         raise Exception(
             'ERROR: There is no existing remote alias for the %s repo.'
-            % remote_url)
+            % ', '.join(remote_urls))
 
     return remote_alias
 
@@ -802,5 +806,5 @@ def write_stdout_safe(string):
         except OSError as e:
             if e.errno == errno.EAGAIN:
                 continue
-            else:
-                raise
+
+            raise

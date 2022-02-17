@@ -33,17 +33,22 @@ import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interactio
 export class InteractionAttributesExtractorService {
   private readonly migratedInteractions: string[] = [
     'Continue',
+    'DragAndDropSortInput',
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
     'CodeRepl',
+    'NumberWithUnits',
     'NumericExpressionInput',
     'NumericInput',
     'InteractiveMap',
     'MultipleChoiceInput',
+    'ItemSelectionInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput'
+    'MathEquationInput',
+    'RatioExpressionInput',
+    'PencilCodeEditor',
   ];
 
   constructor(
@@ -52,7 +57,7 @@ export class InteractionAttributesExtractorService {
   ) {}
 
   getValuesFromAttributes(
-      interactionId: InteractionSpecsKey, attributes: Object
+      interactionId: InteractionSpecsKey, attributes: Record<string, string>
   ): InteractionCustomizationArgs {
     const caBackendDict: InteractionCustomizationArgsBackendDict = {};
     const caSpecs = (
@@ -60,7 +65,7 @@ export class InteractionAttributesExtractorService {
         interactionId].customization_arg_specs);
     caSpecs.forEach(caSpec => {
       const caName = caSpec.name;
-      const attributesKey = `${caName}WithValue` as keyof typeof attributes;
+      const attributesKey: string = `${caName}WithValue`;
       Object.defineProperty(caBackendDict, caName, {
         value: {
           value: this.htmlEscaperService.escapedJsonToObj(

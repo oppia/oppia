@@ -459,7 +459,7 @@ def main(args=None):
                 total_failures += failures
                 print('FAILED    %s: %s errors, %s failures' % (
                     spec.test_target, errors, failures))
-            except AttributeError:
+            except AttributeError as e:
                 # There was an internal error, and the tests did not run (The
                 # error message did not match `tests_failed_regex_match`).
                 test_count = 0
@@ -470,7 +470,7 @@ def main(args=None):
                 print('')
                 print('    This is most likely due to an import error.')
                 print('------------------------------------------------------')
-                raise task.exception
+                raise task.exception from e
         else:
             try:
                 tests_run_regex_match = re.search(
@@ -487,9 +487,9 @@ def main(args=None):
                     'Task output:\n%s' % task.task_results[0].get_report()[0])
             if parsed_args.generate_coverage_report:
                 coverage = task.task_results[0].get_report()[-2]
-                if spec.test_target in coverage_exclusions:
-                    continue
-                if coverage != 100:
+                if (
+                        spec.test_target not in coverage_exclusions
+                        and coverage != 100):
                     print('INCOMPLETE COVERAGE (%s%%): %s' % (
                         coverage, spec.test_target))
                     incomplete_coverage += 1
@@ -512,10 +512,12 @@ def main(args=None):
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
-    elif total_errors or total_failures:
+
+    if total_errors or total_failures:
         raise Exception(
             '%s errors, %s failures' % (total_errors, total_failures))
-    elif incomplete_coverage:
+
+    if incomplete_coverage:
         raise Exception(
             '%s tests incompletely cover associated code files.' %
             incomplete_coverage)

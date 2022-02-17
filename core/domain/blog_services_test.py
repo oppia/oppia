@@ -114,6 +114,36 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             expected_blog_post_summary.to_dict(), blog_post_summary.to_dict())
 
+    def test_get_published_blog_post_summaries(self):
+        self.assertIsNone(
+            blog_services.get_published_blog_post_summaries()
+        )
+        blog_services.update_blog_post(
+            self.blog_post_a_id,
+            self.change_dict_two)
+        blog_services.publish_blog_post(self.blog_post_a_id)
+        self.assertEqual(
+            len(blog_services.get_published_blog_post_summaries()),
+            1
+        )
+
+    def test_get_published_blog_post_summaries_by_user_id(self):
+        self.assertIsNone(
+            blog_services.get_published_blog_post_summaries_by_user_id(
+                self.user_id_a, 20
+            )
+        )
+        blog_services.update_blog_post(
+            self.blog_post_a_id,
+            self.change_dict_two)
+        blog_services.publish_blog_post(self.blog_post_a_id)
+        self.assertEqual(
+            len(blog_services.get_published_blog_post_summaries_by_user_id(
+                self.user_id_a,
+                20
+            )), 1
+        )
+
     def test_get_blog_post_summary_from_model(self):
         blog_post_summary_model = (
             blog_models.BlogPostSummaryModel.get(self.blog_post_a_id))
@@ -178,13 +208,13 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_publish_invalid_blog_post(self):
         """Checks that an invalid blog post is not published."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, ('Title should not be empty')):
             blog_services.publish_blog_post(self.blog_post_a_id)
 
         blog_services.update_blog_post(
             self.blog_post_a_id, self.change_dict_one)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, ('Atleast one tag should be selected')):
             blog_services.publish_blog_post(self.blog_post_a_id)
 
@@ -196,12 +226,12 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         }
 
         blog_services.update_blog_post(self.blog_post_a_id, change_dict_three)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, ('Content can not be empty')):
             blog_services.publish_blog_post(self.blog_post_a_id)
 
         blog_services.delete_blog_post(self.blog_post_a_id)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, ('The given blog post does not exist')):
             blog_services.publish_blog_post(self.blog_post_a_id)
 
@@ -220,7 +250,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_unpublish_invalid_blog_post(self):
         blog_services.delete_blog_post(self.blog_post_a_id)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, ('The given blog post does not exist')):
             blog_services.unpublish_blog_post(self.blog_post_a_id)
 
@@ -252,7 +282,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             blog_services.get_blog_post_by_id(self.blog_post_a_id))
         self.assertEqual(updated_blog_post.tags, ['one', 'two'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, (
                 'Blog Post with given title already exists: %s'
                 % 'Sample Title')):
@@ -270,12 +300,12 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(blog_post.to_dict(), expected_blog_post.to_dict())
 
     def test_get_blog_posy_by_invalid_url(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Blog Post URL fragment should be a string. Recieved:'
             r'\[123\]'):
             blog_services.does_blog_post_with_url_fragment_exist([123])
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Blog Post URL fragment should be a string. Recieved:'
             '123'):
@@ -442,7 +472,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         model.put()
 
         # Invalid month.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'time data \'123/09/2000, 00:00:00:00\' does not match' +
             ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
@@ -450,7 +480,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 self.blog_post_a_id, self.user_id_b, '123/09/2000')
 
         # Invalid day.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'time data \'01/38/2000, 00:00:00:00\' does not match' +
             ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
@@ -458,7 +488,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 self.blog_post_a_id, self.user_id_b, '01/38/2000')
 
         # Invalid year.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'time data \'01/22/31126, 00:00:00:00\' does not match' +
             ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
@@ -466,7 +496,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 self.blog_post_a_id, self.user_id_b, '01/22/31126')
 
     def test_update_blog_model_author_and_publish_on_with_invalid_blog_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class BlogPostModel with id invalid_blog_id not found'):
             blog_services.update_blog_models_author_and_published_on_date(

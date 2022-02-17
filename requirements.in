@@ -3,26 +3,26 @@
 #    python -m scripts.install_third_party
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
-apache-beam[gcp]==2.34.0
+apache-beam[gcp]==2.36.0
 beautifulsoup4==4.10.0
 bleach==4.1.0
 defusedxml==0.7.1
 elasticsearch==7.10.1
-firebase-admin==5.1.0
+firebase-admin==5.2.0
 future==0.18.2
 googledatastore==7.0.2
-google-cloud-storage==1.42.3
+google-cloud-storage==2.1.0
 google-auth==1.35.0
 google-cloud-dataflow-client==0.3.1
-google-cloud-logging==2.7.0
+google-cloud-logging==3.0.0
 google-cloud-ndb==1.11.1
-google-cloud-tasks==2.7.1
+google-cloud-tasks==2.7.2
 google-cloud-translate==3.6.1
 gunicorn==20.1.0
 html5lib==1.1
 mailchimp3==3.0.15
 mutagen==1.45.1
-pillow==8.4.0
+pillow==9.0.0
 pylatexenc==2.10
 pytest==6.2.5
 redis==3.5.3
