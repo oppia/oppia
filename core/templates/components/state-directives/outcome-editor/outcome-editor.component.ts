@@ -160,6 +160,10 @@ angular.module('oppia').component('outcomeEditor', {
         }
       };
 
+      ctrl.getChanges = function() {
+        $rootScope.$apply();
+      };
+
       ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
         ctrl.feedbackEditorIsOpen = false;
         var contentHasChanged = (

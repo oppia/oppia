@@ -169,7 +169,9 @@ var ListEditor = function(elem) {
       var startingLength = await elem.all(by.id(
         'protractor-test-schema-based-list-editor-table-row')).all(
         by.tagName('tr')).count();
-      for (var i = startingLength; i < desiredLength; i++) {
+      // Added +1 because there is already one
+      // schema based editor open in multiple choice interaction.
+      for (var i = startingLength + 1; i < desiredLength; i++) {
         await addItem();
       }
       for (var j = startingLength - 1; j >= desiredLength; j--) {
