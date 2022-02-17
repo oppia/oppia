@@ -200,6 +200,7 @@ describe('Topics and skills dashboard functionality', function() {
       await forms.toRichText('Question 1'));
     await explorationEditorMainTab.setInteraction(
       'TextInput', 'Placeholder', 5);
+    // Error.
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
       'FuzzyEquals', ['correct']);
@@ -209,8 +210,9 @@ describe('Topics and skills dashboard functionality', function() {
       await explorationEditorMainTab.getResponseEditor('default')
     ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
+    // Changed Part.
     await explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'correct',
+      correctAnswer: 'c',
       explanation: 'It is correct'
     });
     await skillEditorPage.saveQuestion();

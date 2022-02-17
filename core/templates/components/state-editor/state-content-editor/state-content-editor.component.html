@@ -40,7 +40,8 @@
 
 <div *ngIf="contentEditorIsOpen" class="protractor-test-state-content-editor">
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
-  <schema-based-editor [schema]="HTML_SCHEMA" ng-model="StateContentService.displayed._html" ng-model-change="$applyAsync()">
+  <schema-based-editor [schema]="HTML_SCHEMA"
+                       [(ngModel)]="stateContentService.displayed._html">
   </schema-based-editor>
   <div *ngIf="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning protractor-test-card-height-limit-warning mt-2">
     <i class="material-icons oppia-hide-card-height-warning-icon protractor-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
