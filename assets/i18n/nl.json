@@ -467,6 +467,7 @@
 	"I18N_MODAL_CANCEL_BUTTON": "Annuleren",
 	"I18N_MODAL_CONTINUE_BUTTON": "Doorgaan",
 	"I18N_NEXT_LESSON": "Volgende les",
+	"I18N_NO": "Nee",
 	"I18N_ONE_SUBSCRIBER_TEXT": "Je hebt één abonnee.",
 	"I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Partnerschappen",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_BREADCRUMB": "Account wordt verwijderd",
@@ -623,6 +624,7 @@
 	"I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Toets bekijken",
 	"I18N_SAVE_PROGRESS": "Log in of meld je aan om je voortgang op te slaan en door te gaan met de volgende les.",
 	"I18N_SHARE_LESSON": "Deze les delen",
+	"I18N_SHOW_LESS": "Toon Minder",
 	"I18N_SHOW_SOLUTION_BUTTON": "Oplossing weergeven",
 	"I18N_SIDEBAR_ABOUT_LINK": "Over ons",
 	"I18N_SIDEBAR_BLOG": "Blog",
@@ -739,6 +741,7 @@
 	"I18N_TEACH_TESTIMONIAL_2": "\"Oppia is de eerste in zijn soort! Het helpt leerlingen om alles te leren wat ze nodig hebben over een specifiek onderwerp op een aantrekkelijke en boeiende manier; het moedigt hen ook aan om slimme apparaten voor hun eigen bestwil te gebruiken.\"",
 	"I18N_TEACH_TESTIMONIAL_3": "\"k had nooit verwacht dat de leerlingen zo snel techniek zouden leren en wiskundelessen zouden volgen. Het is hun eerste kennismaking met slimme techniek en ze hadden in het begin echt moeite om ermee om te gaan. Nu voel ik me zo opgetogen om ze de Oppia-lessen te zien doen nog voordat ik het klaslokaal binnenkom!\"",
 	"I18N_THANKS_PAGE_BREADCRUMB": "Bedankjes",
+	"I18N_TIME_FOR_BREAK_TITLE": "Tijd voor een pauze?",
 	"I18N_TOPIC_0abdeaJhmfPm_TITLE": "Breuken",
 	"I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 les} other{# lessen}}",
 	"I18N_TOPIC_VIEWER_CHAPTER": "Hoofdstuk",
@@ -791,5 +794,6 @@
 	"I18N_VOLUNTEER_PAGE_BREADCRUMB": "Meehelpen",
 	"I18N_WARNING_MODAL_DESCRIPTION": "Hiermee krijg je de volledige oplossing te zien. Weet je het zeker?",
 	"I18N_WARNING_MODAL_TITLE": "Waarschuwing!",
-	"I18N_WORKED_EXAMPLE": "Uitgewerkt voorbeeld"
+	"I18N_WORKED_EXAMPLE": "Uitgewerkt voorbeeld",
+	"I18N_YES": "Ja"
 }

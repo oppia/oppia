@@ -96,7 +96,6 @@
 	"I18N_INTERACTIONS_MUSIC_CLEAR": "پاک‌سازی",
 	"I18N_INTERACTIONS_MUSIC_PLAY": "پخش",
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY": "لطفا یک ارز معتبر وارد کنید (مانند 5$ یا 5 Rs)",
-	"I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1": "پاسخ باید مساوی یا بزرگ‌تر از صفر باشد و می‌تواند 15 رقم (0-9) یا نماد (.) داشته‌باشد.",
 	"I18N_INTERACTIONS_PENCILCODE_NARROW_INSTRUCTION": "نمایش ویرایشگر کد",
 	"I18N_INTERACTIONS_RATIO_EMPTY_STRING": "لطفا یک نسبت معتبر وارد کنید (مانند 1:2 یا 1:2:3).",
 	"I18N_INTERACTIONS_RATIO_INCLUDES_ZERO": "نسبت‌ها نمی‌تواند 0 را به عنوان عنصر بپذیرد.",
