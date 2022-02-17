@@ -459,13 +459,13 @@ export class AdminBackendApiService {
     });
   }
 
-  async generateDummyOpportunitiesAsync(
-      numDummyOpsToGenerate: number,
-      numDummyInteractionsToGenerate: number): Promise<void> {
+  async generateSampleOpportunitiesAsync(
+      numSampleOpsToGenerate: number,
+      numSampleInteractionsToGenerate: number): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'generate_dummy_opportunities',
-      num_dummy_ops_to_generate: numDummyOpsToGenerate,
-      num_dummy_interactions: numDummyInteractionsToGenerate
+      action: 'generate_sample_opportunities',
+      num_sample_ops: numSampleOpsToGenerate,
+      num_sample_interactions: numSampleInteractionsToGenerate
     });
   }
 

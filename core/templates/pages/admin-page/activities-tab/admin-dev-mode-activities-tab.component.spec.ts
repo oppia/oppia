@@ -291,15 +291,15 @@ describe('Admin dev mode activities tab', () => {
     });
 
     it('should generate dummy opportunities', async(() => {
-      component.numDummyOpsToGenerate = 20;
-      component.numDummyInteractionsToGenerate = 10;
+      component.numSampleOpsToGenerate = 20;
+      component.numSampleInteractionsToGenerate = 10;
 
-      spyOn(adminBackendApiService, 'generateDummyOpportunitiesAsync')
+      spyOn(adminBackendApiService, 'generateSampleOpportunitiesAsync')
         .and.returnValue(Promise.resolve());
       spyOn(component.setStatusMessage, 'emit');
 
-      component.generateDummyOpportunities();
-      component.generateDummyOpportunities();
+      component.generateSampleOpportunities();
+      component.generateSampleOpportunities();
 
       expect(component.setStatusMessage.emit)
         .toHaveBeenCalledWith('Processing...');
@@ -312,15 +312,15 @@ describe('Admin dev mode activities tab', () => {
 
     it('should show error message when dummy opportunities' +
     'are not generated', async(() => {
-      component.numDummyOpsToGenerate = 2;
-      component.numDummyInteractionsToGenerate = 5;
+      component.numSampleOpsToGenerate = 2;
+      component.numSampleInteractionsToGenerate = 5;
 
-      spyOn(adminBackendApiService, 'generateDummyOpportunitiesAsync')
+      spyOn(adminBackendApiService, 'generateSampleOpportunitiesAsync')
         .and.returnValue(Promise.reject('Dummy opportunities not generated.'));
       spyOn(component.setStatusMessage, 'emit');
 
-      component.generateDummyOpportunities();
-      component.generateDummyOpportunities();
+      component.generateSampleOpportunities();
+      component.generateSampleOpportunities();
 
       expect(component.setStatusMessage.emit)
         .toHaveBeenCalledWith('Processing...');

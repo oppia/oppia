@@ -65,18 +65,18 @@
       <span class="row">
         <label for="label-target-opportunities-to-generate">Number of opportunities to generate</label>
         <input class="form-control form-inline oppia-form-inline"
-               [(ngModel)]="numDummyOpsToGenerate"
+               [(ngModel)]="numSampleOpsToGenerate"
                placeholder="Opportunities to generate" type="number" min="0"
                id="label-target-opportunities-to-generate">
         <label for="label-target-interactions-to-generate">Number of interactions to generate</label>
         <input class="form-control form-inline oppia-form-inline"
-               [(ngModel)]="numDummyInteractionsToGenerate"
+               [(ngModel)]="numSampleInteractionsToGenerate"
                placeholder="Interactions to generate" type="number" min="0"
                id="label-target-interactions-to-generate">
         <button type="button"
                 class="btn btn-primary oppia-generate-exploration-text"
-                (click)="generateDummyOpportunities()"
-                [disabled]="!numDummyOpsToGenerate || !numDummyInteractionsToGenerate">
+                (click)="generateSampleOpportunities()"
+                [disabled]="!numSampleOpsToGenerate || !numSampleInteractionsToGenerate">
           Generate Opportunities
         </button>
       </span>

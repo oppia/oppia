@@ -1121,20 +1121,19 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should generate dummy explorations', fakeAsync(() => {
-    let action = 'generate_dummy_opportunities';
-    let numDummyOpsToGenerate = 20;
-    let numDummyInteractionsToGenerate = 5;
-
-    let payload = {
+  it('should generate sample opportunities', fakeAsync(() => {
+    const action = 'generate_sample_opportunities';
+    const numSampleOpsToGenerate = 20;
+    const numSampleInteractionsToGenerate = 5;
+    const payload = {
       action: action,
-      num_dummy_ops_to_generate: numDummyOpsToGenerate,
-      num_dummy_interactions: numDummyInteractionsToGenerate
+      num_sample_ops: numSampleOpsToGenerate,
+      num_sample_interactions: numSampleInteractionsToGenerate
     };
 
-    abas.generateDummyOpportunitiesAsync(
-      numDummyOpsToGenerate,
-      numDummyInteractionsToGenerate).then(successHandler, failHandler);
+    abas.generateSampleOpportunitiesAsync(
+      numSampleOpsToGenerate,
+      numSampleInteractionsToGenerate).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');

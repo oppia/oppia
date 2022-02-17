@@ -35,8 +35,8 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   demoExplorationIds: string[] = [];
   numDummyExpsToPublish: number = 0;
   numDummyExpsToGenerate: number = 0;
-  numDummyOpsToGenerate: number = 0;
-  numDummyInteractionsToGenerate: number = 0;
+  numSampleOpsToGenerate: number = 0;
+  numSampleInteractionsToGenerate: number = 0;
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
 
@@ -143,15 +143,14 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
-  generateDummyOpportunities(): void {
-    // Generate dummy opportunities.
+  generateSampleOpportunities(): void {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
-    this.adminBackendApiService.generateDummyOpportunitiesAsync(
-      this.numDummyOpsToGenerate, this.numDummyInteractionsToGenerate
+    this.adminBackendApiService.generateSampleOpportunitiesAsync(
+      this.numSampleOpsToGenerate, this.numSampleInteractionsToGenerate
     ).then(() => {
       this.setStatusMessage.emit(
-        'Dummy opportunities generated successfully.');
+        'Sample opportunities generated successfully.');
     }, (errorResponse) => {
       this.setStatusMessage.emit(
         'Server error: ' + errorResponse);
