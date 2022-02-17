@@ -1314,7 +1314,7 @@ class UrlHandlerTests(test_utils.GenericTestBase):
     def test_login_url_is_none_for_signed_in_user(self):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
-        response = self.get_json('/url_handler')
+        response = self.get_json('/url_handler?current_url=login')
         self.assertIsNone(response['login_url'])
         self.logout()
 
@@ -1326,7 +1326,7 @@ class UrlHandlerTests(test_utils.GenericTestBase):
     def test_invalid_input_exception(self):
         response = self.get_json('/url_handler', expected_status_int=400)
         error = {
-            'error': 'Incomplete or empty GET parameters passed',
+            'error': 'Missing key in handler args: current_url.',
             'status_code': 400
         }
         self.assertEqual(response, error)

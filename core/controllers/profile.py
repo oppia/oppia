@@ -616,9 +616,8 @@ class UrlHandler(base.BaseHandler):
             'current_url': {
                 'schema': {
                     'type': 'basestring'
-                 },
-                 'default_value': None
-             }
+                }
+            }
         }
     }
 
