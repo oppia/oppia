@@ -486,6 +486,30 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
+    def get_in_review_translation_suggestions_by_exp_ids(
+        cls, exp_ids: List[str], language_code: str
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Gets all in-review translation suggestions matching the supplied
+        exp_ids and language_code.
+
+        Args:
+            exp_ids: list(str). Exploration IDs matching the target ID of the
+                translation suggestions.
+            language_code: str. The ISO 639-1 language code of the translation
+                suggestions.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions matching the supplied
+            exp_ids and language_code.
+        """
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.target_id.IN(exp_ids),
+            cls.language_code == language_code
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
     def get_in_review_question_suggestions(
         cls, user_id: str
     ) -> Sequence[GeneralSuggestionModel]:
