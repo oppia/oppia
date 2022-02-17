@@ -25,7 +25,6 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import domain_objects_validator
 from core.domain import classroom_services
 from core.domain import email_manager
 from core.domain import fs_services
@@ -311,10 +310,7 @@ class EditableTopicDataHandler(base.BaseHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            domain_objects_validator.
-                            validate_topic_and_sub_topic_change
-                        )
+                        'object_class': topic_domain.TopicChange
                     }
                 }
             }
@@ -418,13 +414,12 @@ class EditableTopicDataHandler(base.BaseHandler):
             'topic_and_subtopic_page_change_dicts')
         topic_and_subtopic_page_change_list = []
         for change in topic_and_subtopic_page_change_dicts:
-            if change['cmd'] == (
+            if change.cmd == (
                     subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 topic_and_subtopic_page_change_list.append(
-                    subtopic_page_domain.SubtopicPageChange(change))
+                    subtopic_page_domain.SubtopicPageChange(change.to_dict()))
             else:
-                topic_and_subtopic_page_change_list.append(
-                    topic_domain.TopicChange(change))
+                topic_and_subtopic_page_change_list.append(change)
         try:
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, topic_and_subtopic_page_change_list,
