@@ -19,7 +19,6 @@ Also contains a list of handler class names which does not contain the schema.
 """
 
 from __future__ import annotations
-import copy
 
 from core import schema_utils
 
@@ -106,9 +105,8 @@ def validate_arguments_against_schema(
                 convert_string_to_bool(handler_args[arg_key]))
 
         try:
-            original_args_schema = copy.deepcopy(arg_schema['schema'])
             normalized_value = schema_utils.normalize_against_schema(
-                handler_args[arg_key], original_args_schema)
+                handler_args[arg_key], arg_schema['schema'])
             # Modification of argument name if new_key_for_argument
             # field is present in the schema.
             if 'new_key_for_argument' in arg_schema['schema']:
