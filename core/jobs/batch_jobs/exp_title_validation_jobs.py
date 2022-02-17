@@ -31,7 +31,7 @@ import apache_beam as beam
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 
-# TODO(#14943): Remove this job after the fix.
+# TODO(#14943): Remove this job after we fix the exploration titles length.
 class GetNumberOfExpExceedsMaxTitleLengthJob(base_jobs.JobBase):
     """Job that returns exploration having title length more than 36."""
 
