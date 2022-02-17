@@ -76,9 +76,9 @@ class SubtopicPageChange(change_domain.BaseChange):
 class SubtopicPageContentsDict(TypedDict):
     """Dictionary representing the SubtopicPageContents object."""
 
-    subtitled_html: state_domain.SubtitledHtml.to_dict() # type: ignore[valid-type]
-    recorded_voiceovers: state_domain.RecordedVoiceovers.to_dict() # type: ignore[valid-type]
-    written_translations: state_domain.WrittenTranslations.to_dict() # type: ignore[valid-type]
+    subtitled_html: state_domain.SubtitledHtml().to_dict() # type: ignore[valid-type]
+    recorded_voiceovers: state_domain.RecordedVoiceovers().to_dict() # type: ignore[valid-type]
+    written_translations: state_domain.WrittenTranslations().to_dict() # type: ignore[valid-type]
 
 
 class SubtopicPageContents:
