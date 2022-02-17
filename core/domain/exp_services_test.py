@@ -1094,10 +1094,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'voiceovers_mapping': {
                 'content': {
                         'en': {
-                        'filename': 'filename3.mp3',
-                        'file_size_bytes': 3000,
-                        'needs_update': False,
-                        'duration_secs': 42.43
+                            'filename': 'filename3.mp3',
+                            'file_size_bytes': 3000,
+                            'needs_update': False,
+                            'duration_secs': 42.43
                     }
                 },
                 'default_outcome': {},
@@ -1150,9 +1150,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.voice_artist_id, self.EXP_0_ID,
             [
                 exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'Another new title'
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Another new title'
                 })
             ],
             'changed title again'
@@ -1175,11 +1175,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'voiceovers_mapping': {
                 'content': {
                     'en': {
-                    'filename': 'filename3.mp3',
-                    'file_size_bytes': 3000,
-                    'needs_update': False,
-                    'duration_secs': 42.43
-                }
+                        'filename': 'filename3.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    }
                 },
                 'default_outcome': {},
                 'ca_placeholder_0': {}
@@ -1308,24 +1308,24 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         )
         change_list = [
             exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': exploration.init_state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'EndExploration'
-            }),
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'EndExploration'
+                }),
             exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': exploration.init_state_name,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                    'new_value': {
-                        'recommendedExplorationIds': {
-                            'value': [
-                                'EXP_1',
-                                'EXP_2'
-                            ]
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                        'new_value': {
+                            'recommendedExplorationIds': {
+                                'value': [
+                                    'EXP_1',
+                                    'EXP_2'
+                                ]
+                            }
                         }
-                     }
                     }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -5849,7 +5849,7 @@ title: Old Title
         change_list_exp = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'title',
-                'new_value': 'new title'
+            'new_value': 'new title'
             })]
         opportunity_services.add_new_exploration_opportunities(
             story_id, [exp_id])
