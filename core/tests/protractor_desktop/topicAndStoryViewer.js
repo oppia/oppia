@@ -92,8 +92,6 @@ describe('Topic and Story viewer functionality', function() {
     await topicEditorPage.submitTopicThumbnail(Constants.TEST_SVG_PATH, true);
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.updatePageTitleFragment('topic page title');
-    // HEREEEEEEEEEEEEEEEEEEEEEEEEee
-    await topicEditorPage.togglePracticeTab();
     await topicEditorPage.saveTopic('Added thumbnail.');
     var url = await browser.getCurrentUrl();
     var topicId = url.split('/')[4].slice(0, -1);
@@ -108,7 +106,6 @@ describe('Topic and Story viewer functionality', function() {
         await elem.setValue(topicId);
       });
 
-    var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill TASV1', 'Concept card explanation', false);
@@ -150,6 +147,7 @@ describe('Topic and Story viewer functionality', function() {
       'Skill TASV1', 'Topic TASV1');
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicEditorPage.togglePracticeTab();
     await topicEditorPage.addSubtopic(
       'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
       'Subtopic content');
