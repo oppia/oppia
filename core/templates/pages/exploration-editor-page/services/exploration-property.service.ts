@@ -19,7 +19,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Output } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -38,7 +38,7 @@ export class ExplorationPropertyService {
   // SUBCLASSES.
   propertyName: string = null;
 
-  @Output() _explorationPropertyChangedEventEmitter = new EventEmitter();
+  _explorationPropertyChangedEventEmitter = new EventEmitter();
   constructor(
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
@@ -90,7 +90,7 @@ export class ExplorationPropertyService {
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
-  _isValid(value: string | boolean): boolean {
+  _isValid(value: string | boolean): string | boolean {
     return true;
   }
 

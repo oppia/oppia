@@ -52,10 +52,8 @@ export class StateInteractionEditorComponent
   implements OnInit, OnDestroy {
   @Output() markAllAudioAsNeedingUpdateModalIfRequired =
     new EventEmitter<string[]>();
-
   @Output() onSaveInteractionCustomizationArgs =
     new EventEmitter<InteractionCustomizationArgs>();
-
   @Output() onSaveInteractionId = new EventEmitter<string>();
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
   @Output() onSaveSolution = new EventEmitter<Solution>();

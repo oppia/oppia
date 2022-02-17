@@ -30,9 +30,8 @@
       <div [hidden]="data.correctAnswer === null">
         <strong>Explanation:</strong>
         <schema-based-editor class="protractor-test-explanation-textarea"
-                             [schema]="getSchema.bind(this)"
-                             [localValue]="data.explanationHtml"
-                             (localValueChange)="this.updateLocalHtml($event)">
+                             [schema]="EXPLANATION_FORM_SCHEMA"
+                             [(localValue)]="data.explanationHtml">
         </schema-based-editor>
       </div>
     </div>

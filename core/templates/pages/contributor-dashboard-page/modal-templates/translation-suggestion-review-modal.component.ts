@@ -391,23 +391,4 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.startedEditing = true;
     this.translationHtml = this.preEditTranslationHtml;
   }
-
-  getHtmlSchema(): HTMLSchema {
-    return this.HTML_SCHEMA;
-  }
-
-  getUnicodeSchema(): UnicodeSchema {
-    return this.UNICODE_SCHEMA;
-  }
-
-  getSetOfStringsSchema(): ListSchema {
-    return this.SET_OF_STRINGS_SCHEMA;
-  }
-
-  updateHtml(value: string): void {
-    if (value !== this.editedContent.html) {
-      this.editedContent.html = value;
-      this.changeDetectorRef.detectChanges();
-    }
-  }
 }

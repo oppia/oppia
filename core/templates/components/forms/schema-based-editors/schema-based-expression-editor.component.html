@@ -1,0 +1,7 @@
+<input type="text"
+       [ngModel]="localValue"
+       (ngModelChange)="localValueChange($event)"
+       class="form-control oppia-autofocus"
+       [disabled]="disabled"
+       required require-is-valid-expression
+       [oppiaFocusOn]="labelForFocusTarget">
