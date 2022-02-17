@@ -15,7 +15,6 @@ core.domain.story_domain_test
 core.domain.suggestion_services_test
 core.domain.stats_services_test
 core.domain.value_generators_domain_test
-core.domain.summary_services_test
 core.domain.interaction_registry_test
 core.domain.skill_domain_test
 core.domain.auth_services_test
@@ -24,7 +23,6 @@ core.domain.feedback_domain_test
 core.domain.playthrough_issue_registry_test
 core.domain.exp_services_test
 core.domain.blog_domain_test
-core.domain.blog_services_test
 core.utils_test
 scripts.install_backend_python_libs_test
 core.domain.subtopic_page_domain_test
@@ -40,14 +38,12 @@ core.storage.job.gae_models_test
 core.storage.base_model.gae_models_test
 core.schema_utils_test
 core.domain.story_services_test
-core.domain.exp_fetchers_test
 core.domain.topic_fetchers_test
 core.domain.classifier_domain_test
 core.domain.state_domain_test
 core.domain.learner_progress_services_test
 core.domain.question_fetchers_test
 core.domain.exp_domain_test
-core.domain.topic_services_test
 scripts.linters.pylint_extensions_test
 core.storage.suggestion.gae_models_test
 core.storage.app_feedback_report.gae_models_test

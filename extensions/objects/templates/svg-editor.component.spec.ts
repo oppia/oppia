@@ -184,6 +184,7 @@ describe('SvgEditor', () => {
         return 'Fake onload executed';
       };
     }
+
     readAsDataURL(file) {
       this.onload();
       return 'The file is loaded';
@@ -198,6 +199,7 @@ describe('SvgEditor', () => {
         return 'Fake onload executed';
       };
     }
+
     set src(url) {
       this.onload();
     }
@@ -855,6 +857,7 @@ describe(
           return 'Fake onload executed';
         };
       }
+
       readAsDataURL(file) {
         this.onload();
         return 'The file is loaded';
@@ -869,6 +872,7 @@ describe(
           return 'Fake onload executed';
         };
       }
+
       set src(url) {
         this.onload();
       }

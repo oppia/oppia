@@ -537,6 +537,20 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'site_language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': list(map(
+                        lambda x: x['id'], constants.SUPPORTED_SITE_LANGUAGES
+                    ))
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
@@ -548,8 +562,12 @@ class SiteLanguageHandler(base.BaseHandler):
 
 class UserInfoHandler(base.BaseHandler):
     """Provides info about user. If user is not logged in,
-    return dict containing false as logged in status.
-    """
+    return dict containing false as logged in status."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
