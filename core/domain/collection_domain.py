@@ -23,10 +23,10 @@ should therefore be independent of the specific storage models used.
 
 from __future__ import annotations
 
+import datetime
 import json
 import re
 import string
-import datetime
 
 from core import feconf
 from core import utils
@@ -168,7 +168,8 @@ class CollectionChange(change_domain.BaseChange):
         'user_id_attribute_names': []
     }]
 
-class CollectionNodeDict(TypedDict, total = False):
+
+class CollectionNodeDict(TypedDict, total=False):
     """Type for the collection node object"""
 
     acquired_skills: List[str]
@@ -245,7 +246,8 @@ class CollectionNode:
         """
         return cls(exploration_id)
 
-class CollectionDict(TypedDict, total = False):
+
+class CollectionDict(TypedDict, total=False):
     """Type for the collection object"""
 
     id: str
@@ -260,7 +262,8 @@ class CollectionDict(TypedDict, total = False):
     created_on: Union[datetime.datetime, str, None]
     last_updated: Union[datetime.datetime, str, None]
 
-class CollectionVersionDict(CollectionDict, total = False):
+
+class CollectionVersionDict(CollectionDict, total=False):
     """Type for the collection Dict based on different versions"""
 
     skills: Dict[str, Dict[str, Any]]
@@ -270,7 +273,7 @@ class CollectionVersionDict(CollectionDict, total = False):
 
 class VersionedCollectionDict(TypedDict):
     """Type for the versioned collection dict"""
-        
+
     schema_version: int
     collection_contents: CollectionVersionDict
 
@@ -578,7 +581,9 @@ class Collection:
         return collection_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(cls, yaml_content: str) -> CollectionDict:
+    def _migrate_to_latest_yaml_version(
+        cls, yaml_content: str
+    ) -> CollectionDict:
         """Return the YAML content of the collection in the latest schema
         format.
 
@@ -586,8 +591,9 @@ class Collection:
             yaml_content: str. The YAML representation of the collection.
 
         Returns:
-            Dict. The dictionary representation of the collection in which the latest 
-            YAML representation of the collection and latest schema format is used.
+            Dict. The dictionary representation of the collection in which
+            the latest YAML representation of the collection and latest
+            schema format is used.
 
         Raises:
             InvalidInputException. The 'yaml_content' or the schema version
@@ -827,7 +833,9 @@ class Collection:
         else:
             return None
 
-    def get_next_exploration_id(self, completed_exp_ids: List[str]) -> Optional[str]:
+    def get_next_exploration_id(
+        self, completed_exp_ids: List[str]
+    ) -> Optional[str]:
         """Returns the first exploration id in the collection that has not yet
            been completed by the learner, or if the collection is completed,
            returns None.
@@ -1130,6 +1138,7 @@ class Collection:
                     'Expected to have at least 1 exploration in the '
                     'collection.')
 
+
 class CollectionSummaryDict(TypedDict):
     """Type for the collection summary object"""
 
@@ -1157,8 +1166,8 @@ class CollectionSummary:
     def __init__(
         self,
         collection_id: str,
-        title: str, 
-        category: str, 
+        title: str,
+        category: str,
         objective: str,
         language_code: str,
         tags: List[str],

@@ -24,7 +24,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import collection_domain
-from core.domain.collection_domain import VersionedCollectionDict
 from core.domain import collection_services
 from core.tests import test_utils
 
@@ -59,7 +58,9 @@ class CollectionChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Command invalid is not allowed'):
             collection_domain.CollectionChange({'cmd': 'invalid'})
 
-    def test_collection_change_object_with_missing_attribute_in_cmd(self) -> None:
+    def test_collection_change_object_with_missing_attribute_in_cmd(
+        self
+    ) -> None:
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following required attributes are missing: '
@@ -83,7 +84,9 @@ class CollectionChangeTests(test_utils.GenericTestBase):
                 'invalid': 'invalid'
             })
 
-    def test_collection_change_object_with_invalid_collection_property(self) -> None:
+    def test_collection_change_object_with_invalid_collection_property(
+        self
+    ) -> None:
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'Value for property_name in cmd edit_collection_property: '
@@ -135,7 +138,9 @@ class CollectionChangeTests(test_utils.GenericTestBase):
         self.assertEqual(col_change_object.first_index, 'first_index')
         self.assertEqual(col_change_object.second_index, 'second_index')
 
-    def test_collection_change_object_with_edit_collection_property(self) -> None:
+    def test_collection_change_object_with_edit_collection_property(
+        self
+    ) -> None:
         col_change_object = collection_domain.CollectionChange({
             'cmd': 'edit_collection_property',
             'property_name': 'category',
@@ -148,7 +153,9 @@ class CollectionChangeTests(test_utils.GenericTestBase):
         self.assertEqual(col_change_object.new_value, 'new_value')
         self.assertEqual(col_change_object.old_value, 'old_value')
 
-    def test_collection_change_object_with_edit_collection_node_property(self) -> None:
+    def test_collection_change_object_with_edit_collection_node_property(
+        self
+    ) -> None:
         col_change_object = collection_domain.CollectionChange({
             'cmd': 'edit_collection_node_property',
             'exploration_id': 'exploration_id',
@@ -186,7 +193,9 @@ class CollectionChangeTests(test_utils.GenericTestBase):
         self.assertEqual(col_change_object.cmd, 'add_collection_skill')
         self.assertEqual(col_change_object.name, 'name')
 
-    def test_collection_change_object_with_delete_collection_skill(self) -> None:
+    def test_collection_change_object_with_delete_collection_skill(
+        self
+    ) -> None:
         col_change_object = collection_domain.CollectionChange({
             'cmd': 'delete_collection_skill',
             'skill_id': 'skill_id'
@@ -195,7 +204,9 @@ class CollectionChangeTests(test_utils.GenericTestBase):
         self.assertEqual(col_change_object.cmd, 'delete_collection_skill')
         self.assertEqual(col_change_object.skill_id, 'skill_id')
 
-    def test_collection_change_object_with_add_question_id_to_skill(self) -> None:
+    def test_collection_change_object_with_add_question_id_to_skill(
+        self
+    ) -> None:
         col_change_object = collection_domain.CollectionChange({
             'cmd': 'add_question_id_to_skill',
             'skill_id': 'skill_id',
@@ -206,7 +217,9 @@ class CollectionChangeTests(test_utils.GenericTestBase):
         self.assertEqual(col_change_object.skill_id, 'skill_id')
         self.assertEqual(col_change_object.question_id, 'question_id')
 
-    def test_collection_change_object_with_remove_question_id_from_skill(self) -> None:
+    def test_collection_change_object_with_remove_question_id_from_skill(
+        self
+    ) -> None:
         col_change_object = collection_domain.CollectionChange({
             'cmd': 'remove_question_id_from_skill',
             'skill_id': 'skill_id',
@@ -242,7 +255,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection = collection_services.get_collection_by_id( # type: ignore[no-untyped-call]
             self.COLLECTION_ID)
 
-    def _assertValidationError(self, expected_error_substring: str) -> None:
+    def _assert_validation_error(self, expected_error_substring: str) -> None: # type: ignore[override]
         """Checks that the collection passes strict validation."""
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -254,67 +267,67 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
     def test_title_validation(self) -> None:
         self.collection.title = 0
-        self._assertValidationError('Expected title to be a string')
+        self._assert_validation_error('Expected title to be a string')
 
     def test_category_validation(self) -> None:
         self.collection.category = 0
-        self._assertValidationError('Expected category to be a string')
+        self._assert_validation_error('Expected category to be a string')
 
     def test_objective_validation(self) -> None:
         self.collection.objective = ''
-        self._assertValidationError('objective must be specified')
+        self._assert_validation_error('objective must be specified')
 
         self.collection.objective = 0
-        self._assertValidationError('Expected objective to be a string')
+        self._assert_validation_error('Expected objective to be a string')
 
     def test_language_code_validation(self) -> None:
         self.collection.language_code = ''
-        self._assertValidationError('language must be specified')
+        self._assert_validation_error('language must be specified')
 
         self.collection.language_code = 0
-        self._assertValidationError('Expected language code to be a string')
+        self._assert_validation_error('Expected language code to be a string')
 
         self.collection.language_code = 'xz'
-        self._assertValidationError('Invalid language code')
+        self._assert_validation_error('Invalid language code')
 
     def test_tags_validation(self) -> None:
         self.collection.tags = 'abc'
-        self._assertValidationError('Expected tags to be a list')
+        self._assert_validation_error('Expected tags to be a list')
 
         self.collection.tags = [2, 3]
-        self._assertValidationError('Expected each tag to be a string')
+        self._assert_validation_error('Expected each tag to be a string')
 
         self.collection.tags = ['', 'tag']
-        self._assertValidationError('Tags should be non-empty')
+        self._assert_validation_error('Tags should be non-empty')
 
         self.collection.tags = ['234']
-        self._assertValidationError(
+        self._assert_validation_error(
             'Tags should only contain lowercase letters and spaces')
 
         self.collection.tags = ['   abc']
-        self._assertValidationError(
+        self._assert_validation_error(
             'Tags should not start or end with whitespace')
 
         self.collection.tags = ['abc  def']
-        self._assertValidationError(
+        self._assert_validation_error(
             'Adjacent whitespace in tags should be collapsed')
 
         self.collection.tags = ['abc', 'abc']
-        self._assertValidationError(
+        self._assert_validation_error(
             'Expected tags to be unique, but found duplicates')
 
     def test_schema_version_validation(self) -> None:
         self.collection.schema_version = 'some_schema_version'
-        self._assertValidationError('Expected schema version to be an int')
+        self._assert_validation_error('Expected schema version to be an int')
 
         self.collection.schema_version = 100
-        self._assertValidationError(
+        self._assert_validation_error(
             'Expected schema version to be %s' %
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
     def test_nodes_validation(self) -> None:
         self.collection.nodes = {}
-        self._assertValidationError('Expected nodes to be a list')
+        self._assert_validation_error('Expected nodes to be a list')
 
         self.collection.nodes = [
             collection_domain.CollectionNode.from_dict({
@@ -325,7 +338,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        self._assertValidationError(
+        self._assert_validation_error(
             'There are explorations referenced in the collection more than '
             'once.')
 
@@ -335,7 +348,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.validate(strict=False)
 
         # But it's not okay for strict validation.
-        self._assertValidationError(
+        self._assert_validation_error(
             'Expected to have at least 1 exploration in the collection.')
 
     def test_metadata_validation(self) -> None:
@@ -347,28 +360,28 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         # Having no title is fine for non-strict validation.
         self.collection.validate(strict=False)
         # But it's not okay for strict validation.
-        self._assertValidationError(
+        self._assert_validation_error(
             'A title must be specified for the collection.')
         self.collection.title = 'A title'
 
         # Having no objective is fine for non-strict validation.
         self.collection.validate(strict=False)
         # But it's not okay for strict validation.
-        self._assertValidationError(
+        self._assert_validation_error(
             'An objective must be specified for the collection.')
         self.collection.objective = 'An objective'
 
         # Having no category is fine for non-strict validation.
         self.collection.validate(strict=False)
         # But it's not okay for strict validation.
-        self._assertValidationError(
+        self._assert_validation_error(
             'A category must be specified for the collection.')
         self.collection.category = 'A category'
 
         # Having no exploration is fine for non-strict validation.
         self.collection.validate(strict=False)
         # But it's not okay for strict validation.
-        self._assertValidationError(
+        self._assert_validation_error(
             'Expected to have at least 1 exploration in the collection.')
         self.collection.add_node('exp_id_1')
 
@@ -380,7 +393,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         # Validate CollectionNode's exploration_id.
         collection_node0 = self.collection.get_node('exp_id_0')
         collection_node0.exploration_id = 2
-        self._assertValidationError('Expected exploration ID to be a string')
+        self._assert_validation_error('Expected exploration ID to be a string')
 
     def test_is_demo_property(self) -> None:
         """Test the is_demo property."""
@@ -476,7 +489,8 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection.nodes), 0)
 
     def test_update_collection_contents_from_model(self) -> None:
-        versioned_collection_contents: VersionedCollectionDict = {
+        versioned_collection_contents: (
+            collection_domain.VersionedCollectionDict) = {
             'schema_version': 1,
             'collection_contents': {}
         }
@@ -495,8 +509,11 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             versioned_collection_contents['collection_contents'], {})
 
-    def test_update_collection_contents_from_model_with_schema_version_5(self) -> None:
-        versioned_collection_contents: VersionedCollectionDict = {
+    def test_update_collection_contents_from_model_with_schema_version_5(
+        self
+    ) -> None:
+        versioned_collection_contents: (
+            collection_domain.VersionedCollectionDict) = {
             'schema_version': 5,
             'collection_contents': {
                 'nodes': [
@@ -526,7 +543,8 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_collection_contents_from_model_with_invalid_schema_version(
             self) -> None:
-        versioned_collection_contents: VersionedCollectionDict = {
+        versioned_collection_contents: (
+            collection_domain.VersionedCollectionDict) = {
             'schema_version': feconf.CURRENT_COLLECTION_SCHEMA_VERSION,
             'collection_contents': {}
         }
@@ -539,7 +557,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
                 versioned_collection_contents,
                 feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-    def test_serialize_and_deserialize_returns_unchanged_collection(self) -> None:
+    def test_serialize_and_deserialize_returns_unchanged_collection(
+        self
+    ) -> None:
         """Checks that serializing and then deserializing a default collection
         works as intended by leaving the collection unchanged.
         """
@@ -712,7 +732,9 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         ):
             collection_domain.Collection.from_yaml('collection3', '')
 
-    def test_from_yaml_with_no_schema_version_specified_raises_error(self) -> None:
+    def test_from_yaml_with_no_schema_version_specified_raises_error(
+        self
+    ) -> None:
         collection = collection_domain.Collection(
             self.COLLECTION_ID, 'title', 'category', 'objective', 'en', [],
             None, [], 0) # type: ignore[arg-type]
@@ -744,7 +766,9 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
     Collection domain object class.
     """
 
-    def test_correct_collection_contents_schema_conversion_methods_exist(self) -> None:
+    def test_correct_collection_contents_schema_conversion_methods_exist(
+        self
+    ) -> None:
         """Test that the right collection_contents schema conversion methods
         exist.
         """
@@ -1104,7 +1128,9 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             self.collection_summary.does_user_have_any_role('other_id')
         )
 
-    def test_add_new_contribution_for_user_adds_user_to_contributors(self) -> None:
+    def test_add_new_contribution_for_user_adds_user_to_contributors(
+        self
+    ) -> None:
         self.collection_summary.add_contribution_by_user('user_id')
         self.assertIn('user_id', self.collection_summary.contributors_summary)
         self.assertEqual(
@@ -1119,7 +1145,9 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.collection_summary.contributors_summary['user_id'], 2)
 
-    def test_add_new_contribution_for_user_does_not_add_system_user(self) -> None:
+    def test_add_new_contribution_for_user_does_not_add_system_user(
+        self
+    ) -> None:
         self.collection_summary.add_contribution_by_user(
             feconf.SYSTEM_COMMITTER_ID)
         self.assertNotIn(
