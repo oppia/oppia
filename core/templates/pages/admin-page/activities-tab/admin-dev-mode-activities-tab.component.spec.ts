@@ -290,7 +290,7 @@ describe('Admin dev mode activities tab', () => {
       expect(adminBackendSpy).not.toHaveBeenCalled();
     });
 
-    it('should generate dummy opportunities', async(() => {
+    it('should generate sample opportunities', async(() => {
       component.numSampleOpsToGenerate = 20;
       component.numSampleInteractionsToGenerate = 10;
 
@@ -306,17 +306,17 @@ describe('Admin dev mode activities tab', () => {
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
-          'Dummy opportunities generated successfully.');
+          'Sample opportunities generated successfully.');
       });
     }));
 
-    it('should show error message when dummy opportunities' +
+    it('should show error message when sample opportunities' +
     'are not generated', async(() => {
       component.numSampleOpsToGenerate = 2;
       component.numSampleInteractionsToGenerate = 5;
 
       spyOn(adminBackendApiService, 'generateSampleOpportunitiesAsync')
-        .and.returnValue(Promise.reject('Dummy opportunities not generated.'));
+        .and.returnValue(Promise.reject('Sample opportunities not generated.'));
       spyOn(component.setStatusMessage, 'emit');
 
       component.generateSampleOpportunities();
@@ -327,7 +327,7 @@ describe('Admin dev mode activities tab', () => {
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
-          'Server error: Dummy opportunities not generated.');
+          'Server error: Sample opportunities not generated.');
       });
     }));
 
