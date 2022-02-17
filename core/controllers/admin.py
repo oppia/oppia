@@ -831,35 +831,35 @@ class AdminHandler(base.BaseHandler):
                             'Elvish, language',
                             'The Science of Superheroes']
         exploration_ids_to_publish = []
-        for opportunity in range(num_sample_ops):
+        for opportunity_num in range(num_sample_ops):
             title = random.choice(possible_titles) + ' ' + str(
-                opportunity + starting_chapter)
+                opportunity_num + starting_chapter)
             category = 'Algorithms'
             new_exploration_id = exp_fetchers.get_new_exploration_id()
             exp = exp_domain.Exploration.create_default_exploration(
                 new_exploration_id, title=title, category=category,
                 objective='Dummy Objective')
 
-            for interaction in range(num_sample_interactions):
-                if interaction == num_sample_interactions - 1:
+            for interaction_num in range(num_sample_interactions):
+                if interaction_num == num_sample_interactions - 1:
                     dest = 'End'
                 else:
-                    dest = 'Interaction' + str(interaction + 1)
-                if interaction == 0:
+                    dest = 'Interaction' + str(interaction_num + 1)
+                if interaction_num == 0:
                     self._create_sample_interactions(
                         exp.states['Introduction'], dest)
                 else:
-                    if interaction == num_sample_interactions - 1:
+                    if interaction_num == num_sample_interactions - 1:
                         dest = 'End'
                     cur_state = state_domain.State.create_default_state(
-                        'Interaction' + str(interaction))
+                        'Interaction' + str(interaction_num))
                     exp.states[
-                        'Interaction' + str(interaction)] = cur_state
+                        'Interaction' + str(interaction_num)] = cur_state
                     self._create_sample_interactions(cur_state, dest)
 
             exp.states['End'] = end_state
             exp_services.save_new_exploration(self.user_id, exp)
-            if opportunity <= num_sample_ops - 1:
+            if opportunity_num <= num_sample_ops - 1:
                 exploration_ids_to_publish.append(new_exploration_id)
                 rights_manager.publish_exploration(
                     self.user, new_exploration_id)
