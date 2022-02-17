@@ -92,6 +92,7 @@ describe('Topic and Story viewer functionality', function() {
     await topicEditorPage.submitTopicThumbnail(Constants.TEST_SVG_PATH, true);
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.updatePageTitleFragment('topic page title');
+    // HEREEEEEEEEEEEEEEEEEEEEEEEEee
     await topicEditorPage.togglePracticeTab();
     await topicEditorPage.saveTopic('Added thumbnail.');
     var url = await browser.getCurrentUrl();
@@ -107,6 +108,7 @@ describe('Topic and Story viewer functionality', function() {
         await elem.setValue(topicId);
       });
 
+    var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill TASV1', 'Concept card explanation', false);
@@ -115,6 +117,33 @@ describe('Topic and Story viewer functionality', function() {
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
     var url = await browser.getCurrentUrl();
     skillId = url.split('/')[4];
+    await skillEditorPage.get(skillId);
+
+    for (let i = 0; i < 10; i++) {
+      await skillEditorPage.moveToQuestionsTab();
+      await skillEditorPage.clickCreateQuestionButton();
+      await explorationEditorMainTab.setContent(
+        await forms.toRichText('Question 1'));
+      await explorationEditorMainTab.setInteraction(
+        'TextInput', 'Placeholder', 5);
+      await explorationEditorMainTab.addResponse(
+        'TextInput', await forms.toRichText('Correct Answer'), null, false,
+        'FuzzyEquals', ['correct']);
+      var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+      await responseEditor.markAsCorrect();
+      await (
+        await explorationEditorMainTab.getResponseEditor('default')
+      ).setFeedback(await forms.toRichText('Try again'));
+      await explorationEditorMainTab.addHint('Hint 1');
+      await explorationEditorMainTab.addSolution('TextInput', {
+        correctAnswer: 'correct',
+        explanation: 'It is correct'
+      });
+      await skillEditorPage.saveQuestion();
+      await skillEditorPage.get(skillId);
+    }
+
+    await general.closeCurrentTabAndSwitchTo(handle);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
