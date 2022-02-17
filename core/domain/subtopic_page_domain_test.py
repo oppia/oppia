@@ -330,7 +330,7 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         }
         subtopic_page_contents = (
             subtopic_page_domain.SubtopicPageContents.from_dict(
-                subtopic_page_contents_dict))
+                subtopic_page_contents_dict)) # type: ignore[arg-type]
         self.assertEqual(
             subtopic_page_contents.to_dict(), subtopic_page_contents_dict)
 

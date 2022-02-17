@@ -76,9 +76,9 @@ class SubtopicPageChange(change_domain.BaseChange):
 class SubtopicPageContentsDict(TypedDict):
     """Dictionary representing the SubtopicPageContents object."""
 
-    subtitled_html: state_domain.SubtitledHtml.to_dict()
-    recorded_voiceovers: state_domain.RecordedVoiceovers.to_dict()
-    written_translations: state_domain.WrittenTranslations.to_dict()
+    subtitled_html: state_domain.SubtitledHtml.to_dict() # type: ignore[valid-type]
+    recorded_voiceovers: state_domain.RecordedVoiceovers.to_dict() # type: ignore[valid-type]
+    written_translations: state_domain.WrittenTranslations.to_dict() # type: ignore[valid-type]
 
 
 class SubtopicPageContents:
@@ -129,7 +129,6 @@ class SubtopicPageContents:
             state_domain.WrittenTranslations.from_dict( # type: ignore[no-untyped-call]
                 {'translations_mapping': {content_id: {}}}))
 
-    @classmethod
     def to_dict(self) -> SubtopicPageContentsDict:
         """Returns a dict representing this SubtopicPageContents domain object.
 
@@ -219,7 +218,6 @@ class SubtopicPage:
         self.language_code = language_code
         self.version = version
 
-    @classmethod
     def to_dict(self) -> SubtopicPageDict:
         """Returns a dict representing this SubtopicPage domain object.
 
