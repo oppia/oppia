@@ -645,7 +645,11 @@ class Collection:
         return collection_dict
 
     @classmethod
-    def from_yaml(cls, collection_id: str, yaml_content: str) -> Collection:
+    def from_yaml(
+        cls,
+        collection_id: str,
+        yaml_content: str
+    ) -> Collection:
         """Converts a YAML string to a Collection domain object.
 
         Args:
@@ -1002,7 +1006,11 @@ class Collection:
                 exploration_id)
         self.nodes.append(CollectionNode.create_default_node(exploration_id))
 
-    def swap_nodes(self, first_index: int, second_index: int) -> None:
+    def swap_nodes(
+        self,
+        first_index: int,
+        second_index: int
+    ) -> None:
         """Swaps the values of 2 nodes in the collection.
 
         Args:

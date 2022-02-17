@@ -255,7 +255,12 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection = collection_services.get_collection_by_id( # type: ignore[no-untyped-call]
             self.COLLECTION_ID)
 
-    def _assert_validation_error(self, expected_error_substring: str) -> None: # type: ignore[override]
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with TestBase._assert_validation_error().
+    def _assert_validation_error( # type: ignore[override]
+        self,
+        expected_error_substring: str
+    ) -> None:
         """Checks that the collection passes strict validation."""
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -542,7 +547,8 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_update_collection_contents_from_model_with_invalid_schema_version(
-            self) -> None:
+        self
+    ) -> None:
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict) = {
             'schema_version': feconf.CURRENT_COLLECTION_SCHEMA_VERSION,
@@ -1138,7 +1144,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         self.assertIn('user_id', self.collection_summary.contributor_ids)
 
     def test_add_new_contribution_for_user_increases_score_in_contributors(
-            self) -> None:
+        self
+    ) -> None:
         self.collection_summary.add_contribution_by_user('user_id')
         self.collection_summary.add_contribution_by_user('user_id')
         self.assertIn('user_id', self.collection_summary.contributors_summary)
