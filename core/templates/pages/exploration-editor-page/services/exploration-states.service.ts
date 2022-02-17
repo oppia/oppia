@@ -166,8 +166,12 @@ export class ExplorationStatesService {
         contentIds.add(answerGroup.outcome.feedback.contentId);
         answerGroup.rules.forEach((rule) => {
           Object.keys(rule.inputs).forEach(inputName => {
-            if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
-              contentIds.add(rule.inputs[inputName].contentId);
+            const ruleInput = rule.inputs[inputName];
+            // All rules input types which are translatable are subclasses of
+            // BaseTranslatableObject having dict structure with contentId
+            // as a key.
+            if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+              contentIds.add(ruleInput.contentId);
             }
           });
         });

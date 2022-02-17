@@ -641,6 +641,9 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(suggestion_thread_dicts['subject'], 'a subject')
         self.assertEqual(
             suggestion_thread_dicts['thread_id'], topic_thread.id)
+        self.assertEqual(
+            suggestion_thread_dicts['original_author_username'],
+            self.OWNER_USERNAME)
 
         self.logout()
 
@@ -714,6 +717,7 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(results), 2)
 
+        self.assertEqual(results[0]['author_username'], self.MODERATOR_USERNAME)
         self.assertEqual(results[0]['text'], 'new text')
         self.assertEqual(results[0]['updated_subject'], 'new subject')
         self.assertEqual(results[0]['entity_type'], 'exploration')
