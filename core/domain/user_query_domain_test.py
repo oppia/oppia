@@ -71,7 +71,8 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_user_id_submitter_id_raises(
-            self) -> None:
+            self
+        ) -> None:
         self.user_query.submitter_id = 'aaabbc'
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected submitter ID to be a valid user ID'
