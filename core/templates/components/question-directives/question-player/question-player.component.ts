@@ -48,13 +48,13 @@ require(
   'components/forms/schema-based-editors/' +
   'schema-based-dict-editor.component.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-expression-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-float-editor.directive.ts');
+  'schema-based-float-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-html-editor.component.ts');

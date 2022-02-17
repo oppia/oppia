@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for general schema-based editors.
+ * @fileoverview Component for general schema-based editors.
  */
 
 import { Input, Output, EventEmitter, Component, forwardRef, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
@@ -23,7 +23,7 @@ import { Schema } from 'services/schema-default-value.service';
 const INVALID = 'INVALID';
 @Component({
   selector: 'schema-based-editor',
-  templateUrl: './schema-based-editor.directive.html',
+  templateUrl: './schema-based-editor.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

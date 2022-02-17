@@ -22,7 +22,7 @@ require(
 require(
   'components/review-material-editor/review-material-editor.component.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
