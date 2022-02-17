@@ -107,9 +107,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.subtopic_page.get_subtopic_id_from_subtopic_page_id(), 1)
 
-    # We have ignored [override] here because Signature of
-    # "_assert_validation_error" is incompatible with supertype "TestBase"
-    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error( # type: ignore[override]
         self,
         expected_error_substring: str
@@ -230,8 +229,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
     def test_create_subtopic_page_change(self) -> None:
-        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange(
-            {
+        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange({
             'cmd': subtopic_page_domain.CMD_CREATE_NEW,
             'topic_id': self.topic_id,
             'subtopic_id': 'subtopic_id'
@@ -340,23 +338,21 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
     def test_subtopic_page_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Missing cmd key in change dict'):
-            subtopic_page_domain.SubtopicPageChange(
-            {'invalid': 'data'})
+            subtopic_page_domain.SubtopicPageChange({'invalid': 'data'})
 
     def test_subtopic_page_change_object_with_invalid_cmd(self) -> None:
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Command invalid is not allowed'):
-            subtopic_page_domain.SubtopicPageChange(
-            {'cmd': 'invalid'})
+            subtopic_page_domain.SubtopicPageChange({'cmd': 'invalid'})
 
     def test_subtopic_page_change_object_with_missing_attribute_in_cmd(
-        self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_value, old_value')):
-            subtopic_page_domain.SubtopicPageChange(
-            {
+            subtopic_page_domain.SubtopicPageChange({
                 'cmd': 'update_subtopic_page_property',
                 'property_name': '<p>page_contents_html</p>',
             })

@@ -41,6 +41,7 @@ CMD_CREATE_NEW = 'create_new'
 # optionally, 'old_value'.
 CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property'
 
+WrittenTranslationsType = Dict[str, Dict[str, Dict[str, Dict[str, object]]]]
 
 class SubtopicPageChange(change_domain.BaseChange):
     """Domain object for changes made to subtopic_page object.
@@ -78,7 +79,7 @@ class SubtopicPageContentsDict(TypedDict):
 
     subtitled_html: Dict[str, Union[str, None]]
     recorded_voiceovers: Dict[str, Dict[str, Dict[str, Union[bool, int, str]]]]
-    written_translations: Dict[str, Dict[str, Dict[str, Union[bool, str]]]]
+    written_translations: WrittenTranslationsType
 
 
 class SubtopicPageContents:
@@ -88,7 +89,8 @@ class SubtopicPageContents:
         self,
         subtitled_html: state_domain.SubtitledHtml,
         recorded_voiceovers: state_domain.RecordedVoiceovers,
-        written_translations: state_domain.WrittenTranslations):
+        written_translations: state_domain.WrittenTranslations
+    ):
         """Constructs a SubtopicPageContents domain object.
 
         Args:
@@ -161,10 +163,9 @@ class SubtopicPageContents:
         return cls(
             page_contents,
             state_domain.RecordedVoiceovers.from_dict( # type: ignore[no-untyped-call]
-            page_contents_dict['recorded_voiceovers']),
+                page_contents_dict['recorded_voiceovers']),
             state_domain.WrittenTranslations.from_dict( # type: ignore[no-untyped-call]
-            page_contents_dict[
-                'written_translations']))
+                page_contents_dict['written_translations']))
 
 
 class VersionedPageContentsDict(TypedDict):
@@ -292,9 +293,9 @@ class SubtopicPage:
             state_domain.WrittenTranslations.convert_html_in_written_translations( # type: ignore[no-untyped-call]
                 subtopic_page_contents_dict['written_translations'],
                 conversion_fn))
-        (subtopic_page_contents_dict['subtitled_html']['html']) = (
+        subtopic_page_contents_dict['subtitled_html']['html'] = (
             conversion_fn(
-                (subtopic_page_contents_dict['subtitled_html']['html'])))
+                subtopic_page_contents_dict['subtitled_html']['html']))
         return subtopic_page_contents_dict
 
     @classmethod
@@ -416,9 +417,7 @@ class SubtopicPage:
 
     def update_page_contents_written_translations(
             self,
-            new_page_written_translations_dict: Dict[
-                str, Dict[str, Dict[str, Dict[str, object]]]
-            ]
+            new_page_written_translations_dict: WrittenTranslationsType
         ) -> None:
         """The new value for the written_translations data field.
 
