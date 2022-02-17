@@ -23,13 +23,11 @@ from __future__ import annotations
 from core.constants import constants
 from core.controllers import base
 from core.domain import blog_domain
-from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import image_validation_services
 from core.domain import question_domain
 from core.domain import state_domain
-from core.domain import topic_domain
 
 from typing import Dict, Optional, Union
 
@@ -67,20 +65,6 @@ def validate_suggestion_change(obj):
         raise base.BaseHandler.InvalidInputException(
             '%s cmd is not allowed.' % obj['cmd'])
     return obj
-
-
-def validate_exploration_change(obj):
-    """Validates exploration change.
-
-    Args:
-        obj: dict. Data that needs to be validated.
-
-    Returns:
-        ExplorationChange. Returns an ExplorationChange object.
-    """
-    # No explicit call to validate_dict method is necessary, because
-    # ExplorationChange calls validate method while initialization.
-    return exp_domain.ExplorationChange(obj)
 
 
 def validate_new_config_property_values(new_config_property):
@@ -139,26 +123,6 @@ def validate_change_dict_for_blog_post(change_dict):
     # to any domain class so we are validating the fields of change_dict
     # as a part of schema validation.
     return change_dict
-
-
-def validate_collection_change(collection_change_dict):
-    """Validates collection change.
-
-    Args:
-        collection_change_dict: dict. Data that needs to be validated.
-
-    Returns:
-        dict. Returns collection change dict after validation.
-    """
-    # No explicit call to validate_dict method is necessary, because
-    # CollectionChange calls validate method while initialization.
-
-    # Object should not be returned from here because it requires modification
-    # in many of the methods in the domain layer of the codebase and we are
-    # planning to remove collections from our codebase hence modification is
-    # not done here.
-    collection_domain.CollectionChange(collection_change_dict)
-    return collection_change_dict
 
 
 def validate_state_dict(state_dict):
@@ -292,24 +256,3 @@ def validate_suggestion_images(files):
     # The files argument do not represent any domain class, hence dict form
     # of the data is returned from here.
     return files
-
-
-def validate_topic_and_sub_topic_change(change_dict):
-    """Validates Topic or Subtopic change.
-
-    Args:
-        change_dict: dict. Data that needs to be validated.
-
-    Returns:
-        dict. Returns the validated change_dict.
-    """
-    allowed_commands = [
-        command['name'] for command in topic_domain.TopicChange.ALLOWED_COMMANDS
-    ]
-
-    if change_dict.get('cmd', None) not in allowed_commands:
-        raise base.BaseHandler.InvalidInputException(
-            '%s cmd is not allowed.' % change_dict.get('cmd', None)
-        )
-
-    return change_dict
