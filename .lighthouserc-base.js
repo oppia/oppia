@@ -62,7 +62,6 @@ module.exports = {
       // Performance category.
       'first-contentful-paint': [ 'warn', {'maxNumericValue': 1230000}],
       'first-meaningful-paint': ['warn', {'maxNumericValue': 1280000}],
-      'first-cpu-idle': ['warn', {'maxNumericValue': 1460000}],
       'speed-index': ['warn', {'maxNumericValue': 1230000}],
       'interactive': ['warn', {'maxNumericValue': 1540000}],
       'max-potential-fid': ['warn', {'maxNumericValue': 130000}],
@@ -73,10 +72,8 @@ module.exports = {
       'offscreen-images': ['error', {'minScore': 0.45}],
       'time-to-first-byte': ['off', {}],
       // Best practices category.
-      'appcache-manifest': ['error', {'minScore': 1}],
       'errors-in-console': ['error', {'minScore': 1}],
       'no-document-write': ['error', {'minScore': 1}],
-      'external-anchors-use-rel-noopener': ['error', {'minScore': 1}],
       'geolocation-on-start': ['error', {'minScore': 1}],
       'doctype': ['error', {'minScore': 1}],
       'no-vulnerable-libraries': ['off', {'minScore': 1}],
@@ -89,7 +86,7 @@ module.exports = {
     }
   },
   basePerformanceAssertions: {
-    'uses-webp-images': [
+    'modern-image-formats': [
       'error', {'maxLength': 0, 'strategy': 'pessimistic'}
     ],
     'uses-passive-event-listeners': ['error', {'minScore': 1}],
