@@ -49,7 +49,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'learner-answer-info.service.ts',
     'mathjax-bind.directive.ts',
     'object-editor.directive.ts',
-    'oppia-footer.component.ts',
     'oppia-interactive-music-notes-input.directive.ts',
     'oppia-interactive-pencil-code-editor.component.ts',
     'oppia-root.directive.ts',
