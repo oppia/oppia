@@ -250,3 +250,57 @@ describe('Testing apply-validation directive', function() {
       expect(Object.keys(testInput.$error).length).not.toEqual(0);
     }));
 });
+
+
+import { Component } from '@angular/core';
+import { By } from '@angular/platform-browser';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { FormControl } from '@angular/forms';
+import { ApplyValidationDirective } from './apply-validation.directive';
+
+@Component({
+  selector: 'mock-comp-a',
+  template: '<div applyValidation></div>'
+})
+class MockCompA {}
+
+describe('Focus on component', () => {
+  let fixture: ComponentFixture<MockCompA>;
+  let directiveInstance: ApplyValidationDirective;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [MockCompA, ApplyValidationDirective]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(MockCompA);
+    fixture.detectChanges();
+
+    const directiveEl = fixture.debugElement.query(
+      By.directive(ApplyValidationDirective));
+    expect(directiveEl).not.toBeNull();
+    directiveInstance = directiveEl.injector.get(ApplyValidationDirective);
+  }));
+
+  it('should return null on validating with empty validators', () => {
+    directiveInstance.validators = [];
+
+    expect(directiveInstance.validate(null)).toBeNull();
+  });
+
+  it('should validate value', () => {
+    directiveInstance.validators = [{
+      id: 'isAtLeast',
+      minValue: -2.5
+    }];
+
+    expect(directiveInstance.validate(new FormControl(2))).toBeNull();
+
+    expect(directiveInstance.validate(new FormControl(null))).toEqual({
+      isAtLeast: {
+        minValue: -2.5,
+        actual: null
+      }
+    });
+  });
+});
