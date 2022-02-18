@@ -107,6 +107,7 @@ def validate_arguments_against_schema(
         try:
             normalized_value = schema_utils.normalize_against_schema(
                 handler_args[arg_key], arg_schema['schema'])
+                
             # Modification of argument name if new_key_for_argument
             # field is present in the schema.
             if 'new_key_for_argument' in arg_schema['schema']:
