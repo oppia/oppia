@@ -30,11 +30,27 @@ export interface OpportunityDict {
   'skill_description': string;
 }
 
-interface FetchSuggestionsResponse {
+class SuggestionFetcher {
+  type: string;
+  offset: number;
+  suggestionIdToDetails: SuggestionDetailsDict;
+
+  constructor(type: string) {
+    this.type = type;
+    this.offset = 0;
+  }
+}
+
+interface SuggestionDetailsDict {
   [targetId: string]: {
     suggestion: SuggestionBackendDict;
     details: OpportunityDict;
   };
+}
+
+interface FetchSuggestionsResponse {
+  suggestionIdToDetails: SuggestionDetailsDict;
+  more: boolean;
 }
 
 @Injectable({
@@ -46,44 +62,109 @@ export class ContributionAndReviewService {
       ContributionAndReviewBackendApiService
   ) {}
 
+  private _userCreatedQuestionFetcher: SuggestionFetcher = (
+    new SuggestionFetcher('SUBMITTED_QUESTION_SUGGESTIONS'));
+  private _reviewableQuestionFetcher: SuggestionFetcher = (
+    new SuggestionFetcher('REVIEWABLE_QUESTION_SUGGESTIONS'));
+  private _userCreatedTranslationFetcher: SuggestionFetcher = (
+    new SuggestionFetcher('SUBMITTED_TRANSLATION_SUGGESTIONS'));
+  private _reviewableTranslationFetcher: SuggestionFetcher = (
+    new SuggestionFetcher('REVIEWABLE_TRANSLATION_SUGGESTIONS'));
+
   private async fetchSuggestionsAsync(
-      fetchType: string
+      fetcher: SuggestionFetcher, resetOffset = false
   ): Promise<FetchSuggestionsResponse> {
-    return (
-      this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
-        fetchType
-      ).then((responseBody) => {
-        const suggestionIdToSuggestions: FetchSuggestionsResponse = {};
-        const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
-        responseBody.suggestions.forEach((suggestion) => {
-          suggestionIdToSuggestions[suggestion.suggestion_id] = {
-            suggestion: suggestion,
-            details: targetIdToDetails[suggestion.target_id]
+    if (resetOffset) {
+      fetcher.offset = 0;
+      fetcher.suggestionIdToDetails = {};
+    }
+    // If fetcher does not have items, fetch 2 pages and return the 1st page.
+    if (Object.keys(fetcher.suggestionIdToDetails).length === 0) {
+      return (
+        this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
+          fetcher.type,
+          // Fetch two pages at a time to compute if we have more results.
+          AppConstants.OPPORTUNITIES_PAGE_SIZE * 2,
+          fetcher.offset
+        ).then((responseBody) => {
+          const responseSuggestionIdToDetails: SuggestionDetailsDict = {};
+          const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
+          responseBody.suggestions.forEach((suggestion, i) => {
+            const suggestionDetails = {
+              suggestion: suggestion,
+              details: targetIdToDetails[suggestion.target_id]
+            };
+            if (i < AppConstants.OPPORTUNITIES_PAGE_SIZE) {
+              // Populate the response with the first page.
+              responseSuggestionIdToDetails[
+                suggestion.suggestion_id] = suggestionDetails;
+            } else {
+              // Cache the 2nd page.
+              fetcher.suggestionIdToDetails[
+                suggestion.suggestion_id] = suggestionDetails;
+            }
+          });
+          fetcher.offset = responseBody.next_offset;
+          return {
+            suggestionIdToDetails: responseSuggestionIdToDetails,
+            more: Object.keys(fetcher.suggestionIdToDetails).length > 0
           };
-        });
-        return suggestionIdToSuggestions;
-      })
-    );
+        })
+      );
+    } else {
+      // If fetcher has items, return fetcher items and fetch 1 extra page to
+      // refill fetcher cache.
+      return (
+        this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
+          fetcher.type,
+          AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          fetcher.offset
+        ).then((responseBody) => {
+          const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
+          fetcher.suggestionIdToDetails = {};
+          const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
+          responseBody.suggestions.forEach((suggestion) => {
+            const suggestionDetails = {
+              suggestion: suggestion,
+              details: targetIdToDetails[suggestion.target_id]
+            };
+            fetcher.suggestionIdToDetails[
+              suggestion.suggestion_id] = suggestionDetails;
+          });
+          fetcher.offset = responseBody.next_offset;
+          return {
+            suggestionIdToDetails: responseSuggestionIdToDetails,
+            more: (
+              Object.keys(fetcher.suggestionIdToDetails).length >
+              AppConstants.OPPORTUNITIES_PAGE_SIZE)
+          };
+        })
+      );
+    }
   }
 
-  async getUserCreatedQuestionSuggestionsAsync():
+  async getUserCreatedQuestionSuggestionsAsync(resetOffset = false):
   Promise<FetchSuggestionsResponse> {
-    return this.fetchSuggestionsAsync('SUBMITTED_QUESTION_SUGGESTIONS');
+    return this.fetchSuggestionsAsync(
+      this._userCreatedQuestionFetcher, resetOffset);
   }
 
-  async getReviewableQuestionSuggestionsAsync():
+  async getReviewableQuestionSuggestionsAsync(resetOffset = false):
   Promise<FetchSuggestionsResponse> {
-    return this.fetchSuggestionsAsync('REVIEWABLE_QUESTION_SUGGESTIONS');
+    return this.fetchSuggestionsAsync(
+      this._reviewableQuestionFetcher, resetOffset);
   }
 
-  async getUserCreatedTranslationSuggestionsAsync():
+  async getUserCreatedTranslationSuggestionsAsync(resetOffset = false):
   Promise<FetchSuggestionsResponse> {
-    return this.fetchSuggestionsAsync('SUBMITTED_TRANSLATION_SUGGESTIONS');
+    return this.fetchSuggestionsAsync(
+      this._userCreatedTranslationFetcher, resetOffset);
   }
 
-  async getReviewableTranslationSuggestionsAsync():
+  async getReviewableTranslationSuggestionsAsync(resetOffset = false):
   Promise<FetchSuggestionsResponse> {
-    return this.fetchSuggestionsAsync('REVIEWABLE_TRANSLATION_SUGGESTIONS');
+    return this.fetchSuggestionsAsync(
+      this._reviewableTranslationFetcher, resetOffset);
   }
 
   reviewExplorationSuggestion(

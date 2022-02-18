@@ -585,17 +585,23 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
     ])
 
 
-def get_reviewable_suggestions(user_id, suggestion_type):
+def get_reviewable_suggestions(user_id, suggestion_type, limit, offset):
     """Returns a list of suggestions of given suggestion_type which the user
     can review.
 
     Args:
         user_id: str. The ID of the user.
         suggestion_type: str. The type of the suggestion.
+        limit: int. The maximum number of results to return.
+        offset: int. The number of results to skip.
 
     Returns:
-        list(Suggestion). A list of suggestions which the given user is allowed
-        to review.
+        Tuple of (results, next_offset), where:
+            results: list(SuggestionModel). A list of suggestions that are
+                of the supplied type which the supplied user is permitted to
+                review.
+            next_offset: int. Number of query results to skip on a subsequent
+                fetch call.
     """
     all_suggestions = []
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -603,12 +609,15 @@ def get_reviewable_suggestions(user_id, suggestion_type):
             user_id)
         language_codes = (
             contribution_rights.can_review_translation_for_language_codes)
-        all_suggestions = ([
-            get_suggestion_from_model(s) for s in (
+        suggestions, next_offset = (
                 suggestion_models.GeneralSuggestionModel
-                .get_in_review_translation_suggestions(
-                    user_id, language_codes))
-        ])
+                .get_in_review_translation_suggestions_by_offset(
+                    limit,
+                    offset,
+                    user_id,
+                    language_codes))
+        all_suggestions = [get_suggestion_from_model(s) for s in suggestions]
+    # TODO: update for question suggestions.
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         all_suggestions = ([
             get_suggestion_from_model(s) for s in (
@@ -616,7 +625,7 @@ def get_reviewable_suggestions(user_id, suggestion_type):
                 .get_in_review_question_suggestions(user_id))
         ])
 
-    return all_suggestions
+    return all_suggestions, next_offset
 
 
 def get_question_suggestions_waiting_longest_for_review():
@@ -907,6 +916,37 @@ def get_submitted_suggestions(user_id, suggestion_type):
             .get_user_created_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
     ])
+
+
+def get_submitted_suggestions_by_offset(
+        user_id, suggestion_type, limit, offset):
+    """Returns a list of suggestions of given suggestion_type which the user
+    has submitted.
+
+    Args:
+        user_id: str. The ID of the user.
+        suggestion_type: str. The type of suggestion.
+        limit: int. The maximum number of results to return.
+        offset: int. The number of results to skip.
+
+    Returns:
+        Tuple of (results, next_offset), where:
+            results: list(SuggestionModel). A list of suggestions of the
+                supplied type which the supplied user has submitted.
+            next_offset: int. Number of query results to skip on a subsequent
+                fetch call.
+    """
+    submitted_suggestion_models, next_offset = (
+        suggestion_models.GeneralSuggestionModel
+            .get_user_created_suggestions_by_offset(
+                limit,
+                offset,
+                suggestion_type,
+                user_id))
+    suggestions = ([
+        get_suggestion_from_model(s) for s in submitted_suggestion_models
+    ])
+    return suggestions, next_offset
 
 
 def get_info_about_suggestions_waiting_too_long_for_review():
