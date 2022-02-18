@@ -626,11 +626,6 @@ class UrlHandler(base.BaseHandler):
         if self.user_id:
             self.render_json({'login_url': None})
         else:
-            if self.normalized_request.get('current_url'):
-                target_url = self.normalized_request.get('current_url')
-                login_url = user_services.create_login_url(target_url)
-                self.render_json({'login_url': login_url})
-            else:
-                raise self.InvalidInputException(
-                    'Missing key in handler args: current_url.'
-                )
+            target_url = self.normalized_request.get('current_url')
+            login_url = user_services.create_login_url(target_url)
+            self.render_json({'login_url': login_url})

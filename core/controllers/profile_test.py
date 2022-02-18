@@ -1325,7 +1325,7 @@ class UrlHandlerTests(test_utils.GenericTestBase):
 
     def test_invalid_input_exception(self):
         response = self.get_json(
-                        '/url_handler?current_url=', expected_status_int=400
+                        '/url_handler', expected_status_int=400
                     )
         error = {
             'error': 'Missing key in handler args: current_url.',
