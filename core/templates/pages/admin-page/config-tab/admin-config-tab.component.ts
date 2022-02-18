@@ -20,7 +20,6 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminBackendApiService, ConfigPropertiesBackendResponse, ConfigPropertyValues } from 'domain/admin/admin-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { Schema } from 'services/schema-default-value.service';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
 
@@ -45,12 +44,6 @@ export class AdminConfigTabComponent {
 
   isNonemptyObject(object: Object): boolean {
     return Object.keys(object).length !== 0;
-  }
-
-  getSchemaCallback(schema: Schema): () => Schema {
-    return () => {
-      return schema;
-    };
   }
 
   reloadConfigProperties(): void {

@@ -16,7 +16,7 @@
  * @fileoverview Component for add worked example modal.
  */
 
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
@@ -39,7 +39,6 @@ export class AddWorkedExampleModalComponent
   };
 
   constructor(
-    private changeDetectorRef: ChangeDetectorRef,
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
@@ -48,24 +47,6 @@ export class AddWorkedExampleModalComponent
   ngOnInit(): void {
     this.tmpWorkedExampleQuestionHtml = '';
     this.tmpWorkedExampleExplanationHtml = '';
-  }
-
-  getSchema(): HtmlFormSchema {
-    return this.WORKED_EXAMPLE_FORM_SCHEMA;
-  }
-
-  updateLocalQues($event: string): void {
-    if (this.tmpWorkedExampleQuestionHtml !== $event) {
-      this.tmpWorkedExampleQuestionHtml = $event;
-      this.changeDetectorRef.detectChanges();
-    }
-  }
-
-  updateLocalExp($event: string): void {
-    if (this.tmpWorkedExampleExplanationHtml !== $event) {
-      this.tmpWorkedExampleExplanationHtml = $event;
-      this.changeDetectorRef.detectChanges();
-    }
   }
 
   saveWorkedExample(): void {

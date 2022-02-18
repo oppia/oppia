@@ -18,7 +18,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -54,7 +54,6 @@ describe('Add Misconception Modal Component', function() {
       ],
       providers: [
         SkillEditorStateService,
-        ChangeDetectorRef,
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal
@@ -154,33 +153,5 @@ describe('Add Misconception Modal Component', function() {
     component.saveMisconception();
 
     expect(ngbActiveModal.close).not.toHaveBeenCalled();
-  });
-
-  it('should get schema for form', () => {
-    expect(component.getSchemaForm())
-      .toEqual(component.MISCONCEPTION_PROPERTY_FORM_SCHEMA);
-  });
-
-  it('should get schema for feedback', () => {
-    expect(component.getSchemaFeedback())
-      .toEqual(component.MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA);
-  });
-
-  it('should update misconceptionNotes', () => {
-    let notes = 'notes';
-    component.ngOnInit();
-
-    component.updateLocalForm(notes);
-
-    expect(component.misconceptionNotes).toEqual(notes);
-  });
-
-  it('should update misconceptionFeedback', () => {
-    let feedback = 'feedback';
-    component.ngOnInit();
-
-    component.updateLocalFeedback(feedback);
-
-    expect(component.misconceptionFeedback).toEqual(feedback);
   });
 });

@@ -149,12 +149,6 @@ describe('Admin config tab component ', () => {
     expect(result).toBe(true);
   });
 
-  it('should return schema callback when calling ' +
-    '\'getSchemaCallback\'', () => {
-    let result = component.getSchemaCallback({type: 'bool'});
-    expect(result()).toEqual({type: 'bool'});
-  });
-
   describe('when clicking on revert to default button ', () => {
     it('should revert to default config property ' +
       'successfully', fakeAsync(() => {

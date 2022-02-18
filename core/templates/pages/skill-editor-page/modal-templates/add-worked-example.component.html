@@ -8,15 +8,14 @@
     <div class="oppia-rule-details-header">
       <strong>Example Question</strong>
       <schema-based-editor class="protractor-test-worked-example-question"
-                           [schema]="getSchema()"
-                           [localValue]="tmpWorkedExampleQuestionHtml"
-                           (localValueChange)="this.updateLocalQues($event)">
+                           [schema]="WORKED_EXAMPLE_FORM_SCHEMA"
+                           [(localValue)]="tmpWorkedExampleQuestionHtml">
       </schema-based-editor>
       <div class="worked-example-explanation-section">
         <strong>Example Explanation</strong>
         <schema-based-editor class="protractor-test-worked-example-explanation"
-                             [schema]="getSchema()"
-                             [localValue]="tmpWorkedExampleExplanationHtml"
+                             [schema]="WORKED_EXAMPLE_FORM_SCHEMA"
+                             [(localValue)]="tmpWorkedExampleExplanationHtml"
                              (localValueChange)="this.updateLocalExp($event)">
         </schema-based-editor>
       </div>

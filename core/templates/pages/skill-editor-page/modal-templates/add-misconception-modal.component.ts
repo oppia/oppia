@@ -16,7 +16,7 @@
  * @fileoverview Component for add misconception modal.
  */
 
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 
@@ -62,8 +62,7 @@ export class AddMisconceptionModalComponent
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private misconceptionObjectFactory: MisconceptionObjectFactory,
-    private skillEditorStateService: SkillEditorStateService,
-    private changeDetectorRef: ChangeDetectorRef
+    private skillEditorStateService: SkillEditorStateService
   ) {
     super(ngbActiveModal);
   }
@@ -78,28 +77,6 @@ export class AddMisconceptionModalComponent
     this.existingMisconceptionNames = this.skill.getMisconceptions().map(
       misconception => misconception.getName()
     );
-  }
-
-  getSchemaForm(): MisconceptionFormSchema {
-    return this.MISCONCEPTION_PROPERTY_FORM_SCHEMA;
-  }
-
-  getSchemaFeedback(): MisconceptionFormSchema {
-    return this.MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA;
-  }
-
-  updateLocalForm($event: string): void {
-    if (this.misconceptionNotes !== $event) {
-      this.misconceptionNotes = $event;
-      this.changeDetectorRef.detectChanges();
-    }
-  }
-
-  updateLocalFeedback($event: string): void {
-    if (this.misconceptionFeedback !== $event) {
-      this.misconceptionFeedback = $event;
-      this.changeDetectorRef.detectChanges();
-    }
   }
 
   saveMisconception(): void {

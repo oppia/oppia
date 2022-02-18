@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AddWorkedExampleModalComponent } from './add-worked-example.component';
@@ -44,7 +44,6 @@ describe('Add Worked Example Modal Component', () => {
         AddWorkedExampleModalComponent
       ],
       providers: [
-        ChangeDetectorRef,
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal
@@ -70,8 +69,8 @@ describe('Add Worked Example Modal Component', () => {
 
   it('should close modal when saving worked example', () => {
     spyOn(ngbActiveModal, 'close');
-    component.updateLocalQues('question');
-    component.updateLocalExp('explanation');
+    component.tmpWorkedExampleQuestionHtml = 'question';
+    component.tmpWorkedExampleExplanationHtml = 'explanation';
 
     component.saveWorkedExample();
 
@@ -79,28 +78,5 @@ describe('Add Worked Example Modal Component', () => {
       workedExampleQuestionHtml: 'question',
       workedExampleExplanationHtml: 'explanation'
     });
-  });
-
-  it('should get schema', () => {
-    expect(component.getSchema())
-      .toEqual(component.WORKED_EXAMPLE_FORM_SCHEMA);
-  });
-
-  it('should update tmpWorkedExampleQuestionHtml', () => {
-    component.tmpWorkedExampleQuestionHtml = 'ques';
-
-    let ques = 'new ques';
-    component.updateLocalQues(ques);
-
-    expect(component.tmpWorkedExampleQuestionHtml).toEqual(ques);
-  });
-
-  it('should update tmpWorkedExampleExplanationHtml', () => {
-    component.tmpWorkedExampleExplanationHtml = 'exp';
-
-    let exp = 'new exp';
-    component.updateLocalExp(exp);
-
-    expect(component.tmpWorkedExampleExplanationHtml).toEqual(exp);
   });
 });
