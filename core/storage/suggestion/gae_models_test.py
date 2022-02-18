@@ -473,6 +473,61 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(results), 0)
         self.assertEqual(offset_3, 2)
 
+    def test_get_in_review_question_suggestions_by_offset(self) -> None:
+        suggestion_1_id = 'skill1.thread1'
+        suggestion_2_id = 'skill1.thread2'
+        user_id = 'author1'
+        limit = 1
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category1',
+            suggestion_1_id, self.question_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_4',
+            'reviewer_2', self.change_cmd, 'category1',
+            suggestion_1_id, self.question_language_code)
+
+        results, offset_1 = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_question_suggestions_by_offset(
+                limit=limit,
+                offset=0,
+                user_id=user_id))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), limit)
+        self.assertEqual(results[0].id, suggestion_1_id)
+        self.assertEqual(offset_1, 1)
+
+        results, offset_2 = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_question_suggestions_by_offset(
+                limit=limit,
+                offset=offset_1,
+                user_id=user_id))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), limit)
+        self.assertEqual(results[0].id, suggestion_2_id)
+        self.assertEqual(offset_2, 2)
+
+        results, offset_3 = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_question_suggestions_by_offset(
+                limit=limit,
+                offset=offset_2,
+                user_id=user_id))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), 0)
+        self.assertEqual(offset_3, 2)
+
     def test_user_created_suggestions_by_offset(self) -> None:
         authored_translation_suggestion_id = 'exploration.exp1.thread_6'
         non_authored_translation_suggestion_id = 'exploration.exp1.thread_7'
@@ -507,7 +562,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         results, translation_suggestion_offset = (
             suggestion_models.GeneralSuggestionModel
-            .get_user_created_suggestions_by_page(
+            .get_user_created_suggestions_by_offset(
                 limit=limit,
                 offset=0,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -520,7 +575,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         results, question_suggestion_offset = (
             suggestion_models.GeneralSuggestionModel
-            .get_user_created_suggestions_by_page(
+            .get_user_created_suggestions_by_offset(
                 limit=limit,
                 offset=0,
                 suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,

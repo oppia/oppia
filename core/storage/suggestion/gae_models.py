@@ -576,32 +576,42 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
-    def get_in_review_question_suggestions_by_page(
-        cls, page_size: int,  offset: int, user_id: str,
+    def get_in_review_question_suggestions_by_offset(
+        cls, limit: int,  offset: int, user_id: str,
     ) -> Sequence[GeneralSuggestionModel]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
 
         Args:
-            page_size: int. The maximum number of entities to be returned.
+            limit: int. Maximum number of entities to be returned.
             offset: int. Number of query results to skip.
             user_id: str. The id of the user trying to make this query. As a
                 user cannot review their own suggestions, suggestions authored
                 by the user will be excluded.
 
         Returns:
-            3-tuple of (results, next_offset, more), where:
+            Tuple of (results, next_offset), where:
                 results: list(SuggestionModel). A list of suggestions that are
-                    in-review and not authored by the supplied user.
+                    in-review, not authored by the supplied user, and that match
+                    one of the supplied language codes.
                 next_offset: int. Number of query results to skip on a
                     subsequent fetch call.
-                more: bool. If true, there are more results after this batch.
         """
-        return cls.get_all().filter(datastore_services.all_of(
+        suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
             cls.author_id != user_id
-        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+        ))
+
+        results: Sequence[GeneralSuggestionModel] = (
+            suggestion_query.fetch(limit, offset)
+        )
+        next_offset = offset + len(results)
+
+        return (
+            results,
+            next_offset
+        )
 
     @classmethod
     def get_question_suggestions_waiting_longest_for_review(
