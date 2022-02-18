@@ -32,31 +32,10 @@ export class NumericExpressionInputRulesService {
   MatchesExactlyWith(
       answer: NumericExpressionAnswer,
       inputs: NumericExpressionRuleInputs): boolean {
-    let mis = new MathInteractionsService();
+    answer = answer.replace(/\s/g, '');
+    inputs.x = inputs.x.replace(/\s/g, '');
 
-    // The expression is first split into terms by addition and subtraction.
-    let answerTerms = mis.getTerms(answer);
-    let inputTerms = mis.getTerms(inputs.x);
-
-    // Now, we try to match all terms between the answer and input.
-    // NOTE: We only need to iterate from the top in the answerTerms list since
-    // in the inputTerms list, we will break the loop each time an element is
-    // removed from it, thus, indexing errors would only arise in the outer
-    // loop.
-    for (let i = answerTerms.length - 1; i >= 0; i--) {
-      for (let j = 0; j < inputTerms.length; j++) {
-        if (mis.termsMatch(answerTerms[i], inputTerms[j])) {
-          answerTerms.splice(i, 1);
-          inputTerms.splice(j, 1);
-          break;
-        }
-      }
-    }
-
-    // The two expressions are considered an exact match if both lists are empty
-    // implying that each term in the answer got uniquely matched with a term
-    // in the input.
-    return answerTerms.length === 0 && inputTerms.length === 0;
+    return answer === inputs.x;
   }
 
   IsEquivalentTo(

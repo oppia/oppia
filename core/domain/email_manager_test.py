@@ -2828,8 +2828,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 day ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 1 day ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -2885,8 +2885,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 5 days ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 5 days ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -2945,8 +2945,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 hour ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 1 hour ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3005,8 +3005,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 5 hours ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 5 hours ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3065,8 +3065,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 minute ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 1 minute ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3125,8 +3125,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 5 minutes ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 5 minutes ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3185,8 +3185,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 minute ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 1 minute ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3252,8 +3252,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '<li>The following English translation suggestion was submitted '
             'for review 1 day ago:'
             '<br>Translation 1</li><br>'
-            '<li>The following French translation suggestion was submitted for '
-            'review 1 hour ago:'
+            '<li>The following français (French) translation suggestion was '
+            'submitted for review 1 hour ago:'
             '<br>Translation 2</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3334,8 +3334,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '<li>The following English translation suggestion was submitted '
             'for review 1 day ago:'
             '<br>Translation 1 for reviewer 1</li><br>'
-            '<li>The following French translation suggestion was submitted for '
-            'review 1 hour ago:'
+            '<li>The following français (French) translation suggestion was '
+            'submitted for review 1 hour ago:'
             '<br>Translation 2 for reviewer 1</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3356,11 +3356,11 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 minute ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 1 minute ago:'
             '<br>Translation 1 for reviewer 2</li><br>'
-            '<li>The following French translation suggestion was submitted for '
-            'review 1 minute ago:'
+            '<li>The following français (French) translation suggestion was '
+            'submitted for review 1 minute ago:'
             '<br>Translation 2 for reviewer 2</li><br>'
             '</ul><br>'
             'Please take some time to review any of the above contributions '
@@ -3471,8 +3471,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Here are some examples of contributions that have been waiting '
             'the longest for review:<br><br>'
             '<ul>'
-            '<li>The following French translation suggestion was submitted for '
-            'review 1 minute ago:'
+            '<li>The following français (French) translation suggestion was '
+             'submitted for review 1 minute ago:'
             '<br>Translation 2</li><br>'
             '<li>The following question suggestion was submitted for '
             'review 1 minute ago:'
@@ -3985,8 +3985,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'review:'
             '<br><br>'
             '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 5 days ago:'
+            '<li>The following हिन्दी (Hindi) translation suggestion was '
+            'submitted for review 5 days ago:'
             '<br>Sample translation</li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br>'
@@ -4062,8 +4062,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>The following English translation suggestion was submitted '
             'for review 2 days ago:'
             '<br>Translation 1</li><br>'
-            '<li>The following French translation suggestion was submitted for '
-            'review 2 days ago:'
+            '<li>The following français (French) translation suggestion was '
+            'submitted for review 2 days ago:'
             '<br>Translation 2</li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br>'
@@ -4147,8 +4147,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>The following English translation suggestion was submitted '
             'for review 2 days ago:'
             '<br>Translation 1</li><br>'
-            '<li>The following French translation suggestion was submitted for '
-            'review 2 days ago:'
+            '<li>The following français (French) translation suggestion was '
+            'submitted for review 2 days ago:'
             '<br>Translation 2</li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br>'
@@ -4654,9 +4654,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
-            'There have been <b>Hindi translation suggestions</b> created on '
-            'the <a href="%s%s">Contributor Dashboard page</a> where there '
-            'are not enough reviewers.<br><br>'
+            'There have been <b>हिन्दी (Hindi) translation suggestions</b> '
+            'created on the <a href="%s%s">Contributor Dashboard page</a> where'
+            ' there are not enough reviewers.<br><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
@@ -4698,9 +4698,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
-            'There have been <b>Hindi translation suggestions</b> created on '
-            'the <a href="%s%s">Contributor Dashboard page</a> where there '
-            'are not enough reviewers.<br><br>'
+            'There have been <b>हिन्दी (Hindi) translation suggestions</b> '
+            'created on the <a href="%s%s">Contributor Dashboard page</a> where'
+            ' there are not enough reviewers.<br><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
@@ -4715,9 +4715,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
-            'There have been <b>Hindi translation suggestions</b> created on '
-            'the <a href="%s%s">Contributor Dashboard page</a> where there '
-            'are not enough reviewers.<br><br>'
+            'There have been <b>हिन्दी (Hindi) translation suggestions</b> '
+            'created on the <a href="%s%s">Contributor Dashboard page</a> where'
+            ' there are not enough reviewers.<br><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
@@ -4772,8 +4772,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'there are not enough reviewers. The languages that need more '
             'reviewers are:'
             '<br><ul>'
-            '<li><b>French</b></li><br>'
-            '<li><b>Hindi</b></li><br>'
+            '<li><b>français (French)</b></li><br>'
+            '<li><b>हिन्दी (Hindi)</b></li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
@@ -4823,8 +4823,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'there are not enough reviewers. The languages that need more '
             'reviewers are:'
             '<br><ul>'
-            '<li><b>French</b></li><br>'
-            '<li><b>Hindi</b></li><br>'
+            '<li><b>français (French)</b></li><br>'
+            '<li><b>हिन्दी (Hindi)</b></li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
@@ -4845,8 +4845,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'there are not enough reviewers. The languages that need more '
             'reviewers are:'
             '<br><ul>'
-            '<li><b>French</b></li><br>'
-            '<li><b>Hindi</b></li><br>'
+            '<li><b>français (French)</b></li><br>'
+            '<li><b>हिन्दी (Hindi)</b></li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
@@ -4906,8 +4906,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'there are not enough reviewers. The languages that need more '
             'reviewers are:'
             '<br><ul>'
-            '<li><b>French</b></li><br>'
-            '<li><b>Hindi</b></li><br>'
+            '<li><b>français (French)</b></li><br>'
+            '<li><b>हिन्दी (Hindi)</b></li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
@@ -4928,8 +4928,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'there are not enough reviewers. The languages that need more '
             'reviewers are:'
             '<br><ul>'
-            '<li><b>French</b></li><br>'
-            '<li><b>Hindi</b></li><br>'
+            '<li><b>français (French)</b></li><br>'
+            '<li><b>हिन्दी (Hindi)</b></li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
@@ -5341,6 +5341,38 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             self.APPLICANT_EMAIL)
         self.assertEqual(len(messages), 0)
 
+    def test_account_deletion_failed_email_is_sent_correctly(self):
+        dummy_admin_address = 'admin@system.com'
+
+        admin_email_ctx = self.swap(
+            feconf, 'ADMIN_EMAIL_ADDRESS', dummy_admin_address)
+
+        with self.can_send_emails_ctx, admin_email_ctx:
+            # Make sure there are no emails already sent.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(messages, [])
+
+            # Send an account deletion failed email to admin.
+            email_manager.send_account_deletion_failed_email(
+                self.applicant_id, self.APPLICANT_EMAIL
+            )
+
+            # Make sure emails are sent.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].to, ['admin@system.com'])
+            self.assertEqual(
+                messages[0].subject,
+                'WIPEOUT: Account deletion failed'
+            )
+            self.assertIn(
+                'The Wipeout process failed for the user with ID \'%s\' and '
+                'email \'%s\'.' % (self.applicant_id, self.APPLICANT_EMAIL),
+                messages[0].html
+            )
+
     def test_that_correct_account_deleted_email_is_sent(self):
         expected_email_subject = 'Account deleted'
         expected_email_html_body = (
@@ -5705,9 +5737,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         expected_email_html_body = (
             'Hi translator,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
-            'reviewer for Hindi language translations. This allows you to '
-            'review translation suggestions made by contributors in the '
-            'Hindi language.<br><br>'
+            'reviewer for हिन्दी (hindi) language translations. This allows you'
+            ' to review translation suggestions made by contributors in the '
+            'हिन्दी (hindi) language.<br><br>'
             'You can check the translation suggestions waiting for review in '
             'the <a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
@@ -5751,9 +5783,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         expected_email_html_body = (
             'Hi voiceartist,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
-            'reviewer for Hindi language voiceovers. This allows you to '
-            'review voiceover applications made by contributors in the '
-            'Hindi language.<br><br>'
+            'reviewer for हिन्दी (hindi) language voiceovers. This allows you '
+            'to review voiceover applications made by contributors in the '
+            'हिन्दी (hindi) language.<br><br>'
             'You can check the voiceover applications waiting for review in '
             'the <a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
@@ -5876,10 +5908,10 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         expected_email_html_body = (
             'Hi translator,<br><br>'
             'The Oppia team has removed you from the translation reviewer role '
-            'in the Hindi language. You won\'t be able to review translation '
-            'suggestions made by contributors in the Hindi language any more, '
-            'but you can still contribute translations through the '
-            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'in the हिन्दी (hindi) language. You won\'t be able to review '
+            'translation suggestions made by contributors in the हिन्दी (hindi)'
+            ' language any more, but you can still contribute translations '
+            'through the <a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
@@ -5921,10 +5953,10 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         expected_email_html_body = (
             'Hi voiceartist,<br><br>'
             'The Oppia team has removed you from the voiceover reviewer role '
-            'in the Hindi language. You won\'t be able to review voiceover '
-            'applications made by contributors in the Hindi language any more, '
-            'but you can still contribute voiceovers through the '
-            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'in the हिन्दी (hindi) language. You won\'t be able to review '
+            'voiceover applications made by contributors in the हिन्दी (hindi)'
+            ' language any more, but you can still contribute voiceovers '
+            'through the <a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
@@ -6001,3 +6033,49 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_REVIEWER)
+
+
+class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
+    """Unit test related to not mergeable change list emails sent to admin."""
+
+    dummy_admin_address = 'admin@system.com'
+
+    def setUp(self):
+        super(NotMergeableChangesEmailUnitTest, self).setUp()
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.admin_email_ctx = self.swap(
+            feconf, 'ADMIN_EMAIL_ADDRESS', self.dummy_admin_address)
+
+    def test_not_mergeable_change_list_email_is_sent_correctly(self):
+        with self.can_send_emails_ctx, self.admin_email_ctx:
+            # Make sure there are no emails already sent.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(messages, [])
+
+            # Send an account deletion failed email to admin.
+            email_manager.send_not_mergeable_change_list_to_admin_for_review(
+                'testExploration', 1, 2, {'field1': 'value1'}
+            )
+
+            # Make sure emails are sent.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].to, ['admin@system.com'])
+            self.assertEqual(
+                messages[0].subject,
+                'Some changes were rejected due to a conflict'
+            )
+            self.assertIn(
+                'Hi Admin,<br><br>'
+                'Some draft changes were rejected in exploration '
+                'testExploration because the changes were conflicting and '
+                'could not be saved. Please see the '
+                'rejected change list below:<br>'
+                'Discarded change list: {\'field1\': \'value1\'} <br><br>'
+                'Frontend Version: 1<br>'
+                'Backend Version: 2<br><br>'
+                'Thanks!',
+                messages[0].html
+            )

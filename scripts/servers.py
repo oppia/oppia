@@ -448,7 +448,7 @@ def managed_portserver():
         # standalone scripts do not. Because of this, the following line cannot
         # be covered. This is fine since we want to cleanup this code anyway in
         # #11549.
-        sys.path.insert(1, common.PSUTIL_DIR) # pragma: nocover
+        sys.path.insert(1, common.PSUTIL_DIR) # pragma: no cover
     import psutil
 
     # Check if a socket file exists. This file can exist when previous instance
@@ -513,7 +513,7 @@ def managed_webdriver_server(chrome_version=None):
             if common.is_mac_os() else 'google-chrome')
         try:
             output = subprocess.check_output([chrome_command, '--version'])
-        except OSError:
+        except OSError as e:
             # For the error message on macOS, we need to add the backslashes in.
             # This is because it is likely that a user will try to run the
             # command on their terminal and, as mentioned above, the macOS
@@ -527,7 +527,7 @@ def managed_webdriver_server(chrome_version=None):
                 'chromedriver version to be used, please follow the '
                 'instructions mentioned in the following URL:\n'
                 'https://chromedriver.chromium.org/downloads/version-selection'
-                % chrome_command.replace(' ', r'\ '))
+                % chrome_command.replace(' ', r'\ ')) from e
 
         installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
         installed_version = '.'.join(

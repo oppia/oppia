@@ -24,9 +24,6 @@ require(
   'question-misconception-editor.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require('filters/parameterize-rule-description.filter.ts');
-require(
-  'components/question-directives/question-misconception-editor/' +
-  'tag-misconception-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/RuleObjectFactory.ts');
@@ -258,7 +255,9 @@ angular.module('oppia').component('answerGroupEditor', {
 
       ctrl.saveRules = function() {
         if (ctrl.originalContentIdToContent !== undefined) {
-          const updatedContentIdToContent = getContentIdToContent();
+          const updatedContentIdToContent = (
+            getTranslatableRulesContentIdToContentMap()
+          );
           const contentIdsWithModifiedContent = [];
           Object.keys(
             ctrl.originalContentIdToContent
@@ -296,7 +295,9 @@ angular.module('oppia').component('answerGroupEditor', {
           // The rule editor may not be opened in a read-only editor view.
           return;
         }
-        ctrl.originalContentIdToContent = getContentIdToContent();
+        ctrl.originalContentIdToContent = (
+          getTranslatableRulesContentIdToContentMap()
+        );
         ctrl.rulesMemento = angular.copy(ctrl.rules);
         ctrl.changeActiveRuleIndex(index);
       };
@@ -322,23 +323,25 @@ angular.module('oppia').component('answerGroupEditor', {
       };
 
       /**
-      * Extracts a mapping of content ids to the html or unicode content
-      * found in the rule inputs.
+      * Extracts a mapping of content ids of translatable rules to the html
+      * or unicode content found in the rule inputs.
       * @returns {Object} A Mapping of content ids (string) to content
       *   (string).
       */
-      const getContentIdToContent = function() {
-        const contentIdToContent = {};
+      const getTranslatableRulesContentIdToContentMap = function() {
+        const contentIdToContentMap = {};
         ctrl.rules.forEach(rule => {
           Object.keys(rule.inputs).forEach(ruleName => {
             const ruleInput = rule.inputs[ruleName];
-            const ruleInputType = rule.inputTypes[ruleName];
-            if (ruleInputType.indexOf('Translatable') === 0) {
-              contentIdToContent[ruleInput.contentId] = ruleInput;
+            // All rules input types which are translatable are subclasses of
+            // BaseTranslatableObject having dict structure with contentId
+            // as a key.
+            if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+              contentIdToContentMap[ruleInput.contentId] = ruleInput;
             }
           });
         });
-        return contentIdToContent;
+        return contentIdToContentMap;
       };
 
       ctrl.$onInit = function() {

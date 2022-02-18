@@ -28,6 +28,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as objects_validator
 from core.domain import email_manager
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
@@ -137,8 +138,7 @@ class ExplorationHandler(EditorHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            objects_validator.validate_exploration_change)
+                        'object_class': exp_domain.ExplorationChange
                     }
                 }
             }
@@ -175,8 +175,8 @@ class ExplorationHandler(EditorHandler):
             exploration_data['exploration_is_linked_to_story'] = (
                 exp_services.get_story_id_linked_to_exploration(
                     exploration_id) is not None)
-        except:
-            raise self.PageNotFoundException
+        except Exception as e:
+            raise self.PageNotFoundException from e
 
         self.values.update(exploration_data)
         self.render_json(self.values)
@@ -1037,8 +1037,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            objects_validator.validate_exploration_change)
+                        'object_class': exp_domain.ExplorationChange
                     }
                 }
             }

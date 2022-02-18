@@ -27,6 +27,7 @@ import {
   AlgebraicExpressionRuleInputsWithPlaceholder,
   AlgebraicExpressionRuleInputsWithoutPlaceholder
 } from 'interactions/rule-input-defs';
+import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,18 +37,40 @@ export class AlgebraicExpressionInputRulesService {
       answer: AlgebraicExpressionAnswer,
       inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     let mis = new MathInteractionsService();
+
+    // If the answer and the inputs are both purely numeric, we use the numeric
+    // expression input's rule functions.
+    if (
+      !mis.containsAtLeastOneVariable(answer) &&
+      !mis.containsAtLeastOneVariable(inputs.x)
+    ) {
+      let numericExpressionRuleService = (
+        new NumericExpressionInputRulesService());
+      return numericExpressionRuleService.MatchesExactlyWith(answer, inputs);
+    }
+
     // Inserting '*' signs between variables if not present.
     answer = mis.insertMultiplicationSigns(answer);
     inputs.x = mis.insertMultiplicationSigns(inputs.x);
-    return nerdamer(
-      nerdamer(answer).text()
-    ).eq(nerdamer(inputs.x).text());
+    return answer === inputs.x;
   }
 
   IsEquivalentTo(
       answer: AlgebraicExpressionAnswer,
       inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     let mis = new MathInteractionsService();
+
+    // If the answer and the inputs are both purely numeric, we use the numeric
+    // expression input's rule functions.
+    if (
+      !mis.containsAtLeastOneVariable(answer) &&
+      !mis.containsAtLeastOneVariable(inputs.x)
+    ) {
+      let numericExpressionRuleService = (
+        new NumericExpressionInputRulesService());
+      return numericExpressionRuleService.IsEquivalentTo(answer, inputs);
+    }
+
     // Inserting '*' signs between variables if not present.
     answer = mis.insertMultiplicationSigns(answer);
     inputs.x = mis.insertMultiplicationSigns(inputs.x);

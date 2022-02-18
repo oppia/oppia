@@ -321,7 +321,8 @@ class SignupPage(base.BaseHandler):
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
-        return_url = self.request.get('return_url', self.request.uri)
+        return_url = self.normalized_request.get(
+            'return_url', self.request.uri)
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
@@ -471,6 +472,11 @@ class ExportAccountHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
@@ -531,6 +537,20 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'site_language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': list(map(
+                        lambda x: x['id'], constants.SUPPORTED_SITE_LANGUAGES
+                    ))
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
@@ -542,8 +562,12 @@ class SiteLanguageHandler(base.BaseHandler):
 
 class UserInfoHandler(base.BaseHandler):
     """Provides info about user. If user is not logged in,
-    return dict containing false as logged in status.
-    """
+    return dict containing false as logged in status."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

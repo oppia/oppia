@@ -39,16 +39,21 @@ export class ExplorationHtmlFormatterService {
     'AlgebraicExpressionInput',
     'CodeRepl',
     'Continue',
+    'DragAndDropSortInput',
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
+    'InteractiveMap',
+    'MathEquationInput',
+    'MultipleChoiceInput',
+    'NumberWithUnits',
+    'ItemSelectionInput',
     'NumericExpressionInput',
     'NumericInput',
-    'InteractiveMap',
-    'MultipleChoiceInput',
+    'PencilCodeEditor',
+    'RatioExpressionInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput'
   ];
 
   constructor(
@@ -56,6 +61,7 @@ export class ExplorationHtmlFormatterService {
       private extensionTagAssembler: ExtensionTagAssemblerService,
       private htmlEscaper: HtmlEscaperService
   ) {}
+
   /**
    * @param {string} interactionId - The interaction id.
    * @param {object} interactionCustomizationArgs - The various
