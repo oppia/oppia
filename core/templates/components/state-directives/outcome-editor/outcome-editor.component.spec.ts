@@ -376,7 +376,6 @@ describe('OutcomeEditorComponent', () => {
     spyOn(StateEditorService, 'getActiveStateName').and.returnValue('Dest1');
 
     ctrl.saveThisDestination();
-    ctrl.getChanges();
 
     expect(ctrl.outcome.refresherExplorationId).toBe(null);
     expect(ctrl.savedOutcome.refresherExplorationId).toBe(null);
