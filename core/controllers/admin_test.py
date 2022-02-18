@@ -927,13 +927,13 @@ class GenerateSampleOpportunitiesTest(test_utils.GenericTestBase):
         self.post_json(
             '/adminhandler', {
                 'action': 'generate_sample_opportunities',
-                'num_sample_ops': 20,
-                'num_sample_interactions': 20
+                'num_sample_ops': 8,
+                'num_sample_interactions': 10
             }, csrf_token=csrf_token)
 
         translation_ops = opportunity_services.get_translation_opportunities(
             'hi', None, None)
-        self.assertEqual(len(translation_ops[0]), 20)
+        self.assertEqual(len(translation_ops[0]), 8)
 
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
