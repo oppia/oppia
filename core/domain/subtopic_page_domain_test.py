@@ -264,7 +264,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             self.subtopic_page.validate()
 
     def test_validate_language_code_is_invalid(self) -> None:
-        self.subtopic_page.language_code = 'abc' # type: ignore[assignment]
+        self.subtopic_page.language_code = 'abc'
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Invalid language code'):
