@@ -59,6 +59,7 @@ implements OnInit, ControlValueAccessor, Validator {
   } & Schema;
   // The length of the list. If not specified, the list is of arbitrary
   // length.
+
   @Input() len: number;
   // UI configuration. May be undefined.
   @Input() uiConfig: {'add_element_text': string};
@@ -78,16 +79,20 @@ implements OnInit, ControlValueAccessor, Validator {
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private schemaUndefinedLastElementService: SchemaUndefinedLastElementService
   ) {}
+
   writeValue(value: SchemaDefaultValue[]): void {
     if (Array.isArray(value)) {
       this.localValue = value;
     }
   }
+
   registerOnChange(fn: (value: unknown) => void): void {
     this.onChange = fn;
   }
+
   registerOnTouched(fn: () => void): void {
   }
+
   validate(control: AbstractControl): ValidationErrors {
     return {};
   }
