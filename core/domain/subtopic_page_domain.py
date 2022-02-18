@@ -41,7 +41,8 @@ CMD_CREATE_NEW = 'create_new'
 # optionally, 'old_value'.
 CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property'
 
-WrittenTranslationsType = Dict[str, Dict[str, Dict[str, Dict[str, Union[str, bool]]]]]
+WrittenTranslationsType = (
+    Dict[str, Dict[str, Dict[str, Dict[str, Union[str, bool]]]]])
 
 
 class SubtopicPageChange(change_domain.BaseChange):
