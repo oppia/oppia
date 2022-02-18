@@ -186,7 +186,7 @@ class SkillChange(change_domain.BaseChange):
 
 
 class MisconceptionDict(TypedDict):
-    """Dictionary representing the Misconception Domain Object"""
+    """Dictionary representing the Misconception domain object"""
 
     id: int
     name: str
@@ -312,7 +312,7 @@ class Misconception:
 
 
 class RubricDict(TypedDict):
-    """Dictionary representing the Rubric Domain Object"""
+    """Dictionary representing the Rubric domain object"""
 
     difficulty: str
     explanations: List[str]
@@ -387,7 +387,7 @@ class Rubric:
 
 
 class WorkedExampleDict(TypedDict):
-    """Dictionary representing the WorkedExample Domain Object"""
+    """Dictionary representing the WorkedExample domain object"""
 
     question: Dict[str, state_domain.SubtitledHtml]
     explanation: Dict[str, state_domain.SubtitledHtml]
@@ -468,7 +468,7 @@ class WorkedExample:
 
 
 class SkillContentsDict(TypedDict):
-    """Dictionary representing the Skill Contents Domain Object"""
+    """Dictionary representing the Skill Contents domain object"""
 
     explanation: Dict[str, state_domain.SubtitledHtml]
     worked_examples: List[WorkedExampleDict]
@@ -586,7 +586,7 @@ class SkillContents:
 
 
 class SkillDict(TypedDict, total=False):
-    """Dictionary representing the Skill Domain Object"""
+    """Dictionary representing the Skill domain object"""
 
     id: str
     description: str
@@ -607,21 +607,21 @@ class SkillDict(TypedDict, total=False):
 
 
 class VersionedSkillDict(TypedDict):
-    """Dictionary representing the Skill Domain Object"""
+    """Dictionary representing the Skill domain object"""
 
     schema_version: int
     skill_contents: SkillContents
 
 
 class VersionedMisconceptionDict(TypedDict):
-    """Dictionary representing the Misconception Domain Object"""
+    """Dictionary representing the Misconception domain object"""
 
     schema_version: int
     misconceptions: List[MisconceptionDict]
 
 
 class VersionedRubricsDict(TypedDict):
-    """Dictionary representing the Rubric Domain Object"""
+    """Dictionary representing the Rubric domain object"""
 
     schema_version: int
     rubrics: List[RubricDict]
@@ -1730,7 +1730,7 @@ class Skill:
 
 
 class SkillSummaryDict(TypedDict):
-    """Dictionary representing the Skill Summary Domain Object"""
+    """Dictionary representing the Skill Summary domain object"""
 
     id: str
     description: str
@@ -1843,7 +1843,7 @@ class SkillSummary:
 
 
 class AugmentedSkillSummaryDict(TypedDict):
-    """Dictionary representing the Augmented Skill Summary Domain Object"""
+    """Dictionary representing the Augmented Skill Summary domain object"""
 
     id: str
     description: str
@@ -1930,7 +1930,7 @@ class AugmentedSkillSummary:
 
 
 class TopicAssignmentDict(TypedDict):
-    """Dictionary representing the Topic Assignment Domain Object"""
+    """Dictionary representing the Topic Assignment domain object"""
 
     topic_id: str
     topic_name: str
@@ -1982,7 +1982,7 @@ class TopicAssignment:
 
 
 class UserSkillMasteryDict(TypedDict):
-    """Dictionary representing the User Skill Mastery Domain Object"""
+    """Dictionary representing the User Skill Mastery domain object"""
 
     user_id: str
     skill_id: str
