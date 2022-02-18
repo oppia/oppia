@@ -928,7 +928,7 @@ class GenerateSampleOpportunitiesTest(test_utils.GenericTestBase):
             '/adminhandler', {
                 'action': 'generate_sample_opportunities',
                 'num_sample_ops': 20,
-                'num_sample_interactions': 10
+                'num_sample_interactions': 20
             }, csrf_token=csrf_token)
 
         translation_ops = opportunity_services.get_translation_opportunities(
