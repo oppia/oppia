@@ -247,9 +247,12 @@ export class ContentTranslationManagerService {
       }
     }
 
+    // DOMParser().parseFromString() creates a HTML document from
+    // the HTML string and it's body contains our required element
+    // as a childnode.
     const element = new DOMParser().parseFromString(
       card.getInteractionHtml(), 'text/html'
-    ).body;
+    ).body.childNodes[0] as HTMLElement;
     this.extensionTagAssemblerService.formatCustomizationArgAttrs(
       element, caValues);
     card.setInteractionHtml(element.outerHTML);
