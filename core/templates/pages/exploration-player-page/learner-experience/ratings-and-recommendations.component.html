@@ -46,15 +46,6 @@
     </div>
   </div>
 
-  <div *ngIf="inStoryMode" class="conversation-skin-back-to-collection-container">
-    <a [href]="storyViewerUrl" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_STORY"></a>
-  </div>
-  <div *ngIf="!collectionSummary && !isRefresherExploration && !inStoryMode" class="conversation-skin-back-to-collection-container">
-    <a href="/community-library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
-  </div>
-  <div *ngIf="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
-    <a [href]="'/collection/' + collectionId" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
-  </div>
   <div *ngIf="inStoryMode && !userIsLoggedIn" class="conversation-skin-login-container">
     <div class="conversation-skin-congratulations-text" translate="I18N_CHAPTER_COMPLETION"></div>
     <span class="conversation-skin-login-text text-secondary" translate="I18N_SAVE_PROGRESS"></span>
@@ -67,9 +58,31 @@
       </button>
     </div>
   </div>
+
+  <div *ngIf="inStoryMode" class="conversation-skin-back-to-collection-container">
+    <a [href]="storyViewerUrl" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_STORY"></a>
+  </div>
+  <div *ngIf="!collectionSummary && !isRefresherExploration && !inStoryMode" class="conversation-skin-back-to-collection-container">
+    <a href="/community-library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
+  </div>
+  <div *ngIf="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
+    <a [href]="'/collection/' + collectionId" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
+  </div>
 </div>
 
 <style>
+.oppia-login-button {
+  background-color: #00645c;
+  font-size: 1em;
+  min-width: max-content;
+  width: 30%;
+}
+.oppia-sign-up-button {
+  background-color: #00609c;
+  font-size: 1em;
+  min-width: max-content;
+  width: 30%;
+}
   .conversation-skin-final-summary {
     margin-bottom: 25px;
     margin-top: 20px;
