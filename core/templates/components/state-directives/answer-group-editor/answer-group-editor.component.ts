@@ -305,16 +305,10 @@ angular.module('oppia').component('answerGroupEditor', {
       ctrl.isCurrentInteractionTrainable = function() {
         var interactionId = ctrl.getCurrentInteractionId();
         if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
-          var rulesString = '';
-          for (var i = 0; i < ctrl.rules.length; i++) {
-            rulesString = rulesString + ctrl.rules[i].type;
-            if (i !== ctrl.rules.length - 1) {
-              rulesString = rulesString + ', ';
-            }
-          }
           throw new Error(
             'Invalid interaction id - ' + interactionId +
-            '. Answer group rules: ' + rulesString);
+            '. Answer group rules: ' +
+            ctrl.rules.map(rule => rule.type).join(', '));
         }
         return INTERACTION_SPECS[interactionId].is_trainable;
       };
