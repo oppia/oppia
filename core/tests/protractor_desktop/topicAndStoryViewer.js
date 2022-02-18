@@ -33,6 +33,8 @@ var TopicViewerPage = require('../protractor_utils/TopicViewerPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var SubTopicViewerPage = require('../protractor_utils/SubTopicViewerPage.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
@@ -73,6 +75,8 @@ describe('Topic and Story viewer functionality', function() {
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     topicAndStoryViewerPage = (
       new TopicAndStoryViewerPage.TopicAndStoryViewerPage());
     topicViewerPage = new TopicViewerPage.TopicViewerPage();
