@@ -108,6 +108,10 @@ angular.module('oppia').component('outcomeEditor', {
         }
       };
 
+      ctrl.getChanges = function() {
+        $rootScope.$applyAsync();
+      };
+
       ctrl.isFeedbackLengthExceeded = function() {
         // TODO(#13764): Edit this check after appropriate limits are found.
         return (ctrl.outcome.feedback._html.length > 10000);

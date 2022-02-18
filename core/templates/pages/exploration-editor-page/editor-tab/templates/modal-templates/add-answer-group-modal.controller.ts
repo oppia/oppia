@@ -109,7 +109,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     // Remove this function once this controller is migrated to
     // Angular 2+.
     $scope.getChanges = function() {
-      $rootScope.$apply();
+      $rootScope.$applyAsync();
     };
 
     $scope.isFeedbackLengthExceeded = function(tmpOutcome) {
