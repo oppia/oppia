@@ -52,23 +52,31 @@ interface UpdateTranslationRequestBody {
 export class ContributionAndReviewBackendApiService {
   private SUBMITTED_SUGGESTION_LIST_HANDLER_URL = (
     '/getsubmittedsuggestions/<target_type>/<suggestion_type>');
+
   private REVIEWABLE_SUGGESTIONS_HANDLER_URL = (
     '/getreviewablesuggestions/<target_type>/<suggestion_type>');
+
   private SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL = (
     '/suggestionactionhandler/exploration/<exp_id>/<suggestion_id>');
+
   private SUGGESTION_TO_SKILL_ACTION_HANDLER_URL = (
     '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>');
+
   private UPDATE_TRANSLATION_HANDLER_URL = (
     '/updatetranslationsuggestionhandler/<suggestion_id>');
+
   private UPDATE_QUESTION_HANDLER_URL = (
     '/updatequestionsuggestionhandler/<suggestion_id>');
 
   private SUBMITTED_QUESTION_SUGGESTIONS = (
     'SUBMITTED_QUESTION_SUGGESTIONS');
+
   private REVIEWABLE_QUESTION_SUGGESTIONS = (
     'REVIEWABLE_QUESTION_SUGGESTIONS');
+
   private SUBMITTED_TRANSLATION_SUGGESTIONS = (
     'SUBMITTED_TRANSLATION_SUGGESTIONS');
+
   private REVIEWABLE_TRANSLATION_SUGGESTIONS = (
     'REVIEWABLE_TRANSLATION_SUGGESTIONS');
 

@@ -205,46 +205,51 @@ export class NumericInputValidationService {
 
     return warningsList;
   }
+
   // Returns 'undefined' when no error occurs.
-  getErrorString(
-      value: number, customizationArgs: boolean
+  getErrorStringI18nKey(
+      value: number, requireNonnegativeInput: boolean
   ): string | undefined {
     let stringValue = null;
+    // Value of sign is '-' if value of number is negative,
+    // '' if non-negative.
+    let sign = value < 0 ? '-' : '';
+
     // Convert exponential notation to decimal number.
     // Logic derived from https://stackoverflow.com/a/16139848.
-    var data = String(value).split(/[eE]/);
-    if (data.length === 1) {
-      stringValue = data[0];
-    } else {
-      var z = '';
-      var sign = value < 0 ? '-' : '';
-      var str = data[0].replace('.', '');
-      var mag = Number(data[1]) + 1;
+    let numberParts = String(value).split(/[eE]/);
 
-      if (mag < 0) {
-        z = sign + '0.';
-        while (mag++) {
-          z += '0';
+    // If numberParts.length === 1, that means number is not in
+    // exponential form.
+    if (numberParts.length === 1) {
+      stringValue = numberParts[0];
+    } else {
+      let exponentialValueToString = '';
+      // Mantissa is the part of exponential number before the 'e' or 'E'.
+      let mantissa = numberParts[0].replace('.', '');
+      let numberOfZerosToAdd = Number(numberParts[1]) + 1;
+
+      if (numberOfZerosToAdd < 0) {
+        exponentialValueToString = sign + '0.';
+        while (numberOfZerosToAdd++) {
+          exponentialValueToString += '0';
         }
-        stringValue = z + str.replace(/^\-/, '');
+        stringValue = exponentialValueToString + mantissa.replace(/^\-/, '');
       } else {
-        mag -= str.length;
-        while (mag--) {
-          z += '0';
+        numberOfZerosToAdd -= mantissa.length;
+        while (numberOfZerosToAdd--) {
+          exponentialValueToString += '0';
         }
-        stringValue = str + z;
+        stringValue = mantissa + exponentialValueToString;
       }
     }
     const stringValueRegExp = stringValue.match(/\d/g);
-    if (
-      customizationArgs &&
-      (stringValueRegExp === null || stringValueRegExp.length > 15)
-    ) {
-      return 'The answer should be greater than or equal to zero and ' +
-      'can contain at most 15 digits (0-9) or symbols(.).';
-    } else if (stringValueRegExp === null || stringValueRegExp.length > 15) {
-      return 'The answer can contain at most 15 digits (0-9) or symbols ' +
-        '(. or -).';
+    if (stringValueRegExp === null) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER';
+    } else if (value < 0 && requireNonnegativeInput) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO';
+    } else if (stringValueRegExp.length > 15) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS';
     }
   }
 }

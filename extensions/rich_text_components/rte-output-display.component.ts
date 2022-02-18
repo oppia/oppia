@@ -199,6 +199,7 @@ export class OppiaRteTextNodeDirective implements AfterViewInit {
   constructor(
     private elementRef: ElementRef
   ) { }
+
   @Input() oppiaRteTextNode: string = '';
   ngAfterViewInit(): void {
     // Creating a text node makes it safe from any XSS attacks.

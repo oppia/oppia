@@ -40,6 +40,7 @@ export class ExtensionTagAssemblerService {
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
+
   _convertCustomizationArgsToBackendDict(
       customizationArgs: InteractionCustomizationArgs
   ): InteractionCustomizationArgsBackendDict {
