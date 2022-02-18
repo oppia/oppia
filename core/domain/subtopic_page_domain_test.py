@@ -243,12 +243,6 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 'subtopic_id': 'subtopic_id'
             })
 
-    def test_validate_version_number(self) -> None:
-        self.subtopic_page.version = 'invalid_version' # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            Exception, 'Expected version number to be an int'):
-            self.subtopic_page.validate()
-
     def test_validate_topic_id(self) -> None:
         self.subtopic_page.topic_id = 123 # type: ignore[assignment]
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
@@ -379,7 +373,8 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
             })
 
     def test_subtopic_page_change_object_with_extra_attribute_in_cmd(
-        self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
@@ -392,7 +387,8 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
             })
 
     def test_subtopic_page_change_object_with_invalid_subtopic_page_property(
-            self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'Value for property_name in cmd update_subtopic_page_property: '
@@ -407,7 +403,8 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
             })
 
     def test_subtopic_page_change_object_with_update_subtopic_page_property(
-            self) -> None:
+        self
+    ) -> None:
         subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange(
         {
             'cmd': 'update_subtopic_page_property',

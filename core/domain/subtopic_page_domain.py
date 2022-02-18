@@ -41,7 +41,7 @@ CMD_CREATE_NEW = 'create_new'
 # optionally, 'old_value'.
 CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property'
 
-WrittenTranslationsType = Dict[str, Dict[str, Dict[str, Dict[str, object]]]]
+WrittenTranslationsType = Dict[str, Dict[str, Dict[str, Dict[str, Union[str, bool]]]]]
 
 
 class SubtopicPageChange(change_domain.BaseChange):
@@ -146,8 +146,7 @@ class SubtopicPageContents:
 
     @classmethod
     def from_dict(
-        cls,
-        page_contents_dict: SubtopicPageContentsDict
+        cls, page_contents_dict: SubtopicPageContentsDict
     ) -> SubtopicPageContents:
         """Creates a subtopic page contents object from a dictionary.
 
@@ -250,9 +249,7 @@ class SubtopicPage:
 
     @classmethod
     def create_default_subtopic_page(
-        cls,
-        subtopic_id: int,
-        topic_id: str
+        cls, subtopic_id: int, topic_id: str
     ) -> SubtopicPage:
         """Creates a SubtopicPage object with default values.
 
@@ -301,8 +298,7 @@ class SubtopicPage:
 
     @classmethod
     def _convert_page_contents_v1_dict_to_v2_dict(
-        cls,
-        page_contents_dict: SubtopicPageContentsDict
+        cls, page_contents_dict: SubtopicPageContentsDict
     ) -> SubtopicPageContentsDict:
         """Converts v1 SubtopicPage Contents schema to the v2 schema.
         v2 schema introduces the new schema for Math components.
@@ -320,8 +316,7 @@ class SubtopicPage:
 
     @classmethod
     def _convert_page_contents_v2_dict_to_v3_dict(
-        cls,
-        page_contents_dict: SubtopicPageContentsDict
+        cls, page_contents_dict: SubtopicPageContentsDict
     ) -> SubtopicPageContentsDict:
         """Converts v2 SubtopicPage Contents schema to the v3 schema.
         v3 schema deprecates oppia-noninteractive-svgdiagram tag and converts
@@ -340,8 +335,7 @@ class SubtopicPage:
 
     @classmethod
     def _convert_page_contents_v3_dict_to_v4_dict(
-        cls,
-        page_contents_dict: SubtopicPageContentsDict
+        cls, page_contents_dict: SubtopicPageContentsDict
     ) -> SubtopicPageContentsDict:
         """Converts v3 SubtopicPage Contents schema to the v4 schema.
         v4 schema fixes HTML encoding issues.
@@ -393,8 +387,7 @@ class SubtopicPage:
         return int(self.id[len(self.topic_id) + 1:])
 
     def update_page_contents_html(
-        self,
-        new_page_contents_html: state_domain.SubtitledHtml
+        self, new_page_contents_html: state_domain.SubtitledHtml
     ) -> None:
         """The new value for the html data field.
 
@@ -405,8 +398,7 @@ class SubtopicPage:
         self.page_contents.subtitled_html = new_page_contents_html
 
     def update_page_contents_audio(
-        self,
-        new_page_contents_audio: state_domain.RecordedVoiceovers
+        self, new_page_contents_audio: state_domain.RecordedVoiceovers
     ) -> None:
         """The new value for the recorded_voiceovers data field.
 
@@ -417,8 +409,7 @@ class SubtopicPage:
         self.page_contents.recorded_voiceovers = new_page_contents_audio
 
     def update_page_contents_written_translations(
-            self,
-            new_page_written_translations_dict: WrittenTranslationsType
+            self, new_page_written_translations_dict: WrittenTranslationsType
         ) -> None:
         """The new value for the written_translations data field.
 
@@ -441,10 +432,6 @@ class SubtopicPage:
             raise utils.ValidationError(
                 'Expected topic_id to be a string, received %s' %
                 self.topic_id)
-        if not isinstance(self.version, int):
-            raise utils.ValidationError(
-                'Expected version number to be an int, received %s' %
-                self.version)
         self.page_contents.validate()
 
         if not isinstance(self.page_contents_schema_version, int):
