@@ -17,9 +17,6 @@
  */
 
 require(
-  'components/state-editor/state-content-editor/' +
-  'state-content-editor.directive.ts');
-require(
   'components/state-editor/state-hints-editor/state-hints-editor.component.ts');
 require(
   'components/state-editor/state-skill-editor/' +

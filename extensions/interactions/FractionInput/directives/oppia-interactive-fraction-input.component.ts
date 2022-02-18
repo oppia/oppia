@@ -58,6 +58,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     type: 'unicode',
     ui_config: {}
   };
+
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private fractionInputRulesService: FractionInputRulesService,
