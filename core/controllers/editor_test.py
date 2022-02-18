@@ -476,6 +476,11 @@ written_translations:
         exp_services.update_exploration(
             owner_id, exp_id, [
                 exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'auto_tts_enabled',
+                    'new_value': True,
+                }),
+                exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State A',
                 }),
