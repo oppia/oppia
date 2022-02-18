@@ -39,6 +39,7 @@ export class CommunityLessonsTabComponent {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService) {
   }
+
   @Input() incompleteExplorationsList: LearnerExplorationSummary[];
   @Input() incompleteCollectionsList: CollectionSummary[];
   @Input() completedExplorationsList: LearnerExplorationSummary[];
@@ -51,20 +52,28 @@ export class CommunityLessonsTabComponent {
   noPlaylistActivity: boolean;
   totalIncompleteLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   totalCompletedLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   totalLessonsInPlaylist: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   allCommunityLessons: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   displayIncompleteLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   displayCompletedLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   displayLessonsInPlaylist: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   displayInCommunityLessons: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   selectedSection: string;
   completed: string = 'Completed';
   incomplete: string = 'Incomplete';
@@ -78,6 +87,7 @@ export class CommunityLessonsTabComponent {
     playlist: false,
     subscriptions: false
   };
+
   pageNumberInCommunityLessons: number = 1;
   pageSize: number = 3;
   startIndexInCommunityLessons: number = 0;
@@ -87,6 +97,7 @@ export class CommunityLessonsTabComponent {
   endIndexInPlaylist: number = 3;
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
+
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
 
