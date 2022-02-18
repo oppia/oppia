@@ -39,12 +39,9 @@ export class AlgebraicExpressionInputRulesService {
     // Inserting '*' signs between variables if not present.
     answer = mis.insertMultiplicationSigns(answer);
     inputs.x = mis.insertMultiplicationSigns(inputs.x);
-
-    // TODO(#13083): Remove the 'as unknown as boolean' part after the library
-    // typing is fixed.
     return nerdamer(
       nerdamer(answer).text()
-    ).eq(nerdamer(inputs.x).text()) as unknown as boolean;
+    ).eq(nerdamer(inputs.x).text());
   }
 
   IsEquivalentTo(
@@ -62,12 +59,9 @@ export class AlgebraicExpressionInputRulesService {
     let expandedCreatorAnswer = nerdamer(inputs.x).expand().text();
     let simplifiedCreatorAnswer = nerdamer(
       `simplify(${expandedCreatorAnswer})`).text();
-
-    // TODO(#13083): Remove the 'as unknown as boolean' part after the library
-    // typing is fixed.
     return nerdamer(
       simplifiedLearnerAnswer
-    ).eq(simplifiedCreatorAnswer) as unknown as boolean;
+    ).eq(simplifiedCreatorAnswer);
   }
 
   ContainsSomeOf(
