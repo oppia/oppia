@@ -87,9 +87,10 @@ describe('Schema Based List Editor Component', () => {
   it('should overwrite local value', () => {
     component.localValue = ['item1', 'item2'];
 
-    component.writeValue(['item1']);
+    let value = ['item1'];
+    component.writeValue(value);
 
-    expect(component.localValue).toEqual(['item1']);
+    expect(component.localValue).toEqual(value);
   });
 
   it('should show and hide add item button', () => {
