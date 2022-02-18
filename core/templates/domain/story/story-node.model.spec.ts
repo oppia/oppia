@@ -64,6 +64,15 @@ describe('Story node model', () => {
 
     expect(() => invalidStoryNode.validate()).toThrowError(
       'The node id 1 is invalid.');
+
+    // This throws "TS2345". We need to suppress this error because
+    // we are testing that _checkValidNodeId return false when
+    // typeof nodeId is not a string.
+    // @ts-ignore
+    const invalidStoryNode2 = StoryNode.createFromIdAndTitle({}, '');
+
+    expect(() => invalidStoryNode2.validate()).toThrowError(
+      'The node id [object Object] is invalid.');
   });
 
   it('should raise issue when validating node with duplicated ' +
@@ -317,14 +326,5 @@ describe('Story node model', () => {
     _sampleStoryNode.setThumbnailBgColor('#fff');
 
     expect(_sampleStoryNode.getThumbnailBgColor()).toEqual('#fff');
-  });
-
-  it('should return false when nodeId is not a string', () => {
-    var nodeId = {};
-    // This throws "TS2345". We need to suppress this error because
-    // we are testing that _checkValidNodeId return false when
-    // typeof nodeId is not a string.
-    // @ts-ignore
-    expect(_sampleStoryNode._checkValidNodeId(nodeId)).toEqual(false);
   });
 });
