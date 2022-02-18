@@ -239,8 +239,10 @@ describe('Topic and Story viewer functionality', function() {
         await topicAndStoryViewerPage.waitForPracticeSessionContainer();
       });
 
-      await explorationPlayerPage.submitAnswer('TextInput', 'correct');
-      await explorationPlayerPage.clickThroughToNextCard();
+      for (let i = 0; i < 10; i++) {
+        await explorationPlayerPage.submitAnswer('TextInput', 'correct');
+        await explorationPlayerPage.clickThroughToNextCard();
+      }
       await topicViewerPage.expectMessageAfterCompletion(
         'Session complete. Well done!'
       );
