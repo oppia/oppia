@@ -20,7 +20,7 @@ import { AlgebraicExpressionInputRulesService } from
 // eslint-disable-next-line max-len
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 
-describe('Algebraic expression input rules service', () => {
+fdescribe('Algebraic expression input rules service', () => {
   let algebraicRulesService: AlgebraicExpressionInputRulesService;
   let inputString;
 
@@ -256,9 +256,12 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '6-(-4)', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '4+6', {x: inputString})).toBeTrue();
+      '-(-4)+6', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '10', {x: inputString})).toBeTrue();
+      '4+6', {x: inputString})).toBeTrue();
+
+    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
+      '10', {x: inputString})).toBeFalse();
   });
 
   it('should have a correct IsEquivalentTo rule', () => {
