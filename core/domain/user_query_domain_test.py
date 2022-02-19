@@ -47,42 +47,12 @@ class UserQueryTests(test_utils.GenericTestBase):
         )
         self.user_query.validate()
 
-    def test_validate_query_with_invalid_type_id_raises(self) -> None:
-        self.user_query.id = 1 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected ID to be a string'
-        ):
-            self.user_query.validate()
-
-    def test_validate_query_with_invalid_type_params_raises(self) -> None:
-        self.user_query.params = 1 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected params to be of type tuple'
-        ):
-            self.user_query.validate()
-
-    def test_validate_query_with_invalid_type_submitter_id_raises(
-            self) -> None:
-        self.user_query.submitter_id = 1 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected submitter ID to be a string'
-        ):
-            self.user_query.validate()
-
     def test_validate_query_with_invalid_user_id_submitter_id_raises(
             self
         ) -> None:
         self.user_query.submitter_id = 'aaabbc'
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected submitter ID to be a valid user ID'
-        ):
-            self.user_query.validate()
-
-    def test_validate_query_with_invalid_type_status_raises(self) -> None:
-        self.user_query.status = 1 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected status to be a string'
         ):
             self.user_query.validate()
 
@@ -93,37 +63,12 @@ class UserQueryTests(test_utils.GenericTestBase):
         ):
             self.user_query.validate()
 
-    def test_validate_query_with_invalid_type_user_ids_raises(self) -> None:
-        self.user_query.user_ids = 'a' # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected user_ids to be a list'
-        ):
-            self.user_query.validate()
-
-    def test_validate_query_with_invalid_type_of_values_in_user_ids_raises(
-            self) -> None:
-        self.user_query.user_ids = [1] # type: ignore[list-item]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected each user ID in user_ids to be a string'
-        ):
-            self.user_query.validate()
-
     def test_validate_query_with_non_user_id_values_in_user_ids_raises(
             self) -> None:
         self.user_query.user_ids = ['aaa']
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected user ID in user_ids to be a valid user ID'
-        ):
-            self.user_query.validate()
-
-    def test_validate_query_with_invalid_type_of_sent_email_model_id_raises(
-            self) -> None:
-        self.user_query.sent_email_model_id = 1 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected sent_email_model_id to be a string'
         ):
             self.user_query.validate()
 
