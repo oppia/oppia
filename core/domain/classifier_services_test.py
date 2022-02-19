@@ -786,6 +786,6 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             current_exploration, old_exploration))
         # Verify if classifier model mapping is maintained using the job ID.
         new_job = classifier_services.get_classifier_training_job(
-            self.exp_id, current_exploration.version, state_name,
+            self.exp_id, current_exploration.version + 1, state_name,
             algorithm_id)
         self.assertEqual(job.job_id, new_job.job_id)
