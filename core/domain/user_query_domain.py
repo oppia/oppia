@@ -25,7 +25,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import List, Union
+from typing import List, Optional
 
 attribute_names = [ # pylint: disable=invalid-name
         predicate['backend_attr'] for predicate in (
@@ -52,8 +52,8 @@ class UserQuery:
             submitter_id: str,
             query_status: str,
             user_ids: List[str],
-            sent_email_model_id: Union[str, None]=None,
-            created_on: Union[datetime.datetime, None]=None,
+            sent_email_model_id: Optional[str]=None,
+            created_on: Optional[datetime.datetime]=None,
             deleted: bool=False
         ) -> None:
         """Create user query domain object.
@@ -161,7 +161,7 @@ class UserQuery:
             feconf.USER_QUERY_STATUS_PROCESSING, []
         )
 
-    def archive(self, sent_email_model_id: Union[str, None]=None) -> None:
+    def archive(self, sent_email_model_id: Optional[str]=None) -> None:
         """Archive the query.
 
         Args:
