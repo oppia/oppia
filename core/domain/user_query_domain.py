@@ -101,7 +101,6 @@ class UserQuery:
                     'Expected user ID in user_ids to be a valid user ID, '
                     'received %s' % user_id)
 
-
     @classmethod
     def create_default(
             cls,
