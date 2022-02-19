@@ -249,6 +249,16 @@ describe('Algebraic expression input rules service', () => {
       '((3*x-1))^(2)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '3*x(3*x-2)+1', {x: inputString})).toBeFalse();
+
+
+    inputString = '6-(-4)';
+
+    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
+      '6-(-4)', {x: inputString})).toBeTrue();
+    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
+      '4+6', {x: inputString})).toBeTrue();
+    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
+      '10', {x: inputString})).toBeTrue();
   });
 
   it('should have a correct IsEquivalentTo rule', () => {
