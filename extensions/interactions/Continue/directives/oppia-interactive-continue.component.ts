@@ -41,6 +41,7 @@ export class OppiaInteractiveContinue implements OnInit {
   readonly DEFAULT_BUTTON_TEXT: string = 'Continue';
   readonly DEFAULT_HUMAN_READABLE_ANSWER: string = (
     'Please continue.');
+
   constructor(
     private continueRulesService: ContinueRulesService,
     private contextService: ContextService,

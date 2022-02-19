@@ -42,6 +42,7 @@ export class CollectionEditorNavbarBreadcrumbComponent {
     stats: 'Statistics',
     history: 'History',
   };
+
   activeTabName: string;
   collection: Collection;
 
