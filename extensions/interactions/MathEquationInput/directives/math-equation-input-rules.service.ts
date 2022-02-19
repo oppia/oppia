@@ -70,6 +70,45 @@ export class MathEquationInputRulesService {
     }
   }
 
+  MatchesUpToTrivialManipulations(
+      answer: MathEquationAnswer,
+      inputs: MathEquationRuleInputsWithSide): boolean {
+    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
+
+    let positionOfTerms = inputs.y;
+
+    let splitAnswer = answer.split('=');
+    let lhsAnswer = splitAnswer[0], rhsAnswer = splitAnswer[1];
+
+    let splitInput = inputs.x.split('=');
+    let lhsInput = splitInput[0], rhsInput = splitInput[1];
+
+    if (positionOfTerms === 'lhs') {
+      return algebraicRulesService.MatchesUpToTrivialManipulations(
+        lhsAnswer, {x: lhsInput});
+    } else if (positionOfTerms === 'rhs') {
+      return algebraicRulesService.MatchesUpToTrivialManipulations(
+        rhsAnswer, {x: rhsInput});
+    } else if (positionOfTerms === 'both') {
+      return (
+        algebraicRulesService.MatchesUpToTrivialManipulations(
+          lhsAnswer, {x: lhsInput}) && (
+          algebraicRulesService.MatchesUpToTrivialManipulations(
+            rhsAnswer, {x: rhsInput})));
+    } else {
+      // Position of terms is irrelevant. So, we bring all terms on one side
+      // and perform an exact match.
+      let rhsAnswerModified = nerdamer(rhsAnswer).multiply('-1').text();
+      let expressionAnswer = nerdamer(rhsAnswerModified).add(lhsAnswer).text();
+
+      let rhsInputModified = nerdamer(rhsInput).multiply('-1').text();
+      let expressionInput = nerdamer(rhsInputModified).add(lhsInput).text();
+
+      return algebraicRulesService.MatchesUpToTrivialManipulations(
+        expressionAnswer, {x: expressionInput});
+    }
+  }
+
   IsEquivalentTo(
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithoutSide): boolean {

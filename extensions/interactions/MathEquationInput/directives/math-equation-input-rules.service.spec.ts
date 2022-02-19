@@ -134,6 +134,109 @@ describe('Math equation input rules service', () => {
       'y^2=m*x*y+c*y', {x: inputString, y: positionOfTerms})).toBeFalse();
   });
 
+  it('should have a correct MatchesUpToTrivialManipulations rule', () => {
+    inputString = 'y=m*x+c';
+
+    positionOfTerms = 'lhs';
+    // Accepted cases.
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y=m*x^2+c', {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      '(y^2)/y=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y=0', {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y=m*x-c', {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y-m*x=c', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'm*x+c=y', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y^2=m*x', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'x=m*y+c', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y/(m*x+c)=1', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y^2=m*x*y+c*y', {x: inputString, y: positionOfTerms})).toBeFalse();
+
+    positionOfTerms = 'rhs';
+    // Accepted cases.
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y^2=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      '0=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      '0=c+m*x', {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y-m*x=c', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'm*x+c=y', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y^2=m*x', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'x=m*y+c', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y/(m*x+c)=1', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y^2=m*x*y+c*y', {x: inputString, y: positionOfTerms})).toBeFalse();
+
+    positionOfTerms = 'both';
+    // Accepted cases.
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y=m*x+c',
+      {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y=c+m*x', {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      '(y^2)/y=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y-m*x=c', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'm*x+c=y', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y=m*x', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'x=m*y+c', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y/(m*x+c)=1', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y^2=m*x*y+c*y', {x: inputString, y: positionOfTerms})).toBeFalse();
+
+    positionOfTerms = 'irrelevant';
+    // Accepted cases.
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y=c+m*x', {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      '(y^2)/y=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y-m*x=c', {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y-m*x-2*c=-c', {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y^2-m*x=c', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'm*x-c=y', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y=m*x', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'x=m*y+c', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y/(m*x+c)=1', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y^2=m*x*y+c*y', {x: inputString, y: positionOfTerms})).toBeFalse();
+  });
+
   it('should have a correct IsEquivalentTo rule', () => {
     inputString = '(2*x+1)*(x-3)=0';
 

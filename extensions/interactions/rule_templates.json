@@ -3,6 +3,9 @@
     "MatchesExactlyWith": {
       "description": "matches exactly with {{x|AlgebraicExpression}}"
     },
+    "MatchesUpToTrivialManipulations": {
+      "description": "matches up to trivial manipulations with {{x|AlgebraicExpression}}"
+    },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|AlgebraicExpression}}"
     },
@@ -123,6 +126,9 @@
     "MatchesExactlyWith": {
       "description": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}"
     },
+    "MatchesUpToTrivialManipulations": {
+      "description": "matches up to trivial manipulations with {{x|MathEquation}} {{y|PositionOfTerms}}"
+    },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|MathEquation}}"
     },
@@ -172,6 +178,9 @@
   "NumericExpressionInput": {
     "MatchesExactlyWith": {
       "description": "matches exactly with {{x|NumericExpression}}"
+    },
+    "MatchesUpToTrivialManipulations": {
+      "description": "matches up to trivial manipulations with {{x|NumericExpression}}"
     },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|NumericExpression}}"

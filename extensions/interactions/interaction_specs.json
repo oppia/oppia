@@ -97,6 +97,7 @@
     "default_outcome_heading": null,
     "rule_descriptions": {
       "MatchesExactlyWith": "matches exactly with {{x|NumericExpression}}",
+      "MatchesUpToTrivialManipulations": "matches up to trivial manipulations with {{x|NumericExpression}}",
       "IsEquivalentTo": "is equivalent to {{x|NumericExpression}}",
       "ContainsSomeOf": "contains at least one of the terms present in {{x|NumericExpression}}",
       "OmitsSomeOf": "omits at least one of the terms present in {{x|NumericExpression}}"
@@ -605,6 +606,7 @@
     "default_outcome_heading": null,
     "rule_descriptions": {
       "MatchesExactlyWith": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}",
+      "MatchesUpToTrivialManipulations": "matches up to trivial manipulations with {{x|MathEquation}} {{y|PositionOfTerms}}",
       "IsEquivalentTo": "is equivalent to {{x|MathEquation}}",
       "ContainsSomeOf": "contains at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
       "OmitsSomeOf": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
@@ -907,6 +909,7 @@
     "default_outcome_heading": null,
     "rule_descriptions": {
       "MatchesExactlyWith": "matches exactly with {{x|AlgebraicExpression}}",
+      "MatchesUpToTrivialManipulations": "matches up to trivial manipulations with {{x|AlgebraicExpression}}",
       "IsEquivalentTo": "is equivalent to {{x|AlgebraicExpression}}",
       "ContainsSomeOf": "contains at least one of the terms present in {{x|AlgebraicExpression}}",
       "OmitsSomeOf": "omits at least one of the terms present in {{x|AlgebraicExpression}}",
