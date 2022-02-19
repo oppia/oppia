@@ -41,11 +41,9 @@ export class NumericExpressionInputRulesService {
   IsEquivalentTo(
       answer: NumericExpressionAnswer, inputs: NumericExpressionRuleInputs
   ): boolean {
-    // TODO(#13083): Remove the 'as unknown as boolean' part after the library
-    // typing is fixed.
     return nerdamer(answer).eq(
       nerdamer(inputs.x).toString()
-    ) as unknown as boolean;
+    );
   }
 
   ContainsSomeOf(
