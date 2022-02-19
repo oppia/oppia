@@ -120,6 +120,19 @@ angular.module('oppia').directive('objectEditor', [
         };
         if (directiveName) {
           if (MIGRATED_EDITORS.indexOf(directiveName) >= 0) {
+            if (directiveName === (
+              'list-of-sets-of-translatable-html-content-ids'
+            ) && !scope.initArgs) {
+              throw new Error(
+                '\nProvided initArgs: ' + scope.initArgs +
+                '\nExpected initArgs: To be an object containing ' +
+                'a property called \'choices\' whose value would be an ' +
+                'array of answer choices in drag and drop response.' +
+                '\nSince this initArgs will be passed into ' +
+                'list-of-sets-of-translatable-html-content-ids editor, ' +
+                'it might be the cause of issue #14708'
+              );
+            }
             element.html(
               '<' + directiveName +
               '-editor [always-editable]="alwaysEditable"' +
