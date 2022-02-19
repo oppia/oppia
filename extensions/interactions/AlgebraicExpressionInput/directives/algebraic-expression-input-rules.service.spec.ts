@@ -20,7 +20,7 @@ import { AlgebraicExpressionInputRulesService } from
 // eslint-disable-next-line max-len
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 
-fdescribe('Algebraic expression input rules service', () => {
+describe('Algebraic expression input rules service', () => {
   let algebraicRulesService: AlgebraicExpressionInputRulesService;
   let inputString;
 
