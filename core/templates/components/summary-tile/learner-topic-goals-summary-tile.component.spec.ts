@@ -31,7 +31,7 @@ import { LearnerTopicGoalsSummaryTileComponent } from
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 
 
-fdescribe('Learner Topic Goals Summary Tile Component', () => {
+describe('Learner Topic Goals Summary Tile Component', () => {
   let component: LearnerTopicGoalsSummaryTileComponent;
   let fixture: ComponentFixture<LearnerTopicGoalsSummaryTileComponent>;
 
@@ -134,8 +134,8 @@ fdescribe('Learner Topic Goals Summary Tile Component', () => {
     fixture.detectChanges();
   });
 
-  it('should get # as story node link url if all chapters ' +
-    'are read', () => {
+  it('should get # as story node link url if all chapters' +
+    ' are read', () => {
     component.storyNodeToDisplay = null;
     let storyNodeLink = component.getStoryNodeLink();
     fixture.detectChanges();
@@ -154,8 +154,8 @@ fdescribe('Learner Topic Goals Summary Tile Component', () => {
       '-webkit-filter: blur(2px); filter: blur(2px);');
   });
 
-  it('should get story node link url for exploration page if unread ' +
-    'chapters are present in topic', () => {
+  it('should get story node link url for exploration page if unread' +
+    ' chapters are present in topic', () => {
     let storyNodeLink = '/explore/exp_1?topic_url_fragment=topic-name&' +
     'classroom_url_fragment=math&story_url_fragment=story-title&' +
     'node_id=node_1';
