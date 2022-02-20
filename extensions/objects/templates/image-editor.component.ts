@@ -982,31 +982,30 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       let gifHeight = dimensions.height;
       this.processGIFImage(imageDataURI, gifWidth, gifHeight, null, successCb);
     } else if (mimeType === 'data:image/svg+xml') {
-      // Check if the SVG containes 'data-name' attribute and remove it.
-      // We are removing this attribute, because currently it is not in
-      // the allowlist of valid attributes. The allowlist is based on the
-      // list of tags and attributes specified in this project:
+      // We are removing the attributes which are currently is not in
+      // the allowlist of valid attributes. The allowlist is based on
+      // the list of tags and attributes specified in this project:
       // https://github.com/cure53/DOMPurify
       // Complete list of valid SVG attributes is present at
       // 'assets/constants.ts'.
-      let svg = this.svgSanitizerService.removeTagsAndAttributes(
-        this.svgSanitizerService.parseDataURI(imageDataURI),
-        {tags: [], attrs: ['data-name']}
-      );
-      imageDataURI = (
-        'data:image/svg+xml;base64,' +
-        btoa(unescape(encodeURIComponent(svg.documentElement.outerHTML))));
+      let svg = this.svgSanitizerService.parseDataURI(imageDataURI);
       this.invalidTagsAndAttributes = (
         this.svgSanitizerService.getInvalidSvgTagsAndAttrs(svg));
       const tags = this.invalidTagsAndAttributes.tags;
-      const attrs = this.invalidTagsAndAttributes.attrs;
-      if (tags.length === 0 && attrs.length === 0) {
-        resampledFile = (
-          this.imageUploadHelperService.convertImageDataToImageFile(
-            imageDataURI));
-        this.saveImage(dimensions, resampledFile, 'svg');
-        this.data.crop = false;
-      }
+      let attrs: string[] = [];
+      this.invalidTagsAndAttributes.attrs.forEach(attribute => {
+        attrs.push(attribute.split(':')[1]);
+      });
+      svg = this.svgSanitizerService.removeTagsAndAttributes(
+        svg, {tags, attrs});
+      imageDataURI = (
+        'data:image/svg+xml;base64,' +
+        btoa(unescape(encodeURIComponent(svg.documentElement.outerHTML))));
+      resampledFile = (
+        this.imageUploadHelperService.convertImageDataToImageFile(
+          imageDataURI));
+      this.saveImage(dimensions, resampledFile, 'svg');
+      this.data.crop = false;
     } else {
       const resampledImageData = this.getResampledImageData(
         imageDataURI, dimensions.width, dimensions.height);
