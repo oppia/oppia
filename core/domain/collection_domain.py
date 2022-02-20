@@ -33,7 +33,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 from typing_extensions import Final, Literal, TypedDict
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -83,9 +83,12 @@ CMD_REMOVE_QUESTION_ID_FROM_SKILL: Final = 'remove_question_id_from_skill'
 _SKILL_ID_PREFIX: Final = 'skill'
 
 CollectionPropertiesTuple = Tuple[
-    Literal['title'], Literal['category'],
-    Literal['objective'], Literal['language_code'],
-    Literal['tags']]
+    Literal['title'],
+    Literal['category'],
+    Literal['objective'],
+    Literal['language_code'],
+    Literal['tags']
+]
 
 
 class AllowedCommandDict(TypedDict, total=False):
@@ -186,7 +189,7 @@ class CollectionChange(change_domain.BaseChange):
 
 
 class CollectionNodeDict(TypedDict, total=False):
-    """Type for the collection node object"""
+    """Dictionary representing the CollectionNode object."""
 
     acquired_skills: List[str]
     acquired_skill_ids: List[str]
@@ -264,7 +267,7 @@ class CollectionNode:
 
 
 class CollectionDict(TypedDict, total=False):
-    """Type for the collection object"""
+    """Dictionary representing the Collection object."""
 
     id: str
     title: str
@@ -273,22 +276,25 @@ class CollectionDict(TypedDict, total=False):
     language_code: str
     tags: List[str]
     schema_version: int
-    nodes: list[CollectionNodeDict]
+    nodes: List[CollectionNodeDict]
     version: int
     created_on: Union[datetime.datetime, str, None]
     last_updated: Union[datetime.datetime, str, None]
 
 
 class CollectionVersionDict(CollectionDict, total=False):
-    """Type for the collection Dict based on different versions"""
+    """
+    Dictionary representing the Collection object based
+    on different schema versions.
+    """
 
-    skills: Dict[str, Dict[str, Any]]
+    skills: Dict[str, Dict[str, Union[str, List[str]]]]
     next_skill_id: int
     next_skill_index: int
 
 
 class VersionedCollectionDict(TypedDict):
-    """Type for the versioned collection dict"""
+    """Dictionary representing the versioned collection contents."""
 
     schema_version: int
     collection_contents: CollectionVersionDict
@@ -306,7 +312,7 @@ class Collection:
         language_code: str,
         tags: List[str],
         schema_version: int,
-        nodes: list[CollectionNode],
+        nodes: List[CollectionNode],
         version: int,
         created_on: Optional[datetime.datetime] = None,
         last_updated: Optional[datetime.datetime] = None
@@ -376,7 +382,8 @@ class Collection:
 
     @classmethod
     def create_default_collection(
-        cls, collection_id: str,
+        cls,
+        collection_id: str,
         title: str = feconf.DEFAULT_COLLECTION_TITLE,
         category: str = feconf.DEFAULT_COLLECTION_CATEGORY,
         objective: str = feconf.DEFAULT_COLLECTION_OBJECTIVE,
@@ -646,9 +653,7 @@ class Collection:
 
     @classmethod
     def from_yaml(
-        cls,
-        collection_id: str,
-        yaml_content: str
+        cls, collection_id: str, yaml_content: str
     ) -> Collection:
         """Converts a YAML string to a Collection domain object.
 
@@ -1007,9 +1012,7 @@ class Collection:
         self.nodes.append(CollectionNode.create_default_node(exploration_id))
 
     def swap_nodes(
-        self,
-        first_index: int,
-        second_index: int
+        self, first_index: int, second_index: int
     ) -> None:
         """Swaps the values of 2 nodes in the collection.
 
@@ -1164,7 +1167,7 @@ class Collection:
 
 
 class CollectionSummaryDict(TypedDict):
-    """Type for the collection summary object"""
+    """Dictionary representing the CollectionSummary object."""
 
     id: str
     title: str
@@ -1285,45 +1288,17 @@ class CollectionSummary:
             ValidationError. One or more attributes of the CollectionSummary
                 are invalid.
         """
-        if not isinstance(self.title, str):
-            raise utils.ValidationError(
-                'Expected title to be a string, received %s' % self.title)
         utils.require_valid_name(
             self.title, 'the collection title', allow_empty=True)
 
-        if not isinstance(self.category, str):
-            raise utils.ValidationError(
-                'Expected category to be a string, received %s'
-                % self.category)
         utils.require_valid_name(
             self.category, 'the collection category', allow_empty=True)
-
-        if not isinstance(self.objective, str):
-            raise utils.ValidationError(
-                'Expected objective to be a string, received %s' %
-                self.objective)
-
-        if not self.language_code:
-            raise utils.ValidationError(
-                'A language must be specified (in the \'Settings\' tab).')
-
-        if not isinstance(self.language_code, str):
-            raise utils.ValidationError(
-                'Expected language code to be a string, received %s' %
-                self.language_code)
 
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        if not isinstance(self.tags, list):
-            raise utils.ValidationError(
-                'Expected tags to be a list, received %s' % self.tags)
-
         for tag in self.tags:
-            if not isinstance(tag, str):
-                raise utils.ValidationError(
-                    'Expected each tag to be a string, received \'%s\'' % tag)
 
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
@@ -1347,57 +1322,6 @@ class CollectionSummary:
         if len(set(self.tags)) < len(self.tags):
             raise utils.ValidationError(
                 'Expected tags to be unique, but found duplicates')
-
-        if not isinstance(self.status, str):
-            raise utils.ValidationError(
-                'Expected status to be string, received %s' % self.status)
-
-        if not isinstance(self.community_owned, bool):
-            raise utils.ValidationError(
-                'Expected community_owned to be bool, received %s' % (
-                    self.community_owned))
-
-        if not isinstance(self.owner_ids, list):
-            raise utils.ValidationError(
-                'Expected owner_ids to be list, received %s' % self.owner_ids)
-        for owner_id in self.owner_ids:
-            if not isinstance(owner_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in owner_ids to '
-                    'be string, received %s' % owner_id)
-
-        if not isinstance(self.editor_ids, list):
-            raise utils.ValidationError(
-                'Expected editor_ids to be list, received %s' % self.editor_ids)
-        for editor_id in self.editor_ids:
-            if not isinstance(editor_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in editor_ids to '
-                    'be string, received %s' % editor_id)
-
-        if not isinstance(self.viewer_ids, list):
-            raise utils.ValidationError(
-                'Expected viewer_ids to be list, received %s' % self.viewer_ids)
-        for viewer_id in self.viewer_ids:
-            if not isinstance(viewer_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in viewer_ids to '
-                    'be string, received %s' % viewer_id)
-
-        if not isinstance(self.contributor_ids, list):
-            raise utils.ValidationError(
-                'Expected contributor_ids to be list, received %s' % (
-                    self.contributor_ids))
-        for contributor_id in self.contributor_ids:
-            if not isinstance(contributor_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in contributor_ids to '
-                    'be string, received %s' % contributor_id)
-
-        if not isinstance(self.contributors_summary, dict):
-            raise utils.ValidationError(
-                'Expected contributors_summary to be dict, received %s' % (
-                    self.contributors_summary))
 
     def is_editable_by(self, user_id: str) -> bool:
         """Checks if a given user may edit the collection.

@@ -495,7 +495,8 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_collection_contents_from_model(self) -> None:
         versioned_collection_contents: (
-            collection_domain.VersionedCollectionDict) = {
+            collection_domain.VersionedCollectionDict
+        ) = {
             'schema_version': 1,
             'collection_contents': {}
         }
@@ -518,7 +519,8 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         versioned_collection_contents: (
-            collection_domain.VersionedCollectionDict) = {
+            collection_domain.VersionedCollectionDict
+        ) = {
             'schema_version': 5,
             'collection_contents': {
                 'nodes': [
@@ -550,7 +552,8 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         versioned_collection_contents: (
-            collection_domain.VersionedCollectionDict) = {
+            collection_domain.VersionedCollectionDict
+        ) = {
             'schema_version': feconf.CURRENT_COLLECTION_SCHEMA_VERSION,
             'collection_contents': {}
         }
@@ -1017,57 +1020,10 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
     def test_validation_passes_with_valid_properties(self) -> None:
         self.collection_summary.validate()
 
-    def test_validation_fails_with_invalid_title(self) -> None:
-        self.collection_summary.title = 0 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected title to be a string, received 0'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_category(self) -> None:
-        self.collection_summary.category = 0 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected category to be a string, received 0'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_objective(self) -> None:
-        self.collection_summary.objective = 0 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected objective to be a string, received 0'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_missing_language_code(self) -> None:
-        self.collection_summary.language_code = None # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'A language must be specified \\(in the \'Settings\' tab\\).'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_language_code(self) -> None:
-        self.collection_summary.language_code = 1 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected language code to be a string, received 1'):
-            self.collection_summary.validate()
-
     def test_validation_fails_with_unallowed_language_code(self) -> None:
         self.collection_summary.language_code = 'invalid'
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid language code: invalid'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_tags(self) -> None:
-        self.collection_summary.tags = 'tags' # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected tags to be a list, received tags'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_tag_in_tags(self) -> None:
-        self.collection_summary.tags = ['tag', 2] # type: ignore[list-item]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected each tag to be a string, received \'2\''):
             self.collection_summary.validate()
 
     def test_validation_fails_with_empty_tag_in_tags(self) -> None:
@@ -1111,88 +1067,6 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected tags to be unique, but found duplicates'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_status(self) -> None:
-        self.collection_summary.status = 0 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected status to be string, received 0'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_community_owned(self) -> None:
-        self.collection_summary.community_owned = 0 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected community_owned to be bool, received 0'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_contributors_summary(self) -> None:
-        self.collection_summary.contributors_summary = 0 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected contributors_summary to be dict, received 0'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_owner_ids_type(self) -> None:
-        self.collection_summary.owner_ids = 0 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected owner_ids to be list, received 0'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_owner_id_in_owner_ids(self) -> None:
-        self.collection_summary.owner_ids = ['1', 2, '3'] # type: ignore[list-item]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected each id in owner_ids to be string, received 2'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_editor_ids_type(self) -> None:
-        self.collection_summary.editor_ids = 0 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected editor_ids to be list, received 0'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_editor_id_in_editor_ids(
-        self
-    ) -> None:
-        self.collection_summary.editor_ids = ['1', 2, '3'] # type: ignore[list-item]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected each id in editor_ids to be string, received 2'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_viewer_ids_type(self) -> None:
-        self.collection_summary.viewer_ids = 0 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected viewer_ids to be list, received 0'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_viewer_id_in_viewer_ids(
-        self
-    ) -> None:
-        self.collection_summary.viewer_ids = ['1', 2, '3'] # type: ignore[list-item]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected each id in viewer_ids to be string, received 2'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_contributor_ids_type(self) -> None:
-        self.collection_summary.contributor_ids = 0 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected contributor_ids to be list, received 0'):
-            self.collection_summary.validate()
-
-    def test_validation_fails_with_invalid_contributor_id_in_contributor_ids(
-        self
-    ) -> None:
-        self.collection_summary.contributor_ids = ['1', 2, '3'] # type: ignore[list-item]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected each id in contributor_ids to be string, received 2'):
             self.collection_summary.validate()
 
     def test_is_private(self) -> None:
