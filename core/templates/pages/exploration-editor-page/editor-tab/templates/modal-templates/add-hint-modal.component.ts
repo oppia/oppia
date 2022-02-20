@@ -25,7 +25,6 @@ import { StateHintsService } from 'components/state-editor/state-editor-properti
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ContextService } from 'services/context.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { FormControl } from '@angular/forms';
 
 interface HintFormSchema {
   type: string;
@@ -41,7 +40,6 @@ export class AddHintModalComponent
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  addHintForm!: FormControl;
   hintIndex!: number;
   tmpHint: string = '';
   COMPONENT_NAME_HINT: string = (
