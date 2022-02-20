@@ -283,8 +283,7 @@ class CollectionDict(TypedDict, total=False):
 
 
 class CollectionVersionDict(CollectionDict, total=False):
-    """
-    Dictionary representing the Collection object based
+    """Dictionary representing the Collection object based
     on different schema versions.
     """
 
