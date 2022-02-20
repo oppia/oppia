@@ -778,7 +778,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
-        
+
         current_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         # Store the job before reverting the exploration.
         job = classifier_services.get_classifier_training_job(
