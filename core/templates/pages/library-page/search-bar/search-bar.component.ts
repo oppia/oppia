@@ -160,7 +160,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       totalCount === 1 ? selectedItems[0] :
       'I18N_LIBRARY_N_' + itemsName.toUpperCase());
     this.translationData[itemsName + 'Count'] = totalCount;
-
     // TODO(milit): When the language changes, the translations won't
     // change until the user changes the selection and this function is
     // re-executed.
@@ -187,12 +186,14 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
     this.updateSelectionDetails(itemsType);
     this.onSearchQueryChangeExec();
+    this.refreshSearchBarLabels();
   }
 
   deselectAll(itemsType: string): void {
     this.selectionDetails[itemsType].selections = {};
     this.updateSelectionDetails(itemsType);
     this.onSearchQueryChangeExec();
+    this.refreshSearchBarLabels();
   }
 
   onSearchQueryChangeExec(): void {
@@ -226,9 +227,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.selectionDetails.categories.selections = {};
     this.selectionDetails.languageCodes.selections = {};
 
-    this.updateSelectionDetails('categories');
-    this.updateSelectionDetails('languageCodes');
-
     let newQuery = (
       this.searchService.updateSearchFieldsBasedOnUrlQuery(
         this.windowRef.nativeWindow.location.search, this.selectionDetails));
@@ -237,6 +235,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       this.searchQuery = newQuery;
       this.onSearchQueryChangeExec();
     }
+
+    this.updateSelectionDetails('categories');
+    this.updateSelectionDetails('languageCodes');
+    this.refreshSearchBarLabels();
   }
 
   refreshSearchBarLabels(): void {
@@ -301,6 +303,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     for (let itemsType in this.selectionDetails) {
       this.updateSelectionDetails(itemsType);
     }
+
+    this.refreshSearchBarLabels();
 
     this.searchQueryChanged
       .pipe(debounceTime(1000), distinctUntilChanged())
