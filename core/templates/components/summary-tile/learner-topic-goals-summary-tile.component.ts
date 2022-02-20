@@ -23,11 +23,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 import { UrlService } from 'services/contextual/url.service';
 import { StoryNode } from 'domain/story/story-node.model';
 import { StorySummary } from 'domain/story/story-summary.model';
-import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
 
 @Component({
   selector: 'oppia-learner-topic-goals-summary-tile',
@@ -62,9 +60,9 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
     );
     let allIncompleteStoryNodes: StoryNode[] = [];
     allStorySummaries.map(storySummary => {
-      if(allIncompleteStoryNodes.length === 0) {
+      if (allIncompleteStoryNodes.length === 0) {
         let allNodes = storySummary.getAllNodes();
-        let completedStoryNodes : string[] = (
+        let completedStoryNodes: string[] = (
           storySummary.getCompletedNodeTitles()
         );
         allIncompleteStoryNodes = allNodes.filter(node => {

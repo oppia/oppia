@@ -130,7 +130,7 @@ describe('Learner Topic Goals Summary Tile Component', () => {
       }
     };
     component.topicSummary = LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict1)
+      learnerTopicSummaryBackendDict1);
     fixture.detectChanges();
   });
 
