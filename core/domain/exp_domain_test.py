@@ -2331,6 +2331,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.deserialize(
                 exploration.serialize()).to_dict())
 
+    def test_validate_exploration_title_length(self):
+        """Checks the title length of a default exploration,
+        whether it exceeds the max title length or not.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exploration.title = 'titleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'Title length should not exceed 36 characters')):
+            exploration.validate()
+
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
 

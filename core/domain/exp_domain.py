@@ -808,6 +808,10 @@ class Exploration:
         utils.require_valid_name(
             self.title, 'the exploration title', allow_empty=True)
 
+        if len(self.title) > 36:
+            raise utils.ValidationError(
+                'Title length should not exceed 36 characters')
+
         if not isinstance(self.category, str):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
