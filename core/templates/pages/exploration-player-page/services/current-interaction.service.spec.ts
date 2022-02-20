@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CurrentInteractionService } from
+import { CurrentInteractionService, InteractionRulesService } from
   'pages/exploration-player-page/services/current-interaction.service';
 import { UrlService } from 'services/contextual/url.service';
 import { PlayerPositionService } from
@@ -27,14 +27,24 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ContextService } from 'services/context.service';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { AudioTranslationLanguageService } from './audio-translation-language.service';
 
 describe('Current Interaction Service', () => {
-  let urlService: UrlService = null;
-  let currentInteractionService: CurrentInteractionService = null;
-  let contextService: ContextService = null;
-  let DUMMY_ANSWER = 'dummy_answer';
-  let playerTranscriptService: PlayerTranscriptService = null;
-  let playerPositionService: PlayerPositionService = null;
+  let urlService: UrlService;
+  let currentInteractionService: CurrentInteractionService;
+  let contextService: ContextService;
+  let DUMMY_ANSWER: string = 'dummy_answer';
+  let playerTranscriptService: PlayerTranscriptService;
+  let playerPositionService: PlayerPositionService;
+  let mockInteractionRule: InteractionRulesService;
+  let dummyValidityCheckFn: () => true;
+  let mockInteraction: Interaction;
+  let mockVoiceover: RecordedVoiceovers;
+  let mockWrittenTranslations: WrittenTranslations;
+  let mockAudioTranslation: AudioTranslationLanguageService;
 
   // This mock is required since ContextService is used in
   // CurrentInteractionService to obtain the explorationId. So, in the
@@ -55,20 +65,22 @@ describe('Current Interaction Service', () => {
 
   it('should properly register onSubmitFn and submitAnswerFn', () => {
     let answerState = null;
-    let dummyOnSubmitFn = (answer, interactionRulesService) => {
+    let dummyOnSubmitFn = (
+        answer: string,
+        interactionRulesService: InteractionRulesService) => {
       answerState = answer;
     };
 
     currentInteractionService.setOnSubmitFn(dummyOnSubmitFn);
-    currentInteractionService.onSubmit(DUMMY_ANSWER, null);
+    currentInteractionService.onSubmit(DUMMY_ANSWER, mockInteractionRule);
     expect(answerState).toEqual(DUMMY_ANSWER);
 
     answerState = null;
     let dummySubmitAnswerFn = () => {
-      currentInteractionService.onSubmit(DUMMY_ANSWER, null);
+      currentInteractionService.onSubmit(DUMMY_ANSWER, mockInteractionRule);
     };
     currentInteractionService.registerCurrentInteraction(
-      dummySubmitAnswerFn, null);
+      dummySubmitAnswerFn, dummyValidityCheckFn);
     currentInteractionService.submitAnswer();
     expect(answerState).toEqual(DUMMY_ANSWER);
   });
@@ -91,13 +103,13 @@ describe('Current Interaction Service', () => {
       return false;
     };
     currentInteractionService.registerCurrentInteraction(
-      dummySubmitAnswerFn, null);
+      dummySubmitAnswerFn, dummyValidityCheckFn);
     expect(currentInteractionService.isSubmitButtonDisabled()).toBe(false);
   });
 
   it('should handle case where submitAnswerFn is null', () => {
     currentInteractionService.registerCurrentInteraction(
-      null, null);
+      null, dummyValidityCheckFn);
     expect(currentInteractionService.isSubmitButtonDisabled()).toBe(true);
   });
 
@@ -115,13 +127,13 @@ describe('Current Interaction Service', () => {
     currentInteractionService.registerPresubmitHook(hookB);
 
     currentInteractionService.setOnSubmitFn(() => {});
-    currentInteractionService.onSubmit(null, null);
+    currentInteractionService.onSubmit('', mockInteractionRule);
 
     expect(hookStateA).toEqual(1);
     expect(hookStateB).toEqual(3);
 
     currentInteractionService.clearPresubmitHooks();
-    currentInteractionService.onSubmit(null, null);
+    currentInteractionService.onSubmit('', mockInteractionRule);
 
     expect(hookStateA).toEqual(1);
     expect(hookStateB).toEqual(3);
@@ -133,7 +145,8 @@ describe('Current Interaction Service', () => {
       StateCard.createNewCard(
         'First State', 'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
-        null, null, null, '', null));
+        mockInteraction, mockVoiceover,
+        mockWrittenTranslations, '', mockAudioTranslation));
     spyOn(contextService, 'getExplorationId').and.returnValue('abc');
     spyOn(contextService, 'getPageContext').and.returnValue('learner');
 
@@ -144,8 +157,12 @@ describe('Current Interaction Service', () => {
       '\nState Name: First State' +
       '\nContext: learner' +
       '\nErrored at index: 1');
+    let dummySubmitAnswerFn = () => {
+      return false;
+    };
 
-    currentInteractionService.registerCurrentInteraction(null, null);
+    currentInteractionService.registerCurrentInteraction(
+      dummySubmitAnswerFn, dummyValidityCheckFn);
 
     expect(() => currentInteractionService.submitAnswer()).toThrowError(
       'The current interaction did not ' + 'register a _submitAnswerFn.' +

@@ -54,9 +54,9 @@ export class CurrentInteractionService {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService) {}
 
-  private static submitAnswerFn: SubmitAnswerFn = null;
-  private static onSubmitFn: OnSubmitFn = null;
-  private static validityCheckFn: ValidityCheckFn = null;
+  private static submitAnswerFn: SubmitAnswerFn | null;
+  private static onSubmitFn: OnSubmitFn;
+  private static validityCheckFn: ValidityCheckFn;
   private static presubmitHooks: PresubmitHookFn[] = [];
   private static answerChangedSubject: Subject<void> = new Subject<void>();
 
@@ -71,7 +71,8 @@ export class CurrentInteractionService {
   }
 
   registerCurrentInteraction(
-      submitAnswerFn: SubmitAnswerFn, validityCheckFn: ValidityCheckFn): void {
+      submitAnswerFn: SubmitAnswerFn | null,
+      validityCheckFn: ValidityCheckFn): void {
     /**
      * Each interaction directive should call registerCurrentInteraction
      * when the interaction directive is first created.

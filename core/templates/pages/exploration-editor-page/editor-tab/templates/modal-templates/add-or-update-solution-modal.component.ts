@@ -29,7 +29,8 @@ import { StateCustomizationArgsService } from 'components/state-editor/state-edi
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+
+const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 interface HtmlFormSchema {
   type: 'html';
@@ -38,9 +39,11 @@ interface HtmlFormSchema {
 
 interface SolutionInterface {
   answerIsExclusive: boolean;
-  correctAnswer: string;
+  // This property will be null when the component is initialised
+  // and correct answer is not yet choosen.
+  correctAnswer: string | null;
   explanationHtml: string;
-  explanationContentId: string;
+  explanationContentId: string | null;
   explanation?: string;
 }
 
@@ -50,17 +53,20 @@ interface SolutionInterface {
 })
 export class AddOrUpdateSolutionModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  ansOptions: string[];
-  answerIsValid: boolean;
-  correctAnswerEditorHtml: string;
-  data: SolutionInterface;
-  savedMemento: InteractionAnswer;
-  solutionType: Solution;
-  tempAnsOption: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  ansOptions!: string[];
+  answerIsValid!: boolean;
+  correctAnswerEditorHtml!: string;
+  data!: SolutionInterface;
+  savedMemento!: InteractionAnswer;
+  solutionType!: Solution;
+  tempAnsOption!: string;
+  EMPTY_SOLUTION_DATA!: SolutionInterface;
   COMPONENT_NAME_SOLUTION: string = (
     AppConstants.COMPONENT_NAME_SOLUTION);
 
-  EMPTY_SOLUTION_DATA: SolutionInterface;
   SOLUTION_EDITOR_FOCUS_LABEL: string = (
     'currentCorrectAnswerEditorHtmlForSolutionEditor');
 
@@ -91,8 +97,8 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   shouldAdditionalSubmitButtonBeShown(): boolean {
-    let interactionSpecs = INTERACTION_SPECS[
-      this.stateInteractionIdService.savedMemento];
+    let id = this.stateInteractionIdService.savedMemento;
+    let interactionSpecs = INTERACTION_SPECS[id];
     return interactionSpecs.show_generic_submit_button;
   }
 
@@ -126,7 +132,8 @@ export class AddOrUpdateSolutionModalComponent
   saveSolution(): void {
     if (typeof this.data.answerIsExclusive === 'boolean' &&
        this.data.correctAnswer !== null &&
-        this.data.explanation !== '') {
+        this.data.explanation !== '' &&
+        this.data.explanationContentId !== null) {
       this.ngbActiveModal.close({
         solution: this.solutionObjectFactory.createNew(
           this.data.answerIsExclusive,
@@ -165,10 +172,9 @@ export class AddOrUpdateSolutionModalComponent
       explanationHtml: (
         this.stateSolutionService.savedMemento.explanation.html),
       explanationContentId: (
-        this.stateSolutionService.savedMemento.explanation
-          .contentId)
+        this.stateSolutionService.savedMemento.explanation.contentId)
     } : cloneDeep(this.EMPTY_SOLUTION_DATA);
-    this.currentInteractionService.setOnSubmitFn((answer) => {
+    this.currentInteractionService.setOnSubmitFn((answer: string) => {
       this.data.correctAnswer = answer;
     });
     this.ansOptions = ['The only', 'One'];

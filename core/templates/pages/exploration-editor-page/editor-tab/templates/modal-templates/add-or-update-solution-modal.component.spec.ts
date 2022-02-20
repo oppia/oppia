@@ -23,7 +23,7 @@ import { StateCustomizationArgsService } from 'components/state-editor/state-edi
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { ShortAnswerResponse, Solution, SolutionBackendDict, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { AddOrUpdateSolutionModalComponent } from './add-or-update-solution-modal.component';
@@ -53,6 +53,7 @@ describe('Add Or Update Solution Modal Component', () => {
   let stateSolutionService: StateSolutionService;
 
   let answerEditorHtml: Solution;
+  let mockInteractionRule: InteractionRulesService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -93,8 +94,7 @@ describe('Add Or Update Solution Modal Component', () => {
       contextService = TestBed.inject(ContextService);
 
       spyOn(contextService, 'getEntityType').and.returnValue('question');
-      spyOn(explorationHtmlFormatterService, 'getInteractionHtml')
-        .and.returnValue(null);
+      spyOn(explorationHtmlFormatterService, 'getInteractionHtml');
 
       answerEditorHtml = {
         ehfs: explorationHtmlFormatterService,
@@ -151,7 +151,7 @@ describe('Add Or Update Solution Modal Component', () => {
     it('should initialize properties after component is initialized', () => {
       stateSolutionService.init('', answerEditorHtml);
 
-      expect(component.correctAnswerEditorHtml).toBe(null);
+      expect(component.correctAnswerEditorHtml).toBeNull();
       expect(component.EMPTY_SOLUTION_DATA).toEqual({
         answerIsExclusive: false,
         correctAnswer: null,
@@ -199,7 +199,7 @@ describe('Add Or Update Solution Modal Component', () => {
 
     it('should update correct answer when submitting current interaction',
       () => {
-        currentInteractionService.onSubmit('answer', null);
+        currentInteractionService.onSubmit('answer', mockInteractionRule);
 
         expect(component.data.correctAnswer).toEqual('answer');
       });
@@ -234,7 +234,7 @@ describe('Add Or Update Solution Modal Component', () => {
     it('should save solution when closing the modal', () => {
       spyOn(ngbActiveModal, 'close');
       stateSolutionService.init('', answerEditorHtml);
-      currentInteractionService.onSubmit('answer', null);
+      currentInteractionService.onSubmit('answer', mockInteractionRule);
 
       component.saveSolution();
 
