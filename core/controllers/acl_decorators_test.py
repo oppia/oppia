@@ -56,42 +56,26 @@ import webtest
 class OpenAccessDecoratorTests(test_utils.GenericTestBase):
     """Tests for open access decorator."""
 
-    user_email = 'user@example.com'
-    username = 'user'
-
     class MockHandler(base.BaseHandler):
-        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.open_access
         def get(self):
-            return self.redirect('/')
+            return self.render_json({'success': True})
 
     def setUp(self):
         super(OpenAccessDecoratorTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/splash', self.MockHandler)],
+            [webapp2.Route('/mock', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
 
     def test_redirect_when_logged_in_user_visits_splash_page(self):
-        self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_html_response(
-                '/splash', expected_status_int=302)
-        self.assertEqual(
-            'http://localhost/', response.headers['location'])
-        self.logout()
-
-    def test_redirect_when_guest_visits_splash_page(self):
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_html_response(
-                '/splash', expected_status_int=302)
-        self.assertEqual(
-            'http://localhost/', response.headers['location'])
+            response = self.get_json('/mock')
+        self.assertTrue(response['success'])
 
 
 class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
@@ -6077,7 +6061,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
 
 
 class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
-    """Tests the decorator can_view_question_editor."""
+    """Tests the decorator can_delete_question."""
 
     question_id = 'question_id'
     user_a = 'A'
