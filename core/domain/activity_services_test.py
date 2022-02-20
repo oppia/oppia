@@ -27,54 +27,69 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 
+from typing import List
+from typing_extensions import Final
+
+ActivityReferenceList = List[activity_domain.ActivityReference]
+
 
 class ActivityServicesTests(test_utils.GenericTestBase):
     """Test the activity services module."""
 
-    EXP_ID_0 = 'EXP_ID_0'
-    EXP_ID_1 = 'EXP_ID_1'
-    COL_ID_2 = 'COL_ID_2'
+    EXP_ID_0: Final = 'EXP_ID_0'
+    EXP_ID_1: Final = 'EXP_ID_1'
+    COL_ID_2: Final = 'COL_ID_2'
 
-    def _create_exploration_reference(self, exploration_id):
+    def _create_exploration_reference(
+        self, exploration_id: str
+    ) -> activity_domain.ActivityReference:
         """Creates and returns the exploration reference corresponding to the
         given exploration id.
         """
         return activity_domain.ActivityReference(
             constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
-    def _create_collection_reference(self, collection_id):
+    def _create_collection_reference(
+        self, collection_id: str
+    ) -> activity_domain.ActivityReference:
         """Creates and returns the collection reference corresponding to the
         given collection id.
         """
         return activity_domain.ActivityReference(
             constants.ACTIVITY_TYPE_COLLECTION, collection_id)
 
-    def _compare_lists(self, reference_list_1, reference_list_2):
+    def _compare_lists(
+        self,
+        reference_list_1: ActivityReferenceList,
+        reference_list_2: ActivityReferenceList
+    ) -> None:
         """Compares the hashed values of the two given reference lists."""
         hashes_1 = [reference.get_hash() for reference in reference_list_1]
         hashes_2 = [reference.get_hash() for reference in reference_list_2]
         self.assertEqual(hashes_1, hashes_2)
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Publish two explorations and one collection."""
         super(ActivityServicesTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
-        self.set_moderators([self.MODERATOR_USERNAME])
-        self.owner = user_services.get_user_actions_info(self.owner_id)
-        self.moderator = user_services.get_user_actions_info(self.moderator_id)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL) # type: ignore[no-untyped-call]
+        self.set_moderators([self.MODERATOR_USERNAME]) # type: ignore[no-untyped-call]
+        self.owner = user_services.get_user_actions_info(self.owner_id) # type: ignore[no-untyped-call]
+        self.moderator = user_services.get_user_actions_info(self.moderator_id) # type: ignore[no-untyped-call]
 
-        self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
-        self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id)
-        self.save_new_valid_collection(
+        self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id) # type: ignore[no-untyped-call]
+        self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id) # type: ignore[no-untyped-call]
+        self.save_new_valid_collection( # type: ignore[no-untyped-call]
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
-    def test_update_featured_refs_correctly_promotes_activities(self):
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
-        rights_manager.publish_collection(self.owner, self.COL_ID_2)
+    def test_update_featured_refs_correctly_promotes_activities(
+        self
+    ) -> None:
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0) # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COL_ID_2) # type: ignore[no-untyped-call]
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
@@ -86,8 +101,10 @@ class ActivityServicesTests(test_utils.GenericTestBase):
                 self._create_exploration_reference(self.EXP_ID_0),
                 self._create_collection_reference(self.COL_ID_2)])
 
-    def test_update_featured_refs_clears_existing_featured_activities(self):
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+    def test_update_featured_refs_clears_existing_featured_activities(
+        self
+    ) -> None:
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0) # type: ignore[no-untyped-call]
         activity_services.update_featured_activity_references([
             self._create_exploration_reference(self.EXP_ID_0)])
         self._compare_lists(
@@ -98,21 +115,25 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-    def test_updating_with_duplicate_refs_raises_exception(self):
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
-        rights_manager.publish_collection(self.owner, self.COL_ID_2)
+    def test_updating_with_duplicate_refs_raises_exception(
+        self
+    ) -> None:
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0) # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COL_ID_2) # type: ignore[no-untyped-call]
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-        with self.assertRaisesRegex(Exception, 'should not have duplicates'):
+        with self.assertRaisesRegex(Exception, 'should not have duplicates'): # type: ignore[no-untyped-call]
             activity_services.update_featured_activity_references([
                 self._create_exploration_reference(self.EXP_ID_0),
                 self._create_exploration_reference(self.EXP_ID_0)])
 
-    def test_deleted_activity_is_removed_from_featured_list(self):
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
-        rights_manager.publish_collection(self.owner, self.COL_ID_2)
+    def test_deleted_activity_is_removed_from_featured_list(
+        self
+    ) -> None:
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0) # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1) # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COL_ID_2) # type: ignore[no-untyped-call]
         activity_services.update_featured_activity_references([
             self._create_exploration_reference(self.EXP_ID_0),
             self._create_collection_reference(self.COL_ID_2)])
@@ -123,24 +144,26 @@ class ActivityServicesTests(test_utils.GenericTestBase):
                 self._create_collection_reference(self.COL_ID_2)])
 
         # Deleting an unfeatured activity does not affect the featured list.
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_1) # type: ignore[no-untyped-call]
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0),
                 self._create_collection_reference(self.COL_ID_2)])
 
         # Deleting a featured activity removes it from the featured list.
-        collection_services.delete_collection(self.owner_id, self.COL_ID_2)
+        collection_services.delete_collection(self.owner_id, self.COL_ID_2) # type: ignore[no-untyped-call]
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0)])
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0) # type: ignore[no-untyped-call]
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-    def test_deleted_activity_is_removed_from_featured_list_multiple(self):
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
+    def test_deleted_activity_is_removed_from_featured_list_multiple(
+        self
+    ) -> None:
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0) # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1) # type: ignore[no-untyped-call]
         exploration_references = [
             self._create_exploration_reference(self.EXP_ID_0),
             self._create_exploration_reference(self.EXP_ID_1)]
@@ -151,15 +174,17 @@ class ActivityServicesTests(test_utils.GenericTestBase):
             activity_services.get_featured_activity_references(),
             exploration_references)
 
-        exp_services.delete_explorations(
+        exp_services.delete_explorations( # type: ignore[no-untyped-call]
             self.owner_id, [self.EXP_ID_0, self.EXP_ID_1])
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-    def test_unpublished_activity_is_removed_from_featured_list(self):
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
-        rights_manager.publish_collection(self.owner, self.COL_ID_2)
+    def test_unpublished_activity_is_removed_from_featured_list(
+        self
+    ) -> None:
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0) # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1) # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COL_ID_2) # type: ignore[no-untyped-call]
         activity_services.update_featured_activity_references([
             self._create_exploration_reference(self.EXP_ID_0),
             self._create_collection_reference(self.COL_ID_2)])
@@ -171,35 +196,39 @@ class ActivityServicesTests(test_utils.GenericTestBase):
 
         # Unpublishing an unfeatured activity does not affect the featured
         # list.
-        rights_manager.unpublish_exploration(self.moderator, self.EXP_ID_1)
+        rights_manager.unpublish_exploration(self.moderator, self.EXP_ID_1) # type: ignore[no-untyped-call]
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0),
                 self._create_collection_reference(self.COL_ID_2)])
 
         # Unpublishing a featured activity removes it from the featured list.
-        rights_manager.unpublish_collection(self.moderator, self.COL_ID_2)
+        rights_manager.unpublish_collection(self.moderator, self.COL_ID_2) # type: ignore[no-untyped-call]
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0)])
 
-        rights_manager.unpublish_exploration(self.moderator, self.EXP_ID_0)
+        rights_manager.unpublish_exploration(self.moderator, self.EXP_ID_0) # type: ignore[no-untyped-call]
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-    def test_publish_activity_does_not_affect_featured_list(self):
+    def test_publish_activity_does_not_affect_featured_list(
+        self
+    ) -> None:
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0) # type: ignore[no-untyped-call]
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-        rights_manager.publish_collection(self.owner, self.COL_ID_2)
+        rights_manager.publish_collection(self.owner, self.COL_ID_2) # type: ignore[no-untyped-call]
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-    def test_split_by_type(self):
+    def test_split_by_type(
+        self
+    ) -> None:
         self.assertEqual(
             activity_services.split_by_type([]), ([], []))
 
@@ -219,9 +248,11 @@ class ActivityServicesTests(test_utils.GenericTestBase):
                 exploration_123, collection_def, exploration_ab]),
             (['123', 'ab'], ['def']))
 
-    def test_split_by_type_raises_error_if_given_invalid_activity_ref(self):
+    def test_split_by_type_raises_error_if_given_invalid_activity_ref(
+        self
+    ) -> None:
         exploration_123 = self._create_exploration_reference('123')
-        with self.assertRaisesRegex(Exception, 'Invalid activity reference'):
+        with self.assertRaisesRegex(Exception, 'Invalid activity reference'): # type: ignore[no-untyped-call]
             activity_services.split_by_type([
                 exploration_123,
                 activity_domain.ActivityReference('invalid_type', 'bbb')
