@@ -77,9 +77,11 @@ var login = async function(email, useManualNavigation = true) {
     // Users will be redirected to preferred dashboard if they are fully
     // registered. Otherwise, they will be redirected to signup page.
     // eslint-disable-next-line max-len
+    console.log(url);
     return /(learner-dashboard|creator-dashboard|signup|pending-account-deletion)/.test(url);
   }, async() => {
     // Cannot predict the new page, so waiting for loading message to disappear.
+    console.log("Login");
     await waitFor.pageToFullyLoad();
   });
 };
@@ -89,8 +91,10 @@ var logout = async function() {
     await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
   }, (url) => {
     // Wait until the URL has changed to something that is not /logout.
+    console.log(url);
     return !(/logout/.test(url));
   }, async() => {
+    console.log("Logout");
     await waitFor.visibilityOf(
       splashPage, 'Splash page takes too long to appear');
     await waitFor.pageToFullyLoad();
@@ -129,6 +133,7 @@ var _completeSignup = async function(username) {
     // Click the "register user" button to trigger redirection.
     await action.click('Register user button', registerUser);
   }, (url) => {
+    console.log(url);
     if (returnUrl === '/') {
       return /(learner-dashboard|creator-dashboard)/.test(url);
     } else {
@@ -136,6 +141,7 @@ var _completeSignup = async function(username) {
     }
   }, async() => {
     // Cannot predict the new page, so waiting for loading message to disappear.
+    console.log("SignUp");
     await waitFor.pageToFullyLoad();
   });
 };
