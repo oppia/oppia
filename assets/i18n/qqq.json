@@ -120,7 +120,7 @@
 	"I18N_COMING_SOON": "Text displayed in the topic viewer on pages that aren't released yet.",
 	"I18N_COMMUNITY_LIBRARY_PAGE_COLLECTION": "The tag displayed in collection cards on the community library page - Shown if card is that of the collection.",
 	"I18N_COMPLETED_STORY": "Text displayed on the learner dashboard that marks a story as completed.",
-	"I18N_COMPLETE_STORY": "Text displayed on the learner dashboard that prompts learner to complete a story in the topic.",
+    "I18N_COMPLETE_CHAPTER": "Text displayed on the learner dashboard that prompts learner to complete a story in the topic.",
 	"I18N_CONTACT_PAGE_BREADCRUMB": "Text displayed in the Contact page. - Text shown in the top left corner of the nav bar.\n{{identical|Contact}}",
 	"I18N_CONTACT_PAGE_HEADING": "Heading for Oppia's Contact Page.",
 	"I18N_CONTACT_PAGE_PARAGRAPH_1": "Text on Oppia's Contact Page - This text serves as a guide for people interested in getting involved with Oppia.",
