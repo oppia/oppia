@@ -780,10 +780,14 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
         current_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
-        (
-            classifier_services
-            .create_classifier_training_job_for_reverted_exploration(
-            current_exploration, old_exploration))
+        # Revert the exploration.
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.revert_exploration(
+                feconf.SYSTEM_COMMITTER_ID,
+                self.exp_id,
+                current_exploration.version,
+                current_exploration.version - 1
+            )
         # Verify if classifier model mapping is maintained using the job ID.
         new_job = classifier_services.get_classifier_training_job(
             self.exp_id, current_exploration.version + 1, state_name,
