@@ -763,14 +763,13 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         """
 
         state_name = 'Home'
-        old_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
-        interaction_id = old_exploration.states[
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        interaction_id = exploration.states[
             state_name].interaction.id
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']
-        job = classifier_services.get_classifier_training_job(
-            self.exp_id, old_exploration.version, state_name,
-            algorithm_id)
+
+        # Make changes to the exploration.
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'title',
@@ -779,7 +778,12 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+        
         current_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        # Store the job before reverting the exploration.
+        job = classifier_services.get_classifier_training_job(
+            self.exp_id, current_exploration.version, state_name,
+            algorithm_id)
         # Revert the exploration.
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.revert_exploration(
