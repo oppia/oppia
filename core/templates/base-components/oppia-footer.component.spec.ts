@@ -19,7 +19,7 @@
 import { AppConstants } from 'app.constants';
 import { OppiaFooterComponent } from './oppia-footer.component';
 
-describe('OppiaFooteeComponent', ()=>{
+describe('OppiaFooterComponent', ()=>{
   let component: OppiaFooterComponent;
   beforeEach(()=>{
     component = new OppiaFooterComponent();
