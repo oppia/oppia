@@ -19,9 +19,9 @@
 import { AppConstants } from 'app.constants';
 import { OppiaFooterComponent } from './oppia-footer.component';
 
-describe('OppiaFooterComponent', ()=>{
+describe('OppiaFooterComponent', () => {
   let component: OppiaFooterComponent;
-  beforeEach(()=>{
+  beforeEach(() => {
     component = new OppiaFooterComponent();
   });
 
@@ -30,7 +30,7 @@ describe('OppiaFooterComponent', ()=>{
       .toBe(AppConstants.SITE_FEEDBACK_FORM_URL);
   });
 
-  it('should get the pages registered with frontend', ()=>{
+  it('should get the pages registered with frontend', () => {
     expect(component.PAGES_REGISTERED_WITH_FRONTEND)
       .toBe(AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
   });
