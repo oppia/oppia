@@ -120,6 +120,11 @@ angular.module('oppia').directive('objectEditor', [
         };
         if (directiveName) {
           if (MIGRATED_EDITORS.indexOf(directiveName) >= 0) {
+            if (directiveName === (
+              'list-of-sets-of-translatable-html-content-ids'
+            ) && !scope.initArgs) {
+              throw new Error('\nProvided initArgs: ' + scope.initArgs);
+            }
             element.html(
               '<' + directiveName +
               '-editor [always-editable]="alwaysEditable"' +
