@@ -110,17 +110,17 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
                 }, {
                     'rule_type': 'HasNumeratorEqualTo',
                     'inputs': {
-                        'f': 5
+                        'x': 5
                     }
                 }, {
                     'rule_type': 'HasDenominatorEqualTo',
                     'inputs': {
-                        'f': 10
+                        'x': 10
                     }
                 }, {
                     'rule_type': 'HasIntegerPartEqualTo',
                     'inputs': {
-                        'f': 10
+                        'x': 10
                     }
                 }, {
                     'rule_type': 'HasNoFractionalPart',

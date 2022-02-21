@@ -278,7 +278,7 @@ class FractionInput(base.BaseInteraction):
             rule_type = rule_spec.rule_type
             rule_proto = (
                 rule_type_to_proto_func_mapping[rule_type](
-                    rule_spec.inputs['f']
+                    rule_spec.inputs
                 )
             )
             rule_specs_list_proto.append(
@@ -288,125 +288,125 @@ class FractionInput(base.BaseInteraction):
         return rule_specs_list_proto
 
     @classmethod
-    def _convert_is_exactly_equal_rule_spec_to_proto(cls, fraction):
+    def _convert_is_exactly_equal_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for IsExactlyEqualToSpecDto.
 
         Args:
-            fraction: Fraction. The fraction domain object.
+            input_dict: dict. The rule dict.
 
         Returns:
             IsExactlyEqualToSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.IsExactlyEqualToSpecDto(
-            input=cls._convert_fraction_to_proto(fraction)
+            input=cls._convert_fraction_to_proto(input_dict['f'])
         )
 
     @classmethod
-    def _convert_is_equivalent_rule_spec_to_proto(cls, fraction):
+    def _convert_is_equivalent_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for IsEquivalentToSpecDto.
 
         Args:
-            fraction: Fraction. The fraction domain object.
+            input_dict: dict. The rule dict.
 
         Returns:
             IsEquivalentToSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.IsEquivalentToSpecDto(
-            input=cls._convert_fraction_to_proto(fraction)
+            input=cls._convert_fraction_to_proto(input_dict['f'])
         )
 
     @classmethod
     def _convert_is_equivalent_to_and_in_simplest_form_rule_spec_to_proto(
-        cls, fraction
+        cls, input_dict
     ):
         """Creates a proto object for IsEquivalentToAndInSimplestFormSpecDto.
 
         Args:
-            fraction: Fraction. The fraction domain object.
+            input_dict: dict. The rule dict.
 
         Returns:
             IsEquivalentToAndInSimplestFormSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.IsEquivalentToAndInSimplestFormSpecDto(
-            input=cls._convert_fraction_to_proto(fraction)
+            input=cls._convert_fraction_to_proto(input_dict['f'])
         )
 
     @classmethod
-    def _convert_is_less_than_rule_spec_to_proto(cls, fraction):
+    def _convert_is_less_than_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for IsLessThanSpecDto.
 
         Args:
-            fraction: Fraction. The fraction domain object.
+            input_dict: dict. The rule dict.
 
         Returns:
             IsLessThanSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.IsLessThanSpecDto(
-            input=cls._convert_fraction_to_proto(fraction)
+            input=cls._convert_fraction_to_proto(input_dict['f'])
         )
 
     @classmethod
-    def _convert_is_greater_than_rule_spec_to_proto(cls, fraction):
+    def _convert_is_greater_than_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for IsGreaterThanSpecDto.
 
         Args:
-            fraction: Fraction. The fraction domain object.
+            input_dict: dict. The rule dict.
 
         Returns:
             IsGreaterThanSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.IsGreaterThanSpecDto(
-            input=cls._convert_fraction_to_proto(fraction)
+            input=cls._convert_fraction_to_proto(input_dict['f'])
         )
 
     @classmethod
-    def _convert_has_numerator_equal_rule_spec_to_proto(cls, numerator):
+    def _convert_has_numerator_equal_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for HasNumeratorEqualToSpecDto.
 
         Args:
-            numerator: int. The expected numerator.
+            input_dict: dict. The rule dict.
 
         Returns:
             HasNumeratorEqualToSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.HasNumeratorEqualToSpecDto(
-            input=numerator
+            input=input_dict['x']
         )
 
     @classmethod
-    def _convert_has_denominator_equal_rule_spec_to_proto(cls, denominator):
+    def _convert_has_denominator_equal_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for HasDenominatorEqualToSpecDto.
 
         Args:
-            denominator: int. The expected denominator.
+            input_dict: dict. The rule dict.
 
         Returns:
             HasDenominatorEqualToSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.HasDenominatorEqualToSpecDto(
-            input=denominator
+            input=input_dict['x']
         )
 
     @classmethod
-    def _convert_has_integer_part_equal_rule_spec_to_proto(cls, integer_part):
+    def _convert_has_integer_part_equal_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for HasIntegerPartEqualToSpecDto.
 
         Args:
-            integer_part: int. The expected integer part.
+            input_dict: dict. The rule dict.
 
         Returns:
             HasIntegerPartEqualToSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.HasIntegerPartEqualToSpecDto(
-            input=integer_part
+            input=input_dict['x']
         )
 
     @classmethod
-    def _convert_has_no_fractional_part_rule_spec_to_proto(cls, integer_part): # pylint: disable=unused-argument
+    def _convert_has_no_fractional_part_rule_spec_to_proto(cls, input_dict): # pylint: disable=unused-argument
         """Creates a proto object for HasNoFractionalPartSpecDto.
 
         Args:
-            integer_part: int. The expected integer part.
+            input_dict: dict. The rule dict.
 
         Returns:
             HasNoFractionalPartSpecDto. The proto object.
@@ -415,16 +415,16 @@ class FractionInput(base.BaseInteraction):
 
     @classmethod
     def _convert_has_fractional_part_exactly_equal_rule_spec_to_proto(
-        cls, fraction
+        cls, input_dict
     ):
         """Creates a proto object for HasFractionalPartExactlyEqualToSpecDto.
 
         Args:
-            fraction: Fraction. The fraction domain object.
+            input_dict: dict. The rule dict.
 
         Returns:
             HasFractionalPartExactlyEqualToSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.HasFractionalPartExactlyEqualToSpecDto(
-            input=cls._convert_fraction_to_proto(fraction)
+            input=cls._convert_fraction_to_proto(input_dict['f'])
         )
