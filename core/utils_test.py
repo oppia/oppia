@@ -31,6 +31,8 @@ from core.tests import test_utils
 
 from typing import Any, Dict, List
 
+from third_party.python_libs.pymongo.compression_support import decompress
+
 
 class UtilsTests(test_utils.GenericTestBase):
     """Test the core utility methods."""
@@ -765,3 +767,69 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(response.getcode(), 200) # type: ignore[attr-defined]
         self.assertEqual(
             response.url, 'http://www.google.com') # type: ignore[attr-defined]
+
+    def test_get_random_int(self) -> None:
+        self.assertLess(utils.get_random_int(5),5)
+        self.assertGreaterEqual(utils.get_random_int(5),0)
+        with self.assertRaisesRegex(AssertionError,'Only positive integers allowed'):
+            utils.get_random_int(-1)
+        with self.assertRaisesRegex(AssertionError,'Only positive integers allowed'):
+            utils.get_random_int(1.5)
+
+    def test_get_random_choice(self) -> None:
+        list_instance = [1,5,9,11,15]
+        list_instance2 = []
+        tuple_instance = (1,)
+        self.assertIn(utils.get_random_choice(list_instance),list_instance)
+        with self.assertRaisesRegex(AssertionError,'Only non-empty lists allowed'):
+            utils.get_random_choice(list_instance2)
+        with self.assertRaisesRegex(AssertionError,'Only non-empty lists allowed'):
+            utils.get_random_choice(tuple_instance)
+    
+    def test_get_human_readable_time_string(self) -> None:
+        '''Should we test for negative time?'''
+        self.assertEqual("December 12 06:42:12",utils.get_human_readable_time_string(944980932342.38))
+
+    def test_generate_new_session_id(self) -> None:
+        self.assertEqual(24,len(utils.generate_new_session_id()))
+        self.assertEqual(type(utils.generate_new_session_id()).__name__,"str")
+
+    def test_require_valid_name(self) -> None:
+        self.assertEqual(None,utils.require_valid_name('','the exploration title',True))
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,'123 must be a string.'):
+            utils.require_valid_name(123,'the exploration title')
+        with self.assertRaisesRegex(
+            utils.ValidationError,'The length of the exploration title should be between 1 and 50 '
+        'characters; received '''):
+            utils.require_valid_name('','the exploration title')
+        with self.assertRaisesRegex(
+            utils.ValidationError,'Names should not start or end with whitespace.'):
+            utils.require_valid_name(' 123\n','the exploration title')
+        with self.assertRaisesRegex(
+            utils.ValidationError,'Adjacent whitespace in the exploration title should be collapsed.'):
+            utils.require_valid_name('1  23','the exploration title')
+        with self.assertRaisesRegex(
+            utils.ValidationError,'Invalid character : in the exploration title: 1\n:23'):
+            utils.require_valid_name('1\n:23','the exploration title')
+        """ADD ANOTHER ONE TO TEST ESCAPE SEQUENCE CHARACTERS"""
+
+    def test_get_hex_color_for_category(self) -> None:
+        self.assertEqual(utils.get_hex_color_for_category("Law"),"#538270")
+        self.assertEqual(utils.get_hex_color_for_category("Quantum Physics"),"#a33f40")
+
+    def test_unescape_encoded_uri_component(self) -> None:
+        self.assertEqual(utils.unescape_encoded_uri_component("/El%20Ni%C3%B1o/"),"/El Niño/")
+
+    def test_compress_and_decompress_zlib(self) -> None:
+        string_instance = b"This is for testing"
+        string_compressed = utils.compress_to_zlib(string_instance)
+        self.assertNotEqual(len(string_compressed),len(string_instance))
+        self.assertEqual(len(utils.decompress_from_zlib(string_compressed)),len(string_instance))
+
+    def test_compute_list_difference(self) -> None:
+        self.assertEqual(utils.compute_list_difference([-5,-1,0,7,-4],[2,0,-5,-2,7]),[-4,-1])
+
+    def test_get_exploration_from_dir(self) -> None:
+        

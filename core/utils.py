@@ -288,7 +288,7 @@ def get_random_int(upper_bound: int) -> int:
     Returns:
         int. Randomly generated integer less than the upper_bound.
     """
-    assert upper_bound >= 0 and isinstance(upper_bound, int)
+    assert upper_bound >= 0 and isinstance(upper_bound, int), 'Only positive integers allowed'
 
     generator = random.SystemRandom()
     return generator.randrange(0, stop=upper_bound)
@@ -303,7 +303,7 @@ def get_random_choice(alist: List[T]) -> T:
     Returns:
         *. Random element choosen from the passed input list.
     """
-    assert isinstance(alist, list) and len(alist) > 0
+    assert isinstance(alist, list) and len(alist) > 0, 'Only non-empty lists allowed'
 
     index = get_random_int(len(alist))
     return alist[index]
