@@ -59,6 +59,7 @@ export class SubtitledHtml {
   set html(html: string) {
     this._html = html;
   }
+
   static createFromBackendDict(
       subtitledHtmlBackendDict: SubtitledHtmlBackendDict): SubtitledHtml {
     return new SubtitledHtml(
