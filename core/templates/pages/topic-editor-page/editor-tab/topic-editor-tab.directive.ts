@@ -286,6 +286,9 @@ angular.module('oppia').directive('topicEditorTab', [
                   TopicUpdateService.setTopicUrlFragment(
                     $scope.topic, newTopicUrlFragment);
                   $rootScope.$applyAsync();
+                }, function() {
+                  TopicUpdateService.setTopicUrlFragment(
+                    $scope.topic, newTopicUrlFragment);
                 });
             } else {
               TopicUpdateService.setTopicUrlFragment(

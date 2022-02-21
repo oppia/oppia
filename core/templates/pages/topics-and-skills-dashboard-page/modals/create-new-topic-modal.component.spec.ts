@@ -121,6 +121,20 @@ describe('Create new topic modal', () => {
       .toHaveBeenCalled();
   });
 
+  it('should not update topic url with wrong framgent', () => {
+    componentInstance.newlyCreatedTopic.urlFragment = 'not empty';
+    spyOn(topicEditorStateService, 'updateExistenceOfTopicUrlFragment')
+      .and.callFake((urlFragment, successCallback, errorCallback) => {
+        errorCallback();
+      });
+    spyOn(topicEditorStateService, 'getTopicWithUrlFragmentExists');
+    componentInstance.onTopicUrlFragmentChange();
+    expect(topicEditorStateService.updateExistenceOfTopicUrlFragment)
+      .toHaveBeenCalled();
+    expect(topicEditorStateService.getTopicWithUrlFragmentExists)
+      .not.toHaveBeenCalled();
+  });
+
   it('should update topic name', () => {
     componentInstance.newlyCreatedTopic.name = 'not-empty';
     spyOn(topicEditorStateService, 'updateExistenceOfTopicName')

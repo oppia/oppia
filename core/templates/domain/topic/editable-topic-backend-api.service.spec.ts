@@ -307,8 +307,9 @@ describe('Editable topic backend API service', () => {
   it('should use the rejection handler if the url fragment already exists',
     fakeAsync(() => {
       editableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
-        'topic-url-fragment').then(() => {}, error => {
-        expect(error).toEqual('Error: Failed to check topic url fragment.');
+        'topic-url-fragment').then(() => {}, errorResponse => {
+        expect(errorResponse.statusText).toEqual(
+          'Error: Failed to check topic url fragment.');
       });
       let req = httpTestingController.expectOne(
         '/topic_url_fragment_handler/topic-url-fragment');
