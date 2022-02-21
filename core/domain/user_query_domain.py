@@ -46,16 +46,16 @@ class UserQuery:
     """Domain object for the UserQueryModel."""
 
     def __init__(
-            self,
-            query_id: str,
-            query_params: UserQueryParams,
-            submitter_id: str,
-            query_status: str,
-            user_ids: List[str],
-            sent_email_model_id: Optional[str]=None,
-            created_on: Optional[datetime.datetime]=None,
-            deleted: bool=False
-        ) -> None:
+        self,
+        query_id: str,
+        query_params: UserQueryParams,
+        submitter_id: str,
+        query_status: str,
+        user_ids: List[str],
+        sent_email_model_id: Optional[str] = None,
+        created_on: Optional[datetime.datetime] = None,
+        deleted: bool = False
+    ) -> None:
         """Create user query domain object.
 
         Args:
@@ -103,10 +103,10 @@ class UserQuery:
 
     @classmethod
     def create_default(
-            cls,
-            query_id: str,
-            query_params: UserQueryParams,
-            submitter_id: str
+        cls,
+        query_id: str,
+        query_params: UserQueryParams,
+        submitter_id: str
     ) -> UserQuery:
         """Create default user query.
 
@@ -123,7 +123,7 @@ class UserQuery:
             feconf.USER_QUERY_STATUS_PROCESSING, []
         )
 
-    def archive(self, sent_email_model_id: Optional[str]=None) -> None:
+    def archive(self, sent_email_model_id: Optional[str] = None) -> None:
         """Archive the query.
 
         Args:
