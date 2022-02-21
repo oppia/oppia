@@ -30,8 +30,8 @@
 .splash-page .oppia-splash-section-two {
   background-color: #fff;
   display: flex;
-  padding: 30px;
   justify-content: space-evenly;
+  padding: 30px;
   text-align: center;
 }
 
