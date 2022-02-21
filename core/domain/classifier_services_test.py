@@ -781,9 +781,9 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
         current_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         # Store the job before reverting the exploration.
-        job = classifier_services.get_classifier_training_job(
+        old_job_id = classifier_services.get_classifier_training_job(
             self.exp_id, current_exploration.version, state_name,
-            algorithm_id)
+            algorithm_id).job_id
         # Revert the exploration.
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.revert_exploration(
@@ -793,7 +793,10 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
                 current_exploration.version - 1
             )
         # Verify if classifier model mapping is maintained using the job ID.
-        new_job = classifier_services.get_classifier_training_job(
-            self.exp_id, current_exploration.version + 1, state_name,
-            algorithm_id)
-        self.assertEqual(job.job_id, new_job.job_id)
+        reverted_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        self.assertEqual(
+            reverted_exploration.version, current_exploration.version + 1)
+        new_job_id = classifier_services.get_classifier_training_job(
+            self.exp_id, reverted_exploration.version, state_name,
+            algorithm_id).job_id
+        self.assertEqual(old_job_id, new_job_id)
