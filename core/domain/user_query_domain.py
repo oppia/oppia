@@ -103,10 +103,10 @@ class UserQuery:
 
     @classmethod
     def create_default(
-            cls,
-            query_id: str,
-            query_params: UserQueryParams,
-            submitter_id: str
+        cls,
+        query_id: str,
+        query_params: UserQueryParams,
+        submitter_id: str
     ) -> UserQuery:
         """Create default user query.
 
