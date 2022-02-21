@@ -64,7 +64,8 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_non_user_id_values_in_user_ids_raises(
-            self) -> None:
+        self
+    ) -> None:
         self.user_query.user_ids = ['aaa']
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
