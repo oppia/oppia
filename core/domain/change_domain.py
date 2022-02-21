@@ -126,7 +126,9 @@ class BaseChange:
         'name': feconf.CMD_DELETE_COMMIT,
         'required_attribute_names': [],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }]
 
     def __init__(self, change_dict: Dict[str, str]) -> None:

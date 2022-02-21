@@ -30,7 +30,7 @@ from typing_extensions import TypedDict
 
 # This TypedDict is used only to create the TypedDict below, because we want
 # to mark some attributes as optional.
-class _ValidCmdDictNotTotal(TypedDict, total=False):
+class _ValidCmdDictNotTotal(TypedDict, total=True):
     """Dictionary representing a non-required part
     of valid commands specs."""
 
@@ -1333,6 +1333,8 @@ ALLOWED_ACTIVITY_STATUS = [
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
 COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
     'name': CMD_CREATE_NEW,
+    'allowed_values': {},
+    'deprecated_values': {},
     'required_attribute_names': [],
     'optional_attribute_names': [],
     'user_id_attribute_names': []
@@ -1342,35 +1344,45 @@ COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
     'optional_attribute_names': [],
     'user_id_attribute_names': ['assignee_id'],
     'allowed_values': {
-        'new_role': ALLOWED_ACTIVITY_ROLES, 'old_role': ALLOWED_ACTIVITY_ROLES}
+        'new_role': ALLOWED_ACTIVITY_ROLES, 'old_role': ALLOWED_ACTIVITY_ROLES},
+    'deprecated_values': {}
 }, {
     'name': CMD_REMOVE_ROLE,
     'required_attribute_names': ['removed_user_id', 'old_role'],
     'optional_attribute_names': [],
     'user_id_attribute_names': ['removed_user_id'],
-    'allowed_values': {'old_role': ALLOWED_ACTIVITY_ROLES}
+    'allowed_values': {'old_role': ALLOWED_ACTIVITY_ROLES},
+    'deprecated_values': {}
 }, {
     'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
     'required_attribute_names': [
         'old_viewable_if_private', 'new_viewable_if_private'],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_RELEASE_OWNERSHIP,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
     'required_attribute_names': [
         'old_first_published_msec', 'new_first_published_msec'],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_DELETE_COMMIT,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }]
 
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[
@@ -1386,7 +1398,8 @@ COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'allowed_values': {
         'old_status': ALLOWED_ACTIVITY_STATUS,
         'new_status': ALLOWED_ACTIVITY_STATUS
-    }
+    },
+    'deprecated_values': {}
 })
 
 EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
@@ -1424,7 +1437,9 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_CHANGE_ROLE,
     'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
@@ -1432,27 +1447,36 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[
     'user_id_attribute_names': ['assignee_id'],
     'allowed_values': {
         'new_role': ALLOWED_TOPIC_ROLES, 'old_role': ALLOWED_TOPIC_ROLES
-    }
+    },
+    'deprecated_values': {}
 }, {
     'name': CMD_REMOVE_MANAGER_ROLE,
     'required_attribute_names': ['removed_user_id'],
     'optional_attribute_names': [],
-    'user_id_attribute_names': ['removed_user_id']
+    'user_id_attribute_names': ['removed_user_id'],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_PUBLISH_TOPIC,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_UNPUBLISH_TOPIC,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_DELETE_COMMIT,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }]
 
 USER_ID_RANDOM_PART_LENGTH = 32

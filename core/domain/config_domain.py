@@ -175,7 +175,9 @@ class ConfigPropertyChange(change_domain.BaseChange):
         'name': CMD_CHANGE_PROPERTY_VALUE,
         'required_attribute_names': ['new_value'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }]
 
 
