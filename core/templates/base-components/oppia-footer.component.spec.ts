@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the Base Transclusion Component.
+ * @fileoverview Tests for the Oppia Footer Component.
  */
 
 import { AppConstants } from 'app.constants';
