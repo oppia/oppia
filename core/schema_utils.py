@@ -36,6 +36,7 @@ from core.constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import user_domain
+
 from typing import Any, Callable, Dict, List, Optional, cast
 
 SCHEMA_KEY_ITEMS = 'items'
