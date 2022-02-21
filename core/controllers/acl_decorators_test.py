@@ -67,19 +67,27 @@ class OpenAccessDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(OpenAccessDecoratorTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
 
-    def test_redirect_when_logged_in_user_visits_splash_page(self):
+    def test_access_with_logged_in_user(self):
+        self.login(self.VIEWER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock')
+        self.assertTrue(response['success'])
+        self.logout()
+
+    def test_access_with_guest_user(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock')
         self.assertTrue(response['success'])
 
 
 class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
-    """Tests for open access decorator."""
+    """Tests for is_source_mailchimp decorator."""
 
     user_email = 'user@example.com'
     username = 'user'
@@ -157,7 +165,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
 
 
 class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
-    """Tests for play exploration decorator."""
+    """Tests for can_view_skills decorator."""
 
     class MockHandler(base.BaseHandler):
         REQUIRE_PAYLOAD_CSRF_CHECK = False
@@ -552,7 +560,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_can_not_access_exploration_with_disabled_exploration_ids(self):
+    def test_cannot_access_exploration_with_disabled_exploration_ids(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_exploration/%s'
@@ -738,7 +746,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
             exploration_id=self.private_col_id)
         rights_manager.publish_collection(self.owner, self.published_col_id)
 
-    def test_can_not_edit_collection_with_invalid_collection_id(self):
+    def test_cannot_edit_collection_with_invalid_collection_id(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -1074,7 +1082,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_can_not_comment_on_feedback_threads_with_disabled_exp_id(self):
+    def test_cannot_comment_on_feedback_threads_with_disabled_exp_id(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -1094,7 +1102,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
                 'exploration feedback.')
         self.logout()
 
-    def test_can_not_comment_on_feedback_threads_with_invalid_thread_id(self):
+    def test_cannot_comment_on_feedback_threads_with_invalid_thread_id(self):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -1195,7 +1203,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_can_not_create_feedback_threads_with_disabled_exp_id(self):
+    def test_cannot_create_feedback_threads_with_disabled_exp_id(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_create_feedback_thread/%s'
@@ -1293,7 +1301,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_can_not_view_feedback_threads_with_disabled_exp_id(self):
+    def test_cannot_view_feedback_threads_with_disabled_exp_id(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_view_feedback_thread/%s' % self.disabled_exp_thread_id,
@@ -1585,6 +1593,7 @@ class SubscriptionToUsersTests(test_utils.GenericTestBase):
 
 
 class SendModeratorEmailsTests(test_utils.GenericTestBase):
+    """Tests for can_send_moderator_emails decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1629,6 +1638,7 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
 
 
 class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_access_release_coordinator_page decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1703,6 +1713,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
 
 class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_access_blog_admin_page decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1776,6 +1787,7 @@ class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
 
 
 class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_manage_blog_post_editors decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1850,6 +1862,7 @@ class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
 
 
 class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_access_blog_dashboard decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1970,7 +1983,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
         blog_post = blog_services.create_new_blog_post(self.blog_editor_id)
         self.blog_post_id = blog_post.id
 
-    def test_guest_can_not_delete_blog_post(self):
+    def test_guest_cannot_delete_blog_post(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_blog_post/%s' % self.blog_post_id,
@@ -2072,7 +2085,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
         blog_post = blog_services.create_new_blog_post(self.blog_editor_id)
         self.blog_post_id = blog_post.id
 
-    def test_guest_can_not_edit_blog_post(self):
+    def test_guest_cannot_edit_blog_post(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_blog_post/%s' % self.blog_post_id,
@@ -2127,6 +2140,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
 
 
 class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_run_any_job decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -2198,6 +2212,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
 
 class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_manage_memcache decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -2272,6 +2287,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
 
 class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_manage_contributors_role decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -2398,6 +2414,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
 
 
 class DeleteAnyUserTests(test_utils.GenericTestBase):
+    """Tests for can_delete_any_user decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -2591,6 +2608,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
 
 
 class VoiceArtistManagementTests(test_utils.GenericTestBase):
+    """Tests for can_add_voice_artist and can_remove_voice_artist decorator."""
 
     role = rights_domain.ROLE_VOICE_ARTIST
     username = 'user'
@@ -2862,7 +2880,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_can_not_edit_exploration_with_invalid_exp_id(self):
+    def test_cannot_edit_exploration_with_invalid_exp_id(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -3176,7 +3194,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_guest_can_not_delete_exploration(self):
+    def test_guest_cannot_delete_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_exploration/%s' % self.private_exp_id,
@@ -4070,7 +4088,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
         self.set_topic_managers([self.manager_username], self.topic_id)
 
-    def test_can_not_edit_topic_with_invalid_topic_id(self):
+    def test_cannot_edit_topic_with_invalid_topic_id(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4145,7 +4163,7 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
         self.save_new_topic(self.topic_id, self.viewer_id)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
-    def test_can_not_delete_topic_with_invalid_topic_id(self):
+    def test_cannot_delete_topic_with_invalid_topic_id(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4221,7 +4239,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
         self.save_new_topic(self.topic_id, self.viewer_id)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
-    def test_can_not_delete_topic_with_invalid_topic_id(self):
+    def test_cannot_delete_topic_with_invalid_topic_id(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4300,14 +4318,14 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             self.topic_id, self.admin_id, canonical_story_ids=[self.story_id])
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
-    def test_can_not_edit_story_with_invalid_story_id(self):
+    def test_cannot_edit_story_with_invalid_story_id(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_story/story_id_new', expected_status_int=404)
         self.logout()
 
-    def test_can_not_edit_story_with_invalid_topic_id(self):
+    def test_cannot_edit_story_with_invalid_topic_id(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
@@ -4317,7 +4335,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
                 '/mock_edit_story/%s' % story_id, expected_status_int=404)
         self.logout()
 
-    def test_can_not_edit_story_with_invalid_canonical_story_ids(self):
+    def test_cannot_edit_story_with_invalid_canonical_story_ids(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         canonical_story_ids_swap = self.swap_to_always_return(
@@ -4407,14 +4425,14 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
             self.topic_id, self.admin_id, canonical_story_ids=[self.story_id])
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
-    def test_can_not_delete_story_with_invalid_story_id(self):
+    def test_cannot_delete_story_with_invalid_story_id(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_delete_story/story_id_new', expected_status_int=404)
         self.logout()
 
-    def test_can_not_delete_story_with_invalid_topic_id(self):
+    def test_cannot_delete_story_with_invalid_topic_id(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
@@ -4578,7 +4596,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
         self.set_topic_managers([self.manager_username], self.topic_id)
 
-    def test_can_not_add_story_to_topic_with_invalid_topic_id(self):
+    def test_cannot_add_story_to_topic_with_invalid_topic_id(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5439,7 +5457,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
             self.get_json('/mock_change_publication_status/%s' % self.topic_id)
         self.logout()
 
-    def test_can_not_change_topic_publication_status_with_invalid_topic_id(
+    def test_cannot_change_topic_publication_status_with_invalid_topic_id(
             self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -5630,7 +5648,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['skill_id'], self.skill_id)
         self.logout()
 
-    def test_normal_user_can_not_edit_public_skill(self):
+    def test_normal_user_cannot_edit_public_skill(self):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5679,7 +5697,7 @@ class DeleteSkillDecoratorTests(test_utils.GenericTestBase):
         self.assertTrue(response['success'])
         self.logout()
 
-    def test_normal_user_can_not_delete_public_skill(self):
+    def test_normal_user_cannot_delete_public_skill(self):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_delete_skill', expected_status_int=401)
@@ -6010,7 +6028,7 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
 
 
 class PlayEntityDecoratorTests(test_utils.GenericTestBase):
-    """Test the decorator can_play_entity."""
+    """Tests the decorator can_play_entity."""
 
     user_email = 'user@example.com'
     username = 'user'
@@ -6112,7 +6130,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
 
 
 class EditEntityDecoratorTests(test_utils.GenericTestBase):
-    """Test the decorator can_edit_entity."""
+    """Tests the decorator can_edit_entity."""
 
     username = 'banneduser'
     user_email = 'user@example.com'
@@ -6388,7 +6406,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
 
-    def test_can_not_save_exploration_with_invalid_exp_id(self):
+    def test_cannot_save_exploration_with_invalid_exp_id(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
