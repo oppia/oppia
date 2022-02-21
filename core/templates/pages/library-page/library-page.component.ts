@@ -19,6 +19,9 @@
 import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
+import { CreatorExplorationSummaryBackendDict } from 'domain/summary/creator-exploration-summary.model';
+import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -32,6 +35,8 @@ import { SearchService } from 'services/search.service';
 import { UserService } from 'services/user.service';
 import { LibraryPageConstants } from './library-page.constants';
 import { ActivityDict,
+  CreatorDashboardData,
+  LibraryIndexData,
   LibraryPageBackendApiService,
   SummaryDict } from './services/library-page-backend-api.service';
 
@@ -45,7 +50,7 @@ interface mobileLibraryGroupProperties {
   templateUrl: './library-page.component.html'
 })
 export class LibraryPageComponent {
-  possibleBannerFilenames = [
+  possibleBannerFilenames: string[] = [
     'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
 
   // If the value below is changed, the following CSS values in
@@ -56,25 +61,28 @@ export class LibraryPageComponent {
   isAnyCarouselCurrentlyScrolling: boolean = false;
   CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
   tileDisplayCount: number = 0;
-  activeGroupIndex: number;
-  libraryGroups: SummaryDict[];
-  mobileLibraryGroupsProperties: mobileLibraryGroupProperties[];
   leftmostCardIndices: number[] = [];
-  currentPath: string;
-  pageMode: string;
   LIBRARY_PAGE_MODES = LibraryPageConstants.LIBRARY_PAGE_MODES;
-  bannerImageFilename: string;
-  bannerImageFileUrl: string;
-  groupName: string;
-  activityList: ActivityDict[];
-  groupHeaderI18nId: string;
-  activitiesOwned = {
+  activitiesOwned: {[key: string]: {[key: string]: boolean}} = {
     explorations: {},
     collections: {}
   };
 
-  libraryWindowIsNarrow: boolean;
-  resizeSubscription: Subscription;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  activeGroupIndex!: number | null;
+  activityList!: ActivityDict[];
+  bannerImageFilename!: string;
+  bannerImageFileUrl!: string;
+  currentPath!: string;
+  groupName!: string;
+  groupHeaderI18nId!: string;
+  libraryGroups!: SummaryDict[];
+  libraryWindowIsNarrow!: boolean;
+  mobileLibraryGroupsProperties!: mobileLibraryGroupProperties[];
+  pageMode!: string;
+  resizeSubscription!: Subscription;
 
   constructor(
     private loggerService: LoggerService,
@@ -110,13 +118,20 @@ export class LibraryPageComponent {
       return;
     }
 
-    let windowWidth = $(window).width() * 0.85;
+    let width = $(window).width();
+    let windowWidth;
+
+    if (width !== undefined) {
+      windowWidth = width * 0.85;
+    }
     // The number 20 is added to LIBRARY_TILE_WIDTH_PX in order to
     // compensate for padding and margins. 20 is just an arbitrary
     // number.
-    this.tileDisplayCount = Math.min(
-      Math.floor(windowWidth / (AppConstants.LIBRARY_TILE_WIDTH_PX + 20)),
-      this.MAX_NUM_TILES_PER_ROW);
+    if (windowWidth !== undefined) {
+      this.tileDisplayCount = Math.min(
+        Math.floor(windowWidth / (AppConstants.LIBRARY_TILE_WIDTH_PX + 20)),
+        this.MAX_NUM_TILES_PER_ROW);
+    }
 
     $('.oppia-library-carousel').css({
       'max-width': (
@@ -131,9 +146,11 @@ export class LibraryPageComponent {
           'n', String(i)));
       let carouselScrollPositionPx = $(
         carouselJQuerySelector).scrollLeft();
-      let index = Math.ceil(
-        carouselScrollPositionPx / AppConstants.LIBRARY_TILE_WIDTH_PX);
-      this.leftmostCardIndices[i] = index;
+      if (carouselScrollPositionPx !== undefined) {
+        let index = Math.ceil(
+          carouselScrollPositionPx / AppConstants.LIBRARY_TILE_WIDTH_PX);
+        this.leftmostCardIndices[i] = index;
+      }
     }
   }
 
@@ -155,7 +172,9 @@ export class LibraryPageComponent {
       return;
     }
 
-    carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
+    if (carouselScrollPositionPx !== undefined) {
+      carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
+    }
 
     if (isLeftScroll) {
       this.leftmostCardIndices[ind] = Math.max(
@@ -167,8 +186,11 @@ export class LibraryPageComponent {
         this.leftmostCardIndices[ind] + this.tileDisplayCount);
     }
 
-    let newScrollPositionPx = carouselScrollPositionPx +
+    let newScrollPositionPx;
+    if (carouselScrollPositionPx !== undefined) {
+      newScrollPositionPx = carouselScrollPositionPx +
       (this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX * direction);
+    }
 
     $(carouselJQuerySelector).animate({
       scrollLeft: newScrollPositionPx
@@ -210,7 +232,7 @@ export class LibraryPageComponent {
     if (fullResultsUrl) {
       this.windowRef.nativeWindow.location.href = fullResultsUrl;
     } else {
-      let selectedCategories = {};
+      let selectedCategories: {[key: string]: boolean} = {};
       for (let i = 0; i < categories.length; i++) {
         selectedCategories[categories[i]] = true;
       }
@@ -267,7 +289,9 @@ export class LibraryPageComponent {
       this.loggerService.error('INVALID URL PATH: ' + currentPath);
     }
 
-    this.pageMode = LibraryPageConstants.LIBRARY_PATHS_TO_MODES[currentPath];
+    let libraryContants:
+      {[key: string]: string } = LibraryPageConstants.LIBRARY_PAGE_MODES;
+    this.pageMode = libraryContants[currentPath];
     this.LIBRARY_PAGE_MODES = LibraryPageConstants.LIBRARY_PAGE_MODES;
 
     let title = 'Community Library Lessons | Oppia';
@@ -302,52 +326,59 @@ export class LibraryPageComponent {
       });
     } else {
       this.libraryPageBackendApiService.fetchLibraryIndexDataAsync()
-        .then((response) => {
+        .then((response: LibraryIndexData) => {
           this.libraryGroups = response.activity_summary_dicts_by_category;
-          this.userService.getUserInfoAsync().then((userInfo) => {
+          this.userService.getUserInfoAsync().then((userInfo: UserInfo) => {
             this.activitiesOwned = {explorations: {}, collections: {}};
             if (userInfo.isLoggedIn()) {
               this.libraryPageBackendApiService.fetchCreatorDashboardDataAsync()
-                .then((response) => {
-                  this.libraryGroups.forEach((libraryGroup) => {
+                .then((response: CreatorDashboardData) => {
+                  this.libraryGroups.forEach((libraryGroup: SummaryDict) => {
                     let activitySummaryDicts = (
                       libraryGroup.activity_summary_dicts);
 
                     let ACTIVITY_TYPE_EXPLORATION = 'exploration';
                     let ACTIVITY_TYPE_COLLECTION = 'collection';
 
-                    activitySummaryDicts.forEach((activitySummaryDict) => {
-                      if (activitySummaryDict.activity_type === (
-                        ACTIVITY_TYPE_EXPLORATION)) {
-                        this.activitiesOwned.explorations[
-                          activitySummaryDict.id] = false;
-                      } else if (activitySummaryDict.activity_type === (
-                        ACTIVITY_TYPE_COLLECTION)) {
-                        this.activitiesOwned.collections[
-                          activitySummaryDict.id] = false;
-                      } else {
-                        this.loggerService.error(
-                          'INVALID ACTIVITY TYPE: Activity' +
+                    activitySummaryDicts.forEach(
+                      (activitySummaryDict: ActivityDict) => {
+                        if (activitySummaryDict.activity_type === (
+                          ACTIVITY_TYPE_EXPLORATION)) {
+                          this.activitiesOwned.explorations[
+                            activitySummaryDict.id] = false;
+                        } else if (activitySummaryDict.activity_type === (
+                          ACTIVITY_TYPE_COLLECTION)) {
+                          this.activitiesOwned.collections[
+                            activitySummaryDict.id] = false;
+                        } else {
+                          this.loggerService.error(
+                            'INVALID ACTIVITY TYPE: Activity' +
                           '(id: ' + activitySummaryDict.id +
                           ', name: ' + activitySummaryDict.title +
                           ', type: ' + activitySummaryDict.activity_type +
                           ') has an invalid activity type, which could ' +
                           'not be recorded as an exploration or a ' +
                           'collection.'
-                        );
-                      }
-                    });
+                          );
+                        }
+                      });
 
                     response.explorations_list.forEach(
-                      (ownedExplorations) => {
+                      (
+                          ownedExplorations:
+                        CreatorExplorationSummaryBackendDict
+                      ) => {
                         this.activitiesOwned.explorations[
                           ownedExplorations.id] = true;
                       });
 
-                    response.collections_list.forEach((ownedCollections) => {
-                      this.activitiesOwned.collections[
-                        ownedCollections.id] = true;
-                    });
+                    response.collections_list.forEach(
+                      (
+                          ownedCollections: CollectionSummaryBackendDict
+                      ) => {
+                        this.activitiesOwned.collections[
+                          ownedCollections.id] = true;
+                      });
                   });
                   this.loaderService.hideLoadingScreen();
                   this.initCarousels();
