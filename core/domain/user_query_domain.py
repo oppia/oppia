@@ -46,16 +46,16 @@ class UserQuery:
     """Domain object for the UserQueryModel."""
 
     def __init__(
-            self,
-            query_id: str,
-            query_params: UserQueryParams,
-            submitter_id: str,
-            query_status: str,
-            user_ids: List[str],
-            sent_email_model_id: Optional[str]=None,
-            created_on: Optional[datetime.datetime]=None,
-            deleted: bool=False
-        ) -> None:
+        self,
+        query_id: str,
+        query_params: UserQueryParams,
+        submitter_id: str,
+        query_status: str,
+        user_ids: List[str],
+        sent_email_model_id: Optional[str] = None,
+        created_on: Optional[datetime.datetime] = None,
+        deleted: bool = False
+    ) -> None:
         """Create user query domain object.
 
         Args:
