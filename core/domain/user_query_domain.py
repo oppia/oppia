@@ -123,7 +123,7 @@ class UserQuery:
             feconf.USER_QUERY_STATUS_PROCESSING, []
         )
 
-    def archive(self, sent_email_model_id: Optional[str]=None) -> None:
+    def archive(self, sent_email_model_id: Optional[str] = None) -> None:
         """Archive the query.
 
         Args:
