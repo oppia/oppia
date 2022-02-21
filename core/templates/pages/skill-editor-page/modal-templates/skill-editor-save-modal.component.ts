@@ -30,8 +30,7 @@ export class SkillEditorSaveModalComponent extends ConfirmOrCancelModal {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   commitMessage!: string;
-  MAX_COMMIT_MESSAGE_LENGTH: number = (
-    AppConstants.MAX_COMMIT_MESSAGE_LENGTH);
+  MAX_COMMIT_MESSAGE_LENGTH: number = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

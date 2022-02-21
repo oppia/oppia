@@ -95,7 +95,6 @@
     "core/templates/components/graph-services/graph-layout.service.ts",
     "core/templates/components/graph-services/graph-layout.service.spec.ts",
     "core/templates/components/on-screen-keyboard/on-screen-keyboard.component.ts",
-   
     "core/templates/components/on-screen-keyboard/on-screen-keyboard.component.spec.ts",
     "core/templates/components/question-directives/question-player/services/question-player-state.service.ts",
     "core/templates/components/question-directives/question-player/services/question-player-state.service.spec.ts",
