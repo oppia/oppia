@@ -31,8 +31,8 @@
   background-color: #fff;
   display: flex;
   padding: 30px;
-  text-align: center;
   justify-content: space-evenly;
+  text-align: center;
 }
 
 .splash-page .oppia-splash-h1,
@@ -147,10 +147,10 @@
 }
 
 .splash-page .splash-icon-text-container {
+  min-width: fit-content;
   padding-left: 15px;
   padding-right: 15px;
   padding-top: 5px;
-  min-width: fit-content;
 }
 
 .splash-page .oppia-splash-section-one-right {
@@ -313,9 +313,9 @@
 }
 
 .splash-page .splash-benefits-section {
-  margin-top: 25px;
   display: flex;
   justify-content: flex-start;
+  margin-top: 25px;
 }
 
 .splash-page .oppia-splash-section-three-right {
@@ -323,10 +323,10 @@
 }
 
 .splash-page .oppia-splash-section-three-left {
-  width: 50%;
-  display: flex;
   align-items: center;
- }
+  display: flex;
+  width: 50%;
+}
 
 .splash-page .splash-matthew-image img {
   max-width: 600px;
@@ -454,8 +454,8 @@
   }
 
   .splash-page .oppia-splash-section-three-left {
-    width: 100%;
     display: block;
+    width: 100%;
   }
 
   .splash-page .oppia-splash-section-five-image {
