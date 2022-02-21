@@ -813,6 +813,7 @@
 	"I18N_SHOW_MORE": "Text, which when clicked on, expands the section it is a part of.",
 	"I18N_SHOW_SOLUTION_BUTTON": "Button displayed in the warning modal that shows the solution of the question, when clicked.",
 	"I18N_SIDEBAR_ABOUT_LINK": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the about page.\n{{Identical|About Us}}",
+	"I18N_SIDEBAR_ABOUT_OPPIA_FOUNDATION": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the about Oppia Foundation page.",
 	"I18N_SIDEBAR_BLOG": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Oppia blog.\n{{Identical|Blog}}",
 	"I18N_SIDEBAR_CLASSROOM": "Text displayed inside the side navigation bar. - When the user clicks the button, a list with several classroom pages is displayed.",
 	"I18N_SIDEBAR_CLASSROOM_BASIC_MATHS": "Text displayed inside drop-down menu. - The list is shown after the user clicks the I18N_SIDEBAR_CLASSROOM button. When the option is clicked, the Maths Classroom page is loaded.",
