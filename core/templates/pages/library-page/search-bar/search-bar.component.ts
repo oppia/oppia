@@ -160,6 +160,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       totalCount === 1 ? selectedItems[0] :
       'I18N_LIBRARY_N_' + itemsName.toUpperCase());
     this.translationData[itemsName + 'Count'] = totalCount;
+
     // TODO(milit): When the language changes, the translations won't
     // change until the user changes the selection and this function is
     // re-executed.
