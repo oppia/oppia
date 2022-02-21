@@ -65,7 +65,6 @@ module.exports = {
       'speed-index': ['warn', {'maxNumericValue': 1230000}],
       'interactive': ['warn', {'maxNumericValue': 1540000}],
       'max-potential-fid': ['warn', {'maxNumericValue': 130000}],
-      'uses-responsive-images': ['error', {'minScore': 1}],
       'uses-optimized-images': ['error', {'minScore': 1}],
       'uses-rel-preconnect': ['error', {'minScore': 0.5}],
       'efficient-animated-content': ['error',{'minScore': 1}],
@@ -77,7 +76,6 @@ module.exports = {
       'geolocation-on-start': ['error', {'minScore': 1}],
       'doctype': ['error', {'minScore': 1}],
       'no-vulnerable-libraries': ['off', {'minScore': 1}],
-      'js-libraries': ['error', {'minScore': 1}],
       'notification-on-start': ['error', {'minScore': 1}],
       'password-inputs-can-be-pasted-into': ['error', {'minScore': 1}],
       'image-aspect-ratio': ['error', {'minScore': 1}],
@@ -92,7 +90,8 @@ module.exports = {
     'uses-passive-event-listeners': ['error', {'minScore': 1}],
     'uses-rel-preload': ['error', {'minScore': 1}],
     'deprecations': ['error', {'minScore': 1}],
-    'redirects': ['error', {'minScore': 1}]
+    'redirects': ['error', {'minScore': 1}],
+    'uses-responsive-images': ['error', {'minScore': 1}],
   },
   baseAccessibilityAssertions: {
     'categories:accessibility': ['error', {'minScore': 1}]
