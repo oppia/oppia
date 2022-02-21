@@ -27,7 +27,7 @@ from core.constants import constants
 
 from typing import List, Optional
 
-attribute_names = [ # pylint: disable=invalid-name
+attribute_names = [
         predicate['backend_attr'] for predicate in (
             constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
