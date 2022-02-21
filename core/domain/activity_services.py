@@ -96,8 +96,7 @@ def remove_featured_activity(activity_type: str, activity_id: str) -> None:
 
 
 def remove_featured_activities(
-    activity_type: str,
-    activity_ids: list[str]
+    activity_type: str, activity_ids: list[str]
 ) -> None:
     """Removes the specified activity references from the list of featured
     activity references.

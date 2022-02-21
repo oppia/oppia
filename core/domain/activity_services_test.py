@@ -27,10 +27,7 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 
-from typing import List
 from typing_extensions import Final
-
-ActivityReferenceList = List[activity_domain.ActivityReference]
 
 
 class ActivityServicesTests(test_utils.GenericTestBase):
@@ -60,8 +57,8 @@ class ActivityServicesTests(test_utils.GenericTestBase):
 
     def _compare_lists(
         self,
-        reference_list_1: ActivityReferenceList,
-        reference_list_2: ActivityReferenceList
+        reference_list_1: activity_services.ActivityReferenceList,
+        reference_list_2: activity_services.ActivityReferenceList,
     ) -> None:
         """Compares the hashed values of the two given reference lists."""
         hashes_1 = [reference.get_hash() for reference in reference_list_1]
@@ -85,9 +82,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self.save_new_valid_collection( # type: ignore[no-untyped-call]
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
-    def test_update_featured_refs_correctly_promotes_activities(
-        self
-    ) -> None:
+    def test_update_featured_refs_correctly_promotes_activities(self) -> None:
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0) # type: ignore[no-untyped-call]
         rights_manager.publish_collection(self.owner, self.COL_ID_2) # type: ignore[no-untyped-call]
         self._compare_lists(
@@ -115,9 +110,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-    def test_updating_with_duplicate_refs_raises_exception(
-        self
-    ) -> None:
+    def test_updating_with_duplicate_refs_raises_exception(self) -> None:
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0) # type: ignore[no-untyped-call]
         rights_manager.publish_collection(self.owner, self.COL_ID_2) # type: ignore[no-untyped-call]
         self._compare_lists(
@@ -128,9 +121,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
                 self._create_exploration_reference(self.EXP_ID_0),
                 self._create_exploration_reference(self.EXP_ID_0)])
 
-    def test_deleted_activity_is_removed_from_featured_list(
-        self
-    ) -> None:
+    def test_deleted_activity_is_removed_from_featured_list(self) -> None:
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0) # type: ignore[no-untyped-call]
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1) # type: ignore[no-untyped-call]
         rights_manager.publish_collection(self.owner, self.COL_ID_2) # type: ignore[no-untyped-call]
@@ -179,9 +170,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-    def test_unpublished_activity_is_removed_from_featured_list(
-        self
-    ) -> None:
+    def test_unpublished_activity_is_removed_from_featured_list(self) -> None:
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0) # type: ignore[no-untyped-call]
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1) # type: ignore[no-untyped-call]
         rights_manager.publish_collection(self.owner, self.COL_ID_2) # type: ignore[no-untyped-call]
@@ -212,9 +201,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-    def test_publish_activity_does_not_affect_featured_list(
-        self
-    ) -> None:
+    def test_publish_activity_does_not_affect_featured_list(self) -> None:
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
@@ -226,9 +213,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-    def test_split_by_type(
-        self
-    ) -> None:
+    def test_split_by_type(self) -> None:
         self.assertEqual(
             activity_services.split_by_type([]), ([], []))
 
