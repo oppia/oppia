@@ -54,9 +54,11 @@ export class CurrentInteractionService {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService) {}
 
-  private static submitAnswerFn: SubmitAnswerFn | null;
+  // The following functions will be null when the
+  // interaction passes the null value.
+  private static submitAnswerFn: SubmitAnswerFn | null = null;
+  private static validityCheckFn: ValidityCheckFn | null = null;
   private static onSubmitFn: OnSubmitFn;
-  private static validityCheckFn: ValidityCheckFn;
   private static presubmitHooks: PresubmitHookFn[] = [];
   private static answerChangedSubject: Subject<void> = new Subject<void>();
 
@@ -70,9 +72,12 @@ export class CurrentInteractionService {
     CurrentInteractionService.onSubmitFn = onSubmit;
   }
 
+  // The interaction can pass in null if it
+  // does not use the progress nav's submit button.
   registerCurrentInteraction(
       submitAnswerFn: SubmitAnswerFn | null,
-      validityCheckFn: ValidityCheckFn): void {
+      validityCheckFn: ValidityCheckFn
+  ): void {
     /**
      * Each interaction directive should call registerCurrentInteraction
      * when the interaction directive is first created.

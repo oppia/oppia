@@ -29,8 +29,7 @@ import { StateCustomizationArgsService } from 'components/state-editor/state-edi
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-
-const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -97,8 +96,11 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   shouldAdditionalSubmitButtonBeShown(): boolean {
-    let id = this.stateInteractionIdService.savedMemento;
-    let interactionSpecs = INTERACTION_SPECS[id];
+    const InteractionSpec:
+      {[key: string]: {show_generic_submit_button: boolean} } = (
+        INTERACTION_SPECS);
+    let interactionSpecs = (
+      InteractionSpec[this.stateInteractionIdService.savedMemento]);
     return interactionSpecs.show_generic_submit_button;
   }
 
@@ -133,7 +135,8 @@ export class AddOrUpdateSolutionModalComponent
     if (typeof this.data.answerIsExclusive === 'boolean' &&
        this.data.correctAnswer !== null &&
         this.data.explanation !== '' &&
-        this.data.explanationContentId !== null) {
+        this.data.explanationContentId !== null
+    ) {
       this.ngbActiveModal.close({
         solution: this.solutionObjectFactory.createNew(
           this.data.answerIsExclusive,

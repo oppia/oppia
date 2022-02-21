@@ -94,7 +94,8 @@ describe('Add Or Update Solution Modal Component', () => {
       contextService = TestBed.inject(ContextService);
 
       spyOn(contextService, 'getEntityType').and.returnValue('question');
-      spyOn(explorationHtmlFormatterService, 'getInteractionHtml');
+      spyOn(explorationHtmlFormatterService, 'getInteractionHtml')
+        .and.returnValue('<p>Interaction Html</>');
 
       answerEditorHtml = {
         ehfs: explorationHtmlFormatterService,
@@ -151,7 +152,8 @@ describe('Add Or Update Solution Modal Component', () => {
     it('should initialize properties after component is initialized', () => {
       stateSolutionService.init('', answerEditorHtml);
 
-      expect(component.correctAnswerEditorHtml).toBeNull();
+      expect(component.correctAnswerEditorHtml).toEqual(
+        '<p>Interaction Html</>');
       expect(component.EMPTY_SOLUTION_DATA).toEqual({
         answerIsExclusive: false,
         correctAnswer: null,

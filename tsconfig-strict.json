@@ -419,6 +419,8 @@
     "core/templates/pages/exploration-player-page/services/content-translation-language.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/content-translation-manager.service.ts",
     "core/templates/pages/exploration-player-page/services/content-translation-manager.service.spec.ts",
+    "core/templates/pages/exploration-player-page/services/current-interaction.service.ts",
+    "core/templates/pages/exploration-player-page/services/current-interaction.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/exploration-recommendations.service.ts",
     "core/templates/pages/exploration-player-page/services/exploration-recommendations.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/fatigue-detection.service.ts",

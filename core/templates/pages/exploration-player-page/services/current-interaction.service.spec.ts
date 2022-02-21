@@ -67,7 +67,8 @@ describe('Current Interaction Service', () => {
     let answerState = null;
     let dummyOnSubmitFn = (
         answer: string,
-        interactionRulesService: InteractionRulesService) => {
+        interactionRulesService: InteractionRulesService
+    ) => {
       answerState = answer;
     };
 
@@ -157,12 +158,9 @@ describe('Current Interaction Service', () => {
       '\nState Name: First State' +
       '\nContext: learner' +
       '\nErrored at index: 1');
-    let dummySubmitAnswerFn = () => {
-      return false;
-    };
 
     currentInteractionService.registerCurrentInteraction(
-      dummySubmitAnswerFn, dummyValidityCheckFn);
+      null, dummyValidityCheckFn);
 
     expect(() => currentInteractionService.submitAnswer()).toThrowError(
       'The current interaction did not ' + 'register a _submitAnswerFn.' +

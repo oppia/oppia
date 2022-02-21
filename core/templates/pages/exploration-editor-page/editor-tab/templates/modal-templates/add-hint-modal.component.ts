@@ -42,8 +42,7 @@ export class AddHintModalComponent
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   hintIndex!: number;
   tmpHint: string = '';
-  COMPONENT_NAME_HINT: string = (
-    AppConstants.COMPONENT_NAME_HINT);
+  COMPONENT_NAME_HINT: string = AppConstants.COMPONENT_NAME_HINT;
 
   HINT_FORM_SCHEMA: HintFormSchema = {
     type: 'html',
