@@ -52,10 +52,13 @@ class RtlCSSTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen_without_std_in)
         expected_rtl_file_count = 0
         pages_base_dir = os.path.join(os.getcwd(), 'core', 'templates')
+
+        # Count rtl css files of pages.
         for _, _, files in os.walk(pages_base_dir):
             for file in files:
                 if file.endswith('.rtl.css'):
                     expected_rtl_file_count += 1
+
         with popen_swap_without_stdin:
             rtl_css.main(args=['--mode', 'generate'])
             self.assertEqual(

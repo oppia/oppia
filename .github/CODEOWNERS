@@ -261,6 +261,7 @@
 /core/templates/components/common-layout-directives/common-elements/alert-message.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.ts @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.css @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @srijanreddy98
