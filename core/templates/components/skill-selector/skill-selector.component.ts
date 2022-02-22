@@ -47,6 +47,7 @@ export class SkillSelectorComponent implements OnInit {
   @Input() categorizedSkills!: CategorizedSkills;
   @Input() untriagedSkillSummaries!: SkillSummary[];
   @Input() allowSkillsFromOtherTopics!: boolean;
+  @Input() isEditableByUser!: boolean;
   @Output() selectedSkillIdChange: EventEmitter<string> = new EventEmitter();
   currCategorizedSkills!: CategorizedSkills;
   selectedSkill!: string;

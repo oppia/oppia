@@ -66,20 +66,18 @@ export class StateSkillEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.skillEditorIsShown = (!this.windowDimensionsService.isWindowNarrow());
+    this.topicsAndSkillsDashboardBackendApiService
+      .fetchDashboardDataAsync()
+      .then((response: TopicsAndSkillDashboardData) => {
+        this.categorizedSkills = response.categorizedSkillsDict;
+        this.untriagedSkillSummaries = response.untriagedSkillSummaries;
+      });
     this.userService.getUserInfoAsync()
       .then((userInfo) => {
         this.isEditableByUser = (
           userInfo.isLoggedIn() &&
           (userInfo.isCurriculumAdmin() || userInfo.isTopicManager())
         );
-        if (this.isEditableByUser) {
-          this.topicsAndSkillsDashboardBackendApiService
-            .fetchDashboardDataAsync()
-            .then((response: TopicsAndSkillDashboardData) => {
-              this.categorizedSkills = response.categorizedSkillsDict;
-              this.untriagedSkillSummaries = response.untriagedSkillSummaries;
-            });
-        }
       });
     if (this.stateLinkedSkillIdService.displayed) {
       this.skillBackendApiService.fetchSkillAsync(
@@ -110,6 +108,7 @@ export class StateSkillEditorComponent implements OnInit {
       allowSkillsFromOtherTopics);
     modalRef.componentInstance.untriagedSkillSummaries = (
       this.untriagedSkillSummaries);
+    modalRef.componentInstance.isEditableByUser = this.isEditableByUser;
     modalRef.result.then((result) => {
       this.skillName = result.description;
       this.stateLinkedSkillIdService.displayed = result.id;

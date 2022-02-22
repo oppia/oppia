@@ -16,7 +16,7 @@
                 <div *ngIf="!checkIfEmpty(subtopic.value)">
                   <mat-card class="list-view-item">
                     <label class="oppia-subtopic-name-text">{{ subtopic.key }}</label>
-                    <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="let skill of searchInSubtopicSkills(subtopic.value, skillFilterText)" [value]="skill.id" attr.aria-label="{{ skill.description }}">
+                    <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="let skill of searchInSubtopicSkills(subtopic.value, skillFilterText)" [value]="skill.id" [disabled]="!isEditableByUser" attr.aria-label="{{ skill.description }}">
                       {{ skill.description }}
                     </mat-radio-button>
                   </mat-card>
@@ -31,7 +31,7 @@
             <div *ngIf="!checkIfEmpty(untriagedSkillSummaries)" class="list-view-item ">
               <mat-card class="list-view-item">
                 <label>
-                  <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="let skill of searchInUntriagedSkillSummaries(skillFilterText)" [value]="skill.id" attr.aria-label="{{ skill.description }}">
+                  <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="let skill of searchInUntriagedSkillSummaries(skillFilterText)" [value]="skill.id" [disabled]="!isEditableByUser" attr.aria-label="{{ skill.description }}">
                     {{ skill.description }}
                   </mat-radio-button>
                 </label>

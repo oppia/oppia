@@ -9,14 +9,14 @@
       <i class="fa fa-caret-up" *ngIf="skillEditorIsShown" aria-hidden="true"></i>
     </mat-card-actions>
   </mat-card-header>
-  <mat-card-actions class="oppia-skill-button-container" *ngIf="skillEditorIsShown && !stateLinkedSkillIdService.displayed && isEditableByUser">
+  <mat-card-actions class="oppia-skill-button-container" *ngIf="skillEditorIsShown && !stateLinkedSkillIdService.displayed">
     <button type="button"
             class="btn btn-primary oppia-add-skill-button"
             (click)="addSkill()">
       + ADD SKILL
     </button>
   </mat-card-actions>
-  <mat-card-actions class="oppia-skill-button-container" *ngIf="skillEditorIsShown && stateLinkedSkillIdService.displayed && isEditableByUser">
+  <mat-card-actions class="oppia-skill-button-container" *ngIf="skillEditorIsShown && stateLinkedSkillIdService.displayed">
     <button type="button"
             class="btn btn-primary oppia-change-skill-button"
             (click)="addSkill()">
