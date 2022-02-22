@@ -25,8 +25,8 @@ import os
 
 from core.constants import constants
 
-from typing import Dict, List, Union
-from typing_extensions import TypedDict
+from typing import Dict, List, Tuple, Union
+from typing_extensions import Literal, TypedDict
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
@@ -39,6 +39,26 @@ ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 # The values which a post_commit_status can have: public, private.
 POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
+
+CollectionPropertiesType = Tuple[
+    Literal['title'],
+    Literal['category'],
+    Literal['objective'],
+    Literal['language_code'],
+    Literal['tags']
+]
+
+
+class ValidCmdDict(TypedDict):
+    """Dictionary representing valid commands specs."""
+
+    name: str
+    required_attribute_names: List[str]
+    optional_attribute_names: List[str]
+    user_id_attribute_names: List[str]
+    allowed_values: Dict[str, Union[CollectionPropertiesType, List[str]]]
+    deprecated_values: Dict[str, List[str]]
+
 
 # Whether to unconditionally log info messages.
 DEBUG = False

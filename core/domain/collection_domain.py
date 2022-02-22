@@ -33,8 +33,8 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Dict, List, Optional, Tuple, Union
-from typing_extensions import Final, Literal, TypedDict
+from typing import Dict, List, Optional, Union
+from typing_extensions import Final, TypedDict
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -82,24 +82,6 @@ CMD_REMOVE_QUESTION_ID_FROM_SKILL: Final = 'remove_question_id_from_skill'
 # backwards-compatibility issues.
 _SKILL_ID_PREFIX: Final = 'skill'
 
-CollectionPropertiesTuple = Tuple[
-    Literal['title'],
-    Literal['category'],
-    Literal['objective'],
-    Literal['language_code'],
-    Literal['tags']
-]
-
-
-class AllowedCommandDict(TypedDict, total=False):
-    """Type for the ALLOWED COMMAND Dict"""
-
-    name: str
-    required_attribute_names: List[str]
-    optional_attribute_names: List[str]
-    user_id_attribute_names: List[str]
-    allowed_values: Dict[str, CollectionPropertiesTuple]
-
 
 class CollectionChange(change_domain.BaseChange):
     """Domain object class for a change to a collection.
@@ -123,77 +105,104 @@ class CollectionChange(change_domain.BaseChange):
 
     # The allowed list of collection properties which can be used in
     # edit_collection_property command.
-    COLLECTION_PROPERTIES: CollectionPropertiesTuple = (
+    COLLECTION_PROPERTIES: feconf.CollectionPropertiesType = (
         COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
         COLLECTION_PROPERTY_OBJECTIVE, COLLECTION_PROPERTY_LANGUAGE_CODE,
         COLLECTION_PROPERTY_TAGS)
 
-    ALLOWED_COMMANDS: List[AllowedCommandDict] = [{
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['category', 'title'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_ADD_COLLECTION_NODE,
         'required_attribute_names': ['exploration_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_DELETE_COLLECTION_NODE,
         'required_attribute_names': ['exploration_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_SWAP_COLLECTION_NODES,
         'required_attribute_names': ['first_index', 'second_index'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_EDIT_COLLECTION_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value'],
         'optional_attribute_names': ['old_value'],
         'user_id_attribute_names': [],
-        'allowed_values': {'property_name': COLLECTION_PROPERTIES}
+        'allowed_values': {'property_name': COLLECTION_PROPERTIES},
+        'deprecated_values': {}
     }, {
         'name': CMD_EDIT_COLLECTION_NODE_PROPERTY,
         'required_attribute_names': [
             'exploration_id', 'property_name', 'new_value'],
         'optional_attribute_names': ['old_value'],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_ADD_COLLECTION_SKILL,
         'required_attribute_names': ['name'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_DELETE_COLLECTION_SKILL,
         'required_attribute_names': ['skill_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_ADD_QUESTION_ID_TO_SKILL,
         'required_attribute_names': ['question_id', 'skill_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_REMOVE_QUESTION_ID_FROM_SKILL,
         'required_attribute_names': ['question_id', 'skill_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }]
 
 
-class CollectionNodeDict(TypedDict, total=False):
+class CollectionNodeDict(TypedDict):
     """Dictionary representing the CollectionNode object."""
+
+    exploration_id: str
+
+
+class CollectionNodeVersionDict(CollectionNodeDict):
+    """Dictionary representing the CollectionNode object based
+    on different schema versions."""
 
     acquired_skills: List[str]
     acquired_skill_ids: List[str]
-    exploration_id: str
     other_field: str
     prerequisite_skills: List[str]
     prerequisite_skill_ids: List[str]
@@ -266,7 +275,7 @@ class CollectionNode:
         return cls(exploration_id)
 
 
-class CollectionDict(TypedDict, total=False):
+class CollectionDict(TypedDict):
     """Dictionary representing the Collection object."""
 
     id: str
@@ -276,13 +285,13 @@ class CollectionDict(TypedDict, total=False):
     language_code: str
     tags: List[str]
     schema_version: int
-    nodes: List[CollectionNodeDict]
+    nodes: List[CollectionNodeVersionDict]
     version: int
     created_on: Union[datetime.datetime, str, None]
     last_updated: Union[datetime.datetime, str, None]
 
 
-class CollectionVersionDict(CollectionDict, total=False):
+class CollectionVersionDict(CollectionDict):
     """Dictionary representing the Collection object based
     on different schema versions.
     """
@@ -366,7 +375,10 @@ class Collection:
         Returns:
             dict. A dict, mapping all fields of Collection instance.
         """
-        return {
+        # Since we're returning keys less than the number of keys defined
+        # in typedDict, Mypy assuming it as an error. So, to prevent from
+        # causing error ignore statement is applied here.
+        return { # type: ignore[typeddict-item]
             'id': self.id,
             'title': self.title,
             'category': self.category,
@@ -509,8 +521,15 @@ class Collection:
 
         # The ID is the only property which should not be stored within the
         # YAML representation.
-        del collection_dict['id']
 
+        # A key is not allowed to delete from defined typedDict. In that case,
+        # mypy assuming it as an error. So, to prevent from causing error
+        # ignore statement is applied here.
+        del collection_dict['id'] # type: ignore[misc]
+
+        # utils.yaml_from_dict() is a general function which accepts only
+        # dict[str, any], but here collection_dict is typed with type
+        # CollectionDict.
         return utils.yaml_from_dict(collection_dict) # type: ignore[arg-type]
 
     @classmethod
@@ -596,8 +615,12 @@ class Collection:
         This changes the structure of each node to not include skills as well
         as remove skills from the Collection model itself.
         """
-        del collection_dict['skills']
-        del collection_dict['next_skill_index']
+
+        # A key is not allowed to delete from defined typedDict. In that case,
+        # mypy assuming it as an error. So, to prevent from causing error
+        # ignore statement is applied here.
+        del collection_dict['skills'] # type: ignore[misc]
+        del collection_dict['next_skill_index'] # type: ignore[misc]
 
         collection_dict['schema_version'] = 6
         return collection_dict
@@ -623,6 +646,9 @@ class Collection:
             Exception. The collection schema version is not valid.
         """
         try:
+            # utils.dict_from_yaml() is general function which return
+            # only dict[str, any] and here we're expecting it to be
+            # type CollectionDict.
             collection_dict: CollectionDict = utils.dict_from_yaml(yaml_content) # type: ignore[assignment]
         except utils.InvalidInputException as e:
             raise utils.InvalidInputException(
@@ -727,8 +753,11 @@ class Collection:
             name: _SKILL_ID_PREFIX + str(index)
             for index, name in enumerate(sorted(skill_names))
         }
-
-        collection_contents['nodes'] = [{
+        # Here we're defining keys less than the number of keys defined in
+        # TypedDict for collectionNode object, because this mypy assuming
+        # it as an error. So, to prevent from causing an error ignore
+        # statement is applied here.
+        collection_contents['nodes'] = [{ # type: ignore[typeddict-item]
             'exploration_id': node['exploration_id'],
             'prerequisite_skill_ids': [
                 skill_names_to_ids[prerequisite_skill_name]
@@ -768,7 +797,10 @@ class Collection:
         """
         collection_contents['next_skill_index'] = collection_contents[
             'next_skill_id']
-        del collection_contents['next_skill_id']
+        # A key is not allowed to delete from defined typedDict. In that case,
+        # mypy assuming it as an error. So, to prevent from causing error
+        # ignore statement is applied here.
+        del collection_contents['next_skill_id'] # type: ignore[misc]
 
         return collection_contents
 
@@ -787,9 +819,12 @@ class Collection:
         Returns:
             dict. The updated collection_contents dict.
         """
+        # A key is not allowed to delete from defined typedDict. In that case,
+        # mypy assuming it as an error. So, to prevent from causing error
+        # ignore statement is applied here.
         for node in collection_contents['nodes']:
-            del node['prerequisite_skill_ids']
-            del node['acquired_skill_ids']
+            del node['prerequisite_skill_ids'] # type: ignore[misc]
+            del node['acquired_skill_ids'] # type: ignore[misc]
 
         return collection_contents
 
@@ -1343,6 +1378,9 @@ class CollectionSummary:
         Returns:
             bool. Whether the collection is private.
         """
+        # Here mypy expecting constants.ACTIVITY_STATUS_PRIVATE to be type
+        # Any and due to this, function is returning type Any. So, to return
+        # bool, bool function is imposed on return value.
         return bool(self.status == constants.ACTIVITY_STATUS_PRIVATE)
 
     def is_solely_owned_by_user(self, user_id: str) -> bool:

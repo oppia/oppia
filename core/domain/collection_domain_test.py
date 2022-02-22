@@ -494,11 +494,14 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection.nodes), 0)
 
     def test_update_collection_contents_from_model(self) -> None:
+        # For test purpose we're only defining required fields which does not
+        # match with defined typedDict. So, to prevent error ignore statement
+        # is applied here.
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict
         ) = {
             'schema_version': 1,
-            'collection_contents': {}
+            'collection_contents': {} # type: ignore[typeddict-item]
         }
 
         collection_domain.Collection.update_collection_contents_from_model(
@@ -518,11 +521,14 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     def test_update_collection_contents_from_model_with_schema_version_5(
         self
     ) -> None:
+        # For test purpose only we're defining required fields which does not
+        # match with defined typedDict. So, to prevent error ignore statement
+        # is applied here.
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict
         ) = {
             'schema_version': 5,
-            'collection_contents': {
+            'collection_contents': { # type: ignore[typeddict-item]
                 'nodes': [
                     {
                         'prerequisite_skill_ids': ['11', '22'],
@@ -551,11 +557,14 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     def test_update_collection_contents_from_model_with_invalid_schema_version(
         self
     ) -> None:
+        # For test purpose only we're defining required fields which does not
+        # match with defined typedDict. So, to prevent error ignore statement
+        # is applied here.
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict
         ) = {
             'schema_version': feconf.CURRENT_COLLECTION_SCHEMA_VERSION,
-            'collection_contents': {}
+            'collection_contents': {} # type: ignore[typeddict-item]
         }
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
