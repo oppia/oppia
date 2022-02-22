@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for storyViewerPage.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { StoryNode } from 'domain/story/story-node.model';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerPageComponent } from './story-viewer-page.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { UserService } from 'services/user.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
@@ -32,7 +32,6 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-
 
 class MockAssetsBackendApiService {
   getThumbnailUrlForPreview() {
@@ -81,6 +80,7 @@ describe('Story Viewer Page component', () => {
     pageTitleService = TestBed.get(PageTitleService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
     urlService = TestBed.get(UrlService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     userService = TestBed.get(UserService);
     alertsService = TestBed.get(AlertsService);
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
@@ -88,6 +88,8 @@ describe('Story Viewer Page component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     let fixture = TestBed.createComponent(StoryViewerPageComponent);
     component = fixture.componentInstance;
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
         reload: ()=>{},
@@ -200,6 +202,9 @@ describe('Story Viewer Page component', () => {
     httpTestingController.verify();
   });
 
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
+  });
 
   it('should get complete exploration url when clicking on svg element',
     () => {
@@ -485,6 +490,45 @@ describe('Story Viewer Page component', () => {
       expect(component.iconUrl === '');
     }));
 
+  it('should close the login overlay', fakeAsync(()=>{
+    spyOn(component, 'hideLoginOverlay').and.callThrough();
+
+    expect(component.showLoginOverlay).toEqual(true);
+
+    component.hideLoginOverlay();
+    tick();
+
+    expect(component.showLoginOverlay).toEqual(false);
+  }));
+
+  it('should set focus on skip button', fakeAsync(()=>{
+    let target = document.createElement('div');
+    target.classList.add('target');
+
+    let nonTarget = document.createElement('div');
+    nonTarget.classList.add('test');
+
+    let overlay = new ElementRef(document.createElement('div'));
+    let button = new ElementRef(document.createElement('button'));
+
+    component.skipButton = button;
+    component.overlay = overlay;
+    component.showLoginOverlay = true;
+
+    spyOn(component, 'focusSkipButton').and.callThrough();
+    spyOn(component.skipButton.nativeElement, 'focus');
+    spyOn(target, 'closest').and.returnValue(nonTarget);
+
+    component.focusSkipButton(target, true);
+    tick();
+
+    expect(component.skipButton.nativeElement.focus).not.toHaveBeenCalled();
+
+    component.focusSkipButton(target, false);
+    tick();
+
+    expect(component.skipButton.nativeElement.focus).toHaveBeenCalled();
+  }));
   it('should check if hacky translation is displayed correctly', () => {
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValues(false, true, false, true);

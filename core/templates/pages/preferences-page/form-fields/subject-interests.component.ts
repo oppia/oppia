@@ -32,6 +32,7 @@ export class SubjectInterestsComponent {
   @Input() subjectInterests: string[] = [];
   @Output() subjectInterestsChange: EventEmitter<string[]> = (
     new EventEmitter());
+
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER];

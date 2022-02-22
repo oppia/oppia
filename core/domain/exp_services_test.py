@@ -1215,8 +1215,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
             exploration.validate(strict=True)
 
             duration = datetime.datetime.utcnow() - start_time
-            processing_time = duration.seconds + python_utils.divide(
-                duration.microseconds, 1E6)
+            processing_time = duration.seconds + (duration.microseconds / 1E6)
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)' %
                 (exploration.title, processing_time))
@@ -1833,7 +1832,7 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     )
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
@@ -1941,7 +1940,7 @@ title: A title
 
     UPDATED_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
@@ -5043,6 +5042,23 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self._check_contributors_summary(
             self.EXP_ID_1, {self.albert_id: 1})
 
+    def test_regenerate_summary_with_new_contributor_with_invalid_exp_id(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        with logging_swap:
+            exp_services.regenerate_exploration_summary_with_new_contributor(
+                'dummy_id', self.albert_id)
+
+        self.assertEqual(
+            observed_log_messages,
+            ['Could not find exploration with ID dummy_id']
+        )
+
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
@@ -5693,7 +5709,7 @@ title: Old Title
 
     def test_update_exploration_auto_tts_enabled(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.auto_tts_enabled, True)
+        self.assertEqual(exploration.auto_tts_enabled, False)
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,

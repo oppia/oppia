@@ -374,10 +374,10 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
         repo_fork.get_git_ref('heads/%s' % target_branch).delete()
     except github.UnknownObjectException:
         pass
-    except Exception:
+    except Exception as e:
         raise Exception(
             'Please ensure that %s branch is deleted before '
-            're-running the script' % target_branch)
+            're-running the script' % target_branch) from e
 
 
 def create_branch(
@@ -551,12 +551,6 @@ def main():
         'the emails of the form: %s.' % (
             constants.release_constants.RELEASE_SUMMARY_FILEPATH,
             constants.release_constants.INVALID_EMAIL_SUFFIX))
-    common.open_new_tab_in_browser_if_possible(
-        constants.release_constants.CREDITS_FORM_URL)
-    common.ask_user_to_confirm(
-        'Check the credits form and add any additional contributors '
-        'to the contributor list in the file: %s.' % (
-            constants.release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(
         'Categorize the PR titles in the Uncategorized section of the '
         'changelog in the file: %s, and arrange the changelog '

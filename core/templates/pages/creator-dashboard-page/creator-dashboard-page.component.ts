@@ -37,6 +37,7 @@ import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-su
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 @Component({
   selector: 'oppia-creator-dashboard-page',
@@ -64,15 +65,20 @@ export class CreatorDashboardPageComponent {
   emptyDashboardImgUrl: string;
   getAverageRating: (
     (ratingFrequencies: ExplorationRatings) => number | null);
+
   SUBSCRIPTION_SORT_BY_KEYS =
     CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS;
+
   EXPLORATIONS_SORT_BY_KEYS =
     CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS;
+
   DEFAULT_EMPTY_TITLE = 'Untitled';
   HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS =
     CreatorDashboardConstants.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS;
+
   HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS =
     CreatorDashboardConstants.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS;
+
   DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD =
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
 
@@ -84,6 +90,7 @@ export class CreatorDashboardPageComponent {
     private loaderService: LoaderService,
     private userService: UserService,
     private alertsService: AlertsService,
+    private windowDimensionsService: WindowDimensionsService,
     private dateTimeFormatService: DateTimeFormatService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
     private explorationCreationService: ExplorationCreationService,
@@ -134,6 +141,10 @@ export class CreatorDashboardPageComponent {
 
   getTrustedResourceUrl(imageFileName: string): string {
     return decodeURIComponent(imageFileName);
+  }
+
+  checkTabletView(): boolean {
+    return (this.windowDimensionsService.getWidth() < 768);
   }
 
   updatesGivenScreenWidth(): void {
