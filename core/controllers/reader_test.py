@@ -1959,8 +1959,8 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'], 'Missing key in handler args: version.'
         )
-    
-    def test_submit_answer_for_exploration_raises_error_with_no_answer(self):
+
+    def test_submit_answer_for_exploration_raises_error_with_no_answer_matching_data_type(self): # pylint: disable=line-too-long
         # Load demo exploration.
         exp_id = '6'
         exp_services.delete_demo(exp_id)
@@ -1978,7 +1978,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             '/explorehandler/answer_submitted_event/%s' % exp_id,
             {
                 'old_state_name': state_name_1,
-                'answer': None,
+                'answer': [],
                 'version': version,
                 'client_time_spent_in_secs': 0,
                 'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
@@ -1990,7 +1990,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
-            'Type of None is not present in options'
+            'Type of [] is not present in options'
         )
 
 
