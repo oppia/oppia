@@ -25,20 +25,62 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 attribute_names = [
         predicate['backend_attr'] for predicate in (
             constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
+# Check to see if list of attributes defined here (attribute_names_predefined)
+# is similar to the one we get during runtime (attribute_names)
+# from (/assets/constants.ts)
+if not TYPE_CHECKING:
+    attribute_names_predefined = [
+            'inactive_in_last_n_days',
+            'has_not_logged_in_for_n_days',
+            'created_at_least_n_exps',
+            'created_fewer_than_n_exps',
+            'edited_at_least_n_exps',
+            'edited_fewer_than_n_exps',
+            'created_collection'
+            ]
+
+    attribute_names_predefined.sort()
+    attribute_names.sort()
+
+    if len(attribute_names_predefined) != len(attribute_names):
+        raise utils.ValidationError(
+        'Attributes mismatch from attributes fetched from /assets/constants.ts')
+
+    if attribute_names_predefined != attribute_names:
+        raise utils.ValidationError(
+        'Attributes mismatch from attributes fetched from /assets/constants.ts')
+
+
 # We can't inject dynamic data(attribute_names) into namedtuple(UserQueryParams)
-# without raising mypy error. Therefore , we need to silence these errors
-# explicitly using # type: ignore[misc] for now.
-# For more information : https://github.com/python/mypy/issues/848
-UserQueryParams = collections.namedtuple( # type: ignore[misc] # pylint: disable=invalid-name
+# without raising mypy error. Therefore , we need to use predefined attributes
+# explicitly and check them for similarity in above check and raise error
+# when needed .
+UserQueryParams = collections.namedtuple(
         'UserQueryParams',
-        attribute_names,
-        defaults=(None,) * len(attribute_names) # type: ignore[misc]
+        [
+        'inactive_in_last_n_days',
+        'has_not_logged_in_for_n_days',
+        'created_at_least_n_exps',
+        'created_fewer_than_n_exps',
+        'edited_at_least_n_exps',
+        'edited_fewer_than_n_exps',
+        'created_collection'
+        ],
+        defaults=(
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None
+            )
         )
 
 
