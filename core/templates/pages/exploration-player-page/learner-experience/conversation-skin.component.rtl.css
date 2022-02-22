@@ -61,7 +61,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
 
 .conversation-skin-tutor-card-container {
   flex-shrink: 10000;
-  margin-bottom: 150px;
+  margin-bottom: 24px;
   max-width: 650px;
   /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
       below should be changed to match. */
