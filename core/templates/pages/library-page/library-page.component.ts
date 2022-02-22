@@ -19,9 +19,6 @@
 import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
-import { CreatorExplorationSummaryBackendDict } from 'domain/summary/creator-exploration-summary.model';
-import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -35,8 +32,6 @@ import { SearchService } from 'services/search.service';
 import { UserService } from 'services/user.service';
 import { LibraryPageConstants } from './library-page.constants';
 import { ActivityDict,
-  CreatorDashboardData,
-  LibraryIndexData,
   LibraryPageBackendApiService,
   SummaryDict } from './services/library-page-backend-api.service';
 
@@ -118,20 +113,17 @@ export class LibraryPageComponent {
       return;
     }
 
-    let width = $(window).width();
-    let windowWidth;
+    // The number 0 here is just to make sure that the type of width is number,
+    // it is never assigned as the width will never be undefined.
+    let width = $(window).width() || 0;
 
-    if (width !== undefined) {
-      windowWidth = width * 0.85;
-    }
+    let windowWidth = width * 0.85;
     // The number 20 is added to LIBRARY_TILE_WIDTH_PX in order to
     // compensate for padding and margins. 20 is just an arbitrary
     // number.
-    if (windowWidth !== undefined) {
-      this.tileDisplayCount = Math.min(
-        Math.floor(windowWidth / (AppConstants.LIBRARY_TILE_WIDTH_PX + 20)),
-        this.MAX_NUM_TILES_PER_ROW);
-    }
+    this.tileDisplayCount = Math.min(
+      Math.floor(windowWidth / (AppConstants.LIBRARY_TILE_WIDTH_PX + 20)),
+      this.MAX_NUM_TILES_PER_ROW);
 
     $('.oppia-library-carousel').css({
       'max-width': (
@@ -144,13 +136,13 @@ export class LibraryPageComponent {
       let carouselJQuerySelector = (
         '.oppia-library-carousel-tiles:eq(n)'.replace(
           'n', String(i)));
+      // The number 0 here is just to make sure that the type of width is
+      // number, it is never assigned as the selector will never be undefined.
       let carouselScrollPositionPx = $(
-        carouselJQuerySelector).scrollLeft();
-      if (carouselScrollPositionPx !== undefined) {
-        let index = Math.ceil(
-          carouselScrollPositionPx / AppConstants.LIBRARY_TILE_WIDTH_PX);
-        this.leftmostCardIndices[i] = index;
-      }
+        carouselJQuerySelector).scrollLeft() || 0;
+      let index = Math.ceil(
+        carouselScrollPositionPx / AppConstants.LIBRARY_TILE_WIDTH_PX);
+      this.leftmostCardIndices[i] = index;
     }
   }
 
@@ -162,8 +154,10 @@ export class LibraryPageComponent {
       '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind.toString()));
 
     let direction = isLeftScroll ? -1 : 1;
+    // The number 0 here is just to make sure that the type of width is
+    // number, it is never assigned as the selector will never be undefined.
     let carouselScrollPositionPx = $(
-      carouselJQuerySelector).scrollLeft();
+      carouselJQuerySelector).scrollLeft() || 0;
 
     // Prevent scrolling if there more carousel pixed widths than
     // there are tile widths.
@@ -172,9 +166,7 @@ export class LibraryPageComponent {
       return;
     }
 
-    if (carouselScrollPositionPx !== undefined) {
-      carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
-    }
+    carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
 
     if (isLeftScroll) {
       this.leftmostCardIndices[ind] = Math.max(
@@ -186,11 +178,8 @@ export class LibraryPageComponent {
         this.leftmostCardIndices[ind] + this.tileDisplayCount);
     }
 
-    let newScrollPositionPx;
-    if (carouselScrollPositionPx !== undefined) {
-      newScrollPositionPx = carouselScrollPositionPx +
+    let newScrollPositionPx = carouselScrollPositionPx +
       (this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX * direction);
-    }
 
     $(carouselJQuerySelector).animate({
       scrollLeft: newScrollPositionPx
@@ -232,7 +221,7 @@ export class LibraryPageComponent {
     if (fullResultsUrl) {
       this.windowRef.nativeWindow.location.href = fullResultsUrl;
     } else {
-      let selectedCategories: {[key: string]: boolean} = {};
+      let selectedCategories: Record<string, boolean> = {};
       for (let i = 0; i < categories.length; i++) {
         selectedCategories[categories[i]] = true;
       }
@@ -289,8 +278,8 @@ export class LibraryPageComponent {
       this.loggerService.error('INVALID URL PATH: ' + currentPath);
     }
 
-    let libraryContants:
-      {[key: string]: string } = LibraryPageConstants.LIBRARY_PAGE_MODES;
+    const libraryContants:
+      Record<string, string> = LibraryPageConstants.LIBRARY_PATHS_TO_MODES;
     this.pageMode = libraryContants[currentPath];
     this.LIBRARY_PAGE_MODES = LibraryPageConstants.LIBRARY_PAGE_MODES;
 
@@ -326,14 +315,14 @@ export class LibraryPageComponent {
       });
     } else {
       this.libraryPageBackendApiService.fetchLibraryIndexDataAsync()
-        .then((response: LibraryIndexData) => {
+        .then((response) => {
           this.libraryGroups = response.activity_summary_dicts_by_category;
-          this.userService.getUserInfoAsync().then((userInfo: UserInfo) => {
+          this.userService.getUserInfoAsync().then((userInfo) => {
             this.activitiesOwned = {explorations: {}, collections: {}};
             if (userInfo.isLoggedIn()) {
               this.libraryPageBackendApiService.fetchCreatorDashboardDataAsync()
-                .then((response: CreatorDashboardData) => {
-                  this.libraryGroups.forEach((libraryGroup: SummaryDict) => {
+                .then((response) => {
+                  this.libraryGroups.forEach((libraryGroup) => {
                     let activitySummaryDicts = (
                       libraryGroup.activity_summary_dicts);
 
@@ -341,7 +330,7 @@ export class LibraryPageComponent {
                     let ACTIVITY_TYPE_COLLECTION = 'collection';
 
                     activitySummaryDicts.forEach(
-                      (activitySummaryDict: ActivityDict) => {
+                      (activitySummaryDict) => {
                         if (activitySummaryDict.activity_type === (
                           ACTIVITY_TYPE_EXPLORATION)) {
                           this.activitiesOwned.explorations[
@@ -364,18 +353,13 @@ export class LibraryPageComponent {
                       });
 
                     response.explorations_list.forEach(
-                      (
-                          ownedExplorations:
-                        CreatorExplorationSummaryBackendDict
-                      ) => {
+                      (ownedExplorations) => {
                         this.activitiesOwned.explorations[
                           ownedExplorations.id] = true;
                       });
 
                     response.collections_list.forEach(
-                      (
-                          ownedCollections: CollectionSummaryBackendDict
-                      ) => {
+                      (ownedCollections) => {
                         this.activitiesOwned.collections[
                           ownedCollections.id] = true;
                       });
