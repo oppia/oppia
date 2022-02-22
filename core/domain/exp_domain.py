@@ -2677,8 +2677,8 @@ class ExplorationSummary:
             self.viewer_ids)
         if len(all_user_ids_with_rights) != len(set(all_user_ids_with_rights)):
             raise utils.ValidationError(
-                'Users should not be assigned to multiple roles '
-                'at once, received users: %s' % all_user_ids_with_rights)
+                'Users should not be assigned to multiple roles at once, '
+                'received users: %s' % ', '.join(all_user_ids_with_rights))
 
         if not isinstance(self.contributor_ids, list):
             raise utils.ValidationError(

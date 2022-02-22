@@ -2562,7 +2562,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Users should not be assigned to multiple roles at once, '
-                'received users: [\'1\', \'2\', \'3\', \'4\', \'2\']')
+                'received users: 1, 2, 3, 4, 2')
         ):
             self.exp_summary.validate()
 
