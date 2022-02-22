@@ -33,10 +33,10 @@ if MYPY: # pragma: no cover
 
 (activity_models,) = models.Registry.import_models([models.NAMES.activity])
 
-ActivityReferenceList = List[activity_domain.ActivityReference]
 
-
-def get_featured_activity_references() -> ActivityReferenceList:
+def get_featured_activity_references() -> (
+    List[activity_domain.ActivityReference]
+):
     """Gets a list of ActivityReference domain models.
 
     Returns:
@@ -53,7 +53,7 @@ def get_featured_activity_references() -> ActivityReferenceList:
 
 
 def update_featured_activity_references(
-    featured_activity_references: ActivityReferenceList
+    featured_activity_references: List[activity_domain.ActivityReference]
 ) -> None:
     """Updates the current list of featured activity references.
 
@@ -126,7 +126,7 @@ def remove_featured_activities(
 
 
 def split_by_type(
-    activity_references: ActivityReferenceList
+    activity_references: List[activity_domain.ActivityReference]
 ) -> Tuple[List[str], List[str]]:
     """Given a list of activity references, returns two lists: the first list
     contains the exploration ids, and the second contains the collection ids.

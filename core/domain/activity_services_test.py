@@ -27,6 +27,7 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 
+from typing import List
 from typing_extensions import Final
 
 
@@ -57,8 +58,8 @@ class ActivityServicesTests(test_utils.GenericTestBase):
 
     def _compare_lists(
         self,
-        reference_list_1: activity_services.ActivityReferenceList,
-        reference_list_2: activity_services.ActivityReferenceList,
+        reference_list_1: List[activity_domain.ActivityReference],
+        reference_list_2: List[activity_domain.ActivityReference],
     ) -> None:
         """Compares the hashed values of the two given reference lists."""
         hashes_1 = [reference.get_hash() for reference in reference_list_1]
