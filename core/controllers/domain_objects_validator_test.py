@@ -25,31 +25,6 @@ from core.controllers import domain_objects_validator
 from core.tests import test_utils
 
 
-class ValidateExplorationChangeTests(test_utils.GenericTestBase):
-    """Tests to validate domain objects coming from API."""
-
-    def test_incorrect_object_raises_exception(self) -> None:
-        incorrect_change_dict = {
-            'old_value': '',
-            'property_name': 'title',
-            'new_value': 'newValue'
-        }
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            Exception, 'Missing cmd key in change dict'):
-            domain_objects_validator.validate_exploration_change(
-                incorrect_change_dict)
-
-    def test_correct_object_do_not_raises_exception(self) -> None:
-        correct_change_dict = {
-            'cmd': 'edit_exploration_property',
-            'new_value': 'arbitary_new_value',
-            'old_value': '',
-            'property_name': 'title'
-        }
-        domain_objects_validator.validate_exploration_change(
-            correct_change_dict)
-
-
 class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
     """Tests to validate domain objects coming from frontend."""
 
@@ -94,31 +69,6 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
             'data_format': 'html'
         }
         domain_objects_validator.validate_suggestion_change(
-            correct_change_dict)
-
-
-class ValidateCollectionChangeTests(test_utils.GenericTestBase):
-    """Tests to validate domain objects coming from API."""
-
-    def test_incorrect_object_raises_exception(self) -> None:
-        incorrect_change_dict = {
-            'old_value': '',
-            'property_name': 'title',
-            'new_value': 'newValue'
-        }
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            Exception, 'Missing cmd key in change dict'):
-            domain_objects_validator.validate_collection_change(
-                incorrect_change_dict)
-
-    def test_correct_object_do_not_raises_exception(self) -> None:
-        correct_change_dict = {
-            'cmd': 'edit_collection_property',
-            'new_value': 'arbitary_new_value',
-            'old_value': '',
-            'property_name': 'title'
-        }
-        domain_objects_validator.validate_collection_change(
             correct_change_dict)
 
 
@@ -314,51 +264,3 @@ class ValidateParamsDict(test_utils.GenericTestBase):
     def test_valid_type_raises_no_exception(self):
         correct_type = {}
         domain_objects_validator.validate_params_dict(correct_type)
-
-
-class ValidateTopicChangeDict(test_utils.GenericTestBase):
-    """Tests to validate change_dict of TopicEditHandler."""
-
-    def test_valid_dict_raises_no_exception(self) -> None:
-        valid_change_dict = {
-            'cmd': 'update_topic_property',
-            'property_name': 'name',
-            'old_value': '',
-            'new_value': 'a'
-        }
-        self.assertEqual(
-            domain_objects_validator.
-            validate_topic_and_sub_topic_change(valid_change_dict),
-            valid_change_dict)
-
-    def test_invalid_dict_raises_exception(self) -> None:
-        cmd_none = {
-            'cmd': None,
-            'property_name': 'name',
-            'old_value': '',
-            'new_value': 'a'
-        }
-        cmd_invalid = {
-            'cmd': 'invalid_cmd',
-            'property_name': 'name',
-            'old_value': '',
-            'new_value': 'a'
-        }
-        cmd_missing = {
-            'property_name': 'name',
-            'old_value': '',
-            'new_value': 'a'
-        }
-
-        with self.assertRaisesRegex(
-            Exception, 'cmd is not allowed.'): # type: ignore[no-untyped-call]
-            domain_objects_validator.validate_topic_and_sub_topic_change(
-                cmd_none)
-        with self.assertRaisesRegex(
-            Exception, 'cmd is not allowed.'): # type: ignore[no-untyped-call]
-            domain_objects_validator.validate_topic_and_sub_topic_change(
-                cmd_invalid)
-        with self.assertRaisesRegex(
-            Exception, 'cmd is not allowed.'): # type: ignore[no-untyped-call]
-            domain_objects_validator.validate_topic_and_sub_topic_change(
-                cmd_missing)
