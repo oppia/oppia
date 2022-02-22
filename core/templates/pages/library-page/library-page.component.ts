@@ -67,6 +67,7 @@ export class LibraryPageComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
 
+  resizeSubscription!: Subscription;
   // The following property will be assigned null when user
   // has not selected any active group index.
   activeGroupIndex!: number | null;
@@ -80,7 +81,6 @@ export class LibraryPageComponent {
   libraryWindowIsNarrow!: boolean;
   mobileLibraryGroupsProperties!: mobileLibraryGroupProperties[];
   pageMode!: string;
-  resizeSubscription!: Subscription;
 
   constructor(
     private loggerService: LoggerService,
@@ -281,8 +281,8 @@ export class LibraryPageComponent {
       this.loggerService.error('INVALID URL PATH: ' + currentPath);
     }
 
-    const libraryContants:
-      Record<string, string> = LibraryPageConstants.LIBRARY_PATHS_TO_MODES;
+    const libraryContants: Record<string, string> = (
+      LibraryPageConstants.LIBRARY_PATHS_TO_MODES);
     this.pageMode = libraryContants[currentPath];
     this.LIBRARY_PAGE_MODES = LibraryPageConstants.LIBRARY_PAGE_MODES;
 
@@ -332,28 +332,27 @@ export class LibraryPageComponent {
                     let ACTIVITY_TYPE_EXPLORATION = 'exploration';
                     let ACTIVITY_TYPE_COLLECTION = 'collection';
 
-                    activitySummaryDicts.forEach(
-                      (activitySummaryDict) => {
-                        if (activitySummaryDict.activity_type === (
-                          ACTIVITY_TYPE_EXPLORATION)) {
-                          this.activitiesOwned.explorations[
-                            activitySummaryDict.id] = false;
-                        } else if (activitySummaryDict.activity_type === (
-                          ACTIVITY_TYPE_COLLECTION)) {
-                          this.activitiesOwned.collections[
-                            activitySummaryDict.id] = false;
-                        } else {
-                          this.loggerService.error(
-                            'INVALID ACTIVITY TYPE: Activity' +
+                    activitySummaryDicts.forEach((activitySummaryDict) => {
+                      if (activitySummaryDict.activity_type === (
+                        ACTIVITY_TYPE_EXPLORATION)) {
+                        this.activitiesOwned.explorations[
+                          activitySummaryDict.id] = false;
+                      } else if (activitySummaryDict.activity_type === (
+                        ACTIVITY_TYPE_COLLECTION)) {
+                        this.activitiesOwned.collections[
+                          activitySummaryDict.id] = false;
+                      } else {
+                        this.loggerService.error(
+                          'INVALID ACTIVITY TYPE: Activity' +
                           '(id: ' + activitySummaryDict.id +
                           ', name: ' + activitySummaryDict.title +
                           ', type: ' + activitySummaryDict.activity_type +
                           ') has an invalid activity type, which could ' +
                           'not be recorded as an exploration or a ' +
                           'collection.'
-                          );
-                        }
-                      });
+                        );
+                      }
+                    });
 
                     response.explorations_list.forEach(
                       (ownedExplorations) => {
@@ -361,11 +360,10 @@ export class LibraryPageComponent {
                           ownedExplorations.id] = true;
                       });
 
-                    response.collections_list.forEach(
-                      (ownedCollections) => {
-                        this.activitiesOwned.collections[
-                          ownedCollections.id] = true;
-                      });
+                    response.collections_list.forEach((ownedCollections) => {
+                      this.activitiesOwned.collections[
+                        ownedCollections.id] = true;
+                    });
                   });
                   this.loaderService.hideLoadingScreen();
                   this.initCarousels();

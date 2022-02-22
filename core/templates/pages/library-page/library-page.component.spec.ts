@@ -277,9 +277,7 @@ describe('Library Page Component', () => {
     windowRef.nativeWindow.location.pathname = '/community-library';
     fixture.detectChanges();
     spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
-      .and.returnValue(Promise.resolve(
-        libraryIndexData)
-      );
+      .and.returnValue(Promise.resolve(libraryIndexData));
     spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
       new UserInfo(
         ['role'], true, true, true, true, true, 'en', 'user',
@@ -323,8 +321,7 @@ describe('Library Page Component', () => {
       windowRef.nativeWindow.location.pathname = '/community-library';
       fixture.detectChanges();
       spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
-        .and.returnValue(Promise.resolve(
-          libraryIndexData));
+        .and.returnValue(Promise.resolve(libraryIndexData));
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve({ isLoggedIn: () => false } as UserInfo));
       spyOn(loaderService, 'hideLoadingScreen');
@@ -369,8 +366,7 @@ describe('Library Page Component', () => {
     windowRef.nativeWindow.location.pathname = '/not-valid';
     fixture.detectChanges();
     spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
-      .and.returnValue(Promise.resolve(
-        libraryIndexData));
+      .and.returnValue(Promise.resolve(libraryIndexData));
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve({ isLoggedIn: () => false } as UserInfo));
     spyOn(loaderService, 'hideLoadingScreen');
