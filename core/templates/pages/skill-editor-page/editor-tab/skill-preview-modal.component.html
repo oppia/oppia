@@ -6,7 +6,7 @@
   <div *ngIf="skillWorkedExamples.length">
     <h3>Worked Examples: </h3>
     <div *ngFor="let example of skillWorkedExamples" class="skill-preview-examples">
-      <angular-html-bind-wrapper class="worked-example-question" [htmlData]="example.getQuestion().html"></angular-html-bind-wrapper>
+      <angular-html-bind-wrapper classStr="worked-example-question" [htmlData]="example.getQuestion().html"></angular-html-bind-wrapper>
       <angular-html-bind-wrapper [htmlData]="example.getExplanation().html"></angular-html-bind-wrapper>
     </div>
   </div>
