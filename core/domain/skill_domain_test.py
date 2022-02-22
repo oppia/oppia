@@ -347,7 +347,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         ):
             self.skill.add_prerequisite_skill('skill_id_2')
 
-    def test__find_prerequisite_skill_id_index(self):
+    def test_find_prerequisite_skill_id_index(self):
         # Disabling pylint protected access because this is a test.
         self.assertEqual(
             self.skill._find_prerequisite_skill_id_index('skill_id_2'), # pylint: disable=protected-access
