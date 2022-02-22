@@ -53,7 +53,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
 
         exp_ids_with_category_not_in_contants = (
             total_explorations
-            | 'Combine exploration id and categoty' >> beam.Map(
+            | 'Combine exploration id and category' >> beam.Map(
                 lambda exp: (exp.id, exp.category))
             | 'Filter exploraton with category not in constants.ts' >>
                 beam.Filter(lambda exp: not exp[1] in constants.ALL_CATEGORIES)
@@ -71,7 +71,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
                 job_result_transforms.CountObjectsToJobRunResult('INVALID'))
         )
 
-        report_invalid_ids_and_their_actual_len = (
+        report_invalid_ids_and_their_category = (
             exp_ids_with_category_not_in_contants
             | 'Save info on invalid exps' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
@@ -84,7 +84,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
             (
                 report_number_of_exps_queried,
                 report_number_of_invalid_exps,
-                report_invalid_ids_and_their_actual_len
+                report_invalid_ids_and_their_category
             )
             | 'Combine results' >> beam.Flatten()
         )
