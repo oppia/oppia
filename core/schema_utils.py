@@ -37,8 +37,7 @@ from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import user_domain
 
-from typing import (Any, Callable, Dict, List, Optional,
-Union, Tuple, cast)
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast # pylint: disable=line-too-long
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
@@ -73,7 +72,7 @@ SCHEMA_TYPE_WEAK_MULTIPLE = 'weak_multiple'
 
 SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
 SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
-ALL_SCHEMAS: Dict[str,Union[type, Tuple[Union[type, Tuple[Any, ...]], ...]]] = { # pylint: disable=long-line
+ALL_SCHEMAS: Dict[str, Union[type, Tuple[Union[type, Tuple[Any, ...]], ...]]] = { # pylint: disable=line-too-long
     SCHEMA_TYPE_BOOL: bool,
     SCHEMA_TYPE_DICT: dict,
     SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS: dict,
@@ -124,8 +123,8 @@ def normalize_against_schema(
                 break
         if normalized_obj is None:
             raise Exception(
-                '%s is not present in options %s' %
-                (obj, schema[SCHEMA_KEY_OPTIONS]))
+                'Type of %s is not present in options' %
+                schema[SCHEMA_KEY_OPTIONS])
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj

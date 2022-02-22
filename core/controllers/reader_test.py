@@ -1959,6 +1959,39 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'], 'Missing key in handler args: version.'
         )
+    
+    def test_submit_answer_for_exploration_raises_error_with_no_answer(self):
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        version = 1
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        state_name_1 = exploration_dict['exploration']['init_state_name']
+
+        response = self.post_json(
+            '/explorehandler/answer_submitted_event/%s' % exp_id,
+            {
+                'old_state_name': state_name_1,
+                'answer': None,
+                'version': version,
+                'client_time_spent_in_secs': 0,
+                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION),
+            }, expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'Type of None is not present in options'
+        )
 
 
 class StateHitEventHandlerTests(test_utils.GenericTestBase):
