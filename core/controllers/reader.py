@@ -494,7 +494,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
             },
             'answer': {
                 'schema': {
-                    'type': 'multiple',
+                    'type': 'weak_multiple',
                     'options': ['int', 'basestring', 'dict']
                 }
             },

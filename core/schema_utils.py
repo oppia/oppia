@@ -37,7 +37,8 @@ from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import user_domain
 
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import (Any, Callable, Dict, List, Optional,
+Union, Tuple, cast)
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
@@ -72,17 +73,17 @@ SCHEMA_TYPE_WEAK_MULTIPLE = 'weak_multiple'
 
 SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
 SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
-ALL_SCHEMAS = {
-    SCHEMA_TYPE_BOOL : bool,
-    SCHEMA_TYPE_DICT : dict,
-    SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS : dict,
-    SCHEMA_TYPE_FLOAT : float,
-    SCHEMA_TYPE_HTML : (str, bytes),
-    SCHEMA_TYPE_INT : int,
-    SCHEMA_TYPE_LIST : list,
-    SCHEMA_TYPE_UNICODE : (str, bytes),
-    SCHEMA_TYPE_BASESTRING : (str, bytes),
-    SCHEMA_TYPE_UNICODE_OR_NONE : (str, bytes),
+ALL_SCHEMAS: Dict[str,Union[type, Tuple[Union[type, Tuple[Any, ...]], ...]]] = { # pylint: disable=long-line
+    SCHEMA_TYPE_BOOL: bool,
+    SCHEMA_TYPE_DICT: dict,
+    SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS: dict,
+    SCHEMA_TYPE_FLOAT: float,
+    SCHEMA_TYPE_HTML: (str, bytes),
+    SCHEMA_TYPE_INT: int,
+    SCHEMA_TYPE_LIST: list,
+    SCHEMA_TYPE_UNICODE: (str, bytes),
+    SCHEMA_TYPE_BASESTRING: (str, bytes),
+    SCHEMA_TYPE_UNICODE_OR_NONE: (str, bytes),
 }
 
 EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
