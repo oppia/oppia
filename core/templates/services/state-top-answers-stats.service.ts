@@ -34,7 +34,7 @@ import { State } from 'domain/state/StateObjectFactory';
 export class AnswerStatsEntry {
   constructor(
       public readonly answers: readonly AnswerStats[],
-      public readonly interactionId: string) {}
+      public readonly interactionId: string | null) {}
 }
 
 @Injectable({
@@ -44,8 +44,8 @@ export class StateTopAnswersStatsService {
   private initializationHasStarted: boolean;
   private topAnswersStatsByStateName: Map<string, AnswerStatsEntry>;
 
-  private resolveInitPromise: () => void;
-  private rejectInitPromise: (_) => void;
+  private resolveInitPromise!: () => void;
+  private rejectInitPromise!: () => void;
   private initPromise: Promise<void>;
 
   constructor(
@@ -80,7 +80,7 @@ export class StateTopAnswersStatsService {
         }
         this.resolveInitPromise();
       } catch (error) {
-        this.rejectInitPromise(error);
+        this.rejectInitPromise();
       }
     }
     return this.initPromise;
