@@ -42,8 +42,8 @@ export class ShortResponseNumericInput implements OnInit {
   ngOnInit(): void {
     let escapedAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
     let recievedAnswer = escapedAnswer as number;
-    this.displayAnswer = this.numberConversionService
-      .convertToLocalizedNumber(recievedAnswer);
+    this.displayAnswer = this.numberConversionService.convertToLocalizedNumber(
+      recievedAnswer);
   }
 }
 
