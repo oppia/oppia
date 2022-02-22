@@ -83,7 +83,7 @@ export class StateSkillEditorComponent implements OnInit {
       this.skillBackendApiService.fetchSkillAsync(
         this.stateLinkedSkillIdService.displayed
       ).then((skill) => {
-        this.skillName = skill.skill._description;
+        this.skillName = skill.skill.getDescription();
       });
     }
   }
