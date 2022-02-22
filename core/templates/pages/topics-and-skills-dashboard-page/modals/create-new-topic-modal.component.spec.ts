@@ -158,7 +158,7 @@ describe('Create new topic modal', () => {
         .not.toHaveBeenCalled();
     });
 
-  it('leading and triling spaces should be removed from topic name',
+  it('should remove unnecessary spaces from topic name',
     () => {
       componentInstance.newlyCreatedTopic.name = ' extra  spaces ';
       componentInstance.onTopicNameChange();
