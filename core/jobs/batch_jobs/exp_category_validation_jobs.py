@@ -31,7 +31,7 @@ import apache_beam as beam
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 
-# TODO(#14943): Remove this job after we fix the exploration titles length.
+# TODO(#14994): Remove this job after we fix the exploration category.
 class GetNumberOfExpWithInvalidCategoryJob(base_jobs.JobBase):
     """Job that returns exploration ids having categories which aren't included in constants.ts"""
 
