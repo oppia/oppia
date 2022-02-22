@@ -274,7 +274,6 @@ export class NumericInputValidationService {
       }
     }
     const stringValueRegExp = stringValue.match(/\d/g);
-
     if (stringValueRegExp === null) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER';
     } else if (stringValueRegExp.length > 15) {
