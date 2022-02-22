@@ -66,6 +66,9 @@ export class LibraryPageComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+
+  // The following property will be assigned null when user
+  // has not selected any active group index.
   activeGroupIndex!: number | null;
   activityList!: ActivityDict[];
   bannerImageFilename!: string;

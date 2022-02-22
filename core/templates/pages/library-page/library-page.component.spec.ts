@@ -21,6 +21,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
+import { CreatorExplorationSummaryBackendDict } from 'domain/summary/creator-exploration-summary.model';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -34,7 +36,7 @@ import { SearchService } from 'services/search.service';
 import { UserService } from 'services/user.service';
 import { MockTranslateModule } from 'tests/unit-test-utils';
 import { LibraryPageComponent } from './library-page.component';
-import { ActivityDict, CreatorDashboardData, LibraryIndexData, LibraryPageBackendApiService } from './services/library-page-backend-api.service';
+import { ActivityDict, LibraryIndexData, LibraryPageBackendApiService } from './services/library-page-backend-api.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -78,15 +80,21 @@ describe('Library Page Component', () => {
   let loggerService: LoggerService;
   let searchService: SearchService;
 
-  let explorationList = [{
+  let explorationList: CreatorExplorationSummaryBackendDict[] = [{
     category: '',
     community_owned: true,
     activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
     last_updated_msec: 1,
-    ratings: null,
+    ratings: {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0
+    },
     id: 'id1',
     created_on_msec: 12,
-    human_readable_contributors_summary: null,
+    human_readable_contributors_summary: {},
     language_code: '',
     num_views: 2,
     objective: '',
@@ -99,7 +107,7 @@ describe('Library Page Component', () => {
     num_open_threads: 3
   }];
 
-  let collectionList = [{
+  let collectionList: CollectionSummaryBackendDict[] = [{
     category: '',
     community_owned: true,
     last_updated_msec: 2,
@@ -114,7 +122,7 @@ describe('Library Page Component', () => {
     node_count: 2
   }];
 
-  let libraryIndexData = {
+  let libraryIndexData: LibraryIndexData = {
     activity_summary_dicts_by_category: [{
       activity_summary_dicts: [{
         activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
@@ -270,7 +278,7 @@ describe('Library Page Component', () => {
     fixture.detectChanges();
     spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
       .and.returnValue(Promise.resolve(
-        libraryIndexData as unknown as LibraryIndexData)
+        libraryIndexData)
       );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
       new UserInfo(
@@ -280,7 +288,7 @@ describe('Library Page Component', () => {
       .and.returnValue(Promise.resolve({
         explorations_list: explorationList,
         collections_list: collectionList
-      } as unknown as CreatorDashboardData));
+      }));
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'emit');
     spyOn(keyboardShortcutService, 'bindLibraryPageShortcuts');
@@ -316,7 +324,7 @@ describe('Library Page Component', () => {
       fixture.detectChanges();
       spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
         .and.returnValue(Promise.resolve(
-          libraryIndexData as unknown as LibraryIndexData));
+          libraryIndexData));
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve({ isLoggedIn: () => false } as UserInfo));
       spyOn(loaderService, 'hideLoadingScreen');
@@ -362,7 +370,7 @@ describe('Library Page Component', () => {
     fixture.detectChanges();
     spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
       .and.returnValue(Promise.resolve(
-        libraryIndexData as unknown as LibraryIndexData));
+        libraryIndexData));
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve({ isLoggedIn: () => false } as UserInfo));
     spyOn(loaderService, 'hideLoadingScreen');
