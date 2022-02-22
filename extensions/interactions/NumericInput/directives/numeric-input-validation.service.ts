@@ -208,7 +208,8 @@ export class NumericInputValidationService {
 
   // Returns 'undefined' when no error occurs.
   validateNumericString(
-      value: string, decimalSeparator: string): string | undefined {
+      value: string, decimalSeparator: string
+  ): string | undefined {
     value = value.toString().trim();
     const trailingDot = /[\.|\,|\u066B]\d/g;
     const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
