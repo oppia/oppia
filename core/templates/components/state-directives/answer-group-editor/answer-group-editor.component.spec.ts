@@ -406,9 +406,32 @@ describe('AnswerGroupEditorComponent', () => {
 
     // An error is thrown if an invalid interaction ID is passed.
     StateInteractionIdService.savedMemento = 'InvalidInteraction';
+    ctrl.rules = [];
+    ctrl.rules.push(
+      new Rule('dummyRule1', {
+        x: {
+          contentId: null,
+          normalizedStrSet: []
+        }
+      }, {
+        x: 'dummyInputType1'
+      })
+    );
+    ctrl.rules.push(
+      new Rule('dummyRule2', {
+        x: {
+          contentId: null,
+          normalizedStrSet: []
+        }
+      }, {
+        x: 'dummyInputType2'
+      })
+    );
 
     expect(() => ctrl.isCurrentInteractionTrainable())
-      .toThrowError('Invalid interaction id');
+      .toThrowError(
+        'Invalid interaction id - InvalidInteraction. Answer group rules: ' +
+        'dummyRule1, dummyRule2');
   });
 
   it('should not open rule editor if it is in read-only mode', () => {
