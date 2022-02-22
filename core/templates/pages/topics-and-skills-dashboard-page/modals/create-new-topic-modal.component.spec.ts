@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { CreateNewTopicModalComponent } from './create-new-topic-modal.component';
 
-fdescribe('Create new topic modal', () => {
+describe('Create new topic modal', () => {
   let fixture: ComponentFixture<CreateNewTopicModalComponent>;
   let componentInstance: CreateNewTopicModalComponent;
   let contextService: ContextService;
@@ -160,14 +160,9 @@ fdescribe('Create new topic modal', () => {
 
   it('leading and triling spaces should be removed from topic name',
     () => {
-      componentInstance.newlyCreatedTopic.name = '   not-empty   ';
+      componentInstance.newlyCreatedTopic.name = ' extra  spaces ';
       componentInstance.onTopicNameChange();
-      componentInstance.save();
-      expect(testInstance).toBeDefined();
-      // testInstance.ngOnInit();
-      // testInstance.newlyCreatedTopic.name = 'not-empty';
-      // testInstance.onTopicNameChange();
-      // expect(testInstance.topicNameExists).toBe(true);
+      expect(componentInstance.newlyCreatedTopic.name).toBe('extra spaces');
     });
 
   it('should not update topic url fragment if not provided by user',
