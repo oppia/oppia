@@ -42,7 +42,7 @@ interface mergeviewOptions {
   templateUrl: './state-diff-modal.component.html',
 })
 export class StateDiffModalComponent
-    extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal implements OnInit {
   newState: State | null;
   oldState: State | null;
   newStateName: string;
@@ -52,6 +52,7 @@ export class StateDiffModalComponent
     leftPane: '',
     rightPane: '',
   };
+
   CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
     lineNumbers: true,
     readOnly: true,
