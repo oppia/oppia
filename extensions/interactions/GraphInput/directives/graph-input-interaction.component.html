@@ -1,5 +1,12 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/interactions/GraphInput/directives/graph-input-interaction.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/interactions/GraphInput/directives/graph-input-interaction.component.rtl.css" as="style">
+<style>
+  .graph-input-container {
+    background: #fff;
+    padding: 8px;
+  }
+  .oppia-error-message-text {
+    margin-left: 30px;
+  }
+</style>
 
 <div class="graph-input-container">
   <graph-viz [graph]="graph"
@@ -13,11 +20,8 @@
              [interactionIsActive]="interactionIsActive">
   </graph-viz>
   <!-- The '9999px' is just to push the button as right as possible. Due to the limits of the parent container, it does not overflow out of the div.-->
-  <button class="graph-interaction-reset-button" mat-raised-button (click)="resetGraph()" [disabled]="!interactionIsActive" [innerHTML]="'I18N_INTERACTIONS_GRAPH_RESET_BUTTON' | translate"></button>
+  <button [ngStyle]="isLanguageRTL() ? {'margin' : '0 30px 0 9999px'} : {'margin' : '0 9999px 0 30px'}" mat-raised-button (click)="resetGraph()" [disabled]="!interactionIsActive" [innerHTML]="'I18N_INTERACTIONS_GRAPH_RESET_BUTTON' | translate"></button>
   <span [hidden]="errorMessage" class="text-danger oppia-error-message-text" aria-live="assertive">
     {{errorMessage | translate}}
   </span>
 </div>
-
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/interactions/GraphInput/directives/graph-input-interaction.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/interactions/GraphInput/directives/graph-input-interaction.component.rtl.css">
