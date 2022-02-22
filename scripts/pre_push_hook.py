@@ -101,10 +101,10 @@ class ChangedBranch:
 
 def start_subprocess_for_result(cmd):
     """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = task.communicate()
-    return out, err
+    with subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as task:
+        out, err = task.communicate()
+        return out, err
 
 
 def get_remote_name():
@@ -116,46 +116,52 @@ def get_remote_name():
     remote_name = ''
     remote_num = 0
     get_remotes_name_cmd = 'git remote'.split()
-    task = subprocess.Popen(
-        get_remotes_name_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = task.communicate()
-    remotes = out[:-1].split(b'\n')
-    if not err:
-        for remote in remotes:
-            get_remotes_url_cmd = (
-                b'git config --get remote.%s.url' % remote).split()
-            task = subprocess.Popen(
-                get_remotes_url_cmd, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-            remote_url, err = task.communicate()
-            if not err:
-                if remote_url.endswith(b'oppia/oppia.git\n'):
-                    remote_num += 1
-                    remote_name = remote
-            else:
-                raise ValueError(err)
-    else:
-        raise ValueError(err)
+    with subprocess.Popen(
+        get_remotes_name_cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    ) as task:
+        out, err = task.communicate()
+        remotes = out[:-1].split(b'\n')
+        if not err:
+            for remote in remotes:
+                get_remotes_url_cmd = (
+                    b'git config --get remote.%s.url' % remote).split()
+                with subprocess.Popen(
+                    get_remotes_url_cmd, stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE) as task:
+                    remote_url, err = task.communicate()
+                    if not err:
+                        if remote_url.endswith(b'oppia/oppia.git\n'):
+                            remote_num += 1
+                            remote_name = remote
+                    else:
+                        raise ValueError(err)
+        else:
+            raise ValueError(err)
 
-    if not remote_num:
-        raise Exception(
-            'Error: Please set upstream for the lint checks to run '
-            'efficiently. To do that follow these steps:\n'
-            '1. Run the command \'git remote -v\'\n'
-            '2a. If upstream is listed in the command output, then run the '
-            'command \'git remote set-url upstream '
-            'https://github.com/oppia/oppia.git\'\n'
-            '2b. If upstream is not listed in the command output, then run the '
-            'command \'git remote add upstream '
-            'https://github.com/oppia/oppia.git\'\n'
-        )
+        if not remote_num:
+            raise Exception(
+                'Error: Please set upstream for the lint checks to run '
+                'efficiently. To do that follow these steps:\n'
+                '1. Run the command \'git remote -v\'\n'
+                '2a. If upstream is listed in '
+                'the command output, then run the '
+                'command \'git remote set-url upstream '
+                'https://github.com/oppia/oppia.git\'\n'
+                '2b. If upstream is not listed in'
+                ' the command output, then run the '
+                'command \'git remote add upstream '
+                'https://github.com/oppia/oppia.git\'\n'
+            )
 
-    if remote_num > 1:
-        print(
-            'Warning: Please keep only one remote branch for oppia:develop '
-            'to run the lint checks efficiently.\n')
-        return
-    return remote_name
+        if remote_num > 1:
+            print(
+                'Warning: Please keep only one r'
+                'emote branch for oppia:develop '
+                'to run the lint checks efficiently.\n')
+            return
+        return remote_name
 
 
 def git_diff_name_status(left, right, diff_filter=''):
@@ -322,10 +328,10 @@ def get_refs():
 
 def start_linter(files):
     """Starts the lint checks and returns the returncode of the task."""
-    task = subprocess.Popen(
-        [PYTHON_CMD, '-m', LINTER_MODULE, LINTER_FILE_FLAG] + files)
-    task.communicate()
-    return task.returncode
+    with subprocess.Popen(
+        [PYTHON_CMD, '-m', LINTER_MODULE, LINTER_FILE_FLAG] + files) as task:
+        task.communicate()
+        return task.returncode
 
 
 def execute_mypy_checks():
@@ -334,10 +340,10 @@ def execute_mypy_checks():
     Returns:
         int. The return code from mypy checks.
     """
-    task = subprocess.Popen(
-        [PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE, '--skip-install'])
-    task.communicate()
-    return task.returncode
+    with subprocess.Popen(
+        [PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE, '--skip-install']) as task:
+        task.communicate()
+        return task.returncode
 
 
 def run_script_and_get_returncode(cmd_list):
@@ -349,10 +355,10 @@ def run_script_and_get_returncode(cmd_list):
     Returns:
         int. The return code from the task executed.
     """
-    task = subprocess.Popen(cmd_list)
-    task.communicate()
-    task.wait()
-    return task.returncode
+    with subprocess.Popen(cmd_list) as task:
+        task.communicate()
+        task.wait()
+        return task.returncode
 
 
 def has_uncommitted_files():

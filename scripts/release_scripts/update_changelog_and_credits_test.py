@@ -274,42 +274,44 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 update_changelog_and_credits.CREDITS_END_LINE) + 1
             existing_developer_names = about_page_lines[start_index:end_index]
 
-        tmp_file = tempfile.NamedTemporaryFile()
-        tmp_file.name = MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH
-        with python_utils.open_file(
-            MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w'
-        ) as f:
-            for line in about_page_lines:
-                f.write(str(line))
+        with tempfile.NamedTemporaryFile() as tmp_file:
+            tmp_file.name = MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH
+            with python_utils.open_file(
+                MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w'
+            ) as f:
+                for line in about_page_lines:
+                    f.write(str(line))
 
-        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
-        new_developer_names = update_changelog_and_credits.get_new_contributors(
-            release_summary_lines, return_only_names=True)
+            release_summary_lines = read_from_file(
+                MOCK_RELEASE_SUMMARY_FILEPATH)
+            update_changelog_credits = update_changelog_and_credits
+            new_developer_names = update_changelog_credits.get_new_contributors(
+                release_summary_lines, return_only_names=True)
 
-        expected_developer_names = existing_developer_names
-        for name in new_developer_names:
-            expected_developer_names.append('%s\'%s\',\n' % (
-                update_changelog_and_credits.CREDITS_INDENT, name))
-        expected_developer_names = sorted(
-            list(set(expected_developer_names)), key=lambda s: s.lower())
+            expected_developer_names = existing_developer_names
+            for name in new_developer_names:
+                expected_developer_names.append('%s\'%s\',\n' % (
+                    update_changelog_and_credits.CREDITS_INDENT, name))
+            expected_developer_names = sorted(
+                list(set(expected_developer_names)), key=lambda s: s.lower())
 
-        with self.swap(
-            update_changelog_and_credits, 'ABOUT_PAGE_CONSTANTS_FILEPATH',
-            MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH):
-            update_changelog_and_credits.update_developer_names(
-                release_summary_lines)
+            with self.swap(
+                update_changelog_and_credits, 'ABOUT_PAGE_CONSTANTS_FILEPATH',
+                MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH):
+                update_changelog_and_credits.update_developer_names(
+                    release_summary_lines)
 
-        with python_utils.open_file(tmp_file.name, 'r') as f:
-            about_page_lines = f.readlines()
-            start_index = about_page_lines.index(
-                update_changelog_and_credits.CREDITS_START_LINE) + 1
-            end_index = about_page_lines[start_index:].index(
-                update_changelog_and_credits.CREDITS_END_LINE) + 1
-            actual_developer_names = about_page_lines[start_index:end_index]
+            with python_utils.open_file(tmp_file.name, 'r') as f:
+                about_page_lines = f.readlines()
+                start_index = about_page_lines.index(
+                    update_changelog_and_credits.CREDITS_START_LINE) + 1
+                end_index = about_page_lines[start_index:].index(
+                    update_changelog_and_credits.CREDITS_END_LINE) + 1
+                actual_developer_names = about_page_lines[start_index:end_index]
 
-            self.assertEqual(actual_developer_names, expected_developer_names)
+                self.assertEqual(
+                    actual_developer_names, expected_developer_names)
 
-        tmp_file.close()
         if os.path.isfile(MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH):
             # Occasionally this temp file is not deleted.
             os.remove(MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH)

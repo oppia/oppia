@@ -121,28 +121,29 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         get_commit_swap = self.swap(
             github.Repository.Repository, 'get_commit', mock_get_commit)
 
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
-        expected_feconf_text = feconf_text.replace(
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)',
-            'datetime.datetime(2016, 11, 15, 3, 41, 1)')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
+        with tempfile.NamedTemporaryFile() as temp_feconf:
+            temp_feconf_path = temp_feconf.name
+            feconf_text = (
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
+            expected_feconf_text = feconf_text.replace(
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)',
+                'datetime.datetime(2016, 11, 15, 3, 41, 1)')
+            with python_utils.open_file(temp_feconf_path, 'w') as f:
+                f.write(feconf_text)
 
-        with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
-            with self.open_tab_swap, input_swap, get_commit_swap:
-                update_configs.check_updates_to_terms_of_service(
-                    temp_feconf_path, 'test-token')
-        with python_utils.open_file(temp_feconf_path, 'r') as f:
-            self.assertEqual(f.read(), expected_feconf_text)
+            with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
+                with self.open_tab_swap, input_swap, get_commit_swap:
+                    update_configs.check_updates_to_terms_of_service(
+                        temp_feconf_path, 'test-token')
+            with python_utils.open_file(temp_feconf_path, 'r') as f:
+                self.assertEqual(f.read(), expected_feconf_text)
 
     def test_missing_mailgun_api_key_line(self):
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
@@ -150,23 +151,24 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             return mailgun_api_key
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
+        with tempfile.NamedTemporaryFile() as temp_feconf:
+            temp_feconf_path = temp_feconf.name
+            feconf_text = (
+                'REDISHOST = \'192.13.2.1\'\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
+            with python_utils.open_file(temp_feconf_path, 'w') as f:
+                f.write(feconf_text)
 
-        with getpass_swap, self.assertRaisesRegex(
-            AssertionError, 'Missing mailgun API key'):
-            update_configs.add_mailgun_api_key(temp_feconf_path)
+            with getpass_swap, self.assertRaisesRegex(
+                AssertionError, 'Missing mailgun API key'):
+                update_configs.add_mailgun_api_key(temp_feconf_path)
 
     def test_missing_mailchimp_api_key_line(self):
         mailchimp_api_key = ('%s-us18' % ('').join(['1'] * 32))
@@ -174,23 +176,24 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             return mailchimp_api_key
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
+        with tempfile.NamedTemporaryFile() as temp_feconf:
+            temp_feconf_path = temp_feconf.name
+            feconf_text = (
+                'REDISHOST = \'192.13.2.1\'\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
+            with python_utils.open_file(temp_feconf_path, 'w') as f:
+                f.write(feconf_text)
 
-        with getpass_swap, self.assertRaisesRegex(
-            AssertionError, 'Missing mailchimp API key'):
-            update_configs.add_mailchimp_api_key(temp_feconf_path)
+            with getpass_swap, self.assertRaisesRegex(
+                AssertionError, 'Missing mailchimp API key'):
+                update_configs.add_mailchimp_api_key(temp_feconf_path)
 
     def test_invalid_mailgun_api_key(self):
         check_prompts = {
@@ -211,38 +214,39 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             return 'invalid'
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            'MAILGUN_API_KEY = None\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        expected_feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            'MAILGUN_API_KEY = \'%s\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
-                mailgun_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
+        with tempfile.NamedTemporaryFile() as temp_feconf:
+            temp_feconf_path = temp_feconf.name
+            feconf_text = (
+                'REDISHOST = \'192.13.2.1\'\n'
+                'MAILGUN_API_KEY = None\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+            expected_feconf_text = (
+                'REDISHOST = \'192.13.2.1\'\n'
+                'MAILGUN_API_KEY = \'%s\'\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
+                    mailgun_api_key))
+            with python_utils.open_file(temp_feconf_path, 'w') as f:
+                f.write(feconf_text)
 
-        with getpass_swap:
-            update_configs.add_mailgun_api_key(temp_feconf_path)
-        self.assertEqual(check_prompts, expected_check_prompts)
-        with python_utils.open_file(temp_feconf_path, 'r') as f:
-            self.assertEqual(f.read(), expected_feconf_text)
+            with getpass_swap:
+                update_configs.add_mailgun_api_key(temp_feconf_path)
+            self.assertEqual(check_prompts, expected_check_prompts)
+            with python_utils.open_file(temp_feconf_path, 'r') as f:
+                self.assertEqual(f.read(), expected_feconf_text)
 
     def test_invalid_mailchimp_api_key(self):
         check_prompts = {
@@ -263,40 +267,41 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             return 'invalid'
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            'MAILGUN_API_KEY = None\n'
-            'MAILCHIMP_API_KEY = None\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        expected_feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            'MAILGUN_API_KEY = None\n'
-            'MAILCHIMP_API_KEY = \'%s\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
-                mailchimp_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
+        with tempfile.NamedTemporaryFile() as temp_feconf:
+            temp_feconf_path = temp_feconf.name
+            feconf_text = (
+                'REDISHOST = \'192.13.2.1\'\n'
+                'MAILGUN_API_KEY = None\n'
+                'MAILCHIMP_API_KEY = None\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+            expected_feconf_text = (
+                'REDISHOST = \'192.13.2.1\'\n'
+                'MAILGUN_API_KEY = None\n'
+                'MAILCHIMP_API_KEY = \'%s\'\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
+                    mailchimp_api_key))
+            with python_utils.open_file(temp_feconf_path, 'w') as f:
+                f.write(feconf_text)
 
-        with getpass_swap:
-            update_configs.add_mailchimp_api_key(temp_feconf_path)
-        self.assertEqual(check_prompts, expected_check_prompts)
-        with python_utils.open_file(temp_feconf_path, 'r') as f:
-            self.assertEqual(f.read(), expected_feconf_text)
+            with getpass_swap:
+                update_configs.add_mailchimp_api_key(temp_feconf_path)
+            self.assertEqual(check_prompts, expected_check_prompts)
+            with python_utils.open_file(temp_feconf_path, 'r') as f:
+                self.assertEqual(f.read(), expected_feconf_text)
 
     def test_addition_of_mailgun_api_key(self):
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
@@ -304,37 +309,38 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             return mailgun_api_key
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            'MAILGUN_API_KEY = None\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        expected_feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            'MAILGUN_API_KEY = \'%s\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
-                mailgun_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
+        with tempfile.NamedTemporaryFile() as temp_feconf:
+            temp_feconf_path = temp_feconf.name
+            feconf_text = (
+                'REDISHOST = \'192.13.2.1\'\n'
+                'MAILGUN_API_KEY = None\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+            expected_feconf_text = (
+                'REDISHOST = \'192.13.2.1\'\n'
+                'MAILGUN_API_KEY = \'%s\'\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
+                    mailgun_api_key))
+            with python_utils.open_file(temp_feconf_path, 'w') as f:
+                f.write(feconf_text)
 
-        with getpass_swap:
-            update_configs.add_mailgun_api_key(temp_feconf_path)
-        with python_utils.open_file(temp_feconf_path, 'r') as f:
-            self.assertEqual(f.read(), expected_feconf_text)
+            with getpass_swap:
+                update_configs.add_mailgun_api_key(temp_feconf_path)
+            with python_utils.open_file(temp_feconf_path, 'r') as f:
+                self.assertEqual(f.read(), expected_feconf_text)
 
     def test_addition_of_mailchimp_api_key(self):
         mailchimp_api_key = ('%s-us18' % ('').join(['1'] * 32))
@@ -342,138 +348,148 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             return mailchimp_api_key
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            'MAILGUN_API_KEY = None\n'
-            'MAILCHIMP_API_KEY = None\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        expected_feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            'MAILGUN_API_KEY = None\n'
-            'MAILCHIMP_API_KEY = \'%s\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
-                mailchimp_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
+        with tempfile.NamedTemporaryFile() as temp_feconf:
+            temp_feconf_path = temp_feconf.name
+            feconf_text = (
+                'REDISHOST = \'192.13.2.1\'\n'
+                'MAILGUN_API_KEY = None\n'
+                'MAILCHIMP_API_KEY = None\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+            expected_feconf_text = (
+                'REDISHOST = \'192.13.2.1\'\n'
+                'MAILGUN_API_KEY = None\n'
+                'MAILCHIMP_API_KEY = \'%s\'\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
+                    mailchimp_api_key))
+            with python_utils.open_file(temp_feconf_path, 'w') as f:
+                f.write(feconf_text)
 
-        with getpass_swap:
-            update_configs.add_mailchimp_api_key(temp_feconf_path)
-        with python_utils.open_file(temp_feconf_path, 'r') as f:
-            self.assertEqual(f.read(), expected_feconf_text)
+            with getpass_swap:
+                update_configs.add_mailchimp_api_key(temp_feconf_path)
+            with python_utils.open_file(temp_feconf_path, 'r') as f:
+                self.assertEqual(f.read(), expected_feconf_text)
 
     def test_feconf_verification_with_correct_config(self):
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
         mailchimp_api_key = ('%s-us18' % ('').join(['1'] * 32))
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'MAILGUN_API_KEY = \'%s\'\n'
-            'MAILCHIMP_API_KEY = \'%s\'\n'
-            'REDISHOST = \'192.13.2.1\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
-                mailgun_api_key, mailchimp_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
-        update_configs.verify_feconf(temp_feconf_path, True)
+        with tempfile.NamedTemporaryFile() as temp_feconf:
+            temp_feconf_path = temp_feconf.name
+            feconf_text = (
+                'MAILGUN_API_KEY = \'%s\'\n'
+                'MAILCHIMP_API_KEY = \'%s\'\n'
+                'REDISHOST = \'192.13.2.1\'\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
+                    mailgun_api_key, mailchimp_api_key))
+            with python_utils.open_file(temp_feconf_path, 'w') as f:
+                f.write(feconf_text)
+            update_configs.verify_feconf(temp_feconf_path, True)
 
     def test_feconf_verification_with_mailgun_key_absent(self):
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
-        with self.assertRaisesRegex(
-            Exception, 'The mailgun API key must be added before deployment.'):
-            update_configs.verify_feconf(temp_feconf_path, True)
+        with tempfile.NamedTemporaryFile() as temp_feconf:
+            temp_feconf_path = temp_feconf.name
+            feconf_text = (
+                'REDISHOST = \'192.13.2.1\'\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+            with python_utils.open_file(temp_feconf_path, 'w') as f:
+                f.write(feconf_text)
+            with self.assertRaisesRegex(
+                Exception,
+                'The mailgun API key must be added before deployment.'
+            ):
+                update_configs.verify_feconf(temp_feconf_path, True)
 
     def test_feconf_verification_with_mailchimp_key_absent(self):
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
-        feconf_text = (
-            'MAILGUN_API_KEY = \'%s\'\n'
-            'REDISHOST = \'192.13.2.1\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
-                mailgun_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
-        with self.assertRaisesRegex(
-            Exception, 'The mailchimp API key must be added before deployment'):
-            update_configs.verify_feconf(temp_feconf_path, True)
+        with tempfile.NamedTemporaryFile() as temp_feconf:
+            temp_feconf_path = temp_feconf.name
+            mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
+            feconf_text = (
+                'MAILGUN_API_KEY = \'%s\'\n'
+                'REDISHOST = \'192.13.2.1\'\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
+                    mailgun_api_key))
+            with python_utils.open_file(temp_feconf_path, 'w') as f:
+                f.write(feconf_text)
+            with self.assertRaisesRegex(
+                Exception,
+                'The mailchimp API key must be added before deployment'
+            ):
+                update_configs.verify_feconf(temp_feconf_path, True)
 
     def test_feconf_verification_with_key_absent_and_verification_disabled(
             self):
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
-        update_configs.verify_feconf(temp_feconf_path, False)
+        with tempfile.NamedTemporaryFile() as temp_feconf:
+            temp_feconf_path = temp_feconf.name
+            feconf_text = (
+                'REDISHOST = \'192.13.2.1\'\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+            with python_utils.open_file(temp_feconf_path, 'w') as f:
+                f.write(feconf_text)
+            update_configs.verify_feconf(temp_feconf_path, False)
 
     def test_feconf_verification_with_redishost_absent(self):
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
         mailchimp_api_key = ('%s-us18' % ('').join(['1'] * 32))
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'MAILGUN_API_KEY = \'%s\'\n'
-            'MAILCHIMP_API_KEY = \'%s\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
-                mailgun_api_key, mailchimp_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
-        with self.assertRaisesRegex(
-            Exception, 'REDISHOST must be updated before deployment.'):
-            update_configs.verify_feconf(temp_feconf_path, True)
+        with tempfile.NamedTemporaryFile() as temp_feconf:
+            temp_feconf_path = temp_feconf.name
+            feconf_text = (
+                'MAILGUN_API_KEY = \'%s\'\n'
+                'MAILCHIMP_API_KEY = \'%s\'\n'
+                '# When the site terms were last updated, in UTC.\n'
+                'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+                '# Format of string for dashboard statistics logs.\n'
+                '# NOTE TO DEVELOPERS: This format should not be changed, '
+                'since it is used in\n'
+                '# the existing storage models for UserStatsModel.\n'
+                'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
+                    mailgun_api_key, mailchimp_api_key))
+            with python_utils.open_file(temp_feconf_path, 'w') as f:
+                f.write(feconf_text)
+            with self.assertRaisesRegex(
+                Exception, 'REDISHOST must be updated before deployment.'):
+                update_configs.verify_feconf(temp_feconf_path, True)
 
     def test_invalid_config(self):
         with self.assertRaisesRegex(

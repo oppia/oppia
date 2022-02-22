@@ -2122,8 +2122,11 @@ title: A title
                 zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
             # Read function returns bytes, so we need to decode them before
             # we compare.
-            with zf.open('A title.yaml').read().decode('utf-8') as yaml_content:
-                self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
+            with zf.open('A title.yaml') as yaml_content:
+                self.assertEqual(
+                    yaml_content.read().decode('utf-8'),
+                    self.SAMPLE_YAML_CONTENT
+                )
 
     def test_export_to_zip_file_with_unpublished_exploration(self):
         """Test the export_to_zip_file() method."""
@@ -2218,12 +2221,12 @@ title: A title
                 zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
             # Read function returns bytes, so we need to decode them before
             # we compare.
-            with zf.open('A title.yaml').read().decode('utf-8') as yaml_content:
+            with zf.open('A title.yaml') as yaml_content:
                 self.assertEqual(
-                    yaml_content,
+                    yaml_content.read().decode('utf-8'),
                     self.SAMPLE_YAML_CONTENT)
-            with zf.open('assets/image/abc.png').read() as image:
-                self.assertEqual(image, raw_image)
+            with zf.open('assets/image/abc.png') as image:
+                self.assertEqual(image.read(), raw_image)
 
     def test_export_by_versions(self):
         """Test export_to_zip_file() for different versions."""
@@ -2311,9 +2314,9 @@ title: A title
         with zipfile.ZipFile(zip_file_output) as zf:
             # Read function returns bytes, so we need to decode them before
             # we compare.
-            with zf.open('A title.yaml').read().decode('utf-8') as yaml_content:
+            with zf.open('A title.yaml') as yaml_content:
                 self.assertEqual(
-                    yaml_content,
+                    yaml_content.read().decode('utf-8'),
                     self.SAMPLE_YAML_CONTENT)
 
         # Download version 3.
@@ -2322,9 +2325,9 @@ title: A title
         with zipfile.ZipFile(zip_file_output) as zf:
             # Read function returns bytes, so we need to decode them before
             # we compare.
-            with zf.open('A title.yaml').read().decode('utf-8') as yaml_content:
+            with zf.open('A title.yaml') as yaml_content:
                 self.assertEqual(
-                    yaml_content,
+                    yaml_content.read().decode('utf-8'),
                     self.UPDATED_YAML_CONTENT)
 
 

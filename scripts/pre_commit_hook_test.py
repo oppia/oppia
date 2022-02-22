@@ -184,17 +184,20 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             'pre-commit hook file is now executable!' in self.print_arr)
 
     def test_start_subprocess_for_result(self):
-        process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        def mock_popen(  # pylint: disable=unused-argument
-                unused_cmd_tokens, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE):
-            return process
+        with subprocess.Popen(
+            ['echo', 'test'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        ) as process:
+            def mock_popen(  # pylint: disable=unused-argument
+                    unused_cmd_tokens, stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE):
+                return process
 
-        with self.swap(subprocess, 'Popen', mock_popen):
-            self.assertEqual(
-                pre_commit_hook.start_subprocess_for_result('cmd'),
-                (b'test\n', b''))
+            with self.swap(subprocess, 'Popen', mock_popen):
+                self.assertEqual(
+                    pre_commit_hook.start_subprocess_for_result('cmd'),
+                    (b'test\n', b''))
 
     def test_does_diff_include_package_lock_file_with_package_lock_in_diff(
             self):
@@ -346,37 +349,35 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             check_function_calls['check_changes_in_config_is_called'])
 
     def test_check_changes_in_gcloud_path_without_mismatch(self):
-        temp_file = tempfile.NamedTemporaryFile()
-        temp_file_name = 'mock_release_constants.json'
-        temp_file.name = temp_file_name
-        with python_utils.open_file(temp_file_name, 'w') as tmp:
-            tmp.write('{"GCLOUD_PATH": "%s"}' % common.GCLOUD_PATH)
-        with self.swap(
-            pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name):
-            pre_commit_hook.check_changes_in_gcloud_path()
-        temp_file.close()
-        if os.path.isfile(temp_file_name):
-            # On Windows system, occasionally this temp file is not deleted.
-            os.remove(temp_file_name)
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file_name = 'mock_release_constants.json'
+            temp_file.name = temp_file_name
+            with python_utils.open_file(temp_file_name, 'w') as tmp:
+                tmp.write('{"GCLOUD_PATH": "%s"}' % common.GCLOUD_PATH)
+            with self.swap(
+                pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name):
+                pre_commit_hook.check_changes_in_gcloud_path()
+            if os.path.isfile(temp_file_name):
+                # On Windows system, occasionally this temp file is not deleted.
+                os.remove(temp_file_name)
 
     def test_check_changes_in_gcloud_path_with_mismatch(self):
-        temp_file = tempfile.NamedTemporaryFile()
-        temp_file_name = 'mock_release_constants.json'
-        temp_file.name = temp_file_name
-        incorrect_gcloud_path = (
-            '../oppia_tools/google-cloud-sdk-314.0.0/google-cloud-sdk/'
-            'bin/gcloud')
-        with python_utils.open_file(temp_file_name, 'w') as tmp:
-            tmp.write('{"GCLOUD_PATH": "%s"}' % incorrect_gcloud_path)
-        constants_file_swap = self.swap(
-            pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name)
-        with constants_file_swap, self.assertRaisesRegex(
-            Exception, (
-                'The gcloud path in common.py: %s should match the path in '
-                'release_constants.json: %s. Please fix.' % (
-                    common.GCLOUD_PATH, incorrect_gcloud_path))):
-            pre_commit_hook.check_changes_in_gcloud_path()
-        temp_file.close()
-        if os.path.isfile(temp_file_name):
-            # On Windows system, occasionally this temp file is not deleted.
-            os.remove(temp_file_name)
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file_name = 'mock_release_constants.json'
+            temp_file.name = temp_file_name
+            incorrect_gcloud_path = (
+                '../oppia_tools/google-cloud-sdk-314.0.0/google-cloud-sdk/'
+                'bin/gcloud')
+            with python_utils.open_file(temp_file_name, 'w') as tmp:
+                tmp.write('{"GCLOUD_PATH": "%s"}' % incorrect_gcloud_path)
+            constants_file_swap = self.swap(
+                pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name)
+            with constants_file_swap, self.assertRaisesRegex(
+                Exception, (
+                    'The gcloud path in common.py: %s should match the path in '
+                    'release_constants.json: %s. Please fix.' % (
+                        common.GCLOUD_PATH, incorrect_gcloud_path))):
+                pre_commit_hook.check_changes_in_gcloud_path()
+            if os.path.isfile(temp_file_name):
+                # On Windows system, occasionally this temp file is not deleted.
+                os.remove(temp_file_name)

@@ -147,9 +147,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             # The function is used as follows: python_utils.url_open(req).read()
             # So, the mock returns a file object as a mock so that the read
             # function can work correctly.
-            temp_file = tempfile.NamedTemporaryFile()
-            file_obj = python_utils.open_file(temp_file.name, 'r')
-            return file_obj
+            with tempfile.NamedTemporaryFile() as temp_file:
+                file_obj = python_utils.open_file(temp_file.name, 'r')
+                return file_obj
         def mock_string_io(buffer_value):  # pylint: disable=unused-argument
             return MOCK_TMP_UNZIP_PATH
 
@@ -189,21 +189,23 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(exists_arr, [False])
 
     def test_get_file_contents(self):
-        temp_file = tempfile.NamedTemporaryFile().name
-        actual_text = 'Testing install third party file.'
-        with python_utils.open_file(temp_file, 'w') as f:
-            f.write(actual_text)
-        self.assertEqual(
-            install_third_party.get_file_contents(temp_file), actual_text)
+        with tempfile.NamedTemporaryFile() as temp_file_name:
+            temp_file = temp_file_name.name
+            actual_text = 'Testing install third party file.'
+            with python_utils.open_file(temp_file, 'w') as f:
+                f.write(actual_text)
+            self.assertEqual(
+                install_third_party.get_file_contents(temp_file), actual_text)
 
     def test_return_json(self):
-        temp_file = tempfile.NamedTemporaryFile().name
-        actual_text = '{"Testing": "install_third_party"}'
-        with python_utils.open_file(temp_file, 'w') as f:
-            f.write(actual_text)
-        self.assertEqual(
-            install_third_party.return_json(temp_file),
-            {'Testing': 'install_third_party'})
+        with tempfile.NamedTemporaryFile() as temp_file_name:
+            temp_file = temp_file_name.name
+            actual_text = '{"Testing": "install_third_party"}'
+            with python_utils.open_file(temp_file, 'w') as f:
+                f.write(actual_text)
+            self.assertEqual(
+                install_third_party.return_json(temp_file),
+                {'Testing': 'install_third_party'})
 
     def test_dependencies_syntax_testing_with_valid_syntax(self):
         install_third_party.test_dependencies_syntax(

@@ -32,16 +32,18 @@ class RedirectStoutTest(test_utils.GenericTestBase):
     """Tests for the redirect_stdout function."""
 
     def test_redirect_stdout(self):
-        temp_file = tempfile.NamedTemporaryFile()
+        with tempfile.NamedTemporaryFile() as temp_file:
 
-        with python_utils.open_file(temp_file.name, 'r+') as temp_file_contents:
-            with linter_utils.redirect_stdout(temp_file_contents):
-                print('This is a test')
-            temp_file_contents.seek(0)
-            data = temp_file_contents.read()
-        temp_file.close()
+            with python_utils.open_file(
+                temp_file.name,
+                'r+'
+            ) as temp_file_contents:
+                with linter_utils.redirect_stdout(temp_file_contents):
+                    print('This is a test')
+                temp_file_contents.seek(0)
+                data = temp_file_contents.read()
 
-        self.assertEqual(data, 'This is a test\n')
+            self.assertEqual(data, 'This is a test\n')
 
 
 class ListDuplicateItemsTest(test_utils.GenericTestBase):

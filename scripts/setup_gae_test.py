@@ -106,29 +106,29 @@ class SetupGaeTests(test_utils.GenericTestBase):
             if path == common.GOOGLE_CLOUD_SDK_HOME:
                 return False
             return True
-        temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
-        def mock_open(name):  # pylint: disable=unused-argument
-            self.check_function_calls['open_is_called'] = True
-            return temp_file
-        def mock_extractall(unused_self, path):  # pylint: disable=unused-argument
-            self.check_function_calls['extractall_is_called'] = True
-        def mock_close(unused_self):
-            self.check_function_calls['close_is_called'] = True
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        open_swap = self.swap(tarfile, 'open', mock_open)
-        extractall_swap = self.swap(
-            tarfile.TarFile, 'extractall', mock_extractall)
-        close_swap = self.swap(tarfile.TarFile, 'close', mock_close)
+        with tarfile.open(name=MOCK_TMP_UNTAR_PATH) as temp_file:
+            def mock_open(name):  # pylint: disable=unused-argument
+                self.check_function_calls['open_is_called'] = True
+                return temp_file
+            def mock_extractall(unused_self, path):  # pylint: disable=unused-argument
+                self.check_function_calls['extractall_is_called'] = True
+            def mock_close(unused_self):
+                self.check_function_calls['close_is_called'] = True
+            exists_swap = self.swap(os.path, 'exists', mock_exists)
+            open_swap = self.swap(tarfile, 'open', mock_open)
+            extractall_swap = self.swap(
+                tarfile.TarFile, 'extractall', mock_extractall)
+            close_swap = self.swap(tarfile.TarFile, 'close', mock_close)
 
-        with self.walk_swap, self.remove_swap, self.makedirs_swap:
-            with self.print_swap, self.url_retrieve_swap, exists_swap:
-                with open_swap, extractall_swap, close_swap:
-                    setup_gae.main(args=[])
-        self.assertEqual(
-            self.check_function_calls, self.expected_check_function_calls)
-        self.assertTrue(
-            'Download complete. Installing Google Cloud SDK...'
-            in self.print_arr)
+            with self.walk_swap, self.remove_swap, self.makedirs_swap:
+                with self.print_swap, self.url_retrieve_swap, exists_swap:
+                    with open_swap, extractall_swap, close_swap:
+                        setup_gae.main(args=[])
+            self.assertEqual(
+                self.check_function_calls, self.expected_check_function_calls)
+            self.assertTrue(
+                'Download complete. Installing Google Cloud SDK...'
+                in self.print_arr)
 
     def test_gcloud_install_with_errors(self):
         self.expected_check_function_calls['remove_is_called'] = False

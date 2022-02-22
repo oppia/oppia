@@ -225,28 +225,35 @@ class SetupTests(test_utils.GenericTestBase):
         }
         def mock_url_retrieve(unused_url, filename):  # pylint: disable=unused-argument
             check_function_calls['url_retrieve_is_called'] = True
-        temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
-        def mock_open(name):  # pylint: disable=unused-argument
-            check_function_calls['open_is_called'] = True
-            return temp_file
-        def mock_extractall(unused_self, path):  # pylint: disable=unused-argument
-            check_function_calls['extractall_is_called'] = True
-        def mock_close(unused_self):
-            check_function_calls['close_is_called'] = True
-        def mock_remove(unused_path):
-            check_function_calls['remove_is_called'] = True
+        with tarfile.open(name=MOCK_TMP_UNTAR_PATH) as temp_file:
+            def mock_open(name):  # pylint: disable=unused-argument
+                check_function_calls['open_is_called'] = True
+                return temp_file
+            def mock_extractall(unused_self, path):  # pylint: disable=unused-argument
+                check_function_calls['extractall_is_called'] = True
+            def mock_close(unused_self):
+                check_function_calls['close_is_called'] = True
+            def mock_remove(unused_path):
+                check_function_calls['remove_is_called'] = True
 
-        url_retrieve_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve)
-        open_swap = self.swap(tarfile, 'open', mock_open)
-        extract_swap = self.swap(tarfile.TarFile, 'extractall', mock_extractall)
-        close_swap = self.swap(tarfile.TarFile, 'close', mock_close)
-        remove_swap = self.swap(os, 'remove', mock_remove)
+            url_retrieve_swap = self.swap(
+                urlrequest, 'urlretrieve', mock_url_retrieve)
+            open_swap = self.swap(tarfile, 'open', mock_open)
+            extract_swap = self.swap(
+                tarfile.TarFile,
+                'extractall',
+                mock_extractall
+            )
+            close_swap = self.swap(tarfile.TarFile, 'close', mock_close)
+            remove_swap = self.swap(os, 'remove', mock_remove)
 
-        with url_retrieve_swap, open_swap, extract_swap, close_swap:
-            with remove_swap:
-                setup.download_and_install_package('url', 'filename')
-        self.assertEqual(check_function_calls, expected_check_function_calls)
+            with url_retrieve_swap, open_swap, extract_swap, close_swap:
+                with remove_swap:
+                    setup.download_and_install_package('url', 'filename')
+            self.assertEqual(
+                check_function_calls,
+                expected_check_function_calls
+            )
 
     def test_rename_yarn_folder(self):
         # Creates a dummy yarn folder and then checks if `v` was removed
