@@ -232,7 +232,8 @@ export class NumericInputValidationService {
 
   // Returns 'undefined' when no error occurs.
   validateNumber(
-      value: number, requireNonnegativeInput: boolean,
+      value: number, 
+      requireNonnegativeInput: boolean,
       decimalSeparator: string = '.'
   ): string | undefined {
     if (requireNonnegativeInput && value < 0) {
