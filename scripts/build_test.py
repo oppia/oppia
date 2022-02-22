@@ -466,7 +466,13 @@ class BuildTests(test_utils.GenericTestBase):
             build_tasks.append(task)
             count -= 1
 
-        self.assertEqual(threading.active_count(), 1)
+        self.assertEqual(
+            threading.active_count(), 1,
+            msg=(
+                'Found more than one thread: %s'
+                % ','.join([thread.name for thread in threading.enumerate()])
+            )
+        )
         build._execute_tasks(build_tasks)  # pylint: disable=protected-access
         with self.assertRaisesRegex(
             OSError, 'threads can only be started once'):
