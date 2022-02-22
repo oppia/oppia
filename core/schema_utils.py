@@ -68,10 +68,22 @@ SCHEMA_TYPE_UNICODE = 'unicode'
 SCHEMA_TYPE_BASESTRING = 'basestring'
 SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
 SCHEMA_TYPE_OBJECT_DICT = 'object_dict'
-SCHEMA_TYPE_MULTIPLE = 'multiple'
+SCHEMA_TYPE_WEAK_MULTIPLE = 'weak_multiple'
 
 SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
 SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
+ALL_SCHEMAS = {
+    SCHEMA_TYPE_BOOL : bool,
+    SCHEMA_TYPE_DICT : dict,
+    SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS : dict,
+    SCHEMA_TYPE_FLOAT : float,
+    SCHEMA_TYPE_HTML : (str, bytes),
+    SCHEMA_TYPE_INT : int,
+    SCHEMA_TYPE_LIST : list,
+    SCHEMA_TYPE_UNICODE : (str, bytes),
+    SCHEMA_TYPE_BASESTRING : (str, bytes),
+    SCHEMA_TYPE_UNICODE_OR_NONE : (str, bytes),
+}
 
 EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 
@@ -104,14 +116,15 @@ def normalize_against_schema(
     """
     normalized_obj: Any = None
 
-    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_MULTIPLE:
-        name = type(obj).__name__
-        if name == 'str':
-            name = 'basestring'
-        assert (name in schema[SCHEMA_KEY_OPTIONS]), (
-            '%s, type %s is not present in options %s' %
-            (obj, name, schema[SCHEMA_KEY_OPTIONS]))
-        normalized_obj = obj
+    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_WEAK_MULTIPLE:
+        for i in schema[SCHEMA_KEY_OPTIONS]:
+            if isinstance(obj, ALL_SCHEMAS[i]):
+                normalized_obj = obj
+                break
+        if normalized_obj is None:
+            raise Exception(
+                '%s is not present in options %s' %
+                (obj, schema[SCHEMA_KEY_OPTIONS]))
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj
