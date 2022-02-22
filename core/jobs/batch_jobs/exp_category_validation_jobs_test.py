@@ -33,7 +33,7 @@ from core.platform import models
 class GetNumberOfExpExceedsMaxTitleLengthJobTests(
     job_test_utils.JobTestBase):
 
-    JOB_CLASS = exp_category_validation_jobs.GetNumberOfExpWithInvalidCategoryJob
+    JOB_CLASS = exp_category_validation_jobs.GetExpWithInvalidCategoryJob
 
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
@@ -68,7 +68,7 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
             states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_1}
         )
 
-        # This is an valid model with category in constants.ts
+        # This is an valid model with category in constants.ts.
         self.exp_2 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_2,

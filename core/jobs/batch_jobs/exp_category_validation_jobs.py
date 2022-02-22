@@ -18,13 +18,13 @@
 
 from __future__ import annotations
 
+from core.constants import constants
 from core.domain import exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
-from core.constants import constants
 
 import apache_beam as beam
 
@@ -32,8 +32,8 @@ import apache_beam as beam
 
 
 # TODO(#14994): Remove this job after we fix the exploration category.
-class GetNumberOfExpWithInvalidCategoryJob(base_jobs.JobBase):
-    """Job that returns exploration ids having categories which aren't included in constants.ts"""
+class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
+    """Job that returns explorations with categories not in constants.ts"""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid explorations with their id and
@@ -56,7 +56,7 @@ class GetNumberOfExpWithInvalidCategoryJob(base_jobs.JobBase):
             | 'Combine exploration id and categoty' >> beam.Map(
                 lambda exp: (exp.id, exp.category))
             | 'Filter exploraton with category not in constants.ts' >>
-                beam.Filter(lambda exp: not (exp[1] in constants.ALL_CATEGORIES))
+                beam.Filter(lambda exp: not exp[1] in constants.ALL_CATEGORIES)
         )
 
         report_number_of_exps_queried = (
