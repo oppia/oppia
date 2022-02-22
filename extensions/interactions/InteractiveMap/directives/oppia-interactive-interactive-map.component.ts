@@ -47,6 +47,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
+
   directiveSubscriptions = new Subscription();
   coords: [number, number];
   zoomLevel: number;
@@ -55,6 +56,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     opacity?: number;
     'z-index'?: number;
   };
+
   zoom: number;
   interactionIsActive: boolean;
   mapMarkers;

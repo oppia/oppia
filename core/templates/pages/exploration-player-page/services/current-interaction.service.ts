@@ -76,6 +76,7 @@ export class CurrentInteractionService {
     private contextService: ContextService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService) { }
+
   private static submitAnswerFn: SubmitAnswerFn | null = null;
   private static onSubmitFn: OnSubmitFn | null = null;
   private static validityCheckFn: ValidityCheckFn | null = null;

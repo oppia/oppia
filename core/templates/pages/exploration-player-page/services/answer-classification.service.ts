@@ -86,10 +86,12 @@ export class AnswerClassificationService {
       return new AnswerClassificationResult(
         defaultOutcome, answerGroups.length, 0,
         ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION);
+    } else {
+      this.alertsService.addWarning(
+        'Something went wrong with the exploration.');
+      throw new Error(
+        'No defaultOutcome was available to classify the answer.');
     }
-    let warning = 'Something went wrong with the exploration.';
-    this.alertsService.addWarning(warning);
-    throw new Error(warning);
   }
 
   /**

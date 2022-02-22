@@ -1039,8 +1039,9 @@ class TestBase(unittest.TestCase):
         for param_change in param_changes:
             try:
                 obj_type = exp_param_specs[param_change.name].obj_type
-            except:
-                raise Exception('Parameter %s not found' % param_change.name)
+            except Exception as e:
+                raise Exception(
+                    'Parameter %s not found' % param_change.name) from e
             new_param_dict[param_change.name] = (
                 param_change.get_normalized_value(obj_type, new_param_dict))
         return new_param_dict
@@ -1741,10 +1742,10 @@ class GenericTestBase(AppEngineTestBase):
 
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 init_state_name: %s
 language_code: en
 objective: ''

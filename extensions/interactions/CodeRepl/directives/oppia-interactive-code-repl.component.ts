@@ -177,6 +177,7 @@ export class InteractiveCodeReplComponent implements
       this.sendResponse(evaluation, err);
     });
   }
+
   private submitAnswer() {
     this.runAndSubmitCode(this.code);
   }

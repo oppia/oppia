@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
@@ -38,9 +38,11 @@ import { TranslateService } from '@ngx-translate/core';
   templateUrl: './algebraic-expression-input-interaction.component.html',
   styleUrls: []
 })
-export class AlgebraicExpressionInputInteractionComponent implements OnInit {
+export class AlgebraicExpressionInputInteractionComponent
+    implements OnInit, OnDestroy {
   value: string = '';
   hasBeenTouched = false;
+  viewIsDestroyed: boolean = false;
   warningText: string = '';
   @Input() customOskLettersWithValue: string = '';
   @Input() savedSolution: InteractionAnswer;
@@ -89,6 +91,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
 
   ngOnInit(): void {
     this.hasBeenTouched = false;
+    this.viewIsDestroyed = false;
     this.guppyConfigurationService.init();
     this.guppyConfigurationService.changeDivSymbol(
       JSON.parse(this.useFractionForDivisionWithValue || 'false'));
@@ -118,7 +121,9 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
         if (eventType === 'change') {
           // Need to manually trigger the digest cycle to make any
           // 'watchers' aware of changes in answer.
-          this.changeDetectorRef.detectChanges();
+          if (!this.viewIsDestroyed) {
+            this.changeDetectorRef.detectChanges();
+          }
         }
       }
     });
@@ -131,6 +136,10 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
     };
     this.currentInteractionService.registerCurrentInteraction(
       submitAnswer, isCurrentAnswerValid);
+  }
+
+  ngOnDestroy(): void {
+    this.viewIsDestroyed = true;
   }
 
   showOsk(): void {
