@@ -22,7 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import state_domain
 from core.jobs import job_test_utils
-from core.jobs.batch_jobs import exp_category_validation_jobs
+from core.jobs.batch_jobs import exp_data_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -30,10 +30,10 @@ from core.platform import models
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 
-class GetNumberOfExpExceedsMaxTitleLengthJobTests(
+class GetExpWithInvalidCategoryJobTests(
     job_test_utils.JobTestBase):
 
-    JOB_CLASS = exp_category_validation_jobs.GetExpWithInvalidCategoryJob
+    JOB_CLASS = exp_data_validation_jobs.GetExpWithInvalidCategoryJob
 
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
@@ -138,4 +138,90 @@ class GetNumberOfExpExceedsMaxTitleLengthJobTests(
             job_run_result.JobRunResult.as_stderr(
                 f'The id of exp is {self.EXPLORATION_ID_3} and its category '
                 + f'is {self.exp_3.category}'),
+        ])
+
+class GetExpWithInvalidRatingJobTests(
+    job_test_utils.JobTestBase):
+
+    JOB_CLASS = exp_data_validation_jobs.GetExpWithInvalidRatingJob
+
+    EXPLORATION_ID_1 = '1'
+    EXPLORATION_ID_2 = '2'
+    EXPLORATION_ID_3 = '3'
+
+    def setUp(self):
+        super().setUp()
+
+        # This is an invalid model with scaled avg rating greater than 5.
+        self.exp_1 = self.create_model(
+            exp_models.ExpSummaryModel,
+            id=self.EXPLORATION_ID_1,
+            title='title',
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            ratings=4,
+            scaled_average_rating=6,
+            community_owned=True,
+        )
+
+        # This is an valid model with scaled avg rating between 0-5.
+        self.exp_2 = self.create_model(
+            exp_models.ExpSummaryModel,
+            id=self.EXPLORATION_ID_2,
+            title='title',
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            ratings=4,
+            scaled_average_rating=4,
+            community_owned=True,
+        )
+
+        # This is an invalid model with scaled avg rating less than 0.
+        self.exp_3 = self.create_model(
+            exp_models.ExpSummaryModel,
+            id=self.EXPLORATION_ID_3,
+            title='title',
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            ratings=4,
+            scaled_average_rating=-1,
+            community_owned=True,
+        )
+
+    def test_run_with_no_models(self) -> None:
+        self.assert_job_output_is([])
+
+    def test_run_with_single_valid_model(self) -> None:
+        self.put_multi([self.exp_2])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1')
+        ])
+
+    def test_run_with_single_invalid_model(self) -> None:
+        self.put_multi([self.exp_1])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stderr(
+                f'The id of exp is {self.EXPLORATION_ID_1} and its scaled '
+                + f'avg rating is {self.exp_1.scaled_average_rating}'),
+        ])
+
+    def test_run_with_mixed_models(self) -> None:
+        self.put_multi([self.exp_1, self.exp_2, self.exp_3])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 3'),
+            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
+            job_run_result.JobRunResult.as_stderr(
+                f'The id of exp is {self.EXPLORATION_ID_1} and its scaled '
+                + f'avg rating is {self.exp_1.scaled_average_rating}'),
+            job_run_result.JobRunResult.as_stderr(
+                f'The id of exp is {self.EXPLORATION_ID_3} and its scaled '
+                + f'avg rating is {self.exp_3.scaled_average_rating}'),
         ])
