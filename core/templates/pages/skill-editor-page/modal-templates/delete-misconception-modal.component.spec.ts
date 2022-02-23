@@ -24,14 +24,8 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
 import constants from 'assets/constants';
 
 class MockActiveModal {
-  close(value): void {
+  close(value: string): void {
     return;
-  }
-}
-
-class MockSkillEditorStateService {
-  getSkill(): Skill {
-    return null;
   }
 }
 
@@ -44,6 +38,12 @@ describe('Delete Misconception Modal Component', () => {
   let fixture: ComponentFixture<DeleteMisconceptionModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let closeSpy: jasmine.Spy;
+
+  class MockSkillEditorStateService {
+    getSkill(): Skill {
+      return skillObject;
+    }
+  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
