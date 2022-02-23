@@ -1197,7 +1197,7 @@ export class ConversationSkinComponent {
         explorationId,
         TranslationKeyType.TITLE
       )
-    )
+    );
   }
 
   isHackyExpTitleTranslationDisplayed(explorationId: string): boolean {
