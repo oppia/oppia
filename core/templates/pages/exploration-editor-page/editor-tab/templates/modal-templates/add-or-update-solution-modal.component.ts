@@ -38,9 +38,9 @@ interface HtmlFormSchema {
 
 interface SolutionInterface {
   answerIsExclusive: boolean;
-  // This property will be null when the component is initialised
+  // This property will be undefined when the component is initialised
   // and correct answer is not yet choosen.
-  correctAnswer: string | null;
+  correctAnswer: string | undefined;
   explanationHtml: string;
   // A null 'explanationContentId' indicates that the 'Solution' has been
   // created but not saved.
@@ -99,9 +99,9 @@ export class AddOrUpdateSolutionModalComponent
   shouldAdditionalSubmitButtonBeShown(): boolean {
     let interactionId = (
       this.stateInteractionIdService.savedMemento as InteractionSpecsKey);
-    const InteractionSpec = (
+    const interactionSpec = (
       InteractionSpecsConstants.INTERACTION_SPECS[interactionId]);
-    return InteractionSpec.show_generic_submit_button;
+    return interactionSpec.show_generic_submit_button;
   }
 
   isSolutionExplanationLengthExceeded(
@@ -133,7 +133,7 @@ export class AddOrUpdateSolutionModalComponent
 
   saveSolution(): void {
     if (typeof this.data.answerIsExclusive === 'boolean' &&
-       this.data.correctAnswer !== null &&
+       this.data.correctAnswer !== undefined &&
        this.data.explanation !== '' &&
        this.data.explanationContentId !== null
     ) {
@@ -164,14 +164,14 @@ export class AddOrUpdateSolutionModalComponent
     this.answerIsValid = false;
     this.EMPTY_SOLUTION_DATA = {
       answerIsExclusive: false,
-      correctAnswer: null,
+      correctAnswer: undefined,
       explanationHtml: '',
       explanationContentId: this.COMPONENT_NAME_SOLUTION
     };
     this.data = this.solutionType ? {
       answerIsExclusive: (
         this.stateSolutionService.savedMemento.answerIsExclusive),
-      correctAnswer: null,
+      correctAnswer: undefined,
       explanationHtml: (
         this.stateSolutionService.savedMemento.explanation.html),
       explanationContentId: (
