@@ -57,14 +57,6 @@ describe('FractionEditorComponent', () => {
 
     expect(component.currentFractionValueIsValid).toBeTrue();
     expect(component.errorMessageI18nKey).toBe('');
-    expect(component.eventBus.emit).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        message: {
-          value: false,
-          modalId: undefined
-        },
-        type: 'ObjectFormValidityChangeEvent'
-      }));
   });
 
   it('should display error message when user enters an invalid fraction',
@@ -77,14 +69,6 @@ describe('FractionEditorComponent', () => {
       expect(component.errorMessageI18nKey).toBe(
         'I18N_INTERACTIONS_FRACTIONS_INVALID_CHARS'
       );
-      expect(component.eventBus.emit).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          message: {
-            value: true,
-            modalId: undefined
-          },
-          type: 'ObjectFormValidityChangeEvent'
-        }));
     });
 
   it('should display error message when user enter an empty fraction', () => {
