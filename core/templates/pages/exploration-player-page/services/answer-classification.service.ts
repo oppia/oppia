@@ -63,7 +63,7 @@ export class AnswerClassificationService {
   private classifyAnswer(
       answer: InteractionAnswer,
       answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome,
+      defaultOutcome: Outcome | null,
       interactionRulesService: InteractionRulesService
   ): AnswerClassificationResult {
     // Find the first group that contains a rule which returns true
@@ -118,8 +118,7 @@ export class AnswerClassificationService {
 
     const answerGroups = interactionInOldState.answerGroups;
     const defaultOutcome = interactionInOldState.defaultOutcome;
-    const id = interactionInOldState.id;
-    if (interactionRulesService && defaultOutcome && id) {
+    if (interactionRulesService) {
       answerClassificationResult = this.classifyAnswer(
         answer, answerGroups, defaultOutcome, interactionRulesService);
     } else {
@@ -132,8 +131,12 @@ export class AnswerClassificationService {
 
     const ruleBasedOutcomeIsDefault = (
       answerClassificationResult.outcome === defaultOutcome);
-    const interactionIsTrainable =
-      this.interactionSpecsService.isInteractionTrainable(id);
+    let interactionIsTrainable: boolean = false;
+    if (interactionInOldState.id !== null) {
+      interactionIsTrainable = (
+        this.interactionSpecsService.isInteractionTrainable(
+          interactionInOldState.id));
+    }
 
     if (ruleBasedOutcomeIsDefault && interactionIsTrainable) {
       for (var i = 0; i < answerGroups.length; ++i) {
