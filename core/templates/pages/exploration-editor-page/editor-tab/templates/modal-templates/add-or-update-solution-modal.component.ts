@@ -29,7 +29,7 @@ import { StateCustomizationArgsService } from 'components/state-editor/state-edi
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -97,9 +97,10 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   shouldAdditionalSubmitButtonBeShown(): boolean {
+    let interactionId = (
+      this.stateInteractionIdService.savedMemento as InteractionSpecsKey);
     const InteractionSpec = (
-      InteractionSpecsConstants.INTERACTION_SPECS[
-        this.stateInteractionIdService.savedMemento]);
+      InteractionSpecsConstants.INTERACTION_SPECS[interactionId]);
     return InteractionSpec.show_generic_submit_button;
   }
 
