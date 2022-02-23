@@ -153,6 +153,7 @@ ControlValueAccessor, Validator {
   get value(): unknown {
     return this._value;
   }
+
   @Input() set value(val: unknown) {
     this._value = val;
     if (this.ref) {
@@ -161,6 +162,7 @@ ControlValueAccessor, Validator {
       this.valueChange.emit(this._value);
     }
   }
+
   @Output() valueChange = new EventEmitter();
   ref: ComponentRef<ObjectEditor>;
   componentSubscriptions = new Subscription();
@@ -193,6 +195,7 @@ ControlValueAccessor, Validator {
   registerOnChange(fn: (_: unknown) => void): void {
     this.onChange = fn;
   }
+
   constructor(
     private loggerService: LoggerService,
     private componentFactoryResolver: ComponentFactoryResolver,
