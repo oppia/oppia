@@ -29,7 +29,7 @@ import { StateCustomizationArgsService } from 'components/state-editor/state-edi
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -42,6 +42,8 @@ interface SolutionInterface {
   // and correct answer is not yet choosen.
   correctAnswer: string | null;
   explanationHtml: string;
+  // A null 'explanationContentId' indicates that the 'Solution' has been
+  // created but not saved.
   explanationContentId: string | null;
   explanation?: string;
 }
@@ -63,8 +65,7 @@ export class AddOrUpdateSolutionModalComponent
   solutionType!: Solution;
   tempAnsOption!: string;
   EMPTY_SOLUTION_DATA!: SolutionInterface;
-  COMPONENT_NAME_SOLUTION: string = (
-    AppConstants.COMPONENT_NAME_SOLUTION);
+  COMPONENT_NAME_SOLUTION: string = AppConstants.COMPONENT_NAME_SOLUTION;
 
   SOLUTION_EDITOR_FOCUS_LABEL: string = (
     'currentCorrectAnswerEditorHtmlForSolutionEditor');
@@ -96,12 +97,10 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   shouldAdditionalSubmitButtonBeShown(): boolean {
-    const InteractionSpec:
-      {[key: string]: {show_generic_submit_button: boolean} } = (
-        INTERACTION_SPECS);
-    let interactionSpecs = (
-      InteractionSpec[this.stateInteractionIdService.savedMemento]);
-    return interactionSpecs.show_generic_submit_button;
+    const InteractionSpec = (
+      InteractionSpecsConstants.INTERACTION_SPECS[
+        this.stateInteractionIdService.savedMemento]);
+    return InteractionSpec.show_generic_submit_button;
   }
 
   isSolutionExplanationLengthExceeded(
@@ -134,8 +133,8 @@ export class AddOrUpdateSolutionModalComponent
   saveSolution(): void {
     if (typeof this.data.answerIsExclusive === 'boolean' &&
        this.data.correctAnswer !== null &&
-        this.data.explanation !== '' &&
-        this.data.explanationContentId !== null
+       this.data.explanation !== '' &&
+       this.data.explanationContentId !== null
     ) {
       this.ngbActiveModal.close({
         solution: this.solutionObjectFactory.createNew(

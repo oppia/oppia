@@ -95,7 +95,7 @@ describe('Add Or Update Solution Modal Component', () => {
 
       spyOn(contextService, 'getEntityType').and.returnValue('question');
       spyOn(explorationHtmlFormatterService, 'getInteractionHtml')
-        .and.returnValue('<p>Interaction Html</>');
+        .and.returnValue('<p>Interaction Html</p>');
 
       answerEditorHtml = {
         ehfs: explorationHtmlFormatterService,
@@ -153,7 +153,7 @@ describe('Add Or Update Solution Modal Component', () => {
       stateSolutionService.init('', answerEditorHtml);
 
       expect(component.correctAnswerEditorHtml).toEqual(
-        '<p>Interaction Html</>');
+        '<p>Interaction Html</p>');
       expect(component.EMPTY_SOLUTION_DATA).toEqual({
         answerIsExclusive: false,
         correctAnswer: null,
