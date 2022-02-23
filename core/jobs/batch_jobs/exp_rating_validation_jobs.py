@@ -31,15 +31,15 @@ import apache_beam as beam
 
 
 class GetExpWithInvalidRatingJob(base_jobs.JobBase):
-    """Job that returns exploration having invalid rating."""
+    """Job that returns exploration having invalid scaled avg rating."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid explorations with their id and
-        rating.
+        scaled average rating.
 
         Returns:
             PCollection. Returns PCollection of invalid explorations with
-            their id and rating.
+            their id and scaled avg rating.
         """
         total_explorations = (
             self.pipeline
@@ -51,9 +51,9 @@ class GetExpWithInvalidRatingJob(base_jobs.JobBase):
 
         exp_ids_with_invalid_rating = (
             total_explorations
-            | 'Combine exploration ids and ratings' >> beam.Map(
+            | 'Combine exploration ids and scaled avg ratings' >> beam.Map(
                 lambda exp: (exp.id, exp.scaled_average_rating))
-            | 'Filter exploratons with invalid ratings' >>
+            | 'Filter exploratons with invalid scaled avg ratings' >>
                 beam.Filter(lambda exp: exp[1] > 5 or exp[1] < 0)
         )
 
@@ -69,11 +69,11 @@ class GetExpWithInvalidRatingJob(base_jobs.JobBase):
                 job_result_transforms.CountObjectsToJobRunResult('INVALID'))
         )
 
-        report_invalid_ids_and_their_rating = (
+        report_invalid_ids_and_their_scaled_avg_rating = (
             exp_ids_with_invalid_rating
             | 'Save info on invalid exps' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The id of exp is %s and its rating is %s'
+                    'The id of exp is %s and its scaled avg rating is %s'
                     % (objects[0], objects[1])
                 ))
         )
@@ -82,7 +82,7 @@ class GetExpWithInvalidRatingJob(base_jobs.JobBase):
             (
                 report_number_of_exps_queried,
                 report_number_of_invalid_exps,
-                report_invalid_ids_and_their_rating
+                report_invalid_ids_and_their_scaled_avg_rating
             )
             | 'Combine results' >> beam.Flatten()
         )
