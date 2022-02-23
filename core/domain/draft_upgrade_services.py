@@ -314,6 +314,10 @@ class DraftUpgradeUtil:
 
         Returns:
             list(ExplorationChange). The converted draft_change_list.
+
+        Raises:
+            InvalidDraftConversionException. The conversion cannot be
+                completed.
         """
         for change in draft_change_list:
             if (change.property_name ==
@@ -339,6 +343,10 @@ class DraftUpgradeUtil:
 
         Returns:
             list(ExplorationChange). The converted draft_change_list.
+
+        Raises:
+            InvalidDraftConversionException. The conversion cannot be
+                completed.
         """
         for change in draft_change_list:
             if (change.property_name ==
@@ -364,6 +372,10 @@ class DraftUpgradeUtil:
 
         Returns:
             list(ExplorationChange). The converted draft_change_list.
+
+        Raises:
+            InvalidDraftConversionException. The conversion cannot be
+                completed.
         """
         for change in draft_change_list:
             if (change.property_name ==
@@ -388,6 +400,10 @@ class DraftUpgradeUtil:
 
         Returns:
             list(ExplorationChange). The converted draft_change_list.
+
+        Raises:
+            InvalidDraftConversionException. The conversion cannot be
+                completed.
         """
         for change in draft_change_list:
             if (change.property_name ==

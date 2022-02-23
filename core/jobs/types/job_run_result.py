@@ -42,6 +42,10 @@ class JobRunResult:
         Args:
             stdout: str. The standard output from a job run.
             stderr: str. The error output from a job run.
+
+        Raises:
+            ValueError. Both stdout and stderr are empty.
+            ValueError. JobRunResult exceeds maximum limit.
         """
         if not stdout and not stderr:
             raise ValueError('JobRunResult instances must not be empty')

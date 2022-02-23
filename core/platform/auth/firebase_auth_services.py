@@ -88,7 +88,7 @@ def establish_firebase_connection() -> None:
         firebase_admin.App. The App being by the Firebase SDK.
 
     Raises:
-        Exception. The Firebase app has a genuine problem.
+        ValueError. The Firebase app has a genuine problem.
     """
     try:
         firebase_admin.get_app()
@@ -461,6 +461,9 @@ def grant_super_admin_privileges(user_id: str) -> None:
 
     Args:
         user_id: str. The Oppia user ID to promote to super admin.
+
+    Raises:
+        ValueError. No Firebase account associated with given user ID.
     """
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:
@@ -477,6 +480,9 @@ def revoke_super_admin_privileges(user_id: str) -> None:
 
     Args:
         user_id: str. The Oppia user ID to revoke privileges from.
+
+    Raises:
+        ValueError. No Firebase account associated with given user ID.
     """
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:

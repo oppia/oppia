@@ -369,6 +369,9 @@ def managed_webpack_compiler(
 
     Yields:
         psutil.Process. The Webpack compiler process.
+
+    Raises:
+        OSError. First build never completed.
     """
     if config_path is not None:
         pass
@@ -503,6 +506,9 @@ def managed_webdriver_server(chrome_version=None):
 
     Yields:
         psutil.Process. The Webdriver process.
+
+    Raises:
+        Exception. Space instead of '\'.
     """
     if chrome_version is None:
         # Although there are spaces between Google and Chrome in the path, we
@@ -601,6 +607,9 @@ def managed_protractor_server(
 
     Yields:
         psutil.Process. The protractor process.
+
+    Raises:
+        ValueError. Number of sharding instances are less than 0.
     """
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')

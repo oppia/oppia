@@ -285,6 +285,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
             str. The generated ID for this entity using platform,
             submitted_on_sec, and a random string, of the form
             '[platform].[submitted_on_msec].[random hash]'.
+
+        Raises:
+            Exception. If the id generator is producing too many collisions.
         """
         submitted_datetime_in_msec = utils.get_time_in_millisecs(
             submitted_on_datetime)
@@ -556,6 +559,9 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             milliseconds (as the entity's creation timestamp), a SHA1 hash of
             the ticket_name, and a random string, of the form
             '[creation_datetime_msec]:[hash(ticket_name)]:[random hash]'.
+
+        Raises:
+            Exception. If the id generator is producing too many collisions.
         """
         current_datetime_in_msec = utils.get_time_in_millisecs(
             datetime.datetime.utcnow())

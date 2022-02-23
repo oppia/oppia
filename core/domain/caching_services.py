@@ -177,7 +177,7 @@ def _get_memcache_key(
         obj_id: str. The id of the value to store in the memory cache.
 
     Raises:
-        Exception. The sub-namespace contains a ':'.
+        ValueError. The sub-namespace contains a ':'.
 
     Returns:
         str. The generated key for use in the memory cache in order to

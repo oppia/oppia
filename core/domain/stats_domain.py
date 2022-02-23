@@ -358,6 +358,9 @@ class StateStats:
         Args:
             other: StateStats | SessionStateStats. The other collection of stats
                 to aggregate from.
+
+        Raises:
+            TypeError. Given SessionStateStats can not be aggregated from.
         """
         if other.__class__ is self.__class__:
             self.total_answers_count_v1 += other.total_answers_count_v1

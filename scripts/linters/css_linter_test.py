@@ -61,7 +61,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
             [INVALID_CSS_FILEPATH])
         with self.print_swap, join_swap, self.assertRaisesRegex(
             Exception,
-            'ERROR    Please run start.sh first to install node-eslint or '
+            'ERROR    Please run start.py first to install node-eslint or '
             'node-stylelint and its dependencies.'):
             third_party_linter.perform_all_lint_checks()
 

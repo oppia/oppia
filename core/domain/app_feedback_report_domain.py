@@ -239,6 +239,9 @@ class AppFeedbackReport:
         Returns:
             AppFeedbackReport. The corresponding AppFeedbackReport domain
             object.
+
+        Raises:
+            NotImplementedError. Domain objects for web reports not implemented.
         """
         if report_dict['platform_type'] == (
             app_feedback_report_constants.PLATFORM_CHOICE_ANDROID):

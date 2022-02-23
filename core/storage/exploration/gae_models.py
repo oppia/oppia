@@ -160,6 +160,10 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results after
                     this batch.
+
+        Raises:
+            ValueError. If the max age is other than datetime.timedelta
+                instance or None.
         """
 
         if not isinstance(max_age, datetime.timedelta) and max_age is not None:

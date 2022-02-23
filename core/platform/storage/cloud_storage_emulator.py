@@ -52,6 +52,9 @@ class EmulatorBlob:
                 from Cloud Storage as bytes.
             content_type: str|None. The content type of the blob. It should
                 be in the MIME format.
+
+        Raises:
+            Exception. Content type contains unknown MIME type.
         """
         self._name = name
         # TODO(#13500): Refactor this method that only bytes are passed

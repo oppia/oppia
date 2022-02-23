@@ -287,6 +287,9 @@ def _get_beam_filters_from_ndb_node(
     Returns:
         tuple(tuple(str, str, *)). The equivalent Apache Beam filters. Items
         are: (property name, comparison operator, property value).
+
+    Raises:
+        TypeError. These `!=`, `IN`, and `OR` are forbidden filters.
     """
     beam_filters: List[Tuple[str, str, Any]] = []
 

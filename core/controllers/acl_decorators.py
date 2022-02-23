@@ -150,6 +150,10 @@ def does_classroom_exist(handler):
 
         Returns:
             handler. function. The newly decorated function.
+
+        Raises:
+            Exception. This decorator is not expected to be used with other
+                handler types.
         """
         classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)

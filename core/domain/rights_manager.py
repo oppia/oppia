@@ -971,7 +971,7 @@ def _release_ownership_of_activity(committer, activity_id, activity_type):
             constants.ACTIVITY_TYPE_EXPLORATION,
             constants.ACTIVITY_TYPE_COLLECTION.
 
-    Raise:
+    Raises:
         Exception. The committer does not have release rights.
     """
     committer_id = committer.user_id

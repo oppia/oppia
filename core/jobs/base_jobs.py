@@ -102,6 +102,11 @@ class JobMetaclass(type):
 
         Returns:
             class. The new class instance.
+
+        Raises:
+            TypeError. The given name is already in use.
+            TypeError. The given name must end with "Job".
+            TypeError. The class with the given name must inherit from JobBase.
         """
         if name in cls._JOB_REGISTRY:
             collision = cls._JOB_REGISTRY[name]
@@ -153,6 +158,9 @@ class JobMetaclass(type):
 
         Returns:
             class. The class associated to the given job name.
+
+        Raises:
+            ValueError. Given job name is not registered as a job.
         """
         if job_name not in cls._JOB_REGISTRY:
             raise ValueError('%s is not registered as a job' % job_name)
