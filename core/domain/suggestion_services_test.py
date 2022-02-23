@@ -836,7 +836,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'state_name': 'state 1',
             'content_id': 'content',
             'language_code': 'hi',
-            'content_html': '<p>old content html</p>',
+            'content_html': '',
             'translation_html': '<p>Translation for original content.</p>',
             'data_format': 'html'
         }
@@ -1017,7 +1017,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'state_name': 'state 1',
             'content_id': 'content',
             'language_code': 'hi',
-            'content_html': '<p>old content html</p>',
+            'content_html': '',
             'translation_html': '<p>Translation for original content.</p>',
             'data_format': 'html'
         }
