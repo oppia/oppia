@@ -1093,11 +1093,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content': {
-                        'en': {
-                            'filename': 'filename3.mp3',
-                            'file_size_bytes': 3000,
-                            'needs_update': False,
-                            'duration_secs': 42.43
+                    'en': {
+                        'filename': 'filename3.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
                     }
                 },
                 'default_outcome': {},
@@ -1127,8 +1127,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             })]
         changed_exploration_objective = (
             exp_services.apply_change_list(
-            self.EXP_0_ID,
-            change_list_objective))
+                self.EXP_0_ID,
+                change_list_objective))
         self.assertEqual(
             changed_exploration_objective.objective,
             'new objective')
@@ -1159,8 +1159,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         )
         owner_action = user_services.get_user_actions_info(self.owner_id)
         exp_services.publish_exploration_and_update_user_profiles(
-            owner_action,
-            self.EXP_0_ID)
+            owner_action, self.EXP_0_ID)
         updated_summary = (
             exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID))
         contributer_ids = updated_summary.contributor_ids
@@ -1271,21 +1270,21 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'state_name': exploration.init_state_name,
                 'property_name': (
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                    'new_value': {
-                        'language': {
-                            'value': 'python'
-                        },
-                        'placeholder': {
-                            'value': '# Type your code here.'
-                        },
-                        'preCode': {
-                            'value': ''
-                        },
-                        'postCode': {
-                            'value': ''
-                        }
-                     }
-                    })]
+                'new_value': {
+                    'language': {
+                        'value': 'python'
+                    },
+                    'placeholder': {
+                        'value': '# Type your code here.'
+                    },
+                    'preCode': {
+                        'value': ''
+                    },
+                    'postCode': {
+                        'value': ''
+                    }
+                    }
+                })]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed to CodeRepl')
         updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -1318,22 +1317,22 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'state_name': exploration.init_state_name,
                 'property_name': (
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                        'new_value': {
-                            'recommendedExplorationIds': {
-                                'value': [
-                                    'EXP_1',
-                                    'EXP_2'
-                                ]
-                            }
+                'new_value': {
+                    'recommendedExplorationIds': {
+                        'value': [
+                            'EXP_1',
+                            'EXP_2'
+                            ]
                         }
-                    }),
+                    }
+                }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': (
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
                 'state_name': exploration.init_state_name,
-                'new_value': None
-        })]
+                'new_value': None}
+            )]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             change_list, 'Changed to EndExploration')
@@ -6837,9 +6836,9 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
 
     def test_create_or_update_draft_when_by_voice_artist(self):
         with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Voice artist does not have permission to make some '
-            'changes in the change list.'):
+                utils.ValidationError,
+                'Voice artist does not have permission to make some '
+                'changes in the change list.'):
             exp_services.create_or_update_draft(
             self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
             self.NEWER_DATETIME, True)
