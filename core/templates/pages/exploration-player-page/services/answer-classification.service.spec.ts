@@ -32,8 +32,8 @@ import { StateClassifierMappingService } from 'pages/exploration-player-page/ser
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
-import { TextInputPredictionService } from 'interactions/TextInput/text-input-prediction.service';
 import { AlertsService } from 'services/alerts.service';
+import { TextInputPredictionService } from 'interactions/TextInput/text-input-prediction.service';
 
 describe('Answer Classification Service', () => {
   const stateName = 'Test State';
@@ -47,7 +47,6 @@ describe('Answer Classification Service', () => {
   let stateClassifierMappingService: StateClassifierMappingService;
   let stateObjectFactory: StateObjectFactory;
   let textInputRulesService: InteractionRulesService;
-  let textInputPredictionService: TextInputPredictionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -350,7 +349,9 @@ describe('Answer Classification Service', () => {
       stateClassifierMappingService.testOnlySetClassifierData(
         stateName, testClassifier);
       predictionAlgorithmRegistryService.testOnlySetPredictionService(
-        'TestClassifier', 1, textInputPredictionService);
+        'TestClassifier', 1,
+        { predict: (
+            classifierData, answer) => 1 } as TextInputPredictionService);
 
       stateDict = {
         content: {
@@ -476,7 +477,9 @@ describe('Answer Classification Service', () => {
       () => {
         spyOn(
           predictionAlgorithmRegistryService, 'getPredictionService'
-        ).and.returnValue(textInputPredictionService);
+        ).and.returnValue({
+          predict: (classifierData, answer) => -1
+        } as TextInputPredictionService);
 
         const state = (
           stateObjectFactory.createFromBackendDict(stateName, stateDict));
