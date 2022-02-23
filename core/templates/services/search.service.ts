@@ -60,6 +60,7 @@ export class SearchService {
   private _searchBarLoadedEventEmitter = new EventEmitter<string>();
   private _initialSearchResultsLoadedEventEmitter =
     new EventEmitter<ExplorationSummaryDict[]>();
+
   public numSearchesInProgress = 0;
 
   constructor(

@@ -248,11 +248,11 @@ export class CollectionPlayerPageComponent implements OnInit {
 
   getExplorationTitlePosition(index: number): string {
     if (index % 2 === 0) {
-      return '8px';
+      return '-13px';
     } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
-      return '30px';
+      return '40px';
     } else if ((index + 1) % 4 === 0) {
-      return '-40px';
+      return '-55px';
     }
   }
 
@@ -317,8 +317,8 @@ export class CollectionPlayerPageComponent implements OnInit {
     this.ICON_Y_INITIAL_PX = 35;
     this.ICON_Y_INCREMENT_PX = 110;
     this.ICON_X_MIDDLE_PX = 225;
-    this.ICON_X_LEFT_PX = 55;
-    this.ICON_X_RIGHT_PX = 395;
+    this.ICON_X_LEFT_PX = 60;
+    this.ICON_X_RIGHT_PX = 390;
     this.svgHeight = this.MIN_HEIGHT_FOR_PATH_SVG_PX;
     this.nextExplorationId = null;
     this.whitelistedCollectionIdsForGuestProgress = (

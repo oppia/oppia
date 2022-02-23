@@ -44,6 +44,7 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService
   ) {}
+
   ngOnInit(): void {
     this.topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
@@ -60,6 +61,7 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
         this.topicName = subtopicDataObject.getParentTopicName();
       });
   }
+
   getTopicUrl(): string {
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
