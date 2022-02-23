@@ -156,13 +156,13 @@ describe('Add Or Update Solution Modal Component', () => {
         '<p>Interaction Html</p>');
       expect(component.EMPTY_SOLUTION_DATA).toEqual({
         answerIsExclusive: false,
-        correctAnswer: null,
+        correctAnswer: undefined,
         explanationHtml: '',
         explanationContentId: 'solution'
       });
       expect(component.data).toEqual({
         answerIsExclusive: true,
-        correctAnswer: null,
+        correctAnswer: undefined,
         explanationHtml: 'Explanation html',
         explanationContentId: 'cont_1'
       });
