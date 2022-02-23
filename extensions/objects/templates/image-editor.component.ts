@@ -986,8 +986,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       // the allowlist of valid attributes. The allowlist is based on
       // the list of tags and attributes specified in this project:
       // https://github.com/cure53/DOMPurify
-      // Complete list of valid SVG attributes is present at
-      // 'assets/constants.ts'.
+      // Complete list is present at 'assets/constants.ts'.
       let svg = this.svgSanitizerService.parseDataURI(imageDataURI);
       this.invalidTagsAndAttributes = (
         this.svgSanitizerService.getInvalidSvgTagsAndAttrs(svg));
