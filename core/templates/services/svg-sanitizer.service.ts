@@ -164,7 +164,7 @@ export class SvgSanitizerService {
   }
 
   removeTagsAndAttributes(
-      svg: Document, valuesToBeRemoved?: { tags: string[]; attrs: string[] }
+      svg: Document, valuesToBeRemoved: { tags: string[]; attrs: string[] }
   ): Document {
     let tagsToBeRemoved = valuesToBeRemoved.tags;
     let attrsToBeRemoved = valuesToBeRemoved.attrs;
