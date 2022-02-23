@@ -140,6 +140,7 @@ class GetExpWithInvalidCategoryJobTests(
                 + f'is {self.exp_3.category}'),
         ])
 
+
 class GetExpWithInvalidRatingJobTests(
     job_test_utils.JobTestBase):
 

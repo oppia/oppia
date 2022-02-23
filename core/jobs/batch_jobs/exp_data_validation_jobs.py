@@ -88,6 +88,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
             | 'Combine results' >> beam.Flatten()
         )
 
+
 class GetExpWithInvalidRatingJob(base_jobs.JobBase):
     """Job that returns exploration having invalid scaled avg rating."""
 
