@@ -2289,6 +2289,69 @@ describe('ImageEditor', () => {
     expect(component.data.mode).toBe(component.MODE_SAVED);
   });
 
+  it('should remove invalid tags and attributes before saving svg', () => {
+    spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
+    spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
+    spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
+      offsetLeft: 0,
+      offsetTop: 0,
+      offsetParent: null,
+      classList: {
+        contains: (text) => {
+          return false;
+        }
+      }
+    });
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+    spyOn(component, 'setSavedImageFilename').and.callThrough();
+    spyOn(csrfTokenService, 'getTokenAsync')
+      .and.resolveTo('sample-csrf-token');
+    spyOn(component, 'saveImage').and.callThrough();
+
+    var svgString = (
+      '<svg width="1.33ex" height="1.429ex" viewBox="0 -511.5 572.5 615.4" ' +
+      'focusable="false" role= "img" style="vertical-align: -0.241ex;" xmln' +
+      's="http://www.w3.org/2000/svg"><g stroke="currentColor" fill="curren' +
+      'tColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stro' +
+      'ke-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 ' +
+      '406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 4' +
+      '14 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z' +
+      '" data-custom="datacustom"/></g></svg>'
+    );
+
+    component.data = {
+      mode: 2,
+      metadata: {
+        // This throws an error "Type '{ lastModified: number; name:
+        // string; size: number; type: string; }' is missing the following
+        // properties from type 'File': arrayBuffer, slice, stream, text"
+        // We need to suppress this error because we only need the values given
+        // below.
+        // @ts-expect-error
+        uploadedFile: {
+          lastModified: 1622307491398,
+          name: '2442125.svg',
+          size: 2599,
+          type: 'image/svg+xml'
+        },
+        uploadedImageData: 'data:image/svg+xml;base64,' +
+          btoa(unescape(encodeURIComponent(svgString))),
+        originalWidth: 968,
+        originalHeight: 1707,
+        savedImageFilename: 'saved_file_name.png',
+        savedImageUrl: 'assets/images'
+      },
+      crop: false
+    };
+
+    component.saveUploadedFile();
+
+    expect(component.saveImage).toHaveBeenCalled();
+    expect(component.setSavedImageFilename).toHaveBeenCalled();
+    expect(component.data.mode).toBe(component.MODE_SAVED);
+  });
+
   it('should save uploaded png when user clicks \`Use Image\`' +
   ' button', () => {
     spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
