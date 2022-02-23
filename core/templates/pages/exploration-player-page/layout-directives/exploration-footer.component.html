@@ -1,7 +1,22 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer" *ngIf="!iframed">
   <div class="row">
     <div [ngClass]="{'col-sm-5': isLanguageRTL(), 'col-sm-3': !isLanguageRTL()}">
-      <ul class="author-profile">
+      <ul class="oppia-lesson-info">
+        <li
+            [ngbTooltip]="'I18N_PLAYER_INFO_TOOLTIP' | translate"
+            class="oppia-exploration-info-icon protractor-test-exploration-info-icon">
+          <i class="material-icons oppia-navbar-breadcrumb-icon oppia-footer-info-icon">&#xE88E;</i>
+          <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_INFO_TOOLTIP' | translate }}</span>
+        </li>
+        <li>
+          <h1 class="oppia-lesson-info-h1">
+            <span class="oppia-lesson-info-header">
+                  Lesson Info
+            </span>
+          </h1>
+        </li>
+      </ul>
+      <!-- <ul class="author-profile">
         <li>
           <img [src]="getStaticImageUrl('/general/apple.svg')"
                class="exploration-footer-img"
@@ -41,7 +56,7 @@
             </ul>
           </div>
         </li>
-      </ul>
+      </ul> -->
       <oppia-hint-and-solution-buttons *ngIf="windowIsNarrow && hintsAndSolutionsAreSupported">
       </oppia-hint-and-solution-buttons>
     </div>
@@ -175,6 +190,26 @@
     float: right;
     margin: -8px;
     padding-right: 20px;
+  }
+
+  .oppia-footer-info-icon {
+    font-size: 20px;
+    margin-right: 5px;
+  }
+
+  .oppia-lesson-info {
+    cursor: pointer;
+    display: flex;
+    list-style-type: none;
+    padding-left: 2px;
+    padding-top: 10px;
+  }
+
+  .oppia-lesson-info-h1 {
+    color: #fff;
+    display: inline;
+    font-size: 17px;
+    font-weight: normal;
   }
 
   @media (max-width: 650px) {
