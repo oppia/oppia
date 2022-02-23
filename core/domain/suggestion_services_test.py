@@ -780,7 +780,57 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'content', '<p>old content html</p>').to_dict()
         exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
-        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+        change_list = [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': exploration.title
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'category',
+                'new_value': exploration.category
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'objective',
+                'new_value': exploration.objective
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'language_code',
+                'new_value': exploration.language_code
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'tags',
+                'new_value': exploration.tags
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'blurb',
+                'new_value': exploration.blurb
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'author_notes',
+                'new_value': exploration.author_notes
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_specs',
+                'new_value': exploration.param_specs_dict
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_changes',
+                'new_value': exploration.param_change_dicts
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'auto_tts_enabled',
+                'new_value': exploration.auto_tts_enabled
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'correctness_feedback_enabled',
+                'new_value': exploration.correctness_feedback_enabled
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'init_state_name',
+                'new_value': exploration.init_state_name
+        })]
+        exp_services.update_exploration(
+            self.author_id, exploration.id, change_list, '')
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',
@@ -911,7 +961,57 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'content', '<p>old content html</p>').to_dict()
         exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
-        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+        change_list = [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': exploration.title
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'category',
+                'new_value': exploration.category
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'objective',
+                'new_value': exploration.objective
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'language_code',
+                'new_value': exploration.language_code
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'tags',
+                'new_value': exploration.tags
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'blurb',
+                'new_value': exploration.blurb
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'author_notes',
+                'new_value': exploration.author_notes
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_specs',
+                'new_value': exploration.param_specs_dict
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_changes',
+                'new_value': exploration.param_change_dicts
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'auto_tts_enabled',
+                'new_value': exploration.auto_tts_enabled
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'correctness_feedback_enabled',
+                'new_value': exploration.correctness_feedback_enabled
+        }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'init_state_name',
+                'new_value': exploration.init_state_name
+        })]
+        exp_services.update_exploration(
+            self.author_id, exploration.id, change_list, '')
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',
