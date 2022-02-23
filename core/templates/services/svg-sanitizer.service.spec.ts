@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { DomSanitizer } from '@angular/platform-browser';
 import { SvgSanitizerService } from './svg-sanitizer.service';
 
-fdescribe('SvgSanitizerService', () => {
+describe('SvgSanitizerService', () => {
   let svgSanitizerService: SvgSanitizerService;
   let domParser: DOMParser = new DOMParser();
   class MockDomSanitizer {
