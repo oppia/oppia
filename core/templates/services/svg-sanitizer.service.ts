@@ -171,7 +171,7 @@ export class SvgSanitizerService {
     svg.querySelectorAll('*').forEach((node) => {
       let nodeTagName: string = node.tagName.toLowerCase();
       if (tagsToBeRemoved.indexOf(nodeTagName) !== -1) {
-        svg.removeChild(node);
+        node.parentElement.removeChild(node);
       } else {
         for (let i = 0; i < node.attributes.length; i++) {
           let nodeAttrName: string = node.attributes[i].name.toLowerCase();
