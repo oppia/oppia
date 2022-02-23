@@ -287,8 +287,8 @@ class CollectionDict(TypedDict):
     schema_version: int
     nodes: List[CollectionNodeVersionDict]
     version: int
-    created_on: Union[datetime.datetime, str, None]
-    last_updated: Union[datetime.datetime, str, None]
+    created_on: Union[datetime.datetime, str]
+    last_updated: Union[datetime.datetime, str]
 
 
 class CollectionVersionDict(CollectionDict):
@@ -322,8 +322,8 @@ class Collection:
         schema_version: int,
         nodes: List[CollectionNode],
         version: int,
-        created_on: Optional[datetime.datetime] = None,
-        last_updated: Optional[datetime.datetime] = None
+        created_on: datetime.datetime = datetime.datetime.utcnow(),
+        last_updated: datetime.datetime = datetime.datetime.utcnow()
     ) -> None:
         """Constructs a new collection given all the information necessary to
         represent a collection.
@@ -375,9 +375,9 @@ class Collection:
         Returns:
             dict. A dict, mapping all fields of Collection instance.
         """
-        # Since we're returning keys less than the number of keys defined
-        # in typedDict, Mypy assuming it as an error. So, to prevent from
-        # causing error ignore statement is applied here.
+        # Here, we're not returning created_on, last_updated and version
+        # values as a key which causes MyPy to throw error. thus we
+        # add an ignore.
         return { # type: ignore[typeddict-item]
             'id': self.id,
             'title': self.title,
@@ -423,8 +423,8 @@ class Collection:
         cls,
         collection_dict: CollectionDict,
         collection_version: int = 0,
-        collection_created_on: Optional[datetime.datetime] = None,
-        collection_last_updated: Optional[datetime.datetime] = None
+        collection_created_on: datetime.datetime = datetime.datetime.utcnow(),
+        collection_last_updated: datetime.datetime = datetime.datetime.utcnow()
     ) -> Collection:
         """Return a Collection domain object from a dict.
 
@@ -470,11 +470,12 @@ class Collection:
         created_on = (
             utils.convert_string_to_naive_datetime_object(
                 collection_dict['created_on'])
-            if 'created_on' in collection_dict else None)
+            if 'created_on' in collection_dict else datetime.datetime.utcnow())
         last_updated = (
             utils.convert_string_to_naive_datetime_object(
                 collection_dict['last_updated'])
-            if 'last_updated' in collection_dict else None)
+            if 'last_updated' in collection_dict else (
+                datetime.datetime.utcnow()))
         collection = cls.from_dict(
             collection_dict,
             collection_version=collection_dict['version'],
@@ -521,14 +522,11 @@ class Collection:
 
         # The ID is the only property which should not be stored within the
         # YAML representation.
-
-        # A key is not allowed to delete from defined typedDict. In that case,
-        # mypy assuming it as an error. So, to prevent from causing error
-        # ignore statement is applied here.
+        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
         del collection_dict['id'] # type: ignore[misc]
 
-        # utils.yaml_from_dict() is a general function which accepts only
-        # dict[str, any], but here collection_dict is typed with type
+        # The utils.yaml_from_dict() is a general function which accepts
+        # only Dict[str, Any], but here collection_dict is typed with type
         # CollectionDict.
         return utils.yaml_from_dict(collection_dict) # type: ignore[arg-type]
 
@@ -616,9 +614,7 @@ class Collection:
         as remove skills from the Collection model itself.
         """
 
-        # A key is not allowed to delete from defined typedDict. In that case,
-        # mypy assuming it as an error. So, to prevent from causing error
-        # ignore statement is applied here.
+        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
         del collection_dict['skills'] # type: ignore[misc]
         del collection_dict['next_skill_index'] # type: ignore[misc]
 
@@ -646,9 +642,9 @@ class Collection:
             Exception. The collection schema version is not valid.
         """
         try:
-            # utils.dict_from_yaml() is general function which return
-            # only dict[str, any] and here we're expecting it to be
-            # type CollectionDict.
+            # The utils.dict_from_yaml() is general function which returns
+            # Dict[str, Any] and here we know that the returned value will
+            # be CollectionDict.
             collection_dict: CollectionDict = utils.dict_from_yaml(yaml_content) # type: ignore[assignment]
         except utils.InvalidInputException as e:
             raise utils.InvalidInputException(
@@ -753,10 +749,9 @@ class Collection:
             name: _SKILL_ID_PREFIX + str(index)
             for index, name in enumerate(sorted(skill_names))
         }
-        # Here we're defining keys less than the number of keys defined in
-        # TypedDict for collectionNode object, because this mypy assuming
-        # it as an error. So, to prevent from causing an error ignore
-        # statement is applied here.
+        # Here, we're not returning acquired_skills and prerequisite_skills
+        # values as a key which causes MyPy to throw error. thus we add an
+        # ignore.
         collection_contents['nodes'] = [{ # type: ignore[typeddict-item]
             'exploration_id': node['exploration_id'],
             'prerequisite_skill_ids': [
@@ -797,9 +792,7 @@ class Collection:
         """
         collection_contents['next_skill_index'] = collection_contents[
             'next_skill_id']
-        # A key is not allowed to delete from defined typedDict. In that case,
-        # mypy assuming it as an error. So, to prevent from causing error
-        # ignore statement is applied here.
+        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
         del collection_contents['next_skill_id'] # type: ignore[misc]
 
         return collection_contents
@@ -819,9 +812,7 @@ class Collection:
         Returns:
             dict. The updated collection_contents dict.
         """
-        # A key is not allowed to delete from defined typedDict. In that case,
-        # mypy assuming it as an error. So, to prevent from causing error
-        # ignore statement is applied here.
+        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
         for node in collection_contents['nodes']:
             del node['prerequisite_skill_ids'] # type: ignore[misc]
             del node['acquired_skill_ids'] # type: ignore[misc]
