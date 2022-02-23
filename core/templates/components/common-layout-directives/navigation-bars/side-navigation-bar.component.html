@@ -233,7 +233,7 @@
         <div class="submenu-notop-margin">
           <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" routerLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link">
             <span class="learn-submenu-links" *ngIf="!userIsLoggedIn">{{ 'I18N_SIDEBAR_SUBMENU_SEE_ALL_LESSONS' | translate }}</span>
-            <span class="learn-submenu-links" *ngIf="userIsLoggedIn">Continue learning</span>
+            <span class="learn-submenu-links" *ngIf="userIsLoggedIn">See All Lessons</span>
             <i class="material-icons oppia-sidebar-menu-icon float-none learn-submenu-links">arrow_forward</i>
           </a>
         </div>
@@ -292,6 +292,14 @@
           </a>
         </div>
       </div>
+    </li>
+
+    <li [ngClass]="{'active': currentUrl === '/about-foundation'}" class="oppia-sidebar-rows" *ngIf="!userIsLoggedIn">
+      <a href="/about-foundation"
+         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
+         class="protractor-mobile-test-about-link text-uppercase">
+        <span >{{ 'I18N_SIDEBAR_ABOUT_OPPIA_FOUNDATION' | translate }}</span>
+      </a>
     </li>
 
     <li [ngClass]="{'active': currentUrl === '/donate'}" class="oppia-sidebar-rows">
