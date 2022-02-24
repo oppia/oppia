@@ -57,6 +57,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         'GET': {}
     }
 
+    @acl_decorators.can_access_topics_and_skills_dashboard_read_only
     def get(self):
         """Handles GET requests."""
 
