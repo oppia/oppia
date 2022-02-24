@@ -145,7 +145,7 @@ class ANDROID_NETWORK_TYPE(enum.Enum): # pylint: disable=invalid-name
     none = 'none' # pylint: disable=invalid-name
 
 
-FilterFieldNames= app_feedback_report_models.FilterFieldNames
+FilterFieldNames = app_feedback_report_models.FilterFieldNames
 
 ANDROID_ENTRY_POINT = [
     ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
