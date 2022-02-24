@@ -24,7 +24,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 
-from typing import Callable, Dict, Optional, Union
+from typing import Callable, Dict, Union
 from typing_extensions import TypedDict
 
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -41,7 +41,8 @@ CMD_CREATE_NEW = 'create_new'
 # optionally, 'old_value'.
 CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property'
 
-WrittenTranslationsType = Dict[str, Dict[str, Dict[str, Dict[str, Union[str, bool]]]]]
+WrittenTranslationsType = (
+    Dict[str, Dict[str, Dict[str, Dict[str, Union[str, bool]]]]])
 
 
 class SubtopicPageChange(change_domain.BaseChange):
