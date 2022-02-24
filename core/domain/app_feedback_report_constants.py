@@ -179,7 +179,7 @@ ALLOWED_STATS_PARAMETERS = [
     STATS_PARAMETER_NAMES.android_sdk_version,
     STATS_PARAMETER_NAMES.version_name]
 ALLOWED_FILTERS = [
-    FilterFieldNames.REPORT_TYPE,FilterFieldNames.PLATFORM,
+    FilterFieldNames.REPORT_TYPE, FilterFieldNames.PLATFORM,
     FilterFieldNames.ENTRY_POINT, FilterFieldNames.SUBMITTED_ON,
     FilterFieldNames.ANDROID_DEVICE_MODEL,
     FilterFieldNames.ANDROID_SDK_VERSION,
