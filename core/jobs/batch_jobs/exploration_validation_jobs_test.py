@@ -22,7 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import state_domain
 from core.jobs import job_test_utils
-from core.jobs.batch_jobs import exp_data_validation_jobs
+from core.jobs.batch_jobs import exploration_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -33,7 +33,7 @@ from core.platform import models
 class GetExpWithInvalidCategoryJobTests(
     job_test_utils.JobTestBase):
 
-    JOB_CLASS = exp_data_validation_jobs.GetExpWithInvalidCategoryJob
+    JOB_CLASS = exploration_validation_jobs.GetExpWithInvalidCategoryJob
 
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
@@ -144,7 +144,7 @@ class GetExpWithInvalidCategoryJobTests(
 class GetExpWithInvalidRatingJobTests(
     job_test_utils.JobTestBase):
 
-    JOB_CLASS = exp_data_validation_jobs.GetExpWithInvalidRatingJob
+    JOB_CLASS = exploration_validation_jobs.GetExpWithInvalidRatingJob
 
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
