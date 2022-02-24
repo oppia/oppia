@@ -20,7 +20,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { CookieModule } from 'ngx-cookie';
-import { AppRoutingModule } from 'pages/oppia-root/routing/app.routing.module';
+import { RouterModule } from '@angular/router';
 
 import { DirectivesModule } from 'directives/directives.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
@@ -57,7 +57,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     // TODO(#13443): Remove hybrid router module provider once all pages are
     // migrated to angular router.
     HybridRouterModuleProvider.provide(),
-    AppRoutingModule,
+    RouterModule,
     SharedPipesModule,
   ],
 
