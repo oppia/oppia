@@ -54,7 +54,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
     def test_can_not_open_file(self):
         with self.assertRaisesRegex(
-            IOError, 'Unable to open file: invalid_file.py'):
+            FileNotFoundError, 'Unable to open file: invalid_file.py'):
             with utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
 
