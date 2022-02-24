@@ -229,6 +229,9 @@ class _PortPool:
 
         Returns:
             int. Allocated port or 0 if none could be allocated.
+
+        Raises:
+            RuntimeError. No ports being managed.
         """
         if not self._port_queue:
             raise RuntimeError('No ports being managed.')
@@ -265,6 +268,9 @@ class _PortPool:
 
         Args:
             port: int. The port number to add to the pool.
+
+        Raises:
+            ValueError. The given port not in [1, 65535] range.
         """
         if port < 1 or port > 65535:
             raise ValueError(
@@ -471,6 +477,9 @@ class Server:
 
         Returns:
             Socket. A new socket object bound to the socket file.
+
+        Raises:
+            RuntimeError. Failed to bind socket to the given path.
         """
         sock = self._get_socket()
         try:
