@@ -65,9 +65,9 @@ ENTRY_POINT_CRASH = 'crash'
 ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
 LANGUAGE_LOCALE_CODE_ENGLISH = 'en'
 ANDROID_PACKAGE_VERSION_CODE = 1
-NETWORK_WIFI = app_feedback_report_constants.ANDROID_NETWORK_TYPE.wifi
+NETWORK_WIFI = app_feedback_report_constants.AndroidNetworkType.WIFI
 ANDROID_TEXT_SIZE = (
-    app_feedback_report_constants.ANDROID_TEXT_SIZE.medium_text_size)
+    app_feedback_report_constants.AndroidTextSize.MEDIUM_TEXT_SIZE)
 ANDROID_BUILD_FINGERPRINT = 'example_fingerprint_id'
 EVENT_LOGS = ['event1', 'event2']
 LOGCAT_LOGS = ['logcat1', 'logcat2']
@@ -384,7 +384,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_get_android_network_type_from_string_returns_expected_network_type(
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
-        for network_type in app_feedback_report_constants.ANDROID_NETWORK_TYPE:
+        for network_type in app_feedback_report_constants.AndroidNetworkType:
             self.assertEqual(
                 feedback_report.get_android_network_type_from_string(
                     network_type.name), network_type)
