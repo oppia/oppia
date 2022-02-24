@@ -77,6 +77,10 @@ def store_incoming_report_stats(
 
     Args:
         report_obj: AppFeedbackReport. AppFeedbackReport domain object.
+
+    Raises:
+        NotImplementedError. Stats aggregation for the domain object
+            have not been implemented yet.
     """
     if report_obj.platform == PLATFORM_WEB:
         raise NotImplementedError(
@@ -361,6 +365,10 @@ def get_android_report_from_model(
 
     Returns:
         AppFeedbackReport. The corresponding AppFeedbackReport domain object.
+
+    Raises:
+        NotImplementedError. Android app feedback report migrations not added
+            for new report schemas to be implemented.
     """
     feedback_report = app_feedback_report_domain.AppFeedbackReport
     if android_report_model.android_report_info_schema_version < (
@@ -570,6 +578,10 @@ def reassign_ticket(
         new_ticket: AppFeedbackReportTicket|None. The ticket domain object to
             reassign the report to or None if removing the report form a ticket
             wihtout reassigning.
+
+    Raises:
+        NotImplementedError. Assigning web reports to tickets has not been
+            implemented.
     """
     if report.platform == PLATFORM_WEB:
         raise NotImplementedError(
