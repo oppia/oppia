@@ -311,7 +311,9 @@ export class SvgEditorComponent implements OnInit {
             svgDataUrl as string),
           unsafeUrl: svgDataUrl as string
         };
-        this.savedSvgDiagram = atob(svgDataUrl.split(',')[1]);
+
+        this.savedSvgDiagram = this._base64DecodeUnicode(
+          svgDataUrl.split(',')[1]);
       } else {
         this.svgFileFetcherBackendApiService.fetchSvg(
           this.data.savedSvgUrl as string
@@ -322,6 +324,16 @@ export class SvgEditorComponent implements OnInit {
         );
       }
     }
+  }
+
+  private _base64DecodeUnicode(base64String: string) {
+    // Coverting base64 to unicode string. This technique converts bytestream
+    // to percent-encoding, to original string.
+    // See https://stackoverflow.com/a/30106551
+    return decodeURIComponent(
+      Array.prototype.map.call(atob(base64String), char => {
+        return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2)
+      }).join(''));
   }
 
   postSvgToServer(
