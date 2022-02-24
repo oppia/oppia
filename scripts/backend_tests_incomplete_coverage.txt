@@ -19,7 +19,6 @@ core.domain.skill_domain_test
 core.domain.auth_services_test
 core.domain.opportunity_services_test
 core.domain.feedback_domain_test
-core.domain.playthrough_issue_registry_test
 core.domain.exp_services_test
 core.domain.blog_domain_test
 core.utils_test
