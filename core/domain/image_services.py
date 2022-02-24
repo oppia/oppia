@@ -59,6 +59,9 @@ def compress_image(image_content, scaling_factor):
 
     Returns:
         str. Returns the content of the compressed image.
+
+    Raises:
+        ValueError. Scaling factor is not in the interval (0, 1].
     """
     if scaling_factor > 1 or scaling_factor <= 0:
         raise ValueError(
