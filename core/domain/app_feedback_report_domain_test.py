@@ -1511,14 +1511,14 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(AppFeedbackReportFilterDomainTests, self).setUp()
         self.filter = app_feedback_report_domain.AppFeedbackReportFilter(
-            app_feedback_report_constants.FILTER_FIELD_NAMES.platform,
+            app_feedback_report_constants.FilterFieldNames.platform,
             ['web', 'android'])
 
     def test_to_dict(self) -> None:
         app_feedback_report_constants.PLATFORM_CHOICES.sort()
         expected_dict = {
             'filter_field': 'platform',
-            'filter_options': app_feedback_report_constants.PLATFORM_CHOICES
+            'filter_options': app_feedback_report_constants.PLATzzzFORM_CHOICES
         }
         self.assertDictEqual(
             expected_dict, self.filter.to_dict())
