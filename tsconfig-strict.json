@@ -832,7 +832,6 @@
     "core/templates/domain/story_viewer/*.ts",
     "core/templates/domain/suggestion/*.ts",
     "core/templates/domain/summary/*.ts",
-    "core/templates/domain/topic_viewer/*.ts",
     "core/templates/domain/topics_and_skills_dashboard/*.ts",
     "core/templates/domain/user/*.ts",
     "core/templates/domain/utilities/*.ts",
