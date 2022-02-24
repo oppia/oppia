@@ -37,7 +37,7 @@ describe('Search Backend Api Service', () => {
 
   describe('fetchExplorationSearchResultAsync', () => {
     const sampleSearchResponse = {
-      search_offset: 'notempty',
+      search_cursor: 'notempty',
       activity_list: []
     };
 
@@ -45,7 +45,7 @@ describe('Search Backend Api Service', () => {
       searchBackendApiService.fetchExplorationSearchResultAsync('').then(
         (response: SearchResponseBackendDict) => {
           expect(response.activity_list).toEqual([]);
-          expect(response.search_offset).toBe('notempty');
+          expect(response.search_cursor).toBe('notempty');
         });
       const req = httpTestingController.expectOne('/searchhandler/data');
       expect(req.request.method).toEqual('GET');
