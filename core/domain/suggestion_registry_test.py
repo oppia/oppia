@@ -609,16 +609,24 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
     def test_change_list_for_accepting_suggestion(self):
         self.save_new_default_exploration('exp1', self.author_id)
         exploration = exp_fetchers.get_exploration_by_id('exp1')
-        print(exploration.states)
-        expected_suggestion_dict = self.suggestion_dict
+        change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new suggestion content'
+            },
+            'old_value': None
+        }
         suggestion = suggestion_registry.SuggestionEditStateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, change_dict,
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
 
         exp_services.update_exploration(
             self.author_id, 'exp1', [
@@ -629,13 +637,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             ], 'Added state')
         suggestion.change.state_name = 'State A'
 
+        self.assertEqual(len(exploration.states.keys()), 1)
+        
         suggestion.accept(
             'Accepted suggestion by translator: Add translation change.')
-
         exploration = exp_fetchers.get_exploration_by_id('exp1')
-        print(exploration.states)
 
-        self.assertEqual(2, 2)
+        self.assertEqual(len(exploration.states.keys()), 2)
 
     def test_populate_old_value_of_change_with_invalid_state(self):
         self.save_new_default_exploration('exp1', self.author_id)
@@ -808,7 +816,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
                 'new_value': 'Exploration 1 Albert title'
             }))
 
-    def test_get_all_html_content_strings(self):
+    def test_get_all_html_content_strings_with_none_old_value(self):
         change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -830,6 +838,33 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
         expected_outcome_list = [u'new suggestion content']
+        self.assertEqual(expected_outcome_list, actual_outcome_list)
+
+    def test_get_all_html_content_strings_with_old_value(self):
+        change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new suggestion content'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': '',
+            }
+        }
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, change_dict,
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
+
+        actual_outcome_list = suggestion.get_all_html_content_strings()
+        expected_outcome_list = [u'new suggestion content', '']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_convert_html_in_suggestion_change(self):
