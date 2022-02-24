@@ -145,7 +145,7 @@ class ANDROID_NETWORK_TYPE(enum.Enum): # pylint: disable=invalid-name
     none = 'none' # pylint: disable=invalid-name
 
 
-FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
+FilterFieldNames= app_feedback_report_models.FilterFieldNames
 
 ANDROID_ENTRY_POINT = [
     ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
@@ -179,13 +179,13 @@ ALLOWED_STATS_PARAMETERS = [
     STATS_PARAMETER_NAMES.android_sdk_version,
     STATS_PARAMETER_NAMES.version_name]
 ALLOWED_FILTERS = [
-    FILTER_FIELD_NAMES.report_type, FILTER_FIELD_NAMES.platform,
-    FILTER_FIELD_NAMES.entry_point, FILTER_FIELD_NAMES.submitted_on,
-    FILTER_FIELD_NAMES.android_device_model,
-    FILTER_FIELD_NAMES.android_sdk_version,
-    FILTER_FIELD_NAMES.text_language_code,
-    FILTER_FIELD_NAMES.audio_language_code, FILTER_FIELD_NAMES.platform_version,
-    FILTER_FIELD_NAMES.android_device_country_locale_code]
+    FilterFieldNames.report_type, FilterFieldNames.platform,
+    FilterFieldNames.entry_point, FilterFieldNames.submitted_on,
+    FilterFieldNames.android_device_model,
+    FilterFieldNames.android_sdk_version,
+    FilterFieldNames.text_language_code,
+    FilterFieldNames.audio_language_code, FilterFieldNames.platform_version,
+    FilterFieldNames.android_device_country_locale_code]
 ALLOWED_ANDROID_NETWORK_TYPES = [
     ANDROID_NETWORK_TYPE.wifi, ANDROID_NETWORK_TYPE.cellular,
     ANDROID_NETWORK_TYPE.none]
