@@ -27,7 +27,6 @@ import shutil
 import subprocess
 import sys
 
-from core import python_utils
 from core import utils
 from core.tests import test_utils
 from scripts import common
@@ -120,7 +119,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 pass
 
         self.open_file_swap = self.swap(
-            python_utils, 'open_file', MockOpenFile)
+            utils, 'open_file', MockOpenFile)
 
         self.cmd_token_list = []
         def mock_check_call(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
