@@ -206,7 +206,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
 
         with exists_swap, self.assertRaisesRegex(
             Exception,
-            'ERROR    Please run start.sh first to install node-eslint and '
+            'ERROR    Please run start.py first to install node-eslint and '
             'its dependencies.'):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_SORTED_DEPENDENCIES_FILEPATH]
