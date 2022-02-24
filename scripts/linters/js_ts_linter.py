@@ -190,6 +190,9 @@ class JsTsLintChecksManager:
         Returns:
             dict. A dict which has key as filepath and value as contents of js
             and ts files after validating and parsing the files.
+
+        Raises:
+            Exception. The filepath ends with '.js'.
         """
 
         # Select JS files which need to be checked.
@@ -511,13 +514,16 @@ class ThirdPartyJsTsLintChecksManager:
         Returns:
             TaskResult. A TaskResult object representing the result of the lint
             check.
+
+        Raises:
+            Exception. The start.py file not executed.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         eslint_path = os.path.join(
             'node_modules', 'eslint', 'bin', 'eslint.js')
         if not os.path.exists(eslint_path):
             raise Exception(
-                'ERROR    Please run start.sh first to install node-eslint '
+                'ERROR    Please run start.py first to install node-eslint '
                 'and its dependencies.')
 
         files_to_lint = self.all_filepaths
