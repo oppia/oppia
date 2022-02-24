@@ -329,10 +329,9 @@ export class SvgEditorComponent implements OnInit {
     // Coverting base64 to unicode string. This technique converts bytestream
     // to percent-encoding, to original string.
     // See https://stackoverflow.com/a/30106551
-    return decodeURIComponent(
-      Array.prototype.map.call(atob(base64String), char => {
-        return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2)
-      }).join(''));
+    return decodeURIComponent(atob(base64String).split('').map(char => {
+      return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
   }
 
   postSvgToServer(
