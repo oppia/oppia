@@ -666,7 +666,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED, False)
+            feconf.DEFAULT_AUTO_TTS_ENABLED,
+            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED)
 
     @classmethod
     def from_dict(
