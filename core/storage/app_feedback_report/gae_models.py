@@ -50,19 +50,19 @@ GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
 # The model field names that can be filtered / sorted for when maintainers
 # triage feedback reports.
-class FilterFieldNames(enum.Enum): 
+class FilterFieldNames(enum.Enum):
     """Enum for the model field names that can be filtered"""
 
-    PLATFORM = 'platform' 
-    REPORT_TYPE = 'report_type' 
-    ENTRY_POINT = 'entry_point' 
-    SUBMITTED_ON = 'submitted_on' 
-    ANDROID_DEVICE_MODEL = 'android_device_model' 
-    ANDROID_SDK_VERSION = 'android_sdk_version' 
+    PLATFORM = 'platform'
+    REPORT_TYPE = 'report_type'
+    ENTRY_POINT = 'entry_point'
+    SUBMITTED_ON = 'submitted_on'
+    ANDROID_DEVICE_MODEL = 'android_device_model'
+    ANDROID_SDK_VERSION = 'android_sdk_version'
     TEXT_LANGUAGE_CODE = 'text_language_code'
-    AUDIO_LANGUAGE_CODE = 'audio_language_code' 
-    PLATFORM_VERSION = 'platform_version' 
-    ANDROID_DEVICE_COUNTRY_LOCALE_CODE = 'android_device_country_locale_code' 
+    AUDIO_LANGUAGE_CODE = 'audio_language_code'
+    PLATFORM_VERSION = 'platform_version'
+    ANDROID_DEVICE_COUNTRY_LOCALE_CODE = 'android_device_country_locale_code'
 
 # An ID used for stats model entities tracking all unticketed reports.
 UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
