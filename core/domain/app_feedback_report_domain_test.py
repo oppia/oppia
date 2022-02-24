@@ -1511,7 +1511,7 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(AppFeedbackReportFilterDomainTests, self).setUp()
         self.filter = app_feedback_report_domain.AppFeedbackReportFilter(
-            app_feedback_report_constants.FilterFieldNames.platform,
+            app_feedback_report_constants.FilterFieldNames.PLATFORM,
             ['web', 'android'])
 
     def test_to_dict(self) -> None:
