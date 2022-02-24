@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import copy
 import datetime
+import enum
 import os
 
 from core.constants import constants
@@ -105,6 +106,43 @@ HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH = os.path.join(
     'interactions', 'html_field_types_to_rule_specs.json')
 LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
     'interactions', 'legacy_html_field_types_to_rule_specs_by_state_version')
+
+
+# Valid model names.
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class VALID_MODEL_NAMES(enum.Enum): # pylint: disable=invalid-name
+    """Enum for valid model names."""
+
+    activity = 'activity' # pylint: disable=invalid-name
+    app_feedback_report = 'app_feedback_report' # pylint: disable=invalid-name
+    audit = 'audit' # pylint: disable=invalid-name
+    base_model = 'base_model' # pylint: disable=invalid-name
+    beam_job = 'beam_job' # pylint: disable=invalid-name
+    blog = 'blog' # pylint: disable=invalid-name
+    classifier = 'classifier' # pylint: disable=invalid-name
+    collection = 'collection' # pylint: disable=invalid-name
+    config = 'config' # pylint: disable=invalid-name
+    email = 'email' # pylint: disable=invalid-name
+    exploration = 'exploration' # pylint: disable=invalid-name
+    feedback = 'feedback' # pylint: disable=invalid-name
+    improvements = 'improvements' # pylint: disable=invalid-name
+    job = 'job' # pylint: disable=invalid-name
+    opportunity = 'opportunity' # pylint: disable=invalid-name
+    question = 'question' # pylint: disable=invalid-name
+    recommendations = 'recommendations' # pylint: disable=invalid-name
+    skill = 'skill' # pylint: disable=invalid-name
+    statistics = 'statistics' # pylint: disable=invalid-name
+    auth = 'auth' # pylint: disable=invalid-name
+    story = 'story' # pylint: disable=invalid-name
+    subtopic = 'subtopic' # pylint: disable=invalid-name
+    suggestion = 'suggestion' # pylint: disable=invalid-name
+    topic = 'topic' # pylint: disable=invalid-name
+    translation = 'translation' # pylint: disable=invalid-name
+    user = 'user' # pylint: disable=invalid-name
+
 
 # A mapping of interaction ids to classifier properties.
 # TODO(#10217): As of now we support only one algorithm per interaction.
@@ -369,7 +407,10 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
-DEFAULT_AUTO_TTS_ENABLED = True
+DEFAULT_AUTO_TTS_ENABLED = False
+# Whether new explorations should have correctness-feedback enabled
+# by default.
+DEFAULT_CORRECTNESS_FEEDBACK_ENABLED = True
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''
@@ -1506,5 +1547,40 @@ COMMIT_TYPE_REVERT = 'revert'
 COMMIT_TYPE_EDIT = 'edit'
 COMMIT_TYPE_DELETE = 'delete'
 
-# The default next_content_id_index for exploration and question.
-DEFAULT_NEXT_CONTENT_ID_INDEX_FOR_AN_ENTITY = 0
+# The data type for the content in the TranslatableContent/TranslatedContent
+# object.
+ContentInTranslatableContent = Union[str, List[str]]
+
+
+class TranslatableContentFormat(enum.Enum):
+    """Represents all possible data types for any translatable content."""
+
+    HTML = 'html'
+    UNICODE_STRING = 'unicode'
+    SET_OF_NORMALIZED_STRING = (
+        'set_of_normalized_string')
+    SET_OF_UNICODE_STRING = 'set_of_unicode_string'
+
+
+class TranslatableEntityType(enum.Enum):
+    """Represents all possible entity types which support new translations
+    architecture.
+    """
+
+    EXPLORATION = 'exploration'
+    QUESTION = 'question'
+
+
+class TranslatableContentDict(TypedDict):
+    """Dictionary representing TranslatableContent object."""
+
+    content_id: str
+    content: ContentInTranslatableContent
+    content_type: TranslatableContentFormat
+
+
+class TranslatedContentDict(TypedDict):
+    """Dictionary representing TranslatedContent object."""
+
+    content: ContentInTranslatableContent
+    needs_update: bool

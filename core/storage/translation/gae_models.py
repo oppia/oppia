@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Union
-from typing_extensions import TypedDict
+from typing import Dict, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -35,22 +35,17 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-# TODO(#14537): This is a duplicate of the same TypedDict in translation_domain,
-# it should be removed after we refactor our importing.
-class TranslatedContentDict(TypedDict):
-    """Dictionary representing TranslatedContent object."""
-
-    content: Union[str, List[str]]
-    needs_update: bool
-
-
 class EntityTranslationsModel(base_models.BaseModel):
-    """Model for storing entity translations ."""
+    """Model for storing entity translations."""
 
     # The id of the corresponding entity.
     entity_id = datastore_services.StringProperty(required=True, indexed=True)
     # The type of the corresponding entity.
-    entity_type = datastore_services.StringProperty(required=True, indexed=True)
+    entity_type = datastore_services.StringProperty(
+        required=True, indexed=True, choices=[
+            feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.ENTITY_TYPE_QUESTION
+        ])
     # The version of the corresponding entity.
     entity_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
@@ -85,7 +80,7 @@ class EntityTranslationsModel(base_models.BaseModel):
 
     @staticmethod
     def _generate_id(
-        entity_type: str,
+        entity_type: feconf.TranslatableEntityType,
         entity_id: str,
         entity_version: int,
         language_code: str
@@ -93,7 +88,8 @@ class EntityTranslationsModel(base_models.BaseModel):
         """The method use to generate unique id for entity translations model.
 
         Args:
-            entity_type: str. Type of an entity.
+            entity_type: TranslatableEntityType. Type
+                of the entity to fetch.
             entity_id: str. Id of an entity.
             entity_version: int. Version of an entity.
             language_code: str. Language code for a given entity.
@@ -103,12 +99,12 @@ class EntityTranslationsModel(base_models.BaseModel):
             [entity_type]-[entity_id]-[entity_version]-[language_code].
         """
         return '%s-%s-%s-%s' % (
-            entity_type, entity_id, entity_version, language_code)
+            entity_type.value, entity_id, entity_version, language_code)
 
     @classmethod
     def get_model(
         cls,
-        entity_type: str,
+        entity_type: feconf.TranslatableEntityType,
         entity_id: str,
         entity_version: int,
         language_code: str
@@ -117,7 +113,8 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_version and language_code.
 
         Args:
-            entity_type: str. Type of the entity to fetch.
+            entity_type: TranslatableEntityType. Type
+                of the entity to fetch.
             entity_id: str. Id of an entity.
             entity_version: int. Version of an entity.
             language_code: str. Language code for a given entity.
@@ -134,7 +131,7 @@ class EntityTranslationsModel(base_models.BaseModel):
     @classmethod
     def get_all_for_entity(
         cls,
-        entity_type: str,
+        entity_type: feconf.TranslatableEntityType,
         entity_id: str,
         entity_version: int
     ) -> Sequence[Optional[EntityTranslationsModel]]:
@@ -142,7 +139,8 @@ class EntityTranslationsModel(base_models.BaseModel):
         all languages in which such models exist.
 
         Args:
-            entity_type: str. Type of an entity.
+            entity_type: TranslatableEntityType. Type
+                of an entity to fetch.
             entity_id: str. Id of an entity.
             entity_version: int. Version of an entity.
 
@@ -152,7 +150,7 @@ class EntityTranslationsModel(base_models.BaseModel):
             exist.
         """
         return cls.query(
-            cls.entity_type == entity_type,
+            cls.entity_type == entity_type.value,
             cls.entity_id == entity_id,
             cls.entity_version == entity_version
         ).fetch()
@@ -160,16 +158,17 @@ class EntityTranslationsModel(base_models.BaseModel):
     @classmethod
     def create_new(
         cls,
-        entity_type: str,
+        entity_type: feconf.TranslatableEntityType,
         entity_id: str,
         entity_version: int,
         language_code: str,
-        translations: Dict[str, TranslatedContentDict]
+        translations: Dict[str, feconf.TranslatedContentDict]
     ) -> EntityTranslationsModel:
         """Creates and returns a new EntityTranslationsModel instance.
 
         Args:
-            entity_type: str. Type of an entity.
+            entity_type: TranslatableEntityType. Type
+                of an entity to fetch.
             entity_id: str. Id of an entity.
             entity_version: int. Version of an entity.
             language_code: str. Language code for a given entity.
@@ -182,7 +181,7 @@ class EntityTranslationsModel(base_models.BaseModel):
         return cls(
             id=cls._generate_id(
                 entity_type, entity_id, entity_version, language_code),
-            entity_type=entity_type,
+            entity_type=entity_type.value,
             entity_id=entity_id,
             entity_version=entity_version,
             language_code=language_code,
