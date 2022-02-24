@@ -28,7 +28,6 @@ import sys
 import tempfile
 
 from core import constants
-from core import python_utils
 from core import utils
 from core.tests import test_utils
 from scripts import common
@@ -484,7 +483,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 return False
             return True
 
-        open_file_swap = self.swap(python_utils, 'open_file', mock_open_file)
+        open_file_swap = self.swap(utils, 'open_file', mock_open_file)
         ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         check_order_swap = self.swap(
