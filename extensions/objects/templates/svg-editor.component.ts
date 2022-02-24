@@ -311,7 +311,6 @@ export class SvgEditorComponent implements OnInit {
             svgDataUrl as string),
           unsafeUrl: svgDataUrl as string
         };
-
         this.savedSvgDiagram = this._base64DecodeUnicode(
           svgDataUrl.split(',')[1]);
       } else {
