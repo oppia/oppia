@@ -57,7 +57,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'question-update.service.ts',
     'rule-type-selector.directive.ts',
     'select2-dropdown.directive.ts',
-    'story-node.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
