@@ -42,6 +42,7 @@ PLATFORM_CHOICE_WEB = 'web'
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
+
 class FilterFieldNames(enum.Enum):
     """Enum for the model field names that can be filtered"""
 
@@ -55,6 +56,7 @@ class FilterFieldNames(enum.Enum):
     AUDIO_LANGUAGE_CODE = 'audio_language_code'
     PLATFORM_VERSION = 'platform_version'
     ANDROID_DEVICE_COUNTRY_LOCALE_CODE = 'android_device_country_locale_code'
+
 
 # An ID used for stats model entities tracking all unticketed reports.
 UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
