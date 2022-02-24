@@ -179,13 +179,13 @@ ALLOWED_STATS_PARAMETERS = [
     STATS_PARAMETER_NAMES.android_sdk_version,
     STATS_PARAMETER_NAMES.version_name]
 ALLOWED_FILTERS = [
-    FilterFieldNames.report_type, FilterFieldNames.platform,
-    FilterFieldNames.entry_point, FilterFieldNames.submitted_on,
-    FilterFieldNames.android_device_model,
-    FilterFieldNames.android_sdk_version,
-    FilterFieldNames.text_language_code,
-    FilterFieldNames.audio_language_code, FilterFieldNames.platform_version,
-    FilterFieldNames.android_device_country_locale_code]
+    FilterFieldNames.REPORT_TYPE,FilterFieldNames.PLATFORM,
+    FilterFieldNames.ENTRY_POINT, FilterFieldNames.SUBMITTED_ON,
+    FilterFieldNames.ANDROID_DEVICE_MODEL,
+    FilterFieldNames.ANDROID_SDK_VERSION,
+    FilterFieldNames.TEXT_LANGUAGE_CODE,
+    FilterFieldNames.AUDIO_LANGUAGE_CODE, FilterFieldNames.PLATFORM_VERSION,
+    FilterFieldNames.ANDROID_DEVICE_COUNTRY_LOCALE_CODE]
 ALLOWED_ANDROID_NETWORK_TYPES = [
     ANDROID_NETWORK_TYPE.wifi, ANDROID_NETWORK_TYPE.cellular,
     ANDROID_NETWORK_TYPE.none]
