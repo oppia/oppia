@@ -461,11 +461,13 @@ export class AdminBackendApiService {
 
   async generateSampleOpportunitiesAsync(
       numSampleOpsToGenerate: number,
-      numSampleInteractionsToGenerate: number): Promise<void> {
+      numSampleInteractionsToGenerate: number,
+      shouldSubmitSuggestions: boolean): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_sample_opportunities',
       num_sample_ops: numSampleOpsToGenerate,
-      num_sample_interactions: numSampleInteractionsToGenerate
+      num_sample_interactions: numSampleInteractionsToGenerate,
+      should_submit_suggestions: shouldSubmitSuggestions
     });
   }
 

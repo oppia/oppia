@@ -1125,15 +1125,18 @@ describe('Admin backend api service', () => {
     const action = 'generate_sample_opportunities';
     const numSampleOpsToGenerate = 20;
     const numSampleInteractionsToGenerate = 5;
+    const shouldSubmitSuggestions = false;
     const payload = {
       action: action,
       num_sample_ops: numSampleOpsToGenerate,
-      num_sample_interactions: numSampleInteractionsToGenerate
+      num_sample_interactions: numSampleInteractionsToGenerate,
+      should_submit_suggestions: shouldSubmitSuggestions
     };
 
     abas.generateSampleOpportunitiesAsync(
       numSampleOpsToGenerate,
-      numSampleInteractionsToGenerate).then(successHandler, failHandler);
+      numSampleInteractionsToGenerate,
+      shouldSubmitSuggestions).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
@@ -1145,6 +1148,35 @@ describe('Admin backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }
   ));
+
+  it('should generate sample opportunities and submit suggestions',
+    fakeAsync(() => {
+      const action = 'generate_sample_opportunities';
+      const numSampleOpsToGenerate = 20;
+      const numSampleInteractionsToGenerate = 5;
+      const shouldSubmitSuggestions = true;
+      const payload = {
+        action: action,
+        num_sample_ops: numSampleOpsToGenerate,
+        num_sample_interactions: numSampleInteractionsToGenerate,
+        should_submit_suggestions: shouldSubmitSuggestions
+      };
+
+      abas.generateSampleOpportunitiesAsync(
+        numSampleOpsToGenerate,
+        numSampleInteractionsToGenerate,
+        shouldSubmitSuggestions).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
 
   it('should handle reload exploration request failure', fakeAsync(() => {
     let action = 'reload_exploration';

@@ -53,6 +53,7 @@ from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -128,6 +129,12 @@ class AdminHandler(base.BaseHandler):
             'num_sample_interactions': {
                 'schema': {
                     'type': 'int'
+                },
+                'default_value': None
+            },
+            'should_submit_suggestions': {
+                'schema': {
+                    'type': 'bool'
                 },
                 'default_value': None
             },
@@ -250,8 +257,12 @@ class AdminHandler(base.BaseHandler):
                     'num_sample_ops')
                 num_sample_interactions = self.normalized_payload.get(
                     'num_sample_interactions')
+                should_submit_suggestions = self.normalized_payload.get(
+                    'should_submit_suggestions')
                 self._generate_sample_opportunities(
-                    num_sample_ops, num_sample_interactions)
+                    num_sample_ops,
+                    num_sample_interactions,
+                    should_submit_suggestions)
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
@@ -648,7 +659,7 @@ class AdminHandler(base.BaseHandler):
 
     def _generate_sample_opportunities(
             self, num_sample_ops,
-            num_sample_interactions):
+            num_sample_interactions, should_submit_suggestions):
         """Generates and publishes the given number of sample opportunities.
 
         Args:
@@ -656,6 +667,8 @@ class AdminHandler(base.BaseHandler):
                 be generated.
             num_sample_interactions: int. Count of sample
                 interactions to be generated.
+            should_submit_suggestions: boolean. Boolean to track
+                whether suggestions should be submitted.
 
         Raises:
             Exception. Environment is not DEVMODE.
@@ -666,15 +679,17 @@ class AdminHandler(base.BaseHandler):
                 self._generate_sample_opportunities_with_existing_topic(
                     num_sample_ops,
                     num_sample_interactions,
+                    should_submit_suggestions,
                     'help-jamie-win-arcade')
             else:
                 self._generate_sample_opportunities_without_existing_topic(
                     num_sample_ops,
-                    num_sample_interactions)
+                    num_sample_interactions,
+                    should_submit_suggestions)
 
     def _generate_sample_opportunities_without_existing_topic(
             self, num_sample_ops,
-            num_sample_interactions):
+            num_sample_interactions, should_submit_suggestions):
         """Generates a topic and story and creates
         the given number of sample opportunities.
 
@@ -683,6 +698,8 @@ class AdminHandler(base.BaseHandler):
                 be generated.
             num_sample_interactions: int. Count of sample
                 interactions to be generate.
+            should_submit_suggestions: boolean. Boolean to track
+                whether suggestions should be submitted.
 
         Raises:
             Exception. Environment is not DEVMODE.
@@ -729,13 +746,25 @@ class AdminHandler(base.BaseHandler):
             exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
             opportunity_services.add_new_exploration_opportunities(
                 story_id, exp_ids_in_story)
+
+            if should_submit_suggestions:
+                for i in range(num_sample_ops):
+                    for j in range(num_sample_ops):
+                        if j == 0:
+                            self._submit_suggestion(
+                                exp_ids_in_story[i], 'Introduction')
+                        else:
+                            self._submit_suggestion(
+                                exp_ids_in_story[i], 'Interaction' + str(j))
+
         else:
             raise Exception(
                 'Cannot generate sample explorations in production.')
 
     def _generate_sample_opportunities_with_existing_topic(
             self, num_sample_ops,
-            num_sample_interactions, story_url_fragment):
+            num_sample_interactions,
+            should_submit_suggestions, story_url_fragment):
         """Creates the given number of sample opportunities
         and adds them to an existing story.
 
@@ -744,6 +773,8 @@ class AdminHandler(base.BaseHandler):
                 be generated.
             num_sample_interactions: int. Count of sample
                 interactions to generate.
+            should_submit_suggestions: boolean. Boolean to track
+                whether suggestions should be submitted.
             story_url_fragment: stringType. Story fragment of existing story.
 
         Raises:
@@ -797,9 +828,85 @@ class AdminHandler(base.BaseHandler):
                 len_nodes:]
             opportunity_services.add_new_exploration_opportunities(
                 story_id, exp_ids_in_story)
+
+            if should_submit_suggestions:
+                for i in range(num_sample_ops):
+                    for j in range(num_sample_ops):
+                        if j == 0:
+                            self._submit_suggestion(
+                                exp_ids_in_story[i], 'Introduction')
+                        else:
+                            self._submit_suggestion(
+                                exp_ids_in_story[i], 'Interaction' + str(j))
         else:
             raise Exception(
                 'Cannot generate sample explorations in production.')
+
+    def _submit_suggestion(self, exp_id, state_name):
+        """Submits suggestions to explorations that
+        have the given exploration id and state name.
+
+        Args:
+            exp_id: str. Exploration id of the exploration
+                that will recieve suggestions.
+            state_name: str. Name of the state content
+                which will be translated.
+        """
+        change_dict1 = {
+            'cmd': 'add_written_translation',
+            'content_id': '1',
+            'language_code': 'ak',
+            'content_html': 'Content 1',
+            'state_name': state_name,
+            'translation_html': '<p>Translation for content 1</p>',
+            'data_format': 'html'
+        }
+        change_dict2 = {
+            'cmd': 'add_written_translation',
+            'content_id': 'hint_id',
+            'language_code': 'ak',
+            'content_html': '<p>This is a hint.</p>',
+            'state_name': state_name,
+            'translation_html': '<p>Translation for content 2</p>',
+            'data_format': 'html'
+        }
+        change_dict3 = {
+            'cmd': 'add_written_translation',
+            'content_id': 'feedback_id',
+            'language_code': 'ak',
+            'content_html': '<p>Dummy Feedback</p>',
+            'state_name': state_name,
+            'translation_html': '<p>Translation for content 3</p>',
+            'data_format': 'html'
+        }
+        change_dict4 = {
+            'cmd': 'add_written_translation',
+            'content_id': 'solution',
+            'language_code': 'ak',
+            'content_html': '<p>This is a solution.</p>',
+            'state_name': state_name,
+            'translation_html': '<p>Translation for content 4</p>',
+            'data_format': 'html'
+        }
+        suggestion_services.create_suggestion(
+        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+        feconf.ENTITY_TYPE_EXPLORATION,
+        exp_id, 3, self.user_id, change_dict1, 'description')
+
+        suggestion_services.create_suggestion(
+        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+        feconf.ENTITY_TYPE_EXPLORATION,
+        exp_id, 3, self.user_id, change_dict2, 'description')
+
+        suggestion_services.create_suggestion(
+        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+        feconf.ENTITY_TYPE_EXPLORATION,
+        exp_id, 3, self.user_id, change_dict3, 'description')
+
+        suggestion_services.create_suggestion(
+        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+        feconf.ENTITY_TYPE_EXPLORATION,
+        exp_id, 3, self.user_id, change_dict4, 'description')
 
     def _generate_sample_chapters(
         self, num_sample_ops,
@@ -928,7 +1035,7 @@ class AdminHandler(base.BaseHandler):
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>This is a hint.</p>')
+                    'hint_id', '<p>This is a hint.</p>')
             )
         ]
 

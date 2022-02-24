@@ -293,6 +293,7 @@ describe('Admin dev mode activities tab', () => {
     it('should generate sample opportunities', async(() => {
       component.numSampleOpsToGenerate = 20;
       component.numSampleInteractionsToGenerate = 10;
+      component.shouldSubmitSuggestions = false;
 
       spyOn(adminBackendApiService, 'generateSampleOpportunitiesAsync')
         .and.returnValue(Promise.resolve());
@@ -310,10 +311,33 @@ describe('Admin dev mode activities tab', () => {
       });
     }));
 
+    it('should generate sample opportunities and submit suggestions',
+      async(() => {
+        component.numSampleOpsToGenerate = 5;
+        component.numSampleInteractionsToGenerate = 5;
+        component.shouldSubmitSuggestions = true;
+
+        spyOn(adminBackendApiService, 'generateSampleOpportunitiesAsync')
+          .and.returnValue(Promise.resolve());
+        spyOn(component.setStatusMessage, 'emit');
+
+        component.generateSampleOpportunities();
+        component.generateSampleOpportunities();
+
+        expect(component.setStatusMessage.emit)
+          .toHaveBeenCalledWith('Processing...');
+
+        fixture.whenStable().then(() => {
+          expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+            'Sample opportunities generated successfully.');
+        });
+      }));
+
     it('should show error message when sample opportunities' +
     'are not generated', async(() => {
       component.numSampleOpsToGenerate = 2;
       component.numSampleInteractionsToGenerate = 5;
+      component.shouldSubmitSuggestions = false;
 
       spyOn(adminBackendApiService, 'generateSampleOpportunitiesAsync')
         .and.returnValue(Promise.reject('Sample opportunities not generated.'));

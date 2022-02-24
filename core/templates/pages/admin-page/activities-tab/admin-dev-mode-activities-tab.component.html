@@ -58,9 +58,9 @@
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
     <div class="container">
-      <h3>Generate dummy opportunities</h3>
+      <h3>Generate sample translation opportunities</h3>
       <p>
-        Use this form to generate dummy opportunities with random interactions.
+        Use this form to generate sample translation opportunities with random interactions.
       </p>
       <span class="row">
         <label for="label-target-opportunities-to-generate">Number of opportunities to generate</label>
@@ -73,8 +73,13 @@
                [(ngModel)]="numSampleInteractionsToGenerate"
                placeholder="Interactions to generate" type="number" min="0"
                id="label-target-interactions-to-generate">
+        <label class="oppia-submit-suggestions" for="label-target-submit-suggestions">Submit suggestions </label>
+        <input class="oppia-checkbox-inline"
+               type="checkbox"
+               id="label-target-submit-suggestions"
+               [(ngModel)]="shouldSubmitSuggestions">
         <button type="button"
-                class="btn btn-primary oppia-generate-exploration-text"
+                class="btn btn-primary oppia-generate-opportunity-text"
                 (click)="generateSampleOpportunities()"
                 [disabled]="!numSampleOpsToGenerate || !numSampleInteractionsToGenerate">
           Generate Opportunities
@@ -155,10 +160,21 @@
   .admin-dev-mode-activities-tab .oppia-form-inline {
     margin-bottom: 5px;
   }
+  .admin-dev-mode-activities-tab .oppia-submit-suggestions {
+    margin-right: 5px;
+  }
   .admin-dev-mode-activities-tab .oppia-publish-exploration-text {
     font-size: smaller;
   }
   .admin-dev-mode-activities-tab .oppia-generate-exploration-text {
-    margin-top: 20px;
+    margin-top: 30px;
+  }
+
+  .admin-dev-mode-activities-tab .oppia-checkbox-inline {
+    margin-top: 5px;
+  }
+
+  .admin-dev-mode-activities-tab .oppia-generate-opportunity-text {
+    margin-top: 30px;
   }
 </style>

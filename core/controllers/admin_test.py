@@ -43,6 +43,7 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -928,12 +929,58 @@ class GenerateSampleOpportunitiesTest(test_utils.GenericTestBase):
             '/adminhandler', {
                 'action': 'generate_sample_opportunities',
                 'num_sample_ops': 8,
-                'num_sample_interactions': 10
+                'num_sample_interactions': 10,
+                'should_submit_suggestions': False
+
             }, csrf_token=csrf_token)
 
         translation_ops = opportunity_services.get_translation_opportunities(
-            'hi', None, None)
+            'ak', None, None)
         self.assertEqual(len(translation_ops[0]), 8)
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_sample_opportunities',
+                'num_sample_ops': 2,
+                'num_sample_interactions': 10,
+                'should_submit_suggestions': False
+
+            }, csrf_token=csrf_token)
+
+        translation_ops = opportunity_services.get_translation_opportunities(
+            'ak', None, None)
+        self.assertEqual(len(translation_ops[0]), 10)
+
+    def test_generate_opportunities_and_submit_suggestions(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_sample_opportunities',
+                'num_sample_ops': 5,
+                'num_sample_interactions': 5,
+                'should_submit_suggestions': True
+
+            }, csrf_token=csrf_token)
+
+        submitted_suggestions = suggestion_services.get_submitted_suggestions(
+            user_id, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(len(submitted_suggestions), 100)
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_sample_opportunities',
+                'num_sample_ops': 5,
+                'num_sample_interactions': 5,
+                'should_submit_suggestions': True
+
+            }, csrf_token=csrf_token)
+
+        submitted_suggestions = suggestion_services.get_submitted_suggestions(
+            user_id, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(len(submitted_suggestions), 200)
 
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):

@@ -37,6 +37,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   numDummyExpsToGenerate: number = 0;
   numSampleOpsToGenerate: number = 0;
   numSampleInteractionsToGenerate: number = 0;
+  shouldSubmitSuggestions: boolean = false;
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
 
@@ -147,7 +148,9 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
     this.adminBackendApiService.generateSampleOpportunitiesAsync(
-      this.numSampleOpsToGenerate, this.numSampleInteractionsToGenerate
+      this.numSampleOpsToGenerate,
+      this.numSampleInteractionsToGenerate,
+      this.shouldSubmitSuggestions
     ).then(() => {
       this.setStatusMessage.emit(
         'Sample opportunities generated successfully.');
