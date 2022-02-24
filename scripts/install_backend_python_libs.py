@@ -127,6 +127,9 @@ def _get_requirements_file_contents():
     Returns:
         dict(str, str). Dictionary with the normalized name of the library as
         the key and the version string of that library as the value.
+
+    Raises:
+        Exception. Given URL is invalid.
     """
     requirements_contents = collections.defaultdict()
     with utils.open_file(

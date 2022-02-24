@@ -586,6 +586,9 @@ class BaseHandler(webapp2.RequestHandler):
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
+
+        Raises:
+            Exception. Invalid X-Frame-Options.
         """
 
         # The 'no-store' must be used to properly invalidate the cache when we

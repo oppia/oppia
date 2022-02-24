@@ -84,6 +84,9 @@ def apply_changes_based_on_config(
         expected_config_line_regex: str. The regex to use to verify each line
             of the config file. It should have a single group, which
             corresponds to the prefix to extract.
+
+    Raises:
+        Exception. Line(s) in config file are not matching with the regex.
     """
     with utils.open_file(config_filepath, 'r') as config_file:
         config_lines = config_file.read().splitlines()
@@ -175,6 +178,11 @@ def verify_feconf(release_feconf_path, verify_email_api_keys):
             directory.
         verify_email_api_keys: bool. Whether to verify both mailgun and
             mailchimp api keys.
+
+    Raises:
+        Exception. The mailgun API key not added before deployment.
+        Exception. The mailchimp API key not added before deployment.
+        Exception. REDISHOST not updated before deployment.
     """
     feconf_contents = utils.open_file(
         release_feconf_path, 'r').read()

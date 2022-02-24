@@ -566,8 +566,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         destroy_auth_session_call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
-        response = self.get_json('/url_handler')
-
+        response = self.get_json('/url_handler?current_url=login')
         self.assertIn('login_url', response)
         self.assertIsNone(response['login_url'])
         self.assertNotIn('error', response)
