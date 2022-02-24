@@ -353,7 +353,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         elif filter_field == FilterFieldNames.PLATFORM_VERSION:
             filter_values = [model.platform_version for model in query]
         elif filter_field == (
-                FilterFieldNames.android_device_country_locale_code):
+                FilterFieldNames.ANDROID_DEVICE_COUNTRY_LOCALE_CODE):
             filter_values = [
                 model.android_device_country_locale_code for model in query]
         else:
