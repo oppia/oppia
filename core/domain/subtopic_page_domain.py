@@ -41,7 +41,7 @@ CMD_CREATE_NEW = 'create_new'
 # optionally, 'old_value'.
 CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property'
 
-WrittenTranslationsType = Dict[str, Dict[str, Dict[str, Dict[str, Optional[Union[str, bool]]]]]]
+WrittenTranslationsType = Dict[str, Dict[str, Dict[str, Dict[str, Union[str, bool]]]]]
 
 
 class SubtopicPageChange(change_domain.BaseChange):
@@ -428,16 +428,6 @@ class SubtopicPage:
             ValidationError. One or more attributes of the subtopic page are
                 invalid.
         """
-        if not isinstance(self.topic_id, str):
-            raise utils.ValidationError(
-                'Expected topic_id to be a string, received %s' %
-                self.topic_id)
-        self.page_contents.validate()
-
-        if not isinstance(self.page_contents_schema_version, int):
-            raise utils.ValidationError(
-                'Expected page contents schema version to be an integer, '
-                'received %s' % self.page_contents_schema_version)
         if (
                 self.page_contents_schema_version !=
                 feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
@@ -448,10 +438,6 @@ class SubtopicPage:
                     self.page_contents_schema_version)
             )
 
-        if not isinstance(self.language_code, str):
-            raise utils.ValidationError(
-                'Expected language code to be a string, received %s' %
-                self.language_code)
         if not any(
                 self.language_code == lc['code']
                 for lc in constants.SUPPORTED_CONTENT_LANGUAGES

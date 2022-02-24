@@ -224,7 +224,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         }
 
         self.subtopic_page.update_page_contents_written_translations(
-            written_translations_dict)
+            written_translations_dict) # type: ignore[arg-type]
         self.assertEqual(
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
@@ -243,32 +243,11 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 'subtopic_id': 'subtopic_id'
             })
 
-    def test_validate_topic_id(self) -> None:
-        self.subtopic_page.topic_id = 123 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected topic_id to be a string'):
-            self.subtopic_page.validate()
-
-    def test_validate_language_code_is_not_string(self) -> None:
-        self.subtopic_page.language_code = 123 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected language code to be a string'):
-            self.subtopic_page.validate()
-
     def test_validate_language_code_is_invalid(self) -> None:
         self.subtopic_page.language_code = 'abc'
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Invalid language code'):
-            self.subtopic_page.validate()
-
-    def test_validate_page_contents_schema_version_type(self) -> None:
-        self.subtopic_page.page_contents_schema_version = 'invalid_version' # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            Exception,
-            'Expected page contents schema version to be an integer'):
             self.subtopic_page.validate()
 
     def test_validate_page_contents_schema_version(self) -> None:
