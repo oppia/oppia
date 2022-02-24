@@ -707,6 +707,10 @@
 /core/templates/services/auth-backend-api.service*.ts @vojtechjelinek
 
 
+# Stale tab identification project
+/core/templates/domain/entity_editor_browser_tabs_info/ @kevintab95
+
+
 # Critical files.
 #
 # IMPORTANT NOTE: Please ensure that these files are always located at the end
