@@ -26,7 +26,6 @@
  * learner actions and then returns a giant HTML string.
  */
 
-import { analyzeAndValidateNgModules } from '@angular/compiler';
 import { NgElement, WithProperties } from '@angular/elements';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
@@ -84,13 +83,12 @@ angular.module('oppia').factory('LearnerActionRenderService', [
     var renderAnswerSubmitActionHTML = function(
         answer, destStateName, timeSpentInStateMsecs, currentStateName,
         actionIndex, interaction) {
-      console.log('this is called shivam bhai');
       let el = document.createElement('answer-submit-action') as NgElement
         & WithProperties<{
-        answer: string;
-        destStateName: string;
-        timeSpentInStateSecs: number;
-        currentStateName: string;
+        answer: any;
+        destStateName: any;
+        timeSpentInStateSecs: any;
+        currentStateName: any;
         actionIndex: any;
         interactionId: any;
         interactionCustomizationArgs: any;
@@ -121,7 +119,6 @@ angular.module('oppia').factory('LearnerActionRenderService', [
       var custArgs = learnerAction.actionCustomizationArgs;
       var interaction = ExplorationStatesService.getState(
         custArgs.state_name.value).interaction;
-      console.log('this works');
       if (actionType === ACTION_TYPE_EXPLORATION_START) {
         return renderExplorationStartActionHTML(
           custArgs.state_name.value, actionIndex);

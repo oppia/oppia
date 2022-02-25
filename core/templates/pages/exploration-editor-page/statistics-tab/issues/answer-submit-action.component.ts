@@ -44,9 +44,7 @@ export class AnswerSubmitAction implements OnInit {
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private htmlEscaperService: HtmlEscaperService,
     private interactionObjectFactory: InteractionObjectFactory
-  ) {
-    console.log('called');
-  }
+  ) { }
 
   getShortAnswerHtml(): string {
     return this.explorationHtmlFormatterService.getShortAnswerHtml(
