@@ -305,7 +305,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.android_report_model.android_report_info[
                 'build_fingerprint'])
         self.assertEqual(
-            device_system_context.network_type.name,
+            device_system_context.network_type.value,
             self.android_report_model.android_report_info[
                 'network_type'])
 
@@ -326,7 +326,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_context.audio_language_code,
             self.android_report_model.audio_language_code)
         self.assertEqual(
-            app_context.text_size.name,
+            app_context.text_size.value,
             self.android_report_model.android_report_info['text_size'])
         self.assertEqual(
             app_context.only_allows_wifi_download_and_update,

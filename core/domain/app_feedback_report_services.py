@@ -516,8 +516,8 @@ def save_feedback_report_to_storage(
         'android_device_language_locale_code': (
             device_system_context.device_language_locale_code),
         'build_fingerprint': device_system_context.build_fingerprint,
-        'network_type': device_system_context.network_type.name,
-        'text_size': app_context.text_size.name,
+        'network_type': device_system_context.network_type.value,
+        'text_size': app_context.text_size.value,
         'only_allows_wifi_download_and_update': str(
             app_context.only_allows_wifi_download_and_update),
         'automatically_update_topics': str(
