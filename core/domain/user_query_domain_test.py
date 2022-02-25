@@ -22,8 +22,51 @@ import datetime
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import user_query_domain
 from core.tests import test_utils
+
+from typing import TYPE_CHECKING
+
+
+class UserQueryParamsAttributeTests(test_utils.GenericTestBase):
+    """Test for ensuring matching values for UserQueryParams attributes between
+    predefined and dynamically fetched fields from assets/constants.ts
+    """
+
+    def test_matching_values_for_user_query_params_attributes(self) -> None:
+        """Check to see if list of attributes defined here
+        (attribute_names_predefined) is similar to the one we get during runtime
+        (attribute_names)from (/assets/constants.ts)
+        """
+
+        attribute_names = [
+                predicate['backend_attr'] for predicate in (
+                    constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
+
+        if not TYPE_CHECKING:
+            attribute_names_predefined = [
+                    'inactive_in_last_n_days',
+                    'has_not_logged_in_for_n_days',
+                    'created_at_least_n_exps',
+                    'created_fewer_than_n_exps',
+                    'edited_at_least_n_exps',
+                    'edited_fewer_than_n_exps',
+                    'created_collection'
+                    ]
+
+            attribute_names_predefined.sort()
+            attribute_names.sort()
+
+            if len(attribute_names_predefined) != len(attribute_names):
+                raise utils.ValidationError(
+                'Attributes mismatch from attributes fetched',
+                ' from /assets/constants.ts')
+
+            if attribute_names_predefined != attribute_names:
+                raise utils.ValidationError(
+                'Attributes mismatch from attributes fetched',
+                ' from /assets/constants.ts')
 
 
 class UserQueryTests(test_utils.GenericTestBase):
