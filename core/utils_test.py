@@ -38,14 +38,16 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_open_file(self) -> None:
         with utils.open_file(
-                os.path.join('core', 'python_utils.py'), 'r'
+            os.path.join('core', 'python_utils.py'), 'r'
         ) as f:
             file_content = f.readlines()
             self.assertIsNotNone(file_content)
 
     def test_can_not_open_file(self) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            FileNotFoundError, 'No such file or directory: \'invalid_file.py\''): # pylint: disable=line-too-long
+            FileNotFoundError, 
+            'No such file or directory: \'invalid_file.py\''
+        ):
             with utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
 
@@ -57,7 +59,8 @@ class UtilsTests(test_utils.GenericTestBase):
             unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
 
         with utils.open_file(
-            'core/tests/data/unicode_and_str_handler.py', 'r') as f:
+            'core/tests/data/unicode_and_str_handler.py', 'r'
+        ) as f:
             file_content = f.read()
             self.assertIsInstance(file_content, str)
 
