@@ -44,29 +44,28 @@ class UserQueryParamsAttributeTests(test_utils.GenericTestBase):
                 predicate['backend_attr'] for predicate in (
                     constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
-        if not TYPE_CHECKING:
-            attribute_names_predefined = [
-                    'inactive_in_last_n_days',
-                    'has_not_logged_in_for_n_days',
-                    'created_at_least_n_exps',
-                    'created_fewer_than_n_exps',
-                    'edited_at_least_n_exps',
-                    'edited_fewer_than_n_exps',
-                    'created_collection'
-                    ]
+        attribute_names_predefined = [
+                'inactive_in_last_n_days',
+                'has_not_logged_in_for_n_days',
+                'created_at_least_n_exps',
+                'created_fewer_than_n_exps',
+                'edited_at_least_n_exps',
+                'edited_fewer_than_n_exps',
+                'created_collection'
+                ]
 
-            attribute_names_predefined.sort()
-            attribute_names.sort()
+        attribute_names_predefined.sort()
+        attribute_names.sort()
 
-            if len(attribute_names_predefined) != len(attribute_names):
-                raise utils.ValidationError(
-                'Attributes mismatch from attributes fetched',
-                ' from /assets/constants.ts')
+        if len(attribute_names_predefined) != len(attribute_names):
+            raise utils.ValidationError(
+            'Attributes mismatch from attributes fetched',
+            ' from /assets/constants.ts')
 
-            if attribute_names_predefined != attribute_names:
-                raise utils.ValidationError(
-                'Attributes mismatch from attributes fetched',
-                ' from /assets/constants.ts')
+        if attribute_names_predefined != attribute_names:
+            raise utils.ValidationError(
+            'Attributes mismatch from attributes fetched',
+            ' from /assets/constants.ts')
 
 
 class UserQueryTests(test_utils.GenericTestBase):
