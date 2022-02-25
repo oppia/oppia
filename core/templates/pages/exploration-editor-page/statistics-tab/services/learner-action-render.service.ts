@@ -26,6 +26,8 @@
  * learner actions and then returns a giant HTML string.
  */
 
+import { analyzeAndValidateNgModules } from '@angular/compiler';
+import { NgElement, WithProperties } from '@angular/elements';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -82,20 +84,29 @@ angular.module('oppia').factory('LearnerActionRenderService', [
     var renderAnswerSubmitActionHTML = function(
         answer, destStateName, timeSpentInStateMsecs, currentStateName,
         actionIndex, interaction) {
-      var el = $('<answer-submit-action>');
-      el.attr('answer', HtmlEscaperService.objToEscapedJson(answer));
-      el.attr('dest-state-name', destStateName);
-      el.attr('time-spent-in-state-secs', timeSpentInStateMsecs / 1000);
-      el.attr('current-state-name', currentStateName);
-      el.attr('action-index', actionIndex);
-      el.attr('interaction-id', interaction.id);
-      el.attr(
-        'interaction-customization-args',
-        HtmlEscaperService.objToEscapedJson(
-          Interaction.convertCustomizationArgsToBackendDict(
-            interaction.customizationArgs)
-        )
+      console.log('this is called shivam bhai');
+      let el = document.createElement('answer-submit-action') as NgElement
+        & WithProperties<{
+        answer: string;
+        destStateName: string;
+        timeSpentInStateSecs: number;
+        currentStateName: string;
+        actionIndex: any;
+        interactionId: any;
+        interactionCustomizationArgs: any;
+      }>;
+
+      el.answer = HtmlEscaperService.objToEscapedJson(answer);
+      el.destStateName = destStateName;
+      el.timeSpentInStateSecs = timeSpentInStateMsecs / 1000;
+      el.currentStateName = currentStateName;
+      el.actionIndex = actionIndex;
+      el.interactionId = interaction.id;
+      el.interactionCustomizationArgs = HtmlEscaperService.objToEscapedJson(
+        Interaction.convertCustomizationArgsToBackendDict(
+          interaction.customizationArgs)
       );
+
       return ($('<span>').append(el)).html();
     };
 
@@ -110,6 +121,7 @@ angular.module('oppia').factory('LearnerActionRenderService', [
       var custArgs = learnerAction.actionCustomizationArgs;
       var interaction = ExplorationStatesService.getState(
         custArgs.state_name.value).interaction;
+      console.log('this works');
       if (actionType === ACTION_TYPE_EXPLORATION_START) {
         return renderExplorationStartActionHTML(
           custArgs.state_name.value, actionIndex);

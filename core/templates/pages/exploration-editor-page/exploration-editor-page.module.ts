@@ -58,6 +58,7 @@ import { TranslationTabBusyModalComponent } from './translation-tab/modal-templa
 import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import { PreviewSetParametersModalComponent } from './preview-tab/templates/preview-set-parameters-modal.component';
 import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
+import { AnswerSubmitAction } from './statistics-tab/issues/answer-submit-action.component';
 
 @NgModule({
   imports: [
@@ -98,6 +99,7 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
+    AnswerSubmitAction
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -128,6 +130,7 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
+    AnswerSubmitAction
   ],
   providers: [
     {

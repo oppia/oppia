@@ -1,9 +1,11 @@
-<[$ctrl.actionIndex]>. Submitted answer "
-<angular-html-bind html-data="$ctrl.getShortAnswerHtml()"></angular-html-bind>
-<span ng-if="$ctrl.currentStateName == $ctrl.destStateName">
-  " in card "<[$ctrl.currentStateName]>".
+<h1>Working this is</h1>
+
+{{actionIndex}}. Submitted answer "
+<angular-html-bind-wrapper [htmlData]="getShortAnswerHtml()"></angular-html-bind-wrapper>
+<span *ngIf="currentStateName == destStateName">
+  " in card "{{currentStateName}}".
 </span>
-<span ng-if="$ctrl.currentStateName != $ctrl.destStateName">
-  " and moved to card "<[$ctrl.destStateName]>" after spending <[$ctrl.timeSpentInStateSecs]>
-  seconds on card "<[$ctrl.currentStateName]>".
+<span *ngIf="currentStateName != destStateName">
+  " and moved to card "{{destStateName}}" after spending {{timeSpentInStateSecs}}
+  seconds on card "{{currentStateName}}".
 </span>
