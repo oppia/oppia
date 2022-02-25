@@ -38,12 +38,14 @@ class DummyTranslatableObjectWithTwoParams(
         self.param1 = param1
         self.param2 = param2
 
-    def get_transltable_contents_collection(self) -> None:
+    def get_transltable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_1',
             self.param1)
         translatable_contents_collection.add_translatable_object(self.param2)
@@ -62,12 +64,14 @@ class DummyTranslatableObjectWithSingleParam(
     ) -> None:
         self.param3 = param3
 
-    def get_transltable_contents_collection(self) -> None:
+    def get_transltable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
             self.param3)
         return translatable_contents_collection
@@ -86,16 +90,18 @@ class DummyTranslatableObject(translation_domain.BaseTranslatableObject):
         self.param1 = param1
         self.param2 = param2
 
-    def get_transltable_contents_collection(self) -> None:
+    def get_transltable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
             self.param1)
         translatable_contents_collection.add_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
             self.param2)
         return translatable_contents_collection
@@ -134,24 +140,26 @@ class DummyTranslatableObjectWithFourParams(
         self.param3 = param3
         self.param4 = param4
 
-    def get_transltable_contents_collection(self) -> None:
+    def get_transltable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_1',
             self.param1)
         translatable_contents_collection.add_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
             self.param2)
         translatable_contents_collection.add_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_3',
             self.param3)
         translatable_contents_collection.add_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_4',
             self.param4)
         return translatable_contents_collection
@@ -247,21 +255,22 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
         translatable_content = translation_domain.TranslatableContent(
             'content_id_1',
             'My name is Jhon.',
-            feconf.TranslatableContentFormat.HTML
+            translation_domain.TranslatableContentFormat.HTML
         )
 
         self.assertEqual(translatable_content.content_id, 'content_id_1')
         self.assertEqual(translatable_content.content, 'My name is Jhon.')
         self.assertEqual(
             translatable_content.content_type,
-            feconf.TranslatableContentFormat.HTML)
+            translation_domain.TranslatableContentFormat.HTML)
 
     def test_from_dict_method_of_translatable_content_class(self) -> None:
         translatable_content = (
                 translation_domain.TranslatableContent.from_dict({
                 'content_id': 'content_id_1',
                 'content': 'My name is Jhon.',
-                'content_type': feconf.TranslatableContentFormat.HTML
+                'content_type': translation_domain
+                .TranslatableContentFormat.HTML
             })
         )
 
@@ -269,18 +278,18 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(translatable_content.content, 'My name is Jhon.')
         self.assertEqual(
             translatable_content.content_type,
-            feconf.TranslatableContentFormat.HTML)
+            translation_domain.TranslatableContentFormat.HTML)
 
     def test_to_dict_method_of_translatable_content_class(self) -> None:
         translatable_content_dict = {
             'content_id': 'content_id_1',
             'content': 'My name is Jhon.',
-            'content_type': feconf.TranslatableContentFormat.HTML
+            'content_type': translation_domain.TranslatableContentFormat.HTML
         }
         translatable_content = translation_domain.TranslatableContent(
             'content_id_1',
             'My name is Jhon.',
-            feconf.TranslatableContentFormat.HTML
+            translation_domain.TranslatableContentFormat.HTML
         )
 
         self.assertEqual(

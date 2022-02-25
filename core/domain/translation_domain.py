@@ -19,26 +19,48 @@
 from __future__ import annotations
 
 import copy
+import enum
 
 from core import feconf
 from core import utils
 
 from typing import Dict, List
+from typing_extensions import TypedDict
+
+
+class TranslatableContentFormat(enum.Enum):
+    """Represents all possible data types for any translatable content."""
+
+    HTML = 'html'
+    UNICODE_STRING = 'unicode'
+    SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
+    SET_OF_UNICODE_STRING = 'set_of_unicode_string'
+
+
+class TranslatableContentDict(TypedDict):
+    """Dictionary representing TranslatableContent object."""
+
+    content_id: str
+    content: feconf.ContentInTranslatableContent
+    content_type: TranslatableContentFormat
 
 
 class TranslatableContentsCollection:
-    """Maps content_id to TranslatableContent in a translatable object."""
-    def __init__(self):
+    """Collect all TranslatableContent's from a translatable object and maps
+    with their corresponding content-ids.
+    """
+
+    def __init__(self) -> None:
         """Constructs a TranslatableContentsCollection object."""
         self.translatable_contents: Dict[str, TranslatableContent] = {}
 
     def add_translatable_field(
         self,
-        field_type: feconf.TranslatableContentFormat,
+        field_type: TranslatableContentFormat,
         content_id: str,
         value: feconf.ContentInTranslatableContent
     ) -> None:
-        """Method to add a translatable field.
+        """Adds translatable field parameter to translatable_contents dict.
 
         Args:
             field_type: TranslatableContentFormat. The type of the
@@ -56,7 +78,8 @@ class TranslatableContentsCollection:
         self,
         value: BaseTranslatableObject
     ) -> None:
-        """Method to add a translatable object.
+        """Adds translatable fields of a translatable object parameter to
+        translatable_contents dict.
 
         Args:
             value: BaseTranslatableObject. An object representing
@@ -74,7 +97,9 @@ class BaseTranslatableObject:
     be the child class of BaseTranslatableObject.
     """
 
-    def get_transltable_contents_collection(self) -> None:
+    def get_transltable_contents_collection(
+        self
+    ) -> TranslatableContentsCollection:
         """Get all translatable fields in a translatable object.
 
         Raises:
@@ -175,7 +200,7 @@ class TranslatableContent:
         self,
         content_id: str,
         content: feconf.ContentInTranslatableContent,
-        content_type: feconf.TranslatableContentFormat
+        content_type: TranslatableContentFormat
     ) -> None:
         self.content_id = content_id
         self.content = content
@@ -184,7 +209,7 @@ class TranslatableContent:
     @classmethod
     def from_dict(
         cls,
-        translatable_content_dict: feconf.TranslatableContentDict
+        translatable_content_dict: TranslatableContentDict
     ) -> TranslatableContent:
         """Returns a TranslatableContent object from its dict representation.
 
@@ -200,7 +225,7 @@ class TranslatableContent:
             translatable_content_dict['content'],
             translatable_content_dict['content_type'])
 
-    def to_dict(self) -> feconf.TranslatableContentDict:
+    def to_dict(self) -> TranslatableContentDict:
         """Returns the dict representation of TranslatableContent object.
 
         Returns:
