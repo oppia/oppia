@@ -27,7 +27,7 @@ from core import utils
 from typing import List, Optional
 
 
-# We can't inject dynamic data (attribute_names) into namedtuple (UserQueryParams)
+# We can't inject dynamic data (attribute_names) in namedtuple (UserQueryParams)
 # without raising MyPy error. Therefore, we need to use predefined attributes
 # explicitly and then verify them in the test file and raise errors if needed.
 UserQueryParams = collections.namedtuple(

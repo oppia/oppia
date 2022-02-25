@@ -26,8 +26,6 @@ from core.constants import constants
 from core.domain import user_query_domain
 from core.tests import test_utils
 
-from typing import TYPE_CHECKING
-
 
 class UserQueryParamsAttributeTests(test_utils.GenericTestBase):
     """Test for ensuring matching values for UserQueryParams attributes between
@@ -41,7 +39,7 @@ class UserQueryParamsAttributeTests(test_utils.GenericTestBase):
         """
 
         attribute_names = [
-            predicate['backend_attr'] for predicate 
+            predicate['backend_attr'] for predicate
             in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
         ]
 
