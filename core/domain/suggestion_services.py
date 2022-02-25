@@ -924,6 +924,26 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
     return reviewers_reviewable_suggestion_infos
 
 
+def get_submitted_suggestions(user_id, suggestion_type):
+    """Returns a list of suggestions of given suggestion_type which the user
+    has submitted.
+
+    Args:
+        user_id: str. The ID of the user.
+        suggestion_type: str. The type of the suggestion.
+
+    Returns:
+        list(Suggestion). A list of suggestions which the given user has
+        submitted.
+    """
+    return ([
+        get_suggestion_from_model(s) for s in (
+            suggestion_models.GeneralSuggestionModel
+            .get_user_created_suggestions_of_suggestion_type(
+                suggestion_type, user_id))
+    ])
+
+
 def get_submitted_suggestions_by_offset(
         user_id, suggestion_type, limit, offset):
     """Returns a list of suggestions of given suggestion_type which the user

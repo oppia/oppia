@@ -491,7 +491,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'skill_1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
             'reviewer_2', self.change_cmd, 'category1',
-            suggestion_1_id, self.question_language_code)
+            suggestion_2_id, self.question_language_code)
 
         results, offset_1 = (
             suggestion_models.GeneralSuggestionModel

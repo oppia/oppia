@@ -352,11 +352,11 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       ctrl.loadOpportunities = function() {
-        return ctrl.loadContributions(true);
+        return ctrl.loadContributions(/* Param resetOffset= */ true);
       };
 
       ctrl.loadMoreOpportunities = function() {
-        return ctrl.loadContributions(false);
+        return ctrl.loadContributions(/* Param resetOffset= */ false);
       };
 
       ctrl.loadContributions = function(resetOffset) {

@@ -522,7 +522,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         ))
 
         results: Sequence[GeneralSuggestionModel] = (
-            suggestion_query.fetch(limit, offset)
+            suggestion_query.fetch(limit, offset=offset)
         )
         next_offset = offset + len(results)
 
@@ -604,7 +604,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         ))
 
         results: Sequence[GeneralSuggestionModel] = (
-            suggestion_query.fetch(limit, offset)
+            suggestion_query.fetch(limit, offset=offset)
         )
         next_offset = offset + len(results)
 
@@ -703,7 +703,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).order(-cls.created_on)
 
         results: Sequence[GeneralSuggestionModel] = (
-            suggestion_query.fetch(limit, offset)
+            suggestion_query.fetch(limit, offset=offset)
         )
         next_offset = offset + len(results)
 

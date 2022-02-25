@@ -19,6 +19,7 @@
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
 import { ContributionAndReviewBackendApiService }
   from './contribution-and-review-backend-api.service';
 
@@ -69,7 +70,9 @@ describe('Contribution and review backend API service', () => {
       const url = '/getsubmittedsuggestions/skill/add_question';
 
       carbas.fetchSuggestionsAsync(
-        'SUBMITTED_QUESTION_SUGGESTIONS'
+        'SUBMITTED_QUESTION_SUGGESTIONS',
+        AppConstants.OPPORTUNITIES_PAGE_SIZE,
+        0
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
@@ -87,7 +90,9 @@ describe('Contribution and review backend API service', () => {
       const url = '/getsubmittedsuggestions/exploration/translate_content';
 
       carbas.fetchSuggestionsAsync(
-        'SUBMITTED_TRANSLATION_SUGGESTIONS'
+        'SUBMITTED_TRANSLATION_SUGGESTIONS',
+        AppConstants.OPPORTUNITIES_PAGE_SIZE,
+        0
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
@@ -105,7 +110,9 @@ describe('Contribution and review backend API service', () => {
       const url = '/getreviewablesuggestions/skill/add_question';
 
       carbas.fetchSuggestionsAsync(
-        'REVIEWABLE_QUESTION_SUGGESTIONS'
+        'REVIEWABLE_QUESTION_SUGGESTIONS',
+        AppConstants.OPPORTUNITIES_PAGE_SIZE,
+        0
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
@@ -123,7 +130,9 @@ describe('Contribution and review backend API service', () => {
       const url = '/getreviewablesuggestions/exploration/translate_content';
 
       carbas.fetchSuggestionsAsync(
-        'REVIEWABLE_TRANSLATION_SUGGESTIONS'
+        'REVIEWABLE_TRANSLATION_SUGGESTIONS',
+        AppConstants.OPPORTUNITIES_PAGE_SIZE,
+        0
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');

@@ -290,6 +290,8 @@ class SuggestionsProviderHandler(base.BaseHandler):
         Args:
             target_type: str. The suggestion type.
             suggestions: list(BaseSuggestion). A list of suggestions to render.
+            next_offset: int. The number of results to skip in a subsequent
+                fetch.
         """
         if target_type == feconf.ENTITY_TYPE_EXPLORATION:
             target_id_to_opportunity_dict = (

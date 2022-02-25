@@ -5809,7 +5809,7 @@ export default {
 
   // The default number of opportunities to show on the contributor dashboard
   // page.
-  "OPPORTUNITIES_PAGE_SIZE": 3,
+  "OPPORTUNITIES_PAGE_SIZE": 10,
 
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.

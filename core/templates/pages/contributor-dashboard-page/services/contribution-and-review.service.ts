@@ -64,10 +64,13 @@ export class ContributionAndReviewService {
 
   private _userCreatedQuestionFetcher: SuggestionFetcher = (
     new SuggestionFetcher('SUBMITTED_QUESTION_SUGGESTIONS'));
+
   private _reviewableQuestionFetcher: SuggestionFetcher = (
     new SuggestionFetcher('REVIEWABLE_QUESTION_SUGGESTIONS'));
+
   private _userCreatedTranslationFetcher: SuggestionFetcher = (
     new SuggestionFetcher('SUBMITTED_TRANSLATION_SUGGESTIONS'));
+
   private _reviewableTranslationFetcher: SuggestionFetcher = (
     new SuggestionFetcher('REVIEWABLE_TRANSLATION_SUGGESTIONS'));
 
