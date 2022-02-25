@@ -164,6 +164,6 @@ describe('Schema Based Float Editor Directive', () => {
     ctrl.generateErrors();
 
     expect(ctrl.errorStringI18nKey)
-      .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
+      .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
   });
 });
