@@ -5523,3 +5523,33 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
             self.post_json(
                 '/appfeedbackreporthandler/incoming_android_report', payload,
                 headers=invalid_headers, expected_status_int=401)
+
+
+class TopicsAndSkillsDashboardReadOnlyTest(test_utils.GenericTestBase):
+    """Test for can_access_topics_and_skills_dashboard_read_only"""
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_access_topics_and_skills_dashboard_read_only
+        def get(self):
+            self.render_json({})
+
+    def setUp(self):
+        super(TopicsAndSkillsDashboardReadOnlyTest, self).setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/topics_and_skills_dashboard/data', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_any_user_can_access_topics_and_skills_dashboard_read_only(self):
+        """Test access to topics and skills dashboard for any user in read only format."""
+        self.login(self.NEW_USER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+              url = '/topics_and_skills_dashboard/data',
+              expected_status_int=200)
+        self.logout()
