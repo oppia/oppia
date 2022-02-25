@@ -29,13 +29,13 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './answer-submit-action.component.html'
 })
 export class AnswerSubmitAction implements OnInit {
-  @Input() answer: any;
-  @Input() destStateName: any;
-  @Input() timeSpentInStateSecs: any;
-  @Input() currentStateName: any;
-  @Input() actionIndex: any;
-  @Input() interactionId: any;
-  @Input() interactionCustomizationArgs: any;
+  @Input() answer: string;
+  @Input() destStateName: string;
+  @Input() timeSpentInStateSecs: number;
+  @Input() currentStateName: string;
+  @Input() actionIndex: number;
+  @Input() interactionId: string;
+  @Input() interactionCustomizationArgs: string;
 
   _customizationArgs: InteractionCustomizationArgs;
   _answer: InteractionAnswer | object;

@@ -85,13 +85,13 @@ angular.module('oppia').factory('LearnerActionRenderService', [
         actionIndex, interaction) {
       let el = document.createElement('answer-submit-action') as NgElement
         & WithProperties<{
-        answer: any;
-        destStateName: any;
-        timeSpentInStateSecs: any;
-        currentStateName: any;
-        actionIndex: any;
-        interactionId: any;
-        interactionCustomizationArgs: any;
+        answer: string;
+        destStateName: string;
+        timeSpentInStateSecs: number;
+        currentStateName: string;
+        actionIndex: number;
+        interactionId: string;
+        interactionCustomizationArgs: string;
       }>;
 
       el.answer = HtmlEscaperService.objToEscapedJson(answer);
