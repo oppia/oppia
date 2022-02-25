@@ -38,7 +38,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_open_file(self) -> None:
         with utils.open_file(
-                os.path.join('core', 'python_utils.py'), 'r'
+            os.path.join('core', 'python_utils.py'), 'r'
         ) as f:
             file_content = f.readlines()
             self.assertIsNotNone(file_content)
