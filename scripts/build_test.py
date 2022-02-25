@@ -47,11 +47,11 @@ MOCK_TEMPLATES_DEV_DIR = os.path.join(TEST_SOURCE_DIR, 'templates', '')
 
 MOCK_TSC_OUTPUT_LOG_FILEPATH = os.path.join(
     TEST_SOURCE_DIR, 'mock_tsc_output_log.txt')
-
+FILENAME = 'filename.js'
 INVALID_INPUT_FILEPATH = os.path.join(
-    TEST_DIR, 'invalid', 'path', 'to', 'input.js')
+    TEST_DIR, FILENAME)
 INVALID_OUTPUT_FILEPATH = os.path.join(
-    TEST_DIR, 'invalid', 'path', 'to', 'output.js')
+    TEST_DIR, FILENAME)
 
 EMPTY_DIR = os.path.join(TEST_DIR, 'empty', '')
 
@@ -65,11 +65,14 @@ class BuildTests(test_utils.GenericTestBase):
         build.safe_delete_directory_tree(EMPTY_DIR)
 
     def test_minify(self):
-        """Tests _minify with an invalid filepath."""
+        """Tests _minify indirectly by calling minify_func
+        with an invalid filepath.
+        """
         with self.assertRaisesRegex(
             subprocess.CalledProcessError,
             'returned non-zero exit status 1') as called_process:
-            build._minify(INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)  # pylint: disable=protected-access
+            build.minify_func(
+                INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH, FILENAME)
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
@@ -82,22 +85,6 @@ class BuildTests(test_utils.GenericTestBase):
                 INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
-
-    def test_ensure_files_exist(self):
-        """Test _ensure_files_exist raises exception with a non-existent
-        filepath.
-        """
-        non_existent_filepaths = [INVALID_INPUT_FILEPATH]
-        # Escape the special characters, like '\', in the file paths.
-        # The '\' character is usually seem in Windows style path.
-        # https://docs.python.org/2/library/os.html#os.sep
-        # https://docs.python.org/2/library/re.html#regular-expression-syntax
-        error_message = ('File %s does not exist.') % re.escape(
-            non_existent_filepaths[0])
-        # Exception will be raised at first file determined to be non-existent.
-        with self.assertRaisesRegex(
-            OSError, error_message):
-            build._ensure_files_exist(non_existent_filepaths)  # pylint: disable=protected-access
 
     def test_join_files(self):
         """Determine third_party.js contains the content of the first 10 JS
@@ -461,8 +448,9 @@ class BuildTests(test_utils.GenericTestBase):
         count = task_count
         while count:
             task = threading.Thread(
-                target=build._minify,  # pylint: disable=protected-access
-                args=(INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH))
+                target=build.minify_func,
+                args=(
+                    INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH, FILENAME))
             build_tasks.append(task)
             count -= 1
 
@@ -846,6 +834,9 @@ class BuildTests(test_utils.GenericTestBase):
         feconf_temp_file.close()
 
     def test_safe_delete_file(self):
+        """Test safe_delete_file with both existent and non-existent
+        filepath.
+        """
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = 'some_file.txt'
         with python_utils.open_file('some_file.txt', 'w') as tmp:
@@ -854,6 +845,18 @@ class BuildTests(test_utils.GenericTestBase):
 
         build.safe_delete_file('some_file.txt')
         self.assertFalse(os.path.isfile('some_file.txt'))
+
+        non_existent_filepaths = [INVALID_INPUT_FILEPATH]
+        # Escape the special characters, like '\', in the file paths.
+        # The '\' character is usually seem in Windows style path.
+        # https://docs.python.org/2/library/os.html#os.sep
+        # https://docs.python.org/2/library/re.html#regular-expression-syntax
+        error_message = ('File %s does not exist.') % re.escape(
+            non_existent_filepaths[0])
+        # Exception will be raised at first file determined to be non-existent.
+        with self.assertRaisesRegex(
+            OSError, error_message):
+            build.safe_delete_file(non_existent_filepaths[0])
 
     def test_minify_third_party_libs(self):
 
