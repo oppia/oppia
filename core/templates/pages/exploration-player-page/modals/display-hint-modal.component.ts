@@ -34,12 +34,12 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
   templateUrl: './display-hint-modal.component.html'
 })
 export class DisplayHintModalComponent {
-  index: number | undefined;
-  COMPONENT_NAME_HINT: string = AppConstants.COMPONENT_NAME_HINT;
-  hint!: SubtitledHtml | null;
-  displayedCard!: StateCard;
-  recordedVoiceovers!: RecordedVoiceovers;
-  hintContentId!: string | null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  index!: number;
+  hint!: SubtitledHtml | null; // null is allowed here because displayhint() funtion in hints-and-solution-manager.service.ts can return null
+  hintContentId!: string | null; // null is allowed here because in SubtitledHtml class in the subtitled-html.model.ts file the type of contentID is defined as string | null
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -52,19 +52,17 @@ export class DisplayHintModalComponent {
   ) {}
 
   ngOnInit(): void {
-    if (this.index !== undefined) {
-      this.hint = this.hintsAndSolutionManagerService.displayHint(this.index);
-    }
-    this.displayedCard = this.playerTranscriptService.getCard(
+    this.hint = this.hintsAndSolutionManagerService.displayHint(this.index);
+    let displayedCard : StateCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
-    this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
+    let recordedVoiceovers : RecordedVoiceovers = displayedCard.getRecordedVoiceovers();
     if (this.hint) {
       this.hintContentId = this.hint.contentId;
       if (this.hintContentId !== null) {
         this.audioTranslationManagerService
           .setSecondaryAudioTranslations(
-            this.recordedVoiceovers.getBindableVoiceovers(this.hintContentId),
-            this.hint.html, this.COMPONENT_NAME_HINT);
+            recordedVoiceovers.getBindableVoiceovers(this.hintContentId),
+            this.hint.html, AppConstants.COMPONENT_NAME_HINT);
       }
     }
 

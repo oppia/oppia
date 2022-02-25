@@ -169,7 +169,7 @@ export class HintsAndSolutionManagerService {
       // The latest hint has been consumed. Start the timer.
       this.consumeHint();
     }
-    
+
     if (index < this.numHintsReleased) {
       return this.hintsForLatestCard[index].hintContent;
     }

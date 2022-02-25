@@ -122,9 +122,6 @@ describe('Display hint modal', () => {
     componentInstance.ngOnInit();
 
     expect(componentInstance.hint).toEqual(hint);
-    expect(componentInstance.displayedCard).toEqual(displayedCard);
-    expect(componentInstance.recordedVoiceovers)
-      .toEqual(displayedCard.getRecordedVoiceovers());
     expect(componentInstance.hintContentId).toEqual(contentId);
     expect(audioTranslationManagerService.setSecondaryAudioTranslations)
       .toHaveBeenCalled();
