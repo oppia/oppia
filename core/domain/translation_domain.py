@@ -46,34 +46,20 @@ class TranslatableContentDict(TypedDict):
     content_type: TranslatableContentFormat
 
 
-class BaseTranslatableObject:
-    """Base class for all translatable objects which contain translatable
-    fields/objects. For example, a State is a translatable object in
-    Exploration, a Hint is a translatable object in State, and a hint_content
-    is a translatable field in Hint. So Exploration, State, and Hint all should
-    be the child class of BaseTranslatableObject.
-    """
+class TranslatableContentsCollection:
+    """Maps content_id to TranslatableContent in a translatable object."""
 
-    # Private field to track translatable contents in a BaseTranslatableObject.
-    _translatable_contents: Dict[str, TranslatableContent] = {}
+    def __init__(self) -> None:
+        """Constructs a TranslatableContentsCollection object."""
+        self.translatable_contents: Dict[str, TranslatableContent] = {}
 
-    def _register_all_translatable_fields(self) -> None:
-        """Method to register all translatable fields in a translatable object.
-
-        Raises:
-            NotImplementedError. The derived child class must implement the
-                necessary logic to register all translatable fields in a
-                translatable object.
-        """
-        raise NotImplementedError('Must be implemented in subclasses.')
-
-    def _register_translatable_field(
+    def add_translatable_field(
         self,
         field_type: TranslatableContentFormat,
         content_id: str,
         value: feconf.ContentInTranslatableContent
     ) -> None:
-        """Method to register a translatable field in a translatable object.
+        """Method to add a translatable field.
 
         Args:
             field_type: TranslatableContentFormat. The type of the
@@ -82,25 +68,44 @@ class BaseTranslatableObject:
             value: ContentInTranslatableContent. Value of the content which is
                 translatable.
         """
-        if content_id in self._translatable_contents:
-            raise Exception(
-                'A translatable field is already registered with the '
-                'same content id: %s' % content_id)
-
-        self._translatable_contents[content_id] = TranslatableContent(
+        if not bool(value):
+            return
+        self.translatable_contents[content_id] = TranslatableContent(
             content_id, value, field_type)
 
-    def _register_translatable_object(
+    def add_translatable_object(
         self,
         value: BaseTranslatableObject
     ) -> None:
-        """Method to register a translatable field in a translatable object.
+        """Method to add a translatable object.
 
         Args:
             value: BaseTranslatableObject. An object representing
                 BaseTranslatableObject.
         """
-        self._translatable_contents.update(value.get_translatable_fields())
+        self.translatable_contents.update(
+            value.get_transltable_contents_collection().translatable_contents)
+
+
+class BaseTranslatableObject:
+    """Base class for all translatable objects which contain translatable
+    fields/objects. For example, a State is a translatable object in
+    Exploration, a Hint is a translatable object in State, and a hint_content
+    is a translatable field in Hint. So Exploration, State, and Hint all should
+    be the child class of BaseTranslatableObject.
+    """
+
+    def get_transltable_contents_collection(
+        self
+    ) -> TranslatableContentsCollection:
+        """Get all translatable fields in a translatable object.
+
+        Raises:
+            NotImplementedError. The derived child class must implement the
+                necessary logic to get all translatable fields in a
+                translatable object.
+        """
+        raise NotImplementedError('Must be implemented in subclasses.')
 
     def get_translatable_fields(self) -> Dict[str, TranslatableContent]:
         """Method to get all the translatable fields in a translatable object.
@@ -109,9 +114,8 @@ class BaseTranslatableObject:
             Dict(str, TranslatableContent). Returns the dict containg content_id
             as key and TranslatableContent as value.
         """
-        self._translatable_contents = {}
-        self._register_all_translatable_fields()
-        return copy.deepcopy(self._translatable_contents)
+        return copy.deepcopy(
+            self.get_transltable_contents_collection().translatable_contents)
 
     def get_all_contents_which_need_translations(
         self,
