@@ -38,7 +38,8 @@ class UserQueryParamsAttributeTests(test_utils.GenericTestBase):
         (attribute_names)from (/assets/constants.ts)
         """
 
-        attribute_names_predefined = list(user_query_domain.userqueryparams._fields)
+        attribute_names_predefined = list(
+                user_query_domain.userqueryparams._fields)
         attribute_names = [
             predicate['backend_attr'] for predicate
             in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
