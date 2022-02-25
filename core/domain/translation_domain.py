@@ -33,8 +33,7 @@ class TranslatableContentFormat(enum.Enum):
 
     HTML = 'html'
     UNICODE_STRING = 'unicode'
-    SET_OF_NORMALIZED_STRING = (
-        'set_of_normalized_string')
+    SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
     SET_OF_UNICODE_STRING = 'set_of_unicode_string'
 
 
@@ -47,7 +46,9 @@ class TranslatableContentDict(TypedDict):
 
 
 class TranslatableContentsCollection:
-    """Maps content_id to TranslatableContent in a translatable object."""
+    """Collect all TranslatableContent's from a translatable object and maps
+    with their corresponding content-ids.
+    """
 
     def __init__(self) -> None:
         """Constructs a TranslatableContentsCollection object."""
@@ -59,7 +60,7 @@ class TranslatableContentsCollection:
         content_id: str,
         value: feconf.ContentInTranslatableContent
     ) -> None:
-        """Method to add a translatable field.
+        """Adds translatable field parameter to translatable_contents dict.
 
         Args:
             field_type: TranslatableContentFormat. The type of the
@@ -77,7 +78,8 @@ class TranslatableContentsCollection:
         self,
         value: BaseTranslatableObject
     ) -> None:
-        """Method to add a translatable object.
+        """Adds translatable fields of a translatable object parameter to
+        translatable_contents dict.
 
         Args:
             value: BaseTranslatableObject. An object representing
