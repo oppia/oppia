@@ -59,7 +59,8 @@ class UtilsTests(test_utils.GenericTestBase):
             unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
 
         with utils.open_file(
-            'core/tests/data/unicode_and_str_handler.py', 'r') as f:
+            'core/tests/data/unicode_and_str_handler.py', 'r'
+        ) as f:
             file_content = f.read()
             self.assertIsInstance(file_content, str)
 
