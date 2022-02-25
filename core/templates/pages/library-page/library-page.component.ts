@@ -35,7 +35,7 @@ import { ActivityDict,
   LibraryPageBackendApiService,
   SummaryDict } from './services/library-page-backend-api.service';
 
-interface mobileLibraryGroupProperties {
+interface MobileLibraryGroupProperties {
   inCollapsedState: boolean;
   buttonText: string;
 }
@@ -79,7 +79,7 @@ export class LibraryPageComponent {
   groupHeaderI18nId!: string;
   libraryGroups!: SummaryDict[];
   libraryWindowIsNarrow!: boolean;
-  mobileLibraryGroupsProperties!: mobileLibraryGroupProperties[];
+  mobileLibraryGroupsProperties!: MobileLibraryGroupProperties[];
   pageMode!: string;
 
   constructor(
