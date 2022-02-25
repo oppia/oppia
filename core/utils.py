@@ -223,7 +223,7 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         dict. Parsed dict representation of the yaml string.
 
     Raises:
-        InavlidInputException. If the yaml string sent as the
+        InvalidInputException. If the yaml string sent as the
             parameter is unable to get parsed, them this error gets
             raised.
     """

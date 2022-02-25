@@ -280,6 +280,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that match the given
             query values, up to a maximum of
             feconf.DEFAULT_SUGGESTION_QUERY_LIMIT suggestions.
+
+        Raises:
+            Exception. The field cannot be queried.
         """
         query = cls.query()
         for (field, value) in query_fields_and_values:
@@ -452,6 +455,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that are in the given
             score categories, which are in review, but not created by the
             given user.
+
+        Raises:
+            Exception. Given list of score categories is empty.
         """
         if len(score_categories) == 0:
             raise Exception('Received empty list of score categories')
@@ -483,6 +489,30 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.author_id != user_id,
             cls.language_code.IN(language_codes)
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
+    def get_in_review_translation_suggestions_by_exp_ids(
+        cls, exp_ids: List[str], language_code: str
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Gets all in-review translation suggestions matching the supplied
+        exp_ids and language_code.
+
+        Args:
+            exp_ids: list(str). Exploration IDs matching the target ID of the
+                translation suggestions.
+            language_code: str. The ISO 639-1 language code of the translation
+                suggestions.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions matching the supplied
+            exp_ids and language_code.
+        """
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.target_id.IN(exp_ids),
+            cls.language_code == language_code
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod

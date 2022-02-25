@@ -35,7 +35,7 @@ import { ActivityDict,
   LibraryPageBackendApiService,
   SummaryDict } from './services/library-page-backend-api.service';
 
-interface mobileLibraryGroupProperties {
+interface MobileLibraryGroupProperties {
   inCollapsedState: boolean;
   buttonText: string;
 }
@@ -45,8 +45,9 @@ interface mobileLibraryGroupProperties {
   templateUrl: './library-page.component.html'
 })
 export class LibraryPageComponent {
-  possibleBannerFilenames = [
+  possibleBannerFilenames: string[] = [
     'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
+
   // If the value below is changed, the following CSS values in
   // oppia.css must be changed:
   // - .oppia-exp-summary-tiles-container: max-width
@@ -55,24 +56,31 @@ export class LibraryPageComponent {
   isAnyCarouselCurrentlyScrolling: boolean = false;
   CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
   tileDisplayCount: number = 0;
-  activeGroupIndex: number;
-  libraryGroups: SummaryDict[];
-  mobileLibraryGroupsProperties: mobileLibraryGroupProperties[];
   leftmostCardIndices: number[] = [];
-  currentPath: string;
-  pageMode: string;
   LIBRARY_PAGE_MODES = LibraryPageConstants.LIBRARY_PAGE_MODES;
-  bannerImageFilename: string;
-  bannerImageFileUrl: string;
-  groupName: string;
-  activityList: ActivityDict[];
-  groupHeaderI18nId: string;
-  activitiesOwned = {
+  activitiesOwned: {[key: string]: {[key: string]: boolean}} = {
     explorations: {},
     collections: {}
   };
-  libraryWindowIsNarrow: boolean;
-  resizeSubscription: Subscription;
+
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+
+  resizeSubscription!: Subscription;
+  // The following property will be assigned null when user
+  // has not selected any active group index.
+  activeGroupIndex!: number | null;
+  activityList!: ActivityDict[];
+  bannerImageFilename!: string;
+  bannerImageFileUrl!: string;
+  currentPath!: string;
+  groupName!: string;
+  groupHeaderI18nId!: string;
+  libraryGroups!: SummaryDict[];
+  libraryWindowIsNarrow!: boolean;
+  mobileLibraryGroupsProperties!: MobileLibraryGroupProperties[];
+  pageMode!: string;
 
   constructor(
     private loggerService: LoggerService,
@@ -108,7 +116,11 @@ export class LibraryPageComponent {
       return;
     }
 
-    let windowWidth = $(window).width() * 0.85;
+    // The number 0 here is just to make sure that the type of width is number,
+    // it is never assigned as the width will never be undefined.
+    let width = $(window).width() || 0;
+
+    let windowWidth = width * 0.85;
     // The number 20 is added to LIBRARY_TILE_WIDTH_PX in order to
     // compensate for padding and margins. 20 is just an arbitrary
     // number.
@@ -127,8 +139,10 @@ export class LibraryPageComponent {
       let carouselJQuerySelector = (
         '.oppia-library-carousel-tiles:eq(n)'.replace(
           'n', String(i)));
+      // The number 0 here is just to make sure that the type of width is
+      // number, it is never assigned as the selector will never be undefined.
       let carouselScrollPositionPx = $(
-        carouselJQuerySelector).scrollLeft();
+        carouselJQuerySelector).scrollLeft() || 0;
       let index = Math.ceil(
         carouselScrollPositionPx / AppConstants.LIBRARY_TILE_WIDTH_PX);
       this.leftmostCardIndices[i] = index;
@@ -143,8 +157,10 @@ export class LibraryPageComponent {
       '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind.toString()));
 
     let direction = isLeftScroll ? -1 : 1;
+    // The number 0 here is just to make sure that the type of width is
+    // number, it is never assigned as the selector will never be undefined.
     let carouselScrollPositionPx = $(
-      carouselJQuerySelector).scrollLeft();
+      carouselJQuerySelector).scrollLeft() || 0;
 
     // Prevent scrolling if there more carousel pixed widths than
     // there are tile widths.
@@ -208,7 +224,7 @@ export class LibraryPageComponent {
     if (fullResultsUrl) {
       this.windowRef.nativeWindow.location.href = fullResultsUrl;
     } else {
-      let selectedCategories = {};
+      let selectedCategories: Record<string, boolean> = {};
       for (let i = 0; i < categories.length; i++) {
         selectedCategories[categories[i]] = true;
       }
@@ -265,7 +281,9 @@ export class LibraryPageComponent {
       this.loggerService.error('INVALID URL PATH: ' + currentPath);
     }
 
-    this.pageMode = LibraryPageConstants.LIBRARY_PATHS_TO_MODES[currentPath];
+    const libraryContants: Record<string, string> = (
+      LibraryPageConstants.LIBRARY_PATHS_TO_MODES);
+    this.pageMode = libraryContants[currentPath];
     this.LIBRARY_PAGE_MODES = LibraryPageConstants.LIBRARY_PAGE_MODES;
 
     let title = 'Community Library Lessons | Oppia';

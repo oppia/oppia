@@ -297,18 +297,22 @@ def open_new_tab_in_browser_if_possible(url):
     input()
 
 
-def get_remote_alias(remote_url):
-    """Finds the correct alias for the given remote repository URL."""
+def get_remote_alias(remote_urls):
+    """Finds the correct alias for the given remote repository URLs."""
     git_remote_output = subprocess.check_output(
         ['git', 'remote', '-v']).decode('utf-8').split('\n')
     remote_alias = None
-    for line in git_remote_output:
-        if remote_url in line:
-            remote_alias = line.split()[0]
+    remote_url = None
+    for remote_url in remote_urls:
+        for line in git_remote_output:
+            if remote_url in line:
+                remote_alias = line.split()[0]
+        if remote_alias:
+            break
     if remote_alias is None:
         raise Exception(
             'ERROR: There is no existing remote alias for the %s repo.'
-            % remote_url)
+            % ', '.join(remote_urls))
 
     return remote_alias
 
@@ -351,6 +355,9 @@ def get_current_release_version_number(release_branch_name):
 
     Returns:
         str. The version of release.
+
+    Raises:
+        Exception. Invalid name of the release branch.
     """
     release_match = re.match(RELEASE_BRANCH_REGEX, release_branch_name)
     release_maintenance_match = re.match(
@@ -595,6 +602,10 @@ def inplace_replace_file(
         replacement_string: str. The content to be replaced.
         expected_number_of_replacements: optional(int). The number of
             replacements that should be made. When None no check is done.
+
+    Raises:
+        ValueError. Wrong number of replacements.
+        Exception. The content failed to get replaced.
     """
     backup_filename = '%s.bak' % filename
     shutil.copyfile(filename, backup_filename)
@@ -784,6 +795,9 @@ def write_stdout_safe(string):
 
     Args:
         string: str|bytes. The string to write to stdout.
+
+    Raises:
+        OSError. Failed to write the input string.
     """
     string_bytes = string.encode('utf-8') if isinstance(string, str) else string
 
