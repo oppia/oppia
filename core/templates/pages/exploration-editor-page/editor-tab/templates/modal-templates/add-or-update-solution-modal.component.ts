@@ -42,9 +42,9 @@ interface SolutionInterface {
   // and correct answer is not yet choosen.
   correctAnswer: string | undefined;
   explanationHtml: string;
-  // A null 'explanationContentId' indicates that the 'Solution' has been
+  // An undefined 'explanationContentId' indicates that the 'Solution' has been
   // created but not saved.
-  explanationContentId: string | null;
+  explanationContentId: string | undefined;
   explanation?: string;
 }
 
@@ -132,10 +132,11 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   saveSolution(): void {
-    if (typeof this.data.answerIsExclusive === 'boolean' &&
+    if (
+      typeof this.data.answerIsExclusive === 'boolean' &&
        this.data.correctAnswer !== undefined &&
        this.data.explanation !== '' &&
-       this.data.explanationContentId !== null
+       this.data.explanationContentId !== undefined
     ) {
       this.ngbActiveModal.close({
         solution: this.solutionObjectFactory.createNew(

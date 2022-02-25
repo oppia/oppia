@@ -119,11 +119,11 @@ export class SchemaDefaultValueService {
       return schema.choices[0];
     } else if (schemaIsSubtitledHtml) {
       return SubtitledHtml.createFromBackendDict({
-        html: '', content_id: null
+        html: '', content_id: undefined
       });
     } else if (schemaIsSubtitledUnicode) {
       return this.subtitledUnicodeObjectFactory.createFromBackendDict({
-        unicode_str: '', content_id: null
+        unicode_str: '', content_id: undefined
       });
     } else if (schema.type === SchemaConstants.SCHEMA_TYPE_BOOL) {
       return false;

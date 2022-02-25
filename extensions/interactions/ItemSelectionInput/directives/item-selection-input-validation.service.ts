@@ -137,7 +137,7 @@ export class ItemSelectionInputValidationService {
       var answerChoiceToIndex: Record<string, number> = {};
       seenChoices.forEach((seenChoice, choiceIndex) => {
         const contentId = seenChoice.contentId;
-        if (contentId === null) {
+        if (contentId === undefined) {
           throw new Error('ContentId of choice does not exist');
         }
         answerChoiceToIndex[contentId] = choiceIndex;
