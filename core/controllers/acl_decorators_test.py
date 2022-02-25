@@ -5550,7 +5550,8 @@ class TopicsAndSkillsDashboardReadOnlyTest(test_utils.GenericTestBase):
 
     def test_any_user_can_access_topics_and_skills_dashboard_read_only(self):
         """Test access to topics and skills dashboard
-        for any user in read only format."""
+        for any user in read only format.
+        """
         self.login(self.NEW_USER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
