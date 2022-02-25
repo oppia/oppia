@@ -27,13 +27,12 @@ from core import utils
 from typing import List, Optional
 
 
-# We can't inject dynamic data(attribute_names) into namedtuple(UserQueryParams)
-# without raising mypy error. Therefore , we need to use predefined attributes
-# explicitly and check them for similarity in test file and raise error
-# when needed .
+# We can't inject dynamic data (attribute_names) into namedtuple (UserQueryParams)
+# without raising MyPy error. Therefore, we need to use predefined attributes
+# explicitly and then verify them in the test file and raise errors if needed.
 UserQueryParams = collections.namedtuple(
-        'UserQueryParams',
-        [
+    'UserQueryParams',
+    [
         'inactive_in_last_n_days',
         'has_not_logged_in_for_n_days',
         'created_at_least_n_exps',
@@ -41,17 +40,9 @@ UserQueryParams = collections.namedtuple(
         'edited_at_least_n_exps',
         'edited_fewer_than_n_exps',
         'created_collection'
-        ],
-        defaults=(
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None
-            )
-        )
+    ],
+    defaults=(None, None, None, None, None, None, None)
+)
 
 
 class UserQuery:
