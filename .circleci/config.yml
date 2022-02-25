@@ -6,10 +6,6 @@ workflows:
 
     jobs:
       - setup_and_typescript_tests
-        filters:
-          branches:
-            only:
-              - develop
 
 var_for_docker_image: &docker_image circleci/python:3.7.10-browsers
 
@@ -54,6 +50,10 @@ commands:
 
 jobs:
   setup_and_typescript_tests:
+    filters:
+          branches:
+            only:
+              - develop
     <<: *job_defaults
     steps:
       - checkout
