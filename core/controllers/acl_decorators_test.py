@@ -5541,15 +5541,21 @@ class TopicsAndSkillsDashboardReadOnlyTest(test_utils.GenericTestBase):
         super(TopicsAndSkillsDashboardReadOnlyTest, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/topics_and_skills_dashboard/data', self.MockHandler)],
+            [webapp2.Route(
+              '/topics_and_skills_dashboard/data',
+              self.MockHandler
+            )],
             debug=feconf.DEBUG,
         ))
 
     def test_any_user_can_access_topics_and_skills_dashboard_read_only(self):
-        """Test access to topics and skills dashboard for any user in read only format."""
+        """
+        Test access to topics and skills dashboard
+        for any user in read only format.
+        """
         self.login(self.NEW_USER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-              url = '/topics_and_skills_dashboard/data',
+              url='/topics_and_skills_dashboard/data',
               expected_status_int=200)
         self.logout()
