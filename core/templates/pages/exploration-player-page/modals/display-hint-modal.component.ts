@@ -38,8 +38,13 @@ export class DisplayHintModalComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   index!: number;
-  hint!: SubtitledHtml | null; // null is allowed here because displayhint() funtion in hints-and-solution-manager.service.ts can return null
-  hintContentId!: string | null; // null is allowed here because in SubtitledHtml class in the subtitled-html.model.ts file the type of contentID is defined as string | null
+  hint!: SubtitledHtml | null;
+  // Null is allowed here because displayhint() funtion in
+  // Hints-and-solution-manager.service.ts can return null.
+  hintContentId!: string | null;
+  // Null is allowed here because in SubtitledHtml class in the
+  // Subtitled-html.model.ts file the type of contentID is
+  // Defined as string | null.
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -53,9 +58,10 @@ export class DisplayHintModalComponent {
 
   ngOnInit(): void {
     this.hint = this.hintsAndSolutionManagerService.displayHint(this.index);
-    let displayedCard : StateCard = this.playerTranscriptService.getCard(
+    let displayedCard: StateCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
-    let recordedVoiceovers : RecordedVoiceovers = displayedCard.getRecordedVoiceovers();
+    let recordedVoiceovers: RecordedVoiceovers =
+      displayedCard.getRecordedVoiceovers();
     if (this.hint) {
       this.hintContentId = this.hint.contentId;
       if (this.hintContentId !== null) {
