@@ -22,7 +22,7 @@ import os
 import re
 
 from core import platform_feature_list
-from core import python_utils
+from core import utils
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
@@ -50,7 +50,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
 
     def _parse_feature_names_in_frontend(self):
         """Reads and parses feature flag definition in frontend."""
-        with python_utils.open_file(FRONTEND_FEATURE_NAMES_PATH, 'r') as f:
+        with utils.open_file(FRONTEND_FEATURE_NAMES_PATH, 'r') as f:
             content = f.read()
 
         body = ENUM_BODY_REGEXP.search(content).group(1)

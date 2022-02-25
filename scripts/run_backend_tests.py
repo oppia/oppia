@@ -66,7 +66,7 @@ from . import install_third_party_libs
 # libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
 
-from core import python_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from core import utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -248,7 +248,7 @@ def _get_all_test_targets_from_shard(shard_name):
     Returns:
         list(str). The dotted module names that belong to the shard.
     """
-    with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+    with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
     return shards_spec[shard_name]
 
@@ -266,7 +266,7 @@ def _check_shards_match_tests(include_load_tests=True):
     Raises:
         Exception. Failed to find duplicated module in shards.
     """
-    with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+    with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
     shard_modules = sorted([
         module for shard in shards_spec.values() for module in shard])

@@ -22,7 +22,6 @@ import datetime
 import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import fs_domain
@@ -744,7 +743,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.update_thumbnail_filename('img.svg')
 
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with python_utils.open_file(  # type: ignore[no-untyped-call]
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
@@ -798,7 +797,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
         # Test successful update of thumbnail_filename when the thumbnail
         # is found in the filesystem.
-        with python_utils.open_file(  # type: ignore[no-untyped-call]
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()

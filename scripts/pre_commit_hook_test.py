@@ -24,7 +24,7 @@ import shutil
 import subprocess
 import tempfile
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 from scripts import common
@@ -349,7 +349,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         temp_file = tempfile.NamedTemporaryFile()
         temp_file_name = 'mock_release_constants.json'
         temp_file.name = temp_file_name
-        with python_utils.open_file(temp_file_name, 'w') as tmp:
+        with utils.open_file(temp_file_name, 'w') as tmp:
             tmp.write('{"GCLOUD_PATH": "%s"}' % common.GCLOUD_PATH)
         with self.swap(
             pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name):
@@ -366,7 +366,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         incorrect_gcloud_path = (
             '../oppia_tools/google-cloud-sdk-314.0.0/google-cloud-sdk/'
             'bin/gcloud')
-        with python_utils.open_file(temp_file_name, 'w') as tmp:
+        with utils.open_file(temp_file_name, 'w') as tmp:
             tmp.write('{"GCLOUD_PATH": "%s"}' % incorrect_gcloud_path)
         constants_file_swap = self.swap(
             pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name)

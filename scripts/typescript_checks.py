@@ -23,7 +23,7 @@ import shutil
 import subprocess
 import sys
 
-from core import python_utils
+from core import utils
 from . import common
 
 _PARSER = argparse.ArgumentParser(
@@ -45,7 +45,7 @@ STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
 
 def validate_compiled_js_dir():
     """Validates that compiled JS dir matches out dir in tsconfig."""
-    with python_utils.open_file(TSCONFIG_FILEPATH, 'r') as f:
+    with utils.open_file(TSCONFIG_FILEPATH, 'r') as f:
         config_data = json.load(f)
         out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
     if out_dir != COMPILED_JS_DIR:

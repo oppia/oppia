@@ -23,7 +23,7 @@ from __future__ import annotations
 import collections
 import os
 import sys
-from core import python_utils
+from core import utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -74,7 +74,7 @@ def make_graph():
                 if filename.endswith(SERVICE_FILES_SUFFICES):
                     nodes_set.add(filename)
                     filepath = os.path.join(root, filename)
-                    with python_utils.open_file(filepath, 'r') as f:
+                    with utils.open_file(filepath, 'r') as f:
                         file_lines = f.readlines()
 
                     dep_lines = ''

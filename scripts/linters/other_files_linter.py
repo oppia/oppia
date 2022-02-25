@@ -23,7 +23,7 @@ import json
 import os
 import re
 
-from core import python_utils
+from core import utils
 
 import yaml
 
@@ -139,10 +139,10 @@ class CustomLintChecksManager:
         failed = False
         error_messages = []
 
-        dependencies_json = json.load(python_utils.open_file(
+        dependencies_json = json.load(utils.open_file(
             DEPENDENCIES_JSON_FILE_PATH, 'r'))['dependencies']['frontend']
 
-        package = json.load(python_utils.open_file(
+        package = json.load(utils.open_file(
             PACKAGE_JSON_FILE_PATH, 'r'))['dependencies']
 
         files_in_typings_dir = os.listdir(
@@ -262,7 +262,7 @@ class CustomLintChecksManager:
         failed = False
         error_messages = []
 
-        with python_utils.open_file(STRICT_TS_CONFIG_FILEPATH, 'r') as f:
+        with utils.open_file(STRICT_TS_CONFIG_FILEPATH, 'r') as f:
             strict_ts_config = json.load(f)
 
         # Remove .ts extension from filepath for sorting to ensure that

@@ -30,7 +30,6 @@ import types
 
 from core import feconf
 from core import handler_schema_constants
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -884,7 +883,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n'))
         for filename in filenames:
-            with python_utils.open_file(
+            with utils.open_file(
                 os.path.join(os.getcwd(), 'assets', 'i18n', filename),
                 mode='r') as f:
                 lines = f.readlines()
@@ -2109,7 +2108,7 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
         user_id = user_services.get_user_id_from_username('testlearneruser')
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:

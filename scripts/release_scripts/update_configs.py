@@ -29,7 +29,6 @@ import os
 import re
 import sys
 
-from core import python_utils
 from core import utils
 from .. import common
 
@@ -89,10 +88,10 @@ def apply_changes_based_on_config(
     Raises:
         Exception. Line(s) in config file are not matching with the regex.
     """
-    with python_utils.open_file(config_filepath, 'r') as config_file:
+    with utils.open_file(config_filepath, 'r') as config_file:
         config_lines = config_file.read().splitlines()
 
-    with python_utils.open_file(local_filepath, 'r') as local_file:
+    with utils.open_file(local_filepath, 'r') as local_file:
         local_lines = local_file.read().splitlines()
 
     local_filename = os.path.basename(local_filepath)
@@ -119,7 +118,7 @@ def apply_changes_based_on_config(
     for index, config_line in enumerate(config_lines):
         local_lines[local_line_numbers[index]] = config_line
 
-    with python_utils.open_file(local_filepath, 'w') as writable_local_file:
+    with utils.open_file(local_filepath, 'w') as writable_local_file:
         writable_local_file.write('\n'.join(local_lines) + '\n')
 
 
@@ -158,9 +157,9 @@ def check_updates_to_terms_of_service(
             commit_time.year, commit_time.month, commit_time.day,
             commit_time.hour, commit_time.minute, commit_time.second)
         feconf_lines = []
-        with python_utils.open_file(release_feconf_path, 'r') as f:
+        with utils.open_file(release_feconf_path, 'r') as f:
             feconf_lines = f.readlines()
-        with python_utils.open_file(release_feconf_path, 'w') as f:
+        with utils.open_file(release_feconf_path, 'w') as f:
             for line in feconf_lines:
                 if line.startswith('REGISTRATION_PAGE_LAST_UPDATED_UTC'):
                     line = (
@@ -185,7 +184,7 @@ def verify_feconf(release_feconf_path, verify_email_api_keys):
         Exception. The mailchimp API key not added before deployment.
         Exception. REDISHOST not updated before deployment.
     """
-    feconf_contents = python_utils.open_file(
+    feconf_contents = utils.open_file(
         release_feconf_path, 'r').read()
     if verify_email_api_keys and (
             'MAILGUN_API_KEY' not in feconf_contents or
@@ -222,12 +221,12 @@ def add_mailgun_api_key(release_feconf_path):
         mailgun_api_key = mailgun_api_key.strip()
 
     feconf_lines = []
-    with python_utils.open_file(release_feconf_path, 'r') as f:
+    with utils.open_file(release_feconf_path, 'r') as f:
         feconf_lines = f.readlines()
 
     assert 'MAILGUN_API_KEY = None\n' in feconf_lines, 'Missing mailgun API key'
 
-    with python_utils.open_file(release_feconf_path, 'w') as f:
+    with utils.open_file(release_feconf_path, 'w') as f:
         for line in feconf_lines:
             if line == 'MAILGUN_API_KEY = None\n':
                 line = line.replace('None', '\'%s\'' % mailgun_api_key)
@@ -253,13 +252,13 @@ def add_mailchimp_api_key(release_feconf_path):
         mailchimp_api_key = mailchimp_api_key.strip()
 
     feconf_lines = []
-    with python_utils.open_file(release_feconf_path, 'r') as f:
+    with utils.open_file(release_feconf_path, 'r') as f:
         feconf_lines = f.readlines()
 
     error_text = 'Missing mailchimp API key'
     assert 'MAILCHIMP_API_KEY = None\n' in feconf_lines, error_text
 
-    with python_utils.open_file(release_feconf_path, 'w') as f:
+    with utils.open_file(release_feconf_path, 'w') as f:
         for line in feconf_lines:
             if line == 'MAILCHIMP_API_KEY = None\n':
                 line = line.replace('None', '\'%s\'' % mailchimp_api_key)

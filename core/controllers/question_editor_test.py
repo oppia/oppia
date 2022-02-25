@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.domain import question_fetchers
 from core.domain import question_services
@@ -322,7 +322,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             'skill_difficulties': [0.6]
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:

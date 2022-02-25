@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.domain import taskqueue_services
 from core.tests import test_utils
 
@@ -121,7 +121,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         """
         queue_name_dict = {}
         # Parse the queue.yaml file for the correct queue names.
-        with python_utils.open_file('queue.yaml', 'r') as f:
+        with utils.open_file('queue.yaml', 'r') as f:
             lines = f.readlines()
             for line in lines:
                 if 'name' in line:

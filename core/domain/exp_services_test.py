@@ -25,7 +25,6 @@ import re
 import zipfile
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
@@ -2108,7 +2107,7 @@ title: A title
                         '</oppia-noninteractive-image>').to_dict()
                 })], 'Add state name')
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
@@ -2199,7 +2198,7 @@ title: A title
                         '</oppia-noninteractive-image>').to_dict()
                 })], 'Add state name')
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -2208,7 +2207,7 @@ title: A title
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID))
         fs.commit('image/abc.png', raw_image)
         # Audio files should not be included in asset downloads.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'), 'rb', encoding=None
         ) as f:
             raw_audio = f.read()
@@ -2282,7 +2281,7 @@ title: A title
                 'alt-with-value="&quot;Image&quot;">'
                 '</oppia-noninteractive-image>').to_dict()
         })]
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None
         ) as f:
@@ -2571,7 +2570,7 @@ written_translations:
             'new_value': 1
         })]
         exploration.objective = 'The objective'
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             raw_image = f.read()

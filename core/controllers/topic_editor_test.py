@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import skill_services
@@ -186,7 +186,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'story_url_fragment': 'story-frag-one'
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None
         ) as f:
@@ -214,7 +214,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'story_url_fragment': 'story-frag-two'
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'), 'rb',
             encoding=None
         ) as f:
@@ -249,7 +249,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             url_fragment='original'
         )
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None
         ) as f:

@@ -23,7 +23,7 @@ import os
 import re
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.domain import image_services
 from core.tests import test_utils
 
@@ -39,11 +39,11 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ImageServicesUnitTests, self).setUp()
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'dummy_large_image.jpg'),
             'rb', encoding=None) as f:
             self.jpeg_raw_image = f.read()
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None) as f:
             self.png_raw_image = f.read()
@@ -99,7 +99,7 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(pil_image.format, 'PNG')
 
     def test_compression_results_in_identical_files(self):
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(
                 feconf.TESTS_DATA_DIR, 'compressed_image.jpg'),
             'rb', encoding=None) as f:
