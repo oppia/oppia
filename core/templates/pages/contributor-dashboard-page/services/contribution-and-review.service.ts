@@ -137,34 +137,32 @@ export class ContributionAndReviewService {
           fetcher.offset = responseBody.next_offset;
           return {
             suggestionIdToDetails: responseSuggestionIdToDetails,
-            more: (
-              Object.keys(fetcher.suggestionIdToDetails).length >
-              AppConstants.OPPORTUNITIES_PAGE_SIZE)
+            more: Object.keys(fetcher.suggestionIdToDetails).length > 0
           };
         })
       );
     }
   }
 
-  async getUserCreatedQuestionSuggestionsAsync(resetOffset = false):
+  async getUserCreatedQuestionSuggestionsAsync(resetOffset = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this._userCreatedQuestionFetcher, resetOffset);
   }
 
-  async getReviewableQuestionSuggestionsAsync(resetOffset = false):
+  async getReviewableQuestionSuggestionsAsync(resetOffset = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this._reviewableQuestionFetcher, resetOffset);
   }
 
-  async getUserCreatedTranslationSuggestionsAsync(resetOffset = false):
+  async getUserCreatedTranslationSuggestionsAsync(resetOffset = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this._userCreatedTranslationFetcher, resetOffset);
   }
 
-  async getReviewableTranslationSuggestionsAsync(resetOffset = false):
+  async getReviewableTranslationSuggestionsAsync(resetOffset = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this._reviewableTranslationFetcher, resetOffset);

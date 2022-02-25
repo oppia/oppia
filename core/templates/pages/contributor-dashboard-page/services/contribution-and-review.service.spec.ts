@@ -128,82 +128,80 @@ describe('Contribution and review service', () => {
         expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
       });
 
-    it('should fetch one page ahead and cache extra results',
-      () => {
-        // Return more than a page's worth of results (3 results for a page size
-        // of 2).
-        fetchSuggestionsAsyncSpy.and.returnValue(
-          Promise.resolve(multiplePageBackendFetchResponse));
+    it('should fetch one page ahead and cache extra results', () => {
+      // Return more than a page's worth of results (3 results for a page size
+      // of 2).
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(multiplePageBackendFetchResponse));
 
-        // Only the first 2 results should be returned and the extra result
-        // should be cached.
-        cars.getUserCreatedQuestionSuggestionsAsync()
-          .then((response) => {
-            expect(response.suggestionIdToDetails.suggestion_id_1)
-              .toEqual(expectedSuggestionDict);
-            expect(response.suggestionIdToDetails.suggestion_id_2)
-              .toEqual(expectedSuggestion2Dict);
-            expect(Object.keys(response.suggestionIdToDetails).length)
-              .toEqual(2);
-            expect(response.suggestionIdToDetails.more).toBeTrue();
-          });
+      // Only the first 2 results should be returned and the extra result
+      // should be cached.
+      cars.getUserCreatedQuestionSuggestionsAsync()
+        .then((response) => {
+          expect(response.suggestionIdToDetails.suggestion_id_1)
+            .toEqual(expectedSuggestionDict);
+          expect(response.suggestionIdToDetails.suggestion_id_2)
+            .toEqual(expectedSuggestion2Dict);
+          expect(Object.keys(response.suggestionIdToDetails).length)
+            .toEqual(2);
+          expect(response.suggestionIdToDetails.more).toBeTrue();
+        });
 
-        // No more results from the backend.
-        fetchSuggestionsAsyncSpy.and.returnValue(
-          Promise.resolve({
-            suggestions: [],
-            target_id_to_opportunity_dict: {},
-            next_offset: 3
-          }));
+      // No more results from the backend.
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve({
+          suggestions: [],
+          target_id_to_opportunity_dict: {},
+          next_offset: 3
+        }));
 
-        // Return the cached result that was previously stored from a
-        // fetch-ahead.
-        cars.getUserCreatedQuestionSuggestionsAsync()
-          .then((response) => {
-            expect(response.suggestionIdToDetails.suggestion_id_3)
-              .toEqual(expectedSuggestion3Dict);
-            expect(Object.keys(response.suggestionIdToDetails).length)
-              .toEqual(1);
-            expect(response.suggestionIdToDetails.more).toBeFalse();
-          });
-      });
+      // Return the cached result that was previously stored from a
+      // fetch-ahead.
+      cars.getUserCreatedQuestionSuggestionsAsync()
+        .then((response) => {
+          expect(response.suggestionIdToDetails.suggestion_id_3)
+            .toEqual(expectedSuggestion3Dict);
+          expect(Object.keys(response.suggestionIdToDetails).length)
+            .toEqual(1);
+          expect(response.suggestionIdToDetails.more).toBeFalse();
+        });
+    });
 
-    it('should reset offset',
-      () => {
-        // Return more than a page's worth of results (3 results for a page size
-        // of 2).
-        fetchSuggestionsAsyncSpy.and.returnValue(
-          Promise.resolve(multiplePageBackendFetchResponse));
+    it('should reset offset', () => {
+      // Return more than a page's worth of results (3 results for a page size
+      // of 2).
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(multiplePageBackendFetchResponse));
 
-        // Only the first 2 results should be returned and the extra result
-        // should be cached.
-        cars.getUserCreatedQuestionSuggestionsAsync()
-          .then((response) => {
-            expect(response.suggestionIdToDetails.suggestion_id_1)
-              .toEqual(expectedSuggestionDict);
-            expect(response.suggestionIdToDetails.suggestion_id_2)
-              .toEqual(expectedSuggestion2Dict);
-            expect(Object.keys(response.suggestionIdToDetails).length)
-              .toEqual(2);
-            expect(response.suggestionIdToDetails.more).toBeTrue();
-          });
+      // Only the first 2 results should be returned and the extra result
+      // should be cached.
+      cars.getUserCreatedQuestionSuggestionsAsync()
+        .then((response) => {
+          expect(response.suggestionIdToDetails.suggestion_id_1)
+            .toEqual(expectedSuggestionDict);
+          expect(response.suggestionIdToDetails.suggestion_id_2)
+            .toEqual(expectedSuggestion2Dict);
+          expect(Object.keys(response.suggestionIdToDetails).length)
+            .toEqual(2);
+          expect(response.suggestionIdToDetails.more).toBeTrue();
+        });
 
-        // Fetch again from offset 0.
-        fetchSuggestionsAsyncSpy.and.returnValue(
-          Promise.resolve(multiplePageBackendFetchResponse));
+      // Fetch again from offset 0.
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(multiplePageBackendFetchResponse));
 
-        // Return the first 2 results from offset 0 again.
-        cars.getUserCreatedQuestionSuggestionsAsync(true)
-          .then((response) => {
-            expect(response.suggestionIdToDetails.suggestion_id_1)
-              .toEqual(expectedSuggestionDict);
-            expect(response.suggestionIdToDetails.suggestion_id_2)
-              .toEqual(expectedSuggestion2Dict);
-            expect(Object.keys(response.suggestionIdToDetails).length)
-              .toEqual(2);
-            expect(response.suggestionIdToDetails.more).toBeTrue();
-          });
-      });
+      // Return the first 2 results from offset 0 again.
+      cars.getUserCreatedQuestionSuggestionsAsync(true)
+        .then((response) => {
+          expect(response.suggestionIdToDetails.suggestion_id_1)
+            .toEqual(expectedSuggestionDict);
+          expect(response.suggestionIdToDetails.suggestion_id_2)
+            .toEqual(expectedSuggestion2Dict);
+          expect(Object.keys(response.suggestionIdToDetails).length)
+            .toEqual(2);
+          expect(response.suggestionIdToDetails.more).toBeTrue();
+        });
+    });
   });
 
   describe('getReviewableQuestionSuggestionsAsync', () => {

@@ -79,6 +79,9 @@ export class OpportunitiesListComponent {
     this.directiveSubscriptions.add(
       this.contributionOpportunitiesService
         .removeOpportunitiesEventEmitter.subscribe((opportunityIds) => {
+          if (opportunityIds.length === 0) {
+            return;
+          }
           this.opportunities = this.opportunities.filter((opportunity) => {
             return opportunityIds.indexOf(opportunity.id) < 0;
           });
@@ -95,6 +98,8 @@ export class OpportunitiesListComponent {
 
   ngOnInit(): void {
     this.loadingOpportunityData = true;
+    this.activePageNumber = 1;
+    this.lastPageNumber = 1000;
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.

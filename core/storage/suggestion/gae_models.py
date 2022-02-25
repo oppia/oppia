@@ -497,7 +497,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             limit: int,
             offset: int,
             user_id: str,
-            language_codes: List[str],
+            language_codes: List[str]
     ) -> Sequence[GeneralSuggestionModel]:
         """Fetches translation suggestions that are in-review where the
         author_id != user_id and language_code matches one of the supplied
@@ -537,6 +537,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             next_offset
         )
 
+    @classmethod
     def get_in_review_translation_suggestions_by_exp_ids(
         cls, exp_ids: List[str], language_code: str
     ) -> Sequence[GeneralSuggestionModel]:
@@ -583,7 +584,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_question_suggestions_by_offset(
-        cls, limit: int,  offset: int, user_id: str,
+        cls, limit: int,  offset: int, user_id: str
     ) -> Sequence[GeneralSuggestionModel]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
