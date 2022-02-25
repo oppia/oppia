@@ -309,6 +309,7 @@
         "core.domain.question_domain_test",
         "core.platform.bulk_email.mailchimp_bulk_email_services_test",
         "core.platform.bulk_email.dev_mode_bulk_email_services_test",
-        "core.jobs.io.job_io_test"
+        "core.jobs.io.job_io_test",
+        "core.jobs.batch_jobs.question_schema_validation_jobs_test"
     ]
 }

@@ -17,12 +17,8 @@
 """Unit tests for jobs.batch_jobs.question_schema_validation_jobs."""
 
 from __future__ import annotations
-from turtle import title
 
-from core import feconf
-from core.constants import constants
 from core.domain import question_domain
-from core.domain import state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import question_schema_validation_jobs
 from core.jobs.types import job_run_result
@@ -34,7 +30,8 @@ from core.platform import models
 class GetQuestionsWithInvalidStateDataSchemaVersionJobTests(
     job_test_utils.JobTestBase):
 
-    JOB_CLASS = question_schema_validation_jobs.GetQuestionsWithInvalidStateDataSchemaVersionJob
+    JOB_CLASS = (
+    question_schema_validation_jobs.GetQuestionsWithInvalidSchemaVersionJob)
 
     QUESTION_ID_1 = '1'
     QUESTION_ID_2 = '2'
@@ -43,64 +40,47 @@ class GetQuestionsWithInvalidStateDataSchemaVersionJobTests(
     def setUp(self):
         super().setUp()
 
-        # This is an invalid model with question_state_data_schema_version is less than 25.
+        question_state_data_1 = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_state_data_1['content_ids_to_audio_translations'] = {
+            'content': {},
+            'default_outcome': {}
+        }
+
+        question_state_data_2 = question_state_data_1
+
         self.question_1 = self.create_model(
             question_models.QuestionModel,
             id=self.QUESTION_ID_1,
-            question_state_data={},
-            question_state_data_schema_version=25,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            linked_skill_ids=['skill_1'],
-            inapplicable_skill_misconception_ids=['skill_2']
+            question_state_data=question_state_data_1,
+            question_state_data_schema_version=49,
+            language_code='en',
+            linked_skill_ids=['skill1'],
+            inapplicable_skill_misconception_ids=['skill2']
         )
 
-        # This is an invalid model with question_state_data_schema_version is more than 25.
         self.question_2 = self.create_model(
             question_models.QuestionModel,
             id=self.QUESTION_ID_2,
-            question_state_data={},
-            question_state_data_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            linked_skill_ids=['skill_3'],
-            inapplicable_skill_misconception_ids=['skill_4']
-        )
-
-        # This is an invalid model with question_state_data_schema_version is more than 25.
-        self.question_3 = self.create_model(
-            question_models.QuestionModel,
-            id=self.QUESTION_ID_3,
-            question_state_data={},
-            question_state_data_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            linked_skill_ids=['skill_5'],
-            inapplicable_skill_misconception_ids=['skill_6']
+            question_state_data=question_state_data_2,
+            question_state_data_schema_version=27,
+            language_code='en',
+            linked_skill_ids=['skill1'],
+            inapplicable_skill_misconception_ids=['skill2']
         )
 
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is([])
 
     def test_run_with_single_valid_model(self) -> None:
-        self.put_multi([self.question_2])
+        self.put_multi([self.question_1])
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('QUESTIONS SUCCESS: 1')
         ])
 
-    def test_run_with_single_invalid_model(self) -> None:
-        self.put_multi([self.question_1])
+    def test_run_with_multi_valid_model(self) -> None:
+        self.put_multi([self.question_1, self.question_2])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('QUESTIONS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stderr(
-                f'The id of exp is {self.QUESTION_ID_1} and its category '
-                + f'is {self.question_1.question_state_data_schema_version}'),
-        ])
-
-    def test_run_with_mixed_models(self) -> None:
-        self.put_multi([self.question_1, self.question_2, self.question_3])
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('QUESTIONS SUCCESS: 3'),
-            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stderr(
-                f'The id of exp is {self.QUESTION_ID_1} and its category '
-                + f'is {self.question_1.id}'),
+            job_run_result.JobRunResult.as_stdout('QUESTIONS SUCCESS: 2')
         ])

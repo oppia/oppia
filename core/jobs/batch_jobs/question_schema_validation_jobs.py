@@ -31,11 +31,13 @@ import apache_beam as beam
 (question_models, ) = models.Registry.import_models([models.NAMES.question])
 
 
-class GetQuestionsWithInvalidStateDataSchemaVersionJob(base_jobs.JobBase):
-    """Job that returns questions having state data schema version less than 27"""
+class GetQuestionsWithInvalidSchemaVersionJob(base_jobs.JobBase):
+    """Job that returns questions having state data schema version
+    less than 27
+    """
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """ Returns PCollection of invalid questions with thier id and actual 
+        """Returns PCollection of invalid questions with thier id and actual
         schema version number.
 
         Returns:
@@ -53,7 +55,10 @@ class GetQuestionsWithInvalidStateDataSchemaVersionJob(base_jobs.JobBase):
         question_ids_with_less_schema_version = (
             total_questions
             | 'Combine exploration title and ids' >> beam.Map(
-                lambda question: (question.id, question.question_state_data_schema_version))
+                lambda question: (
+                    question.id,
+                    question.question_state_data_schema_version)
+                )
             | 'Filter questions with schema version less than 27' >>
                 beam.Filter(lambda question: int(question[1]) < 27)
         )
@@ -74,7 +79,7 @@ class GetQuestionsWithInvalidStateDataSchemaVersionJob(base_jobs.JobBase):
             question_ids_with_less_schema_version
             | 'Save info of invalid questions' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The id of question is %s and its actual schema version is %s'
+                  'The id of question is %s and its actual schema version is %s'
                     % (objects[0], objects[1])))
         )
 
