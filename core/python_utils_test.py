@@ -20,15 +20,10 @@ from __future__ import annotations
 
 import ast
 import builtins
-import os
-import sys
-import unittest
 import urllib
 
 from core import python_utils
-from core import utils
 from core.tests import test_utils
-from core.tests.data import unicode_and_str_handler
 
 
 class PythonUtilsTests(test_utils.GenericTestBase):
@@ -44,19 +39,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         function_node = [n for n in ast_node if isinstance(n, ast.FunctionDef)]
         args_list = python_utils.get_args_of_function_node(function_node[0], [])
         self.assertEqual(args_list, ['arg1', 'arg2'])
-
-    def test_open_file(self):
-        with utils.open_file(
-                os.path.join('core', 'python_utils.py'), 'r'
-        ) as f:
-            file_content = f.readlines()
-            self.assertIsNotNone(file_content)
-
-    def test_can_not_open_file(self):
-        with self.assertRaisesRegex(
-            FileNotFoundError, 'Unable to open file: invalid_file.py'):
-            with utils.open_file('invalid_file.py', 'r') as f:
-                f.readlines()
 
     def test_parse_query_string(self):
         response = urllib.parse.parse_qs(
@@ -129,21 +111,3 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             for k, v in value[-1].items():
                 self.assertEqual(type(k), str)
                 self.assertEqual(type(v), str)
-
-
-@unittest.skipUnless(
-    sys.version[0] == '3', 'Test cases for ensuring Python 3 behavior only')
-class PythonUtilsForPython3Tests(test_utils.GenericTestBase):
-    """Tests for feature detection utilities for Python 3."""
-
-    def test_unicode_and_str_chars_in_file(self):
-        self.assertIsInstance(unicode_and_str_handler.SOME_STR_TEXT, str)
-        self.assertIsInstance(
-            unicode_and_str_handler.SOME_UNICODE_TEXT, str)
-        self.assertIsInstance(
-            unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
-
-        with utils.open_file(
-            'core/tests/data/unicode_and_str_handler.py', 'r') as f:
-            file_content = f.read()
-            self.assertIsInstance(file_content, str)
