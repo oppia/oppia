@@ -1,0 +1,48 @@
+<mat-card>
+    <div class="oppia-lesson-info-content">
+        <p class="oppia-story-title">
+            {{ storyTitleTranslationKey }}
+        </p>
+        <hr>
+        <h3 class="oppia-chapter-title">
+            {{ storyNodeTitleTranslationKey }}
+        </h3>
+        <h4 class="oppia-chapter-description">
+            {{ storyNodeDescTranslationKey }}
+        </h4>
+        <br>
+        <div class="progress"style="height: 10px; border-radius: 10px">
+            <div class="progress-bar progress-bar-completed" role="progressbar" style="width:40%;">
+              
+            </div>
+            <div class="progress-bar progress-bar-started" role="progressbar" style="width:10%;">
+              
+            </div>
+            <div class="progress-bar progress-bar-not-started" role="progressbar" style="width:20%;">
+              
+            </div>
+        </div>
+    </div>
+    <button type="button" class="oppia-close-popover-button" (click)="cancel()">
+        <i class="material-icons md-18">&#xE5CD;</i>
+        <span class="oppia-icon-accessibility-label">Close</span>
+    </button>
+</mat-card>
+
+<style>
+    .oppia-story-title {
+        color: grey;
+        font-family: "Capriola", "Roboto", Arial, sans-serif;
+        font-size: 15px;
+    }
+
+    .oppia-lesson-info-content {
+        padding: 30px;
+    }
+
+    .oppia-chapter-description {
+        color: grey;
+        font-size: 18px;
+    }
+
+</style>

@@ -19,14 +19,17 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 
 @Component({
   selector: 'oppia-exploration-footer',
@@ -42,12 +45,14 @@ export class ExplorationFooterComponent {
   resizeSubscription!: Subscription;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
+  expInfo: LearnerExplorationSummaryBackendDict;
 
   constructor(
     private contextService: ContextService,
     private explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private ngbModal: NgbModal,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
@@ -105,6 +110,18 @@ export class ExplorationFooterComponent {
           this.hintsAndSolutionsAreSupported = !resultsLoaded;
         });
     }
+  }
+
+  openInformationCardModal(): void {
+    let modalRef = this.ngbModal.open(LessonInformationCardModalComponent, {
+      windowClass: 'oppia-modal-information-card'
+    });
+
+    modalRef.result.then(() => {}, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 
   ngOnDestroy(): void {

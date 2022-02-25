@@ -17,34 +17,66 @@
  */
 
  import { Component } from '@angular/core';
- import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+ import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
  import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
  import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ContextService } from 'services/context.service';
+import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
  
  @Component({
-   selector: 'oppia-lesson-information-card-modal',
+   selector: 'oppia-information-card-modal',
    templateUrl: './lesson-information-card-modal.component.html'
  })
  export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
-   contributorsSummary = {};
-   expInfo: LearnerExplorationSummaryBackendDict;
-   explorationId: string;
-   explorationTitle: string;
-   explorationIsPrivate: boolean;
+  topicUrlFragment: string;
+  classroomUrlFragment: string;
+  storyUrlFragment: string;
+  storyTitle!: string;
+  storyTitleTranslationKey!: string;
+  storyPlaythroughObject: StoryPlaythrough;
+  storyId: string;
+  storyNodeTitleTranslationKey: string;
+  storyNodeDescTranslationKey: string;
+  explorationId: string;
+  isLinkedToTopic: boolean;
+
  
    constructor(
-     private ngbActiveModal: NgbActiveModal,
+    private ngbModal: NgbModal,
+    private ngbActiveModal: NgbActiveModal,
+    private contextService: ContextService,
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
    ) {
      super(ngbActiveModal);
-   }
+    }
  
-   ngOnInit(): void {
-     this.contributorsSummary = this.expInfo
-       .human_readable_contributors_summary || {};
-     this.explorationId = this.expInfo.id;
-     this.explorationTitle = this.expInfo.title;
-     this.explorationIsPrivate = (this.expInfo.status === 'private');
-   }
-}
- 
+   ngOnInit(): void { 
+        this.explorationId = this.contextService.getExplorationId();
+        this.storyId = this.urlService.getUrlParams().story_id;
+        this.storyTitleTranslationKey = (
+            this.i18nLanguageCodeService
+            .getStoryTranslationKey(
+                this.storyId, TranslationKeyType.TITLE));
+
+        this.storyNodeTitleTranslationKey = (
+            this.i18nLanguageCodeService.
+              getExplorationTranslationKey(
+                this.explorationId, TranslationKeyType.TITLE)
+          );
+        this.storyNodeDescTranslationKey = (
+            this.i18nLanguageCodeService.
+              getExplorationTranslationKey(
+                this.explorationId, TranslationKeyType.DESCRIPTION)
+          );
+    };
+  }
