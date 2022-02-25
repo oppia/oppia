@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -48,7 +48,7 @@ export class ExplorationPlayerPageComponent {
     let explorationId = this.contextService.getExplorationId();
     this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
       explorationId, null
-    ).then((response) => {
+    ).then((response: FetchExplorationBackendResponse) => {
       this.pageTitleService.setDocumentTitle(
         response.exploration.title + ' - Oppia');
       this.metaTagCustomizationService.addOrReplaceMetaTags([

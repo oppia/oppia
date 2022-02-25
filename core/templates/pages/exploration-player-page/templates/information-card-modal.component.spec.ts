@@ -22,6 +22,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
+import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -57,6 +58,7 @@ describe('Information card modal component', () => {
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
+  let rating: ExplorationRatings;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -88,7 +90,7 @@ describe('Information card modal component', () => {
       community_owned: true,
       activity_type: '',
       last_updated_msec: 0,
-      ratings: null,
+      ratings: rating,
       id: expId,
       created_on_msec: 2,
       human_readable_contributors_summary: {
