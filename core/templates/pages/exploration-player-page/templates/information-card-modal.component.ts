@@ -35,22 +35,29 @@ interface ExplorationTagSummary {
   templateUrl: './information-card-modal.component.html'
 })
 export class InformationCardModalComponent extends ConfirmOrCancelModal {
-  DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
+  DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER: string = (
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
 
-  averageRating: number;
-  contributorsSummary = {};
-  contributorNames: string[];
-  expInfo: LearnerExplorationSummaryBackendDict;
-  explorationId: string;
-  explorationTags: ExplorationTagSummary;
-  explorationTitle: string;
-  infoCardBackgroundCss: { 'background-color': string };
-  infoCardBackgroundImageUrl: string;
-  lastUpdatedString: string;
-  numViews: number;
-  objective: string;
-  explorationIsPrivate: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+
+  // Average rating will be 'null' if the ratings are less than the
+  // minimum acceptable number of ratings. The average will
+  // not be computed in this case.
+  averageRating!: number | null;
+  contributorsSummary: {[keys: string]: {num_commits: number}} = {};
+  contributorNames!: string[];
+  expInfo!: LearnerExplorationSummaryBackendDict;
+  explorationId!: string;
+  explorationTags!: ExplorationTagSummary;
+  explorationTitle!: string;
+  infoCardBackgroundCss!: { 'background-color': string };
+  infoCardBackgroundImageUrl!: string;
+  lastUpdatedString!: string;
+  numViews!: number;
+  objective!: string;
+  explorationIsPrivate!: boolean;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -68,7 +75,7 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
       .human_readable_contributors_summary || {};
     this.contributorNames = Object.keys(
       this.contributorsSummary).sort(
-      (contributorUsername1, contributorUsername2) => {
+      (contributorUsername1: string, contributorUsername2: string) => {
         let commitsOfContributor1 = this.contributorsSummary[
           contributorUsername1].num_commits;
         let commitsOfContributor2 = this.contributorsSummary[
