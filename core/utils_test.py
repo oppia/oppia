@@ -45,7 +45,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_can_not_open_file(self) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            FileNotFoundError, 
+            FileNotFoundError,
             'No such file or directory: \'invalid_file.py\''
         ):
             with utils.open_file('invalid_file.py', 'r') as f:
