@@ -364,7 +364,7 @@ class AppFeedbackReport:
         """
         for text_size_type in (
             app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
-            if text_size_name == text_size_type.name:
+            if text_size_name == text_size_type.value:
                 return text_size_type
         raise utils.InvalidInputException(
             'The given Android app text size %s is invalid.' % text_size_name)
@@ -421,7 +421,7 @@ class AppFeedbackReport:
         """
         for network_type in (
             app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES):
-            if network_type_name == network_type.name:
+            if network_type_name == network_type.value:
                 return network_type
         raise utils.InvalidInputException(
             'The given Android network type %s is invalid.' % network_type_name)
@@ -698,7 +698,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             'device_model': self.device_model,
             'sdk_version': self.sdk_version,
             'build_fingerprint': self.build_fingerprint,
-            'network_type': self.network_type.name
+            'network_type': self.network_type.value
         }
 
     def validate(self) -> None:
@@ -977,7 +977,7 @@ class AndroidAppContext(AppContext):
             'entry_point': self.entry_point.to_dict(),
             'text_language_code': self.text_language_code,
             'audio_language_code': self.audio_language_code,
-            'text_size': self.text_size.name,
+            'text_size': self.text_size.value,
             'only_allows_wifi_download_and_update': (
                 self.only_allows_wifi_download_and_update
             ),
