@@ -197,6 +197,24 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
         self.assertEqual(story_summary.thumbnail_filename, 'image.svg')
 
+    def test_update_published_story(self):
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': story_domain.STORY_PROPERTY_TITLE,
+                'old_value': 'Title',
+                'new_value': 'New Title'
+            })
+        ]
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+            )
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list,
+            'Changed title')
+        updated_story = story_fetchers.get_story_by_id(self.STORY_ID)
+        self.assertEqual(updated_story.title, 'New Title')
+
     def test_update_story_node_properties(self):
         changelist = [
             story_domain.StoryChange({
