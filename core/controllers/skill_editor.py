@@ -141,8 +141,6 @@ class SkillRightsHandler(base.BaseHandler):
 class EditableSkillDataHandler(base.BaseHandler):
     """A data handler for skills which supports writing."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     URL_PATH_ARGS_SCHEMAS = {
         'skill_id': {
             'schema': {
@@ -185,6 +183,8 @@ class EditableSkillDataHandler(base.BaseHandler):
         },
         'DELETE': {}
     }
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self, skill_id):

@@ -180,6 +180,43 @@ class QuestionSkillLinkHandler(base.BaseHandler):
 class EditableQuestionDataHandler(base.BaseHandler):
     """A data handler for questions which supports writing."""
 
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
+                    }]
+                }
+            },
+            'change_list': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': question_domain.QuestionChange
+                    }
+                }
+            }
+        },
+        'DELETE': {}
+    }
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'question_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_view_question_editor
@@ -201,22 +238,11 @@ class EditableQuestionDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_question
     def put(self, question_id):
         """Updates properties of the given question."""
-        commit_message = self.payload.get('commit_message')
+        commit_message = self.normalized_payload.get('commit_message')
 
-        if not commit_message:
-            raise self.PageNotFoundException
-
-        if (commit_message is not None and
-                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
-            raise self.InvalidInputException(
-                'Commit messages must be at most %s characters long.'
-                % constants.MAX_COMMIT_MESSAGE_LENGTH)
-
-        if not self.payload.get('change_list'):
-            raise self.PageNotFoundException
         change_list = [
             question_domain.QuestionChange(change)
-            for change in self.payload.get('change_list')
+            for change in self.normalized_payload.get('change_list')
         ]
 
         for change in change_list:
