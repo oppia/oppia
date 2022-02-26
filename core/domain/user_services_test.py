@@ -24,7 +24,6 @@ import os
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import auth_services
@@ -345,7 +344,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
-        with python_utils.open_file(
+        with utils.open_file(
             expected_gravatar_filepath, 'rb', encoding=None) as f:
             expected_gravatar = f.read()
 

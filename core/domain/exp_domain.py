@@ -660,7 +660,8 @@ class Exploration:
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED, False)
+            feconf.DEFAULT_AUTO_TTS_ENABLED,
+            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED)
 
     @classmethod
     def from_dict(
@@ -680,6 +681,10 @@ class Exploration:
 
         Returns:
             Exploration. The corresponding Exploration domain object.
+
+        Raises:
+            Exception. Some parameter was used in a state but not declared
+                in the Exploration dict.
         """
         # NOTE TO DEVELOPERS: It is absolutely ESSENTIAL this conversion to and
         # from an ExplorationModel/dictionary MUST be exhaustive and complete.
@@ -1406,6 +1411,9 @@ class Exploration:
 
         Args:
             init_state_name: str. The new name of the initial state.
+
+        Raises:
+            Exception. Invalid initial state name.
         """
         old_init_state_name = self.init_state_name
         if init_state_name not in self.states:
