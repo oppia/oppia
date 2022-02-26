@@ -50,7 +50,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'mathjax-bind.directive.ts',
     'object-editor.directive.ts',
     'oppia-footer.component.ts',
-    'oppia-interactive-music-notes-input.directive.ts',
+    'oppia-interactive-music-notes-input.component.ts',
     'oppia-interactive-pencil-code-editor.component.ts',
     'oppia-root.directive.ts',
     'parameterize-rule-description.filter.ts',

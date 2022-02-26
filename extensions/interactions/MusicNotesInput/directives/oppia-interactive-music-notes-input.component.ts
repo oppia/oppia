@@ -24,6 +24,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { MusicNotesInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
 import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { Subscription } from 'rxjs';
@@ -54,14 +55,13 @@ interface ReadableNote {
   templateUrl: './music-notes-input-interaction.component.html'
 })
 export class MusicNotesInput implements OnInit, OnDestroy {
-  @Input() element;
   @Input() lastAnswer: string;
-  @Input() sequenceToGuessWithValue: Object[];
+  @Input() sequenceToGuessWithValue;
   @Input() initialSequenceWithValue;
   interactionIsActive: boolean;
-  someSequenceToGuess;
-  initialSequence: ReadableNote[];
-  directiveSubscriptions: Subscription;
+  sequenceToGuess;
+  initialSequence;
+  directiveSubscriptions = new Subscription();
   noteSequence: NoteSequence[] = [];
   _currentNoteId = 0;
   NOTE_TYPE_NATURAL = 0;
@@ -75,6 +75,9 @@ export class MusicNotesInput implements OnInit, OnDestroy {
     81, 79, 77, 76, 74, 72, 71, 69, 67, 65, 64, 62, 60
   ];
 
+  SOUNDFONT_URL = '/third_party/static/midi-js-c26ebb/examples/soundfont/';
+
+
   // Highest number of notes that can fit on the staff at any given time.
   MAXIMUM_NOTES_POSSIBLE = 8;
 
@@ -83,7 +86,9 @@ export class MusicNotesInput implements OnInit, OnDestroy {
   HORIZONTAL_GRID_SPACING: number;
   VERTICAL_GRID_SPACING: number;
   topPositionForCenterOfTopStaffLine: number;
-  NOTE_NAMES_TO_MIDI_VALUES: {};
+  NOTE_NAMES_TO_MIDI_VALUES = (
+    InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES);
+
   staffTop: number;
   staffBottom: number;
   readableSequence: string;
@@ -95,14 +100,8 @@ export class MusicNotesInput implements OnInit, OnDestroy {
     private currentInteractionService: CurrentInteractionService,
     private musicNotesInputRulesService: MusicNotesInputRulesService,
     private musicPhrasePlayerService: MusicPhrasePlayerService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
   ) {}
-
-  // this.element[0].getControllerScope() {
-  //   return this;
-  // };
-
-  SOUNDFONT_URL = '/third_party/static/midi-js-c26ebb/examples/soundfont/';
 
   private _getAttributes() {
     return {
@@ -120,13 +119,11 @@ export class MusicNotesInput implements OnInit, OnDestroy {
         'MusicNotesInput', this._getAttributes()
       ) as MusicNotesInputCustomizationArgs);
 
-    this.someSequenceToGuess = sequenceToGuess;
+    this.sequenceToGuess = sequenceToGuess;
     this.interactionIsActive = (this.lastAnswer === null);
 
     this.initialSequence = this.interactionIsActive ?
       initialSequence : this.lastAnswer;
-
-    this.directiveSubscriptions = new Subscription();
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardAvailable.subscribe(() => {
@@ -137,7 +134,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
     );
 
     this.currentInteractionService.registerCurrentInteraction(
-      this.submitAnswer, null);
+      () => this.submitAnswer(), null);
     // Initialization code.
 
     this.initializeNoteSequence(this.initialSequence);
@@ -170,6 +167,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
       note: note
     });
   }
+
   // Remove a specific note with given noteId from noteSequence. If given
   // noteId is not in noteSequence, nothing will be removed.
   _removeNotesFromNoteSequenceWithId(noteId: string): void {
@@ -179,6 +177,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
       }
     }
   }
+
   // Sorts noteSequence elements according to the return value of the
   // compareNoteStarts function.
   _sortNoteSequence(): void {
@@ -207,7 +206,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
 
   // Creates draggable notes and droppable staff.
   init(): void {
-    let staffContainerElt = this.element.find('.oppia-music-input-staff');
+    let staffContainerElt = $('.oppia-music-input-staff');
     this.CONTAINER_WIDTH = staffContainerElt.width();
     this.CONTAINER_HEIGHT = 0.2 * this.CONTAINER_WIDTH;
 
@@ -249,12 +248,12 @@ export class MusicNotesInput implements OnInit, OnDestroy {
 
   // Removes all notes from staff.
   clearNotesFromStaff(): void {
-    this.element.find('.oppia-music-input-note-choices div').remove();
+    $('.oppia-music-input-note-choices div').remove();
   }
 
   // Removes all droppable staff lines.
   clearDroppableStaff(): void {
-    this.element.find('.oppia-music-input-staff div').remove();
+    $('.oppia-music-input-staff div').remove();
   }
 
   // Returns an Object containing the baseNoteMidiValues (81, 79, 77...)
@@ -262,7 +261,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
   getStaffLinePositions(): Object {
     let staffLinePositionsArray = [];
     let staffLinePositions = {};
-    this.element.find(
+    $(
       '.oppia-music-input-staff div.oppia-music-staff-position').each(
       () => {
         staffLinePositionsArray.push($(this).position().top);
@@ -276,8 +275,8 @@ export class MusicNotesInput implements OnInit, OnDestroy {
 
   // Creates the notes and helper-clone notes for the noteChoices div.
   initPalette(): void {
-    let noteChoicesDiv = this.element.find('.oppia-music-input-note-choices');
-    let validNoteArea = this.element.find(
+    let noteChoicesDiv = $('.oppia-music-input-note-choices');
+    let validNoteArea = $(
       '.oppia-music-input-valid-note-area');
     for (let i = 0; i < this.NOTE_TYPES.length; i++) {
       let innerDiv = $('<div></div>')
@@ -339,7 +338,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
   }
 
   repaintNotes(): void {
-    let noteChoicesDiv = this.element.find('.oppia-music-input-note-choices');
+    let noteChoicesDiv = $('.oppia-music-input-note-choices');
 
     for (let i = 0; i < this.noteSequence.length; i++) {
       let innerDiv = $('<div></div>')
@@ -366,10 +365,10 @@ export class MusicNotesInput implements OnInit, OnDestroy {
           cursor: 'pointer',
           stack: '.oppia-music-input-note-choices div',
           grid: [this.HORIZONTAL_GRID_SPACING, 1],
-          start: function() {
+          start: () => {
             $(this).data('leftPosBeforeDrag', $(this).position().left);
           },
-          revert: function() {
+          revert: () => {
             let draggableOptions = $(this);
             // If note is out of droppable or off staff, remove it.
             if (this.isCloneOffStaff(draggableOptions)) {
@@ -398,7 +397,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
           accept: '.oppia-music-input-note-choices div',
           // Over and out are used to remove helper clone if
           // note is not placed on staff.
-          over: function(evt, ui) {
+          over: (evt, ui) => {
             let lineValue = $(evt.target).data('lineValue');
 
             // Draws a ledger-line when note is hovering over staff-line.
@@ -414,14 +413,14 @@ export class MusicNotesInput implements OnInit, OnDestroy {
               this.drawLedgerLine(topPos, leftPos);
             }
           },
-          out: function() {
+          out: () => {
             // Removes a ledger line when note is dragged out of
             // droppable.
             $('.oppia-music-input-ledger-line').last().hide();
           },
           hoverClass: 'oppia-music-input-hovered',
           // Handles note drops and appends new note to noteSequence.
-          drop: function(evt, ui) {
+          drop: (evt, ui) => {
             // Makes helper clone not disappear when dropped on staff.
             $.ui.ddmanager.current.cancelHelperRemoval = true;
 
@@ -510,8 +509,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
             this.repaintLedgerLines();
           }
         });
-
-      this.element.find('.oppia-music-input-staff').append(staffLineDiv);
+      $('.oppia-music-input-staff').append(staffLineDiv);
 
       if (i === 0) {
         this.topPositionForCenterOfTopStaffLine =
@@ -597,8 +595,8 @@ export class MusicNotesInput implements OnInit, OnDestroy {
   // and Ledger Lines from the staff.
   clearSequence(): void {
     this.noteSequence = [];
-    this.element.find('.oppia-music-input-on-staff').remove();
-    this.element.find('.oppia-music-input-ledger-line').remove();
+    $('.oppia-music-input-on-staff').remove();
+    $('.oppia-music-input-ledger-line').remove();
   }
 
   // Converts the midiValue of a droppable line that a note is on
@@ -617,7 +615,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
    * Horizontal Position value and return the result.
    */
   getHorizontalPosition(noteStartAsFloat: number): number {
-    let lastHorizontalPositionOffset = this.element.find(
+    let lastHorizontalPositionOffset = $(
       '.oppia-music-input-note-choices div:first-child').position().left;
     let leftOffset =
       lastHorizontalPositionOffset - (
@@ -644,7 +642,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
         accept: '.oppia-music-input-note-choices div',
         // When a ledgerLine note is moved out of its droppable,
         // remove ledger line.
-        out: function() {
+        out: () => {
           $(this).hide();
         },
         hoverClass: 'oppia-music-input-hovered',
@@ -658,7 +656,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
         top: topPos + this.VERTICAL_GRID_SPACING * 0.4
       });
 
-    this.element.find('.oppia-music-input-staff').append(ledgerLineDiv);
+    $('.oppia-music-input-staff').append(ledgerLineDiv);
   }
 
   repaintLedgerLines(): void {
@@ -752,14 +750,14 @@ export class MusicNotesInput implements OnInit, OnDestroy {
 
   // For each note in a sequence, add a noteDuration property.
   // TODO(wagnerdmike): - Add more options for note durations.
-  _makeAllNotesHaveDurationOne(noteArray: Object[]): Object[] {
+  _makeAllNotesHaveDurationOne(noteArray: MusicNote[]): Object[] {
     for (let i = 0; i < noteArray.length; i++) {
       noteArray[i].noteDuration = {
         num: 1,
         den: 1
       };
     }
-    return noteArray;
+    return noteArray as Object[];
   }
 
   submitAnswer(): void {
@@ -780,10 +778,10 @@ export class MusicNotesInput implements OnInit, OnDestroy {
 
   playSequenceToGuess(): void {
     let noteSequenceToGuess = [];
-    for (let i = 0; i < this.someSequenceToGuess.length; i++) {
+    for (let i = 0; i < this.sequenceToGuess.length; i++) {
       noteSequenceToGuess.push(
         this._convertReadableNoteToNote(
-          this.someSequenceToGuess[i]));
+          this.sequenceToGuess[i]));
     }
     this.playSequence(this.convertSequenceToGuessToMidiSequence(
       noteSequenceToGuess));

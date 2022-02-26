@@ -1,21 +1,27 @@
 <div class="music-notes-input-container">
   <div class="oppia-music-input-valid-note-area">
-    <button type="button" class="btn btn-secondary oppia-music-input-btn oppia-music-input-play-btn"
-            ng-click="playCurrentSequence()">
+    <button type="button"
+            class="btn btn-secondary oppia-music-input-btn oppia-music-input-play-btn"
+            (click)="playCurrentSequence()">
       <span><i class="material-icons">&#xE037;</i></span>
-      <span translate="I18N_INTERACTIONS_MUSIC_PLAY"></span>
+      <span [innerHTML]="'I18N_INTERACTIONS_MUSIC_PLAY' | translate"></span>
     </button>
     <div class="oppia-music-input-note-choices"></div>
     <div class="oppia-music-input-staff"></div>
   </div>
 
   <div class="oppia-music-input-control-buttons">
-    <button type="button" class="btn btn-secondary oppia-music-input-btn"
-            ng-click="playSequenceToGuess()" translate="I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE">
+    <button type="button"
+            class="btn btn-secondary oppia-music-input-btn"
+            (click)="playSequenceToGuess()"
+            [innerHTML]="'I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE' | translate">
     </button>
     <div class="float-right">
-      <button type="button" class="btn btn-secondary oppia-music-input-btn" ng-disabled="!interactionIsActive"
-              ng-click="clearSequence()" translate="I18N_INTERACTIONS_MUSIC_CLEAR">
+      <button type="button"
+              class="btn btn-secondary oppia-music-input-btn"
+              [disabled]="!interactionIsActive"
+              (click)="clearSequence()"
+              [innerHTML]="'I18N_INTERACTIONS_MUSIC_CLEAR' | translate">
       </button>
     </div>
   </div>
