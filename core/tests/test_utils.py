@@ -2118,7 +2118,7 @@ title: Title
         for name in collection_editor_usernames:
             self.add_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
-    def get_user_id_from_email(self, email):
+    def get_user_id_from_email(self, email) -> str :
         """Gets the user ID corresponding to the given email.
 
         Args:
@@ -2573,7 +2573,8 @@ title: Title
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
             language_code=constants.DEFAULT_LANGUAGE_CODE, end_state_name=None,
-            interaction_id='TextInput', correctness_feedback_enabled=False):
+            interaction_id='TextInput',
+            correctness_feedback_enabled=False) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration.
 
         Args:
