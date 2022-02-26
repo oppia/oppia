@@ -146,8 +146,7 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
 
   submitGraph(): void {
     this.currentInteractionService.onSubmit(
-      cloneDeep<GraphAnswer>(this.graph),
-      this.graphInputRulesService);
+      cloneDeep<GraphAnswer>(this.graph), this.graphInputRulesService);
   }
 
   isLanguageRTL(): boolean {

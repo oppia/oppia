@@ -84,9 +84,7 @@ export class AlgebraicExpressionInputInteractionComponent
       return;
     }
     this.currentInteractionService.onSubmit(
-      this.value,
-      this.algebraicExpressionInputRulesService
-    );
+      this.value, this.algebraicExpressionInputRulesService);
   }
 
   ngOnInit(): void {

@@ -92,9 +92,8 @@ export class InteractiveNumericExpressionInput implements OnInit {
     if (!this.isCurrentAnswerValid()) {
       return;
     }
-    this.currentInteractionService.onSubmit(this.value, (
-      this.numericExpressionInputRulesService
-    ));
+    this.currentInteractionService.onSubmit(
+      this.value, this.numericExpressionInputRulesService);
   }
 
   showOSK(): void {
