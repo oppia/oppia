@@ -42,6 +42,7 @@ export class PretestQuestionBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
+    private questionObjectFactory: QuestionObjectFactory
   ) {}
 
   _fetchPretestQuestions(
