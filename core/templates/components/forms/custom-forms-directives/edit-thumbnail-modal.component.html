@@ -26,11 +26,11 @@
       <div class="oppia-form-error" *ngIf="invalidFilenameWarningIsShown">
         Please upload a valid filename image i.e; The svg file must not start with a dot or have '/' or 2 consecutive dots.
       </div>
-      <div class="oppia-form-error" *ngIf="invalidTagsAndAttributes?.tags.length">
-        Removed unsupported SVG tags: {{ invalidTagsAndAttributes.tags }}. Please upload another svg if this feels distorted.
+      <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes?.tags.length">
+        Note: Removed {{ invalidTagsAndAttributes.tags }} tag. If your file looks distorted please <a href="https://github.com/oppia/oppia/issues/new?title=Image%20file%20got%20distorted%20on%20upload&body=Image%20file%20got%20distorted%20while%20uploading%20on%20%7B%7BADDRESS_URL_HERE%7D%7D.%0A%0AThe%20Image%20file%20is%20attached%20below%20-%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem-%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D" target="_blank" rel="noopener">let us know</a>, then try uploading a different SVG.
       </div>
-      <div class="oppia-form-error" *ngIf="invalidTagsAndAttributes?.attrs.length">
-        Removed unsupported SVG attributes: {{ invalidTagsAndAttributes.attrs }}. Please upload another svg if this feels distorted.
+      <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes?.attrs.length">
+        Note: Removed {{ invalidTagsAndAttributes.attrs }} attribute. If your file looks distorted please <a href="https://github.com/oppia/oppia/issues/new?title=Image%20file%20got%20distorted%20on%20upload&body=Image%20file%20got%20distorted%20while%20uploading%20on%20%7B%7BADDRESS_URL_HERE%7D%7D.%0A%0AThe%20Image%20file%20is%20attached%20below%20-%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem-%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D" target="_blank" rel="noopener">let us know</a>, then try uploading a different SVG.
       </div>
       <div [hidden]="!uploadedImage">
         <div [hidden]="!allowedBgColors">
@@ -159,5 +159,11 @@
   .oppia-form-error {
     margin-top: 15px;
     word-break: break-word;
+  }
+  .oppia-unsupported-svg-tag-attribute-error{
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+    padding: 10px;
   }
 </style>

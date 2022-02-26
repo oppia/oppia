@@ -26,10 +26,10 @@
           <img id="croppable-image" [src]="uploadedImage" #croppableImage>
         </div>
         <div class="oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes.tags.length">
-          Removed unsupported SVG tags: {{ invalidTagsAndAttributes.tags }}. Please upload another svg if this feels distorted.
+          Note: Removed {{ invalidTagsAndAttributes.tags }} tag. If your file looks distorted please <a href="https://github.com/oppia/oppia/issues/new?title=Image%20file%20got%20distorted%20on%20upload&body=Image%20file%20got%20distorted%20while%20uploading%20on%20%7B%7BADDRESS_URL_HERE%7D%7D.%0A%0AThe%20Image%20file%20is%20attached%20below%20-%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem-%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D" target="_blank" rel="noopener">let us know</a>, then try uploading a different SVG.
         </div>
         <div class="oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes.attrs.length">
-          Removed unsupported SVG attributes: {{ invalidTagsAndAttributes.attrs }}. Please upload another svg if this feels distorted.
+          Note: Removed {{ invalidTagsAndAttributes.attrs }} attribute. If your file looks distorted please <a href="https://github.com/oppia/oppia/issues/new?title=Image%20file%20got%20distorted%20on%20upload&body=Image%20file%20got%20distorted%20while%20uploading%20on%20%7B%7BADDRESS_URL_HERE%7D%7D.%0A%0AThe%20Image%20file%20is%20attached%20below%20-%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem-%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D" target="_blank" rel="noopener">let us know</a>, then try uploading a different SVG.
         </div>
       </div>
     </div>
@@ -69,5 +69,12 @@
   }
   .oppia-unsupported-svg-tag-attribute-error {
     margin-top: 15px;
+  }
+  .oppia-unsupported-svg-tag-attribute-error{
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+    margin-top: 15px;
+    padding: 10px;
   }
 </style>
