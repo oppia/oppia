@@ -27,10 +27,10 @@
         Please upload a valid filename image i.e; The svg file must not start with a dot or have '/' or 2 consecutive dots.
       </div>
       <div class="oppia-form-error" *ngIf="invalidTagsAndAttributes?.tags.length">
-        Unsupported SVG tags found: {{ invalidTagsAndAttributes.tags }}
+        Removed unsupported SVG tags: {{ invalidTagsAndAttributes.tags }}. Please upload another svg if this feels distorted.
       </div>
       <div class="oppia-form-error" *ngIf="invalidTagsAndAttributes?.attrs.length">
-        Unsupported SVG attributes found: {{ invalidTagsAndAttributes.attrs }}
+        Removed unsupported SVG attributes: {{ invalidTagsAndAttributes.attrs }}. Please upload another svg if this feels distorted.
       </div>
       <div [hidden]="!uploadedImage">
         <div [hidden]="!allowedBgColors">

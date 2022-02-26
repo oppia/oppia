@@ -115,17 +115,21 @@ export class EditThumbnailModalComponent {
       this.imgSrc = reader.result as string;
       this.updateBackgroundColor(this.tempBgColor);
       img.src = this.imgSrc;
-      this.uploadedImage = this.imgSrc;
+      let svg = this.svgSanitizerService.parseDataURI(this.imgSrc);
       this.invalidTagsAndAttributes = (
-        this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
-          this.imgSrc));
-      this.tags = this.invalidTagsAndAttributes.tags;
-      this.attrs = this.invalidTagsAndAttributes.attrs;
-      if (this.tags.length > 0 || this.attrs.length > 0) {
-        this.reset();
-      } else {
-        this.thumbnailHasChanged = true;
-      }
+        this.svgSanitizerService.getInvalidSvgTagsAndAttrs(svg));
+      const tags = this.invalidTagsAndAttributes.tags;
+      let attrs: string[] = [];
+      this.invalidTagsAndAttributes.attrs.forEach(attribute => {
+        attrs.push(attribute.split(':')[1]);
+      });
+      svg = this.svgSanitizerService.removeTagsAndAttributes(
+        svg, {tags, attrs});
+      this.imgSrc = (
+        'data:image/svg+xml;base64,' +
+        btoa(unescape(encodeURIComponent(svg.documentElement.outerHTML))));
+      this.uploadedImage = this.imgSrc;
+      this.thumbnailHasChanged = true;
     };
     reader.readAsDataURL(file);
   }
