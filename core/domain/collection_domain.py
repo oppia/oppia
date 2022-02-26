@@ -225,7 +225,7 @@ class CollectionNode:
             prerequisite_skill_ids, acquired_skill_ids) of CollectionNode
             instance.
         """
-        # Here, we're not returning keys other than exploration_id of 
+        # Here, we're not returning keys other than exploration_id of
         # CollectionNodeDict which causes MyPy to throw error. thus we
         # add an ignore.
         return { # type: ignore[typeddict-item]
@@ -286,23 +286,16 @@ class CollectionDict(TypedDict):
     version: int
     created_on: Union[datetime.datetime, str]
     last_updated: Union[datetime.datetime, str]
-
-
-class CollectionVersionDict(CollectionDict):
-    """Dictionary representing the Collection object based
-    on different schema versions.
-    """
-
     skills: Dict[str, Dict[str, Union[str, List[str]]]]
     next_skill_id: int
     next_skill_index: int
 
 
 class VersionedCollectionDict(TypedDict):
-    """Dictionary representing the versioned collection contents."""
+    """Type for the argument versioned_collection_contents."""
 
     schema_version: int
-    collection_contents: CollectionVersionDict
+    collection_contents: CollectionDict
 
 
 class Collection:
@@ -372,7 +365,7 @@ class Collection:
         Returns:
             dict. A dict, mapping all fields of Collection instance.
         """
-        # Here, we're not returning created_on, last_updated and version
+        # Here, we're not returning created_on, last_updated, version and other
         # keys of CollectionDict which causes MyPy to throw error. thus
         # we add an ignore here.
         return { # type: ignore[typeddict-item]
@@ -529,8 +522,8 @@ class Collection:
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(
-        cls, collection_dict: CollectionVersionDict
-    ) -> CollectionVersionDict:
+        cls, collection_dict: CollectionDict
+    ) -> CollectionDict:
         """Converts a v1 collection dict into a v2 collection dict.
 
         Adds a language code, and tags.
@@ -550,8 +543,8 @@ class Collection:
 
     @classmethod
     def _convert_v2_dict_to_v3_dict(
-        cls, collection_dict: CollectionVersionDict
-    ) -> CollectionVersionDict:
+        cls, collection_dict: CollectionDict
+    ) -> CollectionDict:
         """Converts a v2 collection dict into a v3 collection dict.
 
         This function does nothing as the collection structure is changed in
@@ -570,8 +563,8 @@ class Collection:
 
     @classmethod
     def _convert_v3_dict_to_v4_dict(
-        cls, collection_dict: CollectionVersionDict
-    ) -> CollectionVersionDict:
+        cls, collection_dict: CollectionDict
+    ) -> CollectionDict:
         """Converts a v3 collection dict into a v4 collection dict.
 
         This migrates the structure of skills, see the docstring in
@@ -589,8 +582,8 @@ class Collection:
 
     @classmethod
     def _convert_v4_dict_to_v5_dict(
-        cls, collection_dict: CollectionVersionDict
-    ) -> CollectionVersionDict:
+        cls, collection_dict: CollectionDict
+    ) -> CollectionDict:
         """Converts a v4 collection dict into a v5 collection dict.
 
         This changes the field name of next_skill_id to next_skill_index.
@@ -603,8 +596,8 @@ class Collection:
 
     @classmethod
     def _convert_v5_dict_to_v6_dict(
-        cls, collection_dict: CollectionVersionDict
-    ) -> CollectionVersionDict:
+        cls, collection_dict: CollectionDict
+    ) -> CollectionDict:
         """Converts a v5 collection dict into a v6 collection dict.
 
         This changes the structure of each node to not include skills as well
@@ -689,8 +682,8 @@ class Collection:
 
     @classmethod
     def _convert_collection_contents_v1_dict_to_v2_dict(
-        cls, collection_contents: CollectionVersionDict
-    ) -> CollectionVersionDict:
+        cls, collection_contents: CollectionDict
+    ) -> CollectionDict:
         """Converts from version 1 to 2. Does nothing since this migration only
         changes the language code.
 
@@ -705,8 +698,8 @@ class Collection:
 
     @classmethod
     def _convert_collection_contents_v2_dict_to_v3_dict(
-        cls, collection_contents: CollectionVersionDict
-    ) -> CollectionVersionDict:
+        cls, collection_contents: CollectionDict
+    ) -> CollectionDict:
         """Converts from version 2 to 3. Does nothing since the changes are
         handled while loading the collection.
 
@@ -721,8 +714,8 @@ class Collection:
 
     @classmethod
     def _convert_collection_contents_v3_dict_to_v4_dict(
-        cls, collection_contents: CollectionVersionDict
-    ) -> CollectionVersionDict:
+        cls, collection_contents: CollectionDict
+    ) -> CollectionDict:
         """Converts from version 3 to 4.
 
         Adds a skills dict and skill id counter. Migrates prerequisite_skills
@@ -773,8 +766,8 @@ class Collection:
 
     @classmethod
     def _convert_collection_contents_v4_dict_to_v5_dict(
-        cls, collection_contents: CollectionVersionDict
-    ) -> CollectionVersionDict:
+        cls, collection_contents: CollectionDict
+    ) -> CollectionDict:
         """Converts from version 4 to 5.
 
         Converts next_skill_id to next_skill_index, since next_skill_id isn't
@@ -796,8 +789,8 @@ class Collection:
 
     @classmethod
     def _convert_collection_contents_v5_dict_to_v6_dict(
-        cls, collection_contents: CollectionVersionDict
-    ) -> CollectionVersionDict:
+        cls, collection_contents: CollectionDict
+    ) -> CollectionDict:
         """Converts from version 5 to 6.
 
         Removes skills from collection node.
@@ -1366,7 +1359,7 @@ class CollectionSummary:
         Returns:
             bool. Whether the collection is private.
         """
-        # Here mypy evaluates constants.ACTIVITY_STATUS_PRIVATE to be Any 
+        # Here mypy evaluates constants.ACTIVITY_STATUS_PRIVATE to be Any
         # and due to this, the == is returning Any. So, in order to
         # return bool, we explicitly convert the operation to bool.
         return bool(self.status == constants.ACTIVITY_STATUS_PRIVATE)
