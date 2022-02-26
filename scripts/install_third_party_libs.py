@@ -50,7 +50,7 @@ for package_name, version_number, target_path in PREREQUISITES:
         subprocess.check_call(command_text + uextention_text)
 
 
-from core import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -304,7 +304,7 @@ def main() -> None:
     for path_list in os.walk(correct_google_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
-            with python_utils.open_file(
+            with utils.open_file(
                 os.path.join(root_path, '__init__.py'), 'a'):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.
