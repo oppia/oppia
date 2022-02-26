@@ -35,6 +35,11 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
+  invalidTagsAndAttributes: { tags: string[]; attrs: string[] } = {
+    tags: [],
+    attrs: []
+  };
+
   // 'cropper' is initialized before it is to be used, hence we need to do
   // non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -64,8 +69,29 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     this.invalidImageWarningIsShown = false;
     let reader = new FileReader();
     reader.onload = (e) => {
+      this.invalidTagsAndAttributes = {
+        tags: [],
+        attrs: []
+      };
+      let imageData = (e.target as FileReader).result as string;
+      const mimeType = imageData.split(';')[0];
+      if (mimeType === 'data:image/svg+xml') {
+        let svg = this.svgSanitizerService.parseDataURI(imageData);
+        this.invalidTagsAndAttributes = (
+          this.svgSanitizerService.getInvalidSvgTagsAndAttrs(svg));
+        const tags = this.invalidTagsAndAttributes.tags;
+        let attrs: string[] = [];
+        this.invalidTagsAndAttributes.attrs.forEach(attribute => {
+          attrs.push(attribute.split(':')[1]);
+        });
+        svg = this.svgSanitizerService.removeTagsAndAttributes(
+          svg, {tags, attrs});
+        imageData = (
+          'data:image/svg+xml;base64,' +
+        btoa(unescape(encodeURIComponent(svg.documentElement.outerHTML))));
+      }
       this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        (e.target as FileReader).result as string);
+        imageData);
       if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
           (e.target as FileReader).result as string);
@@ -85,6 +111,10 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   }
 
   reset(): void {
+    this.invalidTagsAndAttributes = {
+      tags: [],
+      attrs: []
+    };
     this.uploadedImage = null;
     this.cropppedImageDataUrl = '';
   }

@@ -25,6 +25,12 @@
           </button>
           <img id="croppable-image" [src]="uploadedImage" #croppableImage>
         </div>
+        <div class="oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes.tags.length">
+          Removed unsupported SVG tags: {{ invalidTagsAndAttributes.tags }}. Please upload another svg if this feels distorted.
+        </div>
+        <div class="oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes.attrs.length">
+          Removed unsupported SVG attributes: {{ invalidTagsAndAttributes.attrs }}. Please upload another svg if this feels distorted.
+        </div>
       </div>
     </div>
   </div>
@@ -59,6 +65,9 @@
     min-height: 300px;
   }
   .oppia-profile-picture-container .oppia-form-error-text {
+    margin-top: 15px;
+  }
+  .oppia-unsupported-svg-tag-attribute-error {
     margin-top: 15px;
   }
 </style>

@@ -213,12 +213,12 @@ export class SvgSanitizerService {
     }
 
     // Check for malicious SVG.
-    const { tags: invalidTags, attrs: invalidAttributes } = (
-      this.getInvalidSvgTagsAndAttrsFromDataUri(base64ImageData));
+    // const { tags: invalidTags, attrs: invalidAttributes } = (
+    //   this.getInvalidSvgTagsAndAttrsFromDataUri(base64ImageData));
 
-    if (invalidTags.length > 0 || invalidAttributes.length > 0) {
-      return false;
-    }
+    // if (invalidTags.length > 0 || invalidAttributes.length > 0) {
+    //   return false;
+    // }
 
     // The SVG is safe and valid.
     return true;

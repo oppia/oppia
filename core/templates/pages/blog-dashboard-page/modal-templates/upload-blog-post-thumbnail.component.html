@@ -19,6 +19,12 @@
           <img id="croppable-image" [src]="uploadedImage" #croppableImage alt="">
         </div>
       </div>
+      <div class="oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes.tags.length">
+        Removed unsupported SVG tags: {{ invalidTagsAndAttributes.tags }}. Please upload another svg if this feels distorted.
+      </div>
+      <div class="oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes.attrs.length">
+        Removed unsupported SVG attributes: {{ invalidTagsAndAttributes.attrs }}. Please upload another svg if this feels distorted.
+      </div>
     </div>
   </div>
 
@@ -60,6 +66,10 @@
     margin-right: auto;
     padding-top: 0;
     width: 300px;
+  }
+
+  .oppia-unsupported-svg-tag-attribute-error {
+    margin-top: 15px;
   }
 
   @media(max-width: 768px) {
