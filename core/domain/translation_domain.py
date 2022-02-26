@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import copy
 import enum
 
 from core import feconf
@@ -46,8 +45,8 @@ class TranslatableContentDict(TypedDict):
 
 
 class TranslatableContentsCollection:
-    """Collect all TranslatableContent's from a translatable object and maps
-    with their corresponding content-ids.
+    """A class to collect all TranslatableContents from a translatable object
+    and maps with their corresponding content-ids.
     """
 
     def __init__(self) -> None:
@@ -69,8 +68,6 @@ class TranslatableContentsCollection:
             value: ContentInTranslatableContent. Value of the content which is
                 translatable.
         """
-        if not bool(value):
-            return
         self.translatable_contents[content_id] = TranslatableContent(
             content_id, value, field_type)
 
@@ -109,16 +106,6 @@ class BaseTranslatableObject:
         """
         raise NotImplementedError('Must be implemented in subclasses.')
 
-    def get_translatable_fields(self) -> Dict[str, TranslatableContent]:
-        """Method to get all the translatable fields in a translatable object.
-
-        Returns:
-            Dict(str, TranslatableContent). Returns the dict containg content_id
-            as key and TranslatableContent as value.
-        """
-        return copy.deepcopy(
-            self.get_translatable_contents_collection().translatable_contents)
-
     def get_all_contents_which_need_translations(
         self,
         entity_translation: EntityTranslation
@@ -131,27 +118,29 @@ class BaseTranslatableObject:
                 existing translations of an entity.
 
         Returns:
-            list(TranslatableContent). Returns a list of TranslatableContents.
+            list(TranslatableContent). Returns a list of TranslatableContent.
         """
         contents_which_need_translation = []
         content_ids_for_translated_contents = (
             entity_translation.translations.keys())
+        translatable_content_list = (
+            self.get_translatable_contents_collection()
+            .translatable_contents.values())
 
-        for translatable_item in self.get_translatable_fields().values():
-            # translatable_item is of type TranslatableContent.
-            if translatable_item.content == '':
+        for translatable_content in translatable_content_list:
+            if translatable_content.content == '':
                 continue
 
             if (
-                translatable_item.content_id not in
+                translatable_content.content_id not in
                 content_ids_for_translated_contents
             ):
-                contents_which_need_translation.append(translatable_item)
+                contents_which_need_translation.append(translatable_content)
             elif (
                 entity_translation.translations[
-                translatable_item.content_id].needs_update
+                translatable_content.content_id].needs_update
             ):
-                contents_which_need_translation.append(translatable_item)
+                contents_which_need_translation.append(translatable_content)
 
         return contents_which_need_translation
 
