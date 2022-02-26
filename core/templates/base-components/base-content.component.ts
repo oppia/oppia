@@ -17,7 +17,6 @@
  */
 
 import { ChangeDetectorRef, Component, Directive, OnInit } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { CookieService } from 'ngx-cookie';
@@ -54,23 +53,12 @@ export class BaseContentComponent implements OnInit {
     private keyboardShortcutService: KeyboardShortcutService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
-    private router: Router,
     private sidebarStatusService: SidebarStatusService,
     private urlService: UrlService,
     private windowRef: WindowRef,
   ) {}
 
   ngOnInit(): void {
-    /**
-     * Scroll to the top of the page while navigating
-     * through the static pages.
-     */
-    this.router.events.subscribe((evt) => {
-      if (!(evt instanceof NavigationEnd)) {
-        return;
-      }
-      window.scrollTo(0, 0);
-    });
     /**
      * Redirect any developers using the old appspot URL to the
      * test server (see issue #7867 for details).

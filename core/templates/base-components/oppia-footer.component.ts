@@ -17,6 +17,7 @@
  */
 
 import { Component } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 
@@ -28,6 +29,21 @@ export class OppiaFooterComponent {
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+
+  constructor(private router: Router) {}
+
+  ngOnInit(): void {
+    /**
+     * Scroll to the top of the page while navigating
+     * through the static pages.
+     */
+    this.router.events.subscribe((evt) => {
+      if (!(evt instanceof NavigationEnd)) {
+        return;
+      }
+      window.scrollTo(0, 0);
+    });
+  }
 }
 
 angular.module('oppia').directive('oppiaFooter',
