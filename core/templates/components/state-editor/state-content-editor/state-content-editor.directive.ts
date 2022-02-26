@@ -125,7 +125,7 @@ angular.module('oppia').directive('stateContentEditor', [
                   ContextService.getEntityType() === 'question')
               }
             };
-            $scope.contentId = undefined;
+            $scope.contentId = null;
             $scope.StateContentService = StateContentService;
             if (StateContentService.displayed) {
               $scope.contentId = StateContentService.displayed.contentId;
