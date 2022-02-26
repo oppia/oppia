@@ -27,7 +27,6 @@ import tarfile
 import urllib
 import zipfile
 
-from core import python_utils
 from core import utils
 
 from . import common
@@ -198,7 +197,7 @@ def download_and_untar_files(
 
 def get_file_contents(filepath, mode='r'):
     """Gets the contents of a file, given a relative filepath from oppia/."""
-    with python_utils.open_file(filepath, mode) as f:
+    with utils.open_file(filepath, mode) as f:
         return f.read()
 
 
@@ -278,6 +277,9 @@ def validate_dependencies(filepath):
 
     Args:
         filepath: str. The path to the json file.
+
+    Raises:
+        Exception. The 'downloadFormat' not specified.
     """
     dependencies_data = return_json(filepath)
     dependencies = dependencies_data['dependencies']
