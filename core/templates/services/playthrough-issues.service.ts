@@ -19,9 +19,6 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('services/playthrough-issues-backend-api.service.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/services/' +
-  'learner-action-render.service.ts');
-require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvement-modal.service.ts');
 
