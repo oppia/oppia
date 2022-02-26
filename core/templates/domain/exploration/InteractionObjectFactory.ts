@@ -186,8 +186,7 @@ export class Interaction {
    * details.
    * @param {InteractionCustomizationArgs} customizationArgs The customization
    *  arguments to get content ids for.
-   * @returns {(string | null)[]} List of content ids in customization
-   *  args.
+   * @returns {(string | null)[]} List of content ids in customization args.
    */
   static getCustomizationArgContentIds(
       customizationArgs: InteractionCustomizationArgs
