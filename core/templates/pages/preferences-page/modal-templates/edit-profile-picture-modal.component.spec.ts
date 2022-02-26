@@ -84,7 +84,7 @@ describe('Edit Profile Picture Modal Component', () => {
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
   });
 
-  it('should correctly extract and remove invalid tags and attributes', ()=>{
+  it('should remove invalid tags and attributes', ()=>{
     const svgString = (
       '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
       '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
@@ -103,9 +103,6 @@ describe('Edit Profile Picture Modal Component', () => {
 
     componentInstance.onFileChanged(file);
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
-    expect(componentInstance.invalidTagsAndAttributes).toEqual(
-      {tags: ['circel'], attrs: ['data-name']}
-    );
     expect(componentInstance.cropper).toBeDefined();
   });
 

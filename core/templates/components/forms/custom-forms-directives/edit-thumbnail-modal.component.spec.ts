@@ -153,7 +153,7 @@ describe('Edit Thumbnail Modal Component', () => {
     expect(component.invalidFilenameWarningIsShown).toBe(false);
   });
 
-  it('should correctly extract and remove invalid tags and attributes', ()=>{
+  it('should remove invalid tags and attributes', ()=>{
     spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
     spyOn(component, 'isValidFilename').and.returnValue(true);
     const svgString = (
@@ -178,9 +178,6 @@ describe('Edit Thumbnail Modal Component', () => {
     component.onFileChanged(file);
     expect(component.invalidImageWarningIsShown).toBe(false);
     expect(component.invalidFilenameWarningIsShown).toBe(false);
-    expect(component.invalidTagsAndAttributes).toEqual(
-      {tags: ['circel'], attrs: ['data-name']}
-    );
   });
 
   it('should not load file if it is not a svg type', () => {
