@@ -20,6 +20,10 @@ from __future__ import annotations
 
 from core.domain import playthrough_issue_registry
 from core.tests import test_utils
+from extensions.issues.CyclicStateTransitions import CyclicStateTransitions
+from extensions.issues.EarlyQuit import EarlyQuit
+from extensions.issues.MultipleIncorrectSubmissions import (
+    MultipleIncorrectSubmissions)
 
 
 class IssueRegistryUnitTests(test_utils.GenericTestBase):
@@ -29,3 +33,28 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         """Do some sanity checks on the issue registry."""
         self.assertEqual(
             len(playthrough_issue_registry.Registry.get_all_issues()), 3)
+
+    def test_issue_registry_types(self):
+        """Do some issue type checks on the issue registry."""
+        issues_dict = {
+                'EarlyQuit':
+                EarlyQuit.EarlyQuit,
+                'CyclicStateTransitions':
+                CyclicStateTransitions.CyclicStateTransitions,
+                'MultipleIncorrectSubmissions':
+                MultipleIncorrectSubmissions.MultipleIncorrectSubmissions
+                }
+
+        for issue_type, instance in issues_dict.items():
+            self.assertIsInstance(
+                    playthrough_issue_registry.Registry.get_issue_by_type(
+                        issue_type),
+                        instance
+                        )
+
+        self.assertRaisesRegex(
+                KeyError,
+                'Invalid issue_type. Please check your input issue_type.',
+                playthrough_issue_registry.Registry.get_issue_by_type(
+            'FalseIssue'
+            ))

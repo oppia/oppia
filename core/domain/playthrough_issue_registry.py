@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import importlib
+import logging
 import os
 
 from core import feconf
@@ -87,6 +88,11 @@ class Registry:
             *. An instance of the corresponding issue class. This class has
             "BaseExplorationIssueSpec" as an ancestor class.
         """
-        if issue_type not in cls._issues:
-            cls._refresh()
-        return cls._issues[issue_type]
+        try:
+            if issue_type not in cls._issues:
+                cls._refresh()
+            return cls._issues[issue_type]
+        except KeyError as e:
+            logging.error(
+                    'Invalid issue_type %s.', e
+                    )
