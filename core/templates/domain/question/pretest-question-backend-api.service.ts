@@ -42,7 +42,6 @@ export class PretestQuestionBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private questionObjectFactory: QuestionObjectFactory
   ) {}
 
   _fetchPretestQuestions(
@@ -67,9 +66,10 @@ export class PretestQuestionBackendApiService {
     ).toPromise().then(data => {
       var pretestQuestionDicts = (
         cloneDeep(data.pretest_question_dicts));
+      var questionObjectFactory: QuestionObjectFactory;
       var pretestQuestionObjects = pretestQuestionDicts.map(
         function(pretestQuestionDict) {
-          return this.questionObjectFactory.createFromBackendDict(
+          return questionObjectFactory.createFromBackendDict(
             pretestQuestionDict);
         }, this);
       if (successCallback) {

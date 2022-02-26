@@ -68,8 +68,9 @@ export class AnswerClassificationService {
   private classifyAnswer(
       answer: InteractionAnswer,
       answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome,
-      interactionRulesService): AnswerClassificationResult {
+      defaultOutcome: Outcome | null,
+      interactionRulesService: InteractionRulesService
+  ): AnswerClassificationResult {
     // Find the first group that contains a rule which returns true
     // TODO(bhenning): Implement training data classification.
     for (var i = 0; i < answerGroups.length; ++i) {
@@ -135,9 +136,12 @@ export class AnswerClassificationService {
 
     const ruleBasedOutcomeIsDefault = (
       answerClassificationResult.outcome === defaultOutcome);
-    const interactionIsTrainable =
+    if (interactionInOldState.id === null) {
+      throw new Error('Interaction ID must not be null');
+    }
+    const interactionIsTrainable = (
       this.interactionSpecsService.isInteractionTrainable(
-        interactionInOldState.id);
+        interactionInOldState.id));
 
     if (ruleBasedOutcomeIsDefault && interactionIsTrainable) {
       for (var i = 0; i < answerGroups.length; ++i) {

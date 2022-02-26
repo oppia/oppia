@@ -33,9 +33,9 @@ export class AudioPreloaderService {
   private filenamesOfAudioCurrentlyDownloading: string[] = [];
   private filenamesOfAudioToBeDownloaded: string[] = [];
 
-  private exploration: Exploration = null;
-  private audioLoadedCallback: (_: string) => void = null;
-  private mostRecentlyRequestedAudioFilename: string = null;
+  private exploration!: Exploration;
+  private audioLoadedCallback!: (_: string) => void;
+  private mostRecentlyRequestedAudioFilename: string | null = null;
 
   constructor(
       private assetsBackendApiService: AssetsBackendApiService,
@@ -82,7 +82,7 @@ export class AudioPreloaderService {
     this.mostRecentlyRequestedAudioFilename = null;
   }
 
-  getMostRecentlyRequestedAudioFilename(): string {
+  getMostRecentlyRequestedAudioFilename(): string | null {
     return this.mostRecentlyRequestedAudioFilename;
   }
 
@@ -93,10 +93,17 @@ export class AudioPreloaderService {
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
     const languageCode = (
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
+    if (languageCode === null) {
+      throw new Error('Language code must exists');
+    }
     const allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
+    const initialStateName = this.exploration.getInitialState().name;
+    if (initialStateName === null) {
+      throw new Error('Initial State Name cannot be null');
+    }
     const bfsTraversalOfStates = (
       this.computeGraphService.computeBfsTraversalOfStates(
-        this.exploration.getInitialState().name, this.exploration.getStates(),
+        initialStateName, this.exploration.getStates(),
         sourceStateName));
     const audioFilenamesInBfsOrder = [];
     for (const stateName of bfsTraversalOfStates) {
@@ -119,6 +126,9 @@ export class AudioPreloaderService {
 
       if (this.filenamesOfAudioToBeDownloaded.length > 0) {
         const nextAudioFilename = this.filenamesOfAudioToBeDownloaded.shift();
+        if (nextAudioFilename === undefined) {
+          throw new Error('Audio Filename cannot be undefined');
+        }
         this.loadAudio(nextAudioFilename);
         this.filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
       }
