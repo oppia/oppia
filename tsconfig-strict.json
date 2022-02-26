@@ -282,6 +282,7 @@
     "core/templates/domain/topic/subtopic-page-contents.model.spec.ts",
     "core/templates/domain/topic/subtopic.model.ts",
     "core/templates/domain/topic/subtopic.model.spec.ts",
+    "core/templates/domain/topic/subtopic-page.model.ts",
     "core/templates/domain/topic/topic-creation-backend-api.service.ts",
     "core/templates/domain/topic/topic-creation-backend-api.service.spec.ts",
     "core/templates/domain/topic/topic-domain.constants.ts",
@@ -817,8 +818,7 @@
     "extensions/objects/templates/translatable-set-of-unicode-string-editor.component.ts",
     "extensions/objects/templates/translatable-set-of-unicode-string-editor.component.spec.ts",
     "extensions/objects/templates/unicode-string-editor.component.ts",
-    "extensions/objects/templates/unicode-string-editor.component.spec.ts",
-    "core/templates/domain/topic/subtopic-page.model.ts"
+    "extensions/objects/templates/unicode-string-editor.component.spec.ts"
   ],
   "include": [
     "assets/*.ts",
@@ -853,8 +853,8 @@
     "core/templates/domain/subtopic_viewer/*.ts",
     "core/templates/domain/suggestion/*.ts",
     "core/templates/domain/summary/*.ts",
-    "core/templates/domain/topic_viewer/*.ts",
     "core/templates/domain/topics_and_skills_dashboard/*.ts",
+    "core/templates/domain/topic_viewer/*.ts",
     "core/templates/domain/user/*.ts",
     "core/templates/domain/utilities/*.ts",
     "core/templates/expressions/*.ts",
