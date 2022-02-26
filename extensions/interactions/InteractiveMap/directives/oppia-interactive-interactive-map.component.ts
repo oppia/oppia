@@ -153,8 +153,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
       const newLng = e.latlng.lng;
       this._changeMarkerPosition(newLat, newLng);
       this.currentInteractionService.onSubmit(
-        [newLat, newLng],
-        this.interactiveMapRulesService
+        [newLat, newLng], this.interactiveMapRulesService
       );
     }
   }

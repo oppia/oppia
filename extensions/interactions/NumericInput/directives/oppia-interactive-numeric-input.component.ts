@@ -68,8 +68,7 @@ export class InteractiveNumericInput implements OnInit {
   submitAnswer(answer: number): void {
     if (this.isAnswerValid()) {
       this.currentInteractionService.onSubmit(
-        answer,
-        this.numericInputRulesService);
+        answer, this.numericInputRulesService);
     }
   }
 

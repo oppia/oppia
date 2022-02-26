@@ -78,8 +78,7 @@ export class InteractiveMathEquationInput implements OnInit {
       return;
     }
     this.currentInteractionService.onSubmit(
-      this.value,
-      this.mathEquationInputRulesService);
+      this.value, this.mathEquationInputRulesService);
   }
 
   showOSK(): void {

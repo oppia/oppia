@@ -125,8 +125,7 @@ export class InteractiveSetInputComponent implements OnInit {
     } else {
       this.errorMessage = '';
       this.currentInteractionService.onSubmit(
-        answer,
-        this.setInputRulesService);
+        answer, this.setInputRulesService);
     }
   }
 

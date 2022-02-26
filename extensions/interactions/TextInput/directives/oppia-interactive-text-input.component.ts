@@ -111,8 +111,7 @@ export class InteractiveTextInputComponent implements OnInit {
       return;
     }
     this.currentInteractionService.onSubmit(
-      answer,
-      this.textInputRulesService);
+      answer, this.textInputRulesService);
   }
 
   updateAnswer(answer: string): void {

@@ -131,7 +131,7 @@ export class AnswerClassificationService {
 
     const ruleBasedOutcomeIsDefault = (
       answerClassificationResult.outcome === defaultOutcome);
-    let interactionIsTrainable: boolean = false;
+    let interactionIsTrainable = false;
     if (interactionInOldState.id !== null) {
       interactionIsTrainable = (
         this.interactionSpecsService.isInteractionTrainable(

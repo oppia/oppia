@@ -275,8 +275,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       clickedRegions: this.currentlyHoveredRegions
     };
     this.currentInteractionService.onSubmit(
-      answer,
-      this.imageClickInputRulesService);
+      answer, this.imageClickInputRulesService);
   }
 
   ngOnDestroy(): void {

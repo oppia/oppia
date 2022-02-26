@@ -182,8 +182,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
         this.isValid = false;
       } else {
         this.currentInteractionService.onSubmit(
-          fraction,
-          this.fractionInputRulesService);
+          fraction, this.fractionInputRulesService);
       }
     } catch (parsingError) {
       this.errorMessageI18nKey = parsingError.message;

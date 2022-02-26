@@ -66,8 +66,10 @@ export class TextInputPredictionService {
           textInputTokens, cvVocabulary);
         predictionResult = this.svmPredictionService.predict(
           svmData, textVector);
-        if (predictionResult.predictionConfidence >
-            this.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD) {
+        if (
+          predictionResult.predictionConfidence >
+          this.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD
+        ) {
           return predictionResult.predictionLabel;
         }
       }
