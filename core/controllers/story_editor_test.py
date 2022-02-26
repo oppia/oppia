@@ -440,8 +440,6 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.assertEqual(self.story_id, json_response['story']['id'])
         self.assertEqual('Name', json_response['topic_name'])
         self.assertEqual(len(json_response['skill_summaries']), 0)
-        self.assertEqual(
-            json_response['skill_summaries'][0]['description'], 'Description 3')
         self.logout()
 
     def test_editable_story_handler_put(self):
