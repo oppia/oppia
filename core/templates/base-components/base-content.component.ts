@@ -16,7 +16,7 @@
  * @fileoverview Component for the Base Transclusion Component.
  */
 
-import { ChangeDetectorRef, Component, Directive, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Directive } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { CookieService } from 'ngx-cookie';
@@ -35,7 +35,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
   selector: 'oppia-base-content',
   templateUrl: './base-content.component.html'
 })
-export class BaseContentComponent implements OnInit {
+export class BaseContentComponent {
   loadingMessage: string = '';
   mobileNavOptionsAreShown: boolean = false;
   iframed: boolean = false;
@@ -45,17 +45,17 @@ export class BaseContentComponent implements OnInit {
   directiveSubscriptions = new Subscription();
 
   constructor(
+    private windowRef: WindowRef,
     private backgroundMaskService: BackgroundMaskService,
     private bottomNavbarStatusService: BottomNavbarStatusService,
     private changeDetectorRef: ChangeDetectorRef,
-    private cookieService: CookieService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private keyboardShortcutService: KeyboardShortcutService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
     private sidebarStatusService: SidebarStatusService,
     private urlService: UrlService,
-    private windowRef: WindowRef,
+    private cookieService: CookieService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
