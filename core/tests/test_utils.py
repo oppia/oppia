@@ -33,7 +33,6 @@ import re
 import unittest
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
@@ -129,6 +128,9 @@ def get_filepath_from_filename(filename, rootdir):
     Returns:
         str | None. The path of the file if file is found otherwise
         None.
+
+    Raises:
+        Exception. Multiple files found with given file name.
     """
     # This is required since error files are served according to error status
     # code. The file served is error-page.mainpage.html but it is compiled and
@@ -161,7 +163,7 @@ def mock_load_template(filename):
     """
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'pages'))
-    with python_utils.open_file(filepath, 'r') as f:
+    with utils.open_file(filepath, 'r') as f:
         return f.read()
 
 
@@ -1325,6 +1327,9 @@ class TestBase(unittest.TestCase):
 
         Returns:
             bool. Whether the code raised exception in the expected format.
+
+        Raises:
+            Exception. No Regex given.
         """
         if not expected_regex:
             raise Exception(
@@ -1927,6 +1932,9 @@ title: Title
 
         Yields:
             None. Empty yield statement.
+
+        Raises:
+            Exception. Given argument is not a datetime.
         """
         if not isinstance(mocked_now, datetime.datetime):
             raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
@@ -2642,6 +2650,10 @@ title: Title
 
         Returns:
             Exploration. The exploration domain object.
+
+        Raises:
+            ValueError. Given list of state names is empty.
+            ValueError. Given list of interaction ids is empty.
         """
         if not state_names:
             raise ValueError('must provide at least one state name')
@@ -3781,6 +3793,10 @@ class FailingFunction(FunctionWrapper):
                 exception, before a call succeeds. If this is 0, all calls will
                 succeed, if it is FailingFunction. INFINITY, all calls will
                 fail.
+
+        Raises:
+            ValueError. The number of times to raise an exception before a call
+                succeeds should be a non-negative interger or INFINITY.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception
