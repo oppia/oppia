@@ -47,15 +47,7 @@ class UserQueryParamsAttributeTests(test_utils.GenericTestBase):
         attribute_names_predefined.sort()
         attribute_names.sort()
 
-        if len(attribute_names_predefined) != len(attribute_names):
-            raise utils.ValidationError(
-            'Attributes mismatch from attributes fetched',
-            ' from /assets/constants.ts')
-
-        if attribute_names_predefined != attribute_names:
-            raise utils.ValidationError(
-            'Attributes mismatch from attributes fetched',
-            ' from /assets/constants.ts')
+        self.assertEqual(attribute_names_predefined, attribute_names)
 
 
 class UserQueryTests(test_utils.GenericTestBase):
