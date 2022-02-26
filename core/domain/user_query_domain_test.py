@@ -33,9 +33,8 @@ class UserQueryParamsAttributeTests(test_utils.GenericTestBase):
     """
 
     def test_user_query_params_attributes_against_dynamic_data(self) -> None:
-        """Check to see if list of attributes field defined for UserQueryParams
-        (attribute_names_predefined) is similar to the one we get during runtime
-        (attribute_names)from (/assets/constants.ts)
+        """Check to see if the list of attributes of UserQueryParams
+        is similar to the one we get during runtime from assets/constants.ts.
         """
 
         attribute_names_predefined = list(
