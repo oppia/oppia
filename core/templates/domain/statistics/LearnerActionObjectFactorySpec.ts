@@ -129,12 +129,26 @@ describe('Learner Action Object Factory', () => {
       var learnerActionObject =
         learnerActionObjectFactory.createFromBackendDict({
           action_type: 'AnswerSubmit',
-          action_customization_args: null,
+          action_customization_args: {
+            state_name: {value: 'string'},
+            dest_state_name: {value: 'string'},
+            interaction_id: {value: 'string'},
+            submitted_answer: {value: 'string'},
+            feedback: {value: 'string'},
+            time_spent_state_in_msecs: {value: 5}
+          },
           schema_version: 1
         });
 
       expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
-      expect(learnerActionObject.actionCustomizationArgs).toEqual(null);
+      expect(learnerActionObject.actionCustomizationArgs).toEqual({
+        state_name: {value: 'string'},
+        dest_state_name: {value: 'string'},
+        interaction_id: {value: 'string'},
+        submitted_answer: {value: 'string'},
+        feedback: {value: 'string'},
+        time_spent_state_in_msecs: {value: 5}
+      });
       expect(learnerActionObject.schemaVersion).toEqual(1);
     });
 
