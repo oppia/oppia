@@ -36,7 +36,7 @@ import subprocess
 import sys
 
 sys.path.append(os.getcwd())
-from core import python_utils  # isort:skip # pylint: disable=wrong-import-position
+from core import utils  # isort:skip # pylint: disable=wrong-import-position
 from scripts import common  # isort:skip # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH = os.path.join('core', 'feconf.py')
@@ -190,7 +190,7 @@ def check_changes_in_gcloud_path():
         Exception. The gcloud path in common.py does not match with the path
             in release_constants.json.
     """
-    with python_utils.open_file(RELEASE_CONSTANTS_FILEPATH, 'r') as f:
+    with utils.open_file(RELEASE_CONSTANTS_FILEPATH, 'r') as f:
         release_constants_gcloud_path = json.loads(f.read())['GCLOUD_PATH']
 
     if not (
