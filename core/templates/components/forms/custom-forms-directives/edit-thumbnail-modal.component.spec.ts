@@ -78,9 +78,17 @@ describe('Edit Thumbnail Modal Component', () => {
   }
 
   let mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrsFromDataUri: (dataUri: string) => {
+    parseDataURI: (dataURI: string) => {
+      return Document;
+    },
+    getInvalidSvgTagsAndAttrs: (svg: Document) => {
       return { tags: ['script'], attrs: [] };
     },
+    removeTagsAndAttributes: (
+        svg: Document, valuesToBeRemoved: { tags: string[]; attrs: string[] }
+    ) => {
+      return Document;
+    }
   };
 
   const fileContent = (
@@ -134,7 +142,6 @@ describe('Edit Thumbnail Modal Component', () => {
     ' svg file', () => {
     spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
     spyOn(component, 'isValidFilename').and.returnValue(true);
-    const resetSpy = spyOn(component, 'reset').and.callThrough();
     let file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
     component.invalidImageWarningIsShown = false;
     component.invalidFilenameWarningIsShown = false;
@@ -144,9 +151,6 @@ describe('Edit Thumbnail Modal Component', () => {
     component.onFileChanged(file);
     expect(component.invalidImageWarningIsShown).toBe(false);
     expect(component.invalidFilenameWarningIsShown).toBe(false);
-    expect(component.tags).toEqual(['script']);
-    expect(component.attrs).toEqual([]);
-    expect(resetSpy).toHaveBeenCalled();
   });
 
   it('should not load file if it is not a svg type', () => {
@@ -275,7 +279,7 @@ describe('Edit Thumbnail Modal Component', () => {
     spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
     spyOn(component, 'isValidFilename').and.returnValue(true);
     spyOn(
-      svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri'
+      svgSanitizerService, 'getInvalidSvgTagsAndAttrs'
     ).and.callFake(() => {
       return { tags: [], attrs: [] };
     });

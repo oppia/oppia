@@ -62,8 +62,6 @@ export class EditThumbnailModalComponent {
   @Input() dimensions!: Dimensions;
   @Input() uploadedImageMimeType!: string;
   @Input() openInUploadMode: boolean = false;
-  tags!: string[];
-  attrs!: string[];
   imgSrc!: string;
   invalidTagsAndAttributes!: InvalidTagsAndAttributes;
 
@@ -127,7 +125,7 @@ export class EditThumbnailModalComponent {
         svg, {tags, attrs});
       this.imgSrc = (
         'data:image/svg+xml;base64,' +
-        btoa(unescape(encodeURIComponent(svg.documentElement.outerHTML))));
+        btoa(unescape(encodeURIComponent(svg.documentElement?.outerHTML))));
       this.uploadedImage = this.imgSrc;
       this.thumbnailHasChanged = true;
     };
