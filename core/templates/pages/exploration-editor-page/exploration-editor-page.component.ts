@@ -59,9 +59,6 @@ require('pages/exploration-editor-page/settings-tab/settings-tab.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/issues/' +
-  'playthrough-issues.component.ts');
-require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab.component.ts');
