@@ -237,6 +237,7 @@
 /core/templates/services/exploration-html-formatter.service*.ts @kevintab95
 /core/templates/services/image-upload-helper.service*.ts @kevintab95
 /core/templates/services/validators.service*.ts @kevintab95
+/core/templates/domain/entity_editor_browser_tabs_info/ @kevintab95
 
 
 # Forms pages.
@@ -705,10 +706,6 @@
 /core/domain/taskqueue*.py @vojtechjelinek
 /core/templates/services/auth.service*.ts @vojtechjelinek
 /core/templates/services/auth-backend-api.service*.ts @vojtechjelinek
-
-
-# Stale tab identification project
-/core/templates/domain/entity_editor_browser_tabs_info/ @kevintab95
 
 
 # Critical files.

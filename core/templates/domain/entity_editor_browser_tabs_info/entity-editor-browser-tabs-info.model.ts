@@ -15,6 +15,14 @@
 /**
  * @fileoverview Model for creating and mutating instances of entity editor
  * browser tabs info.
+ *
+ * This domain object will store information about opened
+ * entity editor tabs. This information will be stored in the local storage
+ * and is requried in order to sync between different entity editor
+ * tabs with the same url and show some meaningful info to the user
+ * when a tab becomes stale or some other tab with the same url has
+ * unsaved changes. This will make the user take the necerssary actions
+ * and avoid failure in the future while saving their work.
  */
 
 export interface EntityEditorBrowserTabsInfoObject {
@@ -26,11 +34,45 @@ export interface EntityEditorBrowserTabsInfoObject {
 }
 
 export class EntityEditorBrowserTabsInfo {
-  // Id of the entity whose editor page is opened.
+  /**
+    * It stores the type of the entity for a particular opened
+    * entity editor tab.
+    * It can have values: 'topic', 'story', 'skill' and 'exploration'.
+    * For example, if an editor tab with url '/topic_editor/topic_1' is
+    * opened, then this property will store 'topic'.
+   */
   _entityType: string;
+  /**
+   * It stores the id of the entity for a particular opened
+   * entity editor tab.
+   * For example, if an editor tab with url '/topic_editor/topic_1' is
+   * opened, then this property will store 'topic_1'.
+   */
   _id: string;
+  /**
+   * It stores the latest version for a particular entity with a particular id.
+   * For example, if an editor tab with url '/topic_editor/topic_1' is
+   * opened, then this property will store the
+   * latest version of the topic with id 'topic_1'.
+   */
   _latestVersion: number;
+  /**
+   * It stores the number of opened tabs for a particular
+   * entity editor tab url.
+   * For example, if we open two topic editor tabs with url
+   * '/topic_editor/topic_1', then the value of this property will be 2.
+   */
   _numberOfOpenedTabs: number;
+  /**
+   * It stores whether some other entity editor tab with the same url
+   * has some unsaved changes on it.
+   * For example, if we open two topic editor tabs with
+   * url '/topic_editor/topic_1'. At first, value of this property
+   * will be false. Now, if we make some changes on one of them
+   * then the value of this property will be set to true
+   * untill the changes are saved. After that, it will be set
+   * to false again.
+   */
   _someTabHasUnsavedChanges: boolean;
 
   constructor(
@@ -97,10 +139,18 @@ export class EntityEditorBrowserTabsInfo {
     return this._numberOfOpenedTabs;
   }
 
+  /**
+   * Increments the number of opened tabs by one. It is required
+   * when a new tab of a particular url is opened.
+   */
   incrementNumberOfOpenedTabs(): void {
     this._numberOfOpenedTabs = this._numberOfOpenedTabs + 1;
   }
 
+  /**
+   * Decrements the number of opened tabs by one. It is required
+   * when a tab of a particular url is closed.
+   */
   decrementNumberOfOpenedTabs(): void {
     this._numberOfOpenedTabs = this._numberOfOpenedTabs - 1;
   }

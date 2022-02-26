@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for entity editor browser tabs info
+ * @fileoverview Unit tests for entity editor browser tabs info.
  */
 
 import { EntityEditorBrowserTabsInfo } from './entity-editor-browser-tabs-info.model';
