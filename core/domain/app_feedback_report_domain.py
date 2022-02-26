@@ -353,18 +353,18 @@ class AppFeedbackReport:
     @classmethod
     def get_android_text_size_from_string(
         cls, text_size_name: str
-    ) -> app_feedback_report_constants.ANDROID_TEXT_SIZE:
+    ) -> app_feedback_report_constants.AndroidTextSize:
         """Determines the app text size based on the JSON value.
 
         Args:
             text_size_name: str. The name of the app's text size set.
 
         Returns:
-            ANDROID_TEXT_SIZE. The enum representing the text size.
+            AndroidTextSize. The enum representing the text size.
         """
         for text_size_type in (
             app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
-            if text_size_name == text_size_type.name:
+            if text_size_name == text_size_type.value:
                 return text_size_type
         raise utils.InvalidInputException(
             'The given Android app text size %s is invalid.' % text_size_name)
@@ -410,18 +410,18 @@ class AppFeedbackReport:
     @classmethod
     def get_android_network_type_from_string(
         cls, network_type_name: str
-    ) -> app_feedback_report_constants.ANDROID_NETWORK_TYPE:
+    ) -> app_feedback_report_constants.AndroidNetworkType:
         """Determines the network type based on the JSON value.
 
         Args:
             network_type_name: str. The name of the network type.
 
         Returns:
-            ANDROID_NETWORK_TYPE. The enum representing the network type.
+            AndroidNetworkType. The enum representing the network type.
         """
         for network_type in (
             app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES):
-            if network_type_name == network_type.name:
+            if network_type_name == network_type.value:
                 return network_type
         raise utils.InvalidInputException(
             'The given Android network type %s is invalid.' % network_type_name)
@@ -651,7 +651,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         device_model: str,
         sdk_version: int,
         build_fingerprint: str,
-        network_type: app_feedback_report_constants.ANDROID_NETWORK_TYPE
+        network_type: app_feedback_report_constants.AndroidNetworkType
     ) -> None:
         """Constructs an AndroidDeviceSystemContext domain object.
 
@@ -670,7 +670,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             sdk_version: int. The Android SDK version running on the device.
             build_fingerprint: str. The unique build fingerprint of this app
                 version.
-            network_type: ANDROID_NETWORK_TYPE. The enum for the network type
+            network_type: AndroidNetworkType. The enum for the network type
                 the device was connected to.
         """
         super(AndroidDeviceSystemContext, self).__init__(
@@ -698,7 +698,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             'device_model': self.device_model,
             'sdk_version': self.sdk_version,
             'build_fingerprint': self.build_fingerprint,
-            'network_type': self.network_type.name
+            'network_type': self.network_type.value
         }
 
     def validate(self) -> None:
@@ -843,12 +843,12 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
     @classmethod
     def require_valid_network_type(
-        cls, network_type: app_feedback_report_constants.ANDROID_NETWORK_TYPE
+        cls, network_type: app_feedback_report_constants.AndroidNetworkType
     ) -> None:
         """Checks that the Android device's network type is valid.
 
         Args:
-            network_type: ANDROID_NETWORK_TYPE. The network type the device
+            network_type: AndroidNetworkType. The network type the device
                 was connected to when sending the report, as an enum.
 
         Raises:
@@ -923,7 +923,7 @@ class AndroidAppContext(AppContext):
         entry_point: EntryPoint,
         text_language_code: str,
         audio_language_code: str,
-        text_size: app_feedback_report_constants.ANDROID_TEXT_SIZE,
+        text_size: app_feedback_report_constants.AndroidTextSize,
         only_allows_wifi_download_and_update: bool,
         automatically_update_topics: bool,
         account_is_profile_admin: bool,
@@ -939,7 +939,7 @@ class AndroidAppContext(AppContext):
                 in the app.
             audio_language_code: str. The ISO-639 code for the audio language
                 set in the app.
-            text_size: ANDROID_TEXT_SIZE. The enum type for text size set by
+            text_size: AndroidTextSize. The enum type for text size set by
                 the user in the app.
             only_allows_wifi_download_and_update: bool. True if the user only
                 allows downloads and updates when connected to wifi.
@@ -977,7 +977,7 @@ class AndroidAppContext(AppContext):
             'entry_point': self.entry_point.to_dict(),
             'text_language_code': self.text_language_code,
             'audio_language_code': self.audio_language_code,
-            'text_size': self.text_size.name,
+            'text_size': self.text_size.value,
             'only_allows_wifi_download_and_update': (
                 self.only_allows_wifi_download_and_update
             ),
@@ -1067,13 +1067,13 @@ class AndroidAppContext(AppContext):
 
     @classmethod
     def require_valid_text_size(
-        cls, text_size: app_feedback_report_constants.ANDROID_TEXT_SIZE
+        cls, text_size: app_feedback_report_constants.AndroidTextSize
     ) -> None:
         """Checks whether the package version code is a valid string code for
         Oppia Android.
 
         Args:
-            text_size: ANDROID_TEXT_SIZE. The enum type for the text size set by
+            text_size: AndroidTextSize. The enum type for the text size set by
                 the user in the app.
 
         Raises:
