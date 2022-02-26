@@ -22,6 +22,8 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 export class AnswerClassificationResult {
   outcome: Outcome;
   answerGroupIndex: number;
+  // 'ruleIndex' is null if 'predictedAnswerGroupIndex'
+  // is not equal to '-1'.
   ruleIndex: number | null;
   classificationCategorization: string;
 
