@@ -4374,7 +4374,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_translatable_fields_for_state_content(self):
         """Get all translatable fields for state content."""
-
         state = state_domain.State.create_default_state('state_1')
         state_content_dict = {
             'content_id': 'content',
@@ -4382,19 +4381,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
-
         translatable_contents = [
             translatable_content.content
             for translatable_content in
             state.get_translatable_fields().values()
         ]
+
         self.assertItemsEqual(
             translatable_contents, ['<p>state content html</p>']
         )
 
     def test_get_translatable_fields_for_answer_groups(self):
         """Get all the translatable fields for answer group."""
-
         state = state_domain.State.create_default_state('state_1')
         state_answer_group = [state_domain.AnswerGroup(
             state_domain.Outcome(
@@ -4413,12 +4411,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         )]
         state.update_interaction_id('TextInput')
         state.update_interaction_answer_groups(state_answer_group)
-
         translatable_contents = [
             translatable_content.content
             for translatable_content in
             state.get_translatable_fields().values()
         ]
+
         self.assertItemsEqual(
             translatable_contents, [
                 '<p>state outcome html</p>',
@@ -4427,7 +4425,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_translatable_fields_for_solution(self):
         """Get all translatable fields for solution."""
-
         state = state_domain.State.create_default_state('state_1')
         state_solution_dict = {
             'answer_is_exclusive': True,
@@ -4441,18 +4438,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
-
         translatable_contents = [
             translatable_content.content
             for translatable_content in
             state.get_translatable_fields().values()
         ]
+
         self.assertItemsEqual(
             translatable_contents, ['<p>This is solution for state_1</p>'])
 
     def test_get_translatable_fields_for_customization_args(self):
         """Get all the translatable fields for customization args."""
-
         state = state_domain.State.create_default_state('state_1')
         state_interaction_cust_args = {
             'placeholder': {
@@ -4465,26 +4461,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args(state_interaction_cust_args)
-
         translatable_contents = [
             translatable_content.content
             for translatable_content in
             state.get_translatable_fields().values()
         ]
+
         self.assertItemsEqual(
             translatable_contents, ['Translatable cust args.'])
 
     def test_get_translatable_fields_for_hints(self):
         """Get all translatable fields for hints."""
-
         hint = state_domain.Hint(state_domain.SubtitledHtml(
             'hint_1', '<p>Hello, this is html1 for state_1</p>'))
-
         translatable_contents = [
             translatable_content.content
             for translatable_content in
             hint.get_translatable_fields().values()
         ]
+
         self.assertItemsEqual(
             translatable_contents, [
                 '<p>Hello, this is html1 for state_1</p>'

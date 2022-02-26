@@ -628,7 +628,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the exploration."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
-
         for state in self.states.values():
             translatable_contents_collection.add_translatable_object(state)
         return translatable_contents_collection

@@ -1713,6 +1713,22 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
+    def test_get_translatable_fields_returns_corrctly(self):
+        """Get all translatable fields from exploration."""
+        translatable_contents = [
+            translatable_content.content
+            for translatable_content in
+            self.question.get_translatable_fields().values()
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents,
+            [
+                'Enter text here',
+                '<p>This is a hint.</p>',
+                '<p>This is a solution.</p>'
+            ])
+
 
 class QuestionSummaryTest(test_utils.GenericTestBase):
     """Test for Question Summary object."""

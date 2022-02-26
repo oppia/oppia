@@ -2333,12 +2333,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_translatable_fields_returns_corrctly(self):
         """Get all translatable fields from exploration."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-
         state_content_dict = {
             'content_id': 'content',
             'html': '<p>state content html</p>'
@@ -2393,7 +2391,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rows': {'value': 1}
         }
-
         state.update_next_content_id_index(3)
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))

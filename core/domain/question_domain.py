@@ -173,9 +173,13 @@ class Question(translation_domain.BaseTranslatableObject):
         self.created_on = created_on
         self.last_updated = last_updated
 
-    def _register_all_translatable_fields(self) -> None:
+    def get_translatable_contents_collection(self) -> None:
         """Registers all of translatable fields/objects in the question."""
-        self._register_translatable_object(self.question_state_data)
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+        translatable_contents_collection.add_translatable_object(
+            self.question_state_data)
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this Question domain object.

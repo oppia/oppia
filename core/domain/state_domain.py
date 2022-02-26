@@ -81,7 +81,6 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         """Get all translatable fields in the answer group."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
-
         if self.outcome is not None:
             translatable_contents_collection.add_translatable_object(
                 self.outcome)
@@ -294,7 +293,6 @@ class Hint(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the hint."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
-
         translatable_contents_collection.add_translatable_field(
             translation_domain.TranslatableContentFormat.HTML,
             self.hint_content.content_id,
@@ -387,7 +385,6 @@ class Solution(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the solution."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
-
         translatable_contents_collection.add_translatable_field(
             translation_domain.TranslatableContentFormat.HTML,
             self.explanation.content_id,
@@ -549,26 +546,20 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the interaction instance."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
-
         if self.default_outcome is not None:
             translatable_contents_collection.add_translatable_object(
                 self.default_outcome)
-
         for answer_group in self.answer_groups:
             translatable_contents_collection.add_translatable_object(
                 answer_group)
-
         for customization_arg in self.customization_args.values():
             translatable_contents_collection.add_translatable_object(
                 customization_arg)
-
         for hint in self.hints:
             translatable_contents_collection.add_translatable_object(hint)
-
         if self.solution is not None:
             translatable_contents_collection.add_translatable_object(
                 self.solution)
-
         return translatable_contents_collection
 
     def to_dict(self):
@@ -1386,7 +1377,6 @@ class Outcome(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the outcome."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
-
         translatable_contents_collection.add_translatable_field(
             translation_domain.TranslatableContentFormat.HTML,
             self.feedback.content_id,
@@ -2174,7 +2164,6 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the rule spec."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
-
         for input_value in self.inputs.values():
             if 'normalizedStrSet' in input_value:
                 translatable_contents_collection.add_translatable_field(
@@ -2188,7 +2177,6 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
                     .SET_OF_UNICODE_STRING,
                     input_value['contentId'],
                     input_value['unicodeStrSet'])
-
         return translatable_contents_collection
 
     def to_dict(self):
@@ -2631,14 +2619,12 @@ class State(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the state."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
-
         translatable_contents_collection.add_translatable_field(
             translation_domain.TranslatableContentFormat.HTML,
             self.content.content_id,
             self.content.html)
         translatable_contents_collection.add_translatable_object(
             self.interaction)
-
         return translatable_contents_collection
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
