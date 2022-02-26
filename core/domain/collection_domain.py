@@ -1369,9 +1369,9 @@ class CollectionSummary:
         Returns:
             bool. Whether the collection is private.
         """
-        # Here mypy expecting constants.ACTIVITY_STATUS_PRIVATE to be type
-        # Any and due to this, function is returning type Any. So, to return
-        # bool, bool function is imposed on return value.
+        # Here mypy evaluates constants.ACTIVITY_STATUS_PRIVATE to be Any 
+        # and due to this, the == is returning Any. So, in order to
+        # return bool, we explicitly convert the operation to bool.
         return bool(self.status == constants.ACTIVITY_STATUS_PRIVATE)
 
     def is_solely_owned_by_user(self, user_id: str) -> bool:

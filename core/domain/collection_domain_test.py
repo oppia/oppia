@@ -258,8 +258,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     # We have ignored [override] here because the signature of this method
     # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error( # type: ignore[override]
-        self,
-        expected_error_substring: str
+        self, expected_error_substring: str
     ) -> None:
         """Checks that the collection passes strict validation."""
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
@@ -494,9 +493,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection.nodes), 0)
 
     def test_update_collection_contents_from_model(self) -> None:
-        # For test purpose we're only defining required fields which does not
-        # match with defined typedDict. So, to prevent error ignore statement
-        # is applied here.
+        # For test purposes we're defining fields that do not match with
+        # defined VersionedCollectionDict. So, in order to prevent MyPy
+        # errors we add an ignore statement here.
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict
         ) = {
@@ -521,9 +520,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     def test_update_collection_contents_from_model_with_schema_version_5(
         self
     ) -> None:
-        # For test purpose only we're defining required fields which does not
-        # match with defined typedDict. So, to prevent error ignore statement
-        # is applied here.
+        # For test purposes we're defining fields that do not match with
+        # defined VersionedCollectionDict. So, in order to prevent MyPy
+        # errors we add an ignore statement here.
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict
         ) = {
@@ -557,9 +556,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     def test_update_collection_contents_from_model_with_invalid_schema_version(
         self
     ) -> None:
-        # For test purpose only we're defining required fields which does not
-        # match with defined typedDict. So, to prevent error ignore statement
-        # is applied here.
+        # For test purposes we're defining fields that do not match with
+        # defined VersionedCollectionDict. So, in order to prevent MyPy
+        # errors we add an ignore statement here.
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict
         ) = {

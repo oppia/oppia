@@ -56,7 +56,7 @@ class ValidCmdDict(TypedDict):
     required_attribute_names: List[str]
     optional_attribute_names: List[str]
     user_id_attribute_names: List[str]
-    allowed_values: Dict[str, Union[CollectionPropertiesType, List[str]]]
+    allowed_values: Dict[str, Union[CollectionPropertiesType, str]]
     deprecated_values: Dict[str, List[str]]
 
 
