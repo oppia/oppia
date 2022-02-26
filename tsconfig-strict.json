@@ -808,7 +808,9 @@
     "extensions/objects/templates/translatable-set-of-unicode-string-editor.component.ts",
     "extensions/objects/templates/translatable-set-of-unicode-string-editor.component.spec.ts",
     "extensions/objects/templates/unicode-string-editor.component.ts",
-    "extensions/objects/templates/unicode-string-editor.component.spec.ts"
+    "extensions/objects/templates/unicode-string-editor.component.spec.ts",
+    "core/templates/components/skill-selector/skill-selector.component.ts",
+    "core/templates/components/skill-selector/skill-selector.component.spec.ts"
   ],
   "include": [
     "assets/*.ts",

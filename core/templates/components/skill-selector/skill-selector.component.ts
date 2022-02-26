@@ -50,7 +50,7 @@ export class SkillSelectorComponent implements OnInit {
   @Output() selectedSkillIdChange: EventEmitter<string> = new EventEmitter();
   currCategorizedSkills!: CategorizedSkills;
   selectedSkill!: string;
-  skillFilterText: string = '';
+  skillFilterText: string;
   topicFilterList: { topicName: string ; checked: boolean }[] = [];
   subTopicFilterDict: SubTopicFilterDict = {};
   initialSubTopicFilterDict: SubTopicFilterDict = {};
