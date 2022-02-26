@@ -22,17 +22,48 @@ import inspect
 
 from extensions.answer_summarizers import models
 
+from typing import Callable, cast, overload
+from typing_extensions import Literal, TypedDict
+
+
+class CalculationDict(TypedDict):
+    """Type for the _calculations_dict."""
+
+    AnswerFrequencies: Callable[..., models.AnswerFrequencies]
+    Top5AnswerFrequencies: Callable[..., models.Top5AnswerFrequencies]
+    Top10AnswerFrequencies: Callable[..., models.Top10AnswerFrequencies]
+    FrequencyCommonlySubmittedElements: (
+        Callable[..., models.FrequencyCommonlySubmittedElements])
+    TopAnswersByCategorization: (
+        Callable[..., models.TopAnswersByCategorization])
+    TopNUnresolvedAnswersByFrequency: (
+        Callable[..., models.TopNUnresolvedAnswersByFrequency])
+
+
+# Type defined for arguments which can accept only keys of Dict
+# CalculationDict.
+CalculationIdType = Literal[
+    'AnswerFrequencies',
+    'Top5AnswerFrequencies',
+    'Top10AnswerFrequencies',
+    'FrequencyCommonlySubmittedElements',
+    'TopAnswersByCategorization',
+    'TopNUnresolvedAnswersByFrequency'
+]
+
 
 class Registry:
     """Registry of all calculations for summarizing answers."""
 
     # Dict mapping calculation class names to their classes.
-    _calculations_dict = {}
+    # Here we are just initializing it as a dict and MyPy does not
+    # allow defining empty TypedDict, thus we add an ignore.
+    _calculations_dict: CalculationDict = {} # type: ignore[typeddict-item]
 
     @classmethod
-    def _refresh_registry(cls):
+    def _refresh_registry(cls) -> None:
         """Refreshes the registry to add new visualization instances."""
-        cls._calculations_dict.clear()
+        cls._calculations_dict.clear() # type: ignore[attr-defined]
 
         # Add new visualization instances to the registry.
         for name, clazz in inspect.getmembers(
@@ -43,10 +74,49 @@ class Registry:
             ancestor_names = [
                 base_class.__name__ for base_class in inspect.getmro(clazz)]
             if 'BaseCalculation' in ancestor_names:
-                cls._calculations_dict[clazz.__name__] = clazz
+                cls._calculations_dict[cast(
+                    CalculationIdType, clazz.__name__)] = clazz
+
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: Literal['AnswerFrequencies']
+    ) -> models.AnswerFrequencies: ...
+
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: Literal['Top5AnswerFrequencies']
+    ) -> models.Top5AnswerFrequencies: ...
+
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: Literal['Top10AnswerFrequencies']
+    ) -> models.Top10AnswerFrequencies: ...
+
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: Literal['FrequencyCommonlySubmittedElements']
+    ) -> models.FrequencyCommonlySubmittedElements: ...
+
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: Literal['TopAnswersByCategorization']
+    ) -> models.TopAnswersByCategorization: ...
+
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: Literal['TopNUnresolvedAnswersByFrequency']
+    ) -> models.TopNUnresolvedAnswersByFrequency: ...
 
     @classmethod
-    def get_calculation_by_id(cls, calculation_id):
+    def get_calculation_by_id(
+        cls, calculation_id: CalculationIdType
+    ) -> models.BaseCalculation:
         """Gets a calculation instance by its id (which is also its class name).
 
         Refreshes once if the class is not found; subsequently, throws an
