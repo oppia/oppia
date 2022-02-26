@@ -76,7 +76,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
 
     def get_transltable_contents_collection(self) -> None:
-        """Registers all of translatable field/objects in the answer group."""
+        """Get all translatable fields in the answer group."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
@@ -287,7 +287,7 @@ class Hint(translation_domain.BaseTranslatableObject):
         self.hint_content = hint_content
 
     def get_transltable_contents_collection(self) -> None:
-        """Registers all of the translatable fields/objects in the hint."""
+        """Get all translatable fields/objects in the hint."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
@@ -378,7 +378,7 @@ class Solution(translation_domain.BaseTranslatableObject):
         self.explanation = explanation
 
     def get_transltable_contents_collection(self) -> None:
-        """Registers all of the translatable fields/objects in the solution."""
+        """Get all translatable fields/objects in the solution."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
@@ -538,9 +538,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         self.solution = solution
 
     def get_transltable_contents_collection(self) -> None:
-        """Registers all of the translatable fields/objects in the interaction
-        instance.
-        """
+        """Get all translatable fields/objects in the interaction instance."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
@@ -1012,8 +1010,8 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         self.schema = schema
 
     def get_transltable_contents_collection(self) -> None:
-        """Registers all of the translatable fields/objects in the interaction
-        customization args.
+        """Get all translatable fields/objects in the interaction customization
+        args.
         """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
@@ -1373,7 +1371,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
         self.missing_prerequisite_skill_id = missing_prerequisite_skill_id
 
     def get_transltable_contents_collection(self) -> None:
-        """Registers all of the translatable fields/objects in the outcome."""
+        """Get all translatable fields/objects in the outcome."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
@@ -2159,7 +2157,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         self.inputs = inputs
 
     def get_transltable_contents_collection(self) -> None:
-        """Registers all of the translatable fields/objects in the rule spec."""
+        """Get all translatable fields/objects in the rule spec."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
@@ -2612,7 +2610,7 @@ class State(translation_domain.BaseTranslatableObject):
         self.next_content_id_index = next_content_id_index
 
     def get_transltable_contents_collection(self) -> None:
-        """Registers all of the translatable fields/objects in the state."""
+        """Get all translatable fields/objects in the state."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
