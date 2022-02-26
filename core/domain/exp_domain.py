@@ -622,7 +622,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
-    def get_transltable_contents_collection(self) -> None:
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields/objects in the exploration."""
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
