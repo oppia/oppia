@@ -335,10 +335,20 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
         self.collection.nodes = [
             collection_domain.CollectionNode.from_dict({
-                'exploration_id': '0'
+                'exploration_id': '0',
+                'acquired_skills': [],
+                'acquired_skill_ids': [],
+                'other_field': '',
+                'prerequisite_skills': [],
+                'prerequisite_skill_ids': []
             }),
             collection_domain.CollectionNode.from_dict({
-                'exploration_id': '0'
+                'exploration_id': '0',
+                'acquired_skills': [],
+                'acquired_skill_ids': [],
+                'other_field': '',
+                'prerequisite_skills': [],
+                'prerequisite_skill_ids': []
             })
         ]
 

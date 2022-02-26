@@ -194,15 +194,9 @@ class CollectionChange(change_domain.BaseChange):
 class CollectionNodeDict(TypedDict):
     """Dictionary representing the CollectionNode object."""
 
-    exploration_id: str
-
-
-class CollectionNodeVersionDict(CollectionNodeDict):
-    """Dictionary representing the CollectionNode object based
-    on different schema versions."""
-
     acquired_skills: List[str]
     acquired_skill_ids: List[str]
+    exploration_id: str
     other_field: str
     prerequisite_skills: List[str]
     prerequisite_skill_ids: List[str]
@@ -231,7 +225,10 @@ class CollectionNode:
             prerequisite_skill_ids, acquired_skill_ids) of CollectionNode
             instance.
         """
-        return {
+        # Here, we're not returning keys other than exploration_id of 
+        # CollectionNodeDict which causes MyPy to throw error. thus we
+        # add an ignore.
+        return { # type: ignore[typeddict-item]
             'exploration_id': self.exploration_id
         }
 
@@ -285,7 +282,7 @@ class CollectionDict(TypedDict):
     language_code: str
     tags: List[str]
     schema_version: int
-    nodes: List[CollectionNodeVersionDict]
+    nodes: List[CollectionNodeDict]
     version: int
     created_on: Union[datetime.datetime, str]
     last_updated: Union[datetime.datetime, str]
@@ -376,8 +373,8 @@ class Collection:
             dict. A dict, mapping all fields of Collection instance.
         """
         # Here, we're not returning created_on, last_updated and version
-        # values as a key which causes MyPy to throw error. thus we
-        # add an ignore.
+        # keys of CollectionDict which causes MyPy to throw error. thus
+        # we add an ignore here.
         return { # type: ignore[typeddict-item]
             'id': self.id,
             'title': self.title,
