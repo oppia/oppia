@@ -94,5 +94,6 @@ class Registry:
             return cls._issues[issue_type]
         except KeyError as e:
             logging.error(
-                    'Invalid issue_type %s.', e
+                    'Invalid issue_type %s. Please check your input.',
+                     e
                     )

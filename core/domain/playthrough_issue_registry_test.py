@@ -54,7 +54,7 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
 
         self.assertRaisesRegex(
                 KeyError,
-                'Invalid issue_type. Please check your input issue_type.',
+                'Invalid issue_type FalseIssue. Please check your input.',
                 playthrough_issue_registry.Registry.get_issue_by_type(
             'FalseIssue'
             ))
