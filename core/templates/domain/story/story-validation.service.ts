@@ -50,6 +50,7 @@ export class StoryValidationService {
     // skill IDs acquired by a learner as they progress through the story.
     var simulatedSkillIds = new Set(startingNode.getPrerequisiteSkillIds());
 
+    // Validate the prerequisite skills of the starting node.
     startingNode.getPrerequisiteSkillIds().forEach(
       (skillId: string) => {
         if (
