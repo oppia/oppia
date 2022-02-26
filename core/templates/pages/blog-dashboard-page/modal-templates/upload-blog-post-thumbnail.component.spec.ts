@@ -139,7 +139,7 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
 
     componentInstance.onFileChanged(file);
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
-    expect(componentInstance.cropper).toBeDefined();
+    fixture.detectChanges();
   });
 
   it('should handle invalid image', () => {

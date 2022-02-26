@@ -103,7 +103,6 @@ describe('Edit Profile Picture Modal Component', () => {
 
     componentInstance.onFileChanged(file);
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
-    expect(componentInstance.cropper).toBeDefined();
   });
 
   it('should handle invalid image', () => {
