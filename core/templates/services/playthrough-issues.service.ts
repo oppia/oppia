@@ -23,57 +23,11 @@ require(
   'improvement-modal.service.ts');
 
 angular.module('oppia').factory('PlaythroughIssuesService', [
-  'ImprovementModalService', 'PlaythroughIssuesBackendApiService',
-  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
-  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  'PlaythroughIssuesBackendApiService',
   function(
-      ImprovementModalService, PlaythroughIssuesBackendApiService,
-      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
-      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+      PlaythroughIssuesBackendApiService) {
     var explorationId = null;
     var explorationVersion = null;
-
-    var renderEarlyQuitIssueStatement = function() {
-      return 'Several learners exited the exploration in less than a minute.';
-    };
-
-    var renderMultipleIncorrectIssueStatement = function(stateName) {
-      return 'Several learners submitted answers to card "' + stateName +
-        '" several times, then gave up and quit.';
-    };
-
-    var renderCyclicTransitionsIssueStatement = function(stateName) {
-      return 'Several learners ended up in a cyclic loop revisiting card "' +
-        stateName + '" many times.';
-    };
-
-    var renderEarlyQuitIssueSuggestions = function(stateName) {
-      var suggestions = [(
-        'Review the cards up to and including "' + stateName +
-        '" for errors, ' + 'ambiguities, or insufficient motivation.'),
-      ];
-      return suggestions;
-    };
-
-    var renderMultipleIncorrectIssueSuggestions = function(stateName) {
-      var suggestions = [(
-        'Check the wording of the card "' + stateName + '" to ensure it is ' +
-        'not confusing.'), (
-        'Consider addressing the answers submitted in the sample ' +
-          'playthroughs explicitly using answer groups.'),
-      ];
-      return suggestions;
-    };
-
-    var renderCyclicTransitionsIssueSuggestions = function(stateNames) {
-      var finalIndex = stateNames.length - 1;
-      var suggestions = [(
-        'Check that the concept presented in "' + stateNames[0] + '" has ' +
-        'been reinforced sufficiently by the time the learner gets to "' +
-        stateNames[finalIndex] + '".'),
-      ];
-      return suggestions;
-    };
 
     return {
       /** Prepares the PlaythroughIssuesService for subsequent calls to other
@@ -91,44 +45,6 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
       getIssues: function() {
         return PlaythroughIssuesBackendApiService.fetchIssuesAsync(
           explorationId, explorationVersion);
-      },
-      getPlaythrough: function(playthroughId) {
-        return PlaythroughIssuesBackendApiService.fetchPlaythroughAsync(
-          explorationId, playthroughId);
-      },
-      renderIssueStatement: function(issue) {
-        var issueType = issue.issueType;
-        if (issueType === ISSUE_TYPE_EARLY_QUIT) {
-          return renderEarlyQuitIssueStatement();
-        } else if (issueType === ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
-          return renderMultipleIncorrectIssueStatement(
-            issue.issueCustomizationArgs.state_name.value);
-        } else if (issueType === ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
-          return renderCyclicTransitionsIssueStatement(
-            issue.issueCustomizationArgs.state_names.value[0]);
-        }
-      },
-      renderIssueSuggestions: function(issue) {
-        var issueType = issue.issueType;
-        if (issueType === ISSUE_TYPE_EARLY_QUIT) {
-          return renderEarlyQuitIssueSuggestions(
-            issue.issueCustomizationArgs.state_name.value);
-        } else if (issueType === ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
-          return renderMultipleIncorrectIssueSuggestions(
-            issue.issueCustomizationArgs.state_name.value);
-        } else if (issueType === ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
-          return renderCyclicTransitionsIssueSuggestions(
-            issue.issueCustomizationArgs.state_names.value);
-        }
-      },
-      resolveIssue: function(issue) {
-        return PlaythroughIssuesBackendApiService.resolveIssueAsync(
-          issue, explorationId, explorationVersion);
-      },
-      openPlaythroughModal: function(playthroughId, index) {
-        this.getPlaythrough(playthroughId).then(function(playthrough) {
-          ImprovementModalService.openPlaythroughModal(playthrough, index);
-        });
-      },
+      }
     };
   }]);

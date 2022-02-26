@@ -134,7 +134,6 @@ require('services/exploration-features-backend-api.service.ts');
 require('services/exploration-features.service.ts');
 require('services/exploration-improvements.service.ts');
 require('services/page-title.service.ts');
-require('services/playthrough-issues.service.ts');
 require('services/site-analytics.service.ts');
 require('services/state-top-answers-stats-backend-api.service.ts');
 require('services/state-top-answers-stats.service.ts');
