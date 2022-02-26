@@ -38,7 +38,7 @@ class DummyTranslatableObjectWithTwoParams(
         self.param1 = param1
         self.param2 = param2
 
-    def get_transltable_contents_collection(
+    def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
@@ -64,7 +64,7 @@ class DummyTranslatableObjectWithSingleParam(
     ) -> None:
         self.param3 = param3
 
-    def get_transltable_contents_collection(
+    def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
@@ -90,7 +90,7 @@ class DummyTranslatableObject(translation_domain.BaseTranslatableObject):
         self.param1 = param1
         self.param2 = param2
 
-    def get_transltable_contents_collection(
+    def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
@@ -109,8 +109,8 @@ class DummyTranslatableObject(translation_domain.BaseTranslatableObject):
 
 class DummyTranslatableObjectWithoutRegisterMethod(
         translation_domain.BaseTranslatableObject):
-    """A dummy translatable object without get_transltable_contents_collection()
-    method should raise an exception.
+    """A dummy translatable object without
+    get_translatable_contents_collection() method should raise an exception.
     """
 
     def __init__(
@@ -140,7 +140,7 @@ class DummyTranslatableObjectWithFourParams(
         self.param3 = param3
         self.param4 = param4
 
-    def get_transltable_contents_collection(
+    def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (

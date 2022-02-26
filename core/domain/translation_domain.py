@@ -86,7 +86,7 @@ class TranslatableContentsCollection:
                 BaseTranslatableObject.
         """
         self.translatable_contents.update(
-            value.get_transltable_contents_collection().translatable_contents)
+            value.get_translatable_contents_collection().translatable_contents)
 
 
 class BaseTranslatableObject:
@@ -97,7 +97,7 @@ class BaseTranslatableObject:
     be the child class of BaseTranslatableObject.
     """
 
-    def get_transltable_contents_collection(
+    def get_translatable_contents_collection(
         self
     ) -> TranslatableContentsCollection:
         """Get all translatable fields in a translatable object.
@@ -117,7 +117,7 @@ class BaseTranslatableObject:
             as key and TranslatableContent as value.
         """
         return copy.deepcopy(
-            self.get_transltable_contents_collection().translatable_contents)
+            self.get_translatable_contents_collection().translatable_contents)
 
     def get_all_contents_which_need_translations(
         self,
