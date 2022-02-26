@@ -77,11 +77,11 @@ export class ConceptCard {
     let contentIds: Set<string> = new Set();
     workedExamples.forEach((workedExample: WorkedExample) => {
       let question = workedExample.getQuestion();
-      if (question.contentId !== undefined) {
+      if (question.contentId !== null) {
         contentIds.add(question.contentId);
       }
       let explanation = workedExample.getExplanation();
-      if (explanation.contentId !== undefined) {
+      if (explanation.contentId !== null) {
         contentIds.add(explanation.contentId);
       }
     });

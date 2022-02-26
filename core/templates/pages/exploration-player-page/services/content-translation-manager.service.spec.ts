@@ -337,7 +337,7 @@ describe('Content translation manager service', () => {
         }
       }
     });
-    let content = new SubtitledHtml('<p>en content</p>', undefined);
+    let content = new SubtitledHtml('<p>en content</p>', null);
     expect(() => {
       ctms.getTranslatedHtml(writtenTranslations, 'fr', content);
     }).toThrowError('Content ID does not exist');

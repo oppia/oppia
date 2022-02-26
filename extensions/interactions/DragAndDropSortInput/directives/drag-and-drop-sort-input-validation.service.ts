@@ -151,7 +151,7 @@ export class DragAndDropSortInputValidationService {
         customizationArgs.choices.value.forEach(
           choice => {
             const contentId = choice.contentId;
-            if (contentId === undefined) {
+            if (contentId === null) {
               throw new Error ('ContentId of choice does not exist');
             }
             choiceContentIdToHtml[contentId] = choice.html;

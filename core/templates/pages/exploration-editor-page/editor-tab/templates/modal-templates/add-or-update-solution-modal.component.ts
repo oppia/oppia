@@ -42,9 +42,10 @@ interface SolutionInterface {
   // and correct answer is not yet choosen.
   correctAnswer: string | undefined;
   explanationHtml: string;
-  // An undefined 'explanationContentId' indicates that the 'Solution' has been
-  // created but not saved.
-  explanationContentId: string | undefined;
+  // A null 'explanationContentId' indicates that the 'Solution' has been
+  // created but not saved. Before the 'SubtitledHtml' object is saved into a
+  // State, the 'content_id' should be set to a string.
+  explanationContentId: string | null;
   explanation?: string;
 }
 
@@ -136,7 +137,7 @@ export class AddOrUpdateSolutionModalComponent
       typeof this.data.answerIsExclusive === 'boolean' &&
        this.data.correctAnswer !== undefined &&
        this.data.explanation !== '' &&
-       this.data.explanationContentId !== undefined
+       this.data.explanationContentId !== null
     ) {
       this.ngbActiveModal.close({
         solution: this.solutionObjectFactory.createNew(

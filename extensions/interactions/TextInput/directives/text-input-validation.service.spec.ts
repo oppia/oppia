@@ -63,7 +63,7 @@ describe('TextInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        content_id: undefined
+        content_id: null
       },
       labelled_as_correct: false,
       param_changes: [],

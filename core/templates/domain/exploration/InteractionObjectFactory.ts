@@ -186,17 +186,17 @@ export class Interaction {
    * details.
    * @param {InteractionCustomizationArgs} customizationArgs The customization
    *  arguments to get content ids for.
-   * @returns {(string | undefined)[]} List of content ids in customization
+   * @returns {(string | null)[]} List of content ids in customization
    *  args.
    */
   static getCustomizationArgContentIds(
       customizationArgs: InteractionCustomizationArgs
-  ): (string | undefined)[] {
-    // An undefined 'content_id' indicates that the 'SubtitledHtml' or
+  ): (string | null)[] {
+    // A null 'content_id' indicates that the 'SubtitledHtml' or
     // 'SubtitledUnicode' has been created but not saved. Before the
     // 'SubtitledHtml' or 'SubtitledUnicode' object is saved into a State,
     // the 'content_id' should be set to a string.
-    const contentIds: (string | undefined)[] = [];
+    const contentIds: (string | null)[] = [];
 
     const traverseValueAndRetrieveContentIdsFromSubtitled = (
         value: Object[] | Object

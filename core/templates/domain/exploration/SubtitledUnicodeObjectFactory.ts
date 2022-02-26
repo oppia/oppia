@@ -18,7 +18,7 @@
  */
 
 export interface SubtitledUnicodeBackendDict {
-  'content_id': string | undefined;
+  'content_id': string | null;
   'unicode_str': string;
 }
 
@@ -26,12 +26,12 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class SubtitledUnicode {
-  // An undefined 'content_id' indicates that the 'SubtitledHtml' has been
-  // created but not saved. Before the 'SubtitledHtml' object is saved into
-  // a State, the 'content_id' should be set to a string.
+  // A null 'content_id' indicates that the 'SubtitledHtml' has been created
+  // but not saved. Before the 'SubtitledHtml' object is saved into a State,
+  // the 'content_id' should be set to a string.
   constructor(
     private _unicode: string,
-    private _contentId: string | undefined
+    private _contentId: string | null
   ) {}
 
   toBackendDict(): SubtitledUnicodeBackendDict {
@@ -45,11 +45,11 @@ export class SubtitledUnicode {
     return !this._unicode;
   }
 
-  get contentId(): string | undefined {
+  get contentId(): string | null {
     return this._contentId;
   }
 
-  set contentId(contentId: string | undefined) {
+  set contentId(contentId: string | null) {
     this._contentId = contentId;
   }
 
@@ -74,9 +74,7 @@ export class SubtitledUnicodeObjectFactory {
       subtitledUnicodeBackendDict.content_id);
   }
 
-  createDefault(
-      unicode: string, contentId: string | undefined
-  ): SubtitledUnicode {
+  createDefault(unicode: string, contentId: string | null): SubtitledUnicode {
     return new SubtitledUnicode(unicode, contentId);
   }
 }
