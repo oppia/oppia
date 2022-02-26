@@ -24,7 +24,7 @@ import json
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 
 
@@ -137,7 +137,7 @@ class Registry:
                 feconf.INTERACTIONS_LEGACY_SPECS_FILE_DIR, file_name)
 
             if os.path.isfile(spec_file):
-                with python_utils.open_file(spec_file, 'r') as f:
+                with utils.open_file(spec_file, 'r') as f:
                     specs_from_json = json.loads(f.read())
                 cls._state_schema_version_to_interaction_specs[
                     state_schema_version] = specs_from_json

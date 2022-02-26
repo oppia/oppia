@@ -63,7 +63,7 @@ import subprocess
 import sys
 import threading
 
-from core import python_utils
+from core import utils
 
 # Install third party dependencies before proceeding.
 from . import codeowner_linter
@@ -198,7 +198,7 @@ class FileCache:
         """
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
-            with python_utils.open_file(filepath, mode, newline='') as f:
+            with utils.open_file(filepath, mode, newline='') as f:
                 lines = f.readlines()
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return self._CACHE_DATA_DICT[key]
