@@ -120,6 +120,31 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     fixture.detectChanges();
   });
 
+  it('should correctly extract and remove invalid tags and attributes', ()=>{
+    const svgString = (
+      '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
+      '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
+      'cal-align: -0.241ex;"><g stroke="currentColor" fill="currentColor" ' +
+      'stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-widt' +
+      'h="1" d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402' +
+      'Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T' +
+      '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z" ' +
+      'data-name="dataName"/></g><circel></circel></svg>'
+    );
+    var dataURI = (
+      'data:image/svg+xml;base64,' +
+      btoa(unescape(encodeURIComponent(svgString))));
+    let file = new File([dataURI], 'test.svg', {type: 'image/svg'});
+    componentInstance.invalidImageWarningIsShown = false;
+
+    componentInstance.onFileChanged(file);
+    expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
+    expect(componentInstance.invalidTagsAndAttributes).toEqual(
+      {tags: ['circel'], attrs: ['data-name']}
+    );
+    expect(componentInstance.cropper).toBeDefined();
+  });
+
   it('should handle invalid image', () => {
     spyOn(componentInstance, 'reset');
 
