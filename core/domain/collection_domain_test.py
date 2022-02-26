@@ -762,6 +762,9 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
     def test_from_yaml_with_no_schema_version_specified_raises_error(
         self
     ) -> None:
+        # Argument schema_version of collection expects int value but here
+        # we are passing None which causes MyPy to throw error. thus we
+        # add an ignore here.
         collection = collection_domain.Collection(
             self.COLLECTION_ID, 'title', 'category', 'objective', 'en', [],
             None, [], 0) # type: ignore[arg-type]
