@@ -27,7 +27,30 @@ from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import improvements_domain
 from core.domain import improvements_services
+from core.domain import user_services
 
+def get_task_dict_with_username_and_profile_picture(task_entry):
+    """Returns a task entry dict with the username and profile picture
+    URL inserted.
+
+    Args:
+        task_entry: improvements_domain.TaskEntry. The TaskEntry domain object.
+
+    Returns:
+        TaskEntryDict. TaskEntry dict username and profile picture
+        URL inserted.
+    """
+
+    task_entry_dict = task_entry.to_dict()
+    if task_entry.resolver_id:
+        resolver_settings = user_services.get_user_settings(
+                task_entry.resolver_id, strict=True) # type: ignore[no-untyped-call]
+        if resolver_settings:
+            task_entry_dict['resolver_username'] = (
+                resolver_settings.username)
+            task_entry_dict['resolver_profile_picture_data_url'] = (
+                resolver_settings.profile_picture_data_url)
+    return task_entry_dict
 
 class ExplorationImprovementsHandler(base.BaseHandler):
     """Handles operations related to managing exploration improvement tasks.
@@ -71,7 +94,7 @@ class ExplorationImprovementsHandler(base.BaseHandler):
                 exp_fetchers.get_exploration_by_id(exploration_id)))
         self.render_json({
             'open_tasks': [
-                improvements_services.update_task_dict_with_resolver_settings(
+                get_task_dict_with_username_and_profile_picture(
                     t) for t in open_tasks],
             'resolved_task_types_by_state_name': (
                 resolved_task_types_by_state_name),
@@ -144,7 +167,7 @@ class ExplorationImprovementsHistoryHandler(base.BaseHandler):
 
         self.render_json({
             'results': [
-                improvements_services.update_task_dict_with_resolver_settings(
+                get_task_dict_with_username_and_profile_picture(
                     t) for t in results],
             'cursor': new_urlsafe_start_cursor,
             'more': more,
