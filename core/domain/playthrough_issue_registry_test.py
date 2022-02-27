@@ -30,14 +30,9 @@ from extensions.issues.MultipleIncorrectSubmissions import (
 class IssueRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the issue registry."""
 
-    def test_issue_registry(self):
-        """Do some sanity checks on the issue registry."""
-        self.assertEqual(
-            len(playthrough_issue_registry.Registry.get_all_issues()), 3)
-
-    def test_issue_registry_types(self):
-        """Do some issue type checks on the issue registry."""
-        issues_dict = {
+    def setUp(self):
+        super(IssueRegistryUnitTests, self).setUp()
+        self.issues_dict = {
                 'EarlyQuit':
                 EarlyQuit.EarlyQuit,
                 'CyclicStateTransitions':
@@ -45,8 +40,20 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
                 'MultipleIncorrectSubmissions':
                 MultipleIncorrectSubmissions.MultipleIncorrectSubmissions
                 }
+        self.invalid_issue_type = 'InvalidIssueType'
 
-        for issue_type, instance in issues_dict.items():
+    def test_issue_registry(self):
+        """Do some sanity checks on the issue registry."""
+        self.assertEqual(
+            len(playthrough_issue_registry.Registry.get_all_issues()), 3)
+
+    def test_get_all_issue_registry_types(self):
+        """Do check for getting all issue types from the issue registry."""
+
+    def test_issue_registry_types(self):
+        """Do some issue type checks on the issue registry."""
+
+        for issue_type, instance in self.issues_dict.items():
             self.assertIsInstance(
                     playthrough_issue_registry.Registry.get_issue_by_type(
                         issue_type),
@@ -56,16 +63,15 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
     def test_invalid_issue_registry_types(self):
         """Do some invalid issue type checks on the issue registry."""
 
-        invalid_issue_type = 'InvalidIssueType'
-        def validate(invalid_issue_type):
+        def validate(self.invalid_issue_type):
             """validating function."""
             try:
                 playthrough_issue_registry.Registry.get_issue_by_type(
-                    invalid_issue_type)
+                    self.invalid_issue_type)
             except KeyError as e:
                 raise utils.ValidationError('Invalid issue type: %s' % (
-                    invalid_issue_type)) from e
+                    self.invalid_issue_type)) from e
 
         with self.assertRaisesRegex(utils.ValidationError, (
-            'Invalid issue type: %s' % invalid_issue_type)):
-            validate(invalid_issue_type)
+            'Invalid issue type: %s' % self.invalid_issue_type)):
+            validate(self.invalid_issue_type)
