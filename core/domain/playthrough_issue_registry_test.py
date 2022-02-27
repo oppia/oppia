@@ -41,36 +41,29 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
                 MultipleIncorrectSubmissions.MultipleIncorrectSubmissions
                 }
         self.invalid_issue_type = 'InvalidIssueType'
+        self.Registry = playthrough_issue_registry.Registry()
 
     def test_issue_registry(self):
         """Do some sanity checks on the issue registry."""
         self.assertEqual(
-            len(playthrough_issue_registry.Registry.get_all_issues()), 3)
-
-    def test_get_all_issue_registry_types(self):
-        """Do check for getting all issue types from the issue registry."""
+            len(self.Registry.get_all_issues()), 3)
 
     def test_issue_registry_types(self):
         """Do some issue type checks on the issue registry."""
 
-        for issue_type, instance in self.issues_dict.items():
-            self.assertIsInstance(
-                    playthrough_issue_registry.Registry.get_issue_by_type(
-                        issue_type),
-                        instance
-                        )
-
-    def test_invalid_issue_registry_types(self):
-        """Do some invalid issue type checks on the issue registry."""
-
         def validate(issue_type):
             """validating function."""
             try:
-                playthrough_issue_registry.Registry.get_issue_by_type(
+                return self.Registry.get_issue_by_type(
                     issue_type)
             except KeyError as e:
                 raise utils.ValidationError('Invalid issue type: %s' % (
                     issue_type)) from e
+
+        for issue_type, instance in self.issues_dict.items():
+            self.assertIsInstance(
+                    validate(issue_type),
+                    instance)
 
         with self.assertRaisesRegex(utils.ValidationError, (
             'Invalid issue type: %s' % self.invalid_issue_type)):
