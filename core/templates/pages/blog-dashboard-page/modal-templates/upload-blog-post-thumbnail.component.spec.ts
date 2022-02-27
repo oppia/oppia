@@ -120,7 +120,8 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     fixture.detectChanges();
   });
 
-  it('should remove invalid tags and attributes', ()=>{
+  it('should remove invalid tags and attributes', () => {
+    componentInstance.ngOnInit();
     const svgString = (
       '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
       '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
@@ -131,15 +132,11 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
       '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z" ' +
       'data-name="dataName"/></g><circel></circel></svg>'
     );
-    var dataURI = (
-      'data:image/svg+xml;base64,' +
-      btoa(unescape(encodeURIComponent(svgString))));
-    let file = new File([dataURI], 'test.svg', {type: 'image/svg+xml'});
+    let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
     componentInstance.invalidImageWarningIsShown = false;
 
     componentInstance.onFileChanged(file);
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
-    fixture.detectChanges();
   });
 
   it('should handle invalid image', () => {

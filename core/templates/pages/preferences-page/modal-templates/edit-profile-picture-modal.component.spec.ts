@@ -95,15 +95,11 @@ describe('Edit Profile Picture Modal Component', () => {
       '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z" ' +
       'data-name="dataName"/></g><circel></circel></svg>'
     );
-    var dataURI = (
-      'data:image/svg+xml;base64,' +
-      btoa(unescape(encodeURIComponent(svgString))));
-    let file = new File([dataURI], 'test.svg', {type: 'image/svg+xml'});
+    let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
     componentInstance.invalidImageWarningIsShown = false;
 
     componentInstance.onFileChanged(file);
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
-    fixture.detectChanges();
   });
 
   it('should handle invalid image', () => {
