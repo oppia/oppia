@@ -82,7 +82,7 @@ describe('Edit Thumbnail Modal Component', () => {
       return Document;
     },
     getInvalidSvgTagsAndAttrs: (svg: Document) => {
-      return { tags: ['script'], attrs: [] };
+      return { tags: [], attrs: [] };
     },
     removeTagsAndAttributes: (
         svg: Document, valuesToBeRemoved: { tags: string[]; attrs: string[] }
@@ -156,6 +156,11 @@ describe('Edit Thumbnail Modal Component', () => {
   it('should remove invalid tags and attributes', ()=>{
     spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
     spyOn(component, 'isValidFilename').and.returnValue(true);
+    spyOn(
+      svgSanitizerService, 'getInvalidSvgTagsAndAttrs'
+    ).and.callFake(() => {
+      return { tags: ['circel'], attrs: ['data-name'] };
+    });
     const svgString = (
       '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
       '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
@@ -169,7 +174,7 @@ describe('Edit Thumbnail Modal Component', () => {
     var dataURI = (
       'data:image/svg+xml;base64,' +
       btoa(unescape(encodeURIComponent(svgString))));
-    let file = new File([dataURI], 'test.svg', {type: 'image/svg'});
+    let file = new File([dataURI], 'test.svg');
     component.invalidImageWarningIsShown = false;
     component.invalidFilenameWarningIsShown = false;
     component.uploadedImageMimeType = 'image/svg+xml';
@@ -178,6 +183,9 @@ describe('Edit Thumbnail Modal Component', () => {
     component.onFileChanged(file);
     expect(component.invalidImageWarningIsShown).toBe(false);
     expect(component.invalidFilenameWarningIsShown).toBe(false);
+    expect(component.invalidTagsAndAttributes).toEqual(
+      { tags: ['circel'], attrs: ['data-name'] }
+    );
   });
 
   it('should not load file if it is not a svg type', () => {

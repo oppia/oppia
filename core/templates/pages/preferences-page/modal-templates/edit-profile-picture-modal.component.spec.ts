@@ -84,7 +84,7 @@ describe('Edit Profile Picture Modal Component', () => {
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
   });
 
-  it('should remove invalid tags and attributes', ()=>{
+  it('should remove invalid tags and attributes', ()=> {
     const svgString = (
       '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
       '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
@@ -98,11 +98,12 @@ describe('Edit Profile Picture Modal Component', () => {
     var dataURI = (
       'data:image/svg+xml;base64,' +
       btoa(unescape(encodeURIComponent(svgString))));
-    let file = new File([dataURI], 'test.svg', {type: 'image/svg'});
+    let file = new File([dataURI], 'test.svg', {type: 'image/svg+xml'});
     componentInstance.invalidImageWarningIsShown = false;
 
     componentInstance.onFileChanged(file);
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
+    fixture.detectChanges();
   });
 
   it('should handle invalid image', () => {

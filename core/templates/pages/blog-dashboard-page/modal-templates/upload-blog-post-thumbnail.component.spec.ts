@@ -134,7 +134,7 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     var dataURI = (
       'data:image/svg+xml;base64,' +
       btoa(unescape(encodeURIComponent(svgString))));
-    let file = new File([dataURI], 'test.svg', {type: 'image/svg'});
+    let file = new File([dataURI], 'test.svg', {type: 'image/svg+xml'});
     componentInstance.invalidImageWarningIsShown = false;
 
     componentInstance.onFileChanged(file);
