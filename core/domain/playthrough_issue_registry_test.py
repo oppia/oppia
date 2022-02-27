@@ -63,14 +63,14 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
     def test_invalid_issue_registry_types(self):
         """Do some invalid issue type checks on the issue registry."""
 
-        def validate(self.invalid_issue_type):
+        def validate(issue_type):
             """validating function."""
             try:
                 playthrough_issue_registry.Registry.get_issue_by_type(
-                    self.invalid_issue_type)
+                    issue_type)
             except KeyError as e:
                 raise utils.ValidationError('Invalid issue type: %s' % (
-                    self.invalid_issue_type)) from e
+                    issue_type)) from e
 
         with self.assertRaisesRegex(utils.ValidationError, (
             'Invalid issue type: %s' % self.invalid_issue_type)):
