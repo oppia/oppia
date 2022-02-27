@@ -126,11 +126,10 @@ export class AudioPreloaderService {
 
       if (this.filenamesOfAudioToBeDownloaded.length > 0) {
         const nextAudioFilename = this.filenamesOfAudioToBeDownloaded.shift();
-        if (nextAudioFilename === undefined) {
-          throw new Error('Audio Filename cannot be undefined');
+        if (nextAudioFilename !== undefined) {
+          this.loadAudio(nextAudioFilename);
+          this.filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
         }
-        this.loadAudio(nextAudioFilename);
-        this.filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
       }
 
       if (this.audioLoadedCallback) {
