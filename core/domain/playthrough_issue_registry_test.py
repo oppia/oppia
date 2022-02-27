@@ -60,9 +60,8 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         def validate(invalid_issue_type):
             """validating function."""
             try:
-                issue = playthrough_issue_registry.Registry.get_issue_by_type(
-                        invalid_issue_type
-                        )
+                playthrough_issue_registry.Registry.get_issue_by_type(
+                    invalid_issue_type)
             except KeyError as e:
                 raise utils.ValidationError('Invalid issue type: %s' % (
                     invalid_issue_type)) from e
