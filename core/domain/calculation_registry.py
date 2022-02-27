@@ -56,9 +56,16 @@ class Registry:
     """Registry of all calculations for summarizing answers."""
 
     # Dict mapping calculation class names to their classes.
-    # Here we are just initializing it as a dict and MyPy does not
-    # allow defining empty TypedDict, thus we add an ignore.
-    _calculations_dict: CalculationDict = {} # type: ignore[typeddict-item]
+    _calculations_dict: CalculationDict = {
+        'AnswerFrequencies': models.AnswerFrequencies,
+        'Top5AnswerFrequencies': models.Top5AnswerFrequencies,
+        'Top10AnswerFrequencies': models.Top10AnswerFrequencies,
+        'FrequencyCommonlySubmittedElements': (
+            models.FrequencyCommonlySubmittedElements),
+        'TopAnswersByCategorization': models.TopAnswersByCategorization,
+        'TopNUnresolvedAnswersByFrequency': (
+            models.TopNUnresolvedAnswersByFrequency)
+    }
 
     @classmethod
     def _refresh_registry(cls) -> None:

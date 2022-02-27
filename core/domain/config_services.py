@@ -26,8 +26,8 @@ from typing import Any
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
 
-# Value of a particular property can be bool, str, List[Dict], Dict ,
-# int and etc. so, Any type has to be used for Value parameter.
+# Value of a particular property can be bool, str, List[Dict], Dict,
+# int and other types too. so, Any type has to be used for value parameter.
 def set_property(committer_id: str, name: str, value: Any) -> None:
     """Sets a property value. The property must already be registered.
 
