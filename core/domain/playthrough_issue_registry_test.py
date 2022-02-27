@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import utils
 from core.domain import playthrough_issue_registry
 from core.tests import test_utils
 from extensions.issues.CyclicStateTransitions import CyclicStateTransitions
@@ -52,9 +53,20 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
                         instance
                         )
 
-        self.assertRaisesRegex(
-                KeyError,
-                'Invalid issue_type FalseIssue. Please check your input.',
-                playthrough_issue_registry.Registry.get_issue_by_type(
-            'FalseIssue'
-            ))
+    def test_invalid_issue_registry_types(self):
+        """Do some invalid issue type checks on the issue registry."""
+
+        invalid_issue_type = 'InvalidIssueType'
+        def validate(invalid_issue_type):
+            """validating function."""
+            try:
+                issue = playthrough_issue_registry.Registry.get_issue_by_type(
+                        invalid_issue_type
+                        )
+            except KeyError as e:
+                raise utils.ValidationError('Invalid issue type: %s' % (
+                    invalid_issue_type)) from e
+
+        with self.assertRaisesRegex(utils.ValidationError, (
+            'Invalid issue type: %s' % invalid_issue_type)):
+            validate(invalid_issue_type)
