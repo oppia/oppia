@@ -22,11 +22,11 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 export class AnswerClassificationResult {
   outcome: Outcome;
   answerGroupIndex: number;
-  ruleIndex: number | null;
+  ruleIndex: number;
   classificationCategorization: string;
 
   constructor(
-      outcome: Outcome, answerGroupIndex: number, ruleIndex: number | null,
+      outcome: Outcome, answerGroupIndex: number, ruleIndex: number,
       classificationCategorization: string) {
     this.outcome = outcome;
     this.answerGroupIndex = answerGroupIndex;

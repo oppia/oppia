@@ -35,6 +35,8 @@ export class AudioPreloaderService {
 
   private exploration!: Exploration;
   private audioLoadedCallback!: (_: string) => void;
+  // The following property can be null, when there is no recently
+  // requested audio filename.
   private mostRecentlyRequestedAudioFilename: string | null = null;
 
   constructor(
@@ -82,6 +84,8 @@ export class AudioPreloaderService {
     this.mostRecentlyRequestedAudioFilename = null;
   }
 
+  // This function returns null when there is not recently requested
+  // audio filename.
   getMostRecentlyRequestedAudioFilename(): string | null {
     return this.mostRecentlyRequestedAudioFilename;
   }
@@ -93,22 +97,18 @@ export class AudioPreloaderService {
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
     const languageCode = (
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
-    if (languageCode === null) {
-      throw new Error('Language code must exists');
-    }
     const allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
     const initialStateName = this.exploration.getInitialState().name;
-    if (initialStateName === null) {
-      throw new Error('Initial State Name cannot be null');
-    }
     const bfsTraversalOfStates = (
       this.computeGraphService.computeBfsTraversalOfStates(
         initialStateName, this.exploration.getStates(),
         sourceStateName));
     const audioFilenamesInBfsOrder = [];
     for (const stateName of bfsTraversalOfStates) {
-      for (const voiceover of allVoiceovers[stateName]) {
-        audioFilenamesInBfsOrder.push(voiceover.filename);
+      if (allVoiceovers !== null) {
+        for (const voiceover of allVoiceovers[stateName]) {
+          audioFilenamesInBfsOrder.push(voiceover.filename);
+        }
       }
     }
     return audioFilenamesInBfsOrder;

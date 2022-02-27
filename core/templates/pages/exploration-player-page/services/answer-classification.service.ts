@@ -68,7 +68,7 @@ export class AnswerClassificationService {
   private classifyAnswer(
       answer: InteractionAnswer,
       answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome | null,
+      defaultOutcome: Outcome,
       interactionRulesService: InteractionRulesService
   ): AnswerClassificationResult {
     // Find the first group that contains a rule which returns true
@@ -123,6 +123,11 @@ export class AnswerClassificationService {
 
     const answerGroups = interactionInOldState.answerGroups;
     const defaultOutcome = interactionInOldState.defaultOutcome;
+    // A null 'defaultOutcome' indicates that the interaction is
+    // an EndExploration interaction.
+    if (defaultOutcome === null) {
+      throw new Error('Default outcome cannot be null');
+    }
     if (interactionRulesService) {
       answerClassificationResult = this.classifyAnswer(
         answer, answerGroups, defaultOutcome, interactionRulesService);

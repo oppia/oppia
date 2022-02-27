@@ -176,7 +176,10 @@ export class Exploration {
     return this.getState(stateName).content.html;
   }
 
-  getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {
+  getAllVoiceovers(languageCode: string | null): VoiceoverObjectsDict | null {
+    if (!languageCode) {
+      return null;
+    }
     return this.states.getAllVoiceovers(languageCode);
   }
 

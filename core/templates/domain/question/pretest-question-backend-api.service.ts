@@ -67,10 +67,10 @@ export class PretestQuestionBackendApiService {
     ).toPromise().then(data => {
       var pretestQuestionDicts = (
         cloneDeep(data.pretest_question_dicts));
-      var questionObjectFactory: QuestionObjectFactory;
+      var qof: QuestionObjectFactory;
       var pretestQuestionObjects = pretestQuestionDicts.map(
         function(pretestQuestionDict) {
-          return questionObjectFactory.createFromBackendDict(
+          return qof.createFromBackendDict(
             pretestQuestionDict);
         }, this);
       if (successCallback) {
