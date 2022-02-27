@@ -29,6 +29,7 @@ import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from './audio-translation-language.service';
+import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService;
@@ -135,25 +136,10 @@ describe('Current Interaction Service', () => {
   });
 
   it('should throw error on submitting when submitAnswerFn is null', () => {
-    let interaction = {
-      customization_args: {},
-      answer_groups: [],
-      default_outcome: {},
-      confirmed_unclassified_answers: [],
-      id: null
-    } as unknown as Interaction;
-    let recordedVoiceovers = {
-      voiceovers_mapping: {
-        content: {},
-        default_outcome: {},
-      }
-    } as unknown as RecordedVoiceovers;
-    let writtenTranslations = {
-      translations_mapping: {
-        content: {},
-        default_outcome: {},
-      }
-    } as unknown as WrittenTranslations;
+    let interaction = new Interaction([], [], {}, null, [], null, null);
+    let recordedVoiceovers = new RecordedVoiceovers({});
+    let writtenTranslations = new WrittenTranslations(
+      {}, new WrittenTranslationObjectFactory());
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(
       StateCard.createNewCard(

@@ -77,7 +77,14 @@ export class CurrentInteractionService {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService) {}
 
+  // 'submitAnswerFn' - Should grab the learner's answer and pass it to
+  // onSubmit. The interaction can pass in null for this property if it
+  // does not use the progress nav's submit button(ex: MultipleChoiceInput).
   private static submitAnswerFn: SubmitAnswerFn | null = null;
+  // 'validityCheckFn' - The progress nav will use this to decide whether
+  // or not to disable the submit button. If the interaction passes in null,
+  // the submit button will remain enabled (for the entire duration of the
+  // current interaction).
   private static validityCheckFn: ValidityCheckFn | null = null;
   private static onSubmitFn: OnSubmitFn;
   private static presubmitHooks: PresubmitHookFn[] = [];
