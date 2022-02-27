@@ -19,14 +19,16 @@
 
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
+// The property 'ruleIndex' is assigned null when the
+// predicted answer group exists.
 export class AnswerClassificationResult {
   outcome: Outcome;
   answerGroupIndex: number;
-  ruleIndex: number;
+  ruleIndex: number | null;
   classificationCategorization: string;
 
   constructor(
-      outcome: Outcome, answerGroupIndex: number, ruleIndex: number,
+      outcome: Outcome, answerGroupIndex: number, ruleIndex: number | null,
       classificationCategorization: string) {
     this.outcome = outcome;
     this.answerGroupIndex = answerGroupIndex;

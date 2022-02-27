@@ -69,10 +69,10 @@ export class PretestQuestionBackendApiService {
         cloneDeep(data.pretest_question_dicts));
       var qof: QuestionObjectFactory;
       var pretestQuestionObjects = pretestQuestionDicts.map(
-        function(pretestQuestionDict) {
+        (pretestQuestionDict) => {
           return qof.createFromBackendDict(
             pretestQuestionDict);
-        }, this);
+        });
       if (successCallback) {
         successCallback(pretestQuestionObjects);
       }

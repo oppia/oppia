@@ -276,7 +276,7 @@ describe('Solution Verification Service', () => {
     }, null, [], null, null);
 
     expect(() => {
-      ess.verifySolution('State 1', interaction, 'Answer');
+      svs.verifySolution('State 1', interaction, 'Answer');
     }).toThrowError('Interaction ID must not be null');
   });
 });
