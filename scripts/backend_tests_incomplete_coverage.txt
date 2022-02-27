@@ -35,7 +35,6 @@ core.storage.user.gae_models_test
 core.storage.job.gae_models_test
 core.storage.base_model.gae_models_test
 core.schema_utils_test
-core.domain.topic_fetchers_test
 core.domain.classifier_domain_test
 core.domain.state_domain_test
 core.domain.learner_progress_services_test
