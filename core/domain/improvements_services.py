@@ -200,6 +200,9 @@ def apply_changes_to_model(task_entry, task_entry_model):
 
     Returns:
         bool. Whether any change was made to the model.
+
+    Raises:
+        Exception. Wrong model provided.
     """
     if task_entry_model.id != task_entry.task_id:
         raise Exception('Wrong model provided')
