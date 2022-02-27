@@ -30,8 +30,11 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class LostChangesModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() lostChanges: LostChange[];
-  hasLostChanges: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() lostChanges!: LostChange[];
+  hasLostChanges!: boolean;
 
   constructor(
     private elRef: ElementRef,
@@ -54,11 +57,11 @@ export class LostChangesModalComponent
   }
 
   exportChangesAndClose(): void {
-    let lostChangesData: HTMLElement = (
+    let lostChangesData = (
       this.elRef.nativeElement.getElementsByClassName(
-        'oppia-lost-changes'));
-    let blob = new Blob([lostChangesData[0].innerText], {type: 'text/plain'});
-    var elem = this.windowRef.nativeWindow.document.createElement('a');
+        'oppia-lost-changes'))[0] as HTMLInputElement;
+    let blob = new Blob([lostChangesData.innerText], {type: 'text/plain'});
+    let elem = this.windowRef.nativeWindow.document.createElement('a');
     elem.href = URL.createObjectURL(blob);
     elem.download = 'lostChanges.txt';
     elem.click();

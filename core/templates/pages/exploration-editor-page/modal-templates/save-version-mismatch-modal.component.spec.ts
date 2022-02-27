@@ -57,9 +57,9 @@ class MockWindowRef {
         if (this._hashChange === null) {
           return;
         }
-        this._hashChange();
+        this._hashChange;
       },
-      reload: (val) => val
+      reload: (val: string) => val
     },
     get onhashchange() {
       return this.location._hashChange;

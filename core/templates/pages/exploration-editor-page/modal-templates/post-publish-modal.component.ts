@@ -33,10 +33,13 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 export class PostPublishModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   number = '1';
-  congratsImgUrl: string;
-  explorationLinkCopied: boolean;
-  explorationLink: string;
-  explorationId: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  congratsImgUrl!: string;
+  explorationLinkCopied!: boolean;
+  explorationLink!: string;
+  explorationId!: string;
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
@@ -67,8 +70,10 @@ export class PostPublishModalComponent
     range.setStartBefore((codeDiv as HTMLDivElement).firstChild as Node);
     range.setEndAfter((codeDiv as HTMLDivElement).lastChild as Node);
     let selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
+    if (selection !== null) {
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
     document.execCommand('copy');
     this.explorationLinkCopied = true;
   }

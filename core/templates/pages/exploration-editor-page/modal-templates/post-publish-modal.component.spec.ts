@@ -64,7 +64,7 @@ describe('Post Publish Modal Controller', function() {
   }
   const mockWindow = {
     document: {
-      execCommand: (command) => {}
+      execCommand: (command: string) => {}
     }
   };
   beforeEach(waitForAsync(() => {
