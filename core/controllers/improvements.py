@@ -29,6 +29,7 @@ from core.domain import improvements_domain
 from core.domain import improvements_services
 from core.domain import user_services
 
+
 def get_task_dict_with_username_and_profile_picture(task_entry):
     """Returns a task entry dict with the username and profile picture
     URL inserted.
@@ -51,6 +52,7 @@ def get_task_dict_with_username_and_profile_picture(task_entry):
             task_entry_dict['resolver_profile_picture_data_url'] = (
                 resolver_settings.profile_picture_data_url)
     return task_entry_dict
+
 
 class ExplorationImprovementsHandler(base.BaseHandler):
     """Handles operations related to managing exploration improvement tasks.
