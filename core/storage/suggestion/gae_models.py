@@ -280,6 +280,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that match the given
             query values, up to a maximum of
             feconf.DEFAULT_SUGGESTION_QUERY_LIMIT suggestions.
+
+        Raises:
+            Exception. The field cannot be queried.
         """
         query = cls.query()
         for (field, value) in query_fields_and_values:
@@ -452,6 +455,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that are in the given
             score categories, which are in review, but not created by the
             given user.
+
+        Raises:
+            Exception. Given list of score categories is empty.
         """
         if len(score_categories) == 0:
             raise Exception('Received empty list of score categories')
