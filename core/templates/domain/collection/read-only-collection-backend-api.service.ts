@@ -35,7 +35,7 @@ interface CollectionCache {
 
 interface CollectionDetails {
   canEdit: boolean;
-  title: string;
+  title: string | null;
 }
 
 interface CollectionDetailsCache {
@@ -92,10 +92,12 @@ export class ReadOnlyCollectionBackendApiService {
 
   private _cacheCollectionDetails(
       details: ReadOnlyCollectionBackendResponse): void {
-    this._collectionDetailsCache[details.collection.id] = {
-      canEdit: details.can_edit,
-      title: details.collection.title,
-    };
+    if (details.collection.id !== null) {
+      this._collectionDetailsCache[details.collection.id] = {
+        canEdit: details.can_edit,
+        title: details.collection.title,
+      };
+    }
   }
 
   private _isCached(collectionId: string): boolean {
