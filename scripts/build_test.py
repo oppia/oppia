@@ -47,7 +47,7 @@ MOCK_TEMPLATES_DEV_DIR = os.path.join(TEST_SOURCE_DIR, 'templates', '')
 
 MOCK_TSC_OUTPUT_LOG_FILEPATH = os.path.join(
     TEST_SOURCE_DIR, 'mock_tsc_output_log.txt')
-FILENAME = 'filename.js'
+FILENAME = 'invalid_filename.js'
 INVALID_INPUT_FILEPATH = os.path.join(
     TEST_DIR, FILENAME)
 INVALID_OUTPUT_FILEPATH = os.path.join(
@@ -64,10 +64,8 @@ class BuildTests(test_utils.GenericTestBase):
         build.safe_delete_directory_tree(TEST_DIR)
         build.safe_delete_directory_tree(EMPTY_DIR)
 
-    def test_minify(self):
-        """Tests _minify indirectly by calling minify_func
-        with an invalid filepath.
-        """
+    def test_minify_func_with_invalid_filepath(self):
+        """Tests minify_func with an invalid filepath."""
         with self.assertRaisesRegex(
             subprocess.CalledProcessError,
             'returned non-zero exit status 1') as called_process:
