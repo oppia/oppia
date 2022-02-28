@@ -25,7 +25,7 @@ import subprocess
 import sys
 import tempfile
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 from . import common
@@ -392,9 +392,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_get_refs(self):
         temp_stdin_file = tempfile.NamedTemporaryFile().name
-        with python_utils.open_file(temp_stdin_file, 'w') as f:
+        with utils.open_file(temp_stdin_file, 'w') as f:
             f.write('local_ref local_sha1 remote_ref remote_sha1')
-        with python_utils.open_file(temp_stdin_file, 'r') as f:
+        with utils.open_file(temp_stdin_file, 'r') as f:
             with self.swap(sys, 'stdin', f):
                 self.assertEqual(
                     pre_push_hook.get_refs(),
