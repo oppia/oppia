@@ -35,23 +35,23 @@ export interface EntityEditorBrowserTabsInfoObject {
 
 export class EntityEditorBrowserTabsInfo {
   /**
-    * The type of the entity for a particular opened
-    * entity editor tab. It can have values: 'topic', 'story', 'skill'
-    * and 'exploration'. For example, if an editor tab with url
-    * '/topic_editor/topic_1' is opened, then '_entityType' will store 'topic'.
+    * The type of the entity for a particular opened entity editor tab.
+    * It can have values: 'topic', 'story', 'skill' and 'exploration'.
+    * For example, if an editor tab with url '/topic_editor/topic_1' is opened,
+    * then the value of '_entityType' will be 'topic'.
    */
   _entityType: string;
   /**
    * The ID of the entity for a particular opened entity editor tab.
    * For example, if an editor tab with url '/topic_editor/topic_1' is opened,
-   * then '_id' will store 'topic_1'.
+   * then the value of '_id' will be 'topic_1'.
    */
   _id: string;
   /**
    * The latest version for a particular entity with a particular id.
    * For example, if an editor tab with url '/topic_editor/topic_1' is
-   * opened, then '_latestVersion' will store the latest version of the topic
-   * with id 'topic_1'.
+   * opened, then the value of '_latestVersion' will be the latest version of
+   * the topic with id 'topic_1'.
    */
   _latestVersion: number;
   /**
