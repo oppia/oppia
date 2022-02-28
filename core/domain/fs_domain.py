@@ -307,7 +307,7 @@ class AbstractFileSystem:
         self._check_filepath(filepath)
         return self._impl.isfile(filepath)
 
-    def open(self, filepath: str) -> Any:
+    def open(self, filepath: str) -> FileStream:
         """Returns a stream with the file content. Similar to open(...).
 
         Args:
@@ -320,7 +320,7 @@ class AbstractFileSystem:
         self._check_filepath(filepath)
         return self._impl.get(filepath)
 
-    def get(self, filepath: str) -> FileStream:
+    def get(self, filepath: str) -> FileStream | Any:
         """Returns a bytestring with the file content, but no metadata.
 
         Args:
