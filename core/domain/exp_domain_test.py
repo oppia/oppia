@@ -32,6 +32,7 @@ from core.domain import exp_services_test
 from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -994,6 +995,16 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
+
+    def setUp(self):
+        super(ExplorationDomainUnitTests, self).setUp()
+        translation_dict = {
+            'content_id_3': translation_domain.TranslatedContent(
+                'My name is Nikhil.', True)
+        }
+        self.dummy_entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
 
     # TODO(bhenning): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
@@ -2331,7 +2342,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.deserialize(
                 exploration.serialize()).to_dict())
 
-    def test_get_translatable_fields_returns_corrctly(self):
+    def test_get_all_translatable_content_for_exp(self):
         """Get all translatable fields from exploration."""
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
@@ -2406,7 +2417,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         translatable_contents = [
             translatable_content.content
             for translatable_content in
-            exploration.get_translatable_fields().values()
+            exploration.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
         ]
 
         self.assertItemsEqual(

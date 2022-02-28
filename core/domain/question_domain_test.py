@@ -25,6 +25,7 @@ from core import utils
 from core.domain import customization_args_util
 from core.domain import question_domain
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.tests import test_utils
 
 
@@ -294,6 +295,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'question_id', question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'],
             ['skillId12345-123'])
+        translation_dict = {
+            'content_id_3': translation_domain.TranslatedContent(
+                'My name is Nikhil.', True)
+        }
+        self.dummy_entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
 
     def test_to_and_from_dict(self):
         """Test to verify to_dict and from_dict methods
@@ -1713,12 +1721,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_get_translatable_fields_returns_corrctly(self):
+    def test_get_all_translatable_content_for_question(self):
         """Get all translatable fields from exploration."""
         translatable_contents = [
             translatable_content.content
             for translatable_content in
-            self.question.get_translatable_fields().values()
+            self.question.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
         ]
 
         self.assertItemsEqual(
