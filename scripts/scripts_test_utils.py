@@ -177,6 +177,9 @@ class PopenStub:
 
         Args:
             signal_number: int. The number of the received signal.
+
+        Raises:
+            OSError. The SIGINT signal rejected.
         """
         self.signals_received.append(signal_number)
         if self.reject_signal:
@@ -206,6 +209,9 @@ class PopenStub:
         Args:
             timeout: int|None. Time to wait before raising an exception, or None
                 to wait indefinitely.
+
+        Raises:
+            RuntimeError. The PopenStub has entered an infinite loop.
         """
         if not self.alive:
             return
@@ -226,6 +232,9 @@ class PopenStub:
         Returns:
             tuple(bytes, bytes). The stdout and stderr of the process,
             respectively.
+
+        Raises:
+            RuntimeError. The PopenStub has entered an infinite loop.
         """
         if not self.alive:
             return self.stdout.getvalue(), self.stderr.getvalue()
