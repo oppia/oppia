@@ -88,8 +88,8 @@
       </button>
     </div>
     <div *ngIf="invalidTagsAndAttributes.tags.length || invalidTagsAndAttributes.attrs.length"
-          class="oppia-form-error oppia-unsupported-svg-tag-attribute-error"
-          [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: svgSanitizerService.getIssueURL(invalidTagsAndAttributes) }"
+         class="oppia-form-error oppia-unsupported-svg-tag-attribute-error"
+         [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: svgSanitizerService.getIssueURL(invalidTagsAndAttributes) }"
     ></div>
     <div class="oppia-form-error oppia-processed-image-too-large-error" *ngIf="processedImageIsTooLarge">
       The processed image is too large to upload. Please try cropping or resizing the current image.
