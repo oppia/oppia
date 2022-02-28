@@ -794,3 +794,9 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(response.getcode(), 200) # type: ignore[attr-defined]
         self.assertEqual(
             response.url, 'http://www.google.com') # type: ignore[attr-defined]
+
+    def test_throw_get_error(self) -> None:
+        err_message = 'err_message'
+        error = utils.ThrowGetError(err_message)
+        with self.assertRaisesRegex(ValueError, err_message):
+            error.get('key')

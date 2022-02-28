@@ -1185,8 +1185,8 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
         }
 
         def get(self):
-            iframe_restriction = self.request.get(
-                'iframe_restriction', default_value=None)
+            iframe_restriction = self.normalized_request.get(
+                'iframe_restriction', None)
             self.render_template(
                 'oppia-root.mainpage.html',
                 iframe_restriction=iframe_restriction)
@@ -1342,9 +1342,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
             """Returns the message, vm_id and signature retrieved from the
             incoming requests.
             """
-            signature = self.payload.get('signature')
-            vm_id = self.payload.get('vm_id')
-            message = self.payload.get('message')
+            signature = self.normalized_payload.get('signature')
+            vm_id = self.normalized_payload.get('vm_id')
+            message = self.normalized_payload.get('message')
             return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
 
         @acl_decorators.is_from_oppia_ml
@@ -1734,7 +1734,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_play_exploration
         def get(self):
-            exploration_id = self.request.get('exploration_id')
+            exploration_id = self.normalized_request.get('exploration_id')
             return self.render_json({'exploration_id': exploration_id})
 
     class MockHandlerWithMissingRequestSchema(base.BaseHandler):
@@ -1744,7 +1744,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_play_exploration
         def get(self):
-            exploration_id = self.request.get('exploration_id')
+            exploration_id = self.normalized_request.get('exploration_id')
             return self.render_json({'exploration_id': exploration_id})
 
     class MockHandlerWithDefaultGetSchema(base.BaseHandler):

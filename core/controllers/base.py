@@ -474,6 +474,11 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 self.normalized_payload[arg] = normalized_arg_values.get(arg)
 
+        self.request.get = utils.ThrowGetError(
+            'Use self.normalized_request instead of self.request.').get
+        self.payload = utils.ThrowGetError(
+            'Use self.normalized_payload instead of self.payload.')
+
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
@@ -688,7 +693,15 @@ class BaseHandler(webapp2.RequestHandler):
             # For GET requests, there is no payload, so we check against
             # GET_HANDLER_ERROR_RETURN_TYPE.
             # Otherwise, we check whether self.payload exists.
-            if (self.payload is not None or
+
+            # Even if payload exists the request will throw 401 since
+            # self.payload is replaced by ThrowGetError object hence the below
+            # check.
+            # TODO: Change this to self.normalized_payload once schema is
+            #  implemented for all handlers
+            payload_exists = (self.payload is not None and not isinstance(
+                self.payload, utils.ThrowGetError))
+            if (payload_exists or
                     self.GET_HANDLER_ERROR_RETURN_TYPE ==
                     feconf.HANDLER_TYPE_JSON):
                 self.error(401)

@@ -94,6 +94,14 @@ class ExplorationConversionError(Exception):
     pass
 
 
+class ThrowGetError:
+    def __init__(self, message):
+        self.err_message = message
+
+    def get(self, *args):
+        raise ValueError(self.err_message)
+
+
 @overload
 def open_file(
     filename: str,
