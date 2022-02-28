@@ -144,12 +144,12 @@ describe('Math equation input rules service', () => {
     expect(meirs.MatchesUpToTrivialManipulations(
       'y=m*x^2+c', {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesUpToTrivialManipulations(
-      '(y^2)/y=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
-    expect(meirs.MatchesUpToTrivialManipulations(
       'y=0', {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesUpToTrivialManipulations(
       'y=m*x-c', {x: inputString, y: positionOfTerms})).toBeTrue();
     // Rejected cases.
+    expect(meirs.MatchesUpToTrivialManipulations(
+      '(y^2)/y=m*x+c', {x: inputString, y: positionOfTerms})).toBeFalse();
     expect(meirs.MatchesUpToTrivialManipulations(
       'y-m*x=c', {x: inputString, y: positionOfTerms})).toBeFalse();
     expect(meirs.MatchesUpToTrivialManipulations(
@@ -170,7 +170,7 @@ describe('Math equation input rules service', () => {
     expect(meirs.MatchesUpToTrivialManipulations(
       'y^2=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesUpToTrivialManipulations(
-      '0=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
+      '0=x*m+c', {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesUpToTrivialManipulations(
       '0=c+m*x', {x: inputString, y: positionOfTerms})).toBeTrue();
     // Rejected cases.
@@ -194,9 +194,9 @@ describe('Math equation input rules service', () => {
       {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesUpToTrivialManipulations(
       'y=c+m*x', {x: inputString, y: positionOfTerms})).toBeTrue();
-    expect(meirs.MatchesUpToTrivialManipulations(
-      '(y^2)/y=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
     // Rejected cases.
+    expect(meirs.MatchesUpToTrivialManipulations(
+      '(y^2)/y=m*x+c', {x: inputString, y: positionOfTerms})).toBeFalse();
     expect(meirs.MatchesUpToTrivialManipulations(
       'y-m*x=c', {x: inputString, y: positionOfTerms})).toBeFalse();
     expect(meirs.MatchesUpToTrivialManipulations(
@@ -217,11 +217,9 @@ describe('Math equation input rules service', () => {
     expect(meirs.MatchesUpToTrivialManipulations(
       'y=c+m*x', {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesUpToTrivialManipulations(
-      '(y^2)/y=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
+      'y-m*x-2*c=-c', {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesUpToTrivialManipulations(
       'y-m*x=c', {x: inputString, y: positionOfTerms})).toBeTrue();
-    expect(meirs.MatchesUpToTrivialManipulations(
-      'y-m*x-2*c=-c', {x: inputString, y: positionOfTerms})).toBeTrue();
     // Rejected cases.
     expect(meirs.MatchesUpToTrivialManipulations(
       'y^2-m*x=c', {x: inputString, y: positionOfTerms})).toBeFalse();
