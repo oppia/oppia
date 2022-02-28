@@ -184,10 +184,10 @@ class GeneralFileSystem:
             mimetype
         )
 
-
     def delete(self, filepath: str) -> None: # type: ignore[no-untyped-call]
 
         """Deletes a file and the metadata associated with it.
+
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
@@ -217,10 +217,10 @@ class GeneralFileSystem:
             self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
         )
 
-
     def listdir(self, dir_name: str) -> list[str]: # type: ignore[no-untyped-call]
 
         """Lists all files in a directory.
+            
         Args:
             dir_name: str. The directory whose files should be listed. This
                 should not start with '/' or end with '/'.
@@ -250,7 +250,6 @@ class GeneralFileSystem:
             blob.name.replace(assets_path, '') for blob in blobs_in_dir]
 
 class GcsFileSystem(GeneralFileSystem):
-
     """Wrapper for a file system based on GCS.
     This implementation ignores versioning.
     """
