@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.jobs import job_test_utils
-from core.jobs.batch_jobs import skill_misconception_id_jobs
+from core.jobs.batch_jobs import skill_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -29,7 +29,7 @@ from core.platform import models
 class GetSkillWithInvalidMisconceptionIDJobTests(
     job_test_utils.JobTestBase):
 
-    JOB_CLASS = skill_misconception_id_jobs.GetSkillWithInvalidMisconceptionIDJob # pylint: disable=line-too-long
+    JOB_CLASS = skill_validation_jobs.GetSkillWithInvalidMisconceptionIDJob # pylint: disable=line-too-long
 
     SKILL_ID_1 = '1'
     SKILL_ID_2 = '2'
@@ -93,7 +93,7 @@ class GetSkillWithInvalidMisconceptionIDJobTests(
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
                 f'The id of skill is {self.SKILL_ID_1} and its '
-                + f'misconception id is {self.skill_1.next_misconception_id}'),
+                f'misconception id is {self.skill_1.next_misconception_id}'),
         ])
 
     def test_run_with_mixed_models(self) -> None:
@@ -103,8 +103,8 @@ class GetSkillWithInvalidMisconceptionIDJobTests(
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
             job_run_result.JobRunResult.as_stderr(
                 f'The id of skill is {self.SKILL_ID_1} and its '
-                + f'misconception id is {self.skill_1.next_misconception_id}'),
+                f'misconception id is {self.skill_1.next_misconception_id}'),
             job_run_result.JobRunResult.as_stderr(
                 f'The id of skill is {self.SKILL_ID_3} and its '
-                + f'misconception id is {self.skill_3.next_misconception_id}'),
+                f'misconception id is {self.skill_3.next_misconception_id}'),
         ])

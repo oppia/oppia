@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validation Jobs for title exploration"""
+"""Validation Jobs for skills"""
 
 from __future__ import annotations
 
@@ -29,7 +29,6 @@ import apache_beam as beam
 (skill_models, ) = models.Registry.import_models([models.NAMES.skill])
 
 
-# TODO(#14943): Remove this job after we fix the exploration titles length.
 class GetSkillWithInvalidMisconceptionIDJob(base_jobs.JobBase):
     """Job that returns skill having invalid misconception id."""
 
