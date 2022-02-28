@@ -17,8 +17,9 @@
  */
 
 export const EntityEditorBrowserTabsInfoDomainConstants = {
-  OPENED_EXPLORATION_EDITOR_PAGES: 'opened_exploration_editor_pages',
-  OPENED_SKILL_EDITOR_PAGES: 'opened_skill_editor_pages',
-  OPENED_STORY_EDITOR_PAGES: 'opened_story_editor_pages',
-  OPENED_TOPIC_EDITOR_PAGES: 'opened_topic_editor_pages'
+  OPENED_EXPLORATION_EDITOR_BROWSER_TABS: (
+    'opened_exploration_editor_browser_tabs'),
+  OPENED_SKILL_EDITOR_BROWSER_TABS: 'opened_skill_editor_browser_tabs',
+  OPENED_STORY_EDITOR_BROWSER_TABS: 'opened_story_editor_browser_tabs',
+  OPENED_TOPIC_EDITOR_BROWSER_TABS: 'opened_topic_editor_browser_tabs'
 } as const;

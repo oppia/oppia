@@ -18,7 +18,7 @@
  *
  * This domain object will store information about opened
  * entity editor tabs. This information will be stored in the local storage
- * and is requried in order to sync between different entity editor
+ * and is required in order to sync between different entity editor
  * tabs with the same url and show some meaningful info to the user
  * when a tab becomes stale or some other tab with the same url has
  * unsaved changes. This will make the user take the necerssary actions
@@ -35,43 +35,38 @@ export interface EntityEditorBrowserTabsInfoObject {
 
 export class EntityEditorBrowserTabsInfo {
   /**
-    * It stores the type of the entity for a particular opened
-    * entity editor tab.
-    * It can have values: 'topic', 'story', 'skill' and 'exploration'.
-    * For example, if an editor tab with url '/topic_editor/topic_1' is
-    * opened, then this property will store 'topic'.
+    * The type of the entity for a particular opened
+    * entity editor tab. It can have values: 'topic', 'story', 'skill'
+    * and 'exploration'. For example, if an editor tab with url
+    * '/topic_editor/topic_1' is opened, then '_entityType' will store 'topic'.
    */
   _entityType: string;
   /**
-   * It stores the id of the entity for a particular opened
-   * entity editor tab.
-   * For example, if an editor tab with url '/topic_editor/topic_1' is
-   * opened, then this property will store 'topic_1'.
+   * The ID of the entity for a particular opened entity editor tab.
+   * For example, if an editor tab with url '/topic_editor/topic_1' is opened,
+   * then '_id' will store 'topic_1'.
    */
   _id: string;
   /**
-   * It stores the latest version for a particular entity with a particular id.
+   * The latest version for a particular entity with a particular id.
    * For example, if an editor tab with url '/topic_editor/topic_1' is
-   * opened, then this property will store the
-   * latest version of the topic with id 'topic_1'.
+   * opened, then '_latestVersion' will store the latest version of the topic
+   * with id 'topic_1'.
    */
   _latestVersion: number;
   /**
-   * It stores the number of opened tabs for a particular
-   * entity editor tab url.
+   * The number of opened tabs for a particular entity editor tab url.
    * For example, if we open two topic editor tabs with url
-   * '/topic_editor/topic_1', then the value of this property will be 2.
+   * '/topic_editor/topic_1', then the value of '_numberOfOpenedTabs' will be 2.
    */
   _numberOfOpenedTabs: number;
   /**
-   * It stores whether some other entity editor tab with the same url
-   * has some unsaved changes on it.
-   * For example, if we open two topic editor tabs with
-   * url '/topic_editor/topic_1'. At first, value of this property
-   * will be false. Now, if we make some changes on one of them
-   * then the value of this property will be set to true
-   * untill the changes are saved. After that, it will be set
-   * to false again.
+   * Whether some other entity editor tab with the same url
+   * has unsaved changes on it. For example, if we open two topic editor tabs
+   * with url '/topic_editor/topic_1'. At first, value of
+   * '_someTabHasUnsavedChanges' will be false. Now, if we make some changes
+   * on one of them then its value will be set to true until the changes are
+   * saved or discarded. After that, it will be set to false again.
    */
   _someTabHasUnsavedChanges: boolean;
 
@@ -119,46 +114,67 @@ export class EntityEditorBrowserTabsInfo {
     };
   }
 
+  /**
+   * Gets the entity type.
+   */
   getEntityType(): string {
     return this._entityType;
   }
 
+  /**
+   * Gets the id of the entity.
+   */
   getId(): string {
     return this._id;
   }
 
+  /**
+   * Gets the latest version.
+   */
   getLatestVersion(): number {
     return this._latestVersion;
   }
 
+  /**
+   * Sets the latest version to the given value.
+   */
   setLatestVersion(latestVersion: number): void {
     this._latestVersion = latestVersion;
   }
 
+  /**
+   * Gets the number of opened tabs.
+   */
   getNumberOfOpenedTabs(): number {
     return this._numberOfOpenedTabs;
   }
 
   /**
-   * Increments the number of opened tabs by one. It is required
-   * when a new tab of a particular url is opened.
+   * Increments the number of opened tabs by one.
    */
   incrementNumberOfOpenedTabs(): void {
     this._numberOfOpenedTabs = this._numberOfOpenedTabs + 1;
   }
 
   /**
-   * Decrements the number of opened tabs by one. It is required
-   * when a tab of a particular url is closed.
+   * Decrements the number of opened tabs by one.
    */
   decrementNumberOfOpenedTabs(): void {
     this._numberOfOpenedTabs = this._numberOfOpenedTabs - 1;
   }
 
+  /**
+   * Gets whether some other entity editor tab with the same url has unsaved
+   * changes on it.
+   */
   doesSomeTabHaveUnsavedChanges(): boolean {
     return this._someTabHasUnsavedChanges;
   }
 
+  /**
+   * Sets the value of 'presence of unsaved changs on some other tab with the
+   * same url' status to the given value.
+   */
   setSomeTabHasUnsavedChanges(someTabHasUnsavedChanges: boolean): void {
     this._someTabHasUnsavedChanges = someTabHasUnsavedChanges;
   }
