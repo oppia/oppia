@@ -72,7 +72,7 @@ describe('Story Validation Service', () => {
     expect(issues).toEqual([expectedErrorString]);
   });
 
-  it('should report a validation error when skill is not aquired in intial' +
+  it('should report a validation error when skill is not acquired in intial' +
      ' chapter', () => {
     let sampleStoryContentsBackendDict = {
       initial_node_id: 'node_1',
