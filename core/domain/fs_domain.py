@@ -122,6 +122,7 @@ class GeneralFileSystem:
             str. The path.
         """
         return self._assets_path
+    
     def __init__(self, entity_name: str, entity_id: str) -> None:
 
     def _get_gcs_file_url(self, filepath: str) -> str: # type: ignore[no-untyped-call]
@@ -137,7 +138,7 @@ class GeneralFileSystem:
     def copy(self, source_assets_path: str, filepath: str) -> None: # type: ignore[no-untyped-call]
 
     def listdir(self, dir_name: str) -> list[str]: # type: ignore[no-untyped-call]
-        
+
 
 
 
