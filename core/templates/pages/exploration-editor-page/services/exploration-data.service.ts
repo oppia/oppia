@@ -41,11 +41,14 @@ export interface DraftAutoSaveResponse {
   providedIn: 'root'
 })
 export class ExplorationDataService {
-  draftChangeListId: number | null = null;
-  explorationDraftAutosaveUrl: string;
-  explorationId: string;
-  resolvedAnswersUrlPrefix: string;
-  data: ExplorationBackendDict;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  draftChangeListId!: number;
+  explorationDraftAutosaveUrl!: string;
+  explorationId!: string;
+  resolvedAnswersUrlPrefix!: string;
+  data!: ExplorationBackendDict;
 
   constructor(
     private alertsService: AlertsService,
@@ -73,11 +76,6 @@ export class ExplorationDataService {
     if (!explorationId) {
       this.loggerService.error(
         'Unexpected call to ExplorationDataService for pathname: ' + pathname);
-      this.autosaveChangeListAsync = undefined;
-      this.discardDraftAsync = undefined;
-      this.getDataAsync = undefined;
-      this.getLastSavedDataAsync = undefined;
-      this.save = undefined;
     } else {
       this.explorationId = explorationId;
       this.resolvedAnswersUrlPrefix = (
@@ -91,6 +89,9 @@ export class ExplorationDataService {
       changeList: ExplorationChange[]): Promise<DraftAutoSaveResponse> {
     this.localStorageService.saveExplorationDraft(
       this.explorationId, changeList, this.draftChangeListId);
+    if (!this.data.version) {
+      throw new Error('Version cannot be undefined');
+    }
     return this.explorationDataBackendApiService.saveChangeList(
       this.explorationDraftAutosaveUrl,
       changeList,
@@ -149,7 +150,9 @@ export class ExplorationDataService {
             this.explorationId).then((response) => {
             this.loggerService.info('Retrieved exploration data.');
             this.loggerService.info(JSON.stringify(response));
-            this.draftChangeListId = response.draft_change_list_id;
+            if (response.draft_change_list_id) {
+              this.draftChangeListId = response.draft_change_list_id;
+            }
             this.data = response;
             const draft = this.localStorageService.getExplorationDraft(
               this.explorationId);

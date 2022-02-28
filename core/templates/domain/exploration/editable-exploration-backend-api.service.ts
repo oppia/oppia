@@ -45,7 +45,7 @@ export class EditableExplorationBackendApiService {
 
   private async _updateExplorationAsync(
       explorationId: string,
-      explorationVersion: number,
+      explorationVersion: number | null,
       commitMessage: string,
       changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
     const putData = {
@@ -117,7 +117,7 @@ export class EditableExplorationBackendApiService {
    */
   async updateExplorationAsync(
       explorationId: string,
-      explorationVersion: number,
+      explorationVersion: number | null,
       commitMessage: string,
       changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
     return this._updateExplorationAsync(
