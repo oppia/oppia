@@ -288,7 +288,7 @@ class GcsFileSystem(GeneralFileSystem):
         return storage_services.isfile(
             self._bucket_name, self._get_gcs_file_url(filepath))
 
-    def get(self, filepath: str) -> FileStream | None:
+    def get(self, filepath: str) -> Sized:
         """Gets a file as an unencoded stream of raw bytes.
 
         Args:
