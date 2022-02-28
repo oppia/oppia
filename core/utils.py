@@ -97,10 +97,10 @@ class ExplorationConversionError(Exception):
 class ThrowGetError:
     """Error class to throw error while invoking the get function."""
 
-    def __init__(self, message):
+    def __init__(self, message: str):
         self.err_message = message
 
-    def get(self, *args, **kwargs):
+    def get(self, *args: Any, **kwargs: Any):
         """Get function throws error when invoked."""
         raise ValueError(self.err_message)
 

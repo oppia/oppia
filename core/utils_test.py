@@ -798,5 +798,5 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_throw_get_error(self) -> None:
         err_message = 'err_message'
         error = utils.ThrowGetError(err_message)
-        with self.assertRaisesRegex(ValueError, err_message):
+        with self.assertRaisesRegex(ValueError, err_message): # type: ignore[no-untyped-call]
             error.get('key')
