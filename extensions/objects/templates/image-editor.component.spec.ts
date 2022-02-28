@@ -29,6 +29,7 @@ import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { SimpleChanges } from '@angular/core';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 let gifshot = require('gifshot');
 
 declare global {
@@ -359,7 +360,10 @@ describe('ImageEditor', () => {
     TestBed.configureTestingModule(
       {
         imports: [HttpClientTestingModule],
-        declarations: [ImageEditorComponent],
+        declarations: [
+          ImageEditorComponent,
+          MockTranslatePipe
+        ],
         providers: [
           {
             provide: ImageUploadHelperService,
