@@ -151,8 +151,6 @@ class GeneralFileSystem:
         return storage_services.isfile(
             self._bucket_name, self._get_gcs_file_url(filepath))
 
-
-
     def get(self, filepath: str) -> FileStream | None: # type: ignore[no-untyped-call]
         """Gets a file as an unencoded stream of raw bytes.
 
@@ -189,7 +187,6 @@ class GeneralFileSystem:
 
     def delete(self, filepath: str) -> None: # type: ignore[no-untyped-call]
         """Deletes a file and the metadata associated with it.
-
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
@@ -223,7 +220,6 @@ class GeneralFileSystem:
 
     def listdir(self, dir_name: str) -> list[str]: # type: ignore[no-untyped-call]
         """Lists all files in a directory.
-
         Args:
             dir_name: str. The directory whose files should be listed. This
                 should not start with '/' or end with '/'.
@@ -260,7 +256,6 @@ class GcsFileSystem(GeneralFileSystem):
 
     This implementation ignores versioning.
     """
-
     def __init__(self, entity_name: str, entity_id: str) -> None:
         self._bucket_name = app_identity_services.get_gcs_resource_bucket_name()
         super(GcsFileSystem, self).__init__(entity_name, entity_id)
