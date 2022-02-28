@@ -18,11 +18,45 @@
 
 from __future__ import annotations
 
+import datetime
 import re
 
 from core import feconf
 from core import utils
 from core.constants import constants
+
+from typing import List, Optional, overload
+from typing_extensions import TypedDict
+
+
+class UserSettingsDict(TypedDict):
+    """Dictionary representing the UserSettings object."""
+
+    user_id: str
+    email: str
+    roles: List[str]
+    banned: bool
+    username: Optional[str]
+    normalized_username: Optional[str]
+    last_agreed_to_terms: Optional[datetime.datetime]
+    last_started_state_editor_tutorial: Optional[datetime.datetime]
+    last_started_state_translation_tutorial: Optional[datetime.datetime]
+    last_logged_in: Optional[datetime.datetime]
+    last_created_an_exploration: Optional[datetime.datetime]
+    last_edited_an_exploration: Optional[datetime.datetime]
+    profile_picture_data_url: Optional[str]
+    default_dashboard: Optional[str]
+    creator_dashboard_display_pref: str
+    user_bio: str
+    subject_interests: Optional[List[str]]
+    first_contribution_msec: Optional[float]
+    preferred_language_codes: Optional[List[str]]
+    preferred_site_language_code: Optional[str]
+    preferred_audio_language_code: Optional[str]
+    pin: Optional[str]
+    display_alias: Optional[str]
+    deleted: bool
+    created_on: Optional[datetime.datetime]
 
 
 class UserSettings:
@@ -63,17 +97,34 @@ class UserSettings:
     """
 
     def __init__(
-            self, user_id, email, roles, banned, username=None,
-            last_agreed_to_terms=None, last_started_state_editor_tutorial=None,
-            last_started_state_translation_tutorial=None, last_logged_in=None,
-            last_created_an_exploration=None, last_edited_an_exploration=None,
-            profile_picture_data_url=None, default_dashboard=None,
-            creator_dashboard_display_pref=(
-                constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
-            user_bio='', subject_interests=None, first_contribution_msec=None,
-            preferred_language_codes=None, preferred_site_language_code=None,
-            preferred_audio_language_code=None, pin=None, display_alias=None,
-            deleted=False, created_on=None):
+        self,
+        user_id: str,
+        email: str,
+        roles: List[str],
+        banned: bool,
+        username: Optional[str]=None,
+        last_agreed_to_terms: Optional[datetime.datetime]=None,
+        last_started_state_editor_tutorial: Optional[datetime.datetime]=None,
+        last_started_state_translation_tutorial: Optional[datetime.datetime]=(
+            None),
+        last_logged_in: Optional[datetime.datetime]=None,
+        last_created_an_exploration: Optional[datetime.datetime]=None,
+        last_edited_an_exploration: Optional[datetime.datetime]=None,
+        profile_picture_data_url: Optional[str]=None,
+        default_dashboard: Optional[str]=None,
+        creator_dashboard_display_pref: str=(
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
+        user_bio: str ='',
+        subject_interests: Optional[List[str]]=None,
+        first_contribution_msec: Optional[float]=None,
+        preferred_language_codes: Optional[List[str]]=None,
+        preferred_site_language_code: Optional[str]=None,
+        preferred_audio_language_code: Optional[str]=None,
+        pin: Optional[str]=None,
+        display_alias: Optional[str]=None,
+        deleted: bool=False,
+        created_on: Optional[datetime.datetime]=None
+    ) -> None:
         """Constructs a UserSettings domain object.
 
         Args:
@@ -147,7 +198,7 @@ class UserSettings:
         self.deleted = deleted
         self.created_on = created_on
 
-    def validate(self):
+    def validate(self) -> None:
         """Checks that the user_id, email, roles, banned, pin and display_alias
         fields of this UserSettings domain object are valid.
 
@@ -259,7 +310,9 @@ class UserSettings:
                 '%s is not a valid value for the dashboard display '
                 'preferences.' % (self.creator_dashboard_display_pref))
 
-    def populate_from_modifiable_user_data(self, modifiable_user_data):
+    def populate_from_modifiable_user_data(
+        self, modifiable_user_data: ModifiableUserData
+    ) -> None:
         """Populate the UserSettings domain object using the user data in
             modifiable_user_data.
 
@@ -271,6 +324,10 @@ class UserSettings:
             ValidationError. None or empty value is provided for display alias
                 attribute.
         """
+        modifiable_user_data.preferred_language_codes = (
+            modifiable_user_data.preferred_language_codes if (
+                modifiable_user_data.preferred_language_codes) else [])
+
         if (not modifiable_user_data.display_alias or
                 not isinstance(modifiable_user_data.display_alias, str)):
             raise utils.ValidationError(
@@ -286,7 +343,7 @@ class UserSettings:
             modifiable_user_data.preferred_audio_language_code)
         self.pin = modifiable_user_data.pin
 
-    def to_dict(self):
+    def to_dict(self) -> UserSettingsDict:
         """Convert the UserSettings domain instance into a dictionary form
         with its keys as the attributes of this class.
 
@@ -294,7 +351,9 @@ class UserSettings:
             dict. A dictionary containing the UserSettings class information
             in a dictionary form.
         """
-        return {
+        # Here, we're not returning user_id key of UserSettingsDict which
+        # causes MyPy to throw error. thus we add an ignore here.
+        return { # type: ignore[typeddict-item]
             'email': self.email,
             'roles': self.roles,
             'banned': self.banned,
@@ -329,7 +388,7 @@ class UserSettings:
         }
 
     @property
-    def truncated_email(self):
+    def truncated_email(self) -> str:
         """Returns truncated email by replacing last two characters before @
         with period.
 
@@ -349,7 +408,7 @@ class UserSettings:
         return '%s%s' % (first_part, last_part)
 
     @property
-    def normalized_username(self):
+    def normalized_username(self) -> Optional[str]:
         """Returns username in lowercase or None if it does not exist.
 
         Returns:
@@ -359,13 +418,21 @@ class UserSettings:
 
         return self.normalize_username(self.username)
 
+    @overload
     @classmethod
-    def normalize_username(cls, username):
+    def normalize_username(cls, username: str) -> str: ...
+
+    @overload
+    @classmethod
+    def normalize_username(cls, username: None) -> None: ...
+
+    @classmethod
+    def normalize_username(cls, username: Optional[str]) -> Optional[str]:
         """Returns the normalized version of the given username,
         or None if the passed-in 'username' is None.
 
         Args:
-            username: str. Identifiable username to display in the UI.
+            username: str or None. Identifiable username to display in the UI.
 
         Returns:
             str or None. The normalized version of the given username,
@@ -375,7 +442,7 @@ class UserSettings:
         return username.lower() if username else None
 
     @classmethod
-    def require_valid_username(cls, username: str):
+    def require_valid_username(cls, username: str) -> None:
         """Checks if the given username is valid or not.
 
         Args:
@@ -408,12 +475,12 @@ class UserSettings:
             if reserved_username in username.lower().strip():
                 raise utils.ValidationError('This username is not available.')
 
-    def mark_banned(self):
+    def mark_banned(self) -> None:
         """Marks a user banned."""
         self.banned = True
         self.roles = []
 
-    def unmark_banned(self, default_role):
+    def unmark_banned(self, default_role: str) -> None:
         """Unmarks ban for a banned user.
 
         Args:
@@ -432,13 +499,18 @@ class UserActionsInfo:
         actions: list(str). A list of actions accessible to the role.
     """
 
-    def __init__(self, user_id, roles, actions):
+    def __init__(
+        self,
+        user_id: str,
+        roles: List[str],
+        actions: List[str]
+    ) -> None:
         self._user_id = user_id
         self._roles = roles
         self._actions = actions
 
     @property
-    def user_id(self):
+    def user_id(self) -> str:
         """Returns the unique ID of the user.
 
         Returns:
@@ -447,7 +519,7 @@ class UserActionsInfo:
         return self._user_id
 
     @property
-    def roles(self):
+    def roles(self) -> List[str]:
         """Returns the roles of user.
 
         Returns:
@@ -456,7 +528,7 @@ class UserActionsInfo:
         return self._roles
 
     @property
-    def actions(self):
+    def actions(self) -> List[str]:
         """Returns list of actions accessible to a user.
 
         Returns:
@@ -477,7 +549,11 @@ class UserContributions:
     """
 
     def __init__(
-            self, user_id, created_exploration_ids, edited_exploration_ids):
+        self,
+        user_id: str,
+        created_exploration_ids: List[str],
+        edited_exploration_ids: List[str]
+    ) -> None:
         """Constructs a UserContributions domain object.
 
         Args:
@@ -491,7 +567,7 @@ class UserContributions:
         self.created_exploration_ids = created_exploration_ids
         self.edited_exploration_ids = edited_exploration_ids
 
-    def validate(self):
+    def validate(self) -> None:
         """Checks that user_id, created_exploration_ids and
         edited_exploration_ids fields of this UserContributions
         domain object are valid.
@@ -549,9 +625,12 @@ class UserGlobalPrefs:
     """
 
     def __init__(
-            self, can_receive_email_updates, can_receive_editor_role_email,
-            can_receive_feedback_message_email,
-            can_receive_subscription_email):
+        self,
+        can_receive_email_updates: bool,
+        can_receive_editor_role_email: bool,
+        can_receive_feedback_message_email: bool,
+        can_receive_subscription_email: bool
+    ) -> None:
         """Constructs a UserGlobalPrefs domain object.
 
         Args:
@@ -571,13 +650,20 @@ class UserGlobalPrefs:
         self.can_receive_subscription_email = can_receive_subscription_email
 
     @classmethod
-    def create_default_prefs(cls):
+    def create_default_prefs(cls) -> UserGlobalPrefs:
         """Returns UserGlobalPrefs with default attributes."""
         return cls(
             feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+
+class UserExplorationPrefsDict(TypedDict):
+    """Dictionary representing the UserExplorationPrefs object."""
+
+    mute_feedback_notifications: bool
+    mute_suggestion_notifications: bool
 
 
 class UserExplorationPrefs:
@@ -591,7 +677,10 @@ class UserExplorationPrefs:
     """
 
     def __init__(
-            self, mute_feedback_notifications, mute_suggestion_notifications):
+        self,
+        mute_feedback_notifications: bool,
+        mute_suggestion_notifications: bool
+    ) -> None:
         """Constructs a UserExplorationPrefs domain object.
 
         Args:
@@ -604,13 +693,13 @@ class UserExplorationPrefs:
         self.mute_suggestion_notifications = mute_suggestion_notifications
 
     @classmethod
-    def create_default_prefs(cls):
+    def create_default_prefs(cls) -> UserExplorationPrefs:
         """Returns UserExplorationPrefs with default attributes."""
         return cls(
             feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE,
             feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
 
-    def to_dict(self):
+    def to_dict(self) -> UserExplorationPrefsDict:
         """Return dictionary representation of UserExplorationPrefs.
 
         Returns:
@@ -630,8 +719,13 @@ class ExpUserLastPlaythrough:
     """Domain object for an exploration last playthrough model."""
 
     def __init__(
-            self, user_id, exploration_id, last_played_exp_version,
-            last_updated, last_played_state_name):
+        self,
+        user_id: str,
+        exploration_id: str,
+        last_played_exp_version: int,
+        last_updated: datetime.datetime,
+        last_played_state_name: str
+    ) -> None:
         self.id = '%s.%s' % (user_id, exploration_id)
         self.user_id = user_id
         self.exploration_id = exploration_id
@@ -640,7 +734,10 @@ class ExpUserLastPlaythrough:
         self.last_played_state_name = last_played_state_name
 
     def update_last_played_information(
-            self, last_played_exp_version, last_played_state_name):
+        self,
+        last_played_exp_version: int,
+        last_played_state_name: str
+    ) -> None:
         """Updates the last playthrough information of the user.
 
         Args:
@@ -657,8 +754,14 @@ class IncompleteActivities:
     """Domain object for the incomplete activities model."""
 
     def __init__(
-            self, user_id, exploration_ids, collection_ids, story_ids,
-            partially_learnt_topic_ids, partially_mastered_topic_id=None):
+        self,
+        user_id: str,
+        exploration_ids: List[str],
+        collection_ids: List[str],
+        story_ids: List[str],
+        partially_learnt_topic_ids: List[str],
+        partially_mastered_topic_id: Optional[str]=None
+    ) -> None:
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
@@ -666,7 +769,7 @@ class IncompleteActivities:
         self.partially_learnt_topic_ids = partially_learnt_topic_ids
         self.partially_mastered_topic_id = partially_mastered_topic_id
 
-    def add_exploration_id(self, exploration_id):
+    def add_exploration_id(self, exploration_id: str) -> None:
         """Adds the exploration id to the list of incomplete exploration ids.
 
         Args:
@@ -675,7 +778,7 @@ class IncompleteActivities:
         """
         self.exploration_ids.append(exploration_id)
 
-    def remove_exploration_id(self, exploration_id):
+    def remove_exploration_id(self, exploration_id: str) -> None:
         """Removes the exploration id from the list of incomplete exploration
         ids.
 
@@ -685,7 +788,7 @@ class IncompleteActivities:
         """
         self.exploration_ids.remove(exploration_id)
 
-    def add_collection_id(self, collection_id):
+    def add_collection_id(self, collection_id: str) -> None:
         """Adds the collection id to the list of incomplete collection ids.
 
         Args:
@@ -694,7 +797,7 @@ class IncompleteActivities:
         """
         self.collection_ids.append(collection_id)
 
-    def remove_collection_id(self, collection_id):
+    def remove_collection_id(self, collection_id: str) -> None:
         """Removes the collection id from the list of incomplete collection
         ids.
 
@@ -704,7 +807,7 @@ class IncompleteActivities:
         """
         self.collection_ids.remove(collection_id)
 
-    def add_story_id(self, story_id):
+    def add_story_id(self, story_id: str) -> None:
         """Adds the story id to the list of incomplete story ids.
 
         Args:
@@ -713,7 +816,7 @@ class IncompleteActivities:
         """
         self.story_ids.append(story_id)
 
-    def remove_story_id(self, story_id):
+    def remove_story_id(self, story_id: str) -> None:
         """Removes the story id from the list of incomplete story
         ids.
 
@@ -723,7 +826,9 @@ class IncompleteActivities:
         """
         self.story_ids.remove(story_id)
 
-    def add_partially_learnt_topic_id(self, partially_learnt_topic_id):
+    def add_partially_learnt_topic_id(
+        self, partially_learnt_topic_id: str
+    ) -> None:
         """Adds the topic id to the list of partially learnt topic ids.
 
         Args:
@@ -732,7 +837,9 @@ class IncompleteActivities:
         """
         self.partially_learnt_topic_ids.append(partially_learnt_topic_id)
 
-    def remove_partially_learnt_topic_id(self, partially_learnt_topic_id):
+    def remove_partially_learnt_topic_id(
+        self, partially_learnt_topic_id: str
+    ) -> None:
         """Removes the topic id from the list of partially learnt topic
         ids.
 
@@ -747,8 +854,14 @@ class CompletedActivities:
     """Domain object for the activities completed by learner model."""
 
     def __init__(
-            self, user_id, exploration_ids, collection_ids, story_ids,
-            learnt_topic_ids, mastered_topic_ids=None):
+        self,
+        user_id: str,
+        exploration_ids: List[str],
+        collection_ids: List[str],
+        story_ids: List[str],
+        learnt_topic_ids: List[str],
+        mastered_topic_ids: Optional[List[str]]=None
+    ) -> None:
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
@@ -756,7 +869,7 @@ class CompletedActivities:
         self.learnt_topic_ids = learnt_topic_ids
         self.mastered_topic_ids = mastered_topic_ids
 
-    def add_exploration_id(self, exploration_id):
+    def add_exploration_id(self, exploration_id: str) -> None:
         """Adds the exploration id to the list of completed exploration ids.
 
         Args:
@@ -765,7 +878,7 @@ class CompletedActivities:
         """
         self.exploration_ids.append(exploration_id)
 
-    def remove_exploration_id(self, exploration_id):
+    def remove_exploration_id(self, exploration_id: str) -> None:
         """Removes the exploration id from the list of completed exploration
         ids.
 
@@ -775,7 +888,7 @@ class CompletedActivities:
         """
         self.exploration_ids.remove(exploration_id)
 
-    def add_collection_id(self, collection_id):
+    def add_collection_id(self, collection_id: str) -> None:
         """Adds the collection id to the list of completed collection ids.
 
         Args:
@@ -784,7 +897,7 @@ class CompletedActivities:
         """
         self.collection_ids.append(collection_id)
 
-    def remove_collection_id(self, collection_id):
+    def remove_collection_id(self, collection_id: str) -> None:
         """Removes the collection id from the list of completed collection
         ids.
 
@@ -794,7 +907,7 @@ class CompletedActivities:
         """
         self.collection_ids.remove(collection_id)
 
-    def add_story_id(self, story_id):
+    def add_story_id(self, story_id: str) -> None:
         """Adds the story id to the list of completed story ids.
 
         Args:
@@ -803,7 +916,7 @@ class CompletedActivities:
         """
         self.story_ids.append(story_id)
 
-    def remove_story_id(self, story_id):
+    def remove_story_id(self, story_id: str) -> None:
         """Removes the story id from the list of completed story
         ids.
 
@@ -813,7 +926,7 @@ class CompletedActivities:
         """
         self.story_ids.remove(story_id)
 
-    def add_learnt_topic_id(self, learnt_topic_id):
+    def add_learnt_topic_id(self, learnt_topic_id: str) -> None:
         """Adds the topic id to the list of learnt topic ids.
 
         Args:
@@ -822,7 +935,7 @@ class CompletedActivities:
         """
         self.learnt_topic_ids.append(learnt_topic_id)
 
-    def remove_learnt_topic_id(self, learnt_topic_id):
+    def remove_learnt_topic_id(self, learnt_topic_id: str) -> None:
         """Removes the topic id from the list of learnt topic
         ids.
 
@@ -833,17 +946,28 @@ class CompletedActivities:
         self.learnt_topic_ids.remove(learnt_topic_id)
 
 
+class LearnerGoalsDict(TypedDict):
+    """Dictionary representing the LearnerGoals object."""
+
+    user_id: str
+    topic_ids_to_learn: List[str]
+    topic_ids_to_master: List[str]
+
+
 class LearnerGoals:
     """Domain object for the learner goals model."""
 
     def __init__(
-            self, user_id, topic_ids_to_learn,
-            topic_ids_to_master):
+        self,
+        user_id: str,
+        topic_ids_to_learn: List[str],
+        topic_ids_to_master: List[str]
+    ) -> None:
         self.id = user_id
         self.topic_ids_to_learn = topic_ids_to_learn
         self.topic_ids_to_master = topic_ids_to_master
 
-    def add_topic_id_to_learn(self, topic_id):
+    def add_topic_id_to_learn(self, topic_id: str) -> None:
         """Adds the topic id to 'topic IDs to learn' list.
 
         Args:
@@ -851,21 +975,23 @@ class LearnerGoals:
         """
         self.topic_ids_to_learn.append(topic_id)
 
-    def remove_topic_id_from_learn(self, topic_id):
+    def remove_topic_id_from_learn(self, topic_id: str) -> None:
         """Removes the topic id from the 'topic IDs to learn' list.
 
         topic_id: str. The id of the topic to be removed.
         """
         self.topic_ids_to_learn.remove(topic_id)
 
-    def to_dict(self):
+    def to_dict(self) -> LearnerGoalsDict:
         """Return dictionary representation of LearnerGoals.
 
         Returns:
             dict. A dictionary containing the LearnerGoals class information
             in a dictionary form.
         """
-        return {
+        # Here, we're not returning user_id key of UserSettingsDict
+        # which causes MyPy to throw error. thus we add an ignore here.
+        return { # type: ignore[typeddict-item]
             'topic_ids_to_learn': self.topic_ids_to_learn,
             'topic_ids_to_master': self.topic_ids_to_master
         }
@@ -875,13 +1001,18 @@ class LearnerPlaylist:
     """Domain object for the learner playlist model."""
 
     def __init__(
-            self, user_id, exploration_ids, collection_ids):
+        self,
+        user_id: str,
+        exploration_ids: List[str],
+        collection_ids: List[str]
+    ) -> None:
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
 
     def insert_exploration_id_at_given_position(
-            self, exploration_id, position_to_be_inserted):
+        self, exploration_id: str, position_to_be_inserted: int
+    ) -> None:
         """Inserts the given exploration id at the given position.
 
         Args:
@@ -893,7 +1024,7 @@ class LearnerPlaylist:
         self.exploration_ids.insert(
             position_to_be_inserted, exploration_id)
 
-    def add_exploration_id_to_list(self, exploration_id):
+    def add_exploration_id_to_list(self, exploration_id: str) -> None:
         """Inserts the exploration id at the end of the list.
 
         Args:
@@ -903,7 +1034,8 @@ class LearnerPlaylist:
         self.exploration_ids.append(exploration_id)
 
     def insert_collection_id_at_given_position(
-            self, collection_id, position_to_be_inserted):
+        self, collection_id: str, position_to_be_inserted: int
+    ) -> None:
         """Inserts the given collection id at the given position.
 
         Args:
@@ -914,7 +1046,7 @@ class LearnerPlaylist:
         """
         self.collection_ids.insert(position_to_be_inserted, collection_id)
 
-    def add_collection_id_to_list(self, collection_id):
+    def add_collection_id_to_list(self, collection_id: str) -> None:
         """Inserts the collection id at the end of the list.
 
         Args:
@@ -923,14 +1055,14 @@ class LearnerPlaylist:
         """
         self.collection_ids.append(collection_id)
 
-    def remove_exploration_id(self, exploration_id):
+    def remove_exploration_id(self, exploration_id: str) -> None:
         """Removes the exploration id from the learner playlist.
 
         exploration_id: str. The id of the exploration to be removed.
         """
         self.exploration_ids.remove(exploration_id)
 
-    def remove_collection_id(self, collection_id):
+    def remove_collection_id(self, collection_id: str) -> None:
         """Removes the collection id from the learner playlist.
 
         collection_id: str. The id of the collection to be removed.
@@ -941,13 +1073,19 @@ class LearnerPlaylist:
 class UserContributionProficiency:
     """Domain object for UserContributionProficiencyModel."""
 
-    def __init__(self, user_id, score_category, score, onboarding_email_sent):
+    def __init__(
+        self,
+        user_id: str,
+        score_category: str,
+        score: int,
+        onboarding_email_sent: bool
+    ) -> None:
         self.user_id = user_id
         self.score_category = score_category
         self.score = score
         self.onboarding_email_sent = onboarding_email_sent
 
-    def increment_score(self, increment_by):
+    def increment_score(self, increment_by: int) -> None:
         """Increments the score of the user in the category by the given amount.
 
         In the first version of the scoring system, the increment_by quantity
@@ -960,7 +1098,7 @@ class UserContributionProficiency:
         """
         self.score += increment_by
 
-    def can_user_review_category(self):
+    def can_user_review_category(self) -> bool:
         """Checks if user can review suggestions in category score_category.
         If the user has score above the minimum required score, then the user
         is allowed to review.
@@ -971,7 +1109,7 @@ class UserContributionProficiency:
         """
         return self.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
 
-    def mark_onboarding_email_as_sent(self):
+    def mark_onboarding_email_as_sent(self) -> None:
         """Marks the email as sent."""
         self.onboarding_email_sent = True
 
@@ -980,9 +1118,13 @@ class UserContributionRights:
     """Domain object for the UserContributionRightsModel."""
 
     def __init__(
-            self, user_id, can_review_translation_for_language_codes,
-            can_review_voiceover_for_language_codes, can_review_questions,
-            can_submit_questions):
+        self,
+        user_id: str,
+        can_review_translation_for_language_codes: List[str],
+        can_review_voiceover_for_language_codes: List[str],
+        can_review_questions: bool,
+        can_submit_questions: bool
+    ):
         self.id = user_id
         self.can_review_translation_for_language_codes = (
             can_review_translation_for_language_codes)
@@ -991,18 +1133,21 @@ class UserContributionRights:
         self.can_review_questions = can_review_questions
         self.can_submit_questions = can_submit_questions
 
-    def can_review_at_least_one_item(self):
+    def can_review_at_least_one_item(self) -> bool:
         """Checks whether user has rights to review at least one item.
 
         Returns:
             boolean. Whether user has rights to review at east one item.
         """
-        return (
+        # Due to comparison between different types (List[str] and bool) MyPy
+        # expecting to return Union[List[str], bool] type. So, in order to
+        # return bool, we explicitly convert the operation to bool.
+        return bool(
             self.can_review_translation_for_language_codes or
             self.can_review_voiceover_for_language_codes or
             self.can_review_questions)
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates different attributes of the class."""
         if not isinstance(self.can_review_translation_for_language_codes, list):
             raise utils.ValidationError(
@@ -1047,15 +1192,43 @@ class UserContributionRights:
                 'found: %s' % type(self.can_submit_questions))
 
 
+class ModifiableUserDataDict(TypedDict):
+    """Dictionary representing the ModifiableUserData object."""
+
+    display_alias: str
+    pin: Optional[str]
+    preferred_language_codes: Optional[List[str]]
+    preferred_site_language_code: Optional[str]
+    preferred_audio_language_code: Optional[str]
+    user_id: Optional[str]
+
+
+class RawUserDataDict(TypedDict):
+    """Type for the argument raw_user_data_dict."""
+
+    schema_version: int
+    display_alias: str
+    pin: Optional[str]
+    preferred_language_codes: Optional[List[str]]
+    preferred_site_language_code: Optional[str]
+    preferred_audio_language_code: Optional[str]
+    user_id: Optional[str]
+
+
 class ModifiableUserData:
     """Domain object to represent the new values in a UserSettingsModel change
     submitted by the Android client.
     """
 
     def __init__(
-            self, display_alias, pin, preferred_language_codes,
-            preferred_site_language_code, preferred_audio_language_code,
-            user_id=None):
+        self,
+        display_alias: str,
+        pin: Optional[str],
+        preferred_language_codes: Optional[List[str]],
+        preferred_site_language_code: Optional[str],
+        preferred_audio_language_code: Optional[str],
+        user_id: Optional[str]=None
+    ) -> None:
         """Constructs a ModifiableUserData domain object.
 
         Args:
@@ -1082,7 +1255,9 @@ class ModifiableUserData:
         self.user_id = user_id
 
     @classmethod
-    def from_dict(cls, modifiable_user_data_dict):
+    def from_dict(
+        cls, modifiable_user_data_dict: ModifiableUserDataDict
+    ) -> ModifiableUserData:
         """Return a ModifiableUserData domain object from a dict.
 
         Args:
@@ -1105,7 +1280,9 @@ class ModifiableUserData:
     CURRENT_SCHEMA_VERSION = 1
 
     @classmethod
-    def from_raw_dict(cls, raw_user_data_dict):
+    def from_raw_dict(
+        cls, raw_user_data_dict: RawUserDataDict
+    ) -> ModifiableUserData:
         """Converts the raw_user_data_dict into a ModifiableUserData domain
         object by converting it according to the latest schema format.
 
