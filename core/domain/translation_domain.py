@@ -18,9 +18,262 @@
 
 from __future__ import annotations
 
+import enum
+
+from core import feconf
 from core import utils
 
-from typing import Dict
+from typing import Dict, List
+from typing_extensions import TypedDict
+
+
+class TranslatableContentFormat(enum.Enum):
+    """Represents all possible data types for any translatable content."""
+
+    HTML = 'html'
+    UNICODE_STRING = 'unicode'
+    SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
+    SET_OF_UNICODE_STRING = 'set_of_unicode_string'
+
+
+class TranslatableContentDict(TypedDict):
+    """Dictionary representing TranslatableContent object."""
+
+    content_id: str
+    content: feconf.ContentInTranslatableContent
+    content_type: TranslatableContentFormat
+
+
+class TranslatableContentsCollection:
+    """A class to collect all TranslatableContents from a translatable object
+    and maps with their corresponding content-ids.
+    """
+
+    def __init__(self) -> None:
+        """Constructs a TranslatableContentsCollection object."""
+        self.translatable_contents: Dict[str, TranslatableContent] = {}
+
+    def add_translatable_field(
+        self,
+        field_type: TranslatableContentFormat,
+        content_id: str,
+        value: feconf.ContentInTranslatableContent
+    ) -> None:
+        """Adds translatable field parameter to translatable_contents dict.
+
+        Args:
+            field_type: TranslatableContentFormat. The type of the
+                corresponding translatable content.
+            content_id: str. The id of the corresponding translatable content.
+            value: ContentInTranslatableContent. Value of the content which is
+                translatable.
+        """
+        self.translatable_contents[content_id] = TranslatableContent(
+            content_id, value, field_type)
+
+    def add_translatable_object(
+        self,
+        value: BaseTranslatableObject
+    ) -> None:
+        """Adds translatable fields of a translatable object parameter to
+        translatable_contents dict.
+
+        Args:
+            value: BaseTranslatableObject. An object representing
+                BaseTranslatableObject.
+        """
+        self.translatable_contents.update(
+            value.get_translatable_contents_collection().translatable_contents)
+
+
+class BaseTranslatableObject:
+    """Base class for all translatable objects which contain translatable
+    fields/objects. For example, a State is a translatable object in
+    Exploration, a Hint is a translatable object in State, and a hint_content
+    is a translatable field in Hint. So Exploration, State, and Hint all should
+    be the child class of BaseTranslatableObject.
+    """
+
+    def get_translatable_contents_collection(
+        self
+    ) -> TranslatableContentsCollection:
+        """Get all translatable fields in a translatable object.
+
+        Raises:
+            NotImplementedError. The derived child class must implement the
+                necessary logic to get all translatable fields in a
+                translatable object.
+        """
+        raise NotImplementedError('Must be implemented in subclasses.')
+
+    def get_all_contents_which_need_translations(
+        self,
+        entity_translation: EntityTranslation
+    ) -> List[TranslatableContent]:
+        """Returns a list of TranslatableContent instances which need new or
+        updated translations.
+
+        Args:
+            entity_translation: EntityTranslation. An object storing the
+                existing translations of an entity.
+
+        Returns:
+            list(TranslatableContent). Returns a list of TranslatableContent.
+        """
+        contents_which_need_translation = []
+        content_ids_for_translated_contents = (
+            entity_translation.translations.keys())
+        translatable_content_list = (
+            self.get_translatable_contents_collection()
+            .translatable_contents.values())
+
+        for translatable_content in translatable_content_list:
+            if translatable_content.content == '':
+                continue
+
+            if (
+                translatable_content.content_id not in
+                content_ids_for_translated_contents
+            ):
+                contents_which_need_translation.append(translatable_content)
+            elif (
+                entity_translation.translations[
+                translatable_content.content_id].needs_update
+            ):
+                contents_which_need_translation.append(translatable_content)
+
+        return contents_which_need_translation
+
+
+class EntityTranslation:
+    """The EntityTranslation represents an EntityTranslationsModel for a given
+    version of an entity in a given language.
+
+    Args:
+        entity_id: str. The id of the corresponding entity.
+        entity_type: TranslatableEntityType. The type
+            of the corresponding entity.
+        entity_version: str. The version of the corresponding entity.
+        language_code: str. The language code for the corresponding entity.
+        translations: dict(str, TranslatedContent). The translated content.
+    """
+
+    def __init__(
+        self,
+        entity_id: str,
+        entity_type: feconf.TranslatableEntityType,
+        entity_version: int,
+        language_code: str,
+        translations: Dict[str, TranslatedContent]
+    ):
+        self.entity_id = entity_id
+        self.entity_type = entity_type.value
+        self.entity_version = entity_version
+        self.language_code = language_code
+        self.translations = translations
+
+
+class TranslatableContent:
+    """TranslatableContent represents a content of a translatable object which
+    can be translated into multiple languages.
+
+    Args:
+        content_id: str. The id of the corresponding content.
+        content: ContentInTranslatableContent. The content which can be
+            translated.
+        content_type: TranslatableContentFormat. The type of the
+            corresponding content.
+    """
+
+    def __init__(
+        self,
+        content_id: str,
+        content: feconf.ContentInTranslatableContent,
+        content_type: TranslatableContentFormat
+    ) -> None:
+        self.content_id = content_id
+        self.content = content
+        self.content_type = content_type
+
+    @classmethod
+    def from_dict(
+        cls,
+        translatable_content_dict: TranslatableContentDict
+    ) -> TranslatableContent:
+        """Returns a TranslatableContent object from its dict representation.
+
+        Args:
+            translatable_content_dict: dict. Dict representation of
+                TranslatableContent object.
+
+        Returns:
+            TranslatableContent. The TranslatableContent object.
+        """
+        return cls(
+            translatable_content_dict['content_id'],
+            translatable_content_dict['content'],
+            translatable_content_dict['content_type'])
+
+    def to_dict(self) -> TranslatableContentDict:
+        """Returns the dict representation of TranslatableContent object.
+
+        Returns:
+            dict. The dict representation of TranslatableContent object.
+        """
+        return {
+            'content_id': self.content_id,
+            'content': self.content,
+            'content_type': self.content_type
+        }
+
+
+class TranslatedContent:
+    """Represents the translated content of the TranslatableContent object.
+
+    Args:
+        content: ContentInTranslatableContent. Represents already-translated
+            content of TranslatableContent object.
+        needs_update: bool. A boolean value represents whether any translation
+            needs an update or not.
+    """
+
+    def __init__(
+        self,
+        content: feconf.ContentInTranslatableContent,
+        needs_update: bool
+    ) -> None:
+        self.content = content
+        self.needs_update = needs_update
+
+    @classmethod
+    def from_dict(
+        cls,
+        translated_contents_dict: feconf.TranslatedContentDict
+    ) -> TranslatedContent:
+        """Returns a TranslatedContent object from its dict representation.
+
+        Args:
+            translated_contents_dict: TranslatedContentDict. Dict representation
+                of TranslatedContent object.
+
+        Returns:
+            TranslatedContent. The TranslatedContent object.
+        """
+        return cls(
+            translated_contents_dict['content'],
+            translated_contents_dict['needs_update'])
+
+    def to_dict(self) -> feconf.TranslatedContentDict:
+        """Returns the dict representation of TranslatedContent object.
+
+        Returns:
+            TranslatedContentDict. The dict representation of
+            TranslatedContent object.
+        """
+        return {
+            'content': self.content,
+            'needs_update': self.needs_update
+        }
 
 
 class MachineTranslation:

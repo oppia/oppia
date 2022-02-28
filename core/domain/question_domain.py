@@ -32,6 +32,7 @@ from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import expression_parser
 from core.domain import state_domain
+from core.domain import translation_domain
 from extensions import domain
 
 from pylatexenc import latex2text
@@ -130,7 +131,7 @@ class QuestionSuggestionChange(change_domain.BaseChange):
     ]
 
 
-class Question:
+class Question(translation_domain.BaseTranslatableObject):
     """Domain object for a question."""
 
     def __init__(
@@ -171,6 +172,14 @@ class Question:
             inapplicable_skill_misconception_ids)
         self.created_on = created_on
         self.last_updated = last_updated
+
+    def get_translatable_contents_collection(self) -> None:
+        """Registers all of translatable fields/objects in the question."""
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+        translatable_contents_collection.add_translatable_object(
+            self.question_state_data)
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this Question domain object.
