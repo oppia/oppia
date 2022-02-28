@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core import utils
 
-from typing import Any
+from typing import Any, Sized
 
 from core.platform import models # pylint: disable=invalid-import-from # isort:skip
 # TODO(#14537): Refactor this file and remove imports marked
@@ -288,7 +288,7 @@ class GcsFileSystem(GeneralFileSystem):
         return storage_services.isfile(
             self._bucket_name, self._get_gcs_file_url(filepath))
 
-    def get(self, filepath: str) -> Any:
+    def get(self, filepath: str) -> FileStream:
         """Gets a file as an unencoded stream of raw bytes.
 
         Args:
@@ -446,7 +446,7 @@ class AbstractFileSystem:
         self._check_filepath(filepath)
         return self._impl.get(filepath)
 
-    def get(self, filepath: str) -> FileStream | Any:
+    def get(self, filepath: str) -> Sized:
         """Returns a bytestring with the file content, but no metadata.
 
         Args:
