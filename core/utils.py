@@ -96,6 +96,7 @@ class ExplorationConversionError(Exception):
 
 class ThrowGetError:
     """Error class to throw error while invoking the get function."""
+
     def __init__(self, message):
         self.err_message = message
 

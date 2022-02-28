@@ -697,7 +697,7 @@ class BaseHandler(webapp2.RequestHandler):
             # Even if payload exists the request will throw 401 since
             # self.payload is replaced by ThrowGetError object hence the below
             # check.
-            # TODO: Change this to self.normalized_payload once schema is
+            # TODO(#13155): Change this to self.normalized_payload once schema is
             #  implemented for all handlers.
             payload_exists = (self.payload is not None and not isinstance(
                 self.payload, utils.ThrowGetError))
