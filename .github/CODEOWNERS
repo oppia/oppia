@@ -220,6 +220,7 @@
 /core/templates/components/save-pending-changes/ @kevintab95
 /core/templates/components/version-diff-visualization/ @aks681
 /core/templates/domain/editor/ @kevintab95
+/core/templates/domain/entity_editor_browser_tabs_info/ @kevintab95
 /core/templates/domain/exploration/ @kevintab95
 /core/templates/domain/recommendations/ @kevintab95
 /core/templates/domain/state/ @kevintab95
@@ -237,7 +238,6 @@
 /core/templates/services/exploration-html-formatter.service*.ts @kevintab95
 /core/templates/services/image-upload-helper.service*.ts @kevintab95
 /core/templates/services/validators.service*.ts @kevintab95
-/core/templates/domain/entity_editor_browser_tabs_info/ @kevintab95
 
 
 # Forms pages.
