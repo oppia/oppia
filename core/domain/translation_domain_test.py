@@ -180,7 +180,8 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             'My name is jack.'
         ]
         translatable_contents = (
-            self.translatable_object1.get_translatable_fields())
+            self.translatable_object1.get_translatable_contents_collection()
+            .translatable_contents)
 
         self.assertItemsEqual(expected_contents, [ # type: ignore[no-untyped-call]
             translatable_content.content
@@ -193,7 +194,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Must be implemented in subclasses.'):
-            translatable_object.get_translatable_fields()
+            translatable_object.get_translatable_contents_collection()
 
     def test_get_all_contents_which_need_translations_method(self) -> None:
         translation_dict = {
