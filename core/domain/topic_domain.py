@@ -1566,7 +1566,7 @@ class Topic:
             self.subtopics[subtopic_index].thumbnail_filename = (
                 new_thumbnail_filename)
             self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
-                len(fs.get(filepath))) 
+                len(fs.get(filepath)))
         else:
             raise Exception(
                 'The thumbnail %s for subtopic with topic_id %s does not exist'

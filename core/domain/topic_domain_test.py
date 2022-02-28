@@ -804,7 +804,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_TOPIC, self.topic_id))
-        fs.commit( 
+        fs.commit(
             'thumbnail/new_image.svg', raw_image, mimetype='image/svg+xml')
         self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')
         self.assertEqual(
