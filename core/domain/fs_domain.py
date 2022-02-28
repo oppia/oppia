@@ -122,22 +122,139 @@ class GeneralFileSystem:
             str. The path.
         """
         return self._assets_path
-    
+
     def __init__(self, entity_name: str, entity_id: str) -> None:
+         self._bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+        super(GcsFileSystem, self).__init__(entity_name, entity_id)
 
     def _get_gcs_file_url(self, filepath: str) -> str: # type: ignore[no-untyped-call]
+        """Returns the constructed GCS file URL.
+
+        Args:
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+
+        Returns:
+            str. The GCS file URL.
+        """
+        # Upload to GCS bucket with filepath
+        # "<entity>/<entity-id>/assets/<filepath>".
+        gcs_file_url = '%s/%s' % (self._assets_path, filepath)
+        return gcs_file_url
 
     def isfile(self, filepath: str) -> bool:# type: ignore[no-untyped-call]
+        """Checks if the file with the given filepath exists in the GCS.
+
+        Args:
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+
+        Returns:
+            bool. Whether the file exists in GCS.
+        """
+        return storage_services.isfile(
+            self._bucket_name, self._get_gcs_file_url(filepath))
+
+
 
     def get(self, filepath: str) -> FileStream | None: # type: ignore[no-untyped-call]
+        """Gets a file as an unencoded stream of raw bytes.
+
+        Args:
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+
+        Returns:
+            FileStream or None. It returns FileStream domain object if the file
+            exists. Otherwise, it returns None.
+        """
+        if self.isfile(filepath):
+            return FileStream(storage_services.get(
+                self._bucket_name, self._get_gcs_file_url(filepath)))
+        else:
+            return None
 
     def commit(self, filepath: str, raw_bytes: bytes, mimetype: str) -> None: # type: ignore[no-untyped-call]
+        """Commit raw_bytes to the relevant file in the entity's assets folder.
+
+        Args:
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+            raw_bytes: str. The content to be stored in the file.
+            mimetype: str. The content-type of the cloud file.
+        """
+        storage_services.commit(
+            self._bucket_name,
+            self._get_gcs_file_url(filepath),
+            raw_bytes,
+            mimetype
+        )
+
 
     def delete(self, filepath: str) -> None: # type: ignore[no-untyped-call]
+        """Deletes a file and the metadata associated with it.
 
-    def copy(self, source_assets_path: str, filepath: str) -> None: # type: ignore[no-untyped-call]
+        Args:
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+
+        Raises:
+            OSError. Given file does not exist.
+        """
+        if self.isfile(filepath):
+            storage_services.delete(
+                self._bucket_name, self._get_gcs_file_url(filepath))
+        else:
+            raise IOError('File does not exist: %s' % filepath)
+
+    def copy(self, source_assets_path: str, filepath: str) -> None:
+        """Copy images from source_path.
+
+        Args:
+            source_assets_path: str. The path to the source entity's assets
+                folder.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+        """
+        source_file_url = (
+            '%s/%s' % (source_assets_path, filepath)
+        )
+        storage_services.copy(
+            self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
+        )
+
+
 
     def listdir(self, dir_name: str) -> list[str]: # type: ignore[no-untyped-call]
+        """Lists all files in a directory.
+
+        Args:
+            dir_name: str. The directory whose files should be listed. This
+                should not start with '/' or end with '/'.
+
+        Returns:
+            list(str). A lexicographically-sorted list of filenames.
+
+        Raises:
+            OSError. The directory name starts or ends with '/'.
+        """
+        if dir_name.startswith('/') or dir_name.endswith('/'):
+            raise IOError(
+                'The dir_name should not start with / or end with / : %s' %
+                dir_name
+            )
+
+        # The trailing slash is necessary to prevent non-identical directory
+        # names with the same prefix from matching, e.g. /abcd/123.png should
+        # not match a query for files under /abc/.
+        if dir_name and not dir_name.endswith('/'):
+            dir_name += '/'
+
+        assets_path = '%s/' % self._assets_path
+        prefix = utils.vfs_construct_path(self._assets_path, dir_name)
+        blobs_in_dir = storage_services.listdir(self._bucket_name, prefix)
+        return [
+            blob.name.replace(assets_path, '') for blob in blobs_in_dir]
 
 
 
