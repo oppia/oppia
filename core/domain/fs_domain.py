@@ -125,12 +125,19 @@ class GeneralFileSystem:
     def __init__(self, entity_name: str, entity_id: str) -> None:
 
     def _get_gcs_file_url(self, filepath: str) -> str: # type: ignore[no-untyped-call]
+
     def isfile(self, filepath: str) -> bool:# type: ignore[no-untyped-call]
+
     def get(self, filepath: str) -> FileStream | None: # type: ignore[no-untyped-call]
+
     def commit(self, filepath: str, raw_bytes: bytes, mimetype: str) -> None: # type: ignore[no-untyped-call]
+
     def delete(self, filepath: str) -> None: # type: ignore[no-untyped-call]
+
     def copy(self, source_assets_path: str, filepath: str) -> None: # type: ignore[no-untyped-call]
+
     def listdir(self, dir_name: str) -> list[str]: # type: ignore[no-untyped-call]
+        
 
 
 
