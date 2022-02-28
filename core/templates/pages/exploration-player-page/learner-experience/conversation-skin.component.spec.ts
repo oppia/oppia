@@ -1061,4 +1061,20 @@ describe('Conversation skin component', () => {
       componentInstance.showPendingCard();
       tick(2000);
     }));
+
+  it('should check whether hacky translations are displayed or not', () => {
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValues(false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValues(false, false);
+
+    let expId = 'exp_id';
+
+    let hackyStoryTitleTranslationIsDisplayed =
+      componentInstance.isHackyExpTitleTranslationDisplayed(expId);
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
+    hackyStoryTitleTranslationIsDisplayed =
+      componentInstance.isHackyExpTitleTranslationDisplayed(expId);
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+  });
 });
