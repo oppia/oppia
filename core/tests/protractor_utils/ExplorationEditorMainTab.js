@@ -269,6 +269,7 @@ var ExplorationEditorMainTab = function() {
   this.addResponse = async function(
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
+    debugger;
     await action.waitForAutosave();
     // Open the "Add Response" modal if it is not already open.
     await action.click('Response Editor Button', addResponseButton);
@@ -279,6 +280,7 @@ var ExplorationEditorMainTab = function() {
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
     // Set the rule description.
+    debugger;
     var args = [addResponseDetails, interactionId, ruleName];
     for (var i = 5; i < arguments.length; i++) {
       args.push(arguments[i]);
@@ -771,10 +773,11 @@ var ExplorationEditorMainTab = function() {
     var parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
     expect(parameterValues.length).toEqual(parameterTypes.length);
     for (var i = 0; i < parameterValues.length; i++) {
+      // error may in this.
       var parameterElement = answerDescriptionFragment.get(i * 2 + 1);
       var parameterEditor = await forms.getEditor(
         parameterTypes[i])(parameterElement);
-
+      // parameterTypes[i] is TranslatableSetOfNormalizedString.
       if (interactionId === 'MultipleChoiceInput') {
         // This is a special case as it uses a dropdown to set a NonnegativeInt.
         var parameterElementButton = parameterElement.element(

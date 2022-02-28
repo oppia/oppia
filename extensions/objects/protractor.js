@@ -149,12 +149,17 @@ var NonnegativeIntEditor = function(elem) {
 var NormalizedStringEditor = function(elem) {
   return {
     setValue: async function(value) {
+      debugger;
       await elem.element(by.tagName('input')).clear();
+      // while debugging i caught that value stored is 'correct'
+      // error may be in elem
       await elem.element(by.tagName('input')).sendKeys(value);
     },
     expectValueToBe: async function(expectedValue) {
       var value = await elem.element(by.tagName('input')).getAttribute('value');
+      // and it is also reading only the first character.
       expect(value).toEqual(expectedValue);
+      console.log('expected value checked');
     }
   };
 };
@@ -225,13 +230,17 @@ var SanitizedUrlEditor = function(elem) {
 
 var TranslatableSetOfNormalizedStringEditor = function(elem) {
   return {
+    // this function is stored in parameterEditor, elem is parameterElement.
     setValue: async function(normalizedStrings) {
       // Clear all entries.
-      await forms.ListEditor(elem).setLength(0);
+      // await forms.ListEditor(elem).setLength(0);
       for (let i = 0; i < normalizedStrings.length; i++) {
+        // this came from 149 line
         const normalizedStringEditor = await forms.ListEditor(elem).addItem(
           'NormalizedString');
+        debugger;
         await normalizedStringEditor.setValue(normalizedStrings[i]);
+        await normalizedStringEditor.expectValueToBe(normalizedStrings[i]);
       }
     }
   };

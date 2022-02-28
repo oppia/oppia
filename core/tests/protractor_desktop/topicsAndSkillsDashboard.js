@@ -211,8 +211,9 @@ describe('Topics and skills dashboard functionality', function() {
     ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
     // Changed Part.
+    console.log('error');
     await explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'c',
+      correctAnswer: 'correct',
       explanation: 'It is correct'
     });
     await skillEditorPage.saveQuestion();
