@@ -20,11 +20,9 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
+from core.platform import models # pylint: disable=invalid-import-from # isort:skip
 
 from typing import Any
-
-from core.platform import models # pylint: disable=invalid-import-from
-#isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -56,7 +54,7 @@ class FileStream:
         content: str. The content of the file snapshot.
     """
 
-    def __init__(self, content:str) -> None: 
+    def __init__(self, content:str) -> None:
         """Constructs a FileStream object.
 
         Args:
