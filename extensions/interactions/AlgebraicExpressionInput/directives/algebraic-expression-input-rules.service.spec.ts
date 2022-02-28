@@ -188,11 +188,11 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '2*a*b+2*b*c+2*a*c+(a)^(2)+(b)^(2)+(c)^(2)',
       {x: inputString})).toBeTrue();
-    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      'a*a+b*b+((c)^(3))/(c)+2*a*b+2*b*c+2*c*a', {x: inputString})).toBeTrue();
-    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '(a)^(2)+(b)^(2)+(c)^(2)+2*(a*b+b*c+a*c)', {x: inputString})).toBeTrue();
 
+    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
+      'a*a+b*b+((c)^(3))/(c)+2*a*b+2*b*c+2*c*a', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
+      '(a)^(2)+(b)^(2)+(c)^(2)+2*(a*b+b*c+a*c)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '(a+b)^(2)+(c)^(2)+2*b*c+2*a*c', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
@@ -204,13 +204,19 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '(x)^(2*t+3)+(x)^(4)', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '(x)^(2*t)*(x)^(3)+((x)^(2))^(2)', {x: inputString})).toBeTrue();
+      '(x)^(4) + (x)^(2*t+3)', {x: inputString})).toBeTrue();
+    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
+      '(x)^(4) + (x)^(3+2*t)', {x: inputString})).toBeTrue();
+    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
+      '(x)^(4) + (x)^(3+t*2)', {x: inputString})).toBeTrue();
+
+    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
+      '(x)^(2*t)*(x)^(3)+((x)^(2))^(2)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '((x)^(2*t))/((x)^(-3))+((x)^(8))/((x)^(4))',
-      {x: inputString})).toBeTrue();
+      {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '((x)^(2*t+5))/((x)^(2))-(-(x)^(4))', {x: inputString})).toBeTrue();
-
+      '((x)^(2*t+5))/((x)^(2))-(-(x)^(4))', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '(x)^(3*t+3)+(x)^(4)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
@@ -226,30 +232,18 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '9*(x)^(2)-6*x+1', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '3*(3*(x)^(2)-2*x)+1', {x: inputString})).toBeTrue();
+      'x^2 * 9 - 6*x + 1', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '(3*x)^(2)-6*x+1', {x: inputString})).toBeTrue();
+      'x^2 * 9 + 1 - x * 6', {x: inputString})).toBeTrue();
 
+    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
+      '3*(3*(x)^(2)-2*x)+1', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
+      '(3*x)^(2)-6*x+1', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '((3*x-1))^(2)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '3*x(3*x-2)+1', {x: inputString})).toBeFalse();
-
-
-    inputString = '9*(x)^(2)-6*x+1';
-
-    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '9*(x)^(2)-6*x+1', {x: inputString})).toBeTrue();
-    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '3*(3*(x)^(2)-2*x)+1', {x: inputString})).toBeTrue();
-    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '(3*x)^(2)-6*x+1', {x: inputString})).toBeTrue();
-
-    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '((3*x-1))^(2)', {x: inputString})).toBeFalse();
-    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '3*x(3*x-2)+1', {x: inputString})).toBeFalse();
-
 
     inputString = '6-(-4)';
 
