@@ -261,12 +261,12 @@ class GcsFileSystem(GeneralFileSystem):
 class AbstractFileSystem:
     """Interface for a file system."""
 
-    def __init__(self, impl: AbstractFileSystem) -> GeneralFileSystem:
+    def __init__(self, impl: GeneralFileSystem) -> None:
         """Constructs a AbstractFileSystem object."""
         self._impl = impl
 
     @property
-    def impl(self) -> AbstractFileSystem:
+    def impl(self) -> GeneralFileSystem:
         """Returns a AbstractFileSystem object.
 
         Returns:
@@ -293,7 +293,7 @@ class AbstractFileSystem:
         if not normalized_path.startswith(base_dir):
             raise IOError('Invalid filepath: %s' % filepath)
 
-    def isfile(self, filepath: str) -> bool:
+    def isfile(self, filepath: str) -> bool | Any:
         """Checks if a file exists. Similar to os.path.isfile(...).
 
         Args:
