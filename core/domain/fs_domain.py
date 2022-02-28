@@ -184,8 +184,8 @@ class GeneralFileSystem:
             mimetype
         )
 
-
     def delete(self, filepath: str) -> None: # type: ignore[no-untyped-call]
+
         """Deletes a file and the metadata associated with it.
         Args:
             filepath: str. The path to the relevant file within the entity's
@@ -216,9 +216,8 @@ class GeneralFileSystem:
             self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
         )
 
-
-
     def listdir(self, dir_name: str) -> list[str]: # type: ignore[no-untyped-call]
+
         """Lists all files in a directory.
         Args:
             dir_name: str. The directory whose files should be listed. This
@@ -252,8 +251,8 @@ class GeneralFileSystem:
 
 
 class GcsFileSystem(GeneralFileSystem):
-    """Wrapper for a file system based on GCS.
 
+    """Wrapper for a file system based on GCS.
     This implementation ignores versioning.
     """
     def __init__(self, entity_name: str, entity_id: str) -> None:
