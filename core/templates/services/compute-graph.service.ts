@@ -77,8 +77,7 @@ export class ComputeGraphService {
   }
 
   _computeBfsTraversalOfStates(
-      initStateId: string, states: States, sourceStateName: string
-  ): string[] {
+      initStateId: string, states: States, sourceStateName: string): string[] {
     let stateGraph = this._computeGraphData(initStateId, states);
     let stateNamesInBfsOrder: string[] = [];
     let queue: string[] = [];
@@ -108,8 +107,7 @@ export class ComputeGraphService {
   }
 
   computeBfsTraversalOfStates(
-      initStateId: string, states: States, sourceStateName: string
-  ): string[] {
+      initStateId: string, states: States, sourceStateName: string): string[] {
     return this._computeBfsTraversalOfStates(
       initStateId, states, sourceStateName);
   }
