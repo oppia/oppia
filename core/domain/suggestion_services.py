@@ -688,7 +688,7 @@ def get_translation_suggestions_in_review_by_exp_ids(exp_ids, language_code):
     code.
 
     Args:
-        exp_ids: str. Exploration IDs matching the target ID of the
+        exp_ids: list(str). Exploration IDs matching the target ID of the
             translation suggestions.
         language_code: str. The ISO 639-1 language code of the translation
             suggestions.
