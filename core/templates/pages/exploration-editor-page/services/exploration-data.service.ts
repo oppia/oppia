@@ -210,10 +210,14 @@ export class ExplorationDataService {
         isDraftVersionvalid: boolean,
         draftChanges: ExplorationChange[]) => void,
       errorCallback: (errorResponse?: object) => void): void {
+    let dataVersion = null;
+    if (this.data && (this.data.version !== undefined)) {
+      dataVersion = this.data.version;
+    }
     this.editableExplorationBackendApiService.updateExplorationAsync(
       this.explorationId,
-    this.data ? this.data.version : null,
-    commitMessage, changeList).then(
+      dataVersion,
+      commitMessage, changeList).then(
       response => {
         this.alertsService.clearWarnings();
         this.data = response;
