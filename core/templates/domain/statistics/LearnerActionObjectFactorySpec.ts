@@ -124,8 +124,59 @@ describe('Learner Action Object Factory', () => {
       .toEqual(LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   });
 
-  it('should create a new learner action from a backend dict', () => {
-    var learnerActionObject =
+  it('should create a new learner action AnswerSubmit from a backend dict',
+    () => {
+      var learnerActionObject =
+        learnerActionObjectFactory.createFromBackendDict({
+          action_type: 'AnswerSubmit',
+          action_customization_args: {
+            state_name: {value: 'string'},
+            dest_state_name: {value: 'string'},
+            interaction_id: {value: 'string'},
+            submitted_answer: {value: 'string'},
+            feedback: {value: 'string'},
+            time_spent_state_in_msecs: {value: 5}
+          },
+          schema_version: 1
+        });
+
+      expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
+      expect(learnerActionObject.actionCustomizationArgs).toEqual({
+        state_name: {value: 'string'},
+        dest_state_name: {value: 'string'},
+        interaction_id: {value: 'string'},
+        submitted_answer: {value: 'string'},
+        feedback: {value: 'string'},
+        time_spent_state_in_msecs: {value: 5}
+      });
+      expect(learnerActionObject.schemaVersion).toEqual(1);
+    });
+
+  it('should create a new learner action ExplorationStart from a backend dict',
+    () => {
+      var learnerActionObject =
+        learnerActionObjectFactory.createFromBackendDict({
+          action_type: 'ExplorationStart',
+          action_customization_args: {
+            state_name: {
+              value: 'state'
+            },
+          },
+          schema_version: 1
+        });
+
+      expect(learnerActionObject.actionType).toEqual('ExplorationStart');
+      expect(learnerActionObject.actionCustomizationArgs).toEqual({
+        state_name: {
+          value: 'state'
+        }
+      });
+      expect(learnerActionObject.schemaVersion).toEqual(1);
+    });
+
+  it('should create a new learner action ExplorationQuit from a backend dict',
+    () => {
+      var learnerActionObject =
         learnerActionObjectFactory.createFromBackendDict({
           action_type: 'ExplorationQuit',
           action_customization_args: {
@@ -139,17 +190,17 @@ describe('Learner Action Object Factory', () => {
           schema_version: 1
         });
 
-    expect(learnerActionObject.actionType).toEqual('ExplorationQuit');
-    expect(learnerActionObject.actionCustomizationArgs).toEqual({
-      state_name: {
-        value: 'state'
-      },
-      time_spent_in_state_in_msecs: {
-        value: 2
-      }
+      expect(learnerActionObject.actionType).toEqual('ExplorationQuit');
+      expect(learnerActionObject.actionCustomizationArgs).toEqual({
+        state_name: {
+          value: 'state'
+        },
+        time_spent_in_state_in_msecs: {
+          value: 2
+        }
+      });
+      expect(learnerActionObject.schemaVersion).toEqual(1);
     });
-    expect(learnerActionObject.schemaVersion).toEqual(1);
-  });
 
   it('should convert a learner action to a backend dict', () => {
     var learnerActionObject =

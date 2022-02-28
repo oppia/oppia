@@ -58,6 +58,7 @@ describe('OutcomeEditorComponent', () => {
     });
 
     spyOn(StateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
+    spyOn($rootScope, '$applyAsync').and.stub();
   }));
 
   afterEach(() => {
@@ -81,6 +82,7 @@ describe('OutcomeEditorComponent', () => {
     expect(ctrl.savedOutcome).toBe(undefined);
 
     ctrl.$onInit();
+    ctrl.getChanges();
 
     expect(ctrl.editOutcomeForm).toEqual({});
     expect(ctrl.canAddPrerequisiteSkill).toBe(false);
@@ -88,6 +90,7 @@ describe('OutcomeEditorComponent', () => {
     expect(ctrl.destinationEditorIsOpen).toBe(false);
     expect(ctrl.correctnessLabelEditorIsOpen).toBe(false);
     expect(ctrl.savedOutcome).toEqual(outcome);
+    expect($rootScope.$applyAsync).toHaveBeenCalled();
   });
 
   it('should save feedback on external save event when editFeedbackForm is' +
