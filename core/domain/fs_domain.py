@@ -20,15 +20,14 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
-from typing import Any 
-from core.platform import models   # pylint: disable=invalid-import-from
- # isort:skip
+from core.platform import models  # pylint: disable=invalid-import-from isort:skip
+from typing import Any
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
 MYPY = False
-if MYPY : 
+if MYPY: 
     from mypy_imports import app_identity_services
     from mypy_imports import storage_services
 
@@ -55,7 +54,7 @@ class FileStream:
     """
 
     def __init__(self, content:str) -> None: 
-        """Constructs a FileStream object.
+        """Constructs a FileStream object. 
 
         Args:
             content: str. The content of the file snapshots.
