@@ -75,13 +75,18 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         self.training_data = training_data
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
 
-    def _register_all_translatable_fields(self) -> None:
-        """Registers all of translatable field/objects in the answer group."""
-
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields in the answer group."""
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
         if self.outcome is not None:
-            self._register_translatable_object(self.outcome)
+            translatable_contents_collection.add_translatable_object(
+                self.outcome)
         for rule_spec in self.rule_specs:
-            self._register_translatable_object(rule_spec)
+            translatable_contents_collection.add_translatable_object(rule_spec)
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this AnswerGroup domain object.
@@ -282,13 +287,17 @@ class Hint(translation_domain.BaseTranslatableObject):
         """
         self.hint_content = hint_content
 
-    def _register_all_translatable_fields(self) -> None:
-        """Registers all of the translatable fields/objects in the hint."""
-
-        self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the hint."""
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.HTML,
             self.hint_content.content_id,
             self.hint_content.html)
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this Hint domain object.
@@ -370,13 +379,17 @@ class Solution(translation_domain.BaseTranslatableObject):
                 interaction_id).normalize_answer(correct_answer))
         self.explanation = explanation
 
-    def _register_all_translatable_fields(self) -> None:
-        """Registers all of the translatable fields/objects in the solution."""
-
-        self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the solution."""
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.HTML,
             self.explanation.content_id,
             self.explanation.html)
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this Solution domain object.
@@ -527,20 +540,27 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         self.hints = hints
         self.solution = solution
 
-    def _register_all_translatable_fields(self) -> None:
-        """Registers all of the translatable fields/objects in the interaction
-        instance.
-        """
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the interaction instance."""
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
         if self.default_outcome is not None:
-            self._register_translatable_object(self.default_outcome)
+            translatable_contents_collection.add_translatable_object(
+                self.default_outcome)
         for answer_group in self.answer_groups:
-            self._register_translatable_object(answer_group)
-        for ca_dict in self.customization_args.values():
-            self._register_translatable_object(ca_dict)
+            translatable_contents_collection.add_translatable_object(
+                answer_group)
+        for customization_arg in self.customization_args.values():
+            translatable_contents_collection.add_translatable_object(
+                customization_arg)
         for hint in self.hints:
-            self._register_translatable_object(hint)
+            translatable_contents_collection.add_translatable_object(hint)
         if self.solution is not None:
-            self._register_translatable_object(self.solution)
+            translatable_contents_collection.add_translatable_object(
+                self.solution)
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this InteractionInstance domain object.
@@ -988,29 +1008,32 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         self.value = value
         self.schema = schema
 
-    def _register_all_translatable_fields(self) -> None:
-        """Registers all of the translatable fields/objects in the interaction
-        customization args.
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the interaction customization
+        args.
         """
-
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
         subtitled_htmls = self.get_subtitled_html()
         for subtitled_html in subtitled_htmls:
             html_string = subtitled_html.html
             # Make sure we don't include content that only consists of
             # numbers. See issue #13055.
             if not html_string.isnumeric():
-                self._register_translatable_field(
-                    translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+                translatable_contents_collection.add_translatable_field(
+                    translation_domain.TranslatableContentFormat.HTML,
                     subtitled_html.content_id,
                     html_string)
 
         subtitled_unicodes = self.get_subtitled_unicode()
         for subtitled_unicode in subtitled_unicodes:
-            self._register_translatable_field(
-                translation_domain
-                .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            translatable_contents_collection.add_translatable_field(
+                translation_domain.TranslatableContentFormat.UNICODE_STRING,
                 subtitled_unicode.content_id,
                 subtitled_unicode.unicode_str)
+        return translatable_contents_collection
 
     def to_customization_arg_dict(self):
         """Converts a InteractionCustomizationArgument domain object to a
@@ -1348,13 +1371,17 @@ class Outcome(translation_domain.BaseTranslatableObject):
         # when the learner receives this outcome.
         self.missing_prerequisite_skill_id = missing_prerequisite_skill_id
 
-    def _register_all_translatable_fields(self) -> None:
-        """Registers all of the translatable fields/objects in the outcome."""
-
-        self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the outcome."""
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.HTML,
             self.feedback.content_id,
             self.feedback.html)
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this Outcome domain object.
@@ -1726,22 +1753,26 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         self.rule_type = rule_type
         self.inputs = inputs
 
-    def _register_all_translatable_fields(self) -> None:
-        """Registers all of the translatable fields/objects in the rule spec."""
-
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the rule spec."""
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
         for input_value in self.inputs.values():
             if 'normalizedStrSet' in input_value:
-                self._register_translatable_field(
-                    translation_domain
-                    .TRANSLATABLE_CONTENT_FORMAT_SET_OF_NORMALIZED_STRING,
+                translatable_contents_collection.add_translatable_field(
+                    translation_domain.TranslatableContentFormat
+                    .SET_OF_NORMALIZED_STRING,
                     input_value['contentId'],
                     input_value['normalizedStrSet'])
             if 'unicodeStrSet' in input_value:
-                self._register_translatable_field(
-                    translation_domain
-                    .TRANSLATABLE_CONTENT_FORMAT_SET_OF_UNICODE_STRING,
+                translatable_contents_collection.add_translatable_field(
+                    translation_domain.TranslatableContentFormat
+                    .SET_OF_UNICODE_STRING,
                     input_value['contentId'],
                     input_value['unicodeStrSet'])
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this RuleSpec domain object.
@@ -2170,14 +2201,19 @@ class State(translation_domain.BaseTranslatableObject):
         self.solicit_answer_details = solicit_answer_details
         self.card_is_checkpoint = card_is_checkpoint
 
-    def _register_all_translatable_fields(self) -> None:
-        """Registers all of the translatable fields/objects in the state."""
-
-        self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the state."""
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.HTML,
             self.content.content_id,
             self.content.html)
-        self._register_translatable_object(self.interaction)
+        translatable_contents_collection.add_translatable_object(
+            self.interaction)
+        return translatable_contents_collection
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
         """Validates various properties of the State.

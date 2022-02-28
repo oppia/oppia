@@ -38,12 +38,18 @@ class DummyTranslatableObjectWithTwoParams(
         self.param1 = param1
         self.param2 = param2
 
-    def _register_all_translatable_fields(self) -> None:
-        self._register_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_1',
             self.param1)
-        self._register_translatable_object(self.param2)
+        translatable_contents_collection.add_translatable_object(self.param2)
+        return translatable_contents_collection
 
 
 class DummyTranslatableObjectWithSingleParam(
@@ -58,11 +64,17 @@ class DummyTranslatableObjectWithSingleParam(
     ) -> None:
         self.param3 = param3
 
-    def _register_all_translatable_fields(self) -> None:
-        self._register_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
             self.param3)
+        return translatable_contents_collection
 
 
 class DummyTranslatableObject(translation_domain.BaseTranslatableObject):
@@ -78,21 +90,27 @@ class DummyTranslatableObject(translation_domain.BaseTranslatableObject):
         self.param1 = param1
         self.param2 = param2
 
-    def _register_all_translatable_fields(self) -> None:
-        self._register_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
             self.param1)
-        self._register_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
             self.param2)
+        return translatable_contents_collection
 
 
 class DummyTranslatableObjectWithoutRegisterMethod(
         translation_domain.BaseTranslatableObject):
-    """A dummy translatable object without _register_all_translatable_fields()
-    method should raise an exception.
+    """A dummy translatable object without
+    get_translatable_contents_collection() method should raise an exception.
     """
 
     def __init__(
@@ -122,23 +140,29 @@ class DummyTranslatableObjectWithFourParams(
         self.param3 = param3
         self.param4 = param4
 
-    def _register_all_translatable_fields(self) -> None:
-        self._register_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_1',
             self.param1)
-        self._register_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
             self.param2)
-        self._register_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_3',
             self.param3)
-        self._register_translatable_field(
-            feconf.TranslatableContentFormat.UNICODE_STRING,
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_4',
             self.param4)
+        return translatable_contents_collection
 
 
 class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
@@ -156,22 +180,13 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             'My name is jack.'
         ]
         translatable_contents = (
-            self.translatable_object1.get_translatable_fields())
+            self.translatable_object1.get_translatable_contents_collection()
+            .translatable_contents)
 
         self.assertItemsEqual(expected_contents, [ # type: ignore[no-untyped-call]
             translatable_content.content
             for translatable_content in translatable_contents.values()
         ])
-
-    def test_contents_having_same_content_id_raises_exception(self) -> None:
-        translatable_object = DummyTranslatableObject(
-            'My name is jack.', 'My name is jhon.')
-
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            Exception,
-            'A translatable field is already registered with the '
-            'same content id: content_id_2'):
-            translatable_object.get_translatable_fields()
 
     def test_unregistered_translatable_object_raises_exception(self) -> None:
         translatable_object = DummyTranslatableObjectWithoutRegisterMethod(
@@ -179,7 +194,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Must be implemented in subclasses.'):
-            translatable_object.get_translatable_fields()
+            translatable_object.get_translatable_contents_collection()
 
     def test_get_all_contents_which_need_translations_method(self) -> None:
         translation_dict = {
@@ -241,21 +256,22 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
         translatable_content = translation_domain.TranslatableContent(
             'content_id_1',
             'My name is Jhon.',
-            feconf.TranslatableContentFormat.HTML
+            translation_domain.TranslatableContentFormat.HTML
         )
 
         self.assertEqual(translatable_content.content_id, 'content_id_1')
         self.assertEqual(translatable_content.content, 'My name is Jhon.')
         self.assertEqual(
             translatable_content.content_type,
-            feconf.TranslatableContentFormat.HTML)
+            translation_domain.TranslatableContentFormat.HTML)
 
     def test_from_dict_method_of_translatable_content_class(self) -> None:
         translatable_content = (
                 translation_domain.TranslatableContent.from_dict({
                 'content_id': 'content_id_1',
                 'content': 'My name is Jhon.',
-                'content_type': feconf.TranslatableContentFormat.HTML
+                'content_type': translation_domain
+                .TranslatableContentFormat.HTML
             })
         )
 
@@ -263,18 +279,18 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(translatable_content.content, 'My name is Jhon.')
         self.assertEqual(
             translatable_content.content_type,
-            feconf.TranslatableContentFormat.HTML)
+            translation_domain.TranslatableContentFormat.HTML)
 
     def test_to_dict_method_of_translatable_content_class(self) -> None:
         translatable_content_dict = {
             'content_id': 'content_id_1',
             'content': 'My name is Jhon.',
-            'content_type': feconf.TranslatableContentFormat.HTML
+            'content_type': translation_domain.TranslatableContentFormat.HTML
         }
         translatable_content = translation_domain.TranslatableContent(
             'content_id_1',
             'My name is Jhon.',
-            feconf.TranslatableContentFormat.HTML
+            translation_domain.TranslatableContentFormat.HTML
         )
 
         self.assertEqual(

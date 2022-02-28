@@ -634,10 +634,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
-    def _register_all_translatable_fields(self) -> None:
-        """Registers all of translatable fields/objects in the exploration."""
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the exploration."""
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
         for state in self.states.values():
-            self._register_translatable_object(state)
+            translatable_contents_collection.add_translatable_object(state)
+        return translatable_contents_collection
 
     @classmethod
     def create_default_exploration(

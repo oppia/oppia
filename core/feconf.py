@@ -1552,16 +1552,6 @@ COMMIT_TYPE_DELETE = 'delete'
 ContentInTranslatableContent = Union[str, List[str]]
 
 
-class TranslatableContentFormat(enum.Enum):
-    """Represents all possible data types for any translatable content."""
-
-    HTML = 'html'
-    UNICODE_STRING = 'unicode'
-    SET_OF_NORMALIZED_STRING = (
-        'set_of_normalized_string')
-    SET_OF_UNICODE_STRING = 'set_of_unicode_string'
-
-
 class TranslatableEntityType(enum.Enum):
     """Represents all possible entity types which support new translations
     architecture.
@@ -1569,14 +1559,6 @@ class TranslatableEntityType(enum.Enum):
 
     EXPLORATION = 'exploration'
     QUESTION = 'question'
-
-
-class TranslatableContentDict(TypedDict):
-    """Dictionary representing TranslatableContent object."""
-
-    content_id: str
-    content: ContentInTranslatableContent
-    content_type: TranslatableContentFormat
 
 
 class TranslatedContentDict(TypedDict):
