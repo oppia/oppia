@@ -22,55 +22,20 @@ import inspect
 
 from extensions.answer_summarizers import models
 
-from typing import Callable, cast, overload
-from typing_extensions import Literal, TypedDict
-
-
-class CalculationDict(TypedDict):
-    """Type for the _calculations_dict."""
-
-    AnswerFrequencies: Callable[..., models.AnswerFrequencies]
-    Top5AnswerFrequencies: Callable[..., models.Top5AnswerFrequencies]
-    Top10AnswerFrequencies: Callable[..., models.Top10AnswerFrequencies]
-    FrequencyCommonlySubmittedElements: (
-        Callable[..., models.FrequencyCommonlySubmittedElements])
-    TopAnswersByCategorization: (
-        Callable[..., models.TopAnswersByCategorization])
-    TopNUnresolvedAnswersByFrequency: (
-        Callable[..., models.TopNUnresolvedAnswersByFrequency])
-
-
-# Type defined for arguments which can accept only keys of Dict
-# CalculationDict.
-CalculationIdType = Literal[
-    'AnswerFrequencies',
-    'Top5AnswerFrequencies',
-    'Top10AnswerFrequencies',
-    'FrequencyCommonlySubmittedElements',
-    'TopAnswersByCategorization',
-    'TopNUnresolvedAnswersByFrequency'
-]
+from typing import Callable, Dict, overload
+from typing_extensions import Literal
 
 
 class Registry:
     """Registry of all calculations for summarizing answers."""
 
     # Dict mapping calculation class names to their classes.
-    _calculations_dict: CalculationDict = {
-        'AnswerFrequencies': models.AnswerFrequencies,
-        'Top5AnswerFrequencies': models.Top5AnswerFrequencies,
-        'Top10AnswerFrequencies': models.Top10AnswerFrequencies,
-        'FrequencyCommonlySubmittedElements': (
-            models.FrequencyCommonlySubmittedElements),
-        'TopAnswersByCategorization': models.TopAnswersByCategorization,
-        'TopNUnresolvedAnswersByFrequency': (
-            models.TopNUnresolvedAnswersByFrequency)
-    }
+    _calculations_dict: Dict[str, Callable[..., models.BaseCalculation]] = {}
 
     @classmethod
     def _refresh_registry(cls) -> None:
         """Refreshes the registry to add new visualization instances."""
-        cls._calculations_dict.clear() # type: ignore[attr-defined]
+        cls._calculations_dict.clear()
 
         # Add new visualization instances to the registry.
         for name, clazz in inspect.getmembers(
@@ -81,8 +46,7 @@ class Registry:
             ancestor_names = [
                 base_class.__name__ for base_class in inspect.getmro(clazz)]
             if 'BaseCalculation' in ancestor_names:
-                cls._calculations_dict[cast(
-                    CalculationIdType, clazz.__name__)] = clazz
+                cls._calculations_dict[clazz.__name__] = clazz
 
     @overload
     @classmethod
@@ -122,7 +86,7 @@ class Registry:
 
     @classmethod
     def get_calculation_by_id(
-        cls, calculation_id: CalculationIdType
+        cls, calculation_id: str
     ) -> models.BaseCalculation:
         """Gets a calculation instance by its id (which is also its class name).
 
