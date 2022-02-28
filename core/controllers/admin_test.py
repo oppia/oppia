@@ -954,7 +954,7 @@ class GenerateSampleOpportunitiesTest(test_utils.GenericTestBase):
     def test_generate_opportunities_and_submit_suggestions(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         self.post_json(
             '/adminhandler', {
