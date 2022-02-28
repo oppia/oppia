@@ -36,7 +36,6 @@ core.schema_utils_test
 core.domain.classifier_domain_test
 core.domain.state_domain_test
 core.domain.learner_progress_services_test
-core.domain.question_fetchers_test
 core.domain.exp_domain_test
 scripts.linters.pylint_extensions_test
 core.storage.suggestion.gae_models_test
