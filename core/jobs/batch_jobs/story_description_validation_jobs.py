@@ -37,10 +37,12 @@ class GetNumberOfStoriesExceedsMaxDescriptionLengthJob(base_jobs.JobBase):
     """Job that returns stories with invalid description length."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """
+        """Returns PCollection of invalid stories with their id and
+        description length.
+
         Returns:
-            PCollection of invalid stories with their id and
-            actual desctiption length.
+            PCollection. Returns PCollection of invalid stories with
+            their id and description length.
         """
         total_stories = (
             self.pipeline
