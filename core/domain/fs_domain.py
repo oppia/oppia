@@ -54,7 +54,7 @@ class FileStream:
         content: str. The content of the file snapshot.
     """
 
-    def __init__(self, content:str) -> None:
+    def __init__(self, content: str) -> None:
         """Constructs a FileStream object.
 
         Args:
