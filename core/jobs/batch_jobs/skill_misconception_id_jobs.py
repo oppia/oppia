@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core.domain import skill_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -46,18 +45,14 @@ class GetSkillWithInvalidMisconceptionIDJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all SkillModels' >> ndb_io.GetModels(
                 skill_models.SkillModel.get_all(include_deleted=False))
-            | 'Get skills from model' >> beam.Map(
-                skill_fetchers.get_skill_from_model)
+            | 'Combine skill misconception_id and ids' >> beam.Map(
+                lambda skill: (skill.id, skill.next_misconception_id))
         )
 
         skill_ids_with_invalid_misconception_id = (
             total_skills
-            | 'Combine skill misconception_id and ids' >> beam.Map(
-                lambda skill: (skill.id, skill.next_misconception_id))
             | 'Filter skills with invalid misconception_id' >>
-                beam.Filter(
-                    lambda skill: skill[1] < 0 or type(skill[1]) != int
-                    )
+                beam.Filter(lambda skill: skill[1] < 0)
         )
 
         report_number_of_skills_queried = (
