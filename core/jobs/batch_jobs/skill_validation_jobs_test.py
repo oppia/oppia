@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.batch_jobs.skill_misconception_id_jobs."""
+"""Unit tests for jobs.batch_jobs.skill_validation_jobs."""
 
 from __future__ import annotations
 
