@@ -33,7 +33,7 @@ export interface GraphNodes {
 
 export interface GraphData {
   finalStateIds: string[];
-  initStateId: string | null;
+  initStateId: string;
   links: GraphLink[];
   nodes: GraphNodes;
 }
@@ -42,7 +42,7 @@ export interface GraphData {
   providedIn: 'root'
 })
 export class ComputeGraphService {
-  _computeGraphData(initStateId: string | null, states: States): GraphData {
+  _computeGraphData(initStateId: string, states: States): GraphData {
     let nodes: Record<string, string> = {};
     let links: { source: string; target: string }[] = [];
     let finalStateIds = states.getFinalStateNames();
@@ -77,7 +77,7 @@ export class ComputeGraphService {
   }
 
   _computeBfsTraversalOfStates(
-      initStateId: string | null, states: States, sourceStateName: string
+      initStateId: string, states: States, sourceStateName: string
   ): string[] {
     let stateGraph = this._computeGraphData(initStateId, states);
     let stateNamesInBfsOrder: string[] = [];
@@ -108,7 +108,7 @@ export class ComputeGraphService {
   }
 
   computeBfsTraversalOfStates(
-      initStateId: string | null, states: States, sourceStateName: string
+      initStateId: string, states: States, sourceStateName: string
   ): string[] {
     return this._computeBfsTraversalOfStates(
       initStateId, states, sourceStateName);

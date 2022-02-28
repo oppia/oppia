@@ -176,6 +176,7 @@ export class Exploration {
     return this.getState(stateName).content.html;
   }
 
+  // If there is no languagecode provided null will returned.
   getAllVoiceovers(languageCode: string | null): VoiceoverObjectsDict | null {
     if (!languageCode) {
       return null;

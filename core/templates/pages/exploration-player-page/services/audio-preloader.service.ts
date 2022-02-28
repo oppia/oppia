@@ -84,7 +84,7 @@ export class AudioPreloaderService {
     this.mostRecentlyRequestedAudioFilename = null;
   }
 
-  // This function returns null when there is not recently requested
+  // This function returns null when there is no recently requested
   // audio filename.
   getMostRecentlyRequestedAudioFilename(): string | null {
     return this.mostRecentlyRequestedAudioFilename;
@@ -99,6 +99,9 @@ export class AudioPreloaderService {
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
     const allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
     const initialStateName = this.exploration.getInitialState().name;
+    if (initialStateName === null) {
+      throw new Error('Initial State Name cannot be null');
+    }
     const bfsTraversalOfStates = (
       this.computeGraphService.computeBfsTraversalOfStates(
         initialStateName, this.exploration.getStates(),

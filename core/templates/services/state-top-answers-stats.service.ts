@@ -45,7 +45,7 @@ export class StateTopAnswersStatsService {
   private topAnswersStatsByStateName: Map<string, AnswerStatsEntry>;
 
   private resolveInitPromise: () => void;
-  private rejectInitPromise: (_: string) => void;
+  private rejectInitPromise: (_) => void;
   private initPromise: Promise<void>;
 
   constructor(
@@ -80,7 +80,7 @@ export class StateTopAnswersStatsService {
         }
         this.resolveInitPromise();
       } catch (error) {
-        this.rejectInitPromise(error as string);
+        this.rejectInitPromise(error);
       }
     }
     return this.initPromise;
