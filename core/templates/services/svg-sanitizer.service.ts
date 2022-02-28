@@ -233,6 +233,20 @@ export class SvgSanitizerService {
     }
     return null;
   }
+
+  getIssueURL(
+      invalidTagsAndAttributes: { tags: string[]; attrs: string[] }): string {
+    const baseURL = 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20Image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A';
+    let updatedURL = baseURL;
+    if (invalidTagsAndAttributes.tags.length) {
+      updatedURL = updatedURL + ' Tags: ' + invalidTagsAndAttributes.tags;
+    }
+    if (invalidTagsAndAttributes.attrs.length) {
+      updatedURL = updatedURL + ' Attributes: ' +
+        invalidTagsAndAttributes.attrs;
+    }
+    return updatedURL;
+  }
 }
 
 angular.module('oppia').factory(
