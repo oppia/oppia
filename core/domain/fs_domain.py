@@ -255,6 +255,7 @@ class GcsFileSystem(GeneralFileSystem):
     """Wrapper for a file system based on GCS.
     This implementation ignores versioning.
     """
+    
     def __init__(self, entity_name: str, entity_id: str) -> None:
         self._bucket_name = app_identity_services.get_gcs_resource_bucket_name()
         super(GcsFileSystem, self).__init__(entity_name, entity_id)
