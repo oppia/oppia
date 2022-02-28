@@ -22,13 +22,13 @@ in mypy checks not during runtime.
 """
 
 from __future__ import annotations
-from core.platform.app_identity import gae_app_identity_services as app_identity_services
+from core.platform.app_identity import (
+     gae_app_identity_services as app_identity_services)
 from core.platform.cache import redis_cache_services as memory_cache_services
 from core.platform.datastore import (
     cloud_datastore_services as datastore_services)
 from core.platform.search import elastic_search_services as search_services
-from core.platform.storage import(
-     cloud_storage_services as storage_services)
+from core.platform.storage import cloud_storage_services as storage_services
 from core.platform.transactions import (
     cloud_transaction_services as transaction_services)
 from core.storage.activity import gae_models as activity_models
