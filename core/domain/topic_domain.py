@@ -1187,12 +1187,12 @@ class Topic:
         Returns:
             dict. The converted subtopic_dict.
         """
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
             feconf.ENTITY_TYPE_TOPIC, topic_id))
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
         subtopic_dict['thumbnail_size_in_bytes'] = (
-            len(fs.get(filepath)) if fs.isfile(filepath) else None)  # type: ignore[no-untyped-call]
+            len(fs.get(filepath)) if fs.isfile(filepath) else None)
 
         return subtopic_dict
 
@@ -1347,14 +1347,14 @@ class Topic:
             Exception. The thumbnail does not exist for expected topic in
                 the filesystem.
         """
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
             feconf.ENTITY_TYPE_TOPIC, self.id))
 
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
-        if fs.isfile(filepath):  # type: ignore[no-untyped-call]
+        if fs.isfile(filepath):
             self.thumbnail_filename = new_thumbnail_filename
-            self.thumbnail_size_in_bytes = len(fs.get(filepath))  # type: ignore[no-untyped-call]
+            self.thumbnail_size_in_bytes = len(fs.get(filepath))
         else:
             raise Exception(
                 'The thumbnail %s for topic with id %s does not exist'
@@ -1558,15 +1558,15 @@ class Topic:
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
 
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
             feconf.ENTITY_TYPE_TOPIC, self.id))
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
-        if fs.isfile(filepath):  # type: ignore[no-untyped-call]
+        if fs.isfile(filepath):
             self.subtopics[subtopic_index].thumbnail_filename = (
                 new_thumbnail_filename)
             self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
-                len(fs.get(filepath)))  # type: ignore[no-untyped-call]
+                len(fs.get(filepath))) 
         else:
             raise Exception(
                 'The thumbnail %s for subtopic with topic_id %s does not exist'
