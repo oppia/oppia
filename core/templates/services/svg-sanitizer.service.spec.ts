@@ -424,4 +424,38 @@ describe('SvgSanitizerService', () => {
         testCase.expected[1], 'Tags - Case:' + testCase.title);
     });
   });
+
+  it('should return correct GitHub issue URL', () => {
+    const testCases = [
+      {
+        invalidTagsAndAttributes: {
+          tags: [], attrs: ['svg:data-custom']
+        },
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20Image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A Attributes: svg:data-custom'
+      },
+      {
+        invalidTagsAndAttributes: {
+          tags: ['paht'], attrs: []
+        },
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20Image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A Tags: paht'
+      },
+      {
+        invalidTagsAndAttributes: {
+          tags: ['paht', 'circel'], attrs: []
+        },
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20Image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A Tags: paht,circel'
+      },
+      {
+        invalidTagsAndAttributes: {
+          tags: ['circel'], attrs: ['svg:data-name']
+        },
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20Image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A Tags: circel Attributes: svg:data-name'
+      }
+    ];
+    testCases.forEach(testCase => {
+      let testCaseResult = svgSanitizerService.getIssueURL(
+        testCase.invalidTagsAndAttributes);
+      expect(testCaseResult).toEqual(testCase.correctURL);
+    });
+  });
 });
