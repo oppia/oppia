@@ -25,10 +25,10 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { SetInputRulesService } from './set-input-rules.service';
 import eq from 'lodash/eq';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { SetInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { Schema } from 'services/schema-default-value.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { SetInputAnswer } from 'interactions/answer-defs';
 
 @Component({
   selector: 'oppia-interactive-set-input',
@@ -118,15 +118,14 @@ export class InteractiveSetInputComponent implements OnInit {
       () => this.submitAnswer(this.answer), () => this.isAnswerValid());
   }
 
-  submitAnswer(answer: unknown): void {
+  submitAnswer(answer: SetInputAnswer): void {
     if (this.hasDuplicates(answer)) {
       this.errorMessage = (
         'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
     } else {
       this.errorMessage = '';
       this.currentInteractionService.onSubmit(
-        answer as string,
-        this.setInputRulesService as unknown as InteractionRulesService);
+        answer, this.setInputRulesService);
     }
   }
 

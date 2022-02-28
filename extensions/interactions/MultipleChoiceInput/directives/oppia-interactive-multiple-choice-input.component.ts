@@ -25,7 +25,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { MultipleChoiceInputRulesService } from './multiple-choice-input-rules.service';
 
@@ -179,9 +178,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       return;
     }
     this.currentInteractionService.onSubmit(
-      this.answer as unknown as string,
-      this.multipleChoiceInputRulesService as unknown as InteractionRulesService
-    );
+      this.answer, this.multipleChoiceInputRulesService);
   }
 }
 
