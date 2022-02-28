@@ -22,7 +22,8 @@ in mypy checks not during runtime.
 """
 
 from __future__ import annotations
-
+from core.platform.storage import cloud_storage_services as storage_services
+from core.platform.app_identity import gae_app_identity_services as app_identity_services
 from core.platform.cache import redis_cache_services as memory_cache_services
 from core.platform.datastore import (
     cloud_datastore_services as datastore_services)
@@ -60,6 +61,7 @@ from core.storage.user import gae_models as user_models
 __all__ = [
     'activity_models',
     'app_feedback_report_models',
+    'app_identity_services',
     'audit_models',
     'auth_models',
     'base_models',
@@ -81,6 +83,7 @@ __all__ = [
     'search_services',
     'skill_models',
     'stats_models',
+    'storage_services',
     'story_models',
     'subtopic_models',
     'suggestion_models',
