@@ -69,6 +69,9 @@ def export_data_for_user(user_id):
             <MODEL_NAME>_data: <dict of data in format as specified by
                                 model export policy>
         }.
+
+    Raises:
+        NotImplementedError. Takeout for profile users is not implemented.
     """
     user_settings = user_services.get_user_settings(user_id)
     if user_settings is not None and (
