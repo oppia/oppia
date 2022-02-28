@@ -123,10 +123,6 @@ class GeneralFileSystem:
         """
         return self._assets_path
 
-    def __init__(self, entity_name: str, entity_id: str) -> None:
-         self._bucket_name = app_identity_services.get_gcs_resource_bucket_name()
-        super(GcsFileSystem, self).__init__(entity_name, entity_id)
-
     def _get_gcs_file_url(self, filepath: str) -> str: # type: ignore[no-untyped-call]
         """Returns the constructed GCS file URL.
 
