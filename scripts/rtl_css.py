@@ -26,7 +26,7 @@ import argparse
 import os
 import subprocess
 
-from core import python_utils
+from core import utils
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -128,13 +128,13 @@ def main(args=None):
     elif parsed_args.mode == 'validate':
         invalid_files = []
         for file_path in css_files_list:
-            css_file = python_utils.open_file(file_path, 'rb', encoding=None)
+            css_file = utils.open_file(file_path, 'rb', encoding=None)
             out, err = start_subprocess_for_result_with_input(
                 [rtlcss_path, '-'], css_file.read())
             out = out.replace(b'\n', b'')
 
             rtl_file_path = file_path[:-4] + '.rtl' + file_path[-4:]
-            rtl_css_content = python_utils.open_file(
+            rtl_css_content = utils.open_file(
                 rtl_file_path, 'rb', encoding=None).read()
             rtl_css_content = rtl_css_content.replace(b'\n', b'')
             if out != rtl_css_content:
