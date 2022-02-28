@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/learner-view-info.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/learner-view-info.component.rtl.css" as="style">
+
 <ul class="nav navbar-nav oppia-navbar-breadcrumb">
   <li>
     <span class="oppia-navbar-breadcrumb-separator"></span>
@@ -22,48 +25,6 @@
   </li>
 </ul>
 
-<style>
-  .oppia-navbar-breadcrumb {
-    padding-top: 10px;
-  }
-  .oppia-learner-navbar-container {
-    display: flex;
-  }
-  .lesson-info-section {
-    display: contents;
-  }
-  .oppia-navbar-title-container {
-    display: flex;
-    flex-direction: column;
-  }
-  .oppia-exploration-h1 {
-    color: #fff;
-    display: inline;
-    font-size: 18px;
-    font-weight: normal;
-    margin-bottom: 1px;
-  }
-  .oppia-topic-title {
-    color: #fff;
-    display: flex;
-    font-size: 12px;
-    font-weight: 200;
-    padding-left: 26px;
-  }
-  .oppia-topic-title:hover {
-    color: #fff;
-  }
-  .oppia-exploration-info-icon {
-    cursor: pointer;
-  }
-  .oppia-exploration-info-icon:hover {
-    background: #fff;
-    color: #009688;
-    height: 56px;
-    margin-top: -13px;
-    padding-top: 12px;
-  }
-  .oppia-navbar-info-icon {
-    font-size: 20px;
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/learner-view-info.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/learner-view-info.component.rtl.css">

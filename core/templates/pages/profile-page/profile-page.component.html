@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/base-components/oppia-footer.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/base-components/oppia-footer.component.rtl.css" as="style">
+
 <background-banner></background-banner>
 <div class="oppia-profile-container">
   <mat-card class="oppia-profile-user-card">
@@ -156,24 +159,6 @@
   </mat-card>
 </div>
 
-<style>
-  .oppia-profile-container .oppia-profile-portfolio-pages .oppia-navigation-mouse-pointer:hover {
-    background-color: #808080;
-    border-radius: 50%;
-    color: #fff;
-    cursor: pointer;
-  }
-  .oppia-profile-subject-interest-blocks {
-    column-gap: 5px;
-    display: flex;
-    flex-wrap: wrap;
-    padding-top: 5px;
-    row-gap: 5px;
-  }
-  .oppia-profile-container .oppia-stats-value-text {
-    font-size: 16px;
-  }
-  .oppia-profile-container .oppia-user-bio-text {
-    white-space: pre-wrap;
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/profile-page/profile-page.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/profile-page/profile-page.component.rtl.css">

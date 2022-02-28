@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/base-components/oppia-footer.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/base-components/oppia-footer.component.rtl.css" as="style">
+
 <mat-card class="mat-padding">
   <div [ngStyle]="infoCardBackgroundCss" class="oppia-info-card-logo-thumbnail">
     <img [src]="getStaticImageUrl(infoCardBackgroundImageUrl)" class="oppia-info-card-bg-image">
@@ -94,53 +97,6 @@
   </button>
 </mat-card>
 
-<style>
-  .oppia-info-card-content .private-card-info {
-    color: red;
-  }
-  .oppia-info-card-bottom-row em {
-    font-size: 0.75rem;
-  }
-  .oppia-info-card-content .oppia-contributors-icon {
-    cursor: default;
-    margin-right: 0.3125rem;
-  }
-  .oppia-info-card-content p {
-    line-height: 1.5;
-    padding-bottom: 0.5rem;
-  }
-  .oppia-info-card-bottom-row {
-    line-height: 1.5;
-  }
-  .fas.fa-tags.oppia-info-card-modal-tooltip {
-    margin-left: 0.0625rem;
-    margin-right: 0.1875rem;
-  }
-  .mat-padding {
-    padding: 0;
-  }
-  .row.center {
-    display: flex;
-    flex-direction: row;
-  }
-  .space-between {
-    justify-content: space-between;
-  }
-  .center {
-    align-content: center;
-    align-items: center;
-  }
-  .row-item {
-    flex-grow: 1;
-  }
-  .card-metrics {
-    box-sizing: border-box  ;
-    max-width: 100%;
-  }
-  .oppia-info-card-exploration-contributors-profile {
-    justify-content: flex-end;
-  }
-  .exploration-tags {
-    max-width: 90%;
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/base-components/oppia-footer.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/base-components/oppia-footer.component.rtl.css">

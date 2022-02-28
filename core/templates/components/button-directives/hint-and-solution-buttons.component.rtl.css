@@ -53,12 +53,11 @@
   width: 395px;
   z-index: 2;
 }
-
 .hint-box::after,
 .hint-box::before {
   border: solid transparent;
   content: " ";
-  right: 50%;
+  left: 50%;
   position: absolute;
   top: 100%;
 }

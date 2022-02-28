@@ -348,6 +348,28 @@
   margin-right: 15px;
   padding: 0;
 }
+.oppia-navbar-dropdown {
+  border: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-top: 0;
+}
+
+.oppia-navbar-profile-picture-container .caret {
+  margin: 4px;
+  margin-left: 10px;
+}
+.oppia-navbar-profile-picture-container {
+  margin-left: 10px;
+  text-align: right;
+}
+
+.oppia-navbar-dropdown .nav-link {
+  color: #009688;
+}
+.oppia-navbar-dropdown .nav-link:hover {
+  color: #888;
+}
 
 .oppia-signin-text {
   font-family: Roboto, arial, sans-serif;

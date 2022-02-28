@@ -82,7 +82,11 @@ css_files_list = [
     'core/templates/pages/exploration-player-page/layout-directives/'
     'progress-nav.component.css',
     'core/templates/pages/exploration-player-page/layout-directives/'
-    'exploration-footer.component.css'
+    'exploration-footer.component.css',
+    'core/templates/base-components/oppia-footer.component.css',
+    'core/templates/pages/profile-page/profile-page.component.css',
+    'core/templates/pages/exploration-player-page/layout-directives/'
+    'learner-view-info.component.css'
 ]
 
 

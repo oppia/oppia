@@ -15,10 +15,31 @@
 }
 /*rtl:end:ignore*/
 
+.oppia-learner-view-card-top-section {
+  padding: 0 20px;
+  position: relative;
+}
+
 .oppia-learner-view-card {
+  background: #fff;
+  border-radius: 2px;
   max-width: 100vw;
   padding-bottom: 18px;
+  padding-left: 0;
+  padding-top: 20px;
   text-align: left;
+}
+
+.oppia-learner-view-card-top-content {
+  background-color: rgba(224,242,241,1);
+  border-top-left-radius: 0;
+  margin-bottom: 12px;
+  padding: 12px;
+  width: 100%;
+}
+
+.oppia-learner-view-card-content {
+  word-wrap: break-word;
 }
 
 .conversation-skin-instruction-disabled {
@@ -168,9 +189,18 @@
   .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:hover {
     background-color: #115fd4;
   }
-  @media screen and (max-width: 768px) {
-    .oppia-learner-view-card {
-      margin-top: 30px;
-    }
+
+  /*rtl:begin:ignore*/
+  .oppia-learner-view-card {
+    margin-left: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+  }
+  /*rtl:end:ignore*/
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-view-card {
+    margin-top: 30px;
   }
 }
