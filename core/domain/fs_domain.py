@@ -220,7 +220,7 @@ class GeneralFileSystem:
     def listdir(self, dir_name: str) -> list[str]: # type: ignore[no-untyped-call]
 
         """Lists all files in a directory.
-            
+
         Args:
             dir_name: str. The directory whose files should be listed. This
                 should not start with '/' or end with '/'.
@@ -249,7 +249,9 @@ class GeneralFileSystem:
         return [
             blob.name.replace(assets_path, '') for blob in blobs_in_dir]
 
+
 class GcsFileSystem(GeneralFileSystem):
+
     """Wrapper for a file system based on GCS.
     This implementation ignores versioning.
     """
