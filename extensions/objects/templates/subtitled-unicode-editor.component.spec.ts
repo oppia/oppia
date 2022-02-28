@@ -55,9 +55,8 @@ describe('SubtitledUnicodeEditorComponent', () => {
     component.updateValue('new value');
 
     expect(component.value.unicode).toBe('new value');
-    expect(component.valueChanged.emit).toHaveBeenCalledWith({
-      _unicode: 'new value'
-    });
+    expect(component.valueChanged.emit).toHaveBeenCalledWith(
+      component.value);
     expect(detectChangesSpy).toHaveBeenCalled();
   });
 
