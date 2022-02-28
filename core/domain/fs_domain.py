@@ -18,17 +18,17 @@
 
 from __future__ import annotations
 
-from typing import Any, List
-
 from core import feconf
 from core import utils
-from core.platform import models   # pylint: disable=invalid-import-from # isort:skip
+from typing import Any 
+from core.platform import models   # pylint: disable=invalid-import-from
+ # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
 MYPY = False
-if MYPY: 
+if MYPY : 
     from mypy_imports import app_identity_services
     from mypy_imports import storage_services
 
@@ -54,7 +54,7 @@ class FileStream:
         content: str. The content of the file snapshot.
     """
 
-    def __init__(self, content:str) -> None:
+    def __init__(self, content:str) -> None: 
         """Constructs a FileStream object.
 
         Args:
@@ -92,7 +92,8 @@ class GeneralFileSystem:
         self._validate_entity_parameters(entity_name, entity_id)
         self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
 
-    def _validate_entity_parameters(self, entity_name: str, entity_id: str) -> None:
+    def _validate_entity_parameters(
+        self, entity_name: str, entity_id: str) -> None:
         """Checks whether the entity_id and entity_name passed in are valid.
 
         Args:
