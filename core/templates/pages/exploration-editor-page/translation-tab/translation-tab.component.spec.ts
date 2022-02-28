@@ -412,8 +412,8 @@ describe('Translation tab component', function() {
       result: Promise.reject('exp1')
     } as NgbModalRef);
     enterTranslationForTheFirstTimeEmitter.emit();
-    tick();
     $scope.$apply();
+    tick();
 
     expect(siteAnalyticsService.registerDeclineTutorialModalEvent)
       .toHaveBeenCalledWith('exp1');
