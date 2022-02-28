@@ -41,7 +41,7 @@ dill==0.3.1.1
     # via apache-beam
 docopt==0.6.2
     # via hdfs
-elasticsearch==7.10.1
+elasticsearch==7.17.0
     # via -r requirements.in
 fastavro==0.23.6
     # via apache-beam

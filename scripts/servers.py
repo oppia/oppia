@@ -215,10 +215,17 @@ def managed_elasticsearch_dev_server():
     if os.path.exists(common.ES_PATH_DATA_DIR):
         shutil.rmtree(common.ES_PATH_DATA_DIR)
 
-    # -q is the quiet flag.
-    es_args = ['%s/bin/elasticsearch' % common.ES_PATH, '-q']
+    es_args = [
+        '%s/bin/elasticsearch' % common.ES_PATH,
+        # -q is the quiet flag.
+        '-q'
+    ]
     # Override the default path to ElasticSearch config files.
-    es_env = {'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR}
+    es_env = {
+        'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
+        # Set the minimum heap size to 100 MB and maximum to 500 MB.
+        'ES_JAVA_OPTS': '-Xms100m -Xmx500m'
+    }
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
