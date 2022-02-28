@@ -20,9 +20,11 @@ from __future__ import annotations
 
 import importlib
 import os
+from typing import Any, Dict, List
 
 from core import feconf
 from core.platform import models
+from mypy_imports import stats_models
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -31,10 +33,10 @@ class Registry:
     """Registry of all issues."""
 
     # Dict mapping issue types to instances of the issues.
-    _issues = {}
+    _issues: Dict[str, Any] = {}
 
     @classmethod
-    def get_all_issue_types(cls):
+    def get_all_issue_types(cls) -> List[str]:
         """Get a list of all issue types.
 
         Returns:
@@ -43,7 +45,7 @@ class Registry:
         return stats_models.ALLOWED_ISSUE_TYPES
 
     @classmethod
-    def _refresh(cls):
+    def _refresh(cls) -> None:
         """Initializes the mapping between issue types to instances of the issue
         classes.
         """
@@ -62,7 +64,7 @@ class Registry:
                 cls._issues[clazz.__name__] = clazz()
 
     @classmethod
-    def get_all_issues(cls):
+    def get_all_issues(cls) -> List[str]:
         """Get a list of instances of all issues.
 
         Returns:
@@ -74,7 +76,7 @@ class Registry:
         return list(cls._issues.values())
 
     @classmethod
-    def get_issue_by_type(cls, issue_type):
+    def get_issue_by_type(cls, issue_type: str) -> Any:
         """Gets an issue by its type.
 
         Refreshes once if the issue is not found; subsequently, throws a
