@@ -698,7 +698,7 @@ class BaseHandler(webapp2.RequestHandler):
             # self.payload is replaced by ThrowGetError object hence the below
             # check.
             # TODO: Change this to self.normalized_payload once schema is
-            #  implemented for all handlers
+            #  implemented for all handlers.
             payload_exists = (self.payload is not None and not isinstance(
                 self.payload, utils.ThrowGetError))
             if (payload_exists or

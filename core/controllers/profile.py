@@ -326,9 +326,7 @@ class SignupPage(base.BaseHandler):
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
-        from test import log
         if user_services.has_fully_registered_account(self.user_id):
-            log("registered")
             self.redirect(return_url)
             return
 
