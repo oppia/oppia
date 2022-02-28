@@ -700,66 +700,58 @@ class AdminHandler(base.BaseHandler):
                 interactions to be generate.
             should_submit_suggestions: boolean. Boolean to track
                 whether suggestions should be submitted.
-
-        Raises:
-            Exception. Environment is not DEVMODE.
         """
-        if constants.DEV_MODE:
-            topic_id_1 = topic_fetchers.get_new_topic_id()
-            story_id = story_services.get_new_story_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        story_id = story_services.get_new_story_id()
 
-            topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Sample Topic 1', 'sample-topic-one', 'description')
+        topic_1 = topic_domain.Topic.create_default_topic(
+            topic_id_1, 'Sample Topic 1', 'sample-topic-one', 'description')
 
-            topic_1.add_canonical_story(story_id)
-            topic_1.add_subtopic(1, 'Sample Subtopic Title')
+        topic_1.add_canonical_story(story_id)
+        topic_1.add_subtopic(1, 'Sample Subtopic Title')
 
-            subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                1, topic_id_1))
+        subtopic_page = (
+        subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+            1, topic_id_1))
 
-            story = story_domain.Story.create_default_story(
-                story_id, 'Help Jaime win the Arcade', 'Description',
-                topic_id_1, 'help-jamie-win-arcade')
+        story = story_domain.Story.create_default_story(
+            story_id, 'Help Jaime win the Arcade', 'Description',
+            topic_id_1, 'help-jamie-win-arcade')
 
-            story_node_dicts = self._generate_sample_chapters(
-                num_sample_ops,
-                num_sample_interactions, 0)
+        story_node_dicts = self._generate_sample_chapters(
+            num_sample_ops,
+            num_sample_interactions, 0)
 
-            len_story = len(story_node_dicts)
-            for i, story_node_dict in enumerate(story_node_dicts):
-                self._generate_sample_story_nodes(
-                    story, len_story, i + 1, **story_node_dict)
+        len_story = len(story_node_dicts)
+        for i, story_node_dict in enumerate(story_node_dicts):
+            self._generate_sample_story_nodes(
+                story, len_story, i + 1, **story_node_dict)
 
-            story_services.save_new_story(self.user_id, story)
-            topic_services.save_new_topic(self.user_id, topic_1)
+        story_services.save_new_story(self.user_id, story)
+        topic_services.save_new_topic(self.user_id, topic_1)
 
-            subtopic_page_services.save_subtopic_page(
-                self.user_id, subtopic_page, 'Added subtopic',
-                [topic_domain.TopicChange({
-                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                    'subtopic_id': 1,
-                    'title': 'Dummy Subtopic Title'
-                })]
-            )
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Dummy Subtopic Title'
+            })]
+        )
 
-            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
-            opportunity_services.add_new_exploration_opportunities(
-                story_id, exp_ids_in_story)
+        exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+        opportunity_services.add_new_exploration_opportunities(
+            story_id, exp_ids_in_story)
 
-            if should_submit_suggestions:
-                for i in range(num_sample_ops):
-                    for j in range(num_sample_ops):
-                        if j == 0:
-                            self._submit_suggestion(
-                                exp_ids_in_story[i], 'Introduction')
-                        else:
-                            self._submit_suggestion(
-                                exp_ids_in_story[i], 'Interaction' + str(j))
-
-        else:
-            raise Exception(
-                'Cannot generate sample explorations in production.')
+        if should_submit_suggestions:
+            for i in range(num_sample_ops):
+                for j in range(num_sample_ops):
+                    if j == 0:
+                        self._submit_suggestion(
+                            exp_ids_in_story[i], 'Introduction')
+                    else:
+                        self._submit_suggestion(
+                            exp_ids_in_story[i], 'Interaction' + str(j))
 
     def _generate_sample_opportunities_with_existing_topic(
             self, num_sample_ops,
@@ -776,71 +768,64 @@ class AdminHandler(base.BaseHandler):
             should_submit_suggestions: boolean. Boolean to track
                 whether suggestions should be submitted.
             story_url_fragment: stringType. Story fragment of existing story.
-
-        Raises:
-            Exception. Environment is not DEVMODE.
         """
-        if constants.DEV_MODE:
-            story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
-            story_id = story.id
-            len_nodes = len(story.story_contents.nodes)
+        story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
+        story_id = story.id
+        len_nodes = len(story.story_contents.nodes)
 
-            topic = topic_fetchers.get_topic_by_url_fragment('sample-topic-one')
-            topic_id = topic.id
+        topic = topic_fetchers.get_topic_by_url_fragment('sample-topic-one')
+        topic_id = topic.id
 
-            story_node_dicts = self._generate_sample_chapters(
-                num_sample_ops, num_sample_interactions, len_nodes)
+        story_node_dicts = self._generate_sample_chapters(
+            num_sample_ops, num_sample_interactions, len_nodes)
 
-            story_change_list = []
-            len_story = len(story_node_dicts)
-            for i, story_node_dict in enumerate(story_node_dicts):
-                self._generate_sample_story_nodes(
-                    story, len_story, len_nodes + i + 1, **story_node_dict)
-                cur_node_id = 'node_' + str(len_nodes + i + 1)
-                story_change_list.append(story_domain.StoryChange({
-                    'cmd': 'add_story_node',
-                    'node_id': cur_node_id,
-                    'title': story_node_dict['title']
-                }))
-                story_change_list.append(story_domain.StoryChange({
-                    'cmd': 'update_story_node_property',
-                    'property_name': 'exploration_id',
-                    'old_value': None,
-                    'new_value': story_node_dict['exp_id'],
-                    'node_id': cur_node_id,
-                }))
-                story_change_list.append(story_domain.StoryChange({
-                    'cmd': 'update_story_node_property',
-                    'property_name': 'description',
-                    'old_value': None,
-                    'new_value': story_node_dict['description'],
-                    'node_id': cur_node_id,
-                }))
+        story_change_list = []
+        len_story = len(story_node_dicts)
+        for i, story_node_dict in enumerate(story_node_dicts):
+            self._generate_sample_story_nodes(
+                story, len_story, len_nodes + i + 1, **story_node_dict)
+            cur_node_id = 'node_' + str(len_nodes + i + 1)
+            story_change_list.append(story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': cur_node_id,
+                'title': story_node_dict['title']
+            }))
+            story_change_list.append(story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'old_value': None,
+                'new_value': story_node_dict['exp_id'],
+                'node_id': cur_node_id,
+            }))
+            story_change_list.append(story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'description',
+                'old_value': None,
+                'new_value': story_node_dict['description'],
+                'node_id': cur_node_id,
+            }))
 
-            topic_services.update_story_and_topic_summary(
-                self.user_id,
-                story_id,
-                story_change_list,
-                'adding more opportunities',
-                topic_id)
+        topic_services.update_story_and_topic_summary(
+            self.user_id,
+            story_id,
+            story_change_list,
+            'adding more opportunities',
+            topic_id)
 
-            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()[
-                len_nodes:]
-            opportunity_services.add_new_exploration_opportunities(
-                story_id, exp_ids_in_story)
+        exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()[
+            len_nodes:]
+        opportunity_services.add_new_exploration_opportunities(
+            story_id, exp_ids_in_story)
 
-            if should_submit_suggestions:
-                for i in range(num_sample_ops):
-                    for j in range(num_sample_ops):
-                        if j == 0:
-                            self._submit_suggestion(
-                                exp_ids_in_story[i], 'Introduction')
-                        else:
-                            self._submit_suggestion(
-                                exp_ids_in_story[i], 'Interaction' + str(j))
-        else:
-            raise Exception(
-                'Cannot generate sample explorations in production.')
+        if should_submit_suggestions:
+            for i in range(num_sample_ops):
+                for j in range(num_sample_ops):
+                    if j == 0:
+                        self._submit_suggestion(
+                            exp_ids_in_story[i], 'Introduction')
+                    else:
+                        self._submit_suggestion(
+                            exp_ids_in_story[i], 'Interaction' + str(j))
 
     def _submit_suggestion(self, exp_id, state_name):
         """Submits suggestions to explorations that
