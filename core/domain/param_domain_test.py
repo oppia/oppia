@@ -28,11 +28,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
 
     def test_param_spec_validation(self):
         """Test validation of param specs."""
-        param_spec = param_domain.ParamSpec('FakeType')
-        with self.assertRaisesRegex(TypeError, 'is not a valid object class'):
-            param_spec.validate()
-
-        param_spec.obj_type = 'Real'
+        param_spec = param_domain.ParamSpec('Real')
         with self.assertRaisesRegex(
             utils.ValidationError, 'is not among the supported object types'
         ):
@@ -106,7 +102,6 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             'generator_id': 'Copier',
             'customization_args': {'value': '3'}
         })
-        self.assertEqual(param_change.get_normalized_value('Int', {}), 3)
 
     def test_param_change_from_dict(self):
         sample_dict = {

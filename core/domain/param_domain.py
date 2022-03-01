@@ -24,11 +24,6 @@ from core import feconf
 from core import utils
 from core.domain import value_generators_domain
 
-from core.domain import object_registry  # pylint: disable=invalid-import-from # isort:skip
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
-
 
 class ParamSpec:
     """Value object for an exploration parameter specification."""
@@ -74,9 +69,6 @@ class ParamSpec:
 
     def validate(self):
         """Validate the existence of the object class."""
-
-        # Ensure that this object class exists.
-        object_registry.Registry.get_object_class_by_type(self.obj_type)
 
         # Ensure the obj_type is among the supported ParamSpec types.
         if self.obj_type not in self.SUPPORTED_OBJ_TYPES:
@@ -189,12 +181,6 @@ class ParamChange:
         """Generates a single value for a parameter change."""
         return self.generator.generate_value(
             context_params, **self.customization_args)
-
-    def get_normalized_value(self, obj_type, context_params):
-        """Generates a single normalized value for a parameter change."""
-        raw_value = self._get_value(context_params)
-        return object_registry.Registry.get_object_class_by_type(
-            obj_type).normalize(raw_value)
 
     def validate(self):
         """Checks that the properties of this ParamChange object are valid."""
