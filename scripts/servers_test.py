@@ -428,7 +428,10 @@ class ManagedProcessTests(test_utils.TestBase):
             '%s/bin/elasticsearch -q' % common.ES_PATH)
         self.assertEqual(popen_calls[0].kwargs, {
             'shell': True,
-            'env': {'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR},
+            'env': {
+                'ES_JAVA_OPTS': '-Xms100m -Xmx500m',
+                'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR
+            },
         })
 
     def test_start_server_removes_elasticsearch_data(self):

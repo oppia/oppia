@@ -40,7 +40,7 @@ interface SolutionInterface {
   answerIsExclusive: boolean;
   // This property will be undefined when the component is initialised
   // and correct answer is not yet choosen.
-  correctAnswer: string | undefined;
+  correctAnswer: InteractionAnswer | undefined;
   explanationHtml: string;
   // A null 'explanationContentId' indicates that the 'Solution' has been
   // created but not saved. Before the 'SubtitledHtml' object is saved into a
@@ -179,9 +179,10 @@ export class AddOrUpdateSolutionModalComponent
       explanationContentId: (
         this.stateSolutionService.savedMemento.explanation.contentId)
     } : cloneDeep(this.EMPTY_SOLUTION_DATA);
-    this.currentInteractionService.setOnSubmitFn((answer: string) => {
-      this.data.correctAnswer = answer;
-    });
+    this.currentInteractionService.setOnSubmitFn(
+      (answer: InteractionAnswer) => {
+        this.data.correctAnswer = answer;
+      });
     this.ansOptions = ['The only', 'One'];
     this.tempAnsOption = this.ansOptions[1];
   }

@@ -17,34 +17,28 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
-import { CurrentInteractionService, InteractionRulesService } from
-  'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService, OnSubmitFn, ValidityCheckFn } from 'pages/exploration-player-page/services/current-interaction.service';
 import { UrlService } from 'services/contextual/url.service';
-import { PlayerPositionService } from
-  'pages/exploration-player-page/services/player-position.service';
-import { PlayerTranscriptService } from
-  'pages/exploration-player-page/services/player-transcript.service';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ContextService } from 'services/context.service';
+import { InteractionRulesService } from './answer-classification.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from './audio-translation-language.service';
+import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService;
   let currentInteractionService: CurrentInteractionService;
   let contextService: ContextService;
-  let DUMMY_ANSWER: string = 'dummy_answer';
+  let DUMMY_ANSWER = 'dummy_answer';
   let playerTranscriptService: PlayerTranscriptService;
   let playerPositionService: PlayerPositionService;
-  let mockInteractionRule: InteractionRulesService;
-  let dummyValidityCheckFn: () => true;
-  let mockInteraction: Interaction;
-  let mockVoiceover: RecordedVoiceovers;
-  let mockWrittenTranslations: WrittenTranslations;
-  let mockAudioTranslation: AudioTranslationLanguageService;
+  let interactionRulesService: InteractionRulesService;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   // This mock is required since ContextService is used in
   // CurrentInteractionService to obtain the explorationId. So, in the
@@ -52,11 +46,11 @@ describe('Current Interaction Service', () => {
   // since ContextService will error if it is used outside the context
   // of an exploration.
   beforeEach(() => {
-    urlService = TestBed.get(UrlService);
+    urlService = TestBed.inject(UrlService);
     spyOn(urlService, 'getPathname').and.callFake(() => {
       return '/explore/123';
     });
-    currentInteractionService = TestBed.get(CurrentInteractionService);
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     contextService = TestBed.inject(ContextService);
@@ -65,20 +59,20 @@ describe('Current Interaction Service', () => {
 
   it('should properly register onSubmitFn and submitAnswerFn', () => {
     let answerState = null;
-    let dummyOnSubmitFn = (
-        answer: string,
-        interactionRulesService: InteractionRulesService
-    ) => {
+    let dummyOnSubmitFn: OnSubmitFn = (answer: Object) => {
       answerState = answer;
+    };
+    let dummyValidityCheckFn: ValidityCheckFn = () => {
+      return false;
     };
 
     currentInteractionService.setOnSubmitFn(dummyOnSubmitFn);
-    currentInteractionService.onSubmit(DUMMY_ANSWER, mockInteractionRule);
+    currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
     expect(answerState).toEqual(DUMMY_ANSWER);
 
     answerState = null;
     let dummySubmitAnswerFn = () => {
-      currentInteractionService.onSubmit(DUMMY_ANSWER, mockInteractionRule);
+      currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
     };
     currentInteractionService.registerCurrentInteraction(
       dummySubmitAnswerFn, dummyValidityCheckFn);
@@ -104,13 +98,13 @@ describe('Current Interaction Service', () => {
       return false;
     };
     currentInteractionService.registerCurrentInteraction(
-      dummySubmitAnswerFn, dummyValidityCheckFn);
+      dummySubmitAnswerFn, null);
     expect(currentInteractionService.isSubmitButtonDisabled()).toBe(false);
   });
 
   it('should handle case where submitAnswerFn is null', () => {
     currentInteractionService.registerCurrentInteraction(
-      null, dummyValidityCheckFn);
+      null, null);
     expect(currentInteractionService.isSubmitButtonDisabled()).toBe(true);
   });
 
@@ -128,26 +122,30 @@ describe('Current Interaction Service', () => {
     currentInteractionService.registerPresubmitHook(hookB);
 
     currentInteractionService.setOnSubmitFn(() => {});
-    currentInteractionService.onSubmit('', mockInteractionRule);
+    currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
 
     expect(hookStateA).toEqual(1);
     expect(hookStateB).toEqual(3);
 
     currentInteractionService.clearPresubmitHooks();
-    currentInteractionService.onSubmit('', mockInteractionRule);
+    currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
 
     expect(hookStateA).toEqual(1);
     expect(hookStateB).toEqual(3);
   });
 
   it('should throw error on submitting when submitAnswerFn is null', () => {
+    let interaction = new Interaction([], [], {}, null, [], null, null);
+    let recordedVoiceovers = new RecordedVoiceovers({});
+    let writtenTranslations = new WrittenTranslations(
+      {}, new WrittenTranslationObjectFactory());
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(
       StateCard.createNewCard(
         'First State', 'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
-        mockInteraction, mockVoiceover,
-        mockWrittenTranslations, '', mockAudioTranslation));
+        interaction, recordedVoiceovers, writtenTranslations, '',
+        audioTranslationLanguageService));
     spyOn(contextService, 'getExplorationId').and.returnValue('abc');
     spyOn(contextService, 'getPageContext').and.returnValue('learner');
 
@@ -159,8 +157,7 @@ describe('Current Interaction Service', () => {
       '\nContext: learner' +
       '\nErrored at index: 1');
 
-    currentInteractionService.registerCurrentInteraction(
-      null, dummyValidityCheckFn);
+    currentInteractionService.registerCurrentInteraction(null, null);
 
     expect(() => currentInteractionService.submitAnswer()).toThrowError(
       'The current interaction did not ' + 'register a _submitAnswerFn.' +
