@@ -49,6 +49,9 @@ export class StatsReportingService {
     this.refreshAggregatedStats();
   }
 
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
   explorationTitle!: string;
   explorationVersion!: number;
