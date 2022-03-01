@@ -205,47 +205,47 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.training_job_dict['job_id'],
             training_job.job_id
-            )
+        )
         self.assertEqual(
             self.training_job_dict['algorithm_id'],
             training_job.algorithm_id
-            )
+        )
         self.assertEqual(
             self.training_job_dict['interaction_id'],
             training_job.interaction_id
-            )
+        )
         self.assertEqual(
             self.training_job_dict['exp_id'],
             training_job.exp_id
-            )
+        )
         self.assertEqual(
             self.training_job_dict['exp_version'],
             training_job.exp_version
-            )
+        )
         self.assertEqual(
             self.training_job_dict['next_scheduled_check_time'],
             training_job.next_scheduled_check_time
-            )
+        )
         self.assertEqual(
             self.training_job_dict['state_name'],
             training_job.state_name
-            )
+        )
         self.assertEqual(
             self.training_job_dict['status'],
             training_job.status
-            )
+        )
         self.assertEqual(
             self.training_job_dict['status'],
             training_job.status
-            )
+        )
         self.assertEqual(
             self.training_job_dict['training_data'],
             training_job.training_data
-            )
+        )
         self.assertEqual(
             self.training_job_dict['algorithm_version'],
             training_job.algorithm_version
-            )
+        )
 
 
 class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
@@ -309,19 +309,19 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.mapping_dict['exp_id'],
             mapping.exp_id
-            )
+        )
         self.assertEqual(
             self.mapping_dict['exp_version'],
             mapping.exp_version
-            )
+        )
         self.assertEqual(
             self.mapping_dict['state_name'],
             mapping.state_name
-            )
+        )
         self.assertEqual(
             self.mapping_dict['algorithm_ids_to_job_ids'],
             mapping.algorithm_ids_to_job_ids
-            )
+        )
 
 
 class OppiaMLAuthInfoDomainTests(unittest.TestCase):
