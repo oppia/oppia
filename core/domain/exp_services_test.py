@@ -1109,7 +1109,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
             'state_name': 'State 1',
             'new_value': recorded_voiceovers_dict
-            })]
+        })]
         changed_exploration_voiceover = (
             exp_services.apply_change_list(
                 self.EXP_0_ID, change_list_voiceover))
@@ -1123,7 +1123,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'objective',
             'new_value': 'new objective'
-            })]
+        })]
         changed_exploration_objective = (
             exp_services.apply_change_list(
                 self.EXP_0_ID,
@@ -1189,14 +1189,14 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
             'state_name': 'State 1',
             'new_value': recorded_voiceovers_dict
-            })]
+        })]
         self.assertTrue(
             exp_services.is_voiceover_change_list(change_list_voiceover))
         not_voiceover_change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_exploration_property',
             'property_name': 'title',
             'new_value': 'New title'
-            })]
+        })]
         self.assertFalse(
             exp_services.is_voiceover_change_list(not_voiceover_change_list))
 
@@ -1283,7 +1283,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                         'value': ''
                     }
                     }
-                })]
+            })
+        ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed to CodeRepl')
         updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -1310,7 +1311,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'state_name': exploration.init_state_name,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'EndExploration'
-                }),
+            }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': exploration.init_state_name,
@@ -1321,17 +1322,17 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                         'value': [
                             'EXP_1',
                             'EXP_2'
-                            ]
-                        }
+                        ]
                     }
-                }),
+                }
+            }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': (
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
                 'state_name': exploration.init_state_name,
-                'new_value': None}
-            )]
+                'new_value': None})
+        ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             change_list, 'Changed to EndExploration')
@@ -6706,8 +6707,8 @@ title: Old Title
 
     def test_revert_exploration_after_publish(self):
         self.save_new_valid_exploration(
-        self.EXP_0_ID, self.albert_id,
-        end_state_name='EndState')
+            self.EXP_0_ID, self.albert_id,
+            end_state_name='EndState')
         exploration_model = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         exp_services.update_exploration(
             self.albert_id, self.EXP_0_ID, [
@@ -6839,8 +6840,8 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                 'Voice artist does not have permission to make some '
                 'changes in the change list.'):
             exp_services.create_or_update_draft(
-            self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
-            self.NEWER_DATETIME, True)
+                self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
+                self.NEWER_DATETIME, True)
 
     def test_create_or_update_draft_when_older_draft_exists(self):
         exp_services.create_or_update_draft(
