@@ -35,14 +35,14 @@ describe('Playthrough Issues Service', () => {
     });
 
     playthroughIssuesService = TestBed.inject(PlaythroughIssuesService);
-    playthroughIssuesBackendApiService =
-      TestBed.inject(PlaythroughIssuesBackendApiService);
+    playthroughIssuesBackendApiService = (
+      TestBed.inject(PlaythroughIssuesBackendApiService));
 
     spyOn(playthroughIssuesBackendApiService, 'fetchIssuesAsync')
       .and.stub();
   });
 
-  it('should be defined', function() {
+  it('should be defined', () => {
     playthroughIssuesService.initSession('explorationId', 1);
 
     expect(playthroughIssuesService.explorationId).toBe('explorationId');

@@ -40,13 +40,13 @@ import { ExplorationTaskType } from 'domain/improvements/exploration-task.model'
 })
 export class ExplorationImprovementsService implements OnInit {
   initializationHasStarted: boolean;
-  resolveInitPromise: () => void;
-  rejectInitPromise: () => void;
   openHbrTasks: HighBounceRateTask[];
   ngrTasksOpenSinceInit: NeedsGuidingResponsesTask[];
   config: ExplorationImprovementsConfig;
   improvementsTabIsAccessible: boolean;
   initPromise: Promise<void>;
+  resolveInitPromise: () => void;
+  rejectInitPromise: () => void;
 
   constructor(
     private explorationRightsService: ExplorationRightsService,
@@ -68,6 +68,7 @@ export class ExplorationImprovementsService implements OnInit {
       this.initializationHasStarted = true;
       this.doInitAsync().then(this.resolveInitPromise, this.rejectInitPromise);
     }
+
     return this.initPromise;
   }
 
@@ -75,9 +76,11 @@ export class ExplorationImprovementsService implements OnInit {
     if (!await this.isImprovementsTabEnabledAsync()) {
       return;
     }
+
     const hbrTasksStillOpen = (
       this.explorationImprovementsTaskRegistryService
         .getOpenHighBounceRateTasks());
+
     await this.explorationImprovementsBackendApiService.postTasksAsync(
       this.config.explorationId,
       merge([
@@ -85,6 +88,7 @@ export class ExplorationImprovementsService implements OnInit {
         hbrTasksStillOpen.filter(t => !this.openHbrTasks.includes(t)),
         this.ngrTasksOpenSinceInit.filter(t => t.isResolved()),
       ]));
+
     this.openHbrTasks = hbrTasksStillOpen;
     this.ngrTasksOpenSinceInit =
       this.ngrTasksOpenSinceInit.filter(t => t.isOpen());
@@ -92,6 +96,7 @@ export class ExplorationImprovementsService implements OnInit {
 
   async isImprovementsTabEnabledAsync(): Promise<boolean> {
     await this.initPromise;
+
     return this.improvementsTabIsAccessible &&
       this.config.improvementsTabIsEnabled;
   }
@@ -128,9 +133,9 @@ export class ExplorationImprovementsService implements OnInit {
       await this.stateTopAnswersStatsService.getTopAnswersByStateNameAsync());
     const playthroughIssues = await this.playthroughIssuesService.getIssues();
 
-    this.openHbrTasks =
+    this.openHbrTasks = (
       openTasks.filter(t => t.taskType === 'high_bounce_rate') as
-      HighBounceRateTask[];
+      HighBounceRateTask[]);
 
     this.explorationImprovementsTaskRegistryService.initialize(
       this.config, states, expStats, openTasks,
@@ -146,16 +151,19 @@ export class ExplorationImprovementsService implements OnInit {
       (stateName: string) => {
         this.explorationImprovementsTaskRegistryService.onStateAdded(stateName);
       });
+
     this.explorationStatesService.registerOnStateDeletedCallback(
       (stateName: string) => {
         this.explorationImprovementsTaskRegistryService
           .onStateDeleted(stateName);
       });
+
     this.explorationStatesService.registerOnStateRenamedCallback(
       (oldName: string, newName: string) => {
         this.explorationImprovementsTaskRegistryService.onStateRenamed(
           oldName, newName);
       });
+
     this.explorationStatesService.registerOnStateInteractionSavedCallback(
       (state: State) => {
         this.explorationImprovementsTaskRegistryService.onStateInteractionSaved(
