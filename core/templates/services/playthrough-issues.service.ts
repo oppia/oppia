@@ -16,35 +16,34 @@
  * @fileoverview Service for retrieving issues and playthroughs.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/playthrough-issues-backend-api.service.ts');
-require(
-  'pages/exploration-editor-page/improvements-tab/services/' +
-  'improvement-modal.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-backend-api.service';
+import { PlaythroughIssue } from 'domain/statistics/PlaythroughIssueObjectFactory';
 
-angular.module('oppia').factory('PlaythroughIssuesService', [
-  'PlaythroughIssuesBackendApiService',
-  function(
-      PlaythroughIssuesBackendApiService) {
-    var explorationId = null;
-    var explorationVersion = null;
+@Injectable({
+  providedIn: 'root'
+})
+export class PlaythroughIssuesService {
+  explorationId: string = null;
+  explorationVersion: number = null;
 
-    return {
-      /** Prepares the PlaythroughIssuesService for subsequent calls to other
-       * functions.
-       *
-       * @param {string} newExplorationId - the exploration id the service will
-       *    be targeting.
-       * @param {number} newExplorationVersion - the version of the exploration
-       *    the service will be targeting.
-       */
-      initSession: function(newExplorationId, newExplorationVersion) {
-        explorationId = newExplorationId;
-        explorationVersion = newExplorationVersion;
-      },
-      getIssues: function() {
-        return PlaythroughIssuesBackendApiService.fetchIssuesAsync(
-          explorationId, explorationVersion);
-      }
-    };
-  }]);
+  constructor(
+    private playthroughIssuesBackendApiService:
+      PlaythroughIssuesBackendApiService
+  ) { }
+
+  initSession(
+      newExplorationId: string, newExplorationVersion: number): void {
+    this.explorationId = newExplorationId;
+    this.explorationVersion = newExplorationVersion;
+  }
+
+  getIssues(): Promise<PlaythroughIssue[]> {
+    return this.playthroughIssuesBackendApiService.fetchIssuesAsync(
+      this.explorationId, this.explorationVersion);
+  }
+}
+
+angular.module('oppia').factory('PlaythroughIssuesService',
+  downgradeInjectable(PlaythroughIssuesService));
