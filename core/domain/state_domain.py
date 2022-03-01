@@ -83,9 +83,10 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             translation_domain.TranslatableContentsCollection())
         if self.outcome is not None:
             translatable_contents_collection.add_translatable_object(
-                self.outcome)
+                self.outcome.get_translatable_contents_collection())
         for rule_spec in self.rule_specs:
-            translatable_contents_collection.add_translatable_object(rule_spec)
+            translatable_contents_collection.add_translatable_object(
+                rule_spec.get_translatable_contents_collection())
         return translatable_contents_collection
 
     def to_dict(self):
@@ -548,18 +549,19 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             translation_domain.TranslatableContentsCollection())
         if self.default_outcome is not None:
             translatable_contents_collection.add_translatable_object(
-                self.default_outcome)
+                self.default_outcome.get_translatable_contents_collection())
         for answer_group in self.answer_groups:
             translatable_contents_collection.add_translatable_object(
-                answer_group)
+                answer_group.get_translatable_contents_collection())
         for customization_arg in self.customization_args.values():
             translatable_contents_collection.add_translatable_object(
-                customization_arg)
+                customization_arg.get_translatable_contents_collection())
         for hint in self.hints:
-            translatable_contents_collection.add_translatable_object(hint)
+            translatable_contents_collection.add_translatable_object(
+                hint.get_translatable_contents_collection())
         if self.solution is not None:
             translatable_contents_collection.add_translatable_object(
-                self.solution)
+                self.solution.get_translatable_contents_collection())
         return translatable_contents_collection
 
     def to_dict(self):
@@ -2624,7 +2626,7 @@ class State(translation_domain.BaseTranslatableObject):
             self.content.content_id,
             self.content.html)
         translatable_contents_collection.add_translatable_object(
-            self.interaction)
+            self.interaction.get_translatable_contents_collection())
         return translatable_contents_collection
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):

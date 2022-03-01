@@ -73,7 +73,7 @@ class TranslatableContentsCollection:
 
     def add_translatable_object(
         self,
-        value: BaseTranslatableObject
+        translatable_contents_collection
     ) -> None:
         """Adds translatable fields of a translatable object parameter to
         translatable_contents dict.
@@ -83,7 +83,7 @@ class TranslatableContentsCollection:
                 BaseTranslatableObject.
         """
         self.translatable_contents.update(
-            value.get_translatable_contents_collection().translatable_contents)
+            translatable_contents_collection.translatable_contents)
 
 
 class BaseTranslatableObject:

@@ -178,7 +178,7 @@ class Question(translation_domain.BaseTranslatableObject):
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
         translatable_contents_collection.add_translatable_object(
-            self.question_state_data)
+            self.question_state_data.get_translatable_contents_collection())
         return translatable_contents_collection
 
     def to_dict(self):

@@ -629,7 +629,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
         for state in self.states.values():
-            translatable_contents_collection.add_translatable_object(state)
+            translatable_contents_collection.add_translatable_object(
+                state.get_translatable_contents_collection())
         return translatable_contents_collection
 
     @classmethod
