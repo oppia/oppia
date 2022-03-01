@@ -52,7 +52,7 @@ handlers:
   secure: always
   http_headers:
     # This is replaced by a specific origin when doing a deployment.
-    Access-Control-Allow-Origin: *
+    Access-Control-Allow-Origin: "*"
   expiration: "0"
 # Serve CSS files under core/templates.
 # This regex allows us to recursively serve CSS files.
@@ -72,7 +72,7 @@ handlers:
   secure: always
   http_headers:
     # This is replaced by a specific origin when doing a deployment.
-    Access-Control-Allow-Origin: *
+    Access-Control-Allow-Origin: "*"
   expiration: "0"
 - url: /extensions/interactions/(.*)/static/(.*\.(css|png))
   static_files: extensions/interactions/\1/static/\2

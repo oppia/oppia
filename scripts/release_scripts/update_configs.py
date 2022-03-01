@@ -190,7 +190,7 @@ def update_app_yaml(release_app_yaml_path, feconf_config_path):
         'Access-Control-Allow-Origin: %s' % project_origin)
 
     edited_app_yaml_contents, _ = re.subn(
-        r'Access-Control-Allow-Origin: \*',
+        r'Access-Control-Allow-Origin: \"\*\"',
         access_control_allow_origin_header,
         app_yaml_contents
     )
@@ -238,9 +238,9 @@ def verify_config_files(
     with utils.open_file(release_app_yaml_path, 'r') as app_yaml_file:
         app_yaml_contents = app_yaml_file.read()
 
-    if 'Access-Control-Allow-Origin: *' in app_yaml_contents:
+    if 'Access-Control-Allow-Origin: \"*\"' in app_yaml_contents:
         raise Exception(
-            '\'Access-Control-Allow-Origin: *\' must be updated to '
+            '\'Access-Control-Allow-Origin: "*"\' must be updated to '
             'a specific origin before deployment.'
         )
 

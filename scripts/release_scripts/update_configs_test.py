@@ -515,21 +515,47 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             f.write(feconf_text)
         app_yaml_text = (
             '- url: /assets\n'
-            'static_dir: assets\n'
-            'secure: always\n'
-            'http_headers:\n'
-            '    Access-Control-Allow-Origin: *\n'
-            'expiration: "0"'
+            '  static_dir: assets\n'
+            '  secure: always\n'
+            '  http_headers:\n'
+            '    Access-Control-Allow-Origin: "*"\n'
+            '  expiration: "0"'
         )
         with utils.open_file(temp_app_yaml_path, 'w') as f:
             f.write(app_yaml_text)
         with self.assertRaisesRegex(
             Exception,
-            r'\'Access-Control-Allow-Origin: \*\' must be updated to '
+            r'\'Access-Control-Allow-Origin: "\*"\' must be updated to '
             r'a specific origin before deployment.'
         ):
             update_configs.verify_config_files(
                 temp_feconf_path, temp_app_yaml_path, True)
+
+    def test_update_app_yaml_correctly_updates(self):
+        temp_feconf_config_path = tempfile.NamedTemporaryFile().name
+        temp_app_yaml_path = tempfile.NamedTemporaryFile().name
+        feconf_config_text = 'OPPIA_SITE_URL = \'https://oppia.org\'\n'
+        with utils.open_file(temp_feconf_config_path, 'w') as f:
+            f.write(feconf_config_text)
+
+        app_yaml_text = (
+            '- url: /assets\n'
+            '  static_dir: assets\n'
+            '  secure: always\n'
+            '  http_headers:\n'
+            '    Access-Control-Allow-Origin: "*"\n'
+            '  expiration: "0"'
+        )
+        with utils.open_file(temp_app_yaml_path, 'w') as f:
+            f.write(app_yaml_text)
+
+        update_configs.update_app_yaml(
+            temp_app_yaml_path, temp_feconf_config_path)
+
+        with utils.open_file(temp_app_yaml_path, 'r') as f:
+            app_yaml_text = f.read()
+            self.assertIn(
+                'Access-Control-Allow-Origin: https://oppia.org', app_yaml_text)
 
     def test_invalid_config(self):
         with self.assertRaisesRegex(
