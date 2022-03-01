@@ -534,7 +534,7 @@
 
   .splash-page .oppia-splash-icon-3-container {
     display: block;
-    margin-left: 12vw;
+    margin-left: 70vw;
   }
 
   .splash-page .oppia-splash-h1,
@@ -561,5 +561,11 @@
   .splash-page .oppia-splash-h2-text {
     font-size: 1.05em;
     font-weight: 600;
+  }
+  @media screen and (max-width: 768px) {
+    .splash-page .oppia-splash-icon-3-container {
+      display: block;
+      margin-left: 12vw;
+    }
   }
 }
