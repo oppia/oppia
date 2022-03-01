@@ -232,6 +232,7 @@ class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
+
 class TopicAssignmentsHandler(base.BaseHandler):
     """Provides information about which topics contain the given skill."""
 
