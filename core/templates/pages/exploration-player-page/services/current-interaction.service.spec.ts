@@ -17,6 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
 import { CurrentInteractionService, OnSubmitFn, ValidityCheckFn } from 'pages/exploration-player-page/services/current-interaction.service';
 import { UrlService } from 'services/contextual/url.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';

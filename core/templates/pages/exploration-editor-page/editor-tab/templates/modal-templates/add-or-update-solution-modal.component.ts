@@ -135,9 +135,9 @@ export class AddOrUpdateSolutionModalComponent
   saveSolution(): void {
     if (
       typeof this.data.answerIsExclusive === 'boolean' &&
-       this.data.correctAnswer !== undefined &&
-       this.data.explanation !== '' &&
-       this.data.explanationContentId !== null
+      this.data.correctAnswer !== undefined &&
+      this.data.explanation !== '' &&
+      this.data.explanationContentId !== null
     ) {
       this.ngbActiveModal.close({
         solution: this.solutionObjectFactory.createNew(
