@@ -60,8 +60,6 @@ export class AnswerClassificationService {
    *
    * @return AnswerClassificationResult domain object.
    */
-  // The property 'defaultOutcome' will be null if the interaction
-  // is of type EndExploration.
   private classifyAnswer(
       answer: InteractionAnswer,
       answerGroups: AnswerGroup[],
