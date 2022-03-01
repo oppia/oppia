@@ -98,22 +98,21 @@ export class StatePropertyService<StatePropertyType> {
       throw new Error('State property setter method key cannot be null.');
     }
 
-    if (this.displayed === null) {
-      throw new Error(`No state property exits for state: ${this.stateName}`);
-    }
-    this.displayed = this._normalize(this.displayed);
-    if (!this._isValid(this.displayed) || !this.hasChanged()) {
-      this.restoreFromMemento();
-      return;
-    }
+    if (this.displayed !== null) {
+      this.displayed = this._normalize(this.displayed);
+      if (!this._isValid(this.displayed) || !this.hasChanged()) {
+        this.restoreFromMemento();
+        return;
+      }
 
-    if (this.utilsService.isEquivalent(this.displayed, this.savedMemento)) {
-      return;
+      if (this.utilsService.isEquivalent(this.displayed, this.savedMemento)) {
+        return;
+      }
+
+      this.alertsService.clearWarnings();
+
+      this.savedMemento = cloneDeep(this.displayed);
     }
-
-    this.alertsService.clearWarnings();
-
-    this.savedMemento = cloneDeep(this.displayed);
   }
 
   // Reverts the displayed value to the saved memento.

@@ -47,13 +47,11 @@ export class TranslationTabActiveContentIdService {
   setActiveContent(contentId: string, dataFormat: string): void {
     const displayStateRecordedVoiceovers = (
       this._stateRecordedVoiceoversService.displayed);
-    if (displayStateRecordedVoiceovers === null) {
-      throw new Error(
-        'Expected recorded voiceovers to be non-null, but received null.');
-    }
-    var allContentIds = displayStateRecordedVoiceovers.getAllContentIds();
-    if (allContentIds.indexOf(contentId) === -1) {
-      throw new Error('Invalid active content id: ' + contentId);
+    if (displayStateRecordedVoiceovers !== null) {
+      var allContentIds = displayStateRecordedVoiceovers.getAllContentIds();
+      if (allContentIds.indexOf(contentId) === -1) {
+        throw new Error('Invalid active content id: ' + contentId);
+      }
     }
     this.activeContentId = contentId;
     this.activeDataFormat = dataFormat;

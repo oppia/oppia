@@ -117,14 +117,13 @@ export class StateSkillEditorComponent implements OnInit {
     });
   }
 
-  getSkillEditorUrl(): string {
+  // Return undefined if the skill is not linked to the state.
+  getSkillEditorUrl(): string | undefined {
     if (this.stateLinkedSkillIdService.displayed) {
       return this.urlInterpolationService.interpolateUrl(
         '/skill_editor/<skill_id>', {
           skill_id: this.stateLinkedSkillIdService.displayed
         });
-    } else {
-      throw new Error('Skill editor URL cannot be constructed.');
     }
   }
 
