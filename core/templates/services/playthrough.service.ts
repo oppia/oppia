@@ -40,12 +40,11 @@ class CyclicStateTransitionsTracker {
   /** A path of visited states without any repeats. */
   private pathOfVisitedStates: string[];
   /** The most recently discovered cycle of visited states. */
-  private cycleOfVisitedStates: string[];
+  private cycleOfVisitedStates!: string[];
   private numLoops: number;
 
   constructor(initStateName: string) {
     this.pathOfVisitedStates = [initStateName];
-    this.cycleOfVisitedStates = null;
     this.numLoops = 0;
   }
 
@@ -114,8 +113,8 @@ class CyclicStateTransitionsTracker {
 }
 
 class EarlyQuitTracker {
-  private stateName: string = null;
-  private expDurationInSecs: number = null;
+  private stateName!: string;
+  private expDurationInSecs!: number;
 
   foundAnIssue(): boolean {
     return (
@@ -171,16 +170,16 @@ class MultipleIncorrectAnswersTracker {
   providedIn: 'root'
 })
 export class PlaythroughService {
-  private explorationId: string = null;
-  private explorationVersion: number = null;
-  private learnerIsInSamplePopulation: boolean = null;
+  private explorationId!: string;
+  private explorationVersion!: number;
+  private learnerIsInSamplePopulation!: boolean;
 
-  private eqTracker: EarlyQuitTracker = null;
-  private cstTracker: CyclicStateTransitionsTracker = null;
-  private misTracker: MultipleIncorrectAnswersTracker = null;
-  private recordedLearnerActions: LearnerAction[] = null;
-  private playthroughStopwatch: Stopwatch = null;
-  private playthroughDurationInSecs: number = null;
+  private eqTracker!: EarlyQuitTracker;
+  private cstTracker!: CyclicStateTransitionsTracker;
+  private misTracker!: MultipleIncorrectAnswersTracker;
+  private recordedLearnerActions!: LearnerAction[];
+  private playthroughStopwatch!: Stopwatch;
+  private playthroughDurationInSecs!: number;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
@@ -250,7 +249,8 @@ export class PlaythroughService {
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
 
-    this.playthroughDurationInSecs = this.playthroughStopwatch.getTimeInSecs();
+    this.playthroughDurationInSecs = (
+      this.playthroughStopwatch.getTimeInSecs());
     this.eqTracker.recordExplorationQuit(
       stateName, this.playthroughDurationInSecs);
   }

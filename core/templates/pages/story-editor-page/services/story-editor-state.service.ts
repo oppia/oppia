@@ -42,13 +42,13 @@ export class StoryEditorStateService {
   _storyIsInitialized: boolean = false;
   _storyIsLoading: boolean = false;
   _storyIsBeingSaved: boolean = false;
-  _topicName: string = null;
+  _topicName!: string;
   _storyIsPublished: boolean = false;
   _skillSummaries: SkillSummaryBackendDict[] = [];
   _expIdsChanged: boolean = false;
   _storyWithUrlFragmentExists: boolean = false;
-  _classroomUrlFragment: string = null;
-  _topicUrlFragment: string = null;
+  _classroomUrlFragment!: string;
+  _topicUrlFragment!: string;
 
   _storyInitializedEventEmitter = new EventEmitter();
   _storyReinitializedEventEmitter = new EventEmitter();
@@ -206,8 +206,12 @@ export class StoryEditorStateService {
       return false;
     }
     this._storyIsBeingSaved = true;
+    const storyId = this._story.getId();
+    if (storyId === null) {
+      throw Error('Story have not been loaded.');
+    }
     this.editableStoryBackendApiService.updateStoryAsync(
-      this._story.getId(), this._story.getVersion(), commitMessage,
+      storyId, this._story.getVersion(), commitMessage,
       this.undoRedoService.getCommittableChangeList() as StoryChange[]
     ).then(
       (storyBackendObject) => {
@@ -244,8 +248,12 @@ export class StoryEditorStateService {
         'Cannot publish a story before one is loaded.');
     }
 
+    const storyId = this._story.getId();
+    if (storyId === null) {
+      throw Error('Story have not been loaded.');
+    }
     this.editableStoryBackendApiService.changeStoryPublicationStatusAsync(
-      this._story.getId(), newStoryStatusIsPublic).then(
+      storyId, newStoryStatusIsPublic).then(
       (storyBackendObject) => {
         this._setStoryPublicationStatus(newStoryStatusIsPublic);
         if (successCallback) {

@@ -43,8 +43,8 @@ export class StateSkillEditorComponent implements OnInit {
   @Output() onSaveStateContent: EventEmitter<string> = (
     new EventEmitter<string>());
 
-  categorizedSkills: SkillsCategorizedByTopics = null;
-  untriagedSkillSummaries: SkillSummary[] = null;
+  categorizedSkills!: SkillsCategorizedByTopics;
+  untriagedSkillSummaries!: SkillSummary[];
   skillEditorIsShown: boolean = true;
 
   constructor(
@@ -104,7 +104,7 @@ export class StateSkillEditorComponent implements OnInit {
       DeleteStateSkillModalComponent, {
         backdrop: true,
       }).result.then(() => {
-      this.stateLinkedSkillIdService.displayed = null;
+      this.stateLinkedSkillIdService.displayed = '';
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(this.stateLinkedSkillIdService.displayed);
     }, () => {
@@ -120,6 +120,8 @@ export class StateSkillEditorComponent implements OnInit {
         '/skill_editor/<skill_id>', {
           skill_id: this.stateLinkedSkillIdService.displayed
         });
+    } else {
+      throw new Error('Skill editor URL cannot be constructed.');
     }
   }
 

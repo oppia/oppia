@@ -18,7 +18,7 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -31,6 +31,7 @@ import { StateSkillEditorComponent } from './state-skill-editor.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
+import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -43,10 +44,24 @@ describe('State Skill Editor Component', () => {
   let stateLinkedSkillIdService: StateLinkedSkillIdService;
   let urlInterpolationService: UrlInterpolationService;
 
+  let skillSummaryBackendDict: SkillSummaryBackendDict = {
+    id: 'test_id',
+    description: 'description',
+    language_code: 'sadf',
+    version: 10,
+    misconception_count: 0,
+    worked_examples_count: 1,
+    skill_model_created_on: 2,
+    skill_model_last_updated: 3
+  };
+
+  let untriagedSkillSummariesData: SkillSummary[] = (
+    [SkillSummary.createFromBackendDict(skillSummaryBackendDict)]);
+
   class MockNgbModal {
-    modal: string;
+    modal!: string;
     success: boolean = true;
-    open(content, options) {
+    open(content: string, options: NgbModalOptions) {
       if (this.modal === 'add_skill') {
         return {
           componentInstance: {
@@ -58,7 +73,7 @@ describe('State Skill Editor Component', () => {
           },
           result: {
             then: (
-                successCallback: (result) => void,
+                successCallback: (result: {}) => void,
                 cancelCallback: () => void
             ) => {
               if (this.success) {
@@ -95,23 +110,112 @@ describe('State Skill Editor Component', () => {
   }
 
   const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
-    allClassroomNames: null,
-    canDeleteTopic: null,
-    canCreateTopic: null,
-    canDeleteSkill: null,
-    canCreateSkill: null,
-    untriagedSkillSummaries: null,
-    mergeableSkillSummaries: null,
-    totalSkillCount: null,
-    topicSummaries: null,
-    categorizedSkillsDict: null
+    allClassroomNames: [
+      'math'
+    ],
+    canDeleteTopic: true,
+    canCreateTopic: true,
+    canDeleteSkill: true,
+    canCreateSkill: true,
+    untriagedSkillSummaries: untriagedSkillSummariesData,
+    mergeableSkillSummaries: [
+      {
+        id: 'ho60YBh7c3Sn',
+        description: 'terst',
+        languageCode: 'en',
+        version: 1,
+        misconceptionCount: 0,
+        workedExamplesCount: 0,
+        skillModelCreatedOn: 1622827020924.104,
+        skillModelLastUpdated: 1622827020924.109
+      }
+    ],
+    totalSkillCount: 1,
+    topicSummaries: [
+      {
+        version: 1,
+        urlFragment: 'empty-topic',
+        languageCode: 'en',
+        description: 'description',
+        uncategorizedSkillCount: 0,
+        totalPublishedNodeCount: 0,
+        canEditTopic: true,
+        isPublished: false,
+        id: 'HLEn0XQiV9XE',
+        topicModelCreatedOn: 1623851496406.576,
+        subtopicCount: 0,
+        thumbnailBgColor: '#FFFFFF',
+        canonicalStoryCount: 0,
+        name: 'Empty Topic',
+        classroom: 'math',
+        totalSkillCount: 0,
+        additionalStoryCount: 0,
+        topicModelLastUpdated: 1623851496406.582,
+        thumbnailFilename: 'thumbnail_filename',
+        getId(): string {
+          return this.id;
+        },
+        getName(): string {
+          return this.name;
+        },
+        getCanonicalStoryCount(): number {
+          return this.canonicalStoryCount;
+        },
+        getSubtopicCount(): number {
+          return this.subtopicCount;
+        },
+        getTotalSkillCount(): number {
+          return this.totalSkillCount;
+        },
+        getTotalPublishedNodeCount(): number {
+          return this.totalPublishedNodeCount;
+        },
+        getUncategorizedSkillCount(): number {
+          return this.uncategorizedSkillCount;
+        },
+        getLanguageCode(): string {
+          return this.languageCode;
+        },
+        getDescription(): string {
+          return this.description;
+        },
+        getVersion(): number {
+          return this.version;
+        },
+        getAdditionalStoryCount(): number {
+          return this.additionalStoryCount;
+        },
+        getTopicModelCreatedOn(): number {
+          return this.topicModelCreatedOn;
+        },
+        getTopicModelLastUpdated(): number {
+          return this.topicModelLastUpdated;
+        },
+        getClassroom(): string | undefined {
+          return this.classroom;
+        },
+        getUrlFragment(): string {
+          return this.urlFragment;
+        },
+        getThumbnailFilename(): string {
+          return this.thumbnailFilename;
+        },
+        getThumbnailBgColor(): string {
+          return this.thumbnailBgColor;
+        },
+        isTopicPublished(): boolean {
+          return this.isPublished;
+        }
+      }
+    ],
+    categorizedSkillsDict: {}
   };
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     success: boolean = true;
     fetchDashboardDataAsync() {
       return {
-        then: (callback: (resp) => void) => {
+        then: (callback: (resp: TopicsAndSkillDashboardData) => void) => {
           callback(topicsAndSkillsDashboardData);
         }
       };
@@ -153,8 +257,6 @@ describe('State Skill Editor Component', () => {
     fixture = TestBed.createComponent(StateSkillEditorComponent);
     componentInstance = fixture.componentInstance;
     fixture.detectChanges();
-    componentInstance.categorizedSkills = null;
-    componentInstance.skillEditorIsShown = null;
     componentInstance.untriagedSkillSummaries = [];
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
@@ -171,7 +273,7 @@ describe('State Skill Editor Component', () => {
   it('should open add skill modal for adding skill', () => {
     mockNgbModal.modal = 'add_skill';
     const modalSpy = spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
+      setTimeout(opt.beforeDismiss as TimerHandler);
       return (
         { componentInstance: MockNgbModal,
           result: Promise.resolve('success')
@@ -193,7 +295,7 @@ describe('State Skill Editor Component', () => {
   it('should open delete skill modal for deleting skill', () => {
     mockNgbModal.modal = 'delete_skill';
     const modalSpy = spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
+      setTimeout(opt.beforeDismiss as TimerHandler);
       return (
         { componentInstance: MockNgbModal,
           result: Promise.resolve('success')
