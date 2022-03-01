@@ -16,13 +16,35 @@
  * @fileoverview Tests for the Oppia Footer Component.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { OppiaFooterComponent } from './oppia-footer.component';
 
 describe('OppiaFooterComponent', () => {
   let component: OppiaFooterComponent;
+  let fixture: ComponentFixture<OppiaFooterComponent>;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        OppiaFooterComponent,
+        MockTranslatePipe
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
   beforeEach(() => {
-    component = new OppiaFooterComponent();
+    fixture = TestBed.createComponent(OppiaFooterComponent);
+    component = fixture.componentInstance;
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should get the siteFeedbackFormURL', () => {
@@ -33,5 +55,9 @@ describe('OppiaFooterComponent', () => {
   it('should get the pages registered with frontend', () => {
     expect(component.PAGES_REGISTERED_WITH_FRONTEND)
       .toBe(AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 });
