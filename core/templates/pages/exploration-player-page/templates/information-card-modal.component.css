@@ -17,10 +17,6 @@
   cursor: default;
   margin-right: 0.3125rem;
 }
-.oppia-info-card-content p {
-  line-height: 1.5;
-  padding-bottom: 0.5rem;
-}
 .oppia-info-card-bottom-row {
   line-height: 1.5;
   margin-top: 20px
