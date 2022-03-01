@@ -46,8 +46,11 @@ export class StatePropertyService<StatePropertyType> {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   // The name of the setter method in ExplorationStatesService for this
   // property. THIS MUST BE SPECIFIED BY SUBCLASSES.
+  // Displayed is the current value of the property which may be null. In
+  // general it is null until the property is changed. Null is represented
+  // by the default value of the type.
   setterMethodKey!: string | null;
-  displayed!: StatePropertyType;
+  displayed!: StatePropertyType | null;
   stateName!: string;
   savedMemento!: StatePropertyType;
 
@@ -95,6 +98,9 @@ export class StatePropertyService<StatePropertyType> {
       throw new Error('State property setter method key cannot be null.');
     }
 
+    if (this.displayed === null) {
+      throw new Error(`No state property exits for state: ${this.stateName}`);
+    }
     this.displayed = this._normalize(this.displayed);
     if (!this._isValid(this.displayed) || !this.hasChanged()) {
       this.restoreFromMemento();

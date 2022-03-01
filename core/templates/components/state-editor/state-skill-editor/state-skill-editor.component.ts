@@ -37,8 +37,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './state-skill-editor.component.html'
 })
 export class StateSkillEditorComponent implements OnInit {
-  @Output() onSaveLinkedSkillId: EventEmitter<string> = (
-    new EventEmitter<string>());
+  @Output() onSaveLinkedSkillId: EventEmitter<string | null> = (
+    new EventEmitter<string | null>());
 
   @Output() onSaveStateContent: EventEmitter<string> = (
     new EventEmitter<string>());
@@ -107,8 +107,7 @@ export class StateSkillEditorComponent implements OnInit {
       DeleteStateSkillModalComponent, {
         backdrop: true,
       }).result.then(() => {
-      // Empty string is used to indicate that the skill is deleted.
-      this.stateLinkedSkillIdService.displayed = '';
+      this.stateLinkedSkillIdService.displayed = null;
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(this.stateLinkedSkillIdService.displayed);
     }, () => {
