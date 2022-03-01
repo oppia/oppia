@@ -24,6 +24,8 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 export class AnswerClassificationResult {
   outcome: Outcome;
   answerGroupIndex: number;
+  // 'ruleIndex' is null if the answer was classified into the answer
+  // group bucket using machine learning classification.
   ruleIndex: number | null;
   classificationCategorization: string;
 

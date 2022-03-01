@@ -153,8 +153,7 @@ describe('Pretest question backend API service', function() {
     }]
   };
 
-  var sampleDataResultsObjects:
-   {pretest_question_objects: {}};
+  var sampleDataResultsObjects: {pretest_question_objects: {}};
 
   beforeEach(() => {
     TestBed.configureTestingModule({

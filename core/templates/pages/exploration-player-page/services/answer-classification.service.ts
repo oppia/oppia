@@ -20,22 +20,17 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import { AnswerClassificationResult }
-  from 'domain/classifier/answer-classification-result.model';
+import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AppService } from 'services/app.service';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { PredictionAlgorithmRegistryService }
-  // eslint-disable-next-line max-len
-  from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { State } from 'domain/state/StateObjectFactory';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
 export interface InteractionRulesService {
@@ -138,12 +133,12 @@ export class AnswerClassificationService {
 
     const ruleBasedOutcomeIsDefault = (
       answerClassificationResult.outcome === defaultOutcome);
-    if (interactionInOldState.id === null) {
-      throw new Error('Interaction ID must not be null');
+    let interactionIsTrainable = false;
+    if (interactionInOldState.id !== null) {
+      interactionIsTrainable = (
+        this.interactionSpecsService.isInteractionTrainable(
+          interactionInOldState.id));
     }
-    const interactionIsTrainable = (
-      this.interactionSpecsService.isInteractionTrainable(
-        interactionInOldState.id));
 
     if (ruleBasedOutcomeIsDefault && interactionIsTrainable) {
       for (var i = 0; i < answerGroups.length; ++i) {

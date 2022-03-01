@@ -100,10 +100,13 @@ export class AudioPreloaderService {
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
     const languageCode = (
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
-    const allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
+    let allVoiceovers = null;
+    if (languageCode !== null) {
+      allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
+    }
     const initialStateName = this.exploration.getInitialState().name;
     if (initialStateName === null) {
-      throw new Error('Initial State Name cannot be null');
+      throw new Error('Initial state name cannot be null');
     }
     const bfsTraversalOfStates = (
       this.computeGraphService.computeBfsTraversalOfStates(
