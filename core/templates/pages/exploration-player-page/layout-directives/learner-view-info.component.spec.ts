@@ -28,6 +28,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { ContextService } from 'services/context.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
@@ -47,6 +48,7 @@ describe('Learner view info component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -87,6 +89,7 @@ describe('Learner view info component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   afterEach(() => {
@@ -203,4 +206,10 @@ describe('Learner view info component', () => {
 
     expect(loggerService.error).toHaveBeenCalled();
   }));
+
+  it('should get RTL language status correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+    expect(componentInstance.isLanguageRTL()).toEqual(true);
+  });
 });

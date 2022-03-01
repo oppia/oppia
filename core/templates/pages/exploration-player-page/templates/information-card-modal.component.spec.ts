@@ -25,6 +25,7 @@ import { RatingComputationService } from 'components/ratings/rating-computation/
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { InformationCardModalComponent } from './information-card-modal.component';
 
@@ -55,6 +56,7 @@ describe('Information card modal component', () => {
   let dateTimeFormatService: DateTimeFormatService;
   let ratingComputationService: RatingComputationService;
   let urlInterpolationService: UrlInterpolationService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -113,6 +115,7 @@ describe('Information card modal component', () => {
     dateTimeFormatService = TestBed.inject(DateTimeFormatService);
     ratingComputationService = TestBed.inject(RatingComputationService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   it('should initialize', () => {
@@ -170,5 +173,11 @@ describe('Information card modal component', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
       staticImageUrl);
     expect(componentInstance.getStaticImageUrl('')).toEqual(staticImageUrl);
+  });
+
+  it('should get RTL language status correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+    expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
 });

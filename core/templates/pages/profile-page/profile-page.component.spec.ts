@@ -33,6 +33,7 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { LoaderService } from 'services/loader.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('Profile page', () => {
   let fixture: ComponentFixture<ProfilePageComponent>;
@@ -44,6 +45,7 @@ describe('Profile page', () => {
   let loggerService: LoggerService;
   let mockWindowRef: MockWindowRef;
   let profilePageBackendApiService: ProfilePageBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let profileData = UserProfile.createFromBackendDict({
     username: '',
@@ -182,6 +184,7 @@ describe('Profile page', () => {
       jasmine.SpyObj<ProfilePageBackendApiService>);
     spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
       Promise.resolve('sample-csrf-token'));
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   afterEach(() => {
@@ -569,4 +572,10 @@ describe('Profile page', () => {
     expect(loggerService.error).toHaveBeenCalledWith(
       'Error: cannot decrement page');
   }));
+
+  it('should get RTL language status correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+    expect(componentInstance.isLanguageRTL()).toEqual(true);
+  });
 });

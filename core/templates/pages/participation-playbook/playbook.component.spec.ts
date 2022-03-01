@@ -76,6 +76,7 @@ let fixture: ComponentFixture<PlaybookPageComponent>;
 describe('Playbook Page', () => {
   let windowRef: MockWindowRef;
   let siteAnalyticsService: SiteAnalyticsService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
@@ -103,6 +104,7 @@ describe('Playbook Page', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PlaybookPageComponent);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -130,4 +132,10 @@ describe('Playbook Page', () => {
       'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
     expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
   }));
+
+  it('should get RTL language status correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+    expect(component.isLanguageRTL()).toEqual(true);
+  });
 });

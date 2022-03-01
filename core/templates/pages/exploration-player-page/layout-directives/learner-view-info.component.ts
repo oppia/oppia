@@ -30,6 +30,7 @@ import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { StatsReportingService } from '../services/stats-reporting.service';
@@ -59,7 +60,8 @@ export class LearnerViewInfoComponent {
     private statsReportingService: StatsReportingService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private storyViewerBackendApiService: StoryViewerBackendApiService
+    private storyViewerBackendApiService: StoryViewerBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
@@ -161,6 +163,10 @@ export class LearnerViewInfoComponent {
           this.explorationId);
       });
     }
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnDestory(): void {

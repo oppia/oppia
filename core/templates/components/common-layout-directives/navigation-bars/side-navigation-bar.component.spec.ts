@@ -232,4 +232,10 @@ describe('Side Navigation Bar Component', () => {
       componentInstance.isHackyTopicTitleTranslationDisplayed(0);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
   });
+
+  it('should get RTL language status correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+    expect(componentInstance.isLanguageRTL()).toEqual(true);
+  });
 });

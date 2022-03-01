@@ -3522,6 +3522,28 @@ oppia-noninteractive-link {
   right: 0;
 }
 
+.oppia-settings-container .form-group > label {
+  padding-left: 0;
+  padding-right: 0;
+}
+.oppia-settings-container .form-text {
+  color: #737373;
+  display: inline-block;
+  margin-top: 5px;
+}
+/* Styles for exploration settings */
+.oppia-settings-container .has-error .form-text {
+  color: #a94442;
+}
+
+.oppia-settings-container .col-sm-10 {
+  max-width: 100%;
+  padding-right: 0;
+}
+.oppia-settings-container .col-sm-10  > select {
+  width: 85%;
+}
+
 /*
   about/learners/creators media queries
 */

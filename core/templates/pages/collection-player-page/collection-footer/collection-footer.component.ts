@@ -23,6 +23,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'collection-footer',
@@ -33,8 +34,9 @@ export class CollectionFooterComponent implements OnInit {
   collectionId: string = '';
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService) {
-  }
+    private urlService: UrlService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
+  ) {}
 
   ngOnInit(): void {
     this.collectionId = this.urlService.getCollectionIdFromUrl();
@@ -42,6 +44,10 @@ export class CollectionFooterComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
 

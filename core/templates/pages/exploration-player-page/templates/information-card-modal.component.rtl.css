@@ -15,7 +15,7 @@
 }
 .oppia-info-card-content .oppia-contributors-icon {
   cursor: default;
-  margin-right: 0.3125rem;
+  margin-left: 0.3125rem;
 }
 .oppia-info-card-content p {
   line-height: 1.5;
@@ -25,8 +25,8 @@
   line-height: 1.5;
 }
 .fas.fa-tags.oppia-info-card-modal-tooltip {
-  margin-left: 0.0625rem;
-  margin-right: 0.1875rem;
+  margin-right: 0.0625rem;
+  margin-left: 0.1875rem;
 }
 .mat-padding {
   padding: 0;
@@ -84,11 +84,11 @@
 }
 
 .oppia-info-card-bg-image {
-  left: 50%;
-  margin-right: -50%;
+  right: 50%;
+  margin-left: -50%;
   position: absolute;
   top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(50%, -50%);
   width: 120px;
 }
 
@@ -131,7 +131,7 @@
 
 .oppia-info-card-content .card-metrics li .far {
   font-size: 24px;
-  margin-right: 5px;
+  margin-left: 5px;
   vertical-align: middle;
 }
 .oppia-info-card-bottom-row ul li a img {
@@ -140,7 +140,7 @@
 }
 .oppia-info-card-content .card-metrics ul img {
   height: 24px;
-  margin-right: 2px;
+  margin-left: 2px;
   width: 24px;
 }
 

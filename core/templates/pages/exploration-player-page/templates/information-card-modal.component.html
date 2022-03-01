@@ -1,5 +1,5 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/base-components/oppia-footer.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/base-components/oppia-footer.component.rtl.css" as="style">
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/templates/information-card-modal.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/templates/information-card-modal.component.rtl.css" as="style">
 
 <mat-card class="mat-padding">
   <div [ngStyle]="infoCardBackgroundCss" class="oppia-info-card-logo-thumbnail">
@@ -98,5 +98,5 @@
 </mat-card>
 
 <!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/base-components/oppia-footer.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/base-components/oppia-footer.component.rtl.css">
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/templates/information-card-modal.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/templates/information-card-modal.component.rtl.css">

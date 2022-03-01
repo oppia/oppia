@@ -86,7 +86,18 @@ css_files_list = [
     'core/templates/base-components/oppia-footer.component.css',
     'core/templates/pages/profile-page/profile-page.component.css',
     'core/templates/pages/exploration-player-page/layout-directives/'
-    'learner-view-info.component.css'
+    'learner-view-info.component.css',
+    'core/templates/pages/participation-playbook/playbook.component.css',
+    'core/templates/pages/exploration-player-page/templates/'
+    'information-card-modal.component.css',
+    'core/templates/pages/exploration-player-page/layout-directives/'
+    'learner-view-info.component.css',
+    'core/templates/pages/collection-player-page/'
+    'collection-player-page.component.css',
+    'core/templates/components/common-layout-directives/navigation-bars/'
+    'side-navigation-bar.component.css',
+    'core/templates/pages/collection-player-page/collection-footer/'
+    'collection-footer.component.css'
 ]
 
 

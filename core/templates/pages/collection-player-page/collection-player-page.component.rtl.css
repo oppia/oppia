@@ -42,10 +42,10 @@
 }
 
 .oppia-collection-node-small-screen {
-  left: 50%;
+  right: 50%;
   position: absolute;
   text-align: center;
-  transform: translate(-50%, 195px);
+  transform: translate(50%, 195px);
   z-index: 1;
 }
 .oppia-collection-node-small-screen::before {
@@ -53,7 +53,7 @@
   content: attr(title-data);
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 16px;
-  left: -60px;
+  right: -60px;
   position: absolute;
   text-align: center;
   top: -30px;
@@ -64,7 +64,7 @@
   top: 20px
 }
 .oppia-exploration-summary-tile-container {
-  left: 0;
+  right: 0;
   position: fixed;
   top: 0;
   z-index: 100;
@@ -74,7 +74,7 @@
   z-index: 10;
 }
 .oppia-exploration-preview-summary-tile {
-  left: 85px;
+  right: 85px;
   position: absolute;
   top: 30px;
   z-index: 10;
@@ -86,26 +86,11 @@
 .no-exploration-created .oppia-collection-path-section {
   color: red;
   font-size: 20px;
-  left: 15em;
+  right: 15em;
   padding: 70px 40px 90px 40px;
   top: 228px;
 }
 
-/*rtl:begin:remove*/
-.oppia-card-preview-panel {
-  background: #fff;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
-  left: 50%;
-  padding: 30px 85px 70px 85px;
-  pointer-events: none;
-  position: fixed;
-  text-align: left;
-  transform: translateX(29%);
-}
-/*rtl:end:remove*/
-
-/*rtl:raw:
 .oppia-card-preview-panel {
   background: #fff;
   border-radius: 4px;
@@ -118,14 +103,11 @@
   transform: translateX(-29%);
   width: max-content;
 }
-*/
 
 @media screen and (max-width: 1280px) {
-  /*rtl:raw:
   .oppia-card-preview-panel {
     left: 20%;
   }
-  */
 }
 
 @media screen and (max-width: 942px) {

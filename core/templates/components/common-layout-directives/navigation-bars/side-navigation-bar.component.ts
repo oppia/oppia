@@ -131,6 +131,10 @@ export class SideNavigationBarComponent {
     }, 150);
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   isHackyTopicTitleTranslationDisplayed(index: number): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
