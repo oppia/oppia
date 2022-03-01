@@ -38,7 +38,7 @@ interface HtmlFormSchema {
 
 interface SolutionInterface {
   answerIsExclusive: boolean;
-  correctAnswer: string;
+  correctAnswer: InteractionAnswer;
   explanationHtml: string;
   explanationContentId: string;
   explanation?: string;
