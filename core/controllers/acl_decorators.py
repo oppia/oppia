@@ -2937,35 +2937,6 @@ def can_access_topics_and_skills_dashboard(handler):
     return test_can_access_topics_and_skills_dashboard
 
 
-def can_access_topics_and_skills_dashboard_read_only(handler):
-    """Decorator to check whether the user can access the topics and skills
-    dashboard in read only manner.
-
-    Args:
-        handler: function. The function to be decorated.
-
-    Returns:
-        function. The newly decorated function that also checks if
-        the user can access the topics and skills dashboard in read only manner.
-    """
-
-    def test_can_access_topics_and_skills_dashboard_read_only(self, **kwargs):
-        """Checks whether the user can access the topics and skills
-        dashboard in read only manner.
-
-        Args:
-            **kwargs: *. Keyword arguments.
-
-        Returns:
-            *. The return value of the decorated function.
-        """
-        return handler(self, **kwargs)
-
-    test_can_access_topics_and_skills_dashboard_read_only.__wrapped__ = True
-
-    return test_can_access_topics_and_skills_dashboard_read_only
-
-
 def can_view_any_topic_editor(handler):
     """Decorator to check whether the user can view any topic editor.
 

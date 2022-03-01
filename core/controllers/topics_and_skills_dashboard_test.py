@@ -72,22 +72,14 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         BaseTopicsAndSkillsDashboardTests):
 
     def test_get(self):
-        # Check that non-admins or non-topic managers can access the
-        # topics and skills dashboard data in read-only manner.
+        # Check that non-admins or non-topic managers cannot access the
+        # topics and skills dashboard data.
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
         self.login(self.NEW_USER_EMAIL)
-        json_response = self.get_json(
+        self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
-            expected_status_int=200)
-        self.assertEqual(
-            json_response['can_delete_topic'], False)
-        self.assertEqual(
-            json_response['can_create_topic'], False)
-        self.assertEqual(
-            json_response['can_delete_skill'], False)
-        self.assertEqual(
-            json_response['can_create_skill'], False)
+            expected_status_int=401)
         self.logout()
 
         # Check that admins can access the topics and skills dashboard data.
