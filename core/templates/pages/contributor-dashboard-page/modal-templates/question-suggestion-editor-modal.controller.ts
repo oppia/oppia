@@ -70,6 +70,11 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     };
     $scope.setDifficultyString(skillDifficulty);
     $scope.done = function() {
+      if (!QuestionUndoRedoService.hasChanges()) {
+        AlertsService.addInfoMessage(
+          'No changes detected unable to update', 5000);
+        return;
+      }
       if (!$scope.isQuestionValid()) {
         return;
       }

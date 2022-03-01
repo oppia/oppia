@@ -255,6 +255,20 @@ describe('Question Suggestion Editor Modal Controller', function() {
         .toHaveBeenCalled();
     });
 
+    it('should fail toupdate the question', function() {
+      spyOn(ContributionAndReviewService, 'updateQuestionSuggestionAsync')
+        .and.callFake((
+            suggestionId, skillDifficulty, questionStateData, imagesData,
+            successCallback, errorCallback) => {
+          successCallback();
+        });
+
+      $scope.done();
+
+      expect(ContributionAndReviewService.updateQuestionSuggestionAsync)
+        .toHaveBeenCalled();
+    });
+
     it('should show alert when suggestion is submitted', function() {
       spyOn(AlertsService, 'addSuccessMessage');
       $scope.isEditing = false;
