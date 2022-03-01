@@ -269,6 +269,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
     });
 
     it('should show alert when suggestion is submitted', function() {
+      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn(AlertsService, 'addSuccessMessage');
       $scope.isEditing = false;
       $scope.done();
@@ -282,6 +283,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
         SiteAnalyticsService,
         'registerContributorDashboardSubmitSuggestionEvent');
       $scope.isEditing = false;
+      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       $scope.done();
       expect(
         SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
