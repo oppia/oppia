@@ -35,12 +35,6 @@ from core.domain import subtopic_page_domain
 from typing import List, Optional
 from typing_extensions import TypedDict
 
-from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
-
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
@@ -1001,6 +995,10 @@ class Topic:
 
         Args:
             story_id: str. The story id to add to the list.
+
+        Raises:
+            Exception. The story ID is already present in the canonical
+                story references list of the topic.
         """
         canonical_story_ids = self.get_canonical_story_ids()
         if story_id in canonical_story_ids:
@@ -1016,6 +1014,10 @@ class Topic:
 
         Args:
             story_id: str. The story id to add to the list.
+
+        Raises:
+            Exception. The story ID is already present in the additional
+                story references list of the topic.
         """
         additional_story_ids = self.get_additional_story_ids()
         if story_id in additional_story_ids:
@@ -1033,7 +1035,7 @@ class Topic:
             story_id: str. The story id to remove from the list.
 
         Raises:
-            Exception. The story_id is not present in the additional stories
+            Exception. The story ID is not present in the additional stories
                 list of the topic.
         """
         deleted = False
@@ -1185,8 +1187,7 @@ class Topic:
         Returns:
             dict. The converted subtopic_dict.
         """
-        file_system_class = fs_services.get_entity_file_system_class()  # type: ignore[no-untyped-call]
-        fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_TOPIC, topic_id))
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
@@ -1341,9 +1342,12 @@ class Topic:
         Args:
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the topic.
+
+        Raises:
+            Exception. The thumbnail does not exist for expected topic in
+                the filesystem.
         """
-        file_system_class = fs_services.get_entity_file_system_class()  # type: ignore[no-untyped-call]
-        fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_TOPIC, self.id))
 
         filepath = '%s/%s' % (
@@ -1481,6 +1485,9 @@ class Topic:
         Returns:
             int. Returns the index of the subtopic if it exists or else
             None.
+
+        Raises:
+            Exception. The subtopic does not exist.
         """
         for ind, subtopic in enumerate(self.subtopics):
             if subtopic.id == subtopic_id:
@@ -1496,8 +1503,8 @@ class Topic:
             title: str. The title for the new subtopic.
 
         Raises:
-            Exception. The new_subtopic_id and the expected next subtopic id
-                differs.
+            Exception. The new subtopic ID is not equal to the expected next
+                subtopic ID.
         """
         if self.next_subtopic_id != new_subtopic_id:
             raise Exception(
@@ -1551,8 +1558,7 @@ class Topic:
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
 
-        file_system_class = fs_services.get_entity_file_system_class()  # type: ignore[no-untyped-call]
-        fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_TOPIC, self.id))
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
@@ -1574,6 +1580,9 @@ class Topic:
         Args:
             subtopic_id: int. The id of the subtopic to edit.
             new_url_fragment: str. The new url fragment of the subtopic.
+
+        Raises:
+            Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
         utils.require_valid_url_fragment(
@@ -1940,14 +1949,6 @@ class TopicSummary:
         }
 
 
-class TopicRightsDict(TypedDict):
-    """Dictionary that represents TopicRights."""
-
-    topic_id: str
-    manager_names: List[str]
-    topic_is_published: bool
-
-
 class TopicRights:
     """Domain object for topic rights."""
 
@@ -1969,20 +1970,6 @@ class TopicRights:
         self.id = topic_id
         self.manager_ids = manager_ids
         self.topic_is_published = topic_is_published
-
-    def to_dict(self) -> TopicRightsDict:
-        """Returns a dict suitable for use by the frontend.
-
-        Returns:
-            dict. A dict version of TopicRights suitable for use by the
-            frontend.
-        """
-        return {
-            'topic_id': self.id,
-            'manager_names': user_services.get_human_readable_user_ids( # type: ignore[no-untyped-call]
-                self.manager_ids),
-            'topic_is_published': self.topic_is_published
-        }
 
     def is_manager(self, user_id: str) -> bool:
         """Checks whether given user is a manager of the topic.

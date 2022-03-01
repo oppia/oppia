@@ -23,7 +23,7 @@ import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backe
 import { ServicesConstants } from './services.constants';
 
 export class SearchResponseBackendDict {
-  'search_offset': number;
+  'search_cursor': number | null;
   'activity_list': ExplorationSummaryDict[];
 }
 
