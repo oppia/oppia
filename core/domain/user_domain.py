@@ -1149,11 +1149,6 @@ class UserContributionRights:
 
     def validate(self) -> None:
         """Validates different attributes of the class."""
-        if not isinstance(self.can_review_translation_for_language_codes, list):
-            raise utils.ValidationError(
-                'Expected can_review_translation_for_language_codes to be a '
-                'list, found: %s' % type(
-                    self.can_review_translation_for_language_codes))
         for language_code in self.can_review_translation_for_language_codes:
             if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError('Invalid language_code: %s' % (
@@ -1164,12 +1159,6 @@ class UserContributionRights:
                 'Expected can_review_translation_for_language_codes list not '
                 'to have duplicate values, found: %s' % (
                     self.can_review_translation_for_language_codes))
-
-        if not isinstance(self.can_review_voiceover_for_language_codes, list):
-            raise utils.ValidationError(
-                'Expected can_review_voiceover_for_language_codes to be a '
-                'list, found: %s' % type(
-                    self.can_review_voiceover_for_language_codes))
         for language_code in self.can_review_voiceover_for_language_codes:
             if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError('Invalid language_code: %s' % (
@@ -1180,16 +1169,6 @@ class UserContributionRights:
                 'Expected can_review_voiceover_for_language_codes list not to '
                 'have duplicate values, found: %s' % (
                     self.can_review_voiceover_for_language_codes))
-
-        if not isinstance(self.can_review_questions, bool):
-            raise utils.ValidationError(
-                'Expected can_review_questions to be a boolean value, '
-                'found: %s' % type(self.can_review_questions))
-
-        if not isinstance(self.can_submit_questions, bool):
-            raise utils.ValidationError(
-                'Expected can_submit_questions to be a boolean value, '
-                'found: %s' % type(self.can_submit_questions))
 
 
 class ModifiableUserDataDict(TypedDict):
@@ -1299,20 +1278,10 @@ class ModifiableUserData:
             Exception. Schema version is not of type int.
             Exception. Invalid schema version.
         """
-        data_schema_version = raw_user_data_dict.get('schema_version')
-
-        if data_schema_version is None:
-            raise Exception(
-                'Invalid modifiable user data: no schema version specified.')
-        if not isinstance(data_schema_version, int):
-            raise Exception(
-                'Version has invalid type, expected int, '
-                'received %s' % type(data_schema_version)
-            )
+        data_schema_version = raw_user_data_dict['schema_version']
         if (
-                not isinstance(data_schema_version, int) or
-                data_schema_version < 1 or
-                data_schema_version > cls.CURRENT_SCHEMA_VERSION
+            data_schema_version < 1 or
+            data_schema_version > cls.CURRENT_SCHEMA_VERSION
         ):
             raise Exception(
                 'Invalid version %s received. At present we can only process v1'
