@@ -80,7 +80,6 @@ describe('Add Hint Modal Component', () => {
   it('should initialize the properties after component is initialized',
     () => {
       expect(component.tmpHint).toBe('');
-      expect(component.addHintForm).toEqual({});
       expect(component.hintIndex).toBe(5);
     });
 
