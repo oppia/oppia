@@ -98,11 +98,9 @@ export class AudioPreloaderService {
   }
 
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
-    const languageCode = (
+    const currentAudioLanguageCode = (
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
-    if (languageCode === null) {
-      throw new Error('Audio language code is null.');
-    }
+    const languageCode = currentAudioLanguageCode as string;
     const allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
     const bfsTraversalOfStates = (
       this.computeGraphService.computeBfsTraversalOfStates(
