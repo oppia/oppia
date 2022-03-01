@@ -844,6 +844,7 @@
     "core/templates/pages/topics-and-skills-dashboard-page/navbar/*.ts",
     "core/templates/services/contextual/*.ts",
     "core/templates/services/stateful/*.ts",
+    "core/templates/domain/exploration/*.ts",
     "extensions/classifiers/*.ts",
     "extensions/classifiers/proto/*.ts",
     "extensions/rich_text_components/Collapsible/directives/*.ts",
