@@ -17,12 +17,9 @@
   cursor: default;
   margin-left: 0.3125rem;
 }
-.oppia-info-card-content p {
-  line-height: 1.5;
-  padding-bottom: 0.5rem;
-}
 .oppia-info-card-bottom-row {
   line-height: 1.5;
+  margin-top: 20px
 }
 .fas.fa-tags.oppia-info-card-modal-tooltip {
   margin-right: 0.0625rem;
@@ -48,9 +45,6 @@
 .card-metrics {
   box-sizing: border-box  ;
   max-width: 100%;
-}
-.oppia-info-card-exploration-contributors-profile {
-  justify-content: flex-end;
 }
 .exploration-tags {
   max-width: 90%;
@@ -95,8 +89,9 @@
 .oppia-info-card-content p {
   display: block;
   font-size: 1.0em;
-  line-height: 1;
+  line-height: 1.5;
   padding: 12px 0 24px 0;
+  padding-bottom: 0.5rem;
   position: relative;
   word-spacing: 0;
 }
@@ -104,10 +99,6 @@
   font-size: 14px;
   list-style-type: none;
   text-align: center;
-}
-
-.oppia-info-card-bottom-row {
-  margin-top: 20px
 }
 
 .oppia-info-card-bottom-row md-chips md-chip {
@@ -159,6 +150,7 @@
 }
 
 .oppia-info-card-exploration-contributors-profile {
+  justify-content: flex-end;
   padding: 0;
 }
 
