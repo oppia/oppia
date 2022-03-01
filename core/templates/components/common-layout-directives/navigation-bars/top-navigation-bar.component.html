@@ -1,4 +1,6 @@
-<div [ngClass]="{'rtl-navbar-header': isLanguageRTL(), 'float-right': isLanguageRTL(), 'float-left': !isLanguageRTL()}"
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.rtl.css" as="style">
+<div [ngClass]="{'float-right': isLanguageRTL(), 'float-left': !isLanguageRTL()}"
      class="navbar-header protractor-test-navbar-header">
   <a *ngIf="windowIsNarrow"
      (click)="toggleSidebar($event)"
@@ -41,7 +43,7 @@
     {{ subheaderText }}
   </span>
 </div>
-<div [ngClass]="{'rtl-navbar-header': isLanguageRTL(), 'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}"
+<div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}"
      class="navbar-header"
      *ngIf="userMenuIsShown">
   <ul class="nav oppia-navbar-nav"
@@ -496,8 +498,7 @@
     <li ngbDropdown
         *ngIf="!userIsLoggedIn && username !== ''"
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
-      <div [ngStyle]="isLanguageRTL() ? {'margin-left': '10px'} : {'margin-right': '10px'}"
-           class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info">
+      <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info">
         <button ngbDropdownToggle
                 class="btn dropdown-toggle oppia-navbar-button protractor-mobile-test-login"
                 (click)="onLoginButtonClicked()">
@@ -982,3 +983,5 @@
     }
   }
 </style>
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.rtl.css">

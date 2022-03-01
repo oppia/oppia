@@ -1428,6 +1428,9 @@ class Skill:
         Args:
             difficulty: str. The difficulty of the rubric.
             explanations: list(str). The explanations for the rubric.
+
+        Raises:
+            ValueError. No rubric for given difficulty.
         """
         for rubric in self.rubrics:
             if rubric.difficulty == difficulty:
