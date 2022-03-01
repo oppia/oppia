@@ -17,9 +17,6 @@
  * @fileoverview Tests for ExplorationImprovementsService.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { ConfirmDeleteStateModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
@@ -33,7 +30,10 @@ import { ExplorationRightsService } from 'pages/exploration-editor-page/services
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { ExplorationStats } from 'domain/statistics/exploration-stats.model';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
@@ -171,8 +171,6 @@ describe('Exploration Improvements Service', () => {
       TestBed.inject(ExplorationImprovementsBackendApiService));
     explorationImprovementsService = (
       TestBed.inject(ExplorationImprovementsService));
-    explorationImprovementsService = (
-      TestBed.inject(ExplorationImprovementsService));
     explorationImprovementsTaskRegistryService = (
       TestBed.inject(ExplorationImprovementsTaskRegistryService));
     explorationRightsService = TestBed.inject(ExplorationRightsService);
@@ -205,6 +203,7 @@ describe('Exploration Improvements Service', () => {
     stassGetTopAnswersByStateNameAsyncSpy.and.returnValue(Promise.resolve(
       new Map()));
 
+    explorationImprovementsService.ngOnInit();
     explorationStatesService.init(statesBackendDict);
   });
 

@@ -17,7 +17,7 @@
  * of data related to exploration improvement tasks.
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { merge } from 'd3-array';
 import { ExplorationImprovementsConfig } from 'domain/improvements/exploration-improvements-config.model';
@@ -38,19 +38,15 @@ import { ExplorationTaskType } from 'domain/improvements/exploration-task.model'
 @Injectable({
   providedIn: 'root'
 })
-export class ExplorationImprovementsService {
+export class ExplorationImprovementsService implements OnInit {
   initializationHasStarted: boolean;
   resolveInitPromise: () => void;
   rejectInitPromise: () => void;
-  openHbrTasks: HighBounceRateTask[] = [];
-  ngrTasksOpenSinceInit: NeedsGuidingResponsesTask[] = [];
+  openHbrTasks: HighBounceRateTask[];
+  ngrTasksOpenSinceInit: NeedsGuidingResponsesTask[];
   config: ExplorationImprovementsConfig;
   improvementsTabIsAccessible: boolean;
-
-  initPromise: Promise<void> = new Promise((resolve, reject) => {
-    this.resolveInitPromise = resolve;
-    this.rejectInitPromise = reject;
-  });
+  initPromise: Promise<void>;
 
   constructor(
     private explorationRightsService: ExplorationRightsService,
@@ -165,6 +161,15 @@ export class ExplorationImprovementsService {
         this.explorationImprovementsTaskRegistryService.onStateInteractionSaved(
           state);
       });
+  }
+
+  ngOnInit(): void {
+    this.openHbrTasks = [];
+    this.ngrTasksOpenSinceInit = [];
+    this.initPromise = new Promise((resolve, reject) => {
+      this.resolveInitPromise = resolve;
+      this.rejectInitPromise = reject;
+    });
   }
 }
 
