@@ -17,30 +17,30 @@
  * @fileoverview Tests for ExplorationImprovementsService.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { AnswerStats } from 'domain/exploration/answer-stats.model';
-import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
-import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
-import { ExplorationImprovementsConfig } from 'domain/improvements/exploration-improvements-config.model';
-import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
-import { StateBackendDict } from 'domain/state/StateObjectFactory';
-import { ExplorationStats } from 'domain/statistics/exploration-stats.model';
-import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
-import { StateStats } from 'domain/statistics/state-stats-model';
-import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
+import { ConfirmDeleteStateModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import { ContextService } from 'services/context.service';
 import { ExplorationImprovementsBackendApiService, ExplorationImprovementsResponse } from 'services/exploration-improvements-backend-api.service';
-import { ExplorationImprovementsTaskRegistryService } from 'services/exploration-improvements-task-registry.service';
-import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-backend-api.service';
-import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
-import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmDeleteStateModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
+import { ExplorationImprovementsConfig } from 'domain/improvements/exploration-improvements-config.model';
 import { ExplorationImprovementsService } from './exploration-improvements.service';
+import { ExplorationImprovementsTaskRegistryService } from 'services/exploration-improvements-task-registry.service';
+import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
 import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ExplorationStats } from 'domain/statistics/exploration-stats.model';
+import { ExplorationStatsService } from 'services/exploration-stats.service';
+import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
+import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-backend-api.service';
+import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
+import { StateStats } from 'domain/statistics/state-stats-model';
+import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
+import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 
 class MockNgbModal {
   open() {
@@ -52,25 +52,25 @@ class MockNgbModal {
 }
 
 describe('Exploration Improvements Service', () => {
-  let explorationImprovementsService: ExplorationImprovementsService;
-  let ngbModal: NgbModal;
   let changeListService: ChangeListService;
-  let explorationStatesService: ExplorationStatesService;
-  let explorationRightsService: ExplorationRightsService;
-  let explorationImprovementsTaskRegistryService:
-    ExplorationImprovementsTaskRegistryService;
-  let explorationStatsService: ExplorationStatsService;
-  let playthroughObjectFactory: PlaythroughObjectFactory;
-  let playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
-  let stateTopAnswersStatsService: StateTopAnswersStatsService;
   let contextService: ContextService;
-  let explorationImprovementsBackendApiService:
-    ExplorationImprovementsBackendApiService;
-  let userExplorationPermissionsService: UserExplorationPermissionsService;
   let eibasGetTasksAsyncSpy;
   let essGetExplorationStatsSpy;
+  let explorationImprovementsBackendApiService:
+    ExplorationImprovementsBackendApiService;
+  let explorationImprovementsService: ExplorationImprovementsService;
+  let explorationImprovementsTaskRegistryService:
+    ExplorationImprovementsTaskRegistryService;
+  let explorationRightsService: ExplorationRightsService;
+  let explorationStatesService: ExplorationStatesService;
+  let explorationStatsService: ExplorationStatsService;
+  let ngbModal: NgbModal;
   let pibasFetchIssuesSpy;
+  let playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
+  let playthroughObjectFactory: PlaythroughObjectFactory;
   let stassGetTopAnswersByStateNameAsyncSpy;
+  let stateTopAnswersStatsService: StateTopAnswersStatsService;
+  let userExplorationPermissionsService: UserExplorationPermissionsService;
 
   const expId = 'eid';
   const expVersion = 1;
@@ -165,13 +165,12 @@ describe('Exploration Improvements Service', () => {
   });
 
   beforeEach(() => {
-    explorationImprovementsService =
-      TestBed.inject(ExplorationImprovementsService);
     changeListService = TestBed.inject(ChangeListService);
-    ngbModal = TestBed.inject(NgbModal);
     contextService = TestBed.inject(ContextService);
     explorationImprovementsBackendApiService = (
       TestBed.inject(ExplorationImprovementsBackendApiService));
+    explorationImprovementsService = (
+      TestBed.inject(ExplorationImprovementsService));
     explorationImprovementsService = (
       TestBed.inject(ExplorationImprovementsService));
     explorationImprovementsTaskRegistryService = (
@@ -179,6 +178,7 @@ describe('Exploration Improvements Service', () => {
     explorationRightsService = TestBed.inject(ExplorationRightsService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     explorationStatsService = TestBed.inject(ExplorationStatsService);
+    ngbModal = TestBed.inject(NgbModal);
     playthroughIssuesBackendApiService = (
       TestBed.inject(PlaythroughIssuesBackendApiService));
     playthroughObjectFactory = TestBed.inject(PlaythroughObjectFactory);
@@ -187,7 +187,6 @@ describe('Exploration Improvements Service', () => {
       TestBed.inject(UserExplorationPermissionsService));
 
     spyOn(contextService, 'getExplorationId').and.returnValue(expId);
-
     eibasGetTasksAsyncSpy = (
       spyOn(explorationImprovementsBackendApiService, 'getTasksAsync'));
     essGetExplorationStatsSpy = (
