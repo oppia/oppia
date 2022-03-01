@@ -23,7 +23,7 @@ import { DeleteStateSkillModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { TopicsAndSkillsDashboardBackendApiService, CategorizedAndUntriagedSkillsData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { AlertsService } from 'services/alerts.service';
 import {WindowDimensionsService } from 'services/contextual/window-dimensions.service';
@@ -67,8 +67,8 @@ export class StateSkillEditorComponent implements OnInit {
   ngOnInit(): void {
     this.skillEditorIsShown = (!this.windowDimensionsService.isWindowNarrow());
     this.topicsAndSkillsDashboardBackendApiService
-      .fetchDashboardDataAsync()
-      .then((response: TopicsAndSkillDashboardData) => {
+      .fetchCategorizedAndUntriagedSkillsDataAsync()
+      .then((response: CategorizedAndUntriagedSkillsData) => {
         this.categorizedSkills = response.categorizedSkillsDict;
         this.untriagedSkillSummaries = response.untriagedSkillSummaries;
       });

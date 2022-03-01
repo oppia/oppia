@@ -173,6 +173,44 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.logout()
 
 
+class CategorizedAndUntriagedSkillsDataHandlerTests(
+    BaseTopicsAndSkillsDashboardTests):
+
+    def test_get(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
+
+        # Check that logged out users can access the categorized and
+        # untriaged skills data.
+        json_response = self.get_json(
+            '/topics_and_skills_dashboard/' +
+            'categorized_and_untriaged_skills_data',
+            expected_status_int=200)
+        self.assertEqual(
+            len(json_response['untriaged_skill_summary_dicts']), 1)
+        self.assertEqual(
+            json_response['untriaged_skill_summary_dicts'][0]['id'],
+            skill_id)
+        self.assertEqual(
+            len(json_response['categorized_skills_dict']), 1)
+
+        # Check that logged in users can access the categorized and
+        # untriaged skills data.
+        self.login(self.NEW_USER_EMAIL)
+        json_response = self.get_json(
+            '/topics_and_skills_dashboard/' +
+            'categorized_and_untriaged_skills_data',
+            expected_status_int=200)
+        self.assertEqual(
+            len(json_response['untriaged_skill_summary_dicts']), 1)
+        self.assertEqual(
+            json_response['untriaged_skill_summary_dicts'][0]['id'],
+            skill_id)
+        self.assertEqual(
+            len(json_response['categorized_skills_dict']), 1)
+        self.logout()
+
+
 class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_get(self):

@@ -19,7 +19,7 @@
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from
+import { TopicsAndSkillsDashboardBackendApiService, CategorizedAndUntriagedSkillsData } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
@@ -101,25 +101,17 @@ describe('State Skill Editor Component', () => {
     }
   }
 
-  const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
-    allClassroomNames: null,
-    canDeleteTopic: null,
-    canCreateTopic: null,
-    canDeleteSkill: null,
-    canCreateSkill: null,
+  const categorizedAndUntriagedSkillsData: CategorizedAndUntriagedSkillsData = {
     untriagedSkillSummaries: null,
-    mergeableSkillSummaries: null,
-    totalSkillCount: null,
-    topicSummaries: null,
     categorizedSkillsDict: null
   };
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     success: boolean = true;
-    fetchDashboardDataAsync() {
+    fetchCategorizedAndUntriagedSkillsDataAsync() {
       return {
         then: (callback: (resp) => void) => {
-          callback(topicsAndSkillsDashboardData);
+          callback(categorizedAndUntriagedSkillsData);
         }
       };
     }
@@ -242,7 +234,7 @@ describe('State Skill Editor Component', () => {
     expect(componentInstance.skillEditorIsShown).toEqual(false);
   });
 
-  it('should not show the add skill or change skill button when ' +
+  it('should not allow user to update skill when ' +
       'user does not have access to topics and skills dashboard page',
   fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
@@ -256,7 +248,7 @@ describe('State Skill Editor Component', () => {
     expect(componentInstance.isEditableByUser).toBeFalse();
   }));
 
-  it('should show add skill or change skill button when ' +
+  it('should show allow user to update skill when ' +
       'user has access to topics and skills dashboard page',
   fakeAsync(() => {
     const userInfo = UserInfo.createFromBackendDict({
