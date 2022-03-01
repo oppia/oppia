@@ -24,11 +24,14 @@ import { QuestionPlayerStateService } from 'components/question-directives/quest
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { PlayerPositionService } from '../services/player-position.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 
 @Component({
@@ -46,17 +49,23 @@ export class ExplorationFooterComponent {
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
   expInfo: LearnerExplorationSummaryBackendDict;
+  numberofCheckpoints: number;
+  checkpointArray: number[] = [0];
+  completedWidth: number;
 
   constructor(
     private contextService: ContextService,
     private explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private explorationStatesService: ExplorationStatesService,
     private ngbModal: NgbModal,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
-    private questionPlayerStateService: QuestionPlayerStateService
+    private questionPlayerStateService: QuestionPlayerStateService,
+    private playerPositionService: PlayerPositionService,
+    private explorationEngineService: ExplorationEngineService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -74,6 +83,8 @@ export class ExplorationFooterComponent {
     // that the component behaves properly at both the places.
     try {
       this.explorationId = this.contextService.getExplorationId();
+      // this.numberofCheckpoints = this.explorationStatesService.getCheckpointCount();
+      this.numberofCheckpoints = 2;
       this.iframed = this.urlService.isIframed();
       this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
       this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
@@ -101,7 +112,7 @@ export class ExplorationFooterComponent {
               );
             }
           });
-      }
+      }  
     } catch (err) { }
 
     if (this.contextService.isInQuestionPlayerMode()) {
@@ -114,8 +125,36 @@ export class ExplorationFooterComponent {
 
   openInformationCardModal(): void {
     let modalRef = this.ngbModal.open(LessonInformationCardModalComponent, {
-      windowClass: 'oppia-modal-information-card'
+      windowClass: 'oppia-modal-lesson-information-card'
     });
+
+    let index = this.playerPositionService.getDisplayedCardIndex();
+
+    modalRef.componentInstance.numberofCheckpoints = this.numberofCheckpoints;
+      // Note to developers:
+      // The checkpointArray is used to track the number of
+      // completedCheckpoints. 1 is pushed if a checkpoint is
+      // encountered else 0 is pushed.
+    let completedCheckpoints = 0;
+    for (let i = 0; i <= index; i++) {
+      completedCheckpoints = completedCheckpoints + this.checkpointArray[i]; 
+    }
+    this.completedWidth = (
+      100/(this.numberofCheckpoints))*completedCheckpoints;
+
+    if(index > 0){
+      let state = this.explorationEngineService.getState();
+      if(state.cardIsCheckpoint){
+        this.checkpointArray.push(1);  
+      }
+      else {
+        this.checkpointArray.push(0);
+      }
+    }
+    else {
+      this.checkpointArray.push(1);
+    }
+    modalRef.componentInstance.completedWidth = this.completedWidth;
 
     modalRef.result.then(() => {}, () => {
       // Note to developers:

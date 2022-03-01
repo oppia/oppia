@@ -19,19 +19,18 @@
  import { Component } from '@angular/core';
  import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
  import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
- import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
-import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
+import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { PlayerPositionService } from '../services/player-position.service';
+import { PlayerTranscriptService } from '../services/player-transcript.service';
  
  @Component({
-   selector: 'oppia-information-card-modal',
+   selector: 'oppia-lesson-information-card-modal',
    templateUrl: './lesson-information-card-modal.component.html'
  })
  export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
@@ -45,23 +44,39 @@ import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-
   storyId: string;
   storyNodeTitleTranslationKey: string;
   storyNodeDescTranslationKey: string;
+  displayedCard: StateCard;
   explorationId: string;
+  chapterNumber: string;
   isLinkedToTopic: boolean;
+  currentNodeId: string;
+  numberofCheckpoints: number; //To be fetched
+  startedWidth: number;
+  completedWidth: number;
+  separatorWidth: number;
+  fakeArray: number[];
 
  
    constructor(
     private ngbModal: NgbModal,
     private ngbActiveModal: NgbActiveModal,
     private contextService: ContextService,
-    private urlInterpolationService: UrlInterpolationService,
+    private explorationStatesService: ExplorationStatesService,
     private urlService: UrlService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private playerPositionService: PlayerPositionService,
+    private playerTranscriptService: PlayerTranscriptService,
    ) {
      super(ngbActiveModal);
     }
  
-   ngOnInit(): void { 
+   ngOnInit(): void {
+
         this.explorationId = this.contextService.getExplorationId();
+        // The following code generates the chapterNumber
+        // Since fetched via url, doesn't work on localhost.
+        // this.currentNodeId = this.urlService.getUrlParams().node_id;
+        // let node_id: string = this.currentNodeId;
+        // this.chapterNumber = node_id.charAt(node_id.length - 1) 
         this.storyId = this.urlService.getUrlParams().story_id;
         this.storyTitleTranslationKey = (
             this.i18nLanguageCodeService
@@ -72,11 +87,27 @@ import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-
             this.i18nLanguageCodeService.
               getExplorationTranslationKey(
                 this.explorationId, TranslationKeyType.TITLE)
-          );
+        );
         this.storyNodeDescTranslationKey = (
             this.i18nLanguageCodeService.
               getExplorationTranslationKey(
                 this.explorationId, TranslationKeyType.DESCRIPTION)
-          );
-    };
+        );
+
+        // this.fakeArray = new Array(this.numberofCheckpoints);
+        this.separatorWidth = 100/(this.numberofCheckpoints);
+
+        this.startedWidth = 100/(this.numberofCheckpoints);
+
+        if(this.completedWidth >= 99){
+          this.startedWidth = 0;
+        }
+
+        let index = this.playerPositionService.getDisplayedCardIndex();
+        this.displayedCard = this.playerTranscriptService.getCard(index);
+        if(this.displayedCard.isTerminal()){
+          this.completedWidth = 100;
+          this.startedWidth = 0;
+        }
+      }
   }
