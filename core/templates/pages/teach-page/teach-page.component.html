@@ -4,7 +4,9 @@
     <div class="oppia-teach-section-one-left"  *ngIf="!isWindowNarrow">
       <h1 class="oppia-teach-h1" [innerHTML]="'I18N_TEACH_PAGE_HEADING' | translate"></h1>
       <div class="oppia-teach-h2-container">
-        <h2 *ngIf="!isWindowNarrow" class="oppia-teach-h2 oppia-teach-h2-text" [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate"></h2>
+        <h2 *ngIf="!isWindowNarrow" class="oppia-teach-h2 oppia-teach-h2-text"
+            [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate">
+        </h2>
       </div>
       <div class="oppia-teach-button-container">
         <form action="classroomUrl">
@@ -17,8 +19,12 @@
     </div>
 
     <div class="oppia-teach-section-one-left" *ngIf="isWindowNarrow">
-      <h1 class="oppia-teach-h1 mobile-heading" [innerHTML]="'I18N_TEACH_PAGE_HEADING' | translate"></h1>
-      <h2  class="oppia-teach-h2 oppia-teach-h2-text mobile-h2" [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate"></h2>
+      <h1 class="oppia-teach-h1 mobile-heading"
+          [innerHTML]="'I18N_TEACH_PAGE_HEADING' | translate">
+      </h1>
+      <h2  class="oppia-teach-h2 oppia-teach-h2-text mobile-h2"
+           [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate">
+      </h2>
       <div class="oppia-teach-button-container mobile-button">
         <form action="classroomUrl">
           <button type="submit" (click)="onClickStartLearningButton()"
@@ -70,18 +76,28 @@
     <div class="oppia-teach-section-two-right" *ngIf="!isWindowNarrow" >
       <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
       <div class="teach-benefits-section">
-        <img class="bullet-one"  [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
+        <img class="bullet-one"
+             [src]="getStaticImageUrl('/splash/bullet1.svg')"
+             alt="Illustration of first bullet point">
         <div  class="benefits-one">
-          <h2 [innerHTML]="'I18N_TEACH_BENEFITS_ONE' | translate" class="teach-benefits"></h2>
+          <h2 [innerHTML]="'I18N_TEACH_BENEFITS_ONE' | translate"
+              class="teach-benefits">
+          </h2>
         </div>
       </div>
       <div class="teach-benefits-section">
-        <img class="bullet-two" [src]="getStaticImageUrl('/splash/bullet2.svg')" alt="">
-        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_TWO' | translate" class="teach-benefits"></h2>
+        <img class="bullet-two" [src]="getStaticImageUrl('/splash/bullet2.svg')"
+             alt="Illustration of second bullet point">
+        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_TWO' | translate"
+            class="teach-benefits">
+        </h2>
       </div>
       <div class="teach-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet3.svg')" alt="">
-        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_THREE' | translate" class="teach-benefits"></h2>
+        <img [src]="getStaticImageUrl('/splash/bullet3.svg')"
+             alt="Illustration of third bullet point">
+        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_THREE' | translate"
+            class="teach-benefits">
+        </h2>
       </div>
     </div>
 
@@ -90,17 +106,20 @@
         <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
       </div>
       <div class="teach-benefits-section">
-        <img class="bullet-one" [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
+        <img class="bullet-one" [src]="getStaticImageUrl('/splash/bullet1.svg')"
+             alt="Illustration of first bullet point">
         <div  class="benefits-one">
           <h2 [innerHTML]="'I18N_TEACH_BENEFITS_ONE' | translate" class="teach-benefits"></h2>
         </div>
       </div>
       <div class="teach-benefits-section">
-        <img class="bullet-two" [src]="getStaticImageUrl('/splash/bullet2.svg')" alt="">
+        <img class="bullet-two" [src]="getStaticImageUrl('/splash/bullet2.svg')"
+             alt="Illustration of second bullet point">
         <h2 [innerHTML]="'I18N_TEACH_BENEFITS_TWO' | translate" class="teach-benefits"></h2>
       </div>
       <div class="teach-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet3.svg')" alt="">
+        <img [src]="getStaticImageUrl('/splash/bullet3.svg')"
+             alt="Illustration of third bullet point">
         <div  class="benefits-one">
           <h2 [innerHTML]="'I18N_TEACH_BENEFITS_THREE' | translate" class="teach-benefits"></h2>
         </div>
