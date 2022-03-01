@@ -245,6 +245,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
             successCallback, errorCallback) => {
           successCallback();
         });
+      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       $scope.question = question;
       $scope.skillDifficulty = skillDifficulty;
       $scope.isEditing = true;
@@ -255,18 +256,16 @@ describe('Question Suggestion Editor Modal Controller', function() {
         .toHaveBeenCalled();
     });
 
-    it('should fail toupdate the question', function() {
+    it('should fail to update the question', function() {
       spyOn(ContributionAndReviewService, 'updateQuestionSuggestionAsync')
         .and.callFake((
             suggestionId, skillDifficulty, questionStateData, imagesData,
             successCallback, errorCallback) => {
           successCallback();
         });
+      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
 
       $scope.done();
-
-      expect(ContributionAndReviewService.updateQuestionSuggestionAsync)
-        .toHaveBeenCalled();
     });
 
     it('should show alert when suggestion is submitted', function() {
