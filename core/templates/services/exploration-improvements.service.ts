@@ -140,7 +140,7 @@ export class ExplorationImprovementsService implements OnInit {
     this.explorationImprovementsTaskRegistryService.initialize(
       this.config, states, expStats, openTasks,
       resolvedTaskTypesByStateName as
-      Map<string, readonly ExplorationTaskType[]>,
+      Map<string, ExplorationTaskType[]>,
       topAnswersByStateName, playthroughIssues);
 
     this.ngrTasksOpenSinceInit = (
