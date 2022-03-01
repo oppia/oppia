@@ -60,7 +60,8 @@ export const importAllAngularServices = (): void => {
       ],
     });
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function(
+      $provide: ng.auto.IProvideService) {
     for (let [serviceName, serviceType] of angularServices) {
       $provide.value(serviceName, TestBed.inject(serviceType));
     }
@@ -121,8 +122,8 @@ export const bootstrapAsync = async(
   return platform.bootstrapModule(Ng2Module).then(ref => {
     const ngZone = ref.injector.get<NgZone>(NgZone);
     const upgrade = ref.injector.get(UpgradeModule);
-    const failHardModule = ($provide) => {
-      $provide.value('$exceptionHandler', (err) => {
+    const failHardModule = ($provide: ng.auto.IProvideService) => {
+      $provide.value('$exceptionHandler', (err: unknown) => {
         throw err;
       });
       return '';
@@ -148,13 +149,13 @@ export const bootstrapAsync = async(
  * A utility function to get coverage of the upgraded component class.
  * @param {string} kebabCaseName - Name of the upgraded component in kebab-case.
  * @param {string} camelCaseName - Name of the upgraded component in camelCase.
- * @param {unknown} upgradedComponentTypes - An array consisting of only
+ * @param {never[]} upgradedComponentTypes - An array consisting of only
  *   one element. That element is the type of the upgraded component.
  */
 export const setupAndGetUpgradedComponentAsync = async(
     kebabCaseName: string,
     camelCaseName: string,
-    upgradedComponentTypes: unknown): Promise<string> => {
+    upgradedComponentTypes: never[]): Promise<string> => {
   let template = '<' + kebabCaseName + '></' + kebabCaseName + '>';
   @Component({
     selector: 'mock-comp',
@@ -195,10 +196,11 @@ export const setupAndGetUpgradedComponentAsync = async(
 export const TranslatorProviderForTests = function(
     $provide: ng.auto.IProvideService,
     $translateProvider: ng.translate.ITranslateProvider): void {
-  $provide.factory('customLoader', ['$q', function($q) {
-    return function() {
-      return $q.resolve({});
-    };
-  }]);
+  $provide.factory(
+    'customLoader', ['$q', function($q: { resolve: (arg0: {}) => {} }) {
+      return function() {
+        return $q.resolve({});
+      };
+    }]);
   $translateProvider.useLoader('customLoader');
 };

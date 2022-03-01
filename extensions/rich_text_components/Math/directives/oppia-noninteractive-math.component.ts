@@ -61,9 +61,13 @@ interface ImageContainerStyle {
   styleUrls: []
 })
 export class NoninteractiveMath implements OnInit, OnChanges {
-  @Input() mathContentWithValue: string;
-  imageContainerStyle: ImageContainerStyle;
-  imageUrl: string | ArrayBuffer | SafeResourceUrl;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() mathContentWithValue!: string;
+  imageContainerStyle!: ImageContainerStyle;
+  // ImageUrl if the SVG is valid and trusted. Otherwise returns null.
+  imageUrl!: string | ArrayBuffer | SafeResourceUrl | null;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -120,27 +124,29 @@ export class NoninteractiveMath implements OnInit, OnChanges {
         // This is required for the translation suggestion as there can be
         // target entity's images in the translatable content which needs
         // to be fetched from the server.
+        let rawImageData = this.imageLocalStorageService.getRawImageData(
+          mathExpressionContent.svg_filename);
         if (
           this.contextService.getImageSaveDestination() ===
           AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
             this.imageLocalStorageService.isInStorage(
-              mathExpressionContent.svg_filename))) {
+              mathExpressionContent.svg_filename) && rawImageData !== null)) {
           this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
-            this.imageLocalStorageService.getRawImageData(
-              mathExpressionContent.svg_filename));
+            rawImageData);
         } else {
           this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
             this.contextService.getEntityType(),
             this.contextService.getEntityId(),
             mathExpressionContent.svg_filename);
         }
-      } catch (e) {
+      } catch (e: unknown) {
         const additionalInfo = (
           '\nEntity type: ' + this.contextService.getEntityType() +
           '\nEntity ID: ' + this.contextService.getEntityId() +
           '\nFilepath: ' + mathExpressionContent.svg_filename);
-        e.message += additionalInfo;
-        throw e;
+        let error = e as Error;
+        error.message += additionalInfo;
+        throw error;
       }
     }
   }

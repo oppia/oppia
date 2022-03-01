@@ -18,15 +18,15 @@
 
 import { TemplatePortal } from '@angular/cdk/portal';
 import { Injectable } from '@angular/core';
-import { NoninteractiveCollapsible } from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
-import { NoninteractiveImage } from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
-import { NoninteractiveLink } from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
-import { NoninteractiveMath } from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
-import { NoninteractiveSkillreview } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
-import { NoninteractiveTabs } from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
-import { NoninteractiveVideo } from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
+import { NoninteractiveCollapsible } from 'extensions/rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
+import { NoninteractiveImage } from 'extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component';
+import { NoninteractiveLink } from 'extensions/rich_text_components/Link/directives/oppia-noninteractive-link.component';
+import { NoninteractiveMath } from 'extensions/rich_text_components/Math/directives/oppia-noninteractive-math.component';
+import { NoninteractiveSkillreview } from 'extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
+import { NoninteractiveTabs } from 'extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
+import { NoninteractiveVideo } from 'extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component';
 
-const selectorToComponentClassMap = {
+const selectorToComponentClassMap: Record<string, Object> = {
   'oppia-noninteractive-collapsible': NoninteractiveCollapsible,
   'oppia-noninteractive-image': NoninteractiveImage,
   'oppia-noninteractive-link': NoninteractiveLink,
@@ -44,9 +44,12 @@ export class TextNode {
 
 export class OppiaRteNode {
   children: (OppiaRteNode | TextNode)[] = [];
-  parent: OppiaRteNode | null = null;
   nodeType: '' | 'component';
-  portal: TemplatePortal;
+  parent: OppiaRteNode | null = null;
+  // Property below is initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  portal!: TemplatePortal;
   constructor(
     public readonly selector: string,
     public attrs: Record<string, string> = {}
@@ -86,7 +89,7 @@ export class OppiaRteParserService {
       // Create attributes Object from NamedNodeMap.
       for (let i = 0; i < node.attributes.length; i++) {
         attrs[this._convertKebabCaseToCamelCase(node.attributes[i].nodeName)] =
-          node.attributes[i].nodeValue;
+          node.attributes[i].nodeValue as string;
       }
 
       // Check if it an RTE component.
@@ -97,7 +100,7 @@ export class OppiaRteParserService {
       // Check if it is a text node.
       if (Object.keys(node.children).length === 0) {
         const childNode = new OppiaRteNode(tagName, attrs);
-        childNode.children.push(new TextNode(node.textContent));
+        childNode.children.push(new TextNode(node.textContent as string));
         return childNode;
       }
 
@@ -105,7 +108,8 @@ export class OppiaRteParserService {
       const childNode = new OppiaRteNode(tagName, attrs);
       for (let child = 0; child < max; child++) {
         if (node.childNodes[child].nodeType === 3) {
-          const text = node.childNodes[child].nodeValue.replace(
+          let childNodeValue = node.childNodes[child].nodeValue as string;
+          const text = childNodeValue.replace(
             /[\t\n]/g, '');
           childNode.children.push(new TextNode(text));
           continue;

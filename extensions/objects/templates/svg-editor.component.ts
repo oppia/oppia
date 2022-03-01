@@ -50,7 +50,7 @@ export class PolyPoint {
   templateUrl: './svg-editor.component.html'
 })
 export class SvgEditorComponent implements OnInit {
-  @Input() value: string;
+  @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
   // These constants are used to identify the tool that is currently being
@@ -137,9 +137,9 @@ export class SvgEditorComponent implements OnInit {
   isRedo = false;
   undoLimit = 5;
   savedSvgDiagram = '';
-  entityId: string;
-  entityType: string;
-  imageSaveDestination: string;
+  entityId!: string;
+  entityType!: string;
+  imageSaveDestination!: string;
   svgContainerStyle = {};
   layerNum = 0;
   fabricjsOptions = {
@@ -169,21 +169,21 @@ export class SvgEditorComponent implements OnInit {
   }];
 
   allowedImageFormats = ['svg'];
-  uploadedSvgDataUrl: {
+  uploadedSvgDataUrl!: {
     safeUrl: SafeResourceUrl;
     unsafeUrl: string;
-  } = null;
+  };
 
   loadType = 'group';
   defaultTopCoordinate = 50;
   defaultLeftCoordinate = 50;
   defaultRadius = 30;
 
-  canvas: fabric.Canvas;
-  filepath: string;
-  loadingIndicatorIsShown: boolean;
-  x: number;
-  y: number;
+  canvas!: fabric.Canvas;
+  filepath!: string;
+  loadingIndicatorIsShown!: boolean;
+  x!: number;
+  y!: number;
   constructor(
     private alertsService: AlertsService,
     private assetsBackendApiService: AssetsBackendApiService,
@@ -199,7 +199,7 @@ export class SvgEditorComponent implements OnInit {
   ngOnInit(): void {
     this.imageSaveDestination = this.contextService.getImageSaveDestination();
     this.entityId = this.contextService.getEntityId();
-    this.entityType = this.contextService.getEntityType();
+    this.entityType = this.contextService.getEntityType() as string;
     const domReady = new Promise((resolve, reject) => {
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', resolve);
@@ -267,8 +267,16 @@ export class SvgEditorComponent implements OnInit {
         this.imageLocalStorageService.isInStorage(svgFileName))) {
       const imageUrl = this.imageLocalStorageService.getRawImageData(
         svgFileName);
+      if (imageUrl === null) {
+        throw new Error('Image is not in storage');
+      }
+      const svgResourceUrl = (
+        this.svgSanitizerService.getTrustedSvgResourceUrl(imageUrl));
+      if (svgResourceUrl === null) {
+        throw new Error('SVG resource url is null');
+      }
       return {
-        safeUrl: this.svgSanitizerService.getTrustedSvgResourceUrl(imageUrl),
+        safeUrl: svgResourceUrl,
         unsafeUrl: imageUrl
       };
     }
@@ -301,14 +309,19 @@ export class SvgEditorComponent implements OnInit {
       this.diagramWidth = dimensions.width;
       this.diagramHeight = dimensions.height;
       let svgDataUrl = this.imageLocalStorageService.getRawImageData(
-        this.data.savedSvgFileName);
+        this.data.savedSvgFileName as string);
       if (
         this.imageSaveDestination ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && svgDataUrl
       ) {
+        const svgResourceUrl = (
+          this.svgSanitizerService.getTrustedSvgResourceUrl(
+            svgDataUrl as string));
+        if (svgResourceUrl === null) {
+          throw new Error('SVG resource url is null');
+        }
         this.uploadedSvgDataUrl = {
-          safeUrl: this.svgSanitizerService.getTrustedSvgResourceUrl(
-            svgDataUrl as string),
+          safeUrl: svgResourceUrl,
           unsafeUrl: svgDataUrl as string
         };
         this.savedSvgDiagram = this._base64DecodeUnicode(
@@ -371,7 +384,7 @@ export class SvgEditorComponent implements OnInit {
     const svgString = this.canvas.toSVG().replace('\t\t', '');
     const domParser = new DOMParser();
     const doc = domParser.parseFromString(svgString, 'text/xml');
-    const svg = doc.querySelector('svg');
+    const svg = doc.querySelector('svg') as SVGSVGElement;
     svg.removeAttribute('xml:space');
     const textTags = doc.querySelectorAll('text');
     textTags.forEach((obj) => {
@@ -385,7 +398,7 @@ export class SvgEditorComponent implements OnInit {
       if (
         elements[i].getAttributeNames().indexOf('vector-effect') !== -1) {
         elements[i].removeAttribute('vector-effect');
-        let style = elements[i].getAttribute('style');
+        let style = elements[i].getAttribute('style') as string;
         style += ' vector-effect: non-scaling-stroke';
         elements[i].setAttribute('style', style);
       }
@@ -431,9 +444,13 @@ export class SvgEditorComponent implements OnInit {
 
     if (this.isSvgTagValid(svgString)) {
       this.savedSvgDiagram = svgString;
-      resampledFile = (
+      const imageData = (
         this.imageUploadHelperService.convertImageDataToImageFile(
           svgDataURI));
+      if (imageData === null) {
+        throw new Error('Image data is null');
+      }
+      resampledFile = imageData;
       if (
         this.imageSaveDestination ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
@@ -480,6 +497,9 @@ export class SvgEditorComponent implements OnInit {
       const domParser = new DOMParser();
       const doc = domParser.parseFromString(svgString, 'image/svg+xml');
       const parentG = doc.querySelector(selector);
+      if (parentG === null) {
+        throw new Error('Parent element not found');
+      }
       parentG.setAttribute('id', id);
       return doc.documentElement.outerHTML;
     };
@@ -499,7 +519,7 @@ export class SvgEditorComponent implements OnInit {
       groupedObjects.push([]);
     }
     obj.toSVG = this.createCustomToSVG(
-      obj.toSVG, obj.type, (obj as unknown as {id: string}).id, obj);
+      obj.toSVG, obj.type as string, (obj as unknown as {id: string}).id, obj);
     groupedObjects[groupId].push(obj);
     return groupedObjects;
   }

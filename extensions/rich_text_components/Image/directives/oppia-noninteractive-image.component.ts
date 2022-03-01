@@ -56,19 +56,22 @@ interface Dimension {
   styleUrls: []
 })
 export class NoninteractiveImage implements OnInit, OnChanges {
-  @Input() filepathWithValue: string;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() filepathWithValue!: string;
   @Input() altWithValue: string = '';
   @Input() captionWithValue: string = '';
-  filepath: string;
-  imageUrl: SafeResourceUrl | string = '';
+  filepath!: string;
+  imageUrl: SafeResourceUrl | string | null = '';
   imageAltText: string = '';
   imageCaption: string = '';
-  loadingIndicatorUrl;
   isLoadingIndicatorShown: boolean = false;
   isTryAgainShown: boolean = false;
-  dimensions: ImageDimensions;
-  imageContainerStyle: Dimension;
-  loadingIndicatorStyle: Dimension;
+  loadingIndicatorUrl!: string;
+  dimensions!: ImageDimensions;
+  imageContainerStyle!: Dimension;
+  loadingIndicatorStyle!: Dimension;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
@@ -127,12 +130,13 @@ export class NoninteractiveImage implements OnInit, OnChanges {
         // This is required for the translation suggestion as there can be
         // target entity's images in the translatable content which needs
         // to be fetched from the server.
+        const base64Url = this.imageLocalStorageService.getRawImageData(
+          this.filepath);
         if (
           this.contextService.getImageSaveDestination() ===
                 AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
-            this.imageLocalStorageService.isInStorage(this.filepath))) {
-          const base64Url = this.imageLocalStorageService.getRawImageData(
-            this.filepath);
+            this.imageLocalStorageService.isInStorage(this.filepath)) && (
+            base64Url !== null)) {
           const mimeType = base64Url.split(';')[0];
           if (mimeType === 'data:image/svg+xml') {
             this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
@@ -146,13 +150,14 @@ export class NoninteractiveImage implements OnInit, OnChanges {
             this.contextService.getEntityId(),
             this.filepath);
         }
-      } catch (e) {
+      } catch (e: unknown) {
         const additionalInfo = (
           '\nEntity type: ' + this.contextService.getEntityType() +
           '\nEntity ID: ' + this.contextService.getEntityId() +
           '\nFilepath: ' + this.filepath);
-        e.message += additionalInfo;
-        throw e;
+        let error = e as Error;
+        error.message += additionalInfo;
+        throw error;
       }
 
       this.imageCaption = '';

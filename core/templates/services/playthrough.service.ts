@@ -44,9 +44,9 @@ class CyclicStateTransitionsTracker {
   private numLoops: number;
 
   constructor(initStateName: string) {
-    this.pathOfVisitedStates = [initStateName];
-    this.cycleOfVisitedStates = null;
+    this.cycleOfVisitedStates = [];
     this.numLoops = 0;
+    this.pathOfVisitedStates = [initStateName];
   }
 
   foundAnIssue(): boolean {
@@ -114,12 +114,15 @@ class CyclicStateTransitionsTracker {
 }
 
 class EarlyQuitTracker {
-  private stateName: string = null;
-  private expDurationInSecs: number = null;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private expDurationInSecs!: number;
+  private stateName!: string;
 
   foundAnIssue(): boolean {
     return (
-      this.expDurationInSecs !== null &&
+      this.expDurationInSecs !== undefined &&
       this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
   }
 
@@ -171,16 +174,18 @@ class MultipleIncorrectAnswersTracker {
   providedIn: 'root'
 })
 export class PlaythroughService {
-  private explorationId: string = null;
-  private explorationVersion: number = null;
-  private learnerIsInSamplePopulation: boolean = null;
-
-  private eqTracker: EarlyQuitTracker = null;
-  private cstTracker: CyclicStateTransitionsTracker = null;
-  private misTracker: MultipleIncorrectAnswersTracker = null;
-  private recordedLearnerActions: LearnerAction[] = null;
-  private playthroughStopwatch: Stopwatch = null;
-  private playthroughDurationInSecs: number = null;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private cstTracker!: CyclicStateTransitionsTracker;
+  private explorationId!: string;
+  private explorationVersion!: number;
+  private eqTracker!: EarlyQuitTracker;
+  private learnerIsInSamplePopulation!: boolean;
+  private misTracker!: MultipleIncorrectAnswersTracker;
+  private playthroughStopwatch!: Stopwatch;
+  private playthroughDurationInSecs!: number | null;
+  private recordedLearnerActions!: LearnerAction[];
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
@@ -250,9 +255,15 @@ export class PlaythroughService {
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
 
-    this.playthroughDurationInSecs = this.playthroughStopwatch.getTimeInSecs();
-    this.eqTracker.recordExplorationQuit(
-      stateName, this.playthroughDurationInSecs);
+    this.playthroughDurationInSecs = (
+      this.playthroughStopwatch.getTimeInSecs());
+    if (this.playthroughDurationInSecs === null) {
+      this.eqTracker.recordExplorationQuit(
+        stateName, 0);
+    } else {
+      this.eqTracker.recordExplorationQuit(
+        stateName, this.playthroughDurationInSecs);
+    }
   }
 
   storePlaythrough(): void {
@@ -317,6 +328,9 @@ export class PlaythroughService {
   }
 
   private isRecordedPlaythroughHelpful(): boolean {
+    if (this.playthroughDurationInSecs === null) {
+      return false;
+    }
     return (
       // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&

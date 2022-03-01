@@ -179,8 +179,12 @@ export class AssetsBackendApiService {
       entityType, entityId, filename, constants.ASSET_TYPE_AUDIO);
   }
 
+  // EntityType argument may be undefined.
   getImageUrlForPreview(
-      entityType: string, entityId: string, filename: string): string {
+      entityType: string | undefined,
+      entityId: string,
+      filename: string
+  ): string {
     return this.getDownloadUrl(
       entityType, entityId, filename, constants.ASSET_TYPE_IMAGE);
   }

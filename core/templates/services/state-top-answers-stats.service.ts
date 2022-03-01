@@ -42,10 +42,14 @@ export class AnswerStatsEntry {
 })
 export class StateTopAnswersStatsService {
   private initializationHasStarted: boolean;
+  private stateInteractionIds: {[stateName: string]: string} = {};
   private topAnswersStatsByStateName: Map<string, AnswerStatsEntry>;
 
-  private resolveInitPromise: () => void;
-  private rejectInitPromise: (_) => void;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private resolveInitPromise!: () => void;
+  private rejectInitPromise!: (_: unknown) => void;
   private initPromise: Promise<void>;
 
   constructor(
@@ -72,6 +76,7 @@ export class StateTopAnswersStatsService {
         const {answers, interactionIds} = (
           await this.stateTopAnswersStatsBackendApiService.fetchStatsAsync(
             explorationId));
+        this.stateInteractionIds = interactionIds;
         for (const stateName of Object.keys(answers)) {
           this.topAnswersStatsByStateName.set(
             stateName, new AnswerStatsEntry(
@@ -102,7 +107,13 @@ export class StateTopAnswersStatsService {
     if (!this.hasStateStats(stateName)) {
       throw new Error(stateName + ' does not exist.');
     }
-    return [...this.topAnswersStatsByStateName.get(stateName).answers];
+
+    const stateTopAnswersStats = this.topAnswersStatsByStateName.get(
+      stateName);
+    if (typeof stateTopAnswersStats === 'undefined') {
+      throw new Error(stateName + ' does not exist.');
+    }
+    return [...stateTopAnswersStats.answers];
   }
 
   getUnresolvedStateStats(stateName: string): AnswerStats[] {
@@ -118,7 +129,7 @@ export class StateTopAnswersStatsService {
 
   onStateAdded(stateName: string): void {
     this.topAnswersStatsByStateName.set(
-      stateName, new AnswerStatsEntry([], null));
+      stateName, new AnswerStatsEntry([], this.stateInteractionIds[stateName]));
   }
 
   onStateDeleted(stateName: string): void {
@@ -126,8 +137,13 @@ export class StateTopAnswersStatsService {
   }
 
   onStateRenamed(oldStateName: string, newStateName: string): void {
+    const stateTopAnswersStats = this.topAnswersStatsByStateName.get(
+      oldStateName);
+    if (typeof stateTopAnswersStats === 'undefined') {
+      throw new Error(oldStateName + ' does not exist.');
+    }
     this.topAnswersStatsByStateName.set(
-      newStateName, this.topAnswersStatsByStateName.get(oldStateName));
+      newStateName, stateTopAnswersStats);
     this.topAnswersStatsByStateName.delete(oldStateName);
   }
 
@@ -138,15 +154,23 @@ export class StateTopAnswersStatsService {
   private refreshAddressedInfo(updatedState: State): void {
     const stateName = updatedState.name;
 
-    if (!this.topAnswersStatsByStateName.has(stateName)) {
+    if (stateName === null || !this.topAnswersStatsByStateName.has(stateName)) {
       throw new Error(stateName + ' does not exist.');
     }
 
     const stateStats = this.topAnswersStatsByStateName.get(stateName);
 
+    if (typeof stateStats === 'undefined') {
+      throw new Error(stateName + ' does not exist.');
+    }
+
+    const updatedStateInteractionId = updatedState.interaction.id;
+    if (updatedStateInteractionId === null) {
+      throw new Error('Interaction ID cannot be null.');
+    }
     if (stateStats.interactionId !== updatedState.interaction.id) {
       this.topAnswersStatsByStateName.set(
-        stateName, new AnswerStatsEntry([], updatedState.interaction.id));
+        stateName, new AnswerStatsEntry([], updatedStateInteractionId));
     } else {
       stateStats.answers.forEach(a => a.isAddressed = (
         this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(

@@ -165,10 +165,13 @@ export class StateTasks implements Iterable<ExplorationTask> {
  */
 @Injectable({providedIn: 'root'})
 export class ExplorationImprovementsTaskRegistryService {
-  private config: ExplorationImprovementsConfig;
-  private expStats: ExplorationStats;
-  private tasksByState: Map<string, StateTasks>;
-  private openTasksByType: ReadonlyMap<ExplorationTaskType, ExplorationTask[]>;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private config!: ExplorationImprovementsConfig;
+  private expStats!: ExplorationStats;
+  private tasksByState!: Map<string, StateTasks>;
+  private openTasksByType!: ReadonlyMap<ExplorationTaskType, ExplorationTask[]>;
 
   initialize(
       config: ExplorationImprovementsConfig,
@@ -240,6 +243,10 @@ export class ExplorationImprovementsTaskRegistryService {
     this.expStats = this.expStats.createNewWithStateDeleted(oldStateName);
     const oldStateTasks = this.tasksByState.get(oldStateName);
 
+    if (typeof oldStateTasks === 'undefined') {
+      throw new Error(
+        `Attempted to delete state '${oldStateName}' but it was not found.`);
+    }
     for (const oldTask of oldStateTasks) {
       if (oldTask.isOpen()) {
         this.popOpenTask(oldTask);
@@ -254,6 +261,10 @@ export class ExplorationImprovementsTaskRegistryService {
     this.expStats = this.expStats.createNewWithStateRenamed(
       oldStateName, newStateName);
     const oldStateTasks = this.tasksByState.get(oldStateName);
+    if (typeof oldStateTasks === 'undefined') {
+      throw new Error(
+        `Attempted to rename state '${oldStateName}' but it was not found.`);
+    }
     const newStateTasks = new StateTasks(
       newStateName,
       new Map(oldStateTasks.map(oldTask => [
@@ -287,7 +298,12 @@ export class ExplorationImprovementsTaskRegistryService {
   }
 
   onStateInteractionSaved(state: State): void {
-    this.refreshStateTasks(state.name);
+    const stateName = state.name;
+    if (stateName === null) {
+      throw new Error(
+        'Attempted to save interaction for state with null name.');
+    }
+    this.refreshStateTasks(stateName);
   }
 
   getOpenHighBounceRateTasks(): HbrTask[] {
@@ -315,7 +331,13 @@ export class ExplorationImprovementsTaskRegistryService {
     if (!this.tasksByState.has(stateName)) {
       throw new Error('Unknown state with name: ' + stateName);
     }
-    return this.tasksByState.get(stateName);
+    const stateTasks = this.tasksByState.get(stateName);
+    if (typeof stateTasks === 'undefined') {
+      throw new Error(
+        `Attempted to get tasks for state '${stateName}' but it was not found` +
+        ' in the tasksByState map.');
+    }
+    return stateTasks;
   }
 
   getAllStateTasks(): StateTasks[] {
@@ -382,6 +404,11 @@ export class ExplorationImprovementsTaskRegistryService {
     for (const task of openTasks) {
       const stateNameReferences = (
         stateNameReferencesByTaskType.get(task.taskType));
+      if (typeof stateNameReferences === 'undefined') {
+        throw new Error(
+          'Unexpected task type "' + task.taskType + '" for task ' +
+          task.toString());
+      }
       if (stateNameReferences.has(task.targetId)) {
         throw new Error(
           'Found duplicate task of type "' + task.taskType + '" targeting ' +
@@ -393,6 +420,11 @@ export class ExplorationImprovementsTaskRegistryService {
     for (const [stateName, taskTypes] of resolvedTaskTypesByStateName) {
       for (const taskType of taskTypes) {
         const stateNameReferences = stateNameReferencesByTaskType.get(taskType);
+        if (typeof stateNameReferences === 'undefined') {
+          throw new Error(
+            'Unexpected task type "' + taskType + '" for task ' +
+            taskType + ' targeting state "' + stateName + '"');
+        }
         if (stateNameReferences.has(stateName)) {
           throw new Error(
             'Found duplicate task of type "' + taskType + '" targeting state ' +
@@ -452,6 +484,10 @@ export class ExplorationImprovementsTaskRegistryService {
 
   private refreshStateTasks(stateName: string): void {
     const stateTasks = this.tasksByState.get(stateName);
+    if (typeof stateTasks === 'undefined') {
+      throw new Error(
+        'Unexpected call to refreshStateTasks for state "' + stateName + '"');
+    }
     const tasksWithOldStatus: [ExplorationTask, string][] = (
       stateTasks.map(task => [task, task.getStatus()]));
 
@@ -470,12 +506,23 @@ export class ExplorationImprovementsTaskRegistryService {
 
   /** Pre-condition: task is missing from the openTasksByType data structure. */
   private pushOpenTask(task: ExplorationTask): void {
-    this.openTasksByType.get(task.taskType).push(task);
+    const openTasks = this.openTasksByType.get(task.taskType);
+    if (typeof openTasks === 'undefined') {
+      throw new Error(
+        'Unexpected call to pushOpenTask for task type "' + task.taskType +
+        '"');
+    }
+    openTasks.push(task);
   }
 
   /** Pre-condition: task is present in the openTasksByType data structure. */
   private popOpenTask(task: ExplorationTask): void {
     const arrayWithTask = this.openTasksByType.get(task.taskType);
+    if (typeof arrayWithTask === 'undefined') {
+      throw new Error(
+        'Unexpected call to popOpenTask for task type "' + task.taskType +
+        '"');
+    }
     arrayWithTask.splice(arrayWithTask.indexOf(task), 1);
   }
 }

@@ -845,6 +845,7 @@
     "core/templates/domain/opportunity/*.ts",
     "core/templates/domain/platform_feature/*.ts",
     "core/templates/domain/promo_bar/*.ts",
+    "core/templates/domain/question/*.ts",
     "core/templates/domain/recommendations/*.ts",
     "core/templates/domain/review_test/*.ts",
     "core/templates/domain/state/*.ts",

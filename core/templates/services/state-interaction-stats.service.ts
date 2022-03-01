@@ -58,7 +58,8 @@ export interface StateInteractionStats {
 @Injectable({providedIn: 'root'})
 export class StateInteractionStatsService {
   // NOTE TO DEVELOPERS: Fulfilled promises can be reused indefinitely.
-  statsCache: Map<string, Promise<StateInteractionStats>> = new Map();
+  // State name is null before saving a state. Remove null after TODO(#14313).
+  statsCache: Map<string | null, Promise<StateInteractionStats>> = new Map();
 
   constructor(
       private answerClassificationService: AnswerClassificationService,
@@ -94,17 +95,19 @@ export class StateInteractionStatsService {
    * answer-statistics.
    */
   async computeStatsAsync(
-      expId: string, state: State): Promise<StateInteractionStats> {
+      expId: string, state: State): Promise<StateInteractionStats | undefined> {
     if (this.statsCache.has(state.name)) {
       return this.statsCache.get(state.name);
     }
     const interactionRulesService = (
+      // State interaction id is null before saving a state.
+      // Remove type assertion after TODO(#14313).
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
-        state.interaction.id));
+        state.interaction.id as string));
     const statsPromise = (
       this.stateInteractionStatsBackendApiService.getStatsAsync(
         expId,
-        state.name)).then(vizInfo => ({
+        state.name as string)).then(vizInfo => ({
           explorationId: expId,
           stateName: state.name,
           visualizationsInfo: vizInfo.map(info => ({
@@ -116,7 +119,8 @@ export class StateInteractionStatsService {
                 info.addressedInfoIsSupported ?
                 this.answerClassificationService
                   .isClassifiedExplicitlyOrGoesToNewState(
-                    state.name, state, datum.answer, interactionRulesService) :
+                    state.name as string, state, datum.answer,
+                    interactionRulesService) :
                 undefined)
             }) as AnswerData),
             id: info.id,
