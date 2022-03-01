@@ -185,6 +185,9 @@ describe('Profile page', () => {
     spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
       Promise.resolve('sample-csrf-token'));
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   afterEach(() => {
@@ -574,8 +577,6 @@ describe('Profile page', () => {
   }));
 
   it('should get RTL language status correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
     expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
 });

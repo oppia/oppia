@@ -101,6 +101,9 @@ describe('Side Navigation Bar Component', () => {
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     userService = TestBed.inject(UserService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should create', () => {
@@ -234,8 +237,6 @@ describe('Side Navigation Bar Component', () => {
   });
 
   it('should get RTL language status correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
     expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
 });

@@ -2756,6 +2756,11 @@ md-card.preview-conversation-skin-supplemental-card {
   max-width: 560px;
 }
 
+.oppia-settings-container .form-group > label {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .trained-feedback-selection-form-container {
   margin-top: -5px;
   max-height: 250px;
@@ -3522,10 +3527,6 @@ oppia-noninteractive-link {
   right: 0;
 }
 
-.oppia-settings-container .form-group > label {
-  padding-left: 0;
-  padding-right: 0;
-}
 .oppia-settings-container .form-text {
   color: #737373;
   display: inline-block;

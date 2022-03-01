@@ -90,13 +90,13 @@
   font-size: 24px;
 }
 .oppia-sidebar-menu-open {
-box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
-height: 110vh;
-overflow-y: scroll;
--ms-transform: translate(0, 0);
--webkit-transform: translate3d(0, 0, 0);
-transform: translate3d(0, 0, 0);
-visibility: visible;
+  box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
+  height: 110vh;
+  overflow-y: scroll;
+  -ms-transform: translate(0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  visibility: visible;
 }
 .oppia-sidebar-menu-open::after {
   height: 0;
@@ -146,8 +146,8 @@ visibility: visible;
   background: #ededed;
   border-radius: 0 0 8px 8px;
   -webkit-box-shadow: 0 8px 6px -6px black;
-      -moz-box-shadow: 0 8px 6px -6px black;
-          box-shadow: 0 8px 6px -6px grey;
+  -moz-box-shadow: 0 8px 6px -6px black;
+  box-shadow: 0 8px 6px -6px grey;
 }
 .learn-submenu-links {
   color: #00645c;

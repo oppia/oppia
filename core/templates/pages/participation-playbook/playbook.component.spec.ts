@@ -107,6 +107,9 @@ describe('Playbook Page', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should get static image url', () => {
@@ -134,8 +137,6 @@ describe('Playbook Page', () => {
   }));
 
   it('should get RTL language status correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
     expect(component.isLanguageRTL()).toEqual(true);
   });
 });

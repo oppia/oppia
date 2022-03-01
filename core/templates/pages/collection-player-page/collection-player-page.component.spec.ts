@@ -81,7 +81,7 @@ describe('Collection player page component', () => {
       GuestCollectionProgressService);
     readOnlyCollectionBackendApiService = TestBed.inject(
       ReadOnlyCollectionBackendApiService);
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService)
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     fixture = TestBed.createComponent(CollectionPlayerPageComponent);
     component = fixture.componentInstance;
 
@@ -188,6 +188,8 @@ describe('Collection player page component', () => {
       }));
     spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('collectionId');
     alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue(null);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should throw warning message when an invalid collection ' +
@@ -500,8 +502,6 @@ describe('Collection player page component', () => {
   }));
 
   it('should get RTL language status correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
     expect(component.isLanguageRTL()).toEqual(true);
   });
 });

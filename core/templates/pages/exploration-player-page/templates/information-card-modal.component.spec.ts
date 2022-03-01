@@ -116,6 +116,9 @@ describe('Information card modal component', () => {
     ratingComputationService = TestBed.inject(RatingComputationService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should initialize', () => {
@@ -176,8 +179,6 @@ describe('Information card modal component', () => {
   });
 
   it('should get RTL language status correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
     expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
 });

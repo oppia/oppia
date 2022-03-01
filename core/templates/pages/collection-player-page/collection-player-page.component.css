@@ -130,12 +130,12 @@
 
 @media screen and (max-width: 942px) {
   .oppia-collection-path-section, .oppia-card-preview-panel {
-      display: none;
+    display: none;
   }
 }
 
 @media screen and (min-width: 943px) {
   .oppia-collection-table {
-      display: none;
+    display: none;
   }
 }

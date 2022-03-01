@@ -90,6 +90,9 @@ describe('Learner view info component', () => {
     urlService = TestBed.inject(UrlService);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   afterEach(() => {
@@ -208,8 +211,6 @@ describe('Learner view info component', () => {
   }));
 
   it('should get RTL language status correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
     expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
 });
