@@ -65,9 +65,9 @@ ENTRY_POINT_CRASH = 'crash'
 ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
 LANGUAGE_LOCALE_CODE_ENGLISH = 'en'
 ANDROID_PACKAGE_VERSION_CODE = 1
-NETWORK_WIFI = app_feedback_report_constants.ANDROID_NETWORK_TYPE.wifi
+NETWORK_WIFI = app_feedback_report_constants.AndroidNetworkType.WIFI
 ANDROID_TEXT_SIZE = (
-    app_feedback_report_constants.ANDROID_TEXT_SIZE.medium_text_size)
+    app_feedback_report_constants.AndroidTextSize.MEDIUM_TEXT_SIZE)
 ANDROID_BUILD_FINGERPRINT = 'example_fingerprint_id'
 EVENT_LOGS = ['event1', 'event2']
 LOGCAT_LOGS = ['logcat1', 'logcat2']
@@ -80,12 +80,12 @@ ANDROID_REPORT_INFO = {
     'logcat_logs': ['logcat1', 'logcat2'],
     'package_version_code': ANDROID_PACKAGE_VERSION_CODE,
     'build_fingerprint': ANDROID_BUILD_FINGERPRINT,
-    'network_type': NETWORK_WIFI.name,
+    'network_type': NETWORK_WIFI.value,
     'android_device_language_locale_code': LANGUAGE_LOCALE_CODE_ENGLISH,
     'entry_point_info': {
         'entry_point_name': ENTRY_POINT_NAVIGATION_DRAWER,
     },
-    'text_size': ANDROID_TEXT_SIZE.name,
+    'text_size': ANDROID_TEXT_SIZE.value,
     'only_allows_wifi_download_and_update': True,
     'automatically_update_topics': False,
     'account_is_profile_admin': False
@@ -173,7 +173,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 'device_model': ANDROID_DEVICE_MODEL,
                 'sdk_version': ANDROID_SDK_VERSION,
                 'build_fingerprint': ANDROID_BUILD_FINGERPRINT,
-                'network_type': NETWORK_WIFI.name
+                'network_type': NETWORK_WIFI.value
             },
             'app_context': {
                 'entry_point': {
@@ -181,7 +181,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 },
                 'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
                 'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
-                'text_size': ANDROID_TEXT_SIZE.name,
+                'text_size': ANDROID_TEXT_SIZE.value,
                 'only_allows_wifi_download_and_update': True,
                 'automatically_update_topics': False,
                 'account_is_profile_admin': False,
@@ -305,7 +305,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
             self.assertEqual(
                 feedback_report.get_android_text_size_from_string(
-                    text_size.name), text_size)
+                    text_size.value), text_size)
 
     def test_get_android_text_size_from_string_with_invalid_string_raises_error(
             self) -> None:
@@ -384,10 +384,10 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_get_android_network_type_from_string_returns_expected_network_type(
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
-        for network_type in app_feedback_report_constants.ANDROID_NETWORK_TYPE:
+        for network_type in app_feedback_report_constants.AndroidNetworkType:
             self.assertEqual(
                 feedback_report.get_android_network_type_from_string(
-                    network_type.name), network_type)
+                    network_type.value), network_type)
 
     def test_get_android_network_type_from_string_invalid_string_raises_error(
             self) -> None:
@@ -590,7 +590,7 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
             'device_model': ANDROID_DEVICE_MODEL,
             'sdk_version': ANDROID_SDK_VERSION,
             'build_fingerprint': ANDROID_BUILD_FINGERPRINT,
-            'network_type': NETWORK_WIFI.name
+            'network_type': NETWORK_WIFI.value
         }
         self.assertDictEqual(
             expected_dict, self.device_system_context.to_dict())
@@ -1049,7 +1049,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
-            'text_size': ANDROID_TEXT_SIZE.name,
+            'text_size': ANDROID_TEXT_SIZE.value,
             'only_allows_wifi_download_and_update': True,
             'automatically_update_topics': False,
             'account_is_profile_admin': False,
