@@ -170,4 +170,3 @@ export class ExplorationImprovementsService {
 
 angular.module('oppia').factory('ExplorationImprovementsService',
   downgradeInjectable(ExplorationImprovementsService));
-
