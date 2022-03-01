@@ -33,38 +33,44 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(IssueRegistryUnitTests, self).setUp()
         self.issues_dict = {
-                'EarlyQuit':
-                EarlyQuit.EarlyQuit,
-                'CyclicStateTransitions':
-                CyclicStateTransitions.CyclicStateTransitions,
-                'MultipleIncorrectSubmissions':
-                MultipleIncorrectSubmissions.MultipleIncorrectSubmissions
-                }
+            'EarlyQuit': (
+                EarlyQuit.EarlyQuit),
+            'CyclicStateTransitions': (
+                CyclicStateTransitions.CyclicStateTransitions),
+            'MultipleIncorrectSubmissions': (
+                MultipleIncorrectSubmissions.MultipleIncorrectSubmissions)
+            }
         self.invalid_issue_type = 'InvalidIssueType'
-        self.Registry = playthrough_issue_registry.Registry()
 
-    def test_issue_registry(self):
+# Adding test execution order with 01, 02, 03 because playthrough_issue_registry
+# has _issues as a class argument in Registry class . Thus we are maintaing a
+# single copy of _issues for all objects and class itself . This creates a small
+# coverage issue when _issues is already updated by other function whereas it is
+# required to be empty by some other function .
+
+    def test_01_issue_registry(self):
         """Do some sanity checks on the issue registry."""
         self.assertEqual(
-            len(self.Registry.get_all_issues()), 3)
+            len(playthrough_issue_registry.Registry.get_all_issues()), 3)
 
-    def test_issue_registry_types(self):
-        """Do some issue type checks on the issue registry."""
-
-        def validate(issue_type):
-            """validating function."""
-            try:
-                return self.Registry.get_issue_by_type(
-                    issue_type)
-            except KeyError as e:
-                raise utils.ValidationError('Invalid issue type: %s' % (
-                    issue_type)) from e
-
+    def test_02_correct_issue_registry_types(self):
+        """Tests issue registry for fetching of issue instances of correct
+        issue types.
+        """
         for issue_type, instance in self.issues_dict.items():
             self.assertIsInstance(
-                    validate(issue_type),
-                    instance)
+                playthrough_issue_registry.Registry.get_issue_by_type(
+                    issue_type), instance)
 
+    def test_03_incorrect_issue_registry_types(self):
+        """Tests issue registry for raising error on passing incorrect issues
+        types.
+        """
         with self.assertRaisesRegex(utils.ValidationError, (
             'Invalid issue type: %s' % self.invalid_issue_type)):
-            validate(self.invalid_issue_type)
+            try:
+                playthrough_issue_registry.Registry.get_issue_by_type(
+                    self.invalid_issue_type)
+            except KeyError as e:
+                raise utils.ValidationError('Invalid issue type: %s' % (
+                    self.invalid_issue_type)) from e
