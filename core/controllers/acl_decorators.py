@@ -150,6 +150,10 @@ def does_classroom_exist(handler):
 
         Returns:
             handler. function. The newly decorated function.
+
+        Raises:
+            Exception. This decorator is not expected to be used with other
+                handler types.
         """
         classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
@@ -2181,11 +2185,17 @@ def can_access_learner_dashboard(handler):
 
         Raises:
             NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have
+                credentials to access the page.
         """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
         if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.user.actions:
             return handler(self, **kwargs)
         else:
-            raise self.NotLoggedInException
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
     test_can_access.__wrapped__ = True
 
     return test_can_access

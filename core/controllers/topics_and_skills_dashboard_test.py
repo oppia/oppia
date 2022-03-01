@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.domain import config_services
 from core.domain import question_services
@@ -603,7 +603,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'url_fragment': 'name-one'
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None
         ) as f:
@@ -641,7 +641,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'url_fragment': 'name-three'
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
             'rb', encoding=None
         ) as f:
@@ -662,7 +662,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def setUp(self):
         super(NewSkillHandlerTests, self).setUp()
         self.url = feconf.NEW_SKILL_URL
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None
         ) as f:
@@ -806,7 +806,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'thumbnail_filename': 'image.svg'
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
