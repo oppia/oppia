@@ -83,8 +83,9 @@ export class ExplorationFooterComponent {
     // that the component behaves properly at both the places.
     try {
       this.explorationId = this.contextService.getExplorationId();
-      // this.numberofCheckpoints = this.explorationStatesService.getCheckpointCount();
-      this.numberofCheckpoints = 2;
+      this.numberofCheckpoints = this.explorationStatesService.
+        getCheckpointCount();
+      // Testing: this.numberofCheckpoints = 4;
       this.iframed = this.urlService.isIframed();
       this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
       this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
@@ -112,7 +113,7 @@ export class ExplorationFooterComponent {
               );
             }
           });
-      }  
+      }
     } catch (err) { }
 
     if (this.contextService.isInQuestionPlayerMode()) {
@@ -131,27 +132,25 @@ export class ExplorationFooterComponent {
     let index = this.playerPositionService.getDisplayedCardIndex();
 
     modalRef.componentInstance.numberofCheckpoints = this.numberofCheckpoints;
-      // Note to developers:
-      // The checkpointArray is used to track the number of
-      // completedCheckpoints. 1 is pushed if a checkpoint is
-      // encountered else 0 is pushed.
+    // Note to developers:
+    // The checkpointArray is used to track the number of
+    // completedCheckpoints. 1 is pushed if a checkpoint is
+    // encountered else 0 is pushed.
     let completedCheckpoints = 0;
     for (let i = 0; i <= index; i++) {
-      completedCheckpoints = completedCheckpoints + this.checkpointArray[i]; 
+      completedCheckpoints = completedCheckpoints + this.checkpointArray[i];
     }
     this.completedWidth = (
-      100/(this.numberofCheckpoints))*completedCheckpoints;
+      100 / (this.numberofCheckpoints)) * completedCheckpoints;
 
-    if(index > 0){
+    if (index > 0) {
       let state = this.explorationEngineService.getState();
-      if(state.cardIsCheckpoint){
-        this.checkpointArray.push(1);  
-      }
-      else {
+      if (state.cardIsCheckpoint) {
+        this.checkpointArray.push(1);
+      } else {
         this.checkpointArray.push(0);
       }
-    }
-    else {
+    } else {
       this.checkpointArray.push(1);
     }
     modalRef.componentInstance.completedWidth = this.completedWidth;

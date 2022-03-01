@@ -1,95 +1,98 @@
 <mat-card>
-    <div class="oppia-lesson-info-content">
-        <p class="oppia-story-title">
-            {{ storyTitleTranslationKey | translate}}
-        </p>
-        <hr>
-        <h3 class="oppia-chapter-title">
-            Chapter {{ numberofCheckpoints }}: {{ storyNodeTitleTranslationKey | translate}}
-        </h3>
-        <h4 class="oppia-chapter-description">
-            {{ storyNodeDescTranslationKey | translate}}
-        </h4>
-        <p class="progress-text">Progress</p>
-        <div class=bar-container>
-            <div class="progress">
-                <!-- <div *ngFor="let i of fakeArray" class="border_container">
-                    <div class="separator"
-                    [style.width.%]="separatorWidth">
-                    </div>
-                </div> -->
-                <div class="progress-bar progress-bar-completed"
-                     role="progressbar"
-                     [style.width.%]="completedWidth"> 
-                </div>
-                <div class="progress-bar progress-bar-started"
-                     role="progressbar"
-                     [style.width.%]="startedWidth"> 
-                </div>
-            </div>
-        </div>    
+  <div class="oppia-lesson-info-content">
+    <p class="oppia-story-title">
+        {{ storyTitleTranslationKey | translate}}
+    </p>
+    <hr>
+    <h3 class="oppia-chapter-title">
+        Chapter {{ numberofCheckpoints }}: {{ storyNodeTitleTranslationKey | translate}}
+    </h3>
+    <h4 class="oppia-chapter-description">
+        {{ storyNodeDescTranslationKey | translate}}
+    </h4>
+    <p class="progress-text">Progress</p>
+    <div class="progress under_part">
+      <div class="border_container">
+        <div class="separator"
+             *ngFor="let i of separatorArray;"
+             [style.width.%]="separatorWidth">
+        </div>
+      </div>
+      <div class="progress-bar progress-bar-completed"
+           role="progressbar"
+           [style.width.%]="completedWidth">
+      </div>
+      <div class="progress-bar progress-bar-started"
+           role="progressbar"
+           [style.width.%]="startedWidth">
+      </div>
     </div>
-    <button type="button" class="oppia-close-popover-button" (click)="cancel()">
-        <i class="material-icons md-18">&#xE5CD;</i>
-        <span class="oppia-icon-accessibility-label">Close</span>
-    </button>
+  </div>
+  <button type="button" class="oppia-close-popover-button" (click)="cancel()">
+    <i class="material-icons md-18">&#xE5CD;</i>
+    <span class="oppia-icon-accessibility-label">Close</span>
+  </button>
 </mat-card>
 
 <style>
-    .oppia-story-title {
-        color: grey;
-        font-family: "Capriola", "Roboto", Arial, sans-serif;
-        font-size: 15px;
-        margin-bottom: -10px;
-    }
+  .oppia-story-title {
+      color: grey;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+      font-size: 13px;
+      margin-bottom: -10px;
+  }
 
-    .oppia-lesson-info-content {
-        padding: 15px;
-    }
+  .oppia-lesson-info-content {
+      padding: 15px;
+  }
 
-    .oppia-chapter-description {
-        color: #5e5d5d;
-        font-size: 18px;
-        padding-bottom: 10px;
-    }
+  .oppia-chapter-description {
+      color: #5e5d5d;
+      font-size: 18px;
+      padding-bottom: 10px;
+  }
 
-    .bar-container {
-        border: 2px;
-        border-color: grey;
-    }
+  .progress {
+      background: #f0ffff;
+      border: 2px solid #707070;
+      border-radius: 10px;
+      height: 10px;
+      position: relative;
+  }
 
-    .progress {
-        background: #F0FFFF;
-        border: 2px solid #707070;
-        border-radius: 10px;
-        height: 10px;   
-    }
+  .progress-text {
+      color: #1b1b1b;
+      font-size: 12px;
+      margin-bottom: 2px;
+      margin-left: 5px;
+  }
 
-    .progress-text {
-        color: #1b1b1b;
-        font-size: 12px;
-        margin-bottom: 2px;
-        margin-left: 5px;
-    }
+  .progress-bar {
+      left: 0;
+      width: 0;
+  }
 
-    .progress-bar-completed {
-        background-color: #2D4A9D;
-    }
+  .progress-bar-completed {
+      background-color: #2d4a9d;
+      z-index: 5;
+  }
 
-    .progress-bar-started {
-        background-color: #2D4A9D99;
-    }
+  .progress-bar-started {
+      background-color: #2d4a9d99;
+      z-index: 4;
+  }
 
-    /* .separator {
-        height: 100%;
-        border: 2px solid #707070;
-        z-index: 100;
-    }
+  .separator {
+      border: 2px solid #707070;
+      height: 10px;
+      z-index: 1;
+  }
 
-    .border_container {
-        position: absolute;
-        display: flex;
-        width: 100%;
-        height: 10px;
-    } */
+  .border_container {
+      display: flex;
+      height: 10px;
+      position: absolute;
+      width: 100%;
+      z-index: 0;
+  }
 </style>

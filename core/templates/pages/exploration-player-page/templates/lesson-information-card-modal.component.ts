@@ -16,25 +16,24 @@
  * @fileoverview Component for lesson information card modal.
  */
 
- import { Component } from '@angular/core';
- import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
- import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { Component } from '@angular/core';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from
+// eslint-disable-next-line max-len
+  'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
- 
+
  @Component({
    selector: 'oppia-lesson-information-card-modal',
    templateUrl: './lesson-information-card-modal.component.html'
  })
- export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
-
+export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   topicUrlFragment: string;
   classroomUrlFragment: string;
   storyUrlFragment: string;
@@ -49,65 +48,65 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
   chapterNumber: string;
   isLinkedToTopic: boolean;
   currentNodeId: string;
-  numberofCheckpoints: number; //To be fetched
+  numberofCheckpoints: number;
   startedWidth: number;
   completedWidth: number;
   separatorWidth: number;
-  fakeArray: number[];
+  separatorArray: number[];
 
- 
-   constructor(
+
+  constructor(
     private ngbModal: NgbModal,
     private ngbActiveModal: NgbActiveModal,
     private contextService: ContextService,
-    private explorationStatesService: ExplorationStatesService,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
-   ) {
-     super(ngbActiveModal);
-    }
- 
-   ngOnInit(): void {
-
-        this.explorationId = this.contextService.getExplorationId();
-        // The following code generates the chapterNumber
-        // Since fetched via url, doesn't work on localhost.
-        // this.currentNodeId = this.urlService.getUrlParams().node_id;
-        // let node_id: string = this.currentNodeId;
-        // this.chapterNumber = node_id.charAt(node_id.length - 1) 
-        this.storyId = this.urlService.getUrlParams().story_id;
-        this.storyTitleTranslationKey = (
-            this.i18nLanguageCodeService
-            .getStoryTranslationKey(
-                this.storyId, TranslationKeyType.TITLE));
-
-        this.storyNodeTitleTranslationKey = (
-            this.i18nLanguageCodeService.
-              getExplorationTranslationKey(
-                this.explorationId, TranslationKeyType.TITLE)
-        );
-        this.storyNodeDescTranslationKey = (
-            this.i18nLanguageCodeService.
-              getExplorationTranslationKey(
-                this.explorationId, TranslationKeyType.DESCRIPTION)
-        );
-
-        // this.fakeArray = new Array(this.numberofCheckpoints);
-        this.separatorWidth = 100/(this.numberofCheckpoints);
-
-        this.startedWidth = 100/(this.numberofCheckpoints);
-
-        if(this.completedWidth >= 99){
-          this.startedWidth = 0;
-        }
-
-        let index = this.playerPositionService.getDisplayedCardIndex();
-        this.displayedCard = this.playerTranscriptService.getCard(index);
-        if(this.displayedCard.isTerminal()){
-          this.completedWidth = 100;
-          this.startedWidth = 0;
-        }
-      }
+  ) {
+    super(ngbActiveModal);
   }
+
+  ngOnInit(): void {
+    this.explorationId = this.contextService.getExplorationId();
+    // The following code generates the chapterNumber
+    // Since fetched via url, doesn't work on localhost.
+    this.currentNodeId = this.urlService.getUrlParams().node_id;
+    let nodeId: string = this.currentNodeId;
+    this.chapterNumber = nodeId.charAt(nodeId.length - 1);
+    this.storyId = this.urlService.getUrlParams().story_id;
+    this.storyTitleTranslationKey = (
+      this.i18nLanguageCodeService
+        .getStoryTranslationKey(
+          this.storyId, TranslationKeyType.TITLE));
+
+    this.storyNodeTitleTranslationKey = (
+      this.i18nLanguageCodeService.
+        getExplorationTranslationKey(
+          this.explorationId, TranslationKeyType.TITLE)
+    );
+    this.storyNodeDescTranslationKey = (
+      this.i18nLanguageCodeService.
+        getExplorationTranslationKey(
+          this.explorationId, TranslationKeyType.DESCRIPTION)
+    );
+
+    // The purpose of separatorArray is for the working of
+    // for loop in lesson-information-card-modal.component.html.
+    this.separatorArray = new Array(this.numberofCheckpoints);
+    this.separatorWidth = 100 / (this.numberofCheckpoints);
+
+    this.startedWidth = 100 / (this.numberofCheckpoints);
+
+    if (this.completedWidth >= 99) {
+      this.startedWidth = 0;
+    }
+
+    let index = this.playerPositionService.getDisplayedCardIndex();
+    this.displayedCard = this.playerTranscriptService.getCard(index);
+    if (this.displayedCard.isTerminal()) {
+      this.completedWidth = 100;
+      this.startedWidth = 0;
+    }
+  }
+}
