@@ -56,9 +56,11 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
 
         for state_name, state in exp.states.items():
             interaction = state.interaction
-            if interaction.default_outcome.refresher_exploration_id is not None:
-                yield (exp.id, state_name)
-                return
+            default_outcome = interaction.default_outcome
+            if default_outcome is not None:
+                if default_outcome.refresher_exploration_id is not None:
+                    yield (exp.id, state_name)
+                    return
 
             for group in interaction.answer_groups:
                 if group.outcome.refresher_exploration_id is not None:
