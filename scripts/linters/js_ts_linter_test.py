@@ -86,6 +86,24 @@ class JsTsLintTests(test_utils.LinterTestBase):
             else:
                 continue
 
+    def test_compile_all_ts_files_with_error(self):
+        def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            class Ret:
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 1
+                def communicate(self):
+                    """Return some error."""
+                    return '', 'Some error'.encode('utf-8')
+            return Ret()
+
+        popen_error_swap = self.swap(
+            subprocess, 'Popen', mock_popen_error_call)
+        with popen_error_swap:
+            with self.assertRaisesRegex(Exception, 'Some error'):
+                js_ts_linter.compile_all_ts_files()
+
     def test_validate_and_parse_js_and_ts_files_with_exception(self):
         def mock_parse_script(unused_file_content, comment):  # pylint: disable=unused-argument
             raise Exception('Exception raised from parse_script()')
@@ -188,7 +206,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
 
         with exists_swap, self.assertRaisesRegex(
             Exception,
-            'ERROR    Please run start.sh first to install node-eslint and '
+            'ERROR    Please run start.py first to install node-eslint and '
             'its dependencies.'):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_SORTED_DEPENDENCIES_FILEPATH]
