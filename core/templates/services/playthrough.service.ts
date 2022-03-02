@@ -334,7 +334,8 @@ export class PlaythroughService {
       this.recordedLearnerActions !== null);
   }
 
-  private hasRecordingFinished(): boolean {
+  // Return Undefined if Learner has not begun recording.
+  private hasRecordingFinished(): boolean | undefined {
     if (this.recordedLearnerActions !== null) {
       return (
         this.hasRecordingBegun() &&
@@ -342,15 +343,16 @@ export class PlaythroughService {
         this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
           .actionType === AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
     }
-    return false;
   }
 
   private isRecordedPlaythroughHelpful(): boolean {
+    const hasRecordedPlayFinished = this.hasRecordingFinished();
     if (this.recordedLearnerActions !== null && (
-      this.playthroughDurationInSecs !== null)) {
+      this.playthroughDurationInSecs !== null) && (
+      hasRecordedPlayFinished !== undefined)) {
       return (
         // Playthroughs are only helpful in their entirety.
-        this.hasRecordingFinished() &&
+        hasRecordedPlayFinished &&
         // Playthroughs are only helpful if learners have attempted an answer.
         this.recordedLearnerActions.some(
           a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
