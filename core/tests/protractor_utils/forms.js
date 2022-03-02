@@ -30,7 +30,7 @@ var DictionaryEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
       var entry = elem.all(
-        by.css('.protractor-test-schema-based-dict-editor')).row(index);
+        by.css('.protractor-test-schema-based-dict-editor')).get(index);
       var editor = getEditor(objectType);
       return await editor(entry);
     }
@@ -300,7 +300,7 @@ var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
       var entry = elem.all(
-        by.css('.protractor-test-schema-based-dict-editor')).row(index);
+        by.css('.protractor-test-schema-based-dict-editor')).get(index);
       var editor = getEditor(objectType);
       return await editor(entry);
     }
