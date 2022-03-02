@@ -75,3 +75,56 @@ describe('HTML to text', function() {
       });
     }));
 });
+
+import { TestBed } from '@angular/core/testing';
+import { ConvertUnicodeWithParamsToHtmlPipe } from 'filters/convert-unicode-with-params-to-html.filter';
+
+describe('Testing CamelCaseToHyphensPipe', () => {
+  let pipe: ConvertUnicodeWithParamsToHtmlPipe;
+
+  beforeEach(() => {
+    pipe = TestBed.get(ConvertUnicodeWithParamsToHtmlPipe);
+  });
+
+  it('should have all expected pipes', () => {
+    expect(pipe).not.toBeNull();
+  });
+
+  it('should detect invalid unicode strings', () => {
+    var invalidUnicodeStrings = [
+      '{}',
+      '}}abc{{',
+      '\\{{a}}',
+      '{{a\\}}',
+      '{{a}\\}'
+    ];
+    invalidUnicodeStrings.forEach(function(s) {
+      var fn = function() {
+        return pipe.transform(s);
+      };
+      expect(fn).toThrowError(
+        'Invalid unicode-string-with-parameters: ' + false);
+    });
+  });
+
+  it('should detect valid unicode strings', () => {
+    var results = [
+      '<oppia-parameter></oppia-parameter>',
+      '<oppia-parameter>abc</oppia-parameter>',
+      '\\<oppia-parameter>abc</oppia-parameter>',
+      '{<oppia-parameter>abc</oppia-parameter>',
+    ];
+    var validUnicodeStrings = [
+      '{{}}',
+      '{{abc}}',
+      '\\\\{{abc}}',
+      '\\{{{abc}}'
+    ];
+    validUnicodeStrings.forEach(function(s, i) {
+      var fn = (function() {
+        return pipe.transform(s);
+      })();
+      expect(fn).toEqual(results[i]);
+    });
+  });
+});

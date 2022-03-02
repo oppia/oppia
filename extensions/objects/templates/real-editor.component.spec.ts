@@ -35,12 +35,22 @@ describe('RealEditorComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(RealEditorComponent);
     component = fixture.componentInstance;
+
+    component.ngOnInit();
+    component.writeValue(0);
+    component.registerOnTouched(null);
+    component.registerOnChange(null);
+    component.registerOnValidatorChange(() => {});
   });
 
   it('should initialise component when user edits a number', () => {
     component.ngOnInit();
 
     expect(component.value).toBe(0.0);
+  });
+
+  it('should get empty object on validating', () => {
+    expect(component.validate(null)).toEqual({});
   });
 
   it('should initialise with old value if present', () => {
@@ -54,6 +64,12 @@ describe('RealEditorComponent', () => {
   it('should not get schema when called', () => {
     expect(component.getSchema()).toEqual({
       type: 'float'
+    });
+  });
+
+  it('should get component validation state', () => {
+    expect(component.getComponentValidationState()).toEqual({
+      random: true
     });
   });
 

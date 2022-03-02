@@ -57,6 +57,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'python-program.tokenizer.ts',
     'question-update.service.ts',
     'rule-type-selector.directive.ts',
+    'schema-validators.ts',
     'select2-dropdown.directive.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
