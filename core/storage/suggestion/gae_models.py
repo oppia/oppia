@@ -498,7 +498,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             offset: int,
             user_id: str,
             language_codes: List[str]
-    ) -> Sequence[GeneralSuggestionModel]:
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches translation suggestions that are in-review where the
         author_id != user_id and language_code matches one of the supplied
         language_codes.
@@ -585,7 +585,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def get_in_review_question_suggestions_by_offset(
         cls, limit: int, offset: int, user_id: str
-    ) -> Sequence[GeneralSuggestionModel]:
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
 
@@ -687,7 +687,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def get_user_created_suggestions_by_offset(
         cls, limit: int, offset: int, suggestion_type: str, user_id: str
-    ) -> Sequence[GeneralSuggestionModel]:
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches suggestions of suggestion_type which the supplied user has
         created.
 
