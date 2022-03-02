@@ -233,6 +233,7 @@
         "core.jobs.batch_jobs.user_stats_computation_jobs_test",
         "core.jobs.batch_jobs.opportunity_management_jobs_test",
         "core.jobs.batch_jobs.collection_info_jobs_test",
+        "core.jobs.batch_jobs.refresher_exp_id_jobs_test",
         "core.domain.image_validation_services_test",
         "core.storage.beam_job.gae_models_test",
         "scripts.linters.js_ts_linter_test",
