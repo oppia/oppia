@@ -25,7 +25,7 @@ import os
 import zipfile
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import config_services
@@ -476,6 +476,11 @@ written_translations:
         exp_services.update_exploration(
             owner_id, exp_id, [
                 exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'auto_tts_enabled',
+                    'new_value': True,
+                }),
+                exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State A',
                 }),
@@ -601,7 +606,7 @@ written_translations:
         golden_zip_filepath = os.path.join(
             feconf.TESTS_DATA_DIR,
             'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip')
-        with python_utils.open_file(
+        with utils.open_file(
             golden_zip_filepath, 'rb', encoding=None) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
@@ -3255,7 +3260,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertFalse(fs.isfile(filepath))
 
         # Read raw image for testing.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
@@ -3314,7 +3319,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
         # Read raw image for testing.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
