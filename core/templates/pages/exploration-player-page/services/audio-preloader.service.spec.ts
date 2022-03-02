@@ -20,12 +20,14 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
+import { InteractionAnswer } from 'interactions/answer-defs';
 import { AudioPreloaderService } from 'pages/exploration-player-page/services/audio-preloader.service';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { ContextService } from 'services/context.service';
 
 describe('Audio preloader service', () => {
   let httpTestingController: HttpTestingController;
+  let interactionAnswer: InteractionAnswer[] = ['Ans1'];
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
@@ -105,7 +107,7 @@ describe('Audio preloader service', () => {
         },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
       },
       'State 3': {
         param_changes: [],
@@ -147,7 +149,7 @@ describe('Audio preloader service', () => {
         },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
       },
       'State 2': {
         param_changes: [],
@@ -201,7 +203,7 @@ describe('Audio preloader service', () => {
         },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
       },
       Introduction: {
         param_changes: [],
@@ -265,7 +267,7 @@ describe('Audio preloader service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
             },
-            training_data: null,
+            training_data: interactionAnswer,
             tagged_skill_misconception_id: null,
           }, {
             rule_specs: [{
@@ -286,7 +288,7 @@ describe('Audio preloader service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
             },
-            training_data: null,
+            training_data: interactionAnswer,
             tagged_skill_misconception_id: null,
           }],
           hints: []
@@ -302,7 +304,7 @@ describe('Audio preloader service', () => {
         },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
       }
     },
     param_specs: {},
@@ -314,12 +316,12 @@ describe('Audio preloader service', () => {
   let requestUrl4 = '/assetsdevhandler/exploration/1/assets/audio/en-4.mp3';
 
   beforeEach(() => {
-    audioPreloaderService = TestBed.get(AudioPreloaderService);
+    audioPreloaderService = TestBed.inject(AudioPreloaderService);
     audioPreloaderService.setAudioLoadedCallback((_: string): void => {});
     audioTranslationLanguageService = (
-      TestBed.get(AudioTranslationLanguageService));
-    explorationObjectFactory = TestBed.get(ExplorationObjectFactory);
-    contextService = TestBed.get(ContextService);
+      TestBed.inject(AudioTranslationLanguageService));
+    explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
+    contextService = TestBed.inject(ContextService);
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
   });
 
@@ -330,7 +332,7 @@ describe('Audio preloader service', () => {
       audioPreloaderService.init(exploration);
       audioTranslationLanguageService.init(['en'], 'en', 'en', false);
       audioPreloaderService.kickOffAudioPreloader(
-        exploration.getInitialState().name);
+        exploration.getInitialState().name as string);
 
       expect(audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading())
         .toEqual(['en-1.mp3', 'en-2.mp3', 'en-3.mp3']);
@@ -371,7 +373,7 @@ describe('Audio preloader service', () => {
     audioPreloaderService.init(exploration);
     audioTranslationLanguageService.init(['en'], 'en', 'en', false);
     audioPreloaderService.kickOffAudioPreloader(
-      exploration.getInitialState().name);
+      exploration.getInitialState().name as string);
 
     httpTestingController.expectOne(requestUrl1);
     httpTestingController.expectOne(requestUrl2);

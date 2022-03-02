@@ -38,7 +38,9 @@ export class AudioPreloaderService {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private exploration!: Exploration;
   private audioLoadedCallback!: (_: string) => void;
-  private mostRecentlyRequestedAudioFilename!: string;
+  // The following property can be null, when there is no recently
+  // requested audio filename.
+  private mostRecentlyRequestedAudioFilename: string | null = null;
 
   constructor(
       private assetsBackendApiService: AssetsBackendApiService,
@@ -82,14 +84,12 @@ export class AudioPreloaderService {
   }
 
   clearMostRecentlyRequestedAudioFilename(): void {
-    this.mostRecentlyRequestedAudioFilename = 'No audio filename requested';
+    this.mostRecentlyRequestedAudioFilename = null;
   }
 
-  getMostRecentlyRequestedAudioFilename(): string {
-    if (this.mostRecentlyRequestedAudioFilename === (
-      'No audio filename requested')) {
-      throw new Error('No audio filename has been requested yet.');
-    }
+  // This function returns null when there is no recently requested
+  // audio filename.
+  getMostRecentlyRequestedAudioFilename(): string | null {
     return this.mostRecentlyRequestedAudioFilename;
   }
 
@@ -98,18 +98,26 @@ export class AudioPreloaderService {
   }
 
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
-    const currentAudioLanguageCode = (
+    const languageCode = (
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
-    const languageCode = currentAudioLanguageCode as string;
-    const allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
-    const bfsTraversalOfStates = (
-      this.computeGraphService.computeBfsTraversalOfStates(
-        this.exploration.getInitialState().name as string,
-        this.exploration.getStates(), sourceStateName));
+    let allVoiceovers = null;
+    if (languageCode !== null) {
+      allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
+    }
+    const initialStateName = this.exploration.getInitialState().name;
+    let bfsTraversalOfStates: string[] = [];
+    if (initialStateName !== null) {
+      bfsTraversalOfStates = (
+        this.computeGraphService.computeBfsTraversalOfStates(
+          initialStateName, this.exploration.getStates(),
+          sourceStateName));
+    }
     const audioFilenamesInBfsOrder = [];
     for (const stateName of bfsTraversalOfStates) {
-      for (const voiceover of allVoiceovers[stateName]) {
-        audioFilenamesInBfsOrder.push(voiceover.filename);
+      if (allVoiceovers !== null) {
+        for (const voiceover of allVoiceovers[stateName]) {
+          audioFilenamesInBfsOrder.push(voiceover.filename);
+        }
       }
     }
     return audioFilenamesInBfsOrder;
@@ -127,11 +135,10 @@ export class AudioPreloaderService {
 
       if (this.filenamesOfAudioToBeDownloaded.length > 0) {
         const nextAudioFilename = this.filenamesOfAudioToBeDownloaded.shift();
-        if (nextAudioFilename === undefined) {
-          throw new Error('Audio filename is undefined.');
+        if (nextAudioFilename !== undefined) {
+          this.loadAudio(nextAudioFilename);
+          this.filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
         }
-        this.loadAudio(nextAudioFilename);
-        this.filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
       }
 
       if (this.audioLoadedCallback) {
