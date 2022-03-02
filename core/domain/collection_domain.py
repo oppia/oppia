@@ -194,12 +194,7 @@ class CollectionChange(change_domain.BaseChange):
 class CollectionNodeDict(TypedDict):
     """Dictionary representing the CollectionNode object."""
 
-    acquired_skills: List[str]
-    acquired_skill_ids: List[str]
     exploration_id: str
-    other_field: str
-    prerequisite_skills: List[str]
-    prerequisite_skill_ids: List[str]
 
 
 class CollectionNode:
@@ -225,10 +220,7 @@ class CollectionNode:
             prerequisite_skill_ids, acquired_skill_ids) of CollectionNode
             instance.
         """
-        # Here, we're not returning keys other than exploration_id of
-        # CollectionNodeDict which causes MyPy to throw error. thus we
-        # add an ignore.
-        return { # type: ignore[typeddict-item]
+        return {
             'exploration_id': self.exploration_id
         }
 
@@ -733,15 +725,19 @@ class Collection:
 
         skill_names = set()
         for node in collection_contents['nodes']:
-            skill_names.update(node['acquired_skills'])
-            skill_names.update(node['prerequisite_skills'])
+            # CollectionNodeDict is defined according to latest domain object
+            # and here we are returning extra keys which are not defined in
+            # CollectionNodeDict. Thus to prevent MyPy error, ignore statement
+            # is added here.
+            skill_names.update(node['acquired_skills']) # type: ignore[misc]
+            skill_names.update(node['prerequisite_skills']) # type: ignore[misc]
         skill_names_to_ids = {
             name: _SKILL_ID_PREFIX + str(index)
             for index, name in enumerate(sorted(skill_names))
         }
-        # Here, we're not returning acquired_skills and prerequisite_skills
-        # values as a key which causes MyPy to throw error. thus we add an
-        # ignore.
+        # Here, we're accessing acquired_skills and prerequisite_skills keys
+        # which are not defined in CollectionNodeDict. Thus to prevent MyPy
+        # error, we added an ignore here.
         collection_contents['nodes'] = [{ # type: ignore[typeddict-item]
             'exploration_id': node['exploration_id'],
             'prerequisite_skill_ids': [
