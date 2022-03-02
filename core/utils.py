@@ -35,12 +35,12 @@ import urllib
 import zlib
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
-    Union)
+    IO, Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple,
+    TypeVar, Union, overload)
+from typing_extensions import Literal
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
@@ -56,6 +56,9 @@ SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
+
+TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
+BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
 # TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
 # because python_utils is untyped and will be removed in python3.
@@ -91,6 +94,48 @@ class ExplorationConversionError(Exception):
     pass
 
 
+@overload
+def open_file(
+    filename: str,
+    mode: TextModeTypes,
+    encoding: str = 'utf-8',
+    newline: Union[str, None] = None
+) -> IO[str]: ...
+
+
+@overload
+def open_file(
+    filename: str,
+    mode: BinaryModeTypes,
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None
+) -> IO[bytes]: ...
+
+
+def open_file(
+    filename: str,
+    mode: Union[TextModeTypes, BinaryModeTypes],
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None
+) -> IO[Any]:
+    """Open file and return a corresponding file object.
+
+    Args:
+        filename: str. The file to be opened.
+        mode: Literal. Mode in which the file is opened.
+        encoding: str. Encoding in which the file is opened.
+        newline: None|str. Controls how universal newlines work.
+
+    Returns:
+        IO[Any]. The file object.
+
+    Raises:
+        FileNotFoundError. The file cannot be found.
+    """
+    file = open(filename, mode, encoding=encoding, newline=newline)
+    return file
+
+
 def get_file_contents(
         filepath: str, raw_bytes: bool = False, mode: str = 'r'
 ) -> bytes:
@@ -112,7 +157,7 @@ def get_file_contents(
     else:
         encoding = 'utf-8'
 
-    with python_utils.open_file( # type: ignore[no-untyped-call]
+    with open(
         filepath, mode, encoding=encoding) as f:
         return f.read() # type: ignore[no-any-return]
 
@@ -223,7 +268,7 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         dict. Parsed dict representation of the yaml string.
 
     Raises:
-        InavlidInputException. If the yaml string sent as the
+        InvalidInputException. If the yaml string sent as the
             parameter is unable to get parsed, them this error gets
             raised.
     """
@@ -288,7 +333,7 @@ def get_random_int(upper_bound: int) -> int:
     Returns:
         int. Randomly generated integer less than the upper_bound.
     """
-    assert upper_bound >= 0 and isinstance(upper_bound, int)
+    assert upper_bound >= 0 and isinstance(upper_bound, int), 'Only positive integers allowed' # pylint: disable=line-too-long
 
     generator = random.SystemRandom()
     return generator.randrange(0, stop=upper_bound)
@@ -303,7 +348,7 @@ def get_random_choice(alist: List[T]) -> T:
     Returns:
         *. Random element choosen from the passed input list.
     """
-    assert isinstance(alist, list) and len(alist) > 0
+    assert isinstance(alist, list) and len(alist) > 0, 'Only non-empty lists allowed' # pylint: disable=line-too-long
 
     index = get_random_int(len(alist))
     return alist[index]
