@@ -21,11 +21,18 @@ import re
 from core import feconf
 from core.platform import models
 
+from typing import List, Optional
+
 (email_models,) = models.Registry.import_models([models.NAMES.email])
-platform_email_services = models.Registry.import_email_services()
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import email_services
+
+email_services = models.Registry.import_email_services()
 
 
-def _is_email_valid(email_address):
+def _is_email_valid(email_address: str) -> bool:
     """Determines whether an email address is valid.
 
     Args:
@@ -44,10 +51,11 @@ def _is_email_valid(email_address):
     # Matches any characters before the "@" sign, a series of characters until
     # a ".", and then a series of characters after the period.
     regex = r'^.+@[a-zA-Z0-9-.]+\.([a-zA-Z]+|[0-9]+)$'
-    return re.search(regex, email_address)
+    match = re.search(regex, email_address)
+    return bool(match)
 
 
-def _is_sender_email_valid(sender_email):
+def _is_sender_email_valid(sender_email: str) -> bool:
     """Gets the sender_email address and validates that it is of the form
     'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or 'email_address'.
 
@@ -69,8 +77,9 @@ def _is_sender_email_valid(sender_email):
 
 
 def send_mail(
-        sender_email, recipient_email, subject, plaintext_body,
-        html_body, bcc_admin=False):
+        sender_email: str, recipient_email: str, subject: str,
+        plaintext_body: str, html_body: str, bcc_admin: Optional[bool] = False
+        ) -> None:
     """Sends an email.
 
     In general this function should only be called from
@@ -109,7 +118,7 @@ def send_mail(
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
     bcc = [feconf.ADMIN_EMAIL_ADDRESS] if bcc_admin else None
-    response = platform_email_services.send_email_to_recipients(
+    response = email_services.send_email_to_recipients(
         sender_email, [recipient_email], subject,
         plaintext_body, html_body, bcc, '', None)
     if not response:
@@ -120,7 +129,9 @@ def send_mail(
 
 
 def send_bulk_mail(
-        sender_email, recipient_emails, subject, plaintext_body, html_body):
+        sender_email: str, recipient_emails: List[str], subject: str,
+        plaintext_body: str, html_body: str
+        ) -> None:
     """Sends emails to all recipients in recipient_emails.
 
     In general this function should only be called from
@@ -159,7 +170,7 @@ def send_bulk_mail(
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
 
-    response = platform_email_services.send_email_to_recipients(
+    response = email_services.send_email_to_recipients(
         sender_email, recipient_emails, subject, plaintext_body, html_body)
     if not response:
         raise Exception(
