@@ -27,6 +27,7 @@
     <div *ngIf="collection"
          class="oppia-collection-path-section">
       <svg width="540px"
+           [ngStyle]="{'margin-left': '10px'}"
            [attr.height]="svgHeight + 'px'"
            xmlns="http://www.w3.org/2000/svg">
         <path fill="none"
@@ -66,7 +67,7 @@
       <a *ngFor="let node of collection.getCollectionNodes();let index = index"
          [href]="getExplorationUrl(node?.getExplorationId())"
          [ngStyle]="{position: 'absolute', left: pathIconParameters[index].left, top: pathIconParameters[index].top}">
-        <div [ngStyle]="{width: '160px',position: 'absolute',left: getExplorationTitlePosition(index),color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '15px',bottom: '65%'}">
+        <div [ngStyle]="{width: '125px',position: 'absolute',left: getExplorationTitlePosition(index),color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '15px','text-align': 'center',bottom: '70%'}">
             {{ node.getExplorationTitle() }}
         </div>
 

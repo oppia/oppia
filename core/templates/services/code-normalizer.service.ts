@@ -27,12 +27,15 @@ export class CodeNormalizerService {
   removeLeadingWhitespace(str: string): string {
     return str.replace(/^\s+/g, '');
   }
+
   removeTrailingWhitespace(str: string): string {
     return str.replace(/\s+$/g, '');
   }
+
   removeIntermediateWhitespace(str: string): string {
     return str.replace(/\s+/g, ' ');
   }
+
   getNormalizedCode(codeString: string): string {
     /*
      * Normalizes a code string (which is assumed not to contain tab
