@@ -67,7 +67,8 @@ describe('Contribution and review backend API service', () => {
 
     it('should fetch submitted question suggestions', fakeAsync(() => {
       spyOn(carbas, 'fetchSubmittedSuggestionsAsync').and.callThrough();
-      const url = '/getsubmittedsuggestions/skill/add_question';
+      const url = (
+        '/getsubmittedsuggestions/skill/add_question?limit=10&offset=0');
 
       carbas.fetchSuggestionsAsync(
         'SUBMITTED_QUESTION_SUGGESTIONS',
@@ -80,14 +81,17 @@ describe('Contribution and review backend API service', () => {
       flushMicrotasks();
 
       expect(carbas.fetchSubmittedSuggestionsAsync)
-        .toHaveBeenCalledWith('skill', 'add_question');
+        .toHaveBeenCalledWith(
+          'skill', 'add_question',
+          AppConstants.OPPORTUNITIES_PAGE_SIZE, 0);
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
     it('should fetch submitted translation suggestions', fakeAsync(() => {
       spyOn(carbas, 'fetchSubmittedSuggestionsAsync').and.callThrough();
-      const url = '/getsubmittedsuggestions/exploration/translate_content';
+      const url = '/getsubmittedsuggestions/exploration/translate_content' +
+      '?limit=10&offset=0';
 
       carbas.fetchSuggestionsAsync(
         'SUBMITTED_TRANSLATION_SUGGESTIONS',
@@ -100,14 +104,17 @@ describe('Contribution and review backend API service', () => {
       flushMicrotasks();
 
       expect(carbas.fetchSubmittedSuggestionsAsync)
-        .toHaveBeenCalledWith('exploration', 'translate_content');
+        .toHaveBeenCalledWith(
+          'exploration', 'translate_content',
+          AppConstants.OPPORTUNITIES_PAGE_SIZE, 0);
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
     it('should fetch reviewable question suggestions', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
-      const url = '/getreviewablesuggestions/skill/add_question';
+      const url = (
+        '/getreviewablesuggestions/skill/add_question?limit=10&offset=0');
 
       carbas.fetchSuggestionsAsync(
         'REVIEWABLE_QUESTION_SUGGESTIONS',
@@ -120,14 +127,16 @@ describe('Contribution and review backend API service', () => {
       flushMicrotasks();
 
       expect(carbas.fetchReviewableSuggestionsAsync)
-        .toHaveBeenCalledWith('skill', 'add_question');
+        .toHaveBeenCalledWith(
+          'skill', 'add_question', AppConstants.OPPORTUNITIES_PAGE_SIZE, 0);
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
     it('should fetch reviewable translation suggestions', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
-      const url = '/getreviewablesuggestions/exploration/translate_content';
+      const url = '/getreviewablesuggestions/exploration/translate_content' +
+      '?limit=10&offset=0';
 
       carbas.fetchSuggestionsAsync(
         'REVIEWABLE_TRANSLATION_SUGGESTIONS',
@@ -140,7 +149,9 @@ describe('Contribution and review backend API service', () => {
       flushMicrotasks();
 
       expect(carbas.fetchReviewableSuggestionsAsync)
-        .toHaveBeenCalledWith('exploration', 'translate_content');
+        .toHaveBeenCalledWith(
+          'exploration', 'translate_content',
+          AppConstants.OPPORTUNITIES_PAGE_SIZE, 0);
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));

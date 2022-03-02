@@ -31,8 +31,11 @@ export interface OpportunityDict {
 }
 
 class SuggestionFetcher {
+  // Type of suggestion to fetch.
   type: string;
+  // The current offset, i.e. the number of items to skip in the next fetch.
   offset: number;
+  // Cache of suggestions.
   suggestionIdToDetails: SuggestionDetailsDict;
 
   constructor(type: string) {
