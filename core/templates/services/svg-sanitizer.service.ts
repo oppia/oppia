@@ -154,6 +154,12 @@ export class SvgSanitizerService {
     return { tags: invalidTags, attrs: invalidAttrs };
   }
 
+  // Returns SVG by parsing DataURI.
+  // SVG is considered an XMLDocument and DOMParser's parseFromtString method
+  // returns either a HTMLDocument or XMLDocument. Visit here for more info:
+  // https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString
+  // Document is the interface that both HTMLDocument and XMLDocument inherit
+  // properties from.
   getSvgFromDataUri(dataURI: string): Document {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
@@ -205,11 +211,7 @@ export class SvgSanitizerService {
   }
 
   /**
-   * Checks the input for malicious or invalid SVG code.
-   * The checks:
-   * 1. Is base64 encoded.
-   * 2. Has no invalid tags or attributes. This check is performed by the
-   *    getInvalidSvgTagsAndAttrsFromDataUri function in this file.
+   * Checks the input if it is Base64 encoded.
    *
    * @returns {boolean} True if all the checks pass. False Otherwise.
    */
