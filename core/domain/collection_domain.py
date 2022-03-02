@@ -298,8 +298,8 @@ class Collection:
         schema_version: int,
         nodes: List[CollectionNode],
         version: int,
-        created_on: datetime.datetime = datetime.datetime.utcnow(),
-        last_updated: datetime.datetime = datetime.datetime.utcnow()
+        created_on: Optional[datetime.datetime]=None,
+        last_updated: Optional[datetime.datetime]=None
     ) -> None:
         """Constructs a new collection given all the information necessary to
         represent a collection.
@@ -396,8 +396,8 @@ class Collection:
         cls,
         collection_dict: CollectionDict,
         collection_version: int = 0,
-        collection_created_on: datetime.datetime = datetime.datetime.utcnow(),
-        collection_last_updated: datetime.datetime = datetime.datetime.utcnow()
+        collection_created_on: Optional[datetime.datetime]=None,
+        collection_last_updated: Optional[datetime.datetime]=None
     ) -> Collection:
         """Return a Collection domain object from a dict.
 
@@ -443,12 +443,11 @@ class Collection:
         created_on = (
             utils.convert_string_to_naive_datetime_object(
                 collection_dict['created_on'])
-            if 'created_on' in collection_dict else datetime.datetime.utcnow())
+            if 'created_on' in collection_dict else None)
         last_updated = (
             utils.convert_string_to_naive_datetime_object(
                 collection_dict['last_updated'])
-            if 'last_updated' in collection_dict else (
-                datetime.datetime.utcnow()))
+            if 'last_updated' in collection_dict else None)
         collection = cls.from_dict(
             collection_dict,
             collection_version=collection_dict['version'],
