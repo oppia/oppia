@@ -20,9 +20,9 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { MusicNotesInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { MusicNotesInputCustomizationArgs, ReadableMusicNote } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
 import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
@@ -46,52 +46,47 @@ interface NoteSequence {
   note: MusicNote;
 }
 
-interface ReadableNote {
-  readableNoteName: string;
+interface Sequence {
+  value: ReadableMusicNote[];
 }
 
 @Component({
   selector: 'oppia-interactive-music-notes-input',
   templateUrl: './music-notes-input-interaction.component.html'
 })
-export class MusicNotesInput implements OnInit, OnDestroy {
-  @Input() lastAnswer: string;
-  @Input() sequenceToGuessWithValue;
-  @Input() initialSequenceWithValue;
-  interactionIsActive: boolean;
-  sequenceToGuess;
-  initialSequence;
+export class MusicNotesInputComponent implements
+ OnInit, OnDestroy, AfterViewInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() lastAnswer!: string;
+  @Input() sequenceToGuessWithValue!: string;
+  @Input() initialSequenceWithValue!: string;
+  sequenceToGuess!: Sequence;
+  initialSequence!: string | Sequence;
+  staffTop!: number;
+  staffBottom!: number;
+  readableSequence!: string;
+  CONTAINER_WIDTH!: number;
+  CONTAINER_HEIGHT!: number;
+  HORIZONTAL_GRID_SPACING!: number;
+  VERTICAL_GRID_SPACING!: number;
+  topPositionForCenterOfTopStaffLine!: number;
+  interactionIsActive = false;
   directiveSubscriptions = new Subscription();
   noteSequence: NoteSequence[] = [];
   _currentNoteId = 0;
   NOTE_TYPE_NATURAL = 0;
   // TODO(wagnerdmike): More notes types will be added to NOTE_TYPES.
   NOTE_TYPES = [this.NOTE_TYPE_NATURAL];
-
   NOTES_ON_LINES = ['E4', 'G4', 'B4', 'D5', 'F5'];
   LEDGER_LINE_NOTES = ['C4', 'A5'];
-
-  verticalGridKeys = [
-    81, 79, 77, 76, 74, 72, 71, 69, 67, 65, 64, 62, 60
-  ];
-
+  verticalGridKeys = [81, 79, 77, 76, 74, 72, 71, 69, 67, 65, 64, 62, 60];
   SOUNDFONT_URL = '/third_party/static/midi-js-c26ebb/examples/soundfont/';
-
-
   // Highest number of notes that can fit on the staff at any given time.
   MAXIMUM_NOTES_POSSIBLE = 8;
-
-  CONTAINER_WIDTH: number;
-  CONTAINER_HEIGHT: number;
-  HORIZONTAL_GRID_SPACING: number;
-  VERTICAL_GRID_SPACING: number;
-  topPositionForCenterOfTopStaffLine: number;
   NOTE_NAMES_TO_MIDI_VALUES = (
     InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES);
-
-  staffTop: number;
-  staffBottom: number;
-  readableSequence: string;
 
   constructor(
     private interactionAttributesExtractorService:
@@ -137,14 +132,14 @@ export class MusicNotesInput implements OnInit, OnDestroy {
       () => this.submitAnswer(), null);
     // Initialization code.
 
-    this.initializeNoteSequence(this.initialSequence);
+    this.initializeNoteSequence(this.initialSequence as Sequence);
     this.init();
+  }
 
+  ngAfterViewInit(): void {
     // Sets grid positions, displays the staff and note,
     // and then initializes the view after staff has loaded.
-    $(document).ready(() => {
-      this.reinitStaff();
-    });
+    this.reinitStaff();
   }
 
   /**
@@ -229,10 +224,10 @@ export class MusicNotesInput implements OnInit, OnDestroy {
 
   // Initial notes are placed on the staff at the
   // start of the exploration and can be removed by the learner.
-  initializeNoteSequence(initialNotesToAdd: ReadableNote[]): void {
-    for (let i = 0; i < initialNotesToAdd.length; i++) {
+  initializeNoteSequence(initialNotesToAdd: Sequence): void {
+    for (let i = 0; i < initialNotesToAdd.value.length; i++) {
       let { baseNoteMidiNumber, offset } = (
-        this._convertReadableNoteToNote(initialNotesToAdd[i]));
+        this._convertReadableNoteToNote(initialNotesToAdd.value[i]));
       let initialNote = {
         baseNoteMidiNumber: baseNoteMidiNumber,
         offset: offset,
@@ -261,10 +256,11 @@ export class MusicNotesInput implements OnInit, OnDestroy {
   getStaffLinePositions(): Object {
     let staffLinePositionsArray = [];
     let staffLinePositions = {};
-    $(
-      '.oppia-music-input-staff div.oppia-music-staff-position').each(
-      () => {
-        staffLinePositionsArray.push($(this).position().top);
+    let elements = $(
+      '.oppia-music-input-staff div.oppia-music-staff-position');
+    elements.each(
+      (el, val) => {
+        staffLinePositionsArray.push($(val).position().top);
       });
     for (let i = 0; i < staffLinePositionsArray.length; i++) {
       staffLinePositions[this.verticalGridKeys[i]] = (
@@ -276,16 +272,15 @@ export class MusicNotesInput implements OnInit, OnDestroy {
   // Creates the notes and helper-clone notes for the noteChoices div.
   initPalette(): void {
     let noteChoicesDiv = $('.oppia-music-input-note-choices');
-    let validNoteArea = $(
-      '.oppia-music-input-valid-note-area');
+    let validNoteArea = $('.oppia-music-input-valid-note-area');
     for (let i = 0; i < this.NOTE_TYPES.length; i++) {
       let innerDiv = $('<div></div>')
         .data('noteType', this.NOTE_TYPES[i])
         .addClass((index, currentClassName) => {
           let addedClass = null;
-          if ($(this).data('noteType') === this.NOTE_TYPE_NATURAL) {
+          if ($(currentClassName).data('noteType') === this.NOTE_TYPE_NATURAL) {
             addedClass = 'oppia-music-input-natural-note';
-            $(this).addClass('oppia-music-input-natural-note');
+            $(currentClassName).addClass('oppia-music-input-natural-note');
           }
           return addedClass;
         });
@@ -694,7 +689,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
    * (since 64 is the baseNoteMidiNumber for 'E', and -1 indicates a
    * flat).
    */
-  _convertNoteToReadableNote(note: MusicNote): ReadableNote {
+  _convertNoteToReadableNote(note: MusicNote): ReadableMusicNote {
     if (note.offset !== -1 && note.offset !== 0 && note.offset !== 1) {
       console.error('Invalid note offset: ' + note.offset);
     }
@@ -708,7 +703,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
     return {
       readableNoteName:
         correspondingNoteName[0] + accidental + correspondingNoteName[1]
-    };
+    } as ReadableMusicNote;
   }
 
   /*
@@ -718,7 +713,7 @@ export class MusicNotesInput implements OnInit, OnDestroy {
    * return {'baseNoteMidiNumber': 64, 'offset': -1} (since 64 is the
    * baseNoteMidiNumber for 'E', and -1 indicates a flat).
    */
-  _convertReadableNoteToNote(readableNote: ReadableNote): {
+  _convertReadableNoteToNote(readableNote: ReadableMusicNote): {
      baseNoteMidiNumber: number;
      offset: number;
     } {
@@ -750,18 +745,19 @@ export class MusicNotesInput implements OnInit, OnDestroy {
 
   // For each note in a sequence, add a noteDuration property.
   // TODO(wagnerdmike): - Add more options for note durations.
-  _makeAllNotesHaveDurationOne(noteArray: MusicNote[]): Object[] {
+  _makeAllNotesHaveDurationOne(
+      noteArray: ReadableMusicNote[]): ReadableMusicNote[] {
     for (let i = 0; i < noteArray.length; i++) {
       noteArray[i].noteDuration = {
         num: 1,
         den: 1
       };
     }
-    return noteArray as Object[];
+    return noteArray;
   }
 
   submitAnswer(): void {
-    let readableSequence = [];
+    let readableSequence: ReadableMusicNote[] = [];
     for (let i = 0; i < this.noteSequence.length; i++) {
       readableSequence.push(
         this._convertNoteToReadableNote(this.noteSequence[i].note));
@@ -778,10 +774,10 @@ export class MusicNotesInput implements OnInit, OnDestroy {
 
   playSequenceToGuess(): void {
     let noteSequenceToGuess = [];
-    for (let i = 0; i < this.sequenceToGuess.length; i++) {
+    for (let i = 0; i < this.sequenceToGuess.value.length; i++) {
       noteSequenceToGuess.push(
         this._convertReadableNoteToNote(
-          this.sequenceToGuess[i]));
+          this.sequenceToGuess.value[i]));
     }
     this.playSequence(this.convertSequenceToGuessToMidiSequence(
       noteSequenceToGuess));
@@ -870,5 +866,5 @@ export class MusicNotesInput implements OnInit, OnDestroy {
 
 angular.module('oppia').directive(
   'oppiaInteractiveMusicNotesInput', downgradeComponent(
-    {component: MusicNotesInput}
+    {component: MusicNotesInputComponent}
   ) as angular.IDirectiveFactory);

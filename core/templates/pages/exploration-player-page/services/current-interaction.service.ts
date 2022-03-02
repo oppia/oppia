@@ -54,9 +54,9 @@ export class CurrentInteractionService {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService) {}
 
-  private static submitAnswerFn: SubmitAnswerFn = null;
-  private static onSubmitFn: OnSubmitFn = null;
-  private static validityCheckFn: ValidityCheckFn = null;
+  private static submitAnswerFn: SubmitAnswerFn | null;
+  private static onSubmitFn: OnSubmitFn;
+  private static validityCheckFn: ValidityCheckFn | null;
   private static presubmitHooks: PresubmitHookFn[] = [];
   private static answerChangedSubject: Subject<void> = new Subject<void>();
 
@@ -71,7 +71,9 @@ export class CurrentInteractionService {
   }
 
   registerCurrentInteraction(
-      submitAnswerFn: SubmitAnswerFn, validityCheckFn: ValidityCheckFn): void {
+      submitAnswerFn: SubmitAnswerFn | null,
+      validityCheckFn: ValidityCheckFn| null
+  ): void {
     /**
      * Each interaction directive should call registerCurrentInteraction
      * when the interaction directive is first created.
@@ -80,7 +82,7 @@ export class CurrentInteractionService {
      *   answer and pass it to onSubmit. The interaction can pass in
      *   null if it does not use the progress nav's submit button
      *   (ex: MultipleChoiceInput).
-     * @param {function} validityCheckFn - The progress nav will use this
+     * @param {function|null} validityCheckFn - The progress nav will use this
      *   to decide whether or not to disable the submit button. If the
      *   interaction passes in null, the submit button will remain
      *   enabled (for the entire duration of the current interaction).

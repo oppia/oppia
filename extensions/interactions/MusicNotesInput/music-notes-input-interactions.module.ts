@@ -20,7 +20,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { MaterialModule } from 'modules/material.module';
-import { MusicNotesInput } from './directives/oppia-interactive-music-notes-input.component';
+import { MusicNotesInputComponent } from './directives/oppia-interactive-music-notes-input.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ResponseMusicNotesInput } from './directives/oppia-response-music-notes-input.component';
@@ -34,17 +34,17 @@ import { ShortResponseMusicNotesInput } from './directives/oppia-short-response-
     TranslateModule
   ],
   declarations: [
-    MusicNotesInput,
+    MusicNotesInputComponent,
     ResponseMusicNotesInput,
     ShortResponseMusicNotesInput
   ],
   entryComponents: [
-    MusicNotesInput,
+    MusicNotesInputComponent,
     ResponseMusicNotesInput,
     ShortResponseMusicNotesInput
   ],
   exports: [
-    MusicNotesInput,
+    MusicNotesInputComponent,
     ResponseMusicNotesInput,
     ShortResponseMusicNotesInput
   ],
