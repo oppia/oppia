@@ -90,23 +90,23 @@ angular.module('oppia').component('contributionsAndReview', {
 
       var tabNameToOpportunityFetchFunction = {
         [SUGGESTION_TYPE_QUESTION]: {
-          [ctrl.TAB_TYPE_CONTRIBUTIONS]: resetOffset => {
+          [ctrl.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
             return ContributionAndReviewService
-              .getUserCreatedQuestionSuggestionsAsync(resetOffset);
+              .getUserCreatedQuestionSuggestionsAsync(shouldResetOffset);
           },
-          [ctrl.TAB_TYPE_REVIEWS]: resetOffset => {
+          [ctrl.TAB_TYPE_REVIEWS]: shouldResetOffset => {
             return ContributionAndReviewService
-              .getReviewableQuestionSuggestionsAsync(resetOffset);
+              .getReviewableQuestionSuggestionsAsync(shouldResetOffset);
           }
         },
         [SUGGESTION_TYPE_TRANSLATE]: {
-          [ctrl.TAB_TYPE_CONTRIBUTIONS]: resetOffset => {
+          [ctrl.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
             return ContributionAndReviewService
-              .getUserCreatedTranslationSuggestionsAsync(resetOffset);
+              .getUserCreatedTranslationSuggestionsAsync(shouldResetOffset);
           },
-          [ctrl.TAB_TYPE_REVIEWS]: resetOffset => {
+          [ctrl.TAB_TYPE_REVIEWS]: shouldResetOffset => {
             return ContributionAndReviewService
-              .getReviewableTranslationSuggestionsAsync(resetOffset);
+              .getReviewableTranslationSuggestionsAsync(shouldResetOffset);
           }
         }
       };
@@ -352,14 +352,14 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       ctrl.loadOpportunities = function() {
-        return ctrl.loadContributions(/* Param resetOffset= */ true);
+        return ctrl.loadContributions(/* Param shouldResetOffset= */ true);
       };
 
       ctrl.loadMoreOpportunities = function() {
-        return ctrl.loadContributions(/* Param resetOffset= */ false);
+        return ctrl.loadContributions(/* Param shouldResetOffset= */ false);
       };
 
-      ctrl.loadContributions = function(resetOffset) {
+      ctrl.loadContributions = function(shouldResetOffset) {
         if (!ctrl.activeTabType || !ctrl.activeSuggestionType) {
           return new Promise((resolve, reject) => {
             resolve({opportunitiesDicts: [], more: false});
@@ -368,7 +368,7 @@ angular.module('oppia').component('contributionsAndReview', {
         const fetchFunction = tabNameToOpportunityFetchFunction[
           ctrl.activeSuggestionType][ctrl.activeTabType];
 
-        return fetchFunction(resetOffset).then(function(response) {
+        return fetchFunction(shouldResetOffset).then(function(response) {
           Object.keys(response.suggestionIdToDetails).forEach(id => {
             ctrl.contributions[id] = response.suggestionIdToDetails[id];
           });

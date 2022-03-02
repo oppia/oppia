@@ -30,6 +30,8 @@ export interface OpportunityDict {
   'skill_description': string;
 }
 
+// Encapsulates the state necessary to fetch a particular suggestion from the
+// backend.
 class SuggestionFetcher {
   // Type of suggestion to fetch.
   type: string;
@@ -41,6 +43,7 @@ class SuggestionFetcher {
   constructor(type: string) {
     this.type = type;
     this.offset = 0;
+    this.suggestionIdToDetails = {};
   }
 }
 
@@ -78,9 +81,10 @@ export class ContributionAndReviewService {
     new SuggestionFetcher('REVIEWABLE_TRANSLATION_SUGGESTIONS'));
 
   private async fetchSuggestionsAsync(
-      fetcher: SuggestionFetcher, resetOffset = false
+      fetcher: SuggestionFetcher, shouldResetOffset = false
   ): Promise<FetchSuggestionsResponse> {
-    if (resetOffset) {
+    if (shouldResetOffset) {
+      // Handle the case where we need to fetch starting from the beginning.
       fetcher.offset = 0;
       fetcher.suggestionIdToDetails = {};
     }
@@ -147,28 +151,28 @@ export class ContributionAndReviewService {
     }
   }
 
-  async getUserCreatedQuestionSuggestionsAsync(resetOffset = true):
+  async getUserCreatedQuestionSuggestionsAsync(shouldResetOffset = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this._userCreatedQuestionFetcher, resetOffset);
+      this._userCreatedQuestionFetcher, shouldResetOffset);
   }
 
-  async getReviewableQuestionSuggestionsAsync(resetOffset = true):
+  async getReviewableQuestionSuggestionsAsync(shouldResetOffset = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this._reviewableQuestionFetcher, resetOffset);
+      this._reviewableQuestionFetcher, shouldResetOffset);
   }
 
-  async getUserCreatedTranslationSuggestionsAsync(resetOffset = true):
+  async getUserCreatedTranslationSuggestionsAsync(shouldResetOffset = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this._userCreatedTranslationFetcher, resetOffset);
+      this._userCreatedTranslationFetcher, shouldResetOffset);
   }
 
-  async getReviewableTranslationSuggestionsAsync(resetOffset = true):
+  async getReviewableTranslationSuggestionsAsync(shouldResetOffset = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this._reviewableTranslationFetcher, resetOffset);
+      this._reviewableTranslationFetcher, shouldResetOffset);
   }
 
   reviewExplorationSuggestion(
