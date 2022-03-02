@@ -33,7 +33,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 from typing_extensions import Final, TypedDict
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -275,12 +275,6 @@ class CollectionDict(TypedDict):
     tags: List[str]
     schema_version: int
     nodes: List[CollectionNodeDict]
-    version: int
-    created_on: Union[datetime.datetime, str]
-    last_updated: Union[datetime.datetime, str]
-    skills: Dict[str, Dict[str, Union[str, List[str]]]]
-    next_skill_id: int
-    next_skill_index: int
 
 
 class VersionedCollectionDict(TypedDict):
@@ -357,10 +351,7 @@ class Collection:
         Returns:
             dict. A dict, mapping all fields of Collection instance.
         """
-        # Here, we're not returning created_on, last_updated, version and other
-        # keys of CollectionDict which causes MyPy to throw error. thus
-        # we add an ignore here.
-        return { # type: ignore[typeddict-item]
+        return {
             'id': self.id,
             'title': self.title,
             'category': self.category,
@@ -482,14 +473,18 @@ class Collection:
         # files must add a version parameter to their files with the correct
         # version of this object. The line below must then be moved to
         # to_dict().
-        collection_dict['version'] = self.version
+        # Since, collectionDict is a Dict representation of latest schema
+        # domain object and it does not contain version, created_on and
+        # last_updated keys. Thus to prevent MyPy errors, we added an ignore
+        # here.
+        collection_dict['version'] = self.version # type: ignore[misc]
 
         if self.created_on:
-            collection_dict['created_on'] = (
+            collection_dict['created_on'] = ( # type: ignore[misc]
                 utils.convert_naive_datetime_to_string(self.created_on))
 
         if self.last_updated:
-            collection_dict['last_updated'] = (
+            collection_dict['last_updated'] = ( # type: ignore[misc]
                 utils.convert_naive_datetime_to_string(self.last_updated))
 
         return json.dumps(collection_dict)
@@ -565,9 +560,13 @@ class Collection:
         new_collection_dict = (
             cls._convert_collection_contents_v3_dict_to_v4_dict(
                 collection_dict))
-        collection_dict['skills'] = new_collection_dict['skills']
-        collection_dict['next_skill_id'] = (
-            new_collection_dict['next_skill_id'])
+        # CollectionDict is Dict representation of domain object according
+        # to the latest schema version and this Dict does not contain
+        # intermediate schema keys like skills and next_skill_id. Thus to
+        # prevent MyPy errors, we added an ignore statement here.
+        collection_dict['skills'] = new_collection_dict['skills'] # type: ignore[misc]
+        collection_dict['next_skill_id'] = ( # type: ignore[misc]
+            new_collection_dict['next_skill_id']) # type: ignore[misc]
 
         collection_dict['schema_version'] = 4
         return collection_dict
@@ -725,10 +724,10 @@ class Collection:
 
         skill_names = set()
         for node in collection_contents['nodes']:
-            # CollectionNodeDict is defined according to latest domain object
-            # and here we are returning extra keys which are not defined in
-            # CollectionNodeDict. Thus to prevent MyPy error, ignore statement
-            # is added here.
+            # CollectionNodeDict is defined according to latest schema domain
+            # object and here we are returning extra keys which are not defined
+            # in CollectionNodeDict. Thus to prevent MyPy error, ignore is
+            # added here.
             skill_names.update(node['acquired_skills']) # type: ignore[misc]
             skill_names.update(node['prerequisite_skills']) # type: ignore[misc]
         skill_names_to_ids = {
@@ -748,7 +747,11 @@ class Collection:
                 for acquired_skill_name in node['acquired_skills']]
         } for node in collection_contents['nodes']]
 
-        collection_contents['skills'] = {
+        # Since, collection_contents is of CollectionDict type and here
+        # CollectionDict is defined according to lastest schema version.
+        # So, it does not contain intermediate schema keys like skills and
+        # next_skill_id. So, to prevent MyPy errors, we added an ignore here.
+        collection_contents['skills'] = { # type: ignore[misc]
             skill_id: {
                 'name': skill_name,
                 'question_ids': []
@@ -756,7 +759,7 @@ class Collection:
             for skill_name, skill_id in skill_names_to_ids.items()
         }
 
-        collection_contents['next_skill_id'] = len(skill_names)
+        collection_contents['next_skill_id'] = len(skill_names) # type: ignore[misc]
 
         return collection_contents
 
@@ -776,8 +779,12 @@ class Collection:
         Returns:
             dict. The updated collection_contents dict.
         """
-        collection_contents['next_skill_index'] = collection_contents[
-            'next_skill_id']
+        # Since, collection_contents is of CollectionDict type and here
+        # CollectionDict contains only keys according to latest schema
+        # domain object and next_skill_index is not one of them. Thus to
+        # prevent MyPy errors, we added an ignore here.
+        collection_contents['next_skill_index'] = collection_contents[ # type: ignore[misc]
+            'next_skill_id'] # type: ignore[misc]
         # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
         del collection_contents['next_skill_id'] # type: ignore[misc]
 
