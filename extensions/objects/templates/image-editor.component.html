@@ -1,6 +1,5 @@
 <div class="filepath-editor">
-  <div [attr.style]="getMainContainerDynamicStyles()"
-       class="filepath-editor-main-container">
+  <div class="filepath-editor-main-container">
     <div *ngIf="isImageUploaded()"
          class="filepath-editor-img-toolbar"
          [attr.style]="getToolbarDynamicStyles()">
@@ -116,6 +115,7 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    width: 100%;
   }
 
   .filepath-editor .filepath-editor-main-container .oppia-form-error {
@@ -282,10 +282,25 @@
   .filepath-editor .oppia-processed-image-too-large-error {
     margin-top: 15px;
   }
+
   .oppia-unsupported-svg-tag-attribute-error {
     background-color: #fcf8e3;
     border-color: #faebcc;
     color: #8a6d3b;
     padding: 10px;
+
+  @media(max-width:540px) {
+    .filepath-editor .filepath-editor-image-container {
+      text-align: left;
+    }
+
+    .filepath-editor .filepath-editor-img-toolbar-resize {
+      float: none;
+      text-align: left;
+    }
+
+    .filepath-editor .filepath-editor-save-box {
+      text-align: left;
+    }
   }
 </style>

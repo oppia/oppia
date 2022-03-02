@@ -1517,16 +1517,12 @@ describe('ImageEditor', () => {
     expect(component.userIsResizingCropArea).toBe(false);
   });
 
-  it('should get dynamic styles for the main container when called', () => {
-    expect(component.getMainContainerDynamicStyles()).toBe('width: 490px');
-  });
-
   it('should show border for the image container when user has not' +
   ' uploaded a file', () => {
     component.data.mode = component.MODE_EMPTY;
 
     expect(component.getImageContainerDynamicStyles())
-      .toBe('border: 1px dotted #888');
+      .toBe('border: 1px dotted #888; width: 100%');
   });
 
   it('should not show border for the image container when user has' +
@@ -1535,7 +1531,7 @@ describe('ImageEditor', () => {
     expect(component.data.mode).toBe(component.MODE_UPLOADED);
 
     expect(component.getImageContainerDynamicStyles())
-      .toBe('border: none');
+      .toBe('border: none; width: 490px');
   });
 
   it('should not show tool bar when the user is cropping', () => {
