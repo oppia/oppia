@@ -21,7 +21,7 @@ from __future__ import annotations
 import os
 import subprocess
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 from . import rtl_css
@@ -52,10 +52,13 @@ class RtlCSSTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen_without_std_in)
         expected_rtl_file_count = 0
         pages_base_dir = os.path.join(os.getcwd(), 'core', 'templates')
+
+        # Count rtl css files of pages.
         for _, _, files in os.walk(pages_base_dir):
             for file in files:
                 if file.endswith('.rtl.css'):
                     expected_rtl_file_count += 1
+
         with popen_swap_without_stdin:
             rtl_css.main(args=['--mode', 'generate'])
             self.assertEqual(
@@ -102,9 +105,9 @@ class RtlCSSTests(test_utils.GenericTestBase):
 
         popen_swap_with_stdin = self.swap(
             subprocess, 'Popen', mock_popen_with_std_in)
-        open_swap = self.swap(python_utils, 'open_file', mock_open)
+        open_swap = self.swap(utils, 'open_file', mock_open)
         errorred_open_swap = self.swap(
-            python_utils, 'open_file', errorred_mock_open)
+            utils, 'open_file', errorred_mock_open)
 
         raises_exception = self.assertRaisesRegex(
             Exception, 'Invalid RTL CSS for the following files')
