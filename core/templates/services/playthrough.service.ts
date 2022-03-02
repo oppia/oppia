@@ -183,12 +183,12 @@ export class PlaythroughService {
   private explorationVersion!: number;
   private learnerIsInSamplePopulation!: boolean;
 
-  private eqTracker!: EarlyQuitTracker;
-  private cstTracker!: CyclicStateTransitionsTracker;
-  private misTracker!: MultipleIncorrectAnswersTracker;
-  private recordedLearnerActions!: LearnerAction[];
-  private playthroughStopwatch!: Stopwatch;
-  private playthroughDurationInSecs!: number;
+  private eqTracker: EarlyQuitTracker | null = null;
+  private cstTracker: CyclicStateTransitionsTracker | null = null;
+  private misTracker: MultipleIncorrectAnswersTracker | null = null;
+  private recordedLearnerActions: LearnerAction[] | null = null;
+  private playthroughStopwatch: Stopwatch | null = null;
+  private playthroughDurationInSecs: number | null = null;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
@@ -232,18 +232,25 @@ export class PlaythroughService {
       return;
     }
 
-    this.recordedLearnerActions.push(
-      this.learnerActionObjectFactory.createNewAnswerSubmitAction({
-        state_name: {value: stateName},
-        dest_state_name: {value: destStateName},
-        interaction_id: {value: interactionId},
-        submitted_answer: {value: answer},
-        feedback: {value: feedback},
-        time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
-      }));
+    if (this.recordedLearnerActions !== null) {
+      this.recordedLearnerActions.push(
+        this.learnerActionObjectFactory.createNewAnswerSubmitAction({
+          state_name: {value: stateName},
+          dest_state_name: {value: destStateName},
+          interaction_id: {value: interactionId},
+          submitted_answer: {value: answer},
+          feedback: {value: feedback},
+          time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
+        }));
+    }
 
-    this.misTracker.recordStateTransition(destStateName);
-    this.cstTracker.recordStateTransition(destStateName);
+    if (this.misTracker !== null) {
+      this.misTracker.recordStateTransition(destStateName);
+    }
+
+    if (this.cstTracker !== null) {
+      this.cstTracker.recordStateTransition(destStateName);
+    }
   }
 
   recordExplorationQuitAction(
@@ -252,16 +259,23 @@ export class PlaythroughService {
       return;
     }
 
-    this.recordedLearnerActions.push(
-      this.learnerActionObjectFactory.createNewExplorationQuitAction({
-        state_name: {value: stateName},
-        time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
-      }));
+    if (this.recordedLearnerActions !== null) {
+      this.recordedLearnerActions.push(
+        this.learnerActionObjectFactory.createNewExplorationQuitAction({
+          state_name: {value: stateName},
+          time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
+        }));
+    }
 
-    this.playthroughDurationInSecs = (
-      this.playthroughStopwatch.getTimeInSecs());
-    this.eqTracker.recordExplorationQuit(
-      stateName, this.playthroughDurationInSecs);
+    if (this.playthroughStopwatch !== null) {
+      this.playthroughDurationInSecs = (
+        this.playthroughStopwatch.getTimeInSecs());
+    }
+
+    if (this.eqTracker !== null && this.playthroughDurationInSecs !== null) {
+      this.eqTracker.recordExplorationQuit(
+        stateName, this.playthroughDurationInSecs);
+    }
   }
 
   storePlaythrough(): void {
@@ -283,19 +297,22 @@ export class PlaythroughService {
    * If none of the issue types have been discovered, returns null instead.
    */
   private createNewPlaythrough(): Playthrough | null {
-    if (this.misTracker && this.misTracker.foundAnIssue()) {
+    if (this.misTracker && this.misTracker.foundAnIssue() && (
+      this.recordedLearnerActions !== null)) {
       return this.playthroughObjectFactory
         .createNewMultipleIncorrectSubmissionsPlaythrough(
           this.explorationId, this.explorationVersion,
           this.misTracker.generateIssueCustomizationArgs(),
           this.recordedLearnerActions);
-    } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
+    } else if (this.cstTracker && this.cstTracker.foundAnIssue() && (
+      this.recordedLearnerActions !== null)) {
       return this.playthroughObjectFactory
         .createNewCyclicStateTransitionsPlaythrough(
           this.explorationId, this.explorationVersion,
           this.cstTracker.generateIssueCustomizationArgs(),
           this.recordedLearnerActions);
-    } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
+    } else if (this.eqTracker && this.eqTracker.foundAnIssue() && (
+      this.recordedLearnerActions !== null)) {
       return this.playthroughObjectFactory
         .createNewEarlyQuitPlaythrough(
           this.explorationId, this.explorationVersion,
@@ -318,23 +335,30 @@ export class PlaythroughService {
   }
 
   private hasRecordingFinished(): boolean {
-    return (
-      this.hasRecordingBegun() &&
-      this.recordedLearnerActions.length > 1 &&
-      this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
-        .actionType === AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
+    if (this.recordedLearnerActions !== null) {
+      return (
+        this.hasRecordingBegun() &&
+        this.recordedLearnerActions.length > 1 &&
+        this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
+          .actionType === AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
+    }
+    return false;
   }
 
   private isRecordedPlaythroughHelpful(): boolean {
-    return (
-      // Playthroughs are only helpful in their entirety.
-      this.hasRecordingFinished() &&
-      // Playthroughs are only helpful if learners have attempted an answer.
-      this.recordedLearnerActions.some(
-        a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
-      // Playthroughs are only helpful if learners have invested enough time.
-      this.playthroughDurationInSecs >=
-          ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
+    if (this.recordedLearnerActions !== null && (
+      this.playthroughDurationInSecs !== null)) {
+      return (
+        // Playthroughs are only helpful in their entirety.
+        this.hasRecordingFinished() &&
+        // Playthroughs are only helpful if learners have attempted an answer.
+        this.recordedLearnerActions.some(
+          a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
+        // Playthroughs are only helpful if learners have invested enough time.
+        this.playthroughDurationInSecs >= (
+          ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS));
+    }
+    return false;
   }
 }
 
