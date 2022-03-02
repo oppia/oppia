@@ -859,7 +859,7 @@ class UtilsTests(test_utils.GenericTestBase):
             filepath_png, raw_bytes=True, mode='rb')
         self.assertEqual(utils.convert_png_binary_to_data_url(file_contents_png), 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D')  # pylint: disable=line-too-long
 
-    def test_get_exploration_components_from_dir_with_yaml_content(self) -> None:
+    def test_get_exploration_components_from_dir_with_yaml_content(self) -> None: # pylint: disable=line-too-long
         img1_path = 'images/sample_Img.svg'
         img2_path = 'images/sample_Img2.svg'
         img1_file_content = b'<svg width="100" height="100"><circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" /></svg>'  # pylint: disable=line-too-long
