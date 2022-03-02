@@ -61,34 +61,113 @@ describe('SvgSanitizerService', () => {
     'should return SafeResourceUrl when a safe SVG is requested as' +
       'SafeResourceUrl',
     () => {
-      const svgString = (
-        '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
-        '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
-        'cal-align: -0.241ex;"><g stroke="currentColor" fill="currentColor" ' +
-        'stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-widt' +
-        'h="1" d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402' +
-        'Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T' +
-        '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z" ' +
-        'data-name="dataName"/></g><circel></circel></svg>'
-      );
-      let dataURI = (
-        'data:image/svg+xml;base64,' +
-        btoa(unescape(encodeURIComponent(svgString))));
-      let cleanedDataUri = svgSanitizerService.getTrustedSvgResourceUrl(
-        dataURI);
-      const cleanedSvgString = (
-        '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
-        '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
-        'cal-align: -0.241ex;"><g stroke="currentColor" fill="currentColor" ' +
-        'stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-widt' +
-        'h="1" d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402' +
-        'Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T' +
-        '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z"/></' +
-        'g></svg>'
-      );
-      expect(cleanedDataUri).toEqual(
-        'data:image/svg+xml;base64,' +
-        btoa(unescape(encodeURIComponent(cleanedSvgString))));
+      const testCases = [
+        {
+          svgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z"/></g><circel></circel></svg>'),
+          expectedSvgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z"/></g></svg>')
+        },
+        {
+          svgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z" data-name="dataName"/></g></svg>'),
+          expectedSvgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z"/></g></svg>')
+        },
+        {
+          svgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><paht stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z" data-name="dataName"/></g><circel></circel></svg>'),
+          expectedSvgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"/></svg>')
+        },
+        {
+          svgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z" data-custom="dataCustom"/></g><circel></circel></svg>'),
+          expectedSvgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z"/></g></svg>')
+        },
+        {
+          svgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" styyle="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z"/></g></svg>'),
+          expectedSvgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4"' +
+            '><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z"/></g></svg>')
+        }
+      ];
+      testCases.forEach(testCase => {
+        let dataURI = (
+          'data:image/svg+xml;base64,' +
+          btoa(unescape(encodeURIComponent(testCase.svgString))));
+        let safeResourceUrl = svgSanitizerService.getTrustedSvgResourceUrl(
+          dataURI);
+        expect(atob(safeResourceUrl.toString().split(',')[1])).toEqual(
+          testCase.expectedSvgString);
+      });
     });
 
   it('should remove the role attribute from the Math SVG string', () => {
@@ -262,7 +341,7 @@ describe('SvgSanitizerService', () => {
     expect(dimensions).toEqual(expectedDimension);
   });
 
-  it('should correctly parse DataUri', () => {
+  it('should correctly get SVG from DataUri', () => {
     const svgString = (
       '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.429e' +
       'x" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vertical-a' +
