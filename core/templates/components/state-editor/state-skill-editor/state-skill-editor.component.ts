@@ -37,8 +37,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './state-skill-editor.component.html'
 })
 export class StateSkillEditorComponent implements OnInit {
-  @Output() onSaveLinkedSkillId: EventEmitter<string | null> = (
-    new EventEmitter<string | null>());
+  @Output() onSaveLinkedSkillId: EventEmitter<string> = (
+    new EventEmitter<string>());
 
   @Output() onSaveStateContent: EventEmitter<string> = (
     new EventEmitter<string>());
@@ -49,6 +49,7 @@ export class StateSkillEditorComponent implements OnInit {
   categorizedSkills!: SkillsCategorizedByTopics;
   untriagedSkillSummaries!: SkillSummary[];
   skillEditorIsShown: boolean = true;
+  isSkillSelected = false;
 
   constructor(
     private topicsAndSkillsDashboardBackendApiService: (
@@ -91,6 +92,7 @@ export class StateSkillEditorComponent implements OnInit {
     modalRef.componentInstance.untriagedSkillSummaries = (
       this.untriagedSkillSummaries);
     modalRef.result.then((result) => {
+      this.isSkillSelected = true;
       this.stateLinkedSkillIdService.displayed = result.id;
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(result.id);
@@ -107,7 +109,7 @@ export class StateSkillEditorComponent implements OnInit {
       DeleteStateSkillModalComponent, {
         backdrop: true,
       }).result.then(() => {
-      this.stateLinkedSkillIdService.displayed = '';
+      this.isSkillSelected = false;
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(this.stateLinkedSkillIdService.displayed);
     }, () => {
@@ -119,7 +121,7 @@ export class StateSkillEditorComponent implements OnInit {
 
   // Return undefined if the skill is not linked to the state.
   getSkillEditorUrl(): string | undefined {
-    if (this.stateLinkedSkillIdService.displayed) {
+    if (this.isSkillSelected) {
       return this.urlInterpolationService.interpolateUrl(
         '/skill_editor/<skill_id>', {
           skill_id: this.stateLinkedSkillIdService.displayed

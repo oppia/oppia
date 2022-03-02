@@ -319,6 +319,7 @@ describe('State Skill Editor Component', () => {
       urlInterpolationService, 'interpolateUrl')
       .and.returnValue('/skill_editor/skill_1');
 
+    componentInstance.isSkillSelected = true;
     stateLinkedSkillIdService.displayed = 'skill_1';
     componentInstance.getSkillEditorUrl();
     fixture.detectChanges();

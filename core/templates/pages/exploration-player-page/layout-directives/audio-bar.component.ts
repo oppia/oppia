@@ -159,7 +159,7 @@ export class AudioBarComponent {
   // Return undefined if the audio is not available in the current language.
   getCurrentAudioLanguageDescription(): string | undefined {
     const currentAudioLanguageDescription = (
-      this.audioTranslationLanguageService.getCurrentAudioLanguageCode()
+      this.audioTranslationLanguageService.getCurrentAudioLanguageDescription()
     );
     if (currentAudioLanguageDescription !== null) {
       return currentAudioLanguageDescription;
