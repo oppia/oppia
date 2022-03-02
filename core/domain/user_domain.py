@@ -32,7 +32,6 @@ from typing_extensions import TypedDict
 class UserSettingsDict(TypedDict):
     """Dictionary representing the UserSettings object."""
 
-    user_id: str
     email: str
     roles: List[str]
     banned: bool
@@ -311,9 +310,7 @@ class UserSettings:
             dict. A dictionary containing the UserSettings class information
             in a dictionary form.
         """
-        # Here, we're not returning user_id key of UserSettingsDict which
-        # causes MyPy to throw error. thus we add an ignore here.
-        return { # type: ignore[typeddict-item]
+        return {
             'email': self.email,
             'roles': self.roles,
             'banned': self.banned,
