@@ -211,28 +211,28 @@ export class StoryEditorStateService {
     }
     this._storyIsBeingSaved = true;
     const storyId = this._story.getId();
-    if (storyId === null) {
-      throw Error('Story have not been loaded.');
+    if (storyId !== null) {
+      this.editableStoryBackendApiService.updateStoryAsync(
+        storyId, this._story.getVersion(), commitMessage,
+        this.undoRedoService.getCommittableChangeList() as StoryChange[]
+      ).then(
+        (storyBackendObject) => {
+          this._updateStory(storyBackendObject);
+          this.undoRedoService.clearChanges();
+          this._storyIsBeingSaved = false;
+          if (successCallback) {
+            successCallback();
+          }
+        }, error => {
+          let errorMessage = error || (
+            'There was an error when saving the story.');
+          this.alertsService.addWarning(errorMessage);
+          this._storyIsBeingSaved = false;
+          if (errorCallback) {
+            errorCallback(errorMessage);
+          }
+        });
     }
-    this.editableStoryBackendApiService.updateStoryAsync(
-      storyId, this._story.getVersion(), commitMessage,
-      this.undoRedoService.getCommittableChangeList() as StoryChange[]
-    ).then(
-      (storyBackendObject) => {
-        this._updateStory(storyBackendObject);
-        this.undoRedoService.clearChanges();
-        this._storyIsBeingSaved = false;
-        if (successCallback) {
-          successCallback();
-        }
-      }, error => {
-        let errorMessage = error || 'There was an error when saving the story.';
-        this.alertsService.addWarning(errorMessage);
-        this._storyIsBeingSaved = false;
-        if (errorCallback) {
-          errorCallback(errorMessage);
-        }
-      });
     return true;
   }
 
@@ -253,21 +253,20 @@ export class StoryEditorStateService {
     }
 
     const storyId = this._story.getId();
-    if (storyId === null) {
-      throw Error('Story have not been loaded.');
+    if (storyId !== null) {
+      this.editableStoryBackendApiService.changeStoryPublicationStatusAsync(
+        storyId, newStoryStatusIsPublic).then(
+        (storyBackendObject) => {
+          this._setStoryPublicationStatus(newStoryStatusIsPublic);
+          if (successCallback) {
+            successCallback();
+          }
+        }, error => {
+          this.alertsService.addWarning(
+            error ||
+            'There was an error when publishing/unpublishing the story.');
+        });
     }
-    this.editableStoryBackendApiService.changeStoryPublicationStatusAsync(
-      storyId, newStoryStatusIsPublic).then(
-      (storyBackendObject) => {
-        this._setStoryPublicationStatus(newStoryStatusIsPublic);
-        if (successCallback) {
-          successCallback();
-        }
-      }, error => {
-        this.alertsService.addWarning(
-          error ||
-          'There was an error when publishing/unpublishing the story.');
-      });
     return true;
   }
 
