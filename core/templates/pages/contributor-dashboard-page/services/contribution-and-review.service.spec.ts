@@ -25,7 +25,7 @@ import { ContributionAndReviewBackendApiService }
   from './contribution-and-review-backend-api.service';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 
-fdescribe('Contribution and review service', () => {
+describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
   let carbas: ContributionAndReviewBackendApiService;
   let fetchSuggestionsAsyncSpy: jasmine.Spy;
