@@ -698,7 +698,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             user_id: str. The id of the user trying to make this query.
 
         Returns:
-            Tuple of (results, next_offset), where:
+            Tuple of (results, next_offset). Where:
                 results: list(SuggestionModel). A list of suggestions that are
                     of the supplied type which the supplied user has created.
                 next_offset: int. Number of query results to skip on a
