@@ -40,14 +40,6 @@ ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
 
-CollectionPropertiesType = Tuple[
-    Literal['title'],
-    Literal['category'],
-    Literal['objective'],
-    Literal['language_code'],
-    Literal['tags']
-]
-
 
 class ValidCmdDict(TypedDict):
     """Dictionary representing valid commands specs."""
@@ -56,7 +48,7 @@ class ValidCmdDict(TypedDict):
     required_attribute_names: List[str]
     optional_attribute_names: List[str]
     user_id_attribute_names: List[str]
-    allowed_values: Dict[str, Union[CollectionPropertiesType, str]]
+    allowed_values: Dict[str, List[str]]
     deprecated_values: Dict[str, List[str]]
 
 

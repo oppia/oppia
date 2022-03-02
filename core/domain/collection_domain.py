@@ -105,10 +105,10 @@ class CollectionChange(change_domain.BaseChange):
 
     # The allowed list of collection properties which can be used in
     # edit_collection_property command.
-    COLLECTION_PROPERTIES: feconf.CollectionPropertiesType = (
+    COLLECTION_PROPERTIES: List[str] = [
         COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
         COLLECTION_PROPERTY_OBJECTIVE, COLLECTION_PROPERTY_LANGUAGE_CODE,
-        COLLECTION_PROPERTY_TAGS)
+        COLLECTION_PROPERTY_TAGS]
 
     ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
         'name': CMD_CREATE_NEW,
