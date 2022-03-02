@@ -146,6 +146,14 @@ var NonnegativeIntEditor = function(elem) {
   };
 };
 
+var sendChar = async function(element, value) {
+  element.clear();
+
+  for (let i = 0; i < value.length; i++) {
+    await element.element(by.tagName('input')).sendKeys(value[i]);
+  }
+};
+
 var NormalizedStringEditor = function(elem) {
   return {
     setValue: async function(value) {
@@ -153,7 +161,12 @@ var NormalizedStringEditor = function(elem) {
       await elem.element(by.tagName('input')).clear();
       // while debugging i caught that value stored is 'correct'
       // error may be in elem
-      await elem.element(by.tagName('input')).sendKeys(value);
+      await sendChar(elem, value);
+
+      var valueThatIsRead =
+        await elem.element(by.tagName('input')).getAttribute('value');
+      console.log(valueThatIsRead);
+      debugger;
     },
     expectValueToBe: async function(expectedValue) {
       var value = await elem.element(by.tagName('input')).getAttribute('value');
