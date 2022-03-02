@@ -25,7 +25,7 @@ from core.tests import test_utils
 class IssueRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the issue registry."""
 
-    def test_issue_registry(self):
+    def test_issue_registry(self) -> None:
         """Do some sanity checks on the issue registry."""
         self.assertEqual(
             len(playthrough_issue_registry.Registry.get_all_issues()), 3)
