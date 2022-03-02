@@ -168,7 +168,8 @@ class TranslatableContentsCollection:
         content_id: str,
         content_value: feconf.ContentValueType
     ) -> None:
-        """Adds translatable field parameter to translatable_contents dict.
+        """Adds translatable field parameter to
+        'content_id_to_translatable_content' dict.
 
         Args:
             field_type: TranslatableContentFormat. The type of the
