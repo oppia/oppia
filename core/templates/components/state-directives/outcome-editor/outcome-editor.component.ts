@@ -54,13 +54,11 @@ angular.module('oppia').component('outcomeEditor', {
   template: require('./outcome-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    '$rootScope',
-    'ExternalSaveService', 'StateEditorService',
+    '$rootScope', 'ExternalSaveService', 'StateEditorService',
     'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
     'INTERACTION_SPECS',
     function(
-        $rootScope,
-        ExternalSaveService, StateEditorService,
+        $rootScope, ExternalSaveService, StateEditorService,
         StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
         INTERACTION_SPECS) {
       var ctrl = this;
@@ -71,6 +69,10 @@ angular.module('oppia').component('outcomeEditor', {
 
       ctrl.isCorrectnessFeedbackEnabled = function() {
         return StateEditorService.getCorrectnessFeedbackEnabled();
+      };
+
+      ctrl.getChanges = function() {
+        $rootScope.$applyAsync();
       };
 
       // This returns false if the current interaction ID is null.
