@@ -326,7 +326,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """Fetches values that can be used to filter reports by.
 
         Args:
-            filter_field: FilterFieldNames. The enum type of the field we want
+            filter_field: FilterFieldName. The enum type of the field we want
                 to fetch all possible values for.
 
         Returns:
