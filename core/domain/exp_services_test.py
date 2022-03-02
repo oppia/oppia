@@ -25,7 +25,6 @@ import re
 import zipfile
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
@@ -1832,7 +1831,7 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     )
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
@@ -1940,7 +1939,7 @@ title: A title
 
     UPDATED_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
@@ -2108,7 +2107,7 @@ title: A title
                         '</oppia-noninteractive-image>').to_dict()
                 })], 'Add state name')
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
@@ -2199,7 +2198,7 @@ title: A title
                         '</oppia-noninteractive-image>').to_dict()
                 })], 'Add state name')
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -2208,7 +2207,7 @@ title: A title
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID))
         fs.commit('image/abc.png', raw_image)
         # Audio files should not be included in asset downloads.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'), 'rb', encoding=None
         ) as f:
             raw_audio = f.read()
@@ -2282,7 +2281,7 @@ title: A title
                 'alt-with-value="&quot;Image&quot;">'
                 '</oppia-noninteractive-image>').to_dict()
         })]
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None
         ) as f:
@@ -2571,7 +2570,7 @@ written_translations:
             'new_value': 1
         })]
         exploration.objective = 'The objective'
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
@@ -5042,6 +5041,23 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self._check_contributors_summary(
             self.EXP_ID_1, {self.albert_id: 1})
 
+    def test_regenerate_summary_with_new_contributor_with_invalid_exp_id(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        with logging_swap:
+            exp_services.regenerate_exploration_summary_with_new_contributor(
+                'dummy_id', self.albert_id)
+
+        self.assertEqual(
+            observed_log_messages,
+            ['Could not find exploration with ID dummy_id']
+        )
+
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
@@ -5692,7 +5708,7 @@ title: Old Title
 
     def test_update_exploration_auto_tts_enabled(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.auto_tts_enabled, True)
+        self.assertEqual(exploration.auto_tts_enabled, False)
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,

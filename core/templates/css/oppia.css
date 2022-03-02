@@ -823,15 +823,6 @@ textarea {
 }
 
 
-
-.input-group-addon.oppia-search-bar-icon {
-  border-radius: 4px 0 0 4px;
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 1;
-  padding: 7px 12px;
-  text-align: center;
-}
 .oppia-help-dropdown .uib-popover {
   color: white;
   font-size: 14px;
@@ -936,7 +927,7 @@ textarea {
   box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
   font-size: 14px;
   margin: 2px 0 0;
-  max-width: 220px;
+  max-width: 245px;
   min-width: 160px;
   padding: 5px 0;
 }
@@ -1039,6 +1030,13 @@ textarea {
 }
 .oppia-navbar-breadcrumb-separator:after {
   content: ">";
+}
+
+.oppia-navbar-breadcrumb-rtl-separator {
+  margin-left: 8px;
+}
+.oppia-navbar-breadcrumb-rtl-separator:after {
+  content: "<";
 }
 
 .oppia-navbar-breadcrumb-icon {
@@ -3180,6 +3178,14 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: right;
 }
 
+/*
+  The following class is to be used for forcing right align in RTL languages,
+  hence the !important tag.
+*/
+.oppia-force-right-align {
+  text-align: right !important;
+}
+
 .oppia-lost-changes > li {
   margin: 5px 0 5px 10px;
 }
@@ -3221,9 +3227,6 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 0.75em;
   list-style-type: none;
   text-align: center;
-}
-.oppia-navbar-nav.oppia-navbar-profile > li:hover {
-  background-color: #00645c
 }
 .oppia-activity-summary-tile.small-width .metrics li {
   display: block;
@@ -4782,7 +4785,7 @@ div.oppia-issues-learner-action {
   .oppia-profile-picture-container {
     float: left;
     height: auto;
-    width: 130px;
+    width: 100%;
   }
   .oppia-profile-user-card {
     float: none;

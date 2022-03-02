@@ -88,7 +88,7 @@ def establish_firebase_connection() -> None:
         firebase_admin.App. The App being by the Firebase SDK.
 
     Raises:
-        Exception. The Firebase app has a genuine problem.
+        ValueError. The Firebase app has a genuine problem.
     """
     try:
         firebase_admin.get_app()
@@ -461,6 +461,9 @@ def grant_super_admin_privileges(user_id: str) -> None:
 
     Args:
         user_id: str. The Oppia user ID to promote to super admin.
+
+    Raises:
+        ValueError. No Firebase account associated with given user ID.
     """
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:
@@ -477,6 +480,9 @@ def revoke_super_admin_privileges(user_id: str) -> None:
 
     Args:
         user_id: str. The Oppia user ID to revoke privileges from.
+
+    Raises:
+        ValueError. No Firebase account associated with given user ID.
     """
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:
@@ -553,14 +559,19 @@ def _get_auth_claims_from_session_cookie(
         return None
     try:
         claims = firebase_auth.verify_session_cookie(cookie, check_revoked=True)
-    except firebase_auth.ExpiredSessionCookieError:
-        raise auth_domain.StaleAuthSessionError('session has expired')
-    except firebase_auth.RevokedSessionCookieError:
-        raise auth_domain.StaleAuthSessionError('session has been revoked')
-    except firebase_auth.UserDisabledError:
-        raise auth_domain.UserDisabledError('user is being deleted')
-    except (firebase_exceptions.FirebaseError, ValueError) as error:
-        raise auth_domain.InvalidAuthSessionError('session invalid: %s' % error)
+    except firebase_auth.ExpiredSessionCookieError as e:
+        raise auth_domain.StaleAuthSessionError(
+            'session has expired') from e
+    except firebase_auth.RevokedSessionCookieError as e:
+        raise auth_domain.StaleAuthSessionError(
+            'session has been revoked') from e
+    except firebase_auth.UserDisabledError as e:
+        raise auth_domain.UserDisabledError(
+            'user is being deleted') from e
+    except (
+        firebase_exceptions.FirebaseError, ValueError) as error:
+        raise auth_domain.InvalidAuthSessionError(
+            'session invalid: %s' % error) from error
     else:
         return _create_auth_claims(claims)
 

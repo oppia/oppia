@@ -22,7 +22,7 @@ import os
 import re
 import sys
 
-from core import python_utils
+from core import utils
 
 LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
@@ -40,35 +40,24 @@ EXCLUDED_DIRECTORIES = [
 NOT_FULLY_COVERED_FILENAMES = [
     'angular-html-bind.directive.ts',
     'App.ts',
-    'audio-preloader.service.ts',
     'Base.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
-    'collection.model.ts',
     'exploration-states.service.ts',
-    'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
-    'fatigue-detection.service.ts',
     'google-analytics.initializer.ts',
     'learner-answer-info.service.ts',
     'mathjax-bind.directive.ts',
-    'normalize-whitespace-punctuation-and-case.pipe.ts',
     'object-editor.directive.ts',
-    'oppia-footer.component.ts',
     'oppia-interactive-music-notes-input.directive.ts',
     'oppia-interactive-pencil-code-editor.component.ts',
     'oppia-root.directive.ts',
     'parameterize-rule-description.filter.ts',
     'python-program.tokenizer.ts',
     'question-update.service.ts',
-    'refresher-exploration-confirmation-modal.service.ts',
     'rule-type-selector.directive.ts',
     'select2-dropdown.directive.ts',
-    'state-content-editor.directive.ts',
-    'state-interaction-editor.directive.ts',
-    'story-node.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
-    'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
     'unit-test-utils.ajs.ts',
@@ -134,7 +123,7 @@ def get_stanzas_from_lcov_file():
     Returns:
         list(LcovStanzaRelevantLines). A list with all stanzas.
     """
-    f = python_utils.open_file(LCOV_FILE_PATH, 'r')
+    f = utils.open_file(LCOV_FILE_PATH, 'r')
     lcov_items_list = f.read().split('end_of_record')
     stanzas_list = []
 
