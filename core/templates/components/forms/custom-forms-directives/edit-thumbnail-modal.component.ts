@@ -63,7 +63,10 @@ export class EditThumbnailModalComponent {
   @Input() uploadedImageMimeType!: string;
   @Input() openInUploadMode: boolean = false;
   imgSrc!: string;
-  invalidTagsAndAttributes!: InvalidTagsAndAttributes;
+  invalidTagsAndAttributes: InvalidTagsAndAttributes = {
+    tags: [],
+    attrs: []
+  };
 
   invalidImageWarningIsShown = false;
   invalidFilenameWarningIsShown = false;
@@ -112,20 +115,11 @@ export class EditThumbnailModalComponent {
       };
       this.imgSrc = reader.result as string;
       this.updateBackgroundColor(this.tempBgColor);
-      img.src = this.imgSrc;
-      let svg = this.svgSanitizerService.parseDataURI(this.imgSrc);
       this.invalidTagsAndAttributes = (
-        this.svgSanitizerService.getInvalidSvgTagsAndAttrs(svg));
-      const tags = this.invalidTagsAndAttributes.tags;
-      let attrs: string[] = [];
-      this.invalidTagsAndAttributes.attrs.forEach(attribute => {
-        attrs.push(attribute.split(':')[1]);
-      });
-      svg = this.svgSanitizerService.removeTagsAndAttributes(
-        svg, {tags, attrs});
-      this.imgSrc = (
-        'data:image/svg+xml;base64,' +
-        btoa(unescape(encodeURIComponent(svg.documentElement?.outerHTML))));
+        this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
+          this.imgSrc));
+      this.imgSrc = this.svgSanitizerService.removeTagsAndAttributes(
+        this.imgSrc);
       this.uploadedImage = this.imgSrc;
       this.thumbnailHasChanged = true;
     };

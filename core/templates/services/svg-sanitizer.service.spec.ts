@@ -61,7 +61,7 @@ describe('SvgSanitizerService', () => {
   });
 
   it('should check for invalid base64 images', () => {
-    expect(svgSanitizerService.isValidBase64Svg(invalidBase64data)).toBe(false);
+    expect(svgSanitizerService.isBase64Svg(invalidBase64data)).toBe(false);
   });
 
   it(
@@ -256,7 +256,7 @@ describe('SvgSanitizerService', () => {
     const dataURI = (
       'data:image/svg+xml;base64,' +
       btoa(unescape(encodeURIComponent(svgString))));
-    const parsedSvg = svgSanitizerService.parseDataURI(dataURI);
+    const parsedSvg = svgSanitizerService.getSvgFromDataUri(dataURI);
     expect(parsedSvg).toEqual(
       domParser.parseFromString(svgString, 'image/svg+xml'));
   });
@@ -294,13 +294,11 @@ describe('SvgSanitizerService', () => {
       '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z" ' +
       'data-name="dataName"/></g><circel></circel></svg>'
     );
-    var dataURI = (
+    let dataURI = (
       'data:image/svg+xml;base64,' +
       btoa(unescape(encodeURIComponent(svgString))));
-    const parsedSvg = svgSanitizerService.parseDataURI(dataURI);
-    const returnedSvg = svgSanitizerService.removeTagsAndAttributes(
-      parsedSvg, {tags: ['circel'], attrs: ['data-name']}
-    );
+    let cleanedDataUri = svgSanitizerService.removeTagsAndAttributes(
+      dataURI);
     const cleanedSvgString = (
       '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
       '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
@@ -311,8 +309,9 @@ describe('SvgSanitizerService', () => {
       '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z"/></' +
       'g></svg>'
     );
-    expect(returnedSvg).toEqual(
-      domParser.parseFromString(cleanedSvgString, 'image/svg+xml'));
+    expect(cleanedDataUri).toEqual(
+      'data:image/svg+xml;base64,' +
+      btoa(unescape(encodeURIComponent(cleanedSvgString))));
   });
 
   it('should catch malicious SVGs', () => {

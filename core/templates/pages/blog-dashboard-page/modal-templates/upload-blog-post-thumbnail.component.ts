@@ -79,22 +79,8 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
         attrs: []
       };
       let imageData = (e.target as FileReader).result as string;
-      const mimeType = imageData.split(';')[0];
-      if (mimeType === 'data:image/svg+xml') {
-        let svg = this.svgSanitizerService.parseDataURI(imageData);
-        this.invalidTagsAndAttributes = (
-          this.svgSanitizerService.getInvalidSvgTagsAndAttrs(svg));
-        const tags = this.invalidTagsAndAttributes.tags;
-        let attrs: string[] = [];
-        this.invalidTagsAndAttributes.attrs.forEach(attribute => {
-          attrs.push(attribute.split(':')[1]);
-        });
-        svg = this.svgSanitizerService.removeTagsAndAttributes(
-          svg, {tags, attrs});
-        imageData = (
-          'data:image/svg+xml;base64,' +
-        btoa(unescape(encodeURIComponent(svg.documentElement.outerHTML))));
-      }
+      this.invalidTagsAndAttributes = this.svgSanitizerService
+        .getInvalidSvgTagsAndAttrsFromDataUri(imageData);
       this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
         imageData);
       if (!this.uploadedImage) {

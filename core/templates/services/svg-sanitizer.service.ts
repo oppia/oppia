@@ -154,7 +154,7 @@ export class SvgSanitizerService {
     return { tags: invalidTags, attrs: invalidAttrs };
   }
 
-  parseDataURI(dataURI: string): Document {
+  getSvgFromDataUri(dataURI: string): Document {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
     let svgString = atob(dataURI.split(',')[1]);
@@ -163,11 +163,16 @@ export class SvgSanitizerService {
     return doc;
   }
 
-  removeTagsAndAttributes(
-      svg: Document, valuesToBeRemoved: { tags: string[]; attrs: string[] }
-  ): Document {
-    let tagsToBeRemoved = valuesToBeRemoved.tags;
-    let attrsToBeRemoved = valuesToBeRemoved.attrs;
+  removeTagsAndAttributes(dataURI: string): string {
+    // We are removing the attributes which are currently is not in
+    // the allowlist of valid attributes. The allowlist is based on
+    // the list of tags and attributes specified in this project:
+    // https://github.com/cure53/DOMPurify
+    // Complete list is present at 'assets/constants.ts'.
+    let svg = this.getSvgFromDataUri(dataURI);
+    let invalidTagsAndAttributes = this._getInvalidSvgTagsAndAttrs(svg);
+    let tagsToBeRemoved = invalidTagsAndAttributes.tags;
+    let attrsToBeRemoved = invalidTagsAndAttributes.attrs;
     svg.querySelectorAll('*').forEach((node) => {
       let nodeTagName: string = node.tagName.toLowerCase();
       if (tagsToBeRemoved.indexOf(nodeTagName) !== -1) {
@@ -175,13 +180,16 @@ export class SvgSanitizerService {
       } else {
         for (let i = 0; i < node.attributes.length; i++) {
           let nodeAttrName: string = node.attributes[i].name.toLowerCase();
-          if (attrsToBeRemoved.indexOf(nodeAttrName) !== -1) {
+          if (
+            attrsToBeRemoved.indexOf(nodeTagName + ':' + nodeAttrName) !== -1) {
             node.removeAttribute(nodeAttrName);
           }
         }
       }
     });
-    return svg;
+    return (
+      'data:image/svg+xml;base64,' +
+      btoa(unescape(encodeURIComponent(svg.documentElement.outerHTML))));
   }
 
   getInvalidSvgTagsAndAttrs(
@@ -192,7 +200,7 @@ export class SvgSanitizerService {
 
   getInvalidSvgTagsAndAttrsFromDataUri(
       dataURI: string): { tags: string[]; attrs: string[] } {
-    let doc = this.parseDataURI(dataURI);
+    let doc = this.getSvgFromDataUri(dataURI);
     return this._getInvalidSvgTagsAndAttrs(doc);
   }
 
@@ -205,7 +213,7 @@ export class SvgSanitizerService {
    *
    * @returns {boolean} True if all the checks pass. False Otherwise.
    */
-  isValidBase64Svg(base64ImageData: string): boolean {
+  isBase64Svg(base64ImageData: string): boolean {
     const DATA_URL_PATTERN = /^data:image\/svg\+xml;base64,[a-z0-9+\/]+=*$/i;
     // Check if data passed is a valid bse64 SVG.
     if (!base64ImageData.match(DATA_URL_PATTERN)) {
@@ -227,7 +235,9 @@ export class SvgSanitizerService {
    * trusted. Otherwise returns null.
    */
   getTrustedSvgResourceUrl(base64ImageData: string): SafeResourceUrl | null {
-    if (this.isValidBase64Svg(base64ImageData)) {
+    if (this.isBase64Svg(base64ImageData)) {
+      base64ImageData = this.removeTagsAndAttributes(base64ImageData);
+
       // eslint-disable-next-line oppia/no-bypass-security-phrase
       return this.sanitizer.bypassSecurityTrustResourceUrl(base64ImageData);
     }

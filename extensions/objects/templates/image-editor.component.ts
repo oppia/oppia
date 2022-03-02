@@ -875,8 +875,12 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         this.imgData = reader.result as string;
         let imageData: string | SafeResourceUrl = reader.result as string;
         if (file.name.endsWith('.svg')) {
+          this.invalidTagsAndAttributes = this.svgSanitizerService
+            .getInvalidSvgTagsAndAttrsFromDataUri(this.imgData);
+          this.imgData = this.svgSanitizerService.removeTagsAndAttributes(
+            this.imgData);
           imageData = this.svgSanitizerService.getTrustedSvgResourceUrl(
-            imageData as string);
+            this.imgData);
         }
         this.data = {
           mode: this.MODE_UPLOADED,
@@ -984,24 +988,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       let gifHeight = dimensions.height;
       this.processGIFImage(imageDataURI, gifWidth, gifHeight, null, successCb);
     } else if (mimeType === 'data:image/svg+xml') {
-      // We are removing the attributes which are currently is not in
-      // the allowlist of valid attributes. The allowlist is based on
-      // the list of tags and attributes specified in this project:
-      // https://github.com/cure53/DOMPurify
-      // Complete list is present at 'assets/constants.ts'.
-      let svg = this.svgSanitizerService.parseDataURI(imageDataURI);
-      this.invalidTagsAndAttributes = (
-        this.svgSanitizerService.getInvalidSvgTagsAndAttrs(svg));
-      const tags = this.invalidTagsAndAttributes.tags;
-      let attrs: string[] = [];
-      this.invalidTagsAndAttributes.attrs.forEach(attribute => {
-        attrs.push(attribute.split(':')[1]);
-      });
-      svg = this.svgSanitizerService.removeTagsAndAttributes(
-        svg, {tags, attrs});
-      imageDataURI = (
-        'data:image/svg+xml;base64,' +
-        btoa(unescape(encodeURIComponent(svg.documentElement.outerHTML))));
       resampledFile = (
         this.imageUploadHelperService.convertImageDataToImageFile(
           imageDataURI));

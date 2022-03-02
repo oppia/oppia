@@ -78,7 +78,7 @@ describe('Edit Thumbnail Modal Component', () => {
   }
 
   let mockSvgSanitizerService = {
-    parseDataURI: (dataURI: string) => {
+    getSvgFromDataUri: (dataURI: string) => {
       return Document;
     },
     getInvalidSvgTagsAndAttrs: (svg: Document) => {
