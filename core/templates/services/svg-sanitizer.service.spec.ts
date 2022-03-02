@@ -31,20 +31,6 @@ describe('SvgSanitizerService', () => {
     }
   }
 
-  /**
-   * Safe SVG Decoded
-   * <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
-   *  <polygon id="triangle"
-   *           points="0,0 0,50 50,0" fill="#009900" stroke="#004400" />
-   * </svg>
-   */
-  const safeSvg = (
-    'data:image/svg+xml;base64,PHN2ZyBpZD0ic291cmNlIiB2ZXJzaW9uPSIxLjEiIGJhc2' +
-    'VQcm9maWxlPSJmdWxsIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogID' +
-    'xwb2x5Z29uIGlkPSJ0cmlhbmdsZSIgcG9pbnRzPSIwLDAgMCw1MCA1MCwwIiBmaWxsPSIjMD' +
-    'A5OTAwIiBzdHJva2U9IiMwMDQ0MDAiPjwvcG9seWdvbj4KPC9zdmc+'
-  );
-
   const invalidBase64data = 'data:image/svg+xml;base64,This is invalid %3D';
 
   beforeEach(() => {
@@ -64,12 +50,45 @@ describe('SvgSanitizerService', () => {
     expect(svgSanitizerService.isBase64Svg(invalidBase64data)).toBe(false);
   });
 
+  it('should return null when a invalid base64 SVG is requested as' +
+  'SafeResourceUrl',
+  () => {
+    expect(svgSanitizerService.getTrustedSvgResourceUrl(
+      invalidBase64data)).toBeNull();
+  });
+
   it(
     'should return SafeResourceUrl when a safe SVG is requested as' +
-    'SafeResourceUrl',
+      'SafeResourceUrl',
     () => {
-      expect(svgSanitizerService.getTrustedSvgResourceUrl(safeSvg)).toBe(
-        safeSvg);
+      const svgString = (
+        '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
+        '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
+        'cal-align: -0.241ex;"><g stroke="currentColor" fill="currentColor" ' +
+        'stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-widt' +
+        'h="1" d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402' +
+        'Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T' +
+        '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z" ' +
+        'data-name="dataName"/></g><circel></circel></svg>'
+      );
+      let dataURI = (
+        'data:image/svg+xml;base64,' +
+        btoa(unescape(encodeURIComponent(svgString))));
+      let cleanedDataUri = svgSanitizerService.getTrustedSvgResourceUrl(
+        dataURI);
+      const cleanedSvgString = (
+        '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
+        '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
+        'cal-align: -0.241ex;"><g stroke="currentColor" fill="currentColor" ' +
+        'stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-widt' +
+        'h="1" d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402' +
+        'Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T' +
+        '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z"/></' +
+        'g></svg>'
+      );
+      expect(cleanedDataUri).toEqual(
+        'data:image/svg+xml;base64,' +
+        btoa(unescape(encodeURIComponent(cleanedSvgString))));
     });
 
   it('should remove the role attribute from the Math SVG string', () => {
@@ -281,37 +300,6 @@ describe('SvgSanitizerService', () => {
       attrs: ['svg:widdth']
     };
     expect(invalidSvgTagsAndAttrs).toEqual(expectedInvalidSvgTagsAndAttrs);
-  });
-
-  it('should correctly remove invalid svg tags and attributes', () => {
-    const svgString = (
-      '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
-      '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
-      'cal-align: -0.241ex;"><g stroke="currentColor" fill="currentColor" ' +
-      'stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-widt' +
-      'h="1" d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402' +
-      'Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T' +
-      '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z" ' +
-      'data-name="dataName"/></g><circel></circel></svg>'
-    );
-    let dataURI = (
-      'data:image/svg+xml;base64,' +
-      btoa(unescape(encodeURIComponent(svgString))));
-    let cleanedDataUri = svgSanitizerService.removeTagsAndAttributes(
-      dataURI);
-    const cleanedSvgString = (
-      '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
-      '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
-      'cal-align: -0.241ex;"><g stroke="currentColor" fill="currentColor" ' +
-      'stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-widt' +
-      'h="1" d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402' +
-      'Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T' +
-      '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z"/></' +
-      'g></svg>'
-    );
-    expect(cleanedDataUri).toEqual(
-      'data:image/svg+xml;base64,' +
-      btoa(unescape(encodeURIComponent(cleanedSvgString))));
   });
 
   it('should catch malicious SVGs', () => {
