@@ -114,6 +114,68 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
             )
         ])
 
+    def test_yield_from_answer_group(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('1')
+        state1 = exploration.states[exploration.init_state_name]
+        state1.update_interaction_id('TextInput')
+        state_interaction_cust_args = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': 'Placeholder'
+                }
+            },
+            'rows': {'value': 1}
+        }
+        state1.update_interaction_customization_args(
+            state_interaction_cust_args)
+
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+        state1.update_interaction_default_outcome(default_outcome)
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], 'ref_exp_id_2', None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'normalizedStrSet': ['Input1', 'Input2']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
+        state1.update_interaction_answer_groups(
+            [state_answer_group])
+
+        exp = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_1_ID,
+            title='exploration 1 title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            init_state_name='state1',
+            states_schema_version=48,
+            states={'state1': state1.to_dict()})
+        exp.update_timestamps()
+        self.put_multi([exp])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='exp_id: exp_1_id, state name: state1'
+            )
+        ])
+
     def test_multiple_exploration(self) -> None:
         state1 = state_domain.State.create_default_state('state1')  # type: ignore[no-untyped-call]
         state3 = state_domain.State.create_default_state('state3')  # type: ignore[no-untyped-call]
