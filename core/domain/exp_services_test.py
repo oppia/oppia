@@ -27,7 +27,6 @@ import zipfile
 from core import feconf
 from core import utils
 from core.domain import classifier_services
-from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -4149,7 +4148,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
         second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)
 
-        v1_exploration = self.save_new_valid_exploration(
+        self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_0_ID)
@@ -4225,11 +4224,6 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertLess(
             snapshots_metadata[0]['created_on_ms'],
             snapshots_metadata[1]['created_on_ms'])
-
-        # Using the old version of the exploration should raise an error.
-        with self.assertRaisesRegex(Exception, 'version 1, which is too old'):
-            exp_services._save_exploration(
-                second_committer_id, v1_exploration, '', [])
 
         # Another person modifies the exploration.
         new_change_list = [exp_domain.ExplorationChange({
