@@ -22,10 +22,11 @@
 
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { InteractionAnswer, MusicNotesAnswer } from 'interactions/answer-defs';
 import { MusicNotesInputCustomizationArgs, ReadableMusicNote } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
-import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
@@ -131,7 +132,6 @@ export class MusicNotesInputComponent implements
     this.currentInteractionService.registerCurrentInteraction(
       () => this.submitAnswer(), null);
     // Initialization code.
-
     this.initializeNoteSequence(this.initialSequence as Sequence);
     this.init();
   }
@@ -334,7 +334,6 @@ export class MusicNotesInputComponent implements
 
   repaintNotes(): void {
     let noteChoicesDiv = $('.oppia-music-input-note-choices');
-
     for (let i = 0; i < this.noteSequence.length; i++) {
       let innerDiv = $('<div></div>')
         .data('noteType', this.NOTE_TYPE_NATURAL)
@@ -757,15 +756,17 @@ export class MusicNotesInputComponent implements
   }
 
   submitAnswer(): void {
-    let readableSequence: ReadableMusicNote[] = [];
+    let readableSequence: MusicNotesAnswer[] = [];
     for (let i = 0; i < this.noteSequence.length; i++) {
       readableSequence.push(
         this._convertNoteToReadableNote(this.noteSequence[i].note));
     }
     readableSequence = this._makeAllNotesHaveDurationOne(readableSequence);
-    this.currentInteractionService.onSubmit(
-      this.readableSequence,
-      this.musicNotesInputRulesService as unknown as InteractionRulesService);
+    if (readableSequence) {
+      this.currentInteractionService.onSubmit(
+        readableSequence as unknown as InteractionAnswer,
+        this.musicNotesInputRulesService);
+    }
   }
 
   /** *****************************************************************

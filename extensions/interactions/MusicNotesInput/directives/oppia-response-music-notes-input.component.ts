@@ -29,7 +29,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
   templateUrl: './music-notes-input-response.component.html'
 })
 export class ResponseMusicNotesInput implements OnInit {
-  @Input() answer: string;
+  @Input() answer;
   displayedAnswer: string;
 
   constructor(

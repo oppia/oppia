@@ -103,7 +103,7 @@ export class CurrentInteractionService {
 
   registerCurrentInteraction(
       submitAnswerFn: SubmitAnswerFn | null,
-      validityCheckFn: ValidityCheckFn| null
+      validityCheckFn: ValidityCheckFn | null
   ): void {
     /**
      * Each interaction directive should call registerCurrentInteraction
