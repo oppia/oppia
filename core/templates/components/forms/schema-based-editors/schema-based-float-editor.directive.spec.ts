@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Schema Based Float Editor Directive
  */
 
+import { NumberConversionService } from 'services/number-conversion.service';
+import { NumericInputValidationService } from 'interactions/NumericInput/directives/numeric-input-validation.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Schema Based Float Editor Directive', () => {
@@ -25,11 +27,15 @@ describe('Schema Based Float Editor Directive', () => {
   let $timeout = null;
   let directive = null;
   let SchemaFormSubmittedService = null;
+  let numberConversionService: NumberConversionService;
+  let validator: NumericInputValidationService;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector) {
+    numberConversionService = $injector.get('NumberConversionService');
+    validator = $injector.get('NumericInputValidationService');
     $rootScope = $injector.get('$rootScope');
     SchemaFormSubmittedService = $injector.get('SchemaFormSubmittedService');
     $timeout = $injector.get('$timeout');
@@ -165,5 +171,50 @@ describe('Schema Based Float Editor Directive', () => {
 
     expect(ctrl.errorStringI18nKey)
       .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
+  });
+
+  it('should get current decimal separator', ()=>{
+    spyOn(numberConversionService, 'currentDecimalSeparator')
+      .and.returnValues('.', ',');
+
+    expect(ctrl.currentDecimalSeparator()).toEqual('.');
+    expect(ctrl.currentDecimalSeparator()).toEqual(',');
+  });
+
+  it('should remove any invalid character from the input', ()=>{
+    spyOn(numberConversionService, 'getInputValidationRegex')
+      .and.returnValues(/[^e0-9\.\-]/g, /[^e0-9\,\-]/g);
+
+    ctrl.localStringValue = 'a';
+    ctrl.parseInput();
+    expect(ctrl.localStringValue).toEqual('');
+
+    ctrl.localStringValue = '12.';
+    ctrl.parseInput();
+    expect(ctrl.localStringValue).toEqual('12');
+  });
+
+  it('should parse the string to a number on input', ()=>{
+    spyOn(numberConversionService, 'getInputValidationRegex')
+      .and.returnValue(/[^e0-9\.\-]/g);
+    spyOn(ctrl, 'currentDecimalSeparator').and.returnValues('.', ',');
+
+    ctrl.localStringValue = '';
+    ctrl.parseInput();
+    expect(ctrl.localValue).toEqual(null);
+
+    ctrl.localStringValue = '-12';
+    ctrl.parseInput();
+    expect(ctrl.localValue).toEqual(-12);
+
+    ctrl.localStringValue = '-12e1';
+    ctrl.parseInput();
+    expect(ctrl.localValue).toEqual(-120);
+
+    spyOn(validator, 'validateNumericString').and.returnValue('Error');
+    ctrl.localStringValue = '--12';
+    ctrl.parseInput();
+    expect(ctrl.localValue).toEqual(null);
+    expect(ctrl.errorStringI18nKey).toEqual('Error');
   });
 });

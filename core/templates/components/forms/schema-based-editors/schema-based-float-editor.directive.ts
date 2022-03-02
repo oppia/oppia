@@ -25,6 +25,7 @@ require(
   'interactions/NumericInput/directives/numeric-input-validation.service.ts');
 require('services/schema-form-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('services/number-conversion.service');
 
 angular.module('oppia').directive('schemaBasedFloatEditor', [
   function() {
@@ -46,11 +47,11 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$timeout', 'FocusManagerService',
-        'NumericInputValidationService',
+        'NumberConversionService', 'NumericInputValidationService',
         'SchemaFormSubmittedService',
         function(
             $scope, $timeout, FocusManagerService,
-            NumericInputValidationService,
+            NumberConversionService, NumericInputValidationService,
             SchemaFormSubmittedService) {
           var ctrl = this;
           var labelForFocus = $scope.labelForFocusTarget();
@@ -64,7 +65,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               localValue !== null &&
               localValue !== '' &&
               angular.isUndefined(
-                NumericInputValidationService.getErrorStringI18nKey(
+                NumericInputValidationService.validateNumber(
                   localValue, checkRequireNonnegativeInputValue)));
           };
 
@@ -79,6 +80,44 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             ctrl.isUserCurrentlyTyping = false;
             if (ctrl.onInputBlur) {
               ctrl.onInputBlur();
+            }
+          };
+
+          ctrl.currentDecimalSeparator = function() {
+            return NumberConversionService
+              .currentDecimalSeparator();
+          };
+
+          ctrl.parseInput = function(): void {
+            let regex = NumberConversionService.getInputValidationRegex();
+
+            // Remove anything that isn't a number,
+            // minus sign, exponent (e) sign or a decimal separator.
+            ctrl.localStringValue = ctrl.localStringValue
+              .replace(regex, '');
+
+            // If input is empty, the number value should be null.
+            if (ctrl.localStringValue === '') {
+              ctrl.localValue = null;
+              // Clear errors if input is empty.
+              ctrl.errorStringI18nKey = undefined;
+            } else {
+              // Make sure number is in a correct format.
+              let error = NumericInputValidationService
+                .validateNumericString(
+                  ctrl.localStringValue,
+                  ctrl.currentDecimalSeparator());
+              if (error !== undefined) {
+                ctrl.localValue = null;
+                ctrl.errorStringI18nKey = error;
+              } else { // Parse number if the string is in proper format.
+                // Exploration Player.
+                ctrl.localValue = NumberConversionService
+                  .convertToEnglishDecimal(ctrl.localStringValue);
+
+                // Generate errors (if any).
+                ctrl.generateErrors();
+              }
             }
           };
 
@@ -101,8 +140,9 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
 
           ctrl.generateErrors = function() {
             ctrl.errorStringI18nKey = (
-              NumericInputValidationService.getErrorStringI18nKey(
-                ctrl.localValue, ctrl.checkRequireNonnegativeInputValue));
+              NumericInputValidationService.validateNumber(
+                ctrl.localValue, ctrl.checkRequireNonnegativeInputValue,
+                ctrl.currentDecimalSeparator()));
           };
 
           ctrl.onKeypress = function(evt) {
@@ -128,6 +168,9 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               FocusManagerService.generateFocusLabel();
             if (ctrl.localValue === undefined) {
               ctrl.localValue = 0.0;
+            }
+            if (ctrl.localStringValue === undefined) {
+              ctrl.localStringValue = '';
             }
             // To check checkRequireNonnegativeInput customization argument
             // Value of numeric input interaction.

@@ -207,9 +207,39 @@ export class NumericInputValidationService {
   }
 
   // Returns 'undefined' when no error occurs.
-  getErrorStringI18nKey(
-      value: number, requireNonnegativeInput: boolean
+  validateNumericString(
+      value: string, decimalSeparator: string
   ): string | undefined {
+    value = value.toString().trim();
+    const trailingDot = /[\.|\,|\u066B]\d/g;
+    const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
+    const trailingMinus = /(^-)|(e-)/g;
+    const extraMinus = /-.*-/g;
+    const extraExponent = /e.*e/g;
+
+    if (value.includes(decimalSeparator) && !value.match(trailingDot)) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL';
+    } else if (value.match(twoDecimals)) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL';
+    } else if (value.includes('-') && !value.match(trailingMinus)) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_MINUS_AT_BEGINNING';
+    } else if (value.includes('-') && value.match(extraMinus)) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_MINUS';
+    } else if (value.includes('e') && value.match(extraExponent)) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_EXPONENT';
+    }
+  }
+
+  // Returns 'undefined' when no error occurs.
+  validateNumber(
+      value: number,
+      requireNonnegativeInput: boolean,
+      decimalSeparator: string = '.'
+  ): string | undefined {
+    if (requireNonnegativeInput && value < 0) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO';
+    }
+
     let stringValue = null;
     // Value of sign is '-' if value of number is negative,
     // '' if non-negative.
@@ -246,10 +276,12 @@ export class NumericInputValidationService {
     const stringValueRegExp = stringValue.match(/\d/g);
     if (stringValueRegExp === null) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER';
-    } else if (value < 0 && requireNonnegativeInput) {
-      return 'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO';
     } else if (stringValueRegExp.length > 15) {
-      return 'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS';
+      if (decimalSeparator === ',') {
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_COMMA';
+      } else {
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_DOT';
+      }
     }
   }
 }

@@ -31,6 +31,7 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { NumberConversionService } from 'services/number-conversion.service';
 
 @Component({
   selector: 'oppia-input-response-pair',
@@ -58,6 +59,7 @@ export class InputResponsePairComponent {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
+    private numberConversionService: NumberConversionService,
   ) {}
 
   ngOnInit(): void {
@@ -80,12 +82,29 @@ export class InputResponsePairComponent {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
+  isNumber(value: string): boolean {
+    const validRegex = /.*[^0-9.\-].*/g;
+    if (validRegex.test(value)) {
+      return false;
+    }
+    return true;
+  }
+
+  convertAnswerToLocalFormat(data: string): string {
+    // We need to use the numberConversionService, only if the data is number.
+    if (!this.isNumber(data)) {
+      return data;
+    }
+
+    return this.numberConversionService.convertToLocalizedNumber(data);
+  }
+
   getAnswerHtml(): string {
     let displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
     let interaction = displayedCard.getInteraction();
     return this.explorationHtmlFormatterService.getAnswerHtml(
-      this.data.learnerInput, interaction.id,
+      this.convertAnswerToLocalFormat(this.data.learnerInput), interaction.id,
       interaction.customizationArgs);
   }
 
@@ -98,7 +117,7 @@ export class InputResponsePairComponent {
     let shortAnswerHtml = '';
     if (this.data.learnerInput.hasOwnProperty('answerDetails')) {
       shortAnswerHtml = (
-        this.data.learnerInput as unknown as { answerDetails: string })
+           this.data.learnerInput as unknown as { answerDetails: string })
         .answerDetails;
     } else if (
       this.data && interaction.id &&
@@ -108,7 +127,8 @@ export class InputResponsePairComponent {
     ) {
       shortAnswerHtml = (
         this.explorationHtmlFormatterService.getShortAnswerHtml(
-          this.data.learnerInput, interaction.id,
+          this.convertAnswerToLocalFormat(
+            this.data.learnerInput), interaction.id,
           interaction.customizationArgs));
     }
     return shortAnswerHtml;
