@@ -870,7 +870,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_get_current_time_in_millisecs_with_current_time(self) -> None:
         time_instance1 = utils.get_current_time_in_millisecs()
         time_instance2 = utils.get_current_time_in_millisecs()
-        self.assertNotEqual(time_instance1,time_instance2)
+        self.assertNotEqual(time_instance1, time_instance2)
 
     def test_get_require_valid_name_with_empty_string(self) -> None:
         utils.require_valid_name('', 'the exploration title', allow_empty=True)
