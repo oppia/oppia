@@ -599,7 +599,7 @@ def get_reviewable_suggestions(user_id, suggestion_type, limit, offset):
         offset: int. The number of results to skip.
 
     Returns:
-        Tuple of (results, next_offset), where:
+        Tuple of (results, next_offset). Where:
             results: list(SuggestionModel). A list of suggestions that are
                 of the supplied type which the supplied user is permitted to
                 review.
@@ -959,7 +959,7 @@ def get_submitted_suggestions_by_offset(
         offset: int. The number of results to skip.
 
     Returns:
-        Tuple of (results, next_offset), where:
+        Tuple of (results, next_offset). Where:
             results: list(SuggestionModel). A list of suggestions of the
                 supplied type which the supplied user has submitted.
             next_offset: int. Number of query results to skip on a subsequent

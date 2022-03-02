@@ -513,7 +513,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 suggestions should match.
 
         Returns:
-            Tuple of (results, next_offset), where:
+            Tuple of (results, next_offset). Where:
                 results: list(SuggestionModel). A list of suggestions that are
                     in-review, not authored by the supplied user, and that match
                     one of the supplied language codes.
@@ -584,7 +584,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_question_suggestions_by_offset(
-        cls, limit: int,  offset: int, user_id: str
+        cls, limit: int, offset: int, user_id: str
     ) -> Sequence[GeneralSuggestionModel]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
@@ -597,7 +597,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 by the user will be excluded.
 
         Returns:
-            Tuple of (results, next_offset), where:
+            Tuple of (results, next_offset). Where:
                 results: list(SuggestionModel). A list of suggestions that are
                     in-review, not authored by the supplied user, and that match
                     one of the supplied language codes.
