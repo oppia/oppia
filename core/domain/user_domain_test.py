@@ -85,9 +85,8 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
     CURRENT_SCHEMA_VERSION = 2
 
     # Overriding method to add a new attribute added names 'fake_field'.
-    # In overrinding, MyPy considers only body of a function is to be
-    # changed not argument's type but here we are changing them too.
-    # So, in order to prevent MyPy errors we add an ignore statement here.
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with user_domain.ModifiableUserData.from_dict().
     @classmethod
     def from_dict( # type: ignore[override]
         cls, modifiable_user_data_dict: MockModifiableUserDataDict
@@ -114,9 +113,8 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
 
     # Overiding method to first convert raw user data dict to latest version
     # then returning a ModifiableUserData domain object.
-    # In overrinding, MyPy considers only body of a function is to be
-    # changed not argument's type but here we are changing them too.
-    # So, in order to prevent MyPy errors we add an ignore statement here.
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with user_domain.ModifiableUserData.from_raw_dict().
     @classmethod
     def from_raw_dict( # type: ignore[override]
         cls, raw_user_data_dict: MockModifiableUserDataDict
@@ -165,13 +163,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data = (
             user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
-    def test_validate_non_str_user_id_raises_exception(self) -> None:
-        self.user_settings.user_id = 0
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected user_id to be a string'
-        ):
-            self.user_settings.validate()
-
     def test_validate_wrong_format_user_id_raises_exception(
         self
     ) -> None:
@@ -191,32 +182,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
-            self.user_settings.validate()
-
-    def test_validate_invalid_banned_value_type_raises_exception(
-        self
-    ) -> None:
-        self.user_settings.banned = 123
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected banned to be a bool'):
-            self.user_settings.validate()
-
-        self.user_settings.banned = '123'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected banned to be a bool'):
-            self.user_settings.validate()
-
-    def test_validate_invalid_roles_value_type_raises_exception(
-        self
-    ) -> None:
-        self.user_settings.roles = 123
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected roles to be a list'):
-            self.user_settings.validate()
-
-        self.user_settings.roles = True
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected roles to be a list'):
             self.user_settings.validate()
 
     def test_validate_banned_user_with_roles_raises_exception(
@@ -247,13 +212,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected roles to contains one default role.'):
-            self.user_settings.validate()
-
-    def test_validate_non_str_pin_id(self) -> None:
-        self.user_settings.pin = 0
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected PIN to be a string'
-        ):
             self.user_settings.validate()
 
     def test_validate_invalid_length_pin_raises_error(self) -> None:
@@ -296,35 +254,27 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_non_str_role_raises_exception(self) -> None:
-        self.user_settings.roles = [0]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected roles to be a string'
-        ):
-            self.user_settings.validate()
-
     def test_validate_invalid_role_name_raises_exception(self) -> None:
         self.user_settings.roles = ['invalid_role']
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Role invalid_role does not exist.'):
             self.user_settings.validate()
 
-    def test_validate_non_str_display_alias_raises_error(self) -> None:
-        self.user_settings.display_alias = 0
+    def test_validation_none__email_raises_error(self) -> None:
+        self.user_settings.email = None
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected display_alias to be a string,'
-            ' received %s' % self.user_settings.display_alias):
+            utils.ValidationError, 'No user email specified.'):
             self.user_settings.validate()
 
-    def test_validate_non_str_creator_dashboard_display_pref_raises_error(
-        self
-    ) -> None:
-        self.user_settings.creator_dashboard_display_pref = 0
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected dashboard display preference to be a string'
-        ):
-            self.user_settings.validate()
+    def test_validation_wrong_email_raises_error(self) -> None:
+        invalid_emails_list = [
+            'testemail.com', '@testemail.com', 'testemail.com@']
+        for email in invalid_emails_list:
+            self.user_settings.email = email
+            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+                utils.ValidationError, 'Invalid email address: %s' % email
+            ):
+                self.user_settings.validate()
 
     def test_validate_invalid_creator_dashboard_display_pref_raises_error(
         self
@@ -465,41 +415,9 @@ class UserContributionsTests(test_utils.GenericTestBase):
             self.owner_id)
         self.user_contributions.validate()
 
-    def test_validate_non_str_user_id(self) -> None:
-        self.user_contributions.user_id = 0
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            Exception, 'Expected user_id to be a string'):
-            self.user_contributions.validate()
-
     def test_validate_user_id(self) -> None:
         self.user_contributions.user_id = ''
         with self.assertRaisesRegex(Exception, 'No user id specified.'): # type: ignore[no-untyped-call]
-            self.user_contributions.validate()
-
-    def test_validate_non_list_created_exploration_ids(self) -> None:
-        self.user_contributions.created_exploration_ids = 0
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            Exception, 'Expected created_exploration_ids to be a list'):
-            self.user_contributions.validate()
-
-    def test_validate_created_exploration_ids(self) -> None:
-        self.user_contributions.created_exploration_ids = [0]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            Exception, 'Expected exploration_id in created_exploration_ids '
-            'to be a string'):
-            self.user_contributions.validate()
-
-    def test_validate_non_list_edited_exploration_ids(self) -> None:
-        self.user_contributions.edited_exploration_ids = 0
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            Exception, 'Expected edited_exploration_ids to be a list'):
-            self.user_contributions.validate()
-
-    def test_validate_edited_exploration_ids(self) -> None:
-        self.user_contributions.edited_exploration_ids = [0]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            Exception, 'Expected exploration_id in edited_exploration_ids '
-            'to be a string'):
             self.user_contributions.validate()
 
     def test_cannot_create_user_contributions_with_migration_bot(

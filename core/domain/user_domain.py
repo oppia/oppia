@@ -203,17 +203,9 @@ class UserSettings:
         fields of this UserSettings domain object are valid.
 
         Raises:
-            ValidationError. The user_id is not str.
-            ValidationError. The email is not str.
             ValidationError. The email is invalid.
-            ValidationError. The roles is not a list.
             ValidationError. Given role does not exist.
-            ValidationError. The pin is not str.
-            ValidationError. The display alias is not str.
         """
-        if not isinstance(self.user_id, str):
-            raise utils.ValidationError(
-                'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
         if not utils.is_user_id_valid(
@@ -222,14 +214,6 @@ class UserSettings:
                 allow_pseudonymous_id=True
         ):
             raise utils.ValidationError('The user ID is in a wrong format.')
-
-        if not isinstance(self.banned, bool):
-            raise utils.ValidationError(
-                'Expected banned to be a bool, received %s' % self.banned)
-
-        if not isinstance(self.roles, list):
-            raise utils.ValidationError(
-                'Expected roles to be a list, received %s' % self.roles)
 
         if self.banned:
             if self.roles:
@@ -242,10 +226,6 @@ class UserSettings:
                 raise utils.ValidationError(
                     'Roles contains duplicate values: %s' % self.roles)
             for role in self.roles:
-                if not isinstance(role, str):
-                    raise utils.ValidationError(
-                        'Expected roles to be a string, received %s' % role)
-
                 if role not in feconf.ALLOWED_USER_ROLES:
                     raise utils.ValidationError(
                         'Role %s does not exist.' % role)
@@ -258,12 +238,6 @@ class UserSettings:
                     'Expected roles to contains one default role.')
 
         if self.pin is not None:
-            if not isinstance(self.pin, str):
-                raise utils.ValidationError(
-                    'Expected PIN to be a string, received %s' %
-                    self.pin
-                )
-
             if (
                     len(self.pin) != feconf.FULL_USER_PIN_LENGTH and
                     len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH
@@ -282,16 +256,6 @@ class UserSettings:
                         'Only numeric characters are allowed in PIN.'
                     )
 
-        if (self.display_alias is not None and
-                not isinstance(self.display_alias, str)):
-            raise utils.ValidationError(
-                'Expected display_alias to be a string, received %s' %
-                self.display_alias
-            )
-
-        if not isinstance(self.email, str):
-            raise utils.ValidationError(
-                'Expected email to be a string, received %s' % self.email)
         if not self.email:
             raise utils.ValidationError('No user email specified.')
         if ('@' not in self.email or self.email.startswith('@')
@@ -299,10 +263,6 @@ class UserSettings:
             raise utils.ValidationError(
                 'Invalid email address: %s' % self.email)
 
-        if not isinstance(self.creator_dashboard_display_pref, str):
-            raise utils.ValidationError(
-                'Expected dashboard display preference to be a string, '
-                'received %s' % self.creator_dashboard_display_pref)
         if (self.creator_dashboard_display_pref not in
                 list(constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values(
                     ))):
@@ -573,41 +533,10 @@ class UserContributions:
         domain object are valid.
 
         Raises:
-            ValidationError. The user_id is not str.
-            ValidationError. The created_exploration_ids is not a list.
-            ValidationError. The exploration_id in created_exploration_ids
-                is not str.
-            ValidationError. The edited_exploration_ids is not a list.
-            ValidationError. The exploration_id in edited_exploration_ids
-                is not str.
+            ValidationError. No user id sepecified.
         """
-        if not isinstance(self.user_id, str):
-            raise utils.ValidationError(
-                'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-
-        if not isinstance(self.created_exploration_ids, list):
-            raise utils.ValidationError(
-                'Expected created_exploration_ids to be a list, received %s'
-                % self.created_exploration_ids)
-        for exploration_id in self.created_exploration_ids:
-            if not isinstance(exploration_id, str):
-                raise utils.ValidationError(
-                    'Expected exploration_id in created_exploration_ids '
-                    'to be a string, received %s' % (
-                        exploration_id))
-
-        if not isinstance(self.edited_exploration_ids, list):
-            raise utils.ValidationError(
-                'Expected edited_exploration_ids to be a list, received %s'
-                % self.edited_exploration_ids)
-        for exploration_id in self.edited_exploration_ids:
-            if not isinstance(exploration_id, str):
-                raise utils.ValidationError(
-                    'Expected exploration_id in edited_exploration_ids '
-                    'to be a string, received %s' % (
-                        exploration_id))
 
 
 class UserGlobalPrefs:
