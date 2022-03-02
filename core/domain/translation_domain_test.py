@@ -49,7 +49,7 @@ class DummyTranslatableObjectWithTwoParams(
             'content_id_1',
             self.param1)
         translatable_contents_collection.add_fields_from_translatable_object(
-            self.param2.get_translatable_contents_collection())
+            self.param2)
         return translatable_contents_collection
 
 

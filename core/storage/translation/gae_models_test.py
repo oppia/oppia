@@ -39,7 +39,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
             translation_models.EntityTranslationsModel.create_new(
                 feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'hi', {
                     '123': {
-                        'content': 'Hello world!',
+                        'content_value': 'Hello world!',
                         'needs_update': False
                     }
                 })
@@ -49,7 +49,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
         self.assertEqual(enitity_translation_model.entity_version, 1)
         self.assertEqual(enitity_translation_model.language_code, 'hi')
         self.assertEqual(
-            enitity_translation_model.translations['123']['content'],
+            enitity_translation_model.translations['123']['content_value'],
             'Hello world!')
         self.assertEqual(
             enitity_translation_model.translations['123']['needs_update'],
@@ -59,7 +59,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
         translation_models.EntityTranslationsModel.create_new(
             feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'hi', {
                 '123': {
-                    'content': 'Hello world!',
+                    'content_value': 'Hello world!',
                     'needs_update': False
                 }
             }
@@ -72,7 +72,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
         self.assertEqual(enitity_translation_model.entity_version, 1)
         self.assertEqual(enitity_translation_model.language_code, 'hi')
         self.assertEqual(
-            enitity_translation_model.translations['123']['content'],
+            enitity_translation_model.translations['123']['content_value'],
             'Hello world!')
         self.assertEqual(
             enitity_translation_model.translations['123']['needs_update'],
@@ -82,7 +82,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
         translation_models.EntityTranslationsModel.create_new(
             feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'en', {
                 '123': {
-                    'content': 'Hey I am Jhon.',
+                    'content_value': 'Hey I am Jhon.',
                     'needs_update': False
                 }
             }
@@ -90,7 +90,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
         translation_models.EntityTranslationsModel.create_new(
             feconf.TranslatableEntityType.EXPLORATION, 'exp_id2', 2, 'hi', {
                 '123': {
-                    'content': 'Hello world!',
+                    'content_value': 'Hello world!',
                     'needs_update': False
                 }
             }
@@ -98,7 +98,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
         translation_models.EntityTranslationsModel.create_new(
             feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'hi', {
                 '123': {
-                    'content': 'Hey I am Nikhil.',
+                    'content_value': 'Hey I am Nikhil.',
                     'needs_update': False
                 }
             }

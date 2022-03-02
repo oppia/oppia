@@ -1564,5 +1564,5 @@ class TranslatableEntityType(enum.Enum):
 class TranslatedContentDict(TypedDict):
     """Dictionary representing TranslatedContent object."""
 
-    content: ContentValueType
+    content_value: ContentValueType
     needs_update: bool

@@ -40,7 +40,7 @@ class TranslatableContentDict(TypedDict):
     """Dictionary representing TranslatableContent object."""
 
     content_id: str
-    content: feconf.ContentValueType
+    content_value: feconf.ContentValueType
     content_type: TranslatableContentFormat
 
 
@@ -90,9 +90,9 @@ class TranslatableContent:
 
         Returns:
             TranslatableContentDict. A dict, mapping content_id, content_value
-                and content_type of a TranslatableContent instance to
-                corresponding keys 'content_id', 'content_value' and
-                'content_type'.
+            and content_type of a TranslatableContent instance to
+            corresponding keys 'content_id', 'content_value' and
+            'content_type'.
         """
         return {
             'content_id': self.content_id,
@@ -142,8 +142,8 @@ class TranslatedContent:
 
         Returns:
             TranslatedContentDict. A dict, mapping content_value and
-                needs_update of a TranslatableContent instance to
-                corresponding keys 'content_value' and 'needs_update'.
+            needs_update of a TranslatableContent instance to
+            corresponding keys 'content_value' and 'needs_update'.
         """
         return {
             'content_value': self.content_value,
@@ -155,6 +155,8 @@ class TranslatableContentsCollection:
     """A class to collect all TranslatableContents from a translatable object
     and map them with their corresponding content-ids.
     """
+
+    content_id_to_translatable_content: Dict[str, TranslatableContent]
 
     def __init__(self) -> None:
         """Constructs a TranslatableContentsCollection object."""
@@ -180,17 +182,24 @@ class TranslatableContentsCollection:
 
     def add_fields_from_translatable_object(
         self,
-        translatable_contents_collection: TranslatableContentsCollection
+        translatable_object: BaseTranslatableObject
     ) -> None:
         """Adds translatable fields from a translatable object parameter to
-        content_id_to_translatable_content dict.
+        'content_id_to_translatable_content' dict.
+
+        NOTE: The functions take the entire translatable object as a param, as
+        the process to fetch translatable collections from different objects
+        are the same, and keeping this logic in one place will help avoid
+        duplicate patterns inside the calling site at the same time will make
+        the calling site look cleaner.
 
         Args:
-            translatable_contents_collection. An object representing
-                TranslatableContentsCollection.
+            translatable_object: BaseTranslatableObject. An instance of
+                BaseTranslatableObject class.
         """
         self.content_id_to_translatable_content.update(
-            translatable_contents_collection.content_id_to_translatable_content)
+            translatable_object.get_translatable_contents_collection()
+            .content_id_to_translatable_content)
 
 
 class BaseTranslatableObject:
