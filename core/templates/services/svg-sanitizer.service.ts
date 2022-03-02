@@ -250,11 +250,11 @@ export class SvgSanitizerService {
     let updatedURL = baseURL;
     if (invalidTagsAndAttributes.tags.length) {
       updatedURL = updatedURL + ' Tags: ' + (
-        invalidTagsAndAttributes.tags.splice(0, 5));
+        invalidTagsAndAttributes.tags);
     }
     if (invalidTagsAndAttributes.attrs.length) {
       updatedURL = updatedURL + ' Attributes: ' + (
-        invalidTagsAndAttributes.attrs.splice(0, 5));
+        invalidTagsAndAttributes.attrs);
     }
     return updatedURL;
   }
