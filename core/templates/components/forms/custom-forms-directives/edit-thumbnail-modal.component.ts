@@ -63,7 +63,9 @@ export class EditThumbnailModalComponent {
   @Input() uploadedImageMimeType!: string;
   @Input() openInUploadMode: boolean = false;
   imgSrc!: string;
-  invalidTagsAndAttributes!: InvalidTagsAndAttributes;
+  invalidTagsAndAttributes: InvalidTagsAndAttributes = {
+    tags: [], attrs: []
+  };
 
   invalidImageWarningIsShown = false;
   invalidFilenameWarningIsShown = false;
