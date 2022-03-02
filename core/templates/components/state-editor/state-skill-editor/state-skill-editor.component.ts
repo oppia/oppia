@@ -107,7 +107,7 @@ export class StateSkillEditorComponent implements OnInit {
       DeleteStateSkillModalComponent, {
         backdrop: true,
       }).result.then(() => {
-      this.stateLinkedSkillIdService.displayed = null;
+      this.stateLinkedSkillIdService.displayed = '';
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(this.stateLinkedSkillIdService.displayed);
     }, () => {

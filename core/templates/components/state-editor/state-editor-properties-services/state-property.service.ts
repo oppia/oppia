@@ -46,11 +46,8 @@ export class StatePropertyService<StatePropertyType> {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   // The name of the setter method in ExplorationStatesService for this
   // property. THIS MUST BE SPECIFIED BY SUBCLASSES.
-  // Displayed is the current value of the property which may be null. In
-  // general it is null until the property is changed. Null is represented
-  // by the default value of the type.
   setterMethodKey!: string | null;
-  displayed!: StatePropertyType | null;
+  displayed!: StatePropertyType;
   stateName!: string;
   savedMemento!: StatePropertyType;
 
@@ -98,21 +95,19 @@ export class StatePropertyService<StatePropertyType> {
       throw new Error('State property setter method key cannot be null.');
     }
 
-    if (this.displayed !== null) {
-      this.displayed = this._normalize(this.displayed);
-      if (!this._isValid(this.displayed) || !this.hasChanged()) {
-        this.restoreFromMemento();
-        return;
-      }
-
-      if (this.utilsService.isEquivalent(this.displayed, this.savedMemento)) {
-        return;
-      }
-
-      this.alertsService.clearWarnings();
-
-      this.savedMemento = cloneDeep(this.displayed);
+    this.displayed = this._normalize(this.displayed);
+    if (!this._isValid(this.displayed) || !this.hasChanged()) {
+      this.restoreFromMemento();
+      return;
     }
+
+    if (this.utilsService.isEquivalent(this.displayed, this.savedMemento)) {
+      return;
+    }
+
+    this.alertsService.clearWarnings();
+
+    this.savedMemento = cloneDeep(this.displayed);
   }
 
   // Reverts the displayed value to the saved memento.
