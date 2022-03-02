@@ -43,6 +43,7 @@ export class EditableExplorationBackendApiService {
       this._getExplorationUrl(explorationId, applyDraft)).toPromise();
   }
 
+  // The version number is null, whenever we create a deafult exploration.
   private async _updateExplorationAsync(
       explorationId: string,
       explorationVersion: number | null,

@@ -216,8 +216,7 @@ export class ExplorationDataService {
     }
     this.editableExplorationBackendApiService.updateExplorationAsync(
       this.explorationId,
-      dataVersion,
-      commitMessage, changeList).then(
+      dataVersion, commitMessage, changeList).then(
       response => {
         this.alertsService.clearWarnings();
         this.data = response;

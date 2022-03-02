@@ -173,6 +173,31 @@ describe('Exploration data service', function() {
     }
   ));
 
+  it('should trigger errorcallback handler when version number is undefined',
+    fakeAsync(() => {
+      let dataResults: ExplorationBackendDict = {
+        draft_change_list_id: 3,
+        version: undefined,
+        draft_changes: [],
+        is_version_of_draft_valid: true,
+        init_state_name: 'init',
+        param_changes: [],
+        param_specs: {randomProp: {obj_type: 'randomVal'}},
+        states: {},
+        title: 'Test Exploration',
+        language_code: 'en',
+        correctness_feedback_enabled: false
+      };
+      eds.data = dataResults;
+      const errorCallback = jasmine.createSpy('error');
+      const successCallback = jasmine.createSpy('success');
+      eds.autosaveChangeListAsync([], successCallback, errorCallback);
+
+      flushMicrotasks();
+      expect(successCallback).not.toHaveBeenCalled();
+      expect(errorCallback).toHaveBeenCalled();
+    }));
+
   it('should autosave draft changes when draft ids match', fakeAsync(() => {
     const errorCallback = jasmine.createSpy('error');
     const successCallback = jasmine.createSpy('success');
