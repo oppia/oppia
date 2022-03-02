@@ -2547,8 +2547,8 @@ oppia-parameter {
 .oppia-modal-lesson-information-card .modal-dialog {
   margin: 100px auto;
   max-width: 35%;
-  min-width: 280px;
-  width: 400px;
+  min-width: 260px;
+  width: 350px;
 }
 
 .skill-select-modal .modal-xl {
@@ -3143,7 +3143,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-modal-lesson-information-card .modal-dialog .modal-content {
   border-radius: 0;
-  min-width: 280px;
+  min-width: 260px;
 }
 
 .oppia-improvement-task {

@@ -17,47 +17,6 @@
           </h1>
         </li>
       </ul>
-      <!-- <ul class="author-profile">
-        <li>
-          <img [src]="getStaticImageUrl('/general/apple.svg')"
-               class="exploration-footer-img"
-               alt="">
-        </li>
-        <li class="hover-link"
-            (mouseenter)="hovering = true; dropUp.open()"
-            (mouseleave)="hovering = false; dropUp.close()"
-            tabindex="0"
-            aria-haspopup="true"
-            aria-expanded="false">
-          <div ngbDropdown
-               class="dropup"
-               placement="top"
-               [ngClass]="{'open': hovering}"
-               #dropUp="ngbDropdown">
-            <a ngbDropdownAnchor id="dropdownMenu2"
-               [ngClass]="{'hovered-text': hovering}"
-               *ngIf="contributorNames.length > 0"
-               aria-haspopup="true"
-               aria-expanded="false">
-              <h4 [ngStyle]="isLanguageRTL() ? {'text-align': 'right'} : {'text-align': 'left'}" class="author-profile-text protractor-test-author-profile-text"
-                  [ngClass]="{'hovered-text': hovering, 'not-hovered' : !hovering}">
-                  {{ 'I18N_FOOTER_AUTHOR_PROFILES' | translate }}
-              </h4>
-            </a>
-            <ul ngbDropdownMenu class="author-profile-dropdown-menu"
-                aria-labelledby="dropdownMenu2">
-              <li *ngFor="let name of contributorNames | limitTo: 5" ngbDropdownItem>
-                <a href="/profile/{{ name }}"
-                   [routerLink]="'/profile/' + name"
-                   target="_blank"
-                   rel="noopener">
-                   {{ name }}
-                </a>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ul> -->
       <oppia-hint-and-solution-buttons *ngIf="windowIsNarrow && hintsAndSolutionsAreSupported">
       </oppia-hint-and-solution-buttons>
     </div>

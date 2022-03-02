@@ -48,10 +48,10 @@ export class ExplorationFooterComponent {
   resizeSubscription!: Subscription;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
-  expInfo: LearnerExplorationSummaryBackendDict;
-  numberofCheckpoints: number;
+  expInfo!: LearnerExplorationSummaryBackendDict;
+  numberofCheckpoints!: number;
   checkpointArray: number[] = [0];
-  completedWidth: number;
+  completedWidth: number = 0;
 
   constructor(
     private contextService: ContextService,
@@ -154,6 +154,7 @@ export class ExplorationFooterComponent {
       this.checkpointArray.push(1);
     }
     modalRef.componentInstance.completedWidth = this.completedWidth;
+    modalRef.componentInstance.contributorNames = this.contributorNames;
 
     modalRef.result.then(() => {}, () => {
       // Note to developers:

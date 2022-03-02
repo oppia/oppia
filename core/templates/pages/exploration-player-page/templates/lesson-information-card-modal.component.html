@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card class="oppia-lesson-info-card">
   <div class="oppia-lesson-info-content">
     <p class="oppia-story-title">
         {{ storyTitleTranslationKey | translate}}
@@ -33,8 +33,39 @@
     <span class="oppia-icon-accessibility-label">Close</span>
   </button>
 </mat-card>
+<div ngbDropdown>
+  <div ngbDropdownToggle class="authors-title">LESSON AUTHORS</div>
+  <div ngbDropdownMenu class="dropdown-menu">
+    <div *ngFor="let name of contributorNames | limitTo: 5" ngbDropdownItem>{{ name }}</div>
+  </div>
+</div>
 
 <style>
+  .authors-title {
+    color: #00645c;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 5px;
+    padding-bottom: 2px;
+    text-align: center;
+  }
+
+  .dropdown-menu {
+    border: 0;
+    border-radius: 0;
+    margin: 0;
+    /* max-height:50px; */
+    max-width: 350px;
+    min-width: 260px;
+    /* overflow-y: auto; */
+    top: 0.5px;
+    width: 100%;
+  }
+
+  .oppia-lesson-info-card {
+    border-radius: 0;
+  }
+
   .oppia-story-title {
       color: grey;
       font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -44,6 +75,7 @@
 
   .oppia-lesson-info-content {
       padding: 15px;
+      padding-bottom: 0;
   }
 
   .oppia-chapter-description {
@@ -54,10 +86,11 @@
 
   .progress {
       background: #f0ffff;
-      border: 2px solid #707070;
+      border: 1px solid #707070;
       border-radius: 10px;
       height: 10px;
       position: relative;
+      transition: none;
   }
 
   .progress-text {
@@ -74,16 +107,16 @@
 
   .progress-bar-completed {
       background-color: #2d4a9d;
-      z-index: 5;
+      transition: none;
   }
 
   .progress-bar-started {
       background-color: #2d4a9d99;
-      z-index: 4;
+      transition: none;
   }
 
   .separator {
-      border: 2px solid #707070;
+      border: 1px solid #707070;
       height: 10px;
       z-index: 1;
   }

@@ -34,25 +34,24 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
    templateUrl: './lesson-information-card-modal.component.html'
  })
 export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
-  topicUrlFragment: string;
-  classroomUrlFragment: string;
-  storyUrlFragment: string;
-  storyTitle!: string;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   storyTitleTranslationKey!: string;
-  storyPlaythroughObject: StoryPlaythrough;
-  storyId: string;
-  storyNodeTitleTranslationKey: string;
-  storyNodeDescTranslationKey: string;
-  displayedCard: StateCard;
-  explorationId: string;
-  chapterNumber: string;
-  isLinkedToTopic: boolean;
-  currentNodeId: string;
-  numberofCheckpoints: number;
-  startedWidth: number;
-  completedWidth: number;
-  separatorWidth: number;
-  separatorArray: number[];
+  storyPlaythroughObject!: StoryPlaythrough;
+  storyId!: string;
+  storyNodeTitleTranslationKey!: string;
+  storyNodeDescTranslationKey!: string;
+  displayedCard!: StateCard;
+  explorationId!: string;
+  contributorNames: string[] = [];
+  chapterNumber!: string;
+  currentNodeId: string = '';
+  numberofCheckpoints!: number;
+  startedWidth: number = 0;
+  completedWidth!: number;
+  separatorWidth: number = 0;
+  separatorArray: number[] = [];
 
 
   constructor(
@@ -69,11 +68,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   ngOnInit(): void {
     this.explorationId = this.contextService.getExplorationId();
-    // The following code generates the chapterNumber
-    // Since fetched via url, doesn't work on localhost.
-    this.currentNodeId = this.urlService.getUrlParams().node_id;
-    let nodeId: string = this.currentNodeId;
-    this.chapterNumber = nodeId.charAt(nodeId.length - 1);
     this.storyId = this.urlService.getUrlParams().story_id;
     this.storyTitleTranslationKey = (
       this.i18nLanguageCodeService
@@ -90,6 +84,12 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
         getExplorationTranslationKey(
           this.explorationId, TranslationKeyType.DESCRIPTION)
     );
+
+    // The following code generates the chapterNumber
+    // Since fetched via url, doesn't work on localhost.
+    this.currentNodeId = this.urlService.getUrlParams().node_id;
+    let nodeId: string = this.currentNodeId;
+    this.chapterNumber = nodeId.charAt(nodeId.length - 1);
 
     // The purpose of separatorArray is for the working of
     // for loop in lesson-information-card-modal.component.html.
