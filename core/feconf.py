@@ -25,8 +25,8 @@ import os
 
 from core.constants import constants
 
-from typing import Dict, List, Tuple, Union
-from typing_extensions import Literal, TypedDict
+from typing import Dict, List, Union
+from typing_extensions import TypedDict
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
