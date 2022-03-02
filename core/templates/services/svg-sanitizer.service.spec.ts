@@ -165,8 +165,9 @@ describe('SvgSanitizerService', () => {
           btoa(unescape(encodeURIComponent(testCase.svgString))));
         let safeResourceUrl = svgSanitizerService.getTrustedSvgResourceUrl(
           dataURI);
-        expect(atob(safeResourceUrl.toString().split(',')[1])).toEqual(
-          testCase.expectedSvgString);
+        expect(safeResourceUrl).toEqual(
+          'data:image/svg+xml;base64,' +
+          btoa(unescape(encodeURIComponent(testCase.expectedSvgString))));
       });
     });
 
