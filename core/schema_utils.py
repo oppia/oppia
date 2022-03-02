@@ -124,7 +124,7 @@ def normalize_against_schema(
         if normalized_obj is None:
             raise Exception(
                 'Type of %s is not present in options' %
-                schema[SCHEMA_KEY_OPTIONS])
+                obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj
