@@ -40,7 +40,7 @@ class TranslatableContentDict(TypedDict):
     """Dictionary representing TranslatableContent object."""
 
     content_id: str
-    content: feconf.TranslatableContentValue
+    content: feconf.ContentValueType
     content_type: TranslatableContentFormat
 
 
@@ -50,7 +50,7 @@ class TranslatableContent:
 
     Args:
         content_id: str. The id of the corresponding translatable content value.
-        content_value: TranslatableContentValue. The content value which can be
+        content_value: ContentValueType. The content value which can be
             translated.
         content_type: TranslatableContentFormat. The type of the
             corresponding content value.
@@ -59,7 +59,7 @@ class TranslatableContent:
     def __init__(
         self,
         content_id: str,
-        content_value: feconf.TranslatableContentValue,
+        content_value: feconf.ContentValueType,
         content_type: TranslatableContentFormat
     ) -> None:
         self.content_id = content_id
@@ -105,15 +105,15 @@ class TranslatedContent:
     """Represents the translated content of the TranslatableContent object.
 
     Args:
-        content_value: TranslatableContentValue. Represents already-translated
-            content of TranslatableContent object.
+        content_value: ContentValueType. Represents already-translated
+            content in any BaseTranslatableObject.
         needs_update: bool. A boolean value represents whether any translation
             needs an update or not.
     """
 
     def __init__(
         self,
-        content_value: feconf.TranslatableContentValue,
+        content_value: feconf.ContentValueType,
         needs_update: bool
     ) -> None:
         self.content_value = content_value
@@ -164,7 +164,7 @@ class TranslatableContentsCollection:
         self,
         field_type: TranslatableContentFormat,
         content_id: str,
-        content_value: feconf.TranslatableContentValue
+        content_value: feconf.ContentValueType
     ) -> None:
         """Adds translatable field parameter to translatable_contents dict.
 
@@ -172,7 +172,7 @@ class TranslatableContentsCollection:
             field_type: TranslatableContentFormat. The type of the
                 corresponding translatable content.
             content_id: str. The id of the corresponding translatable content.
-            content_value: TranslatableContentValue. Value of the content which
+            content_value: ContentValueType. Value of the content which
                 is translatable.
         """
         self.content_id_to_translatable_content[content_id] = (
