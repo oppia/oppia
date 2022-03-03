@@ -51,7 +51,7 @@ describe('Contributions and review component', function() {
   var userService = null;
   var TranslationTopicService = null;
   var ContributionOpportunitiesService = null;
-  var LocalStorageService = null
+  var LocalStorageService = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -262,17 +262,17 @@ describe('Contributions and review component', function() {
     });
 
     it('should change active topic when clicking on topic selector',
-    function() {
-      spyOn(LocalStorageService, 'updateLastSelectedTranslationTopicName')
-        .and.callThrough();
+      function() {
+        spyOn(LocalStorageService, 'updateLastSelectedTranslationTopicName')
+          .and.callThrough();
 
-      ctrl.onChangeTopic('Topic 2');
+        ctrl.onChangeTopic('Topic 2');
 
-      expect(TranslationTopicService.setActiveTopicName)
-        .toHaveBeenCalledWith('Topic 2');
-      expect(LocalStorageService.updateLastSelectedTranslationTopicName)
-        .toHaveBeenCalledWith('Topic 2');
-    });
+        expect(TranslationTopicService.setActiveTopicName)
+          .toHaveBeenCalledWith('Topic 2');
+        expect(LocalStorageService.updateLastSelectedTranslationTopicName)
+          .toHaveBeenCalledWith('Topic 2');
+      });
 
     it('should open show translation suggestion modal when clicking on' +
       ' suggestion', function() {
