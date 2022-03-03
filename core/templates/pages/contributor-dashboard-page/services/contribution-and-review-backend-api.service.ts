@@ -128,7 +128,10 @@ export class ContributionAndReviewBackendApiService {
         suggestion_type: suggestionType
       }
     );
-    return this.http.get<FetchSuggestionsResponse>(url).toPromise();
+    const params = {
+      topic_name: topicName,
+    };
+    return this.http.get<FetchSuggestionsResponse>(url, { params }).toPromise();
   }
 
   async reviewExplorationSuggestionAsync(
