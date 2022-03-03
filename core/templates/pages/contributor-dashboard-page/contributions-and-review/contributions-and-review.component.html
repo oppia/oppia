@@ -62,7 +62,7 @@
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-dashboard-topic-container"
-         ng-if="$ctrl.isActiveTab($ctrl.TAB_TYPE_REVIEWS, $ctrl.activeSuggestionType)">
+         ng-if="$ctrl.isActiveTab($ctrl.TAB_TYPE_REVIEWS, $ctrl.SUGGESTION_TYPE_TRANSLATE)">
       <span class="oppia-dashboard-topic-container-label">Filter by Topics</span>
       <translation-topic-selector class="oppia-topic-selector" [active-topic-name]="$ctrl.topicName"
                                   (set-active-topic-name)="$ctrl.onChangeTopic($event)">
@@ -126,14 +126,6 @@
     color: #0b6c63;
     font-size: 1.5em;
   }
-
-  /* contributions-and-review .oppia-topic-selector {
-    padding-bottom: 10px;
-  }
-  contributions-and-review .oppia-dashboard-topic-container {
-    margin-left: 10px;
-  } */
-
   contributions-and-review .oppia-contributions-dropdown-list-container {
     background-color: #fff;
     border-radius: 4px;
