@@ -10,7 +10,7 @@ on:
       - release-*
 
 jobs:
-  typescript_test:
+  e2e_coverage_and_typescript_tests:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
