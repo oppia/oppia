@@ -373,30 +373,24 @@ class UserSettings:
             the normalized version of the username. Otherwise, returns None.
         """
 
-        return self.normalize_username(self.username)
-
-    @overload
-    @classmethod
-    def normalize_username(cls, username: str) -> str: ...
-
-    @overload
-    @classmethod
-    def normalize_username(cls, username: None) -> None: ...
+        if self.username:
+            return self.normalize_username(self.username)
+        else:
+            return None
 
     @classmethod
-    def normalize_username(cls, username: Optional[str]) -> Optional[str]:
+    def normalize_username(cls, username: str) -> str:
         """Returns the normalized version of the given username,
         or None if the passed-in 'username' is None.
 
         Args:
-            username: str or None. Identifiable username to display in the UI.
+            username: str. Identifiable username to display in the UI.
 
         Returns:
-            str or None. The normalized version of the given username,
-            or None if the passed-in username is None.
+            str. The normalized version of the given username.
         """
 
-        return username.lower() if username else None
+        return username.lower()
 
     @classmethod
     def require_valid_username(cls, username: str) -> None:
@@ -875,7 +869,6 @@ class CompletedActivities:
 class LearnerGoalsDict(TypedDict):
     """Dictionary representing the LearnerGoals object."""
 
-    user_id: str
     topic_ids_to_learn: List[str]
     topic_ids_to_master: List[str]
 
@@ -915,9 +908,7 @@ class LearnerGoals:
             dict. A dictionary containing the LearnerGoals class information
             in a dictionary form.
         """
-        # Here, we're not returning user_id key of UserSettingsDict
-        # which causes MyPy to throw error. thus we add an ignore here.
-        return { # type: ignore[typeddict-item]
+        return {
             'topic_ids_to_learn': self.topic_ids_to_learn,
             'topic_ids_to_master': self.topic_ids_to_master
         }
