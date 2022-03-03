@@ -97,7 +97,7 @@ export class ContributionAndReviewService {
           fetcher.type,
           // Fetch two pages at a time to compute if we have more results.
           // TODO(#14826): Replace with AppConstants.OPPORTUNITIES_PAGE_SIZE.
-          2 * 2,
+          AppConstants.OPPORTUNITIES_PAGE_SIZE * 2,
           fetcher.offset
         ).then((responseBody) => {
           const responseSuggestionIdToDetails: SuggestionDetailsDict = {};
@@ -107,7 +107,7 @@ export class ContributionAndReviewService {
               suggestion: suggestion,
               details: targetIdToDetails[suggestion.target_id]
             };
-            if (i < 2) {
+            if (i < AppConstants.OPPORTUNITIES_PAGE_SIZE) {
               // Populate the response with the first page.
               responseSuggestionIdToDetails[
                 suggestion.suggestion_id] = suggestionDetails;
@@ -130,7 +130,7 @@ export class ContributionAndReviewService {
       return (
         this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
           fetcher.type,
-          2,
+          AppConstants.OPPORTUNITIES_PAGE_SIZE,
           fetcher.offset
         ).then((responseBody) => {
           const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;

@@ -96,16 +96,11 @@ describe('Contribution and review service', () => {
   };
 
   beforeEach(() => {
-    const MockAppConstants = {
-      OPPORTUNITIES_PAGE_SIZE: 2,
-      ACTION_ACCEPT_SUGGESTION: 'accept'
-    };
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
         UrlInterpolationService,
-        ContributionAndReviewBackendApiService,
-        { provide: AppConstants, useValue: MockAppConstants }
+        ContributionAndReviewBackendApiService
       ]
     });
     cars = TestBed.inject(ContributionAndReviewService);
@@ -114,6 +109,16 @@ describe('Contribution and review service', () => {
   });
 
   describe('getUserCreatedQuestionSuggestionsAsync', () => {
+    const defaultOpportunitiesPageSize = AppConstants.OPPORTUNITIES_PAGE_SIZE;
+    afterAll(() => {
+      // This throws "Cannot assign to 'OPPORTUNITIES_PAGE_SIZE' because it
+      // is a read-only property.". We need to suppress this error because
+      // we need to change the value of 'OPPORTUNITIES_PAGE_SIZE' for testing
+      // purposes.
+      // @ts-expect-error
+      AppConstants.OPPORTUNITIES_PAGE_SIZE = defaultOpportunitiesPageSize;
+    });
+
     it('should return available question suggestions and opportunity details',
       () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
@@ -129,6 +134,13 @@ describe('Contribution and review service', () => {
       });
 
     it('should fetch one page ahead and cache extra results', fakeAsync(() => {
+      // This throws "Cannot assign to 'OPPORTUNITIES_PAGE_SIZE' because it
+      // is a read-only property.". We need to suppress this error because
+      // we need to change the value of 'OPPORTUNITIES_PAGE_SIZE' for testing
+      // purposes.
+      // @ts-expect-error
+      AppConstants.OPPORTUNITIES_PAGE_SIZE = 2;
+
       // Return more than a page's worth of results (3 results for a page size
       // of 2).
       fetchSuggestionsAsyncSpy.and.returnValue(
@@ -208,6 +220,13 @@ describe('Contribution and review service', () => {
     }));
 
     it('should reset offset', fakeAsync(() => {
+      // This throws "Cannot assign to 'OPPORTUNITIES_PAGE_SIZE' because it
+      // is a read-only property.". We need to suppress this error because
+      // we need to change the value of 'OPPORTUNITIES_PAGE_SIZE' for testing
+      // purposes.
+      // @ts-expect-error
+      AppConstants.OPPORTUNITIES_PAGE_SIZE = 2;
+
       // Return more than a page's worth of results (3 results for a page size
       // of 2).
       fetchSuggestionsAsyncSpy.and.returnValue(
