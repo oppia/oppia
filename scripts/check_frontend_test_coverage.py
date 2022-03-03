@@ -22,7 +22,7 @@ import os
 import re
 import sys
 
-from core import python_utils
+from core import utils
 
 LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
@@ -51,7 +51,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'lesson-information-card-modal.component.ts',
     'mathjax-bind.directive.ts',
     'object-editor.directive.ts',
-    'oppia-footer.component.ts',
     'oppia-interactive-music-notes-input.directive.ts',
     'oppia-interactive-pencil-code-editor.component.ts',
     'oppia-root.directive.ts',
@@ -60,7 +59,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'question-update.service.ts',
     'rule-type-selector.directive.ts',
     'select2-dropdown.directive.ts',
-    'story-node.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
@@ -127,7 +125,7 @@ def get_stanzas_from_lcov_file():
     Returns:
         list(LcovStanzaRelevantLines). A list with all stanzas.
     """
-    f = python_utils.open_file(LCOV_FILE_PATH, 'r')
+    f = utils.open_file(LCOV_FILE_PATH, 'r')
     lcov_items_list = f.read().split('end_of_record')
     stanzas_list = []
 
