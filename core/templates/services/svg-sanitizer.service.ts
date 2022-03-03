@@ -154,7 +154,6 @@ export class SvgSanitizerService {
     return { tags: invalidTags, attrs: invalidAttrs };
   }
 
-  // Returns SVG by parsing DataURI.
   // SVG is considered an XMLDocument and DOMParser's parseFromtString method
   // returns either a HTMLDocument or XMLDocument. Visit here for more info:
   // https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString
@@ -165,8 +164,7 @@ export class SvgSanitizerService {
     // held in a string.
     let svgString = atob(dataURI.split(',')[1]);
     let domParser = new DOMParser();
-    let doc = domParser.parseFromString(svgString, 'image/svg+xml');
-    return doc;
+    return domParser.parseFromString(svgString, 'image/svg+xml');
   }
 
   removeTagsAndAttributes(dataURI: string): string {
@@ -238,10 +236,12 @@ export class SvgSanitizerService {
    */
   getTrustedSvgResourceUrl(base64ImageData: string): SafeResourceUrl | null {
     if (this.isBase64Svg(base64ImageData)) {
-      base64ImageData = this.removeTagsAndAttributes(base64ImageData);
+      const sanitizedBase64ImageData = this.removeTagsAndAttributes(
+        base64ImageData);
 
       // eslint-disable-next-line oppia/no-bypass-security-phrase
-      return this.sanitizer.bypassSecurityTrustResourceUrl(base64ImageData);
+      return this.sanitizer.bypassSecurityTrustResourceUrl(
+        sanitizedBase64ImageData);
     }
     return null;
   }
