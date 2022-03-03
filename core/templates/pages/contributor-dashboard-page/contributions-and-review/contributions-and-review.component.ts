@@ -324,7 +324,8 @@ angular.module('oppia').component('contributionsAndReview', {
       var getContributionSummaries = function(suggestionIdToSuggestions) {
         if (ctrl.activeSuggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
           return getTranslationContributionsSummary(suggestionIdToSuggestions);
-        } else if (ctrl.activeSuggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
+        } else if (
+          ctrl.activeSuggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
           return getQuestionContributionsSummary(suggestionIdToSuggestions);
         }
       };
@@ -462,7 +463,8 @@ angular.module('oppia').component('contributionsAndReview', {
                     suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
                     text: 'Review Questions'
                   });
-                  userReviewableSuggestionTypes.push(ctrl.SUGGESTION_TYPE_QUESTION);
+                  userReviewableSuggestionTypes.push(
+                    ctrl.SUGGESTION_TYPE_QUESTION);
                 }
                 if (
                   userCanReviewTranslationSuggestionsInLanguages
@@ -471,17 +473,20 @@ angular.module('oppia').component('contributionsAndReview', {
                     suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
                     text: 'Review Translations'
                   });
-                  userReviewableSuggestionTypes.push(ctrl.SUGGESTION_TYPE_TRANSLATE);
+                  userReviewableSuggestionTypes.push(
+                    ctrl.SUGGESTION_TYPE_TRANSLATE);
                 }
                 if (userReviewableSuggestionTypes.length > 0) {
                   ctrl.switchToTab(
                     ctrl.TAB_TYPE_REVIEWS, userReviewableSuggestionTypes[0]);
                 } else if (userCanSuggestQuestions) {
                   ctrl.switchToTab(
-                    ctrl.TAB_TYPE_CONTRIBUTIONS, ctrl.SUGGESTION_TYPE_QUESTION);
+                    ctrl.TAB_TYPE_CONTRIBUTIONS,
+                    ctrl.SUGGESTION_TYPE_QUESTION);
                 } else {
                   ctrl.switchToTab(
-                    ctrl.TAB_TYPE_CONTRIBUTIONS, ctrl.SUGGESTION_TYPE_TRANSLATE);
+                    ctrl.TAB_TYPE_CONTRIBUTIONS,
+                    ctrl.SUGGESTION_TYPE_TRANSLATE);
                 }
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
