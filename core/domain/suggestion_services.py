@@ -596,9 +596,10 @@ def get_reviewable_suggestions(user_id, suggestion_type,
     Args:
         user_id: str. The ID of the user.
         suggestion_type: str. The type of the suggestion.
-        opportunity_summary_exp_ids: list(ExplorationOpportunitySummaryID) or None.
-            The list of exploration ID for which suggestions should be fetched. If
-            the list is empty, all reviewable suggestions are fetched.
+        opportunity_summary_exp_ids: list(str).
+            The list of exploration ID for which suggestions
+            should be fetched. If the list is empty, all reviewable suggestions
+            are fetched.
 
     Returns:
         list(Suggestion). A list of suggestions which the given user is allowed

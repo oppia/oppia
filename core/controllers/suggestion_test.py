@@ -2333,8 +2333,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID, 'story-b')
 
-        # story.story_contents.nodes[0].exploration_id = self.EXP_ID
-
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -2356,10 +2354,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.save_new_skill(
             self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
-
-        # opportunity_services.create_exp_opportunity_summary(
-        #     topic, story, exploration
-        # )
 
         user_services.allow_user_to_review_question(self.reviewer_id)
         user_services.allow_user_to_review_translation_in_language(

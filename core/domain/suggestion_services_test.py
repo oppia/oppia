@@ -1086,7 +1086,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)
         self.signup(self.REVIEWER_EMAIL_2, 'reviewer2')
         self.reviewer_id_2 = self.get_user_id_from_email(self.REVIEWER_EMAIL_2)
-        self.opportunity_summary_ids = [self.explorations[0].id, self.explorations[1].id, self.explorations[2].id]
+        self.opportunity_summary_ids = [self.explorations[0].id,
+                                        self.explorations[1].id,
+                                        self.explorations[2].id]
 
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',

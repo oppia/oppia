@@ -851,13 +851,15 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_exploration_opportunity_summaries_by_topic_id(self):
         output = (
-            opportunity_services.get_exploration_opportunity_summaries_by_topic_id(
+            opportunity_services
+                .get_exploration_opportunity_summaries_by_topic_id(
                 'None'))
 
         self.assertEqual(output, [])
 
         opportunities = (
-            opportunity_services.get_exploration_opportunity_summaries_by_topic_id(
+            opportunity_services
+                .get_exploration_opportunity_summaries_by_topic_id(
                 'topic'))
 
         self.assertEqual(len(opportunities), 1)

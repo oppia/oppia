@@ -35,6 +35,7 @@ from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 
+
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
 
@@ -351,7 +352,6 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
         """
         topic_name = self.request.get('topic_name', None)
 
-        print("Bhavuk", topic_name)
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
 
@@ -360,10 +360,14 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
         if topic_name is not None:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if topic is not None:
-                exploration_opportunity_summaries = opportunity_services.\
-                    get_exploration_opportunity_summaries_by_topic_id(topic.id)
+                exploration_opportunity_summaries = (
+                    opportunity_services.
+                    get_exploration_opportunity_summaries_by_topic_id(
+                    topic.id))
+
                 opportunity_summary_exp_ids = [
-                    opportunity.id for opportunity in exploration_opportunity_summaries]
+                    opportunity.id for opportunity
+                    in exploration_opportunity_summaries]
 
         suggestions = suggestion_services.get_reviewable_suggestions(
             self.user_id, suggestion_type, opportunity_summary_exp_ids)
