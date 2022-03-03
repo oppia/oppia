@@ -149,20 +149,58 @@ describe('Contribution and review service', () => {
 
       flushMicrotasks();
 
+      const suggestion4 = {
+        suggestion_id: 'suggestion_id_4',
+        target_id: 'skill_id_4',
+      } as SuggestionBackendDict;
+      const opportunityDict4 = {
+        skill_id: 'skill_id_4',
+        skill_description: 'skill_description_4',
+      };
+      const suggestion4BackendFetchResponse = {
+        suggestions: [
+          suggestion4
+        ],
+        target_id_to_opportunity_dict: {
+          skill_id_4: opportunityDict4,
+        },
+        next_offset: 4
+      };
+      const expectedSuggestion4Dict = {
+        suggestion: suggestion4,
+        details: suggestion4BackendFetchResponse
+          .target_id_to_opportunity_dict.skill_id_4
+      };
+
+      // Return a 4th suggestion from the backend.
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(suggestion4BackendFetchResponse));
+
+      // Return the cached 3rd suggestion and update the cache with the 4th.
+      cars.getUserCreatedQuestionSuggestionsAsync(false)
+        .then((response) => {
+          expect(response.suggestionIdToDetails.suggestion_id_3)
+            .toEqual(expectedSuggestion3Dict);
+          expect(Object.keys(response.suggestionIdToDetails).length)
+            .toEqual(1);
+          expect(response.more).toBeTrue();
+        });
+
+      flushMicrotasks();
+
       // No more results from the backend.
       fetchSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve({
           suggestions: [],
           target_id_to_opportunity_dict: {},
-          next_offset: 3
+          next_offset: 4
         }));
 
-      // Return the cached result that was previously stored from a
-      // fetch-ahead.
+      // Return the cached 4th suggestion.
       cars.getUserCreatedQuestionSuggestionsAsync(false)
         .then((response) => {
-          expect(response.suggestionIdToDetails.suggestion_id_3)
-            .toEqual(expectedSuggestion3Dict);
+          expect(response.suggestionIdToDetails.suggestion_id_4)
+            .toEqual(expectedSuggestion4Dict);
           expect(Object.keys(response.suggestionIdToDetails).length)
             .toEqual(1);
           expect(response.more).toBeFalse();
