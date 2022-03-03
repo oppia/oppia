@@ -1086,6 +1086,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)
         self.signup(self.REVIEWER_EMAIL_2, 'reviewer2')
         self.reviewer_id_2 = self.get_user_id_from_email(self.REVIEWER_EMAIL_2)
+        self.opportunity_summary_ids = [self.explorations[0].id,
+                                        self.explorations[1].id,
+                                        self.explorations[2].id]
 
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',
@@ -1333,7 +1336,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.reviewer_id_1, 'pt')
         # Get all reviewable translation suggestions.
         suggestions = suggestion_services.get_reviewable_suggestions(
-            self.reviewer_id_1, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            self.reviewer_id_1, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            self.opportunity_summary_ids)
 
         # Expect that the results correspond to translation suggestions that the
         # user has rights to review.
@@ -1364,7 +1368,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.reviewer_id_1)
         # Get all reviewable question suggestions.
         suggestions = suggestion_services.get_reviewable_suggestions(
-            self.reviewer_id_1, feconf.SUGGESTION_TYPE_ADD_QUESTION)
+            self.reviewer_id_1, feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            self.opportunity_summary_ids)
 
         # Expect that the results correspond to question suggestions.
         self.assertEqual(len(suggestions), 2)
