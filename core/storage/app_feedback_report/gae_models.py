@@ -332,7 +332,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Returns:
             list(str). The possible values that the field name can have.
         """
-        query = cls.query(projection=[filter_field.name], distinct=True)
+        query = cls.query(projection=[filter_field.value], distinct=True)
         filter_values = []
         if filter_field == FilterFieldNames.REPORT_TYPE:
             filter_values = [model.report_type for model in query]
@@ -359,7 +359,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         else:
             raise utils.InvalidInputException(
                 'The field %s is not a valid field to filter reports on' % (
-                    filter_field.name))
+                    filter_field.value))
         return filter_values
 
     @staticmethod

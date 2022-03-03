@@ -1736,7 +1736,7 @@ class AppFeedbackReportFilter:
         """
         self.filter_options.sort()
         return {
-            'filter_field': self.filter_field.name,
+            'filter_field': self.filter_field.value,
             'filter_options': self.filter_options
         }
 
@@ -1753,7 +1753,7 @@ class AppFeedbackReportFilter:
                 'The filter field should be one of %s, received: %s' % (
                     [item.name for item in (
                         app_feedback_report_constants.ALLOWED_FILTERS)],
-                    self.filter_field.name))
+                    self.filter_field.value))
         if not isinstance(self.filter_options, list):
             raise utils.ValidationError(
                 'The filter options should be a list, received: %r' % (
