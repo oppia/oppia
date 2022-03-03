@@ -2332,6 +2332,9 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID, 'story-b')
+
+        # story.story_contents.nodes[0].exploration_id = self.EXP_ID
+
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -2353,6 +2356,10 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.save_new_skill(
             self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
+
+        # opportunity_services.create_exp_opportunity_summary(
+        #     topic, story, exploration
+        # )
 
         user_services.allow_user_to_review_question(self.reviewer_id)
         user_services.allow_user_to_review_translation_in_language(
@@ -2427,9 +2434,76 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.logout()
         self.login(self.REVIEWER_EMAIL)
 
-    def test_exploration_handler_returns_data(self):
+    def test_exploration_handler_returns_data_with_no_topic(self):
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content')
+        self.assertEqual(len(response['suggestions']), 1)
+        suggestion = response['suggestions'][0]
+        self.assertDictEqual(
+            suggestion['change'], self.translate_suggestion_change)
+        self.assertEqual(
+            suggestion['suggestion_type'],
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        )
+        self.assertEqual(
+            suggestion['target_type'], feconf.ENTITY_TYPE_EXPLORATION)
+        self.assertEqual(suggestion['language_code'], 'hi')
+        self.assertEqual(suggestion['author_name'], 'author')
+        self.assertEqual(suggestion['status'], 'review')
+        self.assertDictEqual(
+            response['target_id_to_opportunity_dict'],
+            {
+                'exp1': {
+                    'chapter_title': 'Node1',
+                    'content_count': 2,
+                    'id': 'exp1',
+                    'story_title': 'A story',
+                    'topic_name': 'topic',
+                    'translation_counts': {},
+                    'translation_in_review_counts': {}
+                }
+            }
+        )
+
+    def test_exploration_handler_returns_data_with_valid_topic(self):
+        response = self.get_json(
+            '/getreviewablesuggestions/exploration/translate_content', params={
+                'topic_name': 'topic'
+            })
+        self.assertEqual(len(response['suggestions']), 1)
+        suggestion = response['suggestions'][0]
+        self.assertDictEqual(
+            suggestion['change'], self.translate_suggestion_change)
+        self.assertEqual(
+            suggestion['suggestion_type'],
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        )
+        self.assertEqual(
+            suggestion['target_type'], feconf.ENTITY_TYPE_EXPLORATION)
+        self.assertEqual(suggestion['target_id'], self.EXP_ID)
+        self.assertEqual(suggestion['language_code'], 'hi')
+        self.assertEqual(suggestion['author_name'], 'author')
+        self.assertEqual(suggestion['status'], 'review')
+        self.assertDictEqual(
+            response['target_id_to_opportunity_dict'],
+            {
+                'exp1': {
+                    'chapter_title': 'Node1',
+                    'content_count': 2,
+                    'id': 'exp1',
+                    'story_title': 'A story',
+                    'topic_name': 'topic',
+                    'translation_counts': {},
+                    'translation_in_review_counts': {}
+                }
+            }
+        )
+
+    def test_exploration_handler_returns_data_with_invalid_topic(self):
+        response = self.get_json(
+            '/getreviewablesuggestions/exploration/translate_content', params={
+                'topic_name': 'invalid_topic'
+            })
         self.assertEqual(len(response['suggestions']), 1)
         suggestion = response['suggestions'][0]
         self.assertDictEqual(
@@ -2743,4 +2817,45 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '/getreviewablesuggestions/invalid_target_type/translate_content',
             expected_status_int=400
+        )
+
+
+class AllTopicNamesHandlerTest(test_utils.GenericTestBase):
+    """Test for the AllTopicNamesHandler."""
+
+    def setUp(self):
+        super(AllTopicNamesHandlerTest, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+    def test_get_all_topic_names(self):
+        response = self.get_json('/getalltopicnames')
+        self.assertEqual(
+            response,
+            {'topic_names': []}
+        )
+
+        topic_id = '0'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_3'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic_id, self.admin_id)
+
+        response = self.get_json('/getalltopicnames')
+        self.assertEqual(
+            response,
+            {'topic_names': ['topic']}
         )
