@@ -78,15 +78,25 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields in the answer group."""
+        """Get all translatable fields in the answer group.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
+
         if self.outcome is not None:
-            translatable_contents_collection.add_translatable_object(
-                self.outcome.get_translatable_contents_collection())
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(self.outcome)
+            )
         for rule_spec in self.rule_specs:
-            translatable_contents_collection.add_translatable_object(
-                rule_spec.get_translatable_contents_collection())
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(rule_spec)
+            )
         return translatable_contents_collection
 
     def to_dict(self):
@@ -291,9 +301,15 @@ class Hint(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the hint."""
+        """Get all translatable fields/objects in the hint.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
+
         translatable_contents_collection.add_translatable_field(
             translation_domain.TranslatableContentFormat.HTML,
             self.hint_content.content_id,
@@ -383,9 +399,15 @@ class Solution(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the solution."""
+        """Get all translatable fields/objects in the solution.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
+
         translatable_contents_collection.add_translatable_field(
             translation_domain.TranslatableContentFormat.HTML,
             self.explanation.content_id,
@@ -544,24 +566,40 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the interaction instance."""
+        """Get all translatable fields/objects in the interaction instance.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
+
         if self.default_outcome is not None:
-            translatable_contents_collection.add_translatable_object(
-                self.default_outcome.get_translatable_contents_collection())
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(self.default_outcome)
+            )
         for answer_group in self.answer_groups:
-            translatable_contents_collection.add_translatable_object(
-                answer_group.get_translatable_contents_collection())
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(answer_group)
+            )
         for customization_arg in self.customization_args.values():
-            translatable_contents_collection.add_translatable_object(
-                customization_arg.get_translatable_contents_collection())
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(customization_arg)
+            )
         for hint in self.hints:
-            translatable_contents_collection.add_translatable_object(
-                hint.get_translatable_contents_collection())
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(hint)
+            )
         if self.solution is not None:
-            translatable_contents_collection.add_translatable_object(
-                self.solution.get_translatable_contents_collection())
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(self.solution)
+            )
         return translatable_contents_collection
 
     def to_dict(self):
@@ -1015,9 +1053,14 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields/objects in the interaction customization
         args.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
+
         subtitled_htmls = self.get_subtitled_html()
         for subtitled_html in subtitled_htmls:
             html_string = subtitled_html.html
@@ -1376,9 +1419,15 @@ class Outcome(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the outcome."""
+        """Get all translatable fields/objects in the outcome.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
+
         translatable_contents_collection.add_translatable_field(
             translation_domain.TranslatableContentFormat.HTML,
             self.feedback.content_id,
@@ -2163,9 +2212,15 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the rule spec."""
+        """Get all translatable fields/objects in the rule spec.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
+
         for input_value in self.inputs.values():
             if 'normalizedStrSet' in input_value:
                 translatable_contents_collection.add_translatable_field(
@@ -2618,15 +2673,21 @@ class State(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the state."""
+        """Get all translatable fields/objects in the state.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
+
         translatable_contents_collection.add_translatable_field(
             translation_domain.TranslatableContentFormat.HTML,
             self.content.content_id,
             self.content.html)
-        translatable_contents_collection.add_translatable_object(
-            self.interaction.get_translatable_contents_collection())
+        translatable_contents_collection.add_fields_from_translatable_object(
+            self.interaction)
         return translatable_contents_collection
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):

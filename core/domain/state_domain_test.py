@@ -4393,7 +4393,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         translatable_contents = [
-            translatable_content.content
+            translatable_content.content_value
             for translatable_content in
             state.get_all_contents_which_need_translations(
                 self.dummy_entity_translations)
@@ -4424,7 +4424,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('TextInput')
         state.update_interaction_answer_groups(state_answer_group)
         translatable_contents = [
-            translatable_content.content
+            translatable_content.content_value
             for translatable_content in
             state.get_all_contents_which_need_translations(
                 self.dummy_entity_translations)
@@ -4452,7 +4452,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
         translatable_contents = [
-            translatable_content.content
+            translatable_content.content_value
             for translatable_content in
             state.get_all_contents_which_need_translations(
                 self.dummy_entity_translations)
@@ -4476,7 +4476,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args(state_interaction_cust_args)
         translatable_contents = [
-            translatable_content.content
+            translatable_content.content_value
             for translatable_content in
             state.get_all_contents_which_need_translations(
                 self.dummy_entity_translations)
@@ -4490,7 +4490,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hint = state_domain.Hint(state_domain.SubtitledHtml(
             'hint_1', '<p>Hello, this is html1 for state_1</p>'))
         translatable_contents = [
-            translatable_content.content
+            translatable_content.content_value
             for translatable_content in
             hint.get_all_contents_which_need_translations(
                 self.dummy_entity_translations)
