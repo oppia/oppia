@@ -3241,9 +3241,6 @@ md-card.preview-conversation-skin-supplemental-card {
   list-style-type: none;
   text-align: center;
 }
-.oppia-navbar-nav.oppia-navbar-profile > li:hover {
-  background-color: #00645c
-}
 .oppia-activity-summary-tile.small-width .metrics li {
   display: block;
   font-size: 0.7em;
@@ -4801,7 +4798,7 @@ div.oppia-issues-learner-action {
   .oppia-profile-picture-container {
     float: left;
     height: auto;
-    width: 130px;
+    width: 100%;
   }
   .oppia-profile-user-card {
     float: none;
