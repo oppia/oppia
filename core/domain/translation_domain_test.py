@@ -48,7 +48,8 @@ class DummyTranslatableObjectWithTwoParams(
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_1',
             self.param1)
-        translatable_contents_collection.add_translatable_object(self.param2)
+        translatable_contents_collection.add_fields_from_translatable_object(
+            self.param2)
         return translatable_contents_collection
 
 
@@ -181,11 +182,11 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         ]
         translatable_contents = (
             self.translatable_object1.get_translatable_contents_collection()
-            .translatable_contents)
+            .content_id_to_translatable_content.values())
 
         self.assertItemsEqual(expected_contents, [ # type: ignore[no-untyped-call]
-            translatable_content.content
-            for translatable_content in translatable_contents.values()
+            translatable_content.content_value
+            for translatable_content in translatable_contents
         ])
 
     def test_unregistered_translatable_object_raises_exception(self) -> None:
@@ -217,8 +218,8 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             'My name is Nikhil.'
         ]
         list_of_contents_which_need_translataion = [
-            translatable_item.content
-            for translatable_item in contents_which_need_translation
+            translatable_content.content_value
+            for translatable_content in contents_which_need_translation
         ]
         self.assertItemsEqual( # type: ignore[no-untyped-call]
             expected_list_of_contents_which_need_translataion,
@@ -242,7 +243,7 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(entity_translations.entity_version, 1)
         self.assertEqual(entity_translations.language_code, 'en')
         self.assertEqual(
-            entity_translations.translations['content_id_1'].content,
+            entity_translations.translations['content_id_1'].content_value,
             'My name is Nikhil.')
         self.assertEqual(
             entity_translations.translations['content_id_1'].needs_update,
@@ -260,7 +261,7 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(translatable_content.content_id, 'content_id_1')
-        self.assertEqual(translatable_content.content, 'My name is Jhon.')
+        self.assertEqual(translatable_content.content_value, 'My name is Jhon.')
         self.assertEqual(
             translatable_content.content_type,
             translation_domain.TranslatableContentFormat.HTML)
@@ -269,14 +270,14 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
         translatable_content = (
                 translation_domain.TranslatableContent.from_dict({
                 'content_id': 'content_id_1',
-                'content': 'My name is Jhon.',
+                'content_value': 'My name is Jhon.',
                 'content_type': translation_domain
                 .TranslatableContentFormat.HTML
             })
         )
 
         self.assertEqual(translatable_content.content_id, 'content_id_1')
-        self.assertEqual(translatable_content.content, 'My name is Jhon.')
+        self.assertEqual(translatable_content.content_value, 'My name is Jhon.')
         self.assertEqual(
             translatable_content.content_type,
             translation_domain.TranslatableContentFormat.HTML)
@@ -284,7 +285,7 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
     def test_to_dict_method_of_translatable_content_class(self) -> None:
         translatable_content_dict = {
             'content_id': 'content_id_1',
-            'content': 'My name is Jhon.',
+            'content_value': 'My name is Jhon.',
             'content_type': translation_domain.TranslatableContentFormat.HTML
         }
         translatable_content = translation_domain.TranslatableContent(
@@ -306,23 +307,23 @@ class TranslatedContentUnitTests(test_utils.GenericTestBase):
         translated_content = translation_domain.TranslatedContent(
             'My name is Nikhil.', False)
 
-        self.assertEqual(translated_content.content, 'My name is Nikhil.')
+        self.assertEqual(translated_content.content_value, 'My name is Nikhil.')
         self.assertEqual(translated_content.needs_update, False)
 
     def test_from_dict_method_of_translated_content_class(self) -> None:
         translated_content = translation_domain.TranslatedContent.from_dict({
-            'content': 'My name is Nikhil.',
+            'content_value': 'My name is Nikhil.',
             'needs_update': False
         })
 
-        self.assertEqual(translated_content.content, 'My name is Nikhil.')
+        self.assertEqual(translated_content.content_value, 'My name is Nikhil.')
         self.assertEqual(translated_content.needs_update, False)
 
     def test_to_dict_method_of_translated_content_class(self) -> None:
         translated_content = translation_domain.TranslatedContent(
             'My name is Nikhil.', False)
         translated_content_dict = {
-            'content': 'My name is Nikhil.',
+            'content_value': 'My name is Nikhil.',
             'needs_update': False
         }
 

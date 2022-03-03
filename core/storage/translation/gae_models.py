@@ -52,8 +52,8 @@ class EntityTranslationsModel(base_models.BaseModel):
     # The ISO 639-1 code for the language an entity is written in.
     language_code = datastore_services.StringProperty(
         required=True, indexed=True)
-    # Represents the translated content of the TranslatableContent object. The
-    # format is of type dict(str, TranslatedContent).
+    # A dict representing content-id as keys and dict(TranslatedContent)
+    # as values.
     translations = datastore_services.JsonProperty(required=True)
 
     @staticmethod
@@ -172,8 +172,8 @@ class EntityTranslationsModel(base_models.BaseModel):
             entity_id: str. Id of an entity.
             entity_version: int. Version of an entity.
             language_code: str. Language code for a given entity.
-            translations: dict(str, TranslatedContentDict). The contents which
-                are already translated.
+            translations: dict(str, TranslatedContentDict). A dict representing
+                content-id as keys and dict(TranslatedContent) as values.
 
         Returns:
             EntityTranslationsModel. Returns a new EntityTranslationsModel.

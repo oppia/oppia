@@ -1547,9 +1547,9 @@ COMMIT_TYPE_REVERT = 'revert'
 COMMIT_TYPE_EDIT = 'edit'
 COMMIT_TYPE_DELETE = 'delete'
 
-# The data type for the content in the TranslatableContent/TranslatedContent
-# object.
-ContentInTranslatableContent = Union[str, List[str]]
+# The data type for the translated or translatable content in any
+# BaseTranslatableObject.
+ContentValueType = Union[str, List[str]]
 
 
 class TranslatableEntityType(enum.Enum):
@@ -1564,5 +1564,5 @@ class TranslatableEntityType(enum.Enum):
 class TranslatedContentDict(TypedDict):
     """Dictionary representing TranslatedContent object."""
 
-    content: ContentInTranslatableContent
+    content_value: ContentValueType
     needs_update: bool
