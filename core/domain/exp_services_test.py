@@ -4148,7 +4148,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
         second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)
 
-        self.save_new_valid_exploration(
+        v1_exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_0_ID)
@@ -4224,6 +4224,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertLess(
             snapshots_metadata[0]['created_on_ms'],
             snapshots_metadata[1]['created_on_ms'])
+
+        # Using the old version of the exploration should raise an error.
+        change_list_swap = self.swap_to_always_return(
+            exp_services, 'apply_change_list', value=v1_exploration)
+        with change_list_swap, self.assertRaisesRegex(
+            Exception, 'version 1, which is too old'):
+            exp_services.update_exploration(
+                second_committer_id, self.EXP_0_ID, [], 'commit_message')
 
         # Another person modifies the exploration.
         new_change_list = [exp_domain.ExplorationChange({
@@ -6571,7 +6579,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         exp_user_data.draft_change_list = self.draft_change_list_dict
         exp_user_data.drafdraft_change_list_exp_versiont_change_list_last_updated = (  # pylint: disable=line-too-long
             self.DATETIME)
-        exp_user_data.draft_change_list_exp_version = 3
+        exp_user_data.draft_change_list_exp_version = 2
         exp_user_data.draft_change_list_id = 2
         exp_user_data.update_timestamps()
         exp_user_data.put()
