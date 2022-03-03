@@ -96,7 +96,7 @@ export class ContributionAndReviewService {
         this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
           fetcher.type,
           // Fetch two pages at a time to compute if we have more results.
-          // TODO: Replace with AppConstants.OPPORTUNITIES_PAGE_SIZE.
+          // TODO(#14826): Replace with AppConstants.OPPORTUNITIES_PAGE_SIZE.
           2 * 2,
           fetcher.offset
         ).then((responseBody) => {
