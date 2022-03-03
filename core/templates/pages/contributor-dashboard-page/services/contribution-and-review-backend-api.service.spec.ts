@@ -69,8 +69,8 @@ describe('Contribution and review backend API service', () => {
       const url = '/getsubmittedsuggestions/skill/add_question';
 
       carbas.fetchSuggestionsAsync(
-        'SUBMITTED_QUESTION_SUGGESTIONS'
-      ).then(successHandler, failureHandler);
+        'SUBMITTED_QUESTION_SUGGESTIONS',
+        'all').then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
       req.flush(suggestionsBackendObject);
@@ -87,8 +87,8 @@ describe('Contribution and review backend API service', () => {
       const url = '/getsubmittedsuggestions/exploration/translate_content';
 
       carbas.fetchSuggestionsAsync(
-        'SUBMITTED_TRANSLATION_SUGGESTIONS'
-      ).then(successHandler, failureHandler);
+        'SUBMITTED_TRANSLATION_SUGGESTIONS',
+        'all').then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
       req.flush(suggestionsBackendObject);
@@ -105,8 +105,8 @@ describe('Contribution and review backend API service', () => {
       const url = '/getreviewablesuggestions/skill/add_question';
 
       carbas.fetchSuggestionsAsync(
-        'REVIEWABLE_QUESTION_SUGGESTIONS'
-      ).then(successHandler, failureHandler);
+        'REVIEWABLE_QUESTION_SUGGESTIONS',
+        'all').then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
       req.flush(suggestionsBackendObject);
@@ -123,7 +123,7 @@ describe('Contribution and review backend API service', () => {
       const url = '/getreviewablesuggestions/exploration/translate_content';
 
       carbas.fetchSuggestionsAsync(
-        'REVIEWABLE_TRANSLATION_SUGGESTIONS'
+        'REVIEWABLE_TRANSLATION_SUGGESTIONS', 'all'
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');

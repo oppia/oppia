@@ -57,15 +57,19 @@ angular.module('oppia').component('contributionsAndReview', {
   controller: [
     '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
-    'NgbModal', 'QuestionObjectFactory', 'SkillBackendApiService',
-    'UrlInterpolationService', 'UserService',
-    'CORRESPONDING_DELETED_OPPORTUNITY_TEXT', 'IMAGE_CONTEXT',
+    'LocalStorageService', 'NgbModal',
+    'QuestionObjectFactory', 'SkillBackendApiService',
+    'TranslationTopicService', 'UrlInterpolationService', 'UserService',
+    'CORRESPONDING_DELETED_OPPORTUNITY_TEXT',
+    'DEFAULT_OPPORTUNITY_TOPIC_NAME', 'IMAGE_CONTEXT',
     function(
         $filter, $rootScope, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
-        NgbModal, QuestionObjectFactory, SkillBackendApiService,
-        UrlInterpolationService, UserService,
-        CORRESPONDING_DELETED_OPPORTUNITY_TEXT, IMAGE_CONTEXT) {
+        LocalStorageService, NgbModal,
+        QuestionObjectFactory, SkillBackendApiService,
+        TranslationTopicService, UrlInterpolationService, UserService,
+        CORRESPONDING_DELETED_OPPORTUNITY_TEXT,
+        DEFAULT_OPPORTUNITY_TOPIC_NAME, IMAGE_CONTEXT) {
       var ctrl = this;
       ctrl.contributions = {};
 
@@ -92,21 +96,21 @@ angular.module('oppia').component('contributionsAndReview', {
         [SUGGESTION_TYPE_QUESTION]: {
           [ctrl.TAB_TYPE_CONTRIBUTIONS]: () => {
             return ContributionAndReviewService
-              .getUserCreatedQuestionSuggestionsAsync();
+              .getUserCreatedQuestionSuggestionsAsync(ctrl.topicName);
           },
           [ctrl.TAB_TYPE_REVIEWS]: () => {
             return ContributionAndReviewService
-              .getReviewableQuestionSuggestionsAsync();
+              .getReviewableQuestionSuggestionsAsync(ctrl.topicName);
           }
         },
         [SUGGESTION_TYPE_TRANSLATE]: {
           [ctrl.TAB_TYPE_CONTRIBUTIONS]: () => {
             return ContributionAndReviewService
-              .getUserCreatedTranslationSuggestionsAsync();
+              .getUserCreatedTranslationSuggestionsAsync(ctrl.topicName);
           },
           [ctrl.TAB_TYPE_REVIEWS]: () => {
             return ContributionAndReviewService
-              .getReviewableTranslationSuggestionsAsync();
+              .getReviewableTranslationSuggestionsAsync(ctrl.topicName);
           }
         }
       };
@@ -386,6 +390,15 @@ angular.module('oppia').component('contributionsAndReview', {
         $rootScope.$apply();
       };
 
+      ctrl.onChangeTopic = function(topicName: string) {
+        ctrl.topicName = topicName;
+        TranslationTopicService.setActiveTopicName(ctrl.topicName);
+        LocalStorageService.updateLastSelectedTranslationTopicName(
+          ctrl.topicName);
+        $rootScope.$applyAsync();
+      };
+
+
       ctrl.$onInit = function() {
         ctrl.contributions = [];
         ctrl.userDetailsLoading = true;
@@ -407,6 +420,21 @@ angular.module('oppia').component('contributionsAndReview', {
             enabled: true
           }
         ];
+
+        var prevSelectedTopicName = (
+          LocalStorageService.getLastSelectedTranslationTopicName());
+
+        ctrl.topicName = DEFAULT_OPPORTUNITY_TOPIC_NAME;
+        TranslationTopicService.setActiveTopicName(ctrl.topicName);
+
+        ContributionOpportunitiesService.getAllTopicNamesAsync()
+          .then(function(topicNames) {
+            if (topicNames.indexOf(prevSelectedTopicName) !== -1) {
+              ctrl.topicName = prevSelectedTopicName;
+              TranslationTopicService.setActiveTopicName(ctrl.topicName);
+            }
+            $rootScope.$applyAsync();
+          });
 
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();

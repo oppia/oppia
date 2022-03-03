@@ -47,11 +47,11 @@ export class ContributionAndReviewService {
   ) {}
 
   private async fetchSuggestionsAsync(
-      fetchType: string
+      fetchType: string, topicName: string
   ): Promise<FetchSuggestionsResponse> {
     return (
       this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
-        fetchType
+        fetchType, topicName
       ).then((responseBody) => {
         const suggestionIdToSuggestions: FetchSuggestionsResponse = {};
         const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
@@ -66,24 +66,28 @@ export class ContributionAndReviewService {
     );
   }
 
-  async getUserCreatedQuestionSuggestionsAsync():
+  async getUserCreatedQuestionSuggestionsAsync(topicName: string):
   Promise<FetchSuggestionsResponse> {
-    return this.fetchSuggestionsAsync('SUBMITTED_QUESTION_SUGGESTIONS');
+    return this.fetchSuggestionsAsync(
+      'SUBMITTED_QUESTION_SUGGESTIONS', topicName);
   }
 
-  async getReviewableQuestionSuggestionsAsync():
+  async getReviewableQuestionSuggestionsAsync(topicName: string):
   Promise<FetchSuggestionsResponse> {
-    return this.fetchSuggestionsAsync('REVIEWABLE_QUESTION_SUGGESTIONS');
+    return this.fetchSuggestionsAsync(
+      'REVIEWABLE_QUESTION_SUGGESTIONS', topicName);
   }
 
-  async getUserCreatedTranslationSuggestionsAsync():
+  async getUserCreatedTranslationSuggestionsAsync(topicName: string):
   Promise<FetchSuggestionsResponse> {
-    return this.fetchSuggestionsAsync('SUBMITTED_TRANSLATION_SUGGESTIONS');
+    return this.fetchSuggestionsAsync(
+      'SUBMITTED_TRANSLATION_SUGGESTIONS', topicName);
   }
 
-  async getReviewableTranslationSuggestionsAsync():
+  async getReviewableTranslationSuggestionsAsync(topicName: string):
   Promise<FetchSuggestionsResponse> {
-    return this.fetchSuggestionsAsync('REVIEWABLE_TRANSLATION_SUGGESTIONS');
+    return this.fetchSuggestionsAsync(
+      'REVIEWABLE_TRANSLATION_SUGGESTIONS', topicName);
   }
 
   reviewExplorationSuggestion(

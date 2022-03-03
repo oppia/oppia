@@ -85,7 +85,7 @@ export class ContributionAndReviewBackendApiService {
   ) {}
 
   async fetchSuggestionsAsync(
-      fetchType: string
+      fetchType: string, topicName: string
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync('skill', 'add_question');
@@ -95,11 +95,12 @@ export class ContributionAndReviewBackendApiService {
         'exploration', 'translate_content');
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
-      return this.fetchReviewableSuggestionsAsync('skill', 'add_question');
+      return this.fetchReviewableSuggestionsAsync(
+        'skill', 'add_question', topicName);
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'exploration', 'translate_content');
+        'exploration', 'translate_content', topicName);
     }
   }
 
@@ -118,7 +119,8 @@ export class ContributionAndReviewBackendApiService {
 
   async fetchReviewableSuggestionsAsync(
       targetType: string,
-      suggestionType: string
+      suggestionType: string,
+      topicName: string
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
