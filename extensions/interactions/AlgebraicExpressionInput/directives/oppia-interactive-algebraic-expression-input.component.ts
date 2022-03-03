@@ -29,7 +29,6 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { AlgebraicExpressionInputRulesService } from './algebraic-expression-input-rules.service';
 import constants from 'assets/constants';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { TranslateService } from '@ngx-translate/core';
@@ -85,10 +84,7 @@ export class AlgebraicExpressionInputInteractionComponent
       return;
     }
     this.currentInteractionService.onSubmit(
-      this.value,
-      // eslint-disable-next-line max-len
-      this.algebraicExpressionInputRulesService as unknown as InteractionRulesService
-    );
+      this.value, this.algebraicExpressionInputRulesService);
   }
 
   ngOnInit(): void {
@@ -149,17 +145,6 @@ export class AlgebraicExpressionInputInteractionComponent
     GuppyInitializationService.interactionType = 'AlgebraicExpressionInput';
   }
 }
-
-require(
-  'interactions/AlgebraicExpressionInput/directives/' +
-  'algebraic-expression-input-rules.service.ts');
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/contextual/device-info.service.ts');
-require('services/guppy-configuration.service.ts');
-require('services/guppy-initialization.service.ts');
-require('services/html-escaper.service.ts');
-require('services/math-interactions.service.ts');
 
 angular.module('oppia').directive(
   'oppiaInteractiveAlgebraicExpressionInput',
