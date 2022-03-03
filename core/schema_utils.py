@@ -37,8 +37,7 @@ from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import user_domain
 
-from typing import (Any, Callable, Dict, List,
-                   Optional, Tuple, Union, cast)
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
