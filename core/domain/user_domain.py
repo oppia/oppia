@@ -101,28 +101,31 @@ class UserSettings:
         email: str,
         roles: List[str],
         banned: bool,
-        username: Optional[str]=None,
-        last_agreed_to_terms: Optional[datetime.datetime]=None,
-        last_started_state_editor_tutorial: Optional[datetime.datetime]=None,
-        last_started_state_translation_tutorial: Optional[datetime.datetime]=(
-            None),
+        username: Optional[str] = None,
+        last_agreed_to_terms: Optional[datetime.datetime] = None,
+        last_started_state_editor_tutorial: (
+            Optional[datetime.datetime]) = None,
+        last_started_state_translation_tutorial: (
+            Optional[datetime.datetime]) = None,
         last_logged_in: Optional[datetime.datetime]=None,
-        last_created_an_exploration: Optional[datetime.datetime]=None,
-        last_edited_an_exploration: Optional[datetime.datetime]=None,
+        last_created_an_exploration: (
+            Optional[datetime.datetime]) = None,
+        last_edited_an_exploration: (
+            Optional[datetime.datetime]) = None,
         profile_picture_data_url: Optional[str]=None,
-        default_dashboard: Optional[str]=None,
-        creator_dashboard_display_pref: str=(
+        default_dashboard: Optional[str] = None,
+        creator_dashboard_display_pref: str = (
             constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
-        user_bio: str ='',
-        subject_interests: Optional[List[str]]=None,
-        first_contribution_msec: Optional[float]=None,
-        preferred_language_codes: Optional[List[str]]=None,
-        preferred_site_language_code: Optional[str]=None,
-        preferred_audio_language_code: Optional[str]=None,
-        pin: Optional[str]=None,
-        display_alias: Optional[str]=None,
-        deleted: bool=False,
-        created_on: Optional[datetime.datetime]=None
+        user_bio: str = '',
+        subject_interests: Optional[List[str]] = None,
+        first_contribution_msec: Optional[float] = None,
+        preferred_language_codes: Optional[List[str]] = None,
+        preferred_site_language_code: Optional[str] = None,
+        preferred_audio_language_code: Optional[str] = None,
+        pin: Optional[str] = None,
+        display_alias: Optional[str] = None,
+        deleted: bool = False,
+        created_on: Optional[datetime.datetime] = None
     ) -> None:
         """Constructs a UserSettings domain object.
 
@@ -680,7 +683,7 @@ class IncompleteActivities:
         collection_ids: List[str],
         story_ids: List[str],
         partially_learnt_topic_ids: List[str],
-        partially_mastered_topic_id: Optional[str]=None
+        partially_mastered_topic_id: Optional[str] = None
     ) -> None:
         self.id = user_id
         self.exploration_ids = exploration_ids
@@ -780,7 +783,7 @@ class CompletedActivities:
         collection_ids: List[str],
         story_ids: List[str],
         learnt_topic_ids: List[str],
-        mastered_topic_ids: Optional[List[str]]=None
+        mastered_topic_ids: Optional[List[str]] = None
     ) -> None:
         self.id = user_id
         self.exploration_ids = exploration_ids
@@ -1123,7 +1126,7 @@ class ModifiableUserData:
         preferred_language_codes: Optional[List[str]],
         preferred_site_language_code: Optional[str],
         preferred_audio_language_code: Optional[str],
-        user_id: Optional[str]=None
+        user_id: Optional[str] = None
     ) -> None:
         """Constructs a ModifiableUserData domain object.
 
