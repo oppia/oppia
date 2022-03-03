@@ -58,8 +58,7 @@ describe('SvgSanitizerService', () => {
   });
 
   it(
-    'should return SafeResourceUrl when a safe SVG is requested as' +
-      'SafeResourceUrl',
+    'should return safeResourceUrl after removing invalid tags and attributes',
     () => {
       const testCases = [
         {
