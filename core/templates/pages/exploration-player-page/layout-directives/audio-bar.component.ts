@@ -67,7 +67,8 @@ export class AudioBarComponent {
     this.languagesInExploration = this.audioTranslationLanguageService
       .getLanguageOptionsForDropdown();
     this.selectedLanguage = {
-      value: this.getCurrentAudioLanguageCode() as string
+      value: this.audioTranslationLanguageService
+        .getCurrentAudioLanguageCode() as string
     };
   }
 

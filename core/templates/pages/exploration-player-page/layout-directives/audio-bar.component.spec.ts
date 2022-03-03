@@ -74,10 +74,6 @@ describe('Audio Bar Component', () => {
 
     fixture.detectChanges();
   });
-  beforeEach(() => {
-    spyOn(audioBarStatusService, 'markAudioBarExpanded').and.returnValue();
-    spyOn(audioBarStatusService, 'markAudioBarCollapsed').and.returnValue();
-  });
 
   afterEach(() => {
     component.ngOnDestroy();

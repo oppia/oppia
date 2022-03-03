@@ -94,6 +94,13 @@ describe('Stats reporting service ', () => {
 
   it('should set session properties when calling ' +
     '\'initSession\'', fakeAsync(() => {
+    // Prechecks.
+    expect(statsReportingService.explorationId).toEqual(null);
+    expect(statsReportingService.explorationTitle).toEqual(null);
+    expect(statsReportingService.explorationVersion)
+      .toEqual(null);
+    expect(statsReportingService.sessionId).toEqual(null);
+    expect(statsReportingService.optionalCollectionId).toEqual(null);
     statsReportingService.initSession(
       explorationId, explorationTitle, explorationVersion,
       sessionId, collectionId);

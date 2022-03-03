@@ -55,8 +55,8 @@ describe('State Skill Editor Component', () => {
     skill_model_last_updated: 3
   };
 
-  let untriagedSkillSummariesData: SkillSummary[] = (
-    [SkillSummary.createFromBackendDict(skillSummaryBackendDict)]);
+  let untriagedSkillSummariesData: SkillSummary[] = [
+    SkillSummary.createFromBackendDict(skillSummaryBackendDict)];
 
   class MockNgbModal {
     modal!: string;
