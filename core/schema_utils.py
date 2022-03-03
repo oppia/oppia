@@ -37,7 +37,8 @@ from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import user_domain
 
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast # pylint: disable=line-too-long
+from typing import (Any, Callable, Dict, List,
+                   Optional, Tuple, Union, cast)
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
@@ -123,8 +124,7 @@ def normalize_against_schema(
                 break
         if normalized_obj is None:
             raise Exception(
-                'Type of %s is not present in options' %
-                obj)
+                'Type of %s is not present in options' % obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj
