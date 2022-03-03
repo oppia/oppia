@@ -311,6 +311,7 @@
 /core/templates/services/contextual/window-ref.service*.ts @srijanreddy98
 /core/templates/services/internet-connectivity.service*.ts @srijanreddy98
 /core/templates/services/server-connection-backend-api.service*.ts @srijanreddy98
+/core/templates/services/number-conversion.service*.ts @srijanreddy98
 
 
 # Global stylesheet.
