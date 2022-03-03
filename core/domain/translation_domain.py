@@ -102,13 +102,16 @@ class TranslatableContent:
 
 
 class TranslatedContent:
-    """Represents the translated content of the TranslatableContent object.
+    """Class representing a translation of translatable content. For example,
+    if translatable content 'A' is translated into 'B' in a language other than
+    English, then 'B' is a TranslatedContent instance that represents this
+    class.
+    A (TranslatableContent) -----(translation)-----> B (TranslatedContent).
 
     Args:
-        content_value: ContentValueType. Represents already-translated
-            content in any BaseTranslatableObject.
-        needs_update: bool. A boolean value represents whether any translation
-            needs an update or not.
+        content_value: ContentValueType. Represents translation of translatable
+            content.
+        needs_update: bool. Whether any translation needs an update or not.
     """
 
     def __init__(
@@ -191,8 +194,8 @@ class TranslatableContentsCollection:
         NOTE: The functions take the entire translatable object as a param, as
         the process to fetch translatable collections from different objects
         are the same, and keeping this logic in one place will help avoid
-        duplicate patterns inside the calling site at the same time will make
-        the calling site look cleaner.
+        duplicate patterns in the callsite. It will also help the callsite
+        look cleaner.
 
         Args:
             translatable_object: BaseTranslatableObject. An instance of
