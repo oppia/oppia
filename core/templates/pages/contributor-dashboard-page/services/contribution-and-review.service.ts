@@ -68,20 +68,20 @@ export class ContributionAndReviewService {
       ContributionAndReviewBackendApiService
   ) {}
 
-  private _userCreatedQuestionFetcher: SuggestionFetcher = (
+  private userCreatedQuestionFetcher: SuggestionFetcher = (
     new SuggestionFetcher('SUBMITTED_QUESTION_SUGGESTIONS'));
 
-  private _reviewableQuestionFetcher: SuggestionFetcher = (
+  private reviewableQuestionFetcher: SuggestionFetcher = (
     new SuggestionFetcher('REVIEWABLE_QUESTION_SUGGESTIONS'));
 
-  private _userCreatedTranslationFetcher: SuggestionFetcher = (
+  private userCreatedTranslationFetcher: SuggestionFetcher = (
     new SuggestionFetcher('SUBMITTED_TRANSLATION_SUGGESTIONS'));
 
-  private _reviewableTranslationFetcher: SuggestionFetcher = (
+  private reviewableTranslationFetcher: SuggestionFetcher = (
     new SuggestionFetcher('REVIEWABLE_TRANSLATION_SUGGESTIONS'));
 
   private async fetchSuggestionsAsync(
-      fetcher: SuggestionFetcher, shouldResetOffset = false
+      fetcher: SuggestionFetcher, shouldResetOffset: boolean
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
       // Handle the case where we need to fetch starting from the beginning.
@@ -89,12 +89,15 @@ export class ContributionAndReviewService {
       fetcher.suggestionIdToDetails = {};
     }
     // If fetcher does not have items, fetch 2 pages and return the 1st page.
+    // We fetch ahead to compute whether there exists more items after this
+    // fetch.
     if (Object.keys(fetcher.suggestionIdToDetails).length === 0) {
       return (
         this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
           fetcher.type,
           // Fetch two pages at a time to compute if we have more results.
-          AppConstants.OPPORTUNITIES_PAGE_SIZE * 2,
+          // TODO: Replace with AppConstants.OPPORTUNITIES_PAGE_SIZE.
+          2 * 2,
           fetcher.offset
         ).then((responseBody) => {
           const responseSuggestionIdToDetails: SuggestionDetailsDict = {};
@@ -104,7 +107,7 @@ export class ContributionAndReviewService {
               suggestion: suggestion,
               details: targetIdToDetails[suggestion.target_id]
             };
-            if (i < AppConstants.OPPORTUNITIES_PAGE_SIZE) {
+            if (i < 2) {
               // Populate the response with the first page.
               responseSuggestionIdToDetails[
                 suggestion.suggestion_id] = suggestionDetails;
@@ -127,13 +130,13 @@ export class ContributionAndReviewService {
       return (
         this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
           fetcher.type,
-          AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          2,
           fetcher.offset
         ).then((responseBody) => {
           const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
           fetcher.suggestionIdToDetails = {};
           const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
-          responseBody.suggestions.forEach((suggestion) => {
+          responseBody.suggestions.forEach(suggestion => {
             const suggestionDetails = {
               suggestion: suggestion,
               details: targetIdToDetails[suggestion.target_id]
@@ -151,28 +154,32 @@ export class ContributionAndReviewService {
     }
   }
 
-  async getUserCreatedQuestionSuggestionsAsync(shouldResetOffset = true):
+  async getUserCreatedQuestionSuggestionsAsync(
+      shouldResetOffset: boolean = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this._userCreatedQuestionFetcher, shouldResetOffset);
+      this.userCreatedQuestionFetcher, shouldResetOffset);
   }
 
-  async getReviewableQuestionSuggestionsAsync(shouldResetOffset = true):
+  async getReviewableQuestionSuggestionsAsync(
+      shouldResetOffset: boolean = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this._reviewableQuestionFetcher, shouldResetOffset);
+      this.reviewableQuestionFetcher, shouldResetOffset);
   }
 
-  async getUserCreatedTranslationSuggestionsAsync(shouldResetOffset = true):
+  async getUserCreatedTranslationSuggestionsAsync(
+      shouldResetOffset: boolean = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this._userCreatedTranslationFetcher, shouldResetOffset);
+      this.userCreatedTranslationFetcher, shouldResetOffset);
   }
 
-  async getReviewableTranslationSuggestionsAsync(shouldResetOffset = true):
+  async getReviewableTranslationSuggestionsAsync(
+      shouldResetOffset: boolean = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this._reviewableTranslationFetcher, shouldResetOffset);
+      this.reviewableTranslationFetcher, shouldResetOffset);
   }
 
   reviewExplorationSuggestion(

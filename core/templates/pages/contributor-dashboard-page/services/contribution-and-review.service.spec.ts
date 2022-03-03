@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for contribution and review service
  */
 
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AppConstants } from 'app.constants';
 import { ContributionAndReviewService } from './contribution-and-review.service';
@@ -128,7 +128,7 @@ describe('Contribution and review service', () => {
         expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
       });
 
-    it('should fetch one page ahead and cache extra results', () => {
+    it('should fetch one page ahead and cache extra results', fakeAsync(() => {
       // Return more than a page's worth of results (3 results for a page size
       // of 2).
       fetchSuggestionsAsyncSpy.and.returnValue(
@@ -144,8 +144,10 @@ describe('Contribution and review service', () => {
             .toEqual(expectedSuggestion2Dict);
           expect(Object.keys(response.suggestionIdToDetails).length)
             .toEqual(2);
-          expect(response.suggestionIdToDetails.more).toBeTrue();
+          expect(response.more).toBeTrue();
         });
+
+      flushMicrotasks();
 
       // No more results from the backend.
       fetchSuggestionsAsyncSpy.and.returnValue(
@@ -157,17 +159,17 @@ describe('Contribution and review service', () => {
 
       // Return the cached result that was previously stored from a
       // fetch-ahead.
-      cars.getUserCreatedQuestionSuggestionsAsync()
+      cars.getUserCreatedQuestionSuggestionsAsync(false)
         .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_3)
             .toEqual(expectedSuggestion3Dict);
           expect(Object.keys(response.suggestionIdToDetails).length)
             .toEqual(1);
-          expect(response.suggestionIdToDetails.more).toBeFalse();
+          expect(response.more).toBeFalse();
         });
-    });
+    }));
 
-    it('should reset offset', () => {
+    it('should reset offset', fakeAsync(() => {
       // Return more than a page's worth of results (3 results for a page size
       // of 2).
       fetchSuggestionsAsyncSpy.and.returnValue(
@@ -183,15 +185,17 @@ describe('Contribution and review service', () => {
             .toEqual(expectedSuggestion2Dict);
           expect(Object.keys(response.suggestionIdToDetails).length)
             .toEqual(2);
-          expect(response.suggestionIdToDetails.more).toBeTrue();
+          expect(response.more).toBeTrue();
         });
+
+      flushMicrotasks();
 
       // Fetch again from offset 0.
       fetchSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve(multiplePageBackendFetchResponse));
 
       // Return the first 2 results from offset 0 again.
-      cars.getUserCreatedQuestionSuggestionsAsync(true)
+      cars.getUserCreatedQuestionSuggestionsAsync()
         .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_1)
             .toEqual(expectedSuggestionDict);
@@ -199,9 +203,9 @@ describe('Contribution and review service', () => {
             .toEqual(expectedSuggestion2Dict);
           expect(Object.keys(response.suggestionIdToDetails).length)
             .toEqual(2);
-          expect(response.suggestionIdToDetails.more).toBeTrue();
+          expect(response.more).toBeTrue();
         });
-    });
+    }));
   });
 
   describe('getReviewableQuestionSuggestionsAsync', () => {
