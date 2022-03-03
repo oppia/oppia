@@ -261,7 +261,7 @@ describe('Contributions and review component', function() {
         });
     });
 
-    fit('should change active topic when clicking on topic selector',
+    it('should change active topic when clicking on topic selector',
     function() {
       spyOn(LocalStorageService, 'updateLastSelectedTranslationTopicName')
         .and.callThrough();
