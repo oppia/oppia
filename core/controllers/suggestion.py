@@ -33,7 +33,6 @@ from core.domain import opportunity_services
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
-from core.domain import topic_fetchers
 
 
 class SuggestionHandler(base.BaseHandler):
@@ -332,14 +331,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
         }
     }
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'topic_name': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            }
-        }
+        'GET': {}
     }
 
     @acl_decorators.can_view_reviewable_suggestions
@@ -350,47 +342,11 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
             target_type: str. The type of the suggestion target.
             suggestion_type: str. The type of the suggestion.
         """
-        topic_name = self.request.get('topic_name', None)
-
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
-
-        opportunity_summary_exp_ids = []
-
-        if topic_name is not None:
-            topic = topic_fetchers.get_topic_by_name(topic_name)
-            if topic is not None:
-                exploration_opportunity_summaries = (
-                    opportunity_services.
-                    get_exploration_opportunity_summaries_by_topic_id(
-                    topic.id))
-
-                opportunity_summary_exp_ids = [
-                    opportunity.id for opportunity
-                    in exploration_opportunity_summaries]
-
         suggestions = suggestion_services.get_reviewable_suggestions(
-            self.user_id, suggestion_type, opportunity_summary_exp_ids)
+            self.user_id, suggestion_type)
         self._render_suggestions(target_type, suggestions)
-
-
-class AllTopicNamesHandler(base.BaseHandler):
-    """Provides the names of all existing topics in the datastore."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
-    @acl_decorators.open_access
-    def get(self):
-        topic_summaries = topic_fetchers.get_all_topic_summaries()
-        topic_names = [summary.name for summary in topic_summaries]
-        self.values = {
-            'topic_names': topic_names
-        }
-        self.render_json(self.values)
 
 
 class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
