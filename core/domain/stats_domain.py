@@ -65,6 +65,7 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE = 900000
 # LearnerAnswerInfo.
 MAX_ANSWER_DETAILS_BYTE_SIZE = 10000
 
+
 class SubmittedAnswerDict(TypedDict, total=False):
     """Dictionary representing the SubmittedAnswer object."""
     answer: str
@@ -77,7 +78,7 @@ class SubmittedAnswerDict(TypedDict, total=False):
     time_spent_in_sec: float
     rule_spec_str: Optional[str]
     answer_str: Optional[str]
-       
+  
 
 class ExplorationIssueDict(TypedDict):
     """Dictionary representing the ExplorationIssue object."""
@@ -128,7 +129,7 @@ class ExplorationStatsDict(TypedDict):
 
 
 class ExplorationStatsFrontendDict(TypedDict):
-    """Dictionary representing the ExplorationStats object 
+    """Dictionary representing the ExplorationStats object
     for use in frontend."""
     exp_id: str
     exp_version: int
@@ -163,10 +164,11 @@ class ExplorationStats:
     """Domain object representing analytics data for an exploration."""
 
     def __init__(
-            self, exp_id: str, exp_version: int, num_starts_v1: int, 
-            num_starts_v2: int, num_actual_starts_v1: int, 
+            self, exp_id: str, exp_version: int, num_starts_v1: int,
+            num_starts_v2: int, num_actual_starts_v1: int,
             num_actual_starts_v2: int, num_completions_v1: int,
-            num_completions_v2: int, state_stats_mapping: Dict[str, StateStats]) -> None:
+            num_completions_v2: int, state_stats_mapping: 
+            Dict[str, StateStats]) -> None:
         """Constructs an ExplorationStats domain object.
 
         Args:
@@ -264,7 +266,7 @@ class ExplorationStats:
         return exploration_stats_dict
 
     @classmethod
-    def create_default(cls, exp_id: str, exp_version: int, 
+    def create_default(cls, exp_id: str, exp_version: int,
     state_stats_mapping: Dict[str, StateStats]) -> ExplorationStats:
         """Creates a ExplorationStats domain object and sets all properties to
         0.
@@ -313,7 +315,7 @@ class ExplorationStats:
                 'Expected exp_version to be an int, received %s' % (
                     self.exp_version))
 
-        exploration_stats_dict = self.to_dict() 
+        exploration_stats_dict = self.to_dict()
 
         for stat_property in exploration_stats_properties:
             if not isinstance(exploration_stats_dict[stat_property], int): # type: ignore[misc]
@@ -786,7 +788,6 @@ class ExplorationIssues:
         """
         return cls(exp_id, exp_version, [])
 
-
     def to_dict(self) -> ExplorationIssuesDict:
         """Returns a dict representation of the ExplorationIssues domain object.
 
@@ -815,7 +816,7 @@ class ExplorationIssues:
             object.
         """
         unresolved_issues = [
-            ExplorationIssue.from_dict(unresolved_issue_dict) 
+            ExplorationIssue.from_dict(unresolved_issue_dict)
             for unresolved_issue_dict in exp_issues_dict['unresolved_issues']]
         return cls(
             exp_issues_dict['exp_id'], exp_issues_dict['exp_version'],
@@ -864,7 +865,6 @@ class Playthrough:
         self.issue_customization_args = issue_customization_args
         self.actions = actions
 
-
     def to_dict(self) -> PlaythroughDict:
         """Returns a dict representation of the Playthrough domain object.
 
@@ -902,7 +902,7 @@ class Playthrough:
                         playthrough_property))
 
         actions = [
-            LearnerAction.from_dict(action_dict) 
+            LearnerAction.from_dict(action_dict)
             for action_dict in playthrough_data['actions']]
 
         playthrough = cls(
@@ -912,7 +912,7 @@ class Playthrough:
             playthrough_data['issue_customization_args'],
             actions)
 
-        playthrough.validate() 
+        playthrough.validate()
         return playthrough
 
     def validate(self) -> None:
@@ -927,7 +927,7 @@ class Playthrough:
                 'Expected exp_version to be an int, received %s' % (
                     type(self.exp_version)))
 
-        if not isinstance(self.issue_type, str): 
+        if not isinstance(self.issue_type, str):
             raise utils.ValidationError(
                 'Expected issue_type to be a string, received %s' % type(
                     self.issue_type))
@@ -1009,7 +1009,7 @@ class ExplorationIssue:
         }
 
     @classmethod
-    def from_dict(cls, exp_issue_dict: ExplorationIssueDict) -> ExplorationIssue: 
+    def from_dict(cls, exp_issue_dict: ExplorationIssueDict) -> ExplorationIssue:
         """Checks whether the exploration issue dict has the correct keys and
         then returns a domain object instance.
 
@@ -1036,7 +1036,7 @@ class ExplorationIssue:
             exp_issue_dict['schema_version'],
             exp_issue_dict['is_valid'])
 
-        exp_issue.validate() 
+        exp_issue.validate()
         return exp_issue
 
     @classmethod
@@ -1084,7 +1084,7 @@ class ExplorationIssue:
             raise utils.ValidationError('Invalid issue type: %s' % (
                 self.issue_type))
 
-        customization_args_util.validate_customization_args_and_values( #type: ignore[no-untyped-call]
+        customization_args_util.validate_customization_args_and_values( # type: ignore[no-untyped-call]
             'issue', self.issue_type, self.issue_customization_args,
             issue.customization_arg_specs)
 
@@ -1185,7 +1185,7 @@ class LearnerAction:
                     type(self.schema_version)))
 
         try:
-            action = action_registry.Registry.get_action_by_type( #type: ignore[no-untyped-call]
+            action = action_registry.Registry.get_action_by_type( # type: ignore[no-untyped-call]
                 self.action_type)
         except KeyError:
             raise utils.ValidationError(
@@ -1441,7 +1441,7 @@ class AnswerOccurrence:
         self.answer = answer
         self.frequency = frequency
 
-    def to_raw_type(self) -> AnswerOccurrenceDict: 
+    def to_raw_type(self) -> AnswerOccurrenceDict:
         """Returns a Python dict representing the specific answer.
 
         Returns:
@@ -1772,7 +1772,7 @@ class LearnerAnswerDetails:
                 raise utils.ValidationError(
                     'For entity type exploration, the state reference '
                     'should be of the form \'exp_id:state_name\', but '
-                    'received %s' % (self.state_reference)) 
+                    'received %s' % (self.state_reference))
         elif self.entity_type == feconf.ENTITY_TYPE_QUESTION:
             if len(split_state_reference) != 1:
                 raise utils.ValidationError(
