@@ -72,6 +72,49 @@ describe('Story Validation Service', () => {
     expect(issues).toEqual([expectedErrorString]);
   });
 
+  it('should report a validation error when skill is not acquired in intial' +
+     ' chapter', () => {
+    let sampleStoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: ['skill_3'],
+          acquired_skill_ids: ['skill_2'],
+          destination_node_ids: ['node_2'],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename'
+        }, {
+          id: 'node_2',
+          title: 'Title 2',
+          description: 'Description 2',
+          prerequisite_skill_ids: ['skill_4'],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline 2',
+          exploration_id: 'exp_1',
+          outline_is_finalized: true,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename'
+        }
+      ],
+      next_node_id: 'node_3'
+    };
+    let sampleStoryContents = StoryContents.createFromBackendDict(
+      sampleStoryContentsBackendDict);
+    let issues = svs.validatePrerequisiteSkillsInStoryContents(
+      ['skill_3'], sampleStoryContents);
+    let expectedErrorString = (
+      'The skill with id skill_3 was specified as a prerequisite for ' +
+      'Chapter Title 1 but was not taught in any chapter before it.');
+    expect(issues).toEqual([expectedErrorString]);
+  });
+
   it('should report a validation error when the story graph has loops', () => {
     let sampleStoryContentsBackendDict = {
       initial_node_id: 'node_1',
