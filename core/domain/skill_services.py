@@ -377,6 +377,60 @@ def get_descriptions_of_skills(skill_ids):
     return skill_id_to_description_dict, deleted_skill_ids
 
 
+def get_descriptions_of_uncategorized_skills(
+    uncategorized_skills_id_and_topic_name):
+    """Returns a list of skill descriptions corresponding to the given skills.
+
+    Args:
+        uncategorized_skills_id_and_topic_name: list(dict). The list containing dicts
+        of skill_id and topic_name.
+
+    Returns:
+        dict. The skill descriptions of skills keyed by their
+        corresponding ids.
+    """
+    uncategorized_skill_ids = []
+    for skill_data in uncategorized_skills_id_and_topic_name:
+        uncategorized_skill_ids.append(skill_data.get('skill_id'))
+
+    skill_summaries = get_multi_skill_summaries(uncategorized_skill_ids)
+    skill_id_to_description_dict = {}
+
+    for skill_summary in skill_summaries:
+        if skill_summary is not None:
+            skill_id_to_description_dict[skill_summary.id] = (
+                skill_summary.description)
+
+    return skill_id_to_description_dict
+
+
+def get_descriptions_of_categorized_skills(
+    categorized_skill_ids_with_topic_and_subtopic_name):
+    """Returns a list of skill descriptions corresponding to the given skills.
+
+    Args:
+        categorized_skill_ids_with_topic_and_subtopic_name: list(dict). The list
+        containing dicts of skill_id, topic_name and subtopic_title.
+
+    Returns:
+        dict. The skill descriptions of skills keyed by their
+        corresponding ids.
+    """
+    categorized_skill_ids = []
+    for skill_data in categorized_skill_ids_with_topic_and_subtopic_name:
+        categorized_skill_ids.append(skill_data.get('skill_id'))
+
+    skill_summaries = get_multi_skill_summaries(categorized_skill_ids)
+    skill_id_to_description_dict = {}
+
+    for skill_summary in skill_summaries:
+        if skill_summary is not None:
+            skill_id_to_description_dict[skill_summary.id] = (
+                skill_summary.description)
+
+    return skill_id_to_description_dict
+
+
 def get_skill_summary_from_model(skill_summary_model):
     """Returns a domain object for an Oppia skill summary given a
     skill summary model.
