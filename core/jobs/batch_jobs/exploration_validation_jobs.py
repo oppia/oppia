@@ -17,7 +17,6 @@
 """Validation jobs for exploration models."""
 
 from __future__ import annotations
-from asyncio.windows_events import NULL
 
 from core.constants import constants
 from core.domain import exp_fetchers
@@ -45,20 +44,20 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
         """
         total_explorations = (
             self.pipeline
-            | 'Get all Explorations' >> ndb_io.GetModels(
+            | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExpSummaryModel.get_all(include_deleted=False))
             | 'Get exploration from model' >> beam.Map(
-                exp_fetchers.get_exploration_from_model)
+                exp_fetchers.get_exploration_summary_from_model)
         )
 
         published_explorations = (
             total_explorations
             | 'Get published explorations' >> beam.Filter(
-                lambda exp: not exp.first_published_msec == None
+                lambda exp: exp.first_published_msec is not None
             )
         )
 
-        exp_ids_with_category_not_in_contants = ( 
+        exp_ids_with_category_not_in_contants = (
             published_explorations
             | 'Combine exp id and category and published_info' >> beam.Map(
                 lambda exp: (exp.id, exp.category))
@@ -67,14 +66,8 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
         )
 
         report_number_of_exps_queried = (
-            total_explorations
-            | 'Report count of exp models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('EXPS'))
-        )
-
-        report_number_of_published_exps = (
             published_explorations
-            | 'Report count of exp models' >> (
+            | 'Report count of published exp models' >> (
                 job_result_transforms.CountObjectsToJobRunResult('EXPS'))
         )
 
@@ -96,7 +89,6 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
         return (
             (
                 report_number_of_exps_queried,
-                report_number_of_published_exps,
                 report_number_of_invalid_exps,
                 report_invalid_ids_and_their_category
             )
