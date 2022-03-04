@@ -43,7 +43,7 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
 
     @staticmethod
     def _process_exploration_states(
-        exp: datastore_services.Model) -> Iterable[Tuple[str, str]]:
+        exp: exp_models.ExplorationModel) -> Iterable[Tuple[str, str]]:
         """Filter explorations with a refresher_exploration_id .
 
         Args:
