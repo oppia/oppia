@@ -241,14 +241,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             ('@@', 'Invalid email address: @@'),
             ('abc', 'Invalid email address: abc'),
             ('', 'No user email specified.'),
-            (None, 'Expected email to be a string, received None'),
-            (
-                ['a', '@', 'b.com'],
-                re.escape(
-                    'Expected email to be a string, received '
-                    '[\'a\', \'@\', \'b.com\']'
-                )
-            )
+            (None, 'No user email specified.'),
         ]
         for email, error_msg in bad_email_addresses_with_expected_error_message:
             with self.assertRaisesRegex(utils.ValidationError, error_msg):
