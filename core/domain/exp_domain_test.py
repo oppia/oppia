@@ -2656,6 +2656,18 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected each id in viewer_ids to be string, received 2'):
             self.exp_summary.validate()
 
+    def test_validation_fails_with_duplicate_user_role(self):
+        self.exp_summary.owner_ids = ['1']
+        self.exp_summary.editor_ids = ['2', '3']
+        self.exp_summary.voice_artist_ids = ['4']
+        self.exp_summary.viewer_ids = ['2']
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'Users should not be assigned to multiple roles at once, '
+                'received users: 1, 2, 3, 4, 2')
+        ):
+            self.exp_summary.validate()
+
     def test_validation_fails_with_invalid_contributor_ids_type(self):
         self.exp_summary.contributor_ids = 0
         with self.assertRaisesRegex(
