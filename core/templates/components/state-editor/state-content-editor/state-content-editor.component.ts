@@ -42,8 +42,8 @@ interface HTMLSchema {
 export class StateContentEditorComponent implements OnInit {
   @Output() intialize: EventEmitter<void> = new EventEmitter();
   @Output() saveStateContent = new EventEmitter<SubtitledHtml>();
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
-    new EventEmitter<string[]>();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = (
+    new EventEmitter<string[]>());
 
   @Input() stateContentPlaceholder: string;
   @Input() stateContentSaveButtonPlaceholder: string;
@@ -135,17 +135,6 @@ export class StateContentEditorComponent implements OnInit {
   cancelEdit(): void {
     this.stateContentService.restoreFromMemento();
     this.contentEditorIsOpen = false;
-  }
-
-  getHtmlSchema(): HTMLSchema {
-    return this.HTML_SCHEMA;
-  }
-
-  updateHtml($event: string): void {
-    if ($event !== this.stateContentService.displayed._html) {
-      this.stateContentService.displayed._html = $event;
-      this.changeDetectorRef.detectChanges();
-    }
   }
 
   ngOnDestroy(): void {

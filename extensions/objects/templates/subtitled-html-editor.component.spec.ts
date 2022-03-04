@@ -95,10 +95,9 @@ describe('SubtitledHtmlEditorComponent', () => {
 
     component.updateValue('<p>new test</p>');
 
-    expect(component.value).toEqual({
-      _html: '<p>new test</p>',
-      _contentId: null
-    });
+    expect(component.value).toEqual(
+      new SubtitledHtml('<p>new test</p>', null)
+    );
     expect(component.valueChanged.emit).toHaveBeenCalledWith(mockValue);
     expect(detectChangesSpy).toHaveBeenCalled();
   });

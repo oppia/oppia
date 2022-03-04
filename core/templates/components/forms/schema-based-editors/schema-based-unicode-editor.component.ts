@@ -57,6 +57,7 @@ implements ControlValueAccessor, OnInit, Validator {
   @Input() uiConfig: {
     rows: string[]; placeholder: string; 'coding_mode': unknown;
   };
+
   @Input() validators: OppiaValidator[];
   @Input() labelForFocusTarget: string;
   @Output() inputBlur: EventEmitter<void> = new EventEmitter();

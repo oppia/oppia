@@ -40,21 +40,21 @@ require(
   'schema-based-bool-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-choices-editor.directive.ts');
+  'schema-based-choices-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-custom-editor.directive.ts');
+  'schema-based-custom-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-dict-editor.component.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-expression-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-float-editor.directive.ts');
+  'schema-based-float-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-html-editor.component.ts');
@@ -62,7 +62,7 @@ require(
   'components/forms/schema-based-editors/schema-based-int-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-list-editor.directive.ts');
+  'schema-based-list-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-unicode-editor.component.ts');

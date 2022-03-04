@@ -205,6 +205,12 @@ ControlValueAccessor, Validator {
   ngAfterViewInit(): void {
     const editorName = this.objType.replace(
       /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    if (editorName === (
+              'list-of-sets-of-translatable-html-content-ids'
+         ) && !this.initArgs
+    ) {
+      throw new Error('\nProvided initArgs: ' + this.initArgs);
+    }
     if (EDITORS[editorName]) {
       if (editorName === (
         'list-of-sets-of-translatable-html-content-ids'
