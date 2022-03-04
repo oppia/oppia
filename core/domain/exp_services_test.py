@@ -6577,8 +6577,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         exp_user_data = user_models.ExplorationUserDataModel.create(
             self.USER_ID, self.EXP_ID1)
         exp_user_data.draft_change_list = self.draft_change_list_dict
-        exp_user_data.drafdraft_change_list_exp_versiont_change_list_last_updated = (  # pylint: disable=line-too-long
-            self.DATETIME)
+        exp_user_data.draft_change_list_last_updated = self.DATETIME
         exp_user_data.draft_change_list_exp_version = 2
         exp_user_data.draft_change_list_id = 2
         exp_user_data.update_timestamps()
