@@ -167,6 +167,10 @@ angular.module('oppia').directive('stateGraphVisualization', [
             }, 10);
           };
 
+          $scope.tempFunc = function(){
+            let a=5;
+          }
+
           var centerGraph = function() {
             if ($scope.graphData() && $scope.centerAtCurrentState) {
               if ($scope.allowPanning) {
@@ -182,6 +186,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
                     dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
                     nodeData[$scope.currentStateId()].width / 2);
                 } catch (error) {
+                  $scope.tempFunc();
                   error.message +=
                   `\ncurrentStateId(): ${ $scope.currentStateId() }` +
                   `\nnodeData: ${ nodeData }`;
@@ -301,6 +306,10 @@ angular.module('oppia').directive('stateGraphVisualization', [
             var getNodeFillOpacity = function(nodeId) {
               return $scope.opacityMap ? $scope.opacityMap[nodeId] : 0.5;
             };
+
+            $scope.getCenterGraph = function() {
+              centerGraph();
+            }
 
             $scope.getNodeTitle = function(node) {
               var warning = '';

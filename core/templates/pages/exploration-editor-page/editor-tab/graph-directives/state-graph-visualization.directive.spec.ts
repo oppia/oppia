@@ -69,6 +69,7 @@ describe('State Graph Visualization directive', function() {
   var $flushPendingTasks = null;
   var $rootScope = null;
   var $scope = null;
+  var $timeout = null;
   var explorationWarningsService = null;
   var explorationStatesService = null;
   var routerService = null;
@@ -165,6 +166,7 @@ describe('State Graph Visualization directive', function() {
     $flushPendingTasks = $injector.get('$flushPendingTasks');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
+    $timeout = $injector.get('$timeout');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
     explorationStatesService = $injector.get('ExplorationStatesService');
     routerService = $injector.get('RouterService');
@@ -325,7 +327,12 @@ describe('State Graph Visualization directive', function() {
         $scope.currentStateId = () => undefined;
         $scope.centerAtCurrentState = true;
         $scope.allowPanning = false;
-        expect(() => $scope.drawGraph()).toThrowError(TypeError);
+        spyOn($element, 'height').and.returnValue(10);
+        spyOn($element, 'width').and.returnValue(10);
+        var spyTemp = spyOn($scope, 'tempFunc').and.callThrough();
+        $scope.getCenterGraph();
+        $flushPendingTasks();
+        expect(spyTemp).toHaveBeenCalled();
       });
     });
 
