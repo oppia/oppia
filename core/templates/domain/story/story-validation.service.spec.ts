@@ -25,6 +25,10 @@ describe('Story Validation Service', () => {
   let svs: StoryValidationService;
   let storyContentsObjectFactory: StoryContentsObjectFactory;
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [StoryContentsObjectFactory]
+    });
+
     svs = TestBed.inject(StoryValidationService);
     storyContentsObjectFactory = TestBed.inject(StoryContentsObjectFactory);
   });
