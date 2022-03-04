@@ -298,8 +298,8 @@ class Collection:
         schema_version: int,
         nodes: List[CollectionNode],
         version: int,
-        created_on: Optional[datetime.datetime]=None,
-        last_updated: Optional[datetime.datetime]=None
+        created_on: Optional[datetime.datetime] = None,
+        last_updated: Optional[datetime.datetime] = None
     ) -> None:
         """Constructs a new collection given all the information necessary to
         represent a collection.
@@ -396,8 +396,8 @@ class Collection:
         cls,
         collection_dict: CollectionDict,
         collection_version: int = 0,
-        collection_created_on: Optional[datetime.datetime]=None,
-        collection_last_updated: Optional[datetime.datetime]=None
+        collection_created_on: Optional[datetime.datetime] = None,
+        collection_last_updated: Optional[datetime.datetime] = None
     ) -> Collection:
         """Return a Collection domain object from a dict.
 

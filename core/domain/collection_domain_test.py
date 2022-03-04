@@ -335,10 +335,10 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
         self.collection.nodes = [
             collection_domain.CollectionNode.from_dict({
-                'exploration_id': '0',
+                'exploration_id': '0'
             }),
             collection_domain.CollectionNode.from_dict({
-                'exploration_id': '0',
+                'exploration_id': '0'
             })
         ]
 
@@ -753,7 +753,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         # Argument schema_version of collection expects int value but here
-        # we are passing None which causes MyPy to throw error. thus we
+        # we are passing None which causes MyPy to throw an error. Thus we
         # add an ignore here.
         collection = collection_domain.Collection(
             self.COLLECTION_ID, 'title', 'category', 'objective', 'en', [],
