@@ -212,6 +212,11 @@ ControlValueAccessor, Validator {
       throw new Error('\nProvided initArgs: ' + this.initArgs);
     }
     if (EDITORS[editorName]) {
+      if (editorName === (
+        'list-of-sets-of-translatable-html-content-ids'
+      ) && !this.initArgs) {
+        throw new Error('\nProvided initArgs: ' + this.initArgs);
+      }
       const componentFactory = (
         this.componentFactoryResolver.resolveComponentFactory(
           EDITORS[editorName])

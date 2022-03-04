@@ -394,6 +394,7 @@ import { ExplorationCorrectnessFeedbackService } from 'pages/exploration-editor-
 import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
 import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
 import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
+import { NumberConversionService } from './number-conversion.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
 import { ContributionAndReviewService } from 'pages/contributor-dashboard-page/services/contribution-and-review.service';
@@ -823,5 +824,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['UndoRedoService', UndoRedoService],
   ['QuestionValidationService', QuestionValidationService],
   ['CollectionEditorStateService', CollectionEditorStateService],
-  ['DeleteAccountBackendApiService', DeleteAccountBackendApiService]
+  ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
+  ['NumberConversionService', NumberConversionService]
 ];
