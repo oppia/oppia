@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validation Jobs for exploration"""
+"""Validation jobs for exploration models."""
 
 from __future__ import annotations
 from asyncio.windows_events import NULL
