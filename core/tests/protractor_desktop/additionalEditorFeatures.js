@@ -246,7 +246,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  it(
+  fit(
     'should handle multiple rules in an answer group and also disallow ' +
       'editing of a read-only exploration', async function() {
       await users.createUser(
