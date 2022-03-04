@@ -1945,7 +1945,7 @@ def create_or_update_draft(
     exp_user_data.update_timestamps()
     exp_user_data.put()
 
-# TODO(#15075): Refactor this function.
+
 def get_exp_with_draft_applied(exp_id, user_id):
     """If a draft exists for the given user and exploration,
     apply it to the exploration.
@@ -1958,6 +1958,8 @@ def get_exp_with_draft_applied(exp_id, user_id):
         Exploration or None. Returns the exploration domain object with draft
         applied, or None if draft can not be applied.
     """
+    # TODO(#15075): Refactor this function.
+
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
     draft_change_list = None
