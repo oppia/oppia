@@ -573,16 +573,16 @@ def get_exploration_opportunity_summaries_by_ids(ids):
 
 
 def get_exploration_opportunity_summaries_by_topic_id(topic_id):
-    """Returns a list of ExplorationOpportunitySummary
-    with a given topic id.
+    """Returns a list of all exploration opportunity summaries
+    with the given topic ID.
 
     Args:
         topic_id: str. The topic for which opportunity summaries
             are fetched.
 
     Returns:
-        list(ExplorationOpportunitySummary). A list of
-        ExplorationOpportunitySummary domain objects.
+        list(ExplorationOpportunitySummary). A list of all
+        exploration opportunity summaries with the given topic ID.
     """
     opportunity_summaries = []
     exp_opportunity_summary_models = (

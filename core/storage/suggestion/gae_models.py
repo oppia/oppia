@@ -493,11 +493,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
-    def get_in_review_translation_suggestions_with_topic_name_and_exp_ids(
+    def get_in_review_translation_suggestions_with_exp_ids(
             cls, user_id: str, language_codes: List[str],
-            exp_ids: List[str], topic_name: str | None
+            exp_ids: List[str]
     ) -> Sequence[GeneralSuggestionModel]:
-        """Gets all translation suggestions which are in review.
+        """Gets all translation suggestions which are in review
+        and belong to the passed exp_ids.
 
         Args:
             user_id: str. The id of the user trying to make this query.
@@ -505,12 +506,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 authored by the user will be excluded.
             language_codes: list(str). The list of language codes.
             exp_ids: list(str). Exploration IDs matching the target ID of the
-                translation suggestions. If the list is empty and a valid
-                topic name is specified, we return an empty list.
-                If the list is empty, and topic name is not specified either,
-                we return all translation suggestions.
-            topic_name: str or None. The name of the topic for which suggestions
-                are being fetched. If topic name is not specified, we fetch all
                 translation suggestions.
 
         Returns:
@@ -518,21 +513,13 @@ class GeneralSuggestionModel(base_models.BaseModel):
             type, which are in review, not created by the given user and
             specific to the exploration IDs passed.
         """
-
-        if len(exp_ids) > 0:
-            return cls.get_all().filter(datastore_services.all_of(
-                cls.status == STATUS_IN_REVIEW,
-                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                cls.author_id != user_id,
-                cls.language_code.IN(language_codes),
-                cls.target_id.IN(exp_ids)
-            )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
-        else:
-            if topic_name is None:
-                return cls.get_in_review_translation_suggestions(
-                    user_id, language_codes)
-            else:
-                return []
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.author_id != user_id,
+            cls.language_code.IN(language_codes),
+            cls.target_id.IN(exp_ids)
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def get_in_review_translation_suggestions_by_exp_ids(
