@@ -19,18 +19,12 @@ import { TestBed } from '@angular/core/testing';
 
 import { StoryValidationService } from
   'domain/story/story-validation.service';
-import { StoryContentsObjectFactory } from 'domain/story/StoryContentsObjectFactory';
+import { StoryContents } from 'domain/story/story-contents-object.model';
 
 describe('Story Validation Service', () => {
   let svs: StoryValidationService;
-  let storyContentsObjectFactory: StoryContentsObjectFactory;
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [StoryContentsObjectFactory]
-    });
-
     svs = TestBed.inject(StoryValidationService);
-    storyContentsObjectFactory = TestBed.inject(StoryContentsObjectFactory);
   });
 
   it('should report a validation error when skill is not aquired in previous' +
@@ -66,7 +60,7 @@ describe('Story Validation Service', () => {
       ],
       next_node_id: 'node_3'
     };
-    let sampleStoryContents = storyContentsObjectFactory.createFromBackendDict(
+    let sampleStoryContents = StoryContents.createFromBackendDict(
       sampleStoryContentsBackendDict);
     let issues = svs.validatePrerequisiteSkillsInStoryContents(
       ['skill_3'], sampleStoryContents);
@@ -109,7 +103,7 @@ describe('Story Validation Service', () => {
       ],
       next_node_id: 'node_3'
     };
-    let sampleStoryContents = storyContentsObjectFactory.createFromBackendDict(
+    let sampleStoryContents = StoryContents.createFromBackendDict(
       sampleStoryContentsBackendDict);
     let issues = svs.validatePrerequisiteSkillsInStoryContents(
       ['skill_3'], sampleStoryContents);
@@ -163,7 +157,7 @@ describe('Story Validation Service', () => {
       ],
       next_node_id: 'node_4'
     };
-    let sampleStoryContents = storyContentsObjectFactory.createFromBackendDict(
+    let sampleStoryContents = StoryContents.createFromBackendDict(
       sampleStoryContentsBackendDict);
     let issues = svs.validatePrerequisiteSkillsInStoryContents(
       [], sampleStoryContents);
@@ -191,7 +185,7 @@ describe('Story Validation Service', () => {
       ],
       next_node_id: 'node_2'
     };
-    let sampleStoryContents = storyContentsObjectFactory.createFromBackendDict(
+    let sampleStoryContents = StoryContents.createFromBackendDict(
       sampleStoryContentsBackendDict);
     sampleStoryContents.deleteNode('node_1');
     expect(() => svs.validatePrerequisiteSkillsInStoryContents(
