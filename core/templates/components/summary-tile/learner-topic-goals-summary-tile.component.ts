@@ -116,7 +116,9 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
     this.thumbnailBgColor = this.storyNodeToDisplay.getThumbnailBgColor();
     this.storyName = this.storySummaryToDisplay.getTitle();
     let totalStoryNodesCount = this.storySummaryToDisplay.getAllNodes().length;
-    let completedNodesCount = this.storySummaryToDisplay.getCompletedNodeTitles().length;
+    let completedNodesCount = (
+      this.storySummaryToDisplay.getCompletedNodeTitles().length
+    );
     this.storyProgress = Math.floor(
       (completedNodesCount / totalStoryNodesCount) * 100);
   }
