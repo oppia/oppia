@@ -45,8 +45,10 @@ export class OpportunitiesListComponent {
   @Input() opportunityHeadingTruncationLength: number;
   @Input() opportunityType: string;
 
+  private static readonly MAX_PAGE_NUMBER = 1000;
+
   loadingOpportunityData: boolean = true;
-  lastPageNumber: number = 1000;
+  lastPageNumber: number = OpportunitiesListComponent.MAX_PAGE_NUMBER;
   opportunities: ExplorationOpportunity[] = [];
   visibleOpportunities = [];
   directiveSubscriptions = new Subscription();
@@ -99,7 +101,7 @@ export class OpportunitiesListComponent {
   ngOnInit(): void {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
-    this.lastPageNumber = 1000;
+    this.lastPageNumber = OpportunitiesListComponent.MAX_PAGE_NUMBER;
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.

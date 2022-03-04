@@ -596,15 +596,15 @@ def get_reviewable_suggestions(user_id, suggestion_type, limit, offset):
         user_id: str. The ID of the user.
         suggestion_type: str. The type of the suggestion.
         limit: int. The maximum number of results to return.
-        offset: int. The number of results to skip.
+        offset: int. The number of results to skip from the beginning of all
+            results matching the query.
 
     Returns:
         Tuple of (results, next_offset). Where:
-            results: list(SuggestionModel). A list of suggestions that are
-                of the supplied type which the supplied user is permitted to
-                review.
-            next_offset: int. Number of query results to skip on a subsequent
-                fetch call.
+            results: list(Suggestion). A list of suggestions that are of the
+                supplied type which the supplied user is permitted to review.
+            next_offset: int. The input offset + the number of results returned
+                by the current query.
     """
     all_suggestions = []
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -956,14 +956,15 @@ def get_submitted_suggestions_by_offset(
         user_id: str. The ID of the user.
         suggestion_type: str. The type of suggestion.
         limit: int. The maximum number of results to return.
-        offset: int. The number of results to skip.
+        offset: int. The number of results to skip from the beginning
+            of all results matching the query.
 
     Returns:
         Tuple of (results, next_offset). Where:
-            results: list(SuggestionModel). A list of suggestions of the
-                supplied type which the supplied user has submitted.
-            next_offset: int. Number of query results to skip on a subsequent
-                fetch call.
+            results: list(Suggestion). A list of suggestions of the supplied
+                type which the supplied user has submitted.
+            next_offset: int. The input offset + the number of results returned
+                by the current query.
     """
     submitted_suggestion_models, next_offset = (
         suggestion_models.GeneralSuggestionModel

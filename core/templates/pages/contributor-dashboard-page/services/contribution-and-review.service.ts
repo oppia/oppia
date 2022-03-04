@@ -35,7 +35,8 @@ export interface OpportunityDict {
 class SuggestionFetcher {
   // Type of suggestion to fetch.
   type: string;
-  // The current offset, i.e. the number of items to skip in the next fetch.
+  // The current offset, i.e. the number of items to skip (from the beginning of
+  // all matching results) in the next fetch.
   offset: number;
   // Cache of suggestions.
   suggestionIdToDetails: SuggestionDetailsDict;
@@ -54,8 +55,11 @@ interface SuggestionDetailsDict {
   };
 }
 
+// Represents a client-facing response to a fetch suggestion query.
 interface FetchSuggestionsResponse {
+  // A dict mapping suggestion ID to suggestion metadata.
   suggestionIdToDetails: SuggestionDetailsDict;
+  // Whether there are more results to return after the last query.
   more: boolean;
 }
 
@@ -80,6 +84,16 @@ export class ContributionAndReviewService {
   private reviewableTranslationFetcher: SuggestionFetcher = (
     new SuggestionFetcher('REVIEWABLE_TRANSLATION_SUGGESTIONS'));
 
+  /**
+   * Fetches suggestions from the backend.
+   *
+   * @param {SuggestionFetcher} fetcher - The fetcher for a particular
+   *   suggestion type.
+   * @param {boolean} shouldResetOffset - Whether to reset the input fetcher's
+   *   offset to 0 and clear the fetcher's cache. Set this to true to fetch
+   *   results starting from the beginning of all results matching the query.
+   * @returns {Promise<FetchSuggestionsResponse>}
+   */
   private async fetchSuggestionsAsync(
       fetcher: SuggestionFetcher, shouldResetOffset: boolean
   ): Promise<FetchSuggestionsResponse> {
@@ -96,7 +110,6 @@ export class ContributionAndReviewService {
         this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
           fetcher.type,
           // Fetch two pages at a time to compute if we have more results.
-          // TODO(#14826): Replace with AppConstants.OPPORTUNITIES_PAGE_SIZE.
           AppConstants.OPPORTUNITIES_PAGE_SIZE * 2,
           fetcher.offset
         ).then((responseBody) => {

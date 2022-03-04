@@ -505,7 +505,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Args:
             limit: int. Maximum number of entities to be returned.
-            offset: int. Number of query results to skip.
+            offset: int. Number of results to skip from the beginning of all
+                results matching the query.
             user_id: str. The id of the user trying to make this query. As a
                 user cannot review their own suggestions, suggestions authored
                 by the user will be excluded.
@@ -517,8 +518,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 results: list(SuggestionModel). A list of suggestions that are
                     in-review, not authored by the supplied user, and that match
                     one of the supplied language codes.
-                next_offset: int. Number of query results to skip on a
-                    subsequent fetch call.
+                next_offset: int. The input offset + the number of results
+                    returned by the current query.
         """
         suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
@@ -591,7 +592,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Args:
             limit: int. Maximum number of entities to be returned.
-            offset: int. Number of query results to skip.
+            offset: int. Number of of results to skip from the beginning of all
+                results matching the query.
             user_id: str. The id of the user trying to make this query. As a
                 user cannot review their own suggestions, suggestions authored
                 by the user will be excluded.
@@ -601,8 +603,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 results: list(SuggestionModel). A list of suggestions that are
                     in-review, not authored by the supplied user, and that match
                     one of the supplied language codes.
-                next_offset: int. Number of query results to skip on a
-                    subsequent fetch call.
+                next_offset: int. The input offset + the number of results
+                    returned by the current query.
         """
         suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
@@ -693,7 +695,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Args:
             limit: int. Maximum number of entities to be returned.
-            offset: int. Number of query results to skip.
+            offset: int. The number of results to skip from the beginning of all
+                results matching the query.
             suggestion_type: str. The type of suggestion to query for.
             user_id: str. The id of the user trying to make this query.
 
@@ -701,8 +704,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             Tuple of (results, next_offset). Where:
                 results: list(SuggestionModel). A list of suggestions that are
                     of the supplied type which the supplied user has created.
-                next_offset: int. Number of query results to skip on a
-                    subsequent fetch call.
+                next_offset: int. The input offset + the number of results
+                    returned by the current query.
         """
         suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.suggestion_type == suggestion_type,
