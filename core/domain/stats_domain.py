@@ -77,7 +77,7 @@ class SubmittedAnswerDict(TypedDict, total=False):
     time_spent_in_sec: float
     rule_spec_str: Optional[str]
     answer_str: Optional[str]
-        
+       
 
 class ExplorationIssueDict(TypedDict):
     """Dictionary representing the ExplorationIssue object."""
@@ -128,7 +128,8 @@ class ExplorationStatsDict(TypedDict):
 
 
 class ExplorationStatsFrontendDict(TypedDict):
-    """Dictionary representing the ExplorationStats object for use in frontend."""
+    """Dictionary representing the ExplorationStats object 
+    for use in frontend."""
     exp_id: str
     exp_version: int
     num_starts: int
@@ -162,8 +163,9 @@ class ExplorationStats:
     """Domain object representing analytics data for an exploration."""
 
     def __init__(
-            self, exp_id: str, exp_version: int, num_starts_v1: int, num_starts_v2: int,
-            num_actual_starts_v1: int, num_actual_starts_v2: int, num_completions_v1: int,
+            self, exp_id: str, exp_version: int, num_starts_v1: int, 
+            num_starts_v2: int, num_actual_starts_v1: int, 
+            num_actual_starts_v2: int, num_completions_v1: int,
             num_completions_v2: int, state_stats_mapping: Dict[str, StateStats]) -> None:
         """Constructs an ExplorationStats domain object.
 
@@ -222,7 +224,7 @@ class ExplorationStats:
         """
         return self.num_completions_v1 + self.num_completions_v2
 
-    def to_dict(self) -> ExplorationStatsDict: 
+    def to_dict(self) -> ExplorationStatsDict:
         """Returns a dict representation of the domain object."""
         state_stats_mapping_dict = {}
         for state_name in self.state_stats_mapping:
@@ -262,7 +264,8 @@ class ExplorationStats:
         return exploration_stats_dict
 
     @classmethod
-    def create_default(cls, exp_id: str, exp_version: int, state_stats_mapping: Dict[str, StateStats]) -> ExplorationStats:
+    def create_default(cls, exp_id: str, exp_version: int, 
+    state_stats_mapping: Dict[str, StateStats]) -> ExplorationStats:
         """Creates a ExplorationStats domain object and sets all properties to
         0.
 
