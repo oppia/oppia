@@ -29,7 +29,7 @@ from core.domain import stats_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Union, Dict
+from typing import Any, Dict, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
