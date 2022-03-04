@@ -126,7 +126,7 @@ def call_extend_index_yaml() -> None:
     extend_index_yaml.main()
 
 
-def main(args: Optional[Sequence[str]]=None) -> None:
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
 

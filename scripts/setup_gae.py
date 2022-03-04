@@ -35,7 +35,7 @@ Python execution environment setup for scripts that require GAE.
 GAE_DOWNLOAD_ZIP_PATH = os.path.join('.', 'gae-download.zip')
 
 
-def main(args: Optional[Sequence[str]]=None) -> None:
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the script to setup GAE."""
     unused_parsed_args = _PARSER.parse_args(args=args)
 
