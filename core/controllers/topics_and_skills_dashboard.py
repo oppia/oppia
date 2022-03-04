@@ -193,24 +193,36 @@ class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
         categorized_skills_dict = {}
         topics = topic_fetchers.get_all_topics()
 
-        # For getting uncategorized skills.
-        uncategorized_skills_id_and_topic_name = []
+        uncategorized_skills_ids_and_topic_names = []
+        uncategorized_skill_ids = []
+        categorized_skill_ids_with_topic_and_subtopic_name = []
+        categorized_skill_ids = []
+
         for topic in topics:
+            subtopics = topic.subtopics
             categorized_skills_dict[topic.name] = {}
             categorized_skills_dict[topic.name]['uncategorized'] = []
+
             for skill_id in topic.uncategorized_skill_ids:
-                uncategorized_skills_id_and_topic_name.append({
+                uncategorized_skill_ids.append(skill_id)
+                uncategorized_skills_ids_and_topic_names.append({
                     'skill_id': skill_id,
                     'topic_name': topic.name
                 })
+            for subtopic in subtopics:
+                categorized_skills_dict[topic.name][subtopic.title] = []
+                for skill_id in subtopic.skill_ids:
+                    categorized_skill_ids.append(skill_id)
+                    categorized_skill_ids_with_topic_and_subtopic_name.append({
+                        'skill_id': skill_id,
+                        'topic_name': topic.name,
+                        'subtopic_title': subtopic.title
+                    })
 
-        uncategorized_skill_ids = [skill_data.get('skill_id')
-            for skill_data in uncategorized_skills_id_and_topic_name]
         uncategorized_skills_descriptions = (
             skill_services.get_descriptions_of_skills(
                 uncategorized_skill_ids)[0])
-
-        for skill_data in uncategorized_skills_id_and_topic_name:
+        for skill_data in uncategorized_skills_ids_and_topic_names:
             topic_name = skill_data.get('topic_name')
             skill_dict = {
                 'skill_id': skill_data.get('skill_id'),
@@ -224,25 +236,9 @@ class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
                 skill_dict
             )
 
-        # For getting categorized skills.
-        categorized_skill_ids_with_topic_and_subtopic_name = []
-        for topic in topics:
-            subtopics = topic.subtopics
-            for subtopic in subtopics:
-                categorized_skills_dict[topic.name][subtopic.title] = []
-                for skill_id in subtopic.skill_ids:
-                    categorized_skill_ids_with_topic_and_subtopic_name.append({
-                        'skill_id': skill_id,
-                        'topic_name': topic.name,
-                        'subtopic_title': subtopic.title
-                    })
-
-        categorized_skill_ids = [skill_data.get('skill_id') for skill_data in
-            categorized_skill_ids_with_topic_and_subtopic_name]
         categorized_skill_descriptions = (
             skill_services.get_descriptions_of_skills(
                 categorized_skill_ids)[0])
-
         for skill_data in categorized_skill_ids_with_topic_and_subtopic_name:
             topic_name = skill_data.get('topic_name')
             subtopic_title = skill_data.get('subtopic_title')
@@ -258,7 +254,6 @@ class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
                 skill_dict
             )
 
-        # For getting untriaged skill summaries.
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
