@@ -153,6 +153,7 @@ ControlValueAccessor, Validator {
   get value(): unknown {
     return this._value;
   }
+
   @Input() set value(val: unknown) {
     this._value = val;
     if (this.ref) {
@@ -161,6 +162,7 @@ ControlValueAccessor, Validator {
       this.valueChange.emit(this._value);
     }
   }
+
   @Output() valueChange = new EventEmitter();
   ref: ComponentRef<ObjectEditor>;
   componentSubscriptions = new Subscription();
@@ -193,6 +195,7 @@ ControlValueAccessor, Validator {
   registerOnChange(fn: (_: unknown) => void): void {
     this.onChange = fn;
   }
+
   constructor(
     private loggerService: LoggerService,
     private componentFactoryResolver: ComponentFactoryResolver,
@@ -202,7 +205,18 @@ ControlValueAccessor, Validator {
   ngAfterViewInit(): void {
     const editorName = this.objType.replace(
       /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    if (editorName === (
+              'list-of-sets-of-translatable-html-content-ids'
+         ) && !this.initArgs
+    ) {
+      throw new Error('\nProvided initArgs: ' + this.initArgs);
+    }
     if (EDITORS[editorName]) {
+      if (editorName === (
+        'list-of-sets-of-translatable-html-content-ids'
+      ) && !this.initArgs) {
+        throw new Error('\nProvided initArgs: ' + this.initArgs);
+      }
       const componentFactory = (
         this.componentFactoryResolver.resolveComponentFactory(
           EDITORS[editorName])

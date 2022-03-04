@@ -87,9 +87,10 @@ describe('Schema Based List Editor Component', () => {
   it('should overwrite local value', () => {
     component.localValue = ['item1', 'item2'];
 
-    component.writeValue(['item1']);
+    let value = ['item1'];
+    component.writeValue(value);
 
-    expect(component.localValue).toEqual(['item1']);
+    expect(component.localValue).toEqual(value);
   });
 
   it('should show and hide add item button', () => {
@@ -113,7 +114,8 @@ describe('Schema Based List Editor Component', () => {
 
     component.lastElementOnBlur();
 
-    expect(component.localValue).toEqual(['item1']);
+    let value = ['item1'];
+    expect(component.localValue).toEqual(value);
   });
 
   it('should add element to the item list', () => {
@@ -122,7 +124,8 @@ describe('Schema Based List Editor Component', () => {
 
     component.addElement();
 
-    expect(component.localValue).toEqual(['item1', 'default']);
+    let value = ['item1', 'default'];
+    expect(component.localValue).toEqual(value);
   });
 
   it('should check if the item list has duplicate values or not', () => {
@@ -178,7 +181,8 @@ describe('Schema Based List Editor Component', () => {
 
     component.ngOnInit();
 
-    expect(component.localValue).toEqual(['item1', 'default', 'default']);
+    let value = ['item1', 'default', 'default'];
+    expect(component.localValue).toEqual(value);
   });
 
   it('should show dublicate warning if list is unique', () => {
@@ -210,7 +214,8 @@ describe('Schema Based List Editor Component', () => {
 
     component.showAddItemButton();
 
-    expect(component.localValue).toEqual(['item']);
+    let value = ['item'];
+    expect(component.localValue).toEqual(value);
   });
 
   it('should add element on child form submission when form submission' +
@@ -233,7 +238,8 @@ describe('Schema Based List Editor Component', () => {
 
     onChildFormSubmitEmitter.emit();
 
-    expect(component.localValue).toEqual(['item', 'default']);
+    let value = ['item', 'default'];
+    expect(component.localValue).toEqual(value);
   });
 
   it('should remove focus from element when form submission' +
@@ -273,7 +279,8 @@ describe('Schema Based List Editor Component', () => {
 
     component.setValue('item4', 1);
 
-    expect(component.localValue).toEqual(['item1', 'item4', 'item3']);
+    let value = ['item1', 'item4', 'item3'];
+    expect(component.localValue).toEqual(value);
   });
 
   it('should not change values when html is not updated', () => {
@@ -281,6 +288,7 @@ describe('Schema Based List Editor Component', () => {
 
     component.setValue(null, 2);
 
-    expect(component.localValue).toEqual(['item1', 'item2', 'item3']);
+    let value = ['item1', 'item2', 'item3'];
+    expect(component.localValue).toEqual(value);
   });
 });
