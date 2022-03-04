@@ -38,6 +38,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   incompleteStoryNodes: StoryNode[];
   storySummaryToDisplay: StorySummary;
   storyName: string;
+  storyProgress: number;
   isStoryChapterDisplayed = false;
   storyNodeToDisplay: StoryNode;
   thumbnailUrl: string;
@@ -46,7 +47,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   storyNodeTitle: string;
   starImageUrl: string;
   cardIsHovered = false;
-  openInNewWindow = true;
+  openInNewWindow = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -114,6 +115,10 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
     this.storyNodeTitle = this.storyNodeToDisplay.getTitle();
     this.thumbnailBgColor = this.storyNodeToDisplay.getThumbnailBgColor();
     this.storyName = this.storySummaryToDisplay.getTitle();
+    let totalStoryNodesCount = this.storySummaryToDisplay.getAllNodes().length;
+    let completedNodesCount = this.storySummaryToDisplay.getCompletedNodeTitles().length;
+    this.storyProgress = Math.floor(
+      (completedNodesCount / totalStoryNodesCount) * 100);
   }
 
   isCardHovered(): string {

@@ -4,6 +4,12 @@
       <div class="story-card">
         <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
           <img class="oppia-thumbnail-image" [src]="thumbnailUrl" [attr.style]="isCardHovered()">
+          <div class="oppia-story-completion">
+            <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
+            <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
+              {{storyProgress}}% Complete
+            </p>
+          </div>
         </div>
         <div class="oppia-summary-section">
           <span class="oppia-story-title protractor-test-story-name-in-learner-story-summary-tile">
