@@ -146,8 +146,9 @@ describe('Contributor dashboard page', function() {
       await explorationEditorMainTab.getResponseEditor('default')
     ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
+    // Error.
     await explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'correct',
+      correctAnswer: 'c',
       explanation: 'It is correct'
     });
     await skillEditorPage.saveQuestion();
@@ -208,8 +209,9 @@ describe('Contributor dashboard page', function() {
       await explorationEditorMainTab.getResponseEditor('default')
     ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
+    // Error.
     await explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'correct',
+      correctAnswer: 'c',
       explanation: 'It is correct'
     });
     await skillEditorPage.saveQuestion();

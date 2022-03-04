@@ -91,8 +91,9 @@ describe('Statistics tab', function() {
       'default');
     await responseEditor.setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('The number 2 in words.');
+    // Error.
     await explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'Two',
+      correctAnswer: 'T',
       explanation: 'The English equivalent of 2'
     });
     await explorationEditorMainTab.moveToState('Three');
