@@ -59,7 +59,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
 
         exp_ids_with_category_not_in_contants = (
             published_explorations
-            | 'Combine exp id and category and published_info' >> beam.Map(
+            | 'Combine exp id and category' >> beam.Map(
                 lambda exp: (exp.id, exp.category))
             | 'Filter exploraton with category not in constants.ts' >>
                 beam.Filter(lambda exp: not exp[1] in constants.ALL_CATEGORIES)
