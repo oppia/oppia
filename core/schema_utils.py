@@ -112,7 +112,7 @@ def normalize_against_schema(
         *. The normalized object.
 
     Raises:
-        AssertionError. The object fails to validate against the schema.
+        Exception. The object fails to validate against the schema.
     """
     normalized_obj: Any = None
 
@@ -423,6 +423,9 @@ class _Validators:
         Returns:
             function. The validator method corresponding to the specified
             validator_id.
+
+        Raises:
+            Exception. Given validator method is invalid.
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
