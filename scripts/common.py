@@ -280,7 +280,17 @@ def open_new_tab_in_browser_if_possible(url):
         print('Please open the following link in browser: %s' % url)
         return
     browser_cmds = ['brave', 'chromium-browser', 'google-chrome', 'firefox']
-    for cmd in browser_cmds:
+    print(
+        'Please choose your default browser from the list using a number. '
+        'It will be given a preference over other available options.')
+    for index, browser in enumerate(browser_cmds):
+        print('%s). %s' % (index + 1, browser))
+
+    default_index = int(input().strip()) - 1
+    ordered_browser_cmds = (
+        [browser_cmds[default_index]] + browser_cmds[:default_index] +
+        browser_cmds[default_index + 1:])
+    for cmd in ordered_browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
             subprocess.check_call([cmd, url])
             return
