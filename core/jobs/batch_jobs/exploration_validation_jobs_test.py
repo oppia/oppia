@@ -109,7 +109,7 @@ class GetExpWithInvalidCategoryJobTests(
             correctness_feedback_enabled=False,
             states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_3}
         )
-    
+
         # This is an valid model with empty category.
         self.exp_4 = self.create_model(
             exp_models.ExplorationModel,
@@ -150,7 +150,7 @@ class GetExpWithInvalidCategoryJobTests(
         ])
 
     def test_run_with_mixed_models(self) -> None:
-        self.put_multi([self.exp_1, self.exp_2, self.exp_3, self.exp_4 ])
+        self.put_multi([self.exp_1, self.exp_2, self.exp_3, self.exp_4])
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 4'),
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
