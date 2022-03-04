@@ -197,6 +197,16 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             Exception, 'Must be implemented in subclasses.'):
             translatable_object.get_translatable_contents_collection()
 
+    def test_registering_duplicate_content_id_raises_exception(self) -> None:
+        translatable_object = DummyTranslatableObject(
+            'My name is jack.', 'My name is jhon.')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Content_id content_id_2 already exists in the '
+            'TranslatableContentsCollection.'):
+            translatable_object.get_translatable_contents_collection()
+
     def test_get_all_contents_which_need_translations_method(self) -> None:
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(

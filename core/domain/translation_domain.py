@@ -111,7 +111,7 @@ class TranslatedContent:
     Args:
         content_value: ContentValueType. Represents translation of translatable
             content.
-        needs_update: bool. Whether a translation needs an update or not.
+        needs_update: bool. Whether the translation needs an update or not.
     """
 
     def __init__(
@@ -180,9 +180,15 @@ class TranslatableContentsCollection:
             content_id: str. The id of the corresponding translatable content.
             content_value: ContentValueType. Value of the content which
                 is translatable.
+
+        Raises:
+            Exception. If the content_id_to_translatable_content dict already
+                contains the content_id.
         """
         if content_id in self.content_id_to_translatable_content:
-            raise Exception('Already added as a translatable content.')
+            raise Exception(
+                'Content_id %s already exists in the '
+                'TranslatableContentsCollection.' % content_id)
 
         self.content_id_to_translatable_content[content_id] = (
             TranslatableContent(content_id, content_value, field_type))

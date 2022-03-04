@@ -85,7 +85,7 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_version: int,
         language_code: str
     ) -> str:
-        """The method use to generate the ID for entity translations model.
+        """Generates the ID for an entity translations model.
 
         Args:
             entity_type: TranslatableEntityType. The type of the entity.
