@@ -33,7 +33,7 @@ from core.domain import action_registry  # pylint: disable=invalid-import-from #
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import playthrough_issue_registry  # pylint: disable=invalid-import-from # isort:skip
 
-from typing import Any, Union, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 from typing_extensions import TypedDict
 
 # TODO(#14537): Refactor this file and remove imports marked
