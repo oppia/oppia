@@ -78,7 +78,8 @@ class DummyTranslatableObjectWithSingleParam(
         return translatable_contents_collection
 
 
-class DummyTranslatableObject(translation_domain.BaseTranslatableObject):
+class DummyTranslatableObjectWithDuplicateContentIdForParams(
+        translation_domain.BaseTranslatableObject):
     """A dummy translatable object with two translatable fields and on
     registering with same content_id an error is raised.
     """
@@ -195,6 +196,18 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Must be implemented in subclasses.'):
+            translatable_object.get_translatable_contents_collection()
+
+    def test_registering_duplicate_content_id_raises_exception(self) -> None:
+        translatable_object = (
+            DummyTranslatableObjectWithDuplicateContentIdForParams(
+                'My name is jack.', 'My name is jhon.')
+        )
+
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception,
+            'Content_id content_id_2 already exists in the '
+            'TranslatableContentsCollection.'):
             translatable_object.get_translatable_contents_collection()
 
     def test_get_all_contents_which_need_translations_method(self) -> None:
