@@ -111,7 +111,7 @@ class TranslatedContent:
     Args:
         content_value: ContentValueType. Represents translation of translatable
             content.
-        needs_update: bool. Whether any translation needs an update or not.
+        needs_update: bool. Whether a translation needs an update or not.
     """
 
     def __init__(
@@ -181,8 +181,9 @@ class TranslatableContentsCollection:
             content_value: ContentValueType. Value of the content which
                 is translatable.
         """
-        # The duplicate check is avoided here as object validation check ensures
-        # all the content_ids are unique.
+        if content_id in self.content_id_to_translatable_content:
+            raise Exception('Already added as a translatable content.')
+
         self.content_id_to_translatable_content[content_id] = (
             TranslatableContent(content_id, content_value, field_type))
 
