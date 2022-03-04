@@ -7,7 +7,7 @@ apache-beam[gcp]==2.36.0
 beautifulsoup4==4.10.0
 bleach==4.1.0
 defusedxml==0.7.1
-elasticsearch==7.10.1
+elasticsearch==7.17.0
 firebase-admin==5.2.0
 future==0.18.2
 googledatastore==7.0.2

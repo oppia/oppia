@@ -190,6 +190,11 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
 
         Returns:
             list(str). The list of all html content strings in the interaction.
+
+        Raises:
+            Exception. The Rule spec has an invalid format.
+            Exception. The Rule spec has no valid input variable
+                with HTML in it.
         """
         html_list = []
 
@@ -486,6 +491,9 @@ class Solution(translation_domain.BaseTranslatableObject):
 
         Returns:
             dict. The converted Solution dict.
+
+        Raises:
+            Exception. The Solution dict has an invalid answer type.
         """
         if interaction_id is None:
             return solution_dict
@@ -884,6 +892,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         Returns:
             list(str). The list of all html content strings in the interaction.
+
+        Raises:
+            Exception. The solution has invalid type.
         """
         html_list = []
 
@@ -2349,6 +2360,11 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
 
         Returns:
             dict. The converted Rule Spec dict.
+
+        Raises:
+            Exception. The Rule spec has an invalid format.
+            Exception. The Rule spec has no valid input variable
+                with HTML in it.
         """
         # TODO(#9413): Find a way to include a reference to the interaction
         # type in the Draft change lists.
@@ -2918,7 +2934,7 @@ class State(translation_domain.BaseTranslatableObject):
             str. The YAML version of the state_dict.
 
         Raises:
-            Exception. The state_dict does not represent a valid state.
+            Exception. The state dict does not represent a valid state.
         """
         try:
             # Check if the state_dict can be converted to a State.
@@ -2972,6 +2988,10 @@ class State(translation_domain.BaseTranslatableObject):
             new_ids_list: list(str). A list of content ids currently present
                 within the substructure (like answer groups, hints etc.) of
                 state.
+
+        Raises:
+            Exception. The content to be deleted doesn't exist.
+            Exception. The content to be added already exists.
         """
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
@@ -3125,6 +3145,9 @@ class State(translation_domain.BaseTranslatableObject):
 
         Args:
             customization_args_dict: dict. The new customization_args to set.
+
+        Raises:
+            Exception. The customization arguments are not unique.
         """
         customization_args = (
             InteractionInstance.
@@ -3158,6 +3181,9 @@ class State(translation_domain.BaseTranslatableObject):
         Args:
             answer_groups_list: list(AnswerGroup). List of AnswerGroup domain
                 objects.
+
+        Raises:
+            Exception. Type of AnswerGroup domain objects is not as expected.
         """
         if not isinstance(answer_groups_list, list):
             raise Exception(
@@ -3271,7 +3297,7 @@ class State(translation_domain.BaseTranslatableObject):
                 default outcome.
 
         Raises:
-            Exception. The 'confirmed_unclassified_answers' is not a list.
+            Exception. Given answers is not of type list.
         """
         if not isinstance(confirmed_unclassified_answers, list):
             raise Exception(
@@ -3355,6 +3381,9 @@ class State(translation_domain.BaseTranslatableObject):
         Args:
             solicit_answer_details: bool. The new value of
                 solicit_answer_details for the state.
+
+        Raises:
+            Exception. The argument is not of type bool.
         """
         if not isinstance(solicit_answer_details, bool):
             raise Exception(
@@ -3368,6 +3397,9 @@ class State(translation_domain.BaseTranslatableObject):
         Args:
             card_is_checkpoint: bool. The new value of
                 card_is_checkpoint for the state.
+
+        Raises:
+            Exception. The argument is not of type bool.
         """
         if not isinstance(card_is_checkpoint, bool):
             raise Exception(
