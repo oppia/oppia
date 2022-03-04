@@ -379,6 +379,37 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             .get_multiple_suggestions_from_suggestion_ids(suggestion_ids))
         self.assertEqual(len(suggestions), 3)
 
+    def test_get_translation_suggestions_in_review_with_valid_exp(self) -> None:
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_6', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_4',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_7', self.translation_language_code)
+
+        suggestions = (
+            suggestion_models.GeneralSuggestionModel
+                .get_translation_suggestions_in_review_with_exp_id(
+                'exp1', self.translation_language_code))
+
+        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(suggestions[0].target_id, 'exp1')
+        self.assertEqual(
+            suggestions[0].suggestion_type,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[0].status,
+            suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(suggestions[1].target_id, 'exp1')
+
     def test_get_translation_suggestions_in_review_with_valid_topic_name_and_exp_ids( # pylint: disable=line-too-long
             self) -> None:
         suggestion_models.GeneralSuggestionModel.create(
