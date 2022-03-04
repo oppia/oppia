@@ -589,7 +589,7 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
 
 
 def get_reviewable_suggestions(user_id, suggestion_type,
-                               opportunity_summary_exp_ids):
+                               opportunity_summary_exp_ids, topic_name):
     """Returns a list of suggestions of given suggestion_type which the user
     can review.
 
@@ -597,9 +597,13 @@ def get_reviewable_suggestions(user_id, suggestion_type,
         user_id: str. The ID of the user.
         suggestion_type: str. The type of the suggestion.
         opportunity_summary_exp_ids: list(str).
-            The list of exploration ID for which suggestions
-            should be fetched. If the list is empty, all reviewable suggestions
-            are fetched.
+            The list of exploration IDs for which suggestions
+            should be fetched. If the list is empty and topic name
+            is not specified as well, all reviewable suggestions
+            are fetched. If list is empty and a valid topic name is
+            specified, an empty list is returned.
+        topic_name: str or None. The name of the topic for which
+            suggestions are to be fetched.
 
     Returns:
         list(Suggestion). A list of suggestions which the given user is allowed
@@ -613,9 +617,10 @@ def get_reviewable_suggestions(user_id, suggestion_type,
             contribution_rights.can_review_translation_for_language_codes)
         all_suggestions = ([
             get_suggestion_from_model(s) for s in (
-                suggestion_models.GeneralSuggestionModel
-                .get_in_review_translation_suggestions(
-                    user_id, language_codes, opportunity_summary_exp_ids))
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_translation_suggestions_with_topic_name_and_exp_ids(
+                    user_id, language_codes,
+                    opportunity_summary_exp_ids, topic_name))
         ])
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         all_suggestions = ([
