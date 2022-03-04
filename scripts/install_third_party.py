@@ -352,7 +352,10 @@ def install_elasticsearch_dev_server():
             ['%s/bin/elasticsearch' % common.ES_PATH, '--version'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+            stderr=subprocess.PIPE,
+            # Set the minimum heap size to 100 MB and maximum to 500 MB.
+            env={'ES_JAVA_OPTS': '-Xms100m -Xmx500m'}
+        )
         print('ElasticSearch is already installed.')
         return
     except OSError:
