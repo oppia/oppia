@@ -201,7 +201,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         translatable_object = DummyTranslatableObject(
             'My name is jack.', 'My name is jhon.')
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception,
             'Content_id content_id_2 already exists in the '
             'TranslatableContentsCollection.'):
