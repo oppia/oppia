@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validation Jobs for skills"""
+"""Validation jobs for skill models"""
 
 from __future__ import annotations
 
