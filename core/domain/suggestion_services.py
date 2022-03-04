@@ -588,18 +588,13 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
     ])
 
 
-def get_reviewable_suggestions(user_id, suggestion_type,
-                               opportunity_summary_exp_ids):
+def get_reviewable_suggestions(user_id, suggestion_type):
     """Returns a list of suggestions of given suggestion_type which the user
     can review.
 
     Args:
         user_id: str. The ID of the user.
         suggestion_type: str. The type of the suggestion.
-        opportunity_summary_exp_ids: list(str).
-            The list of exploration ID for which suggestions
-            should be fetched. If the list is empty, all reviewable suggestions
-            are fetched.
 
     Returns:
         list(Suggestion). A list of suggestions which the given user is allowed
@@ -615,7 +610,7 @@ def get_reviewable_suggestions(user_id, suggestion_type,
             get_suggestion_from_model(s) for s in (
                 suggestion_models.GeneralSuggestionModel
                 .get_in_review_translation_suggestions(
-                    user_id, language_codes, opportunity_summary_exp_ids))
+                    user_id, language_codes))
         ])
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         all_suggestions = ([
