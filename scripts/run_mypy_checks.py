@@ -218,8 +218,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/state_domain_test.py',
     'core/domain/statistics_validators.py',
     'core/domain/statistics_validators_test.py',
-    'core/domain/stats_domain.py',
-    'core/domain/stats_domain_test.py',
     'core/domain/stats_jobs_continuous.py',
     'core/domain/stats_jobs_continuous_test.py',
     'core/domain/stats_jobs_one_off.py',
