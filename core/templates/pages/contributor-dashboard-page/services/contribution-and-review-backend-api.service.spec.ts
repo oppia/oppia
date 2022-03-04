@@ -102,7 +102,8 @@ describe('Contribution and review backend API service', () => {
 
     it('should fetch reviewable question suggestions', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
-      const url = '/getreviewablesuggestions/skill/add_question';
+      const url = '/getreviewablesuggestions'
+        + '/skill/add_question?topic_name=all';
 
       carbas.fetchSuggestionsAsync(
         'REVIEWABLE_QUESTION_SUGGESTIONS',
@@ -120,7 +121,8 @@ describe('Contribution and review backend API service', () => {
 
     it('should fetch reviewable translation suggestions', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
-      const url = '/getreviewablesuggestions/exploration/translate_content';
+      const url = '/getreviewablesuggestions/exploration'
+        + '/translate_content?topic_name=all';
 
       carbas.fetchSuggestionsAsync(
         'REVIEWABLE_TRANSLATION_SUGGESTIONS', 'all'
