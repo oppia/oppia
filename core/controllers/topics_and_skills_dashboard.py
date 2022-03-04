@@ -204,9 +204,11 @@ class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
                     'topic_name': topic.name
                 })
 
+        uncategorized_skill_ids = [skill_data.get('skill_id')
+            for skill_data in uncategorized_skills_id_and_topic_name]
         uncategorized_skills_descriptions = (
-            skill_services.get_descriptions_of_uncategorized_skills(
-              uncategorized_skills_id_and_topic_name))
+            skill_services.get_descriptions_of_skills(
+                uncategorized_skill_ids)[0])
 
         for skill_data in uncategorized_skills_id_and_topic_name:
             topic_name = skill_data.get('topic_name')
@@ -235,9 +237,11 @@ class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
                         'subtopic_title': subtopic.title
                     })
 
+        categorized_skill_ids = [skill_data.get('skill_id') for skill_data in
+            categorized_skill_ids_with_topic_and_subtopic_name]
         categorized_skill_descriptions = (
-            skill_services.get_descriptions_of_categorized_skills(
-                categorized_skill_ids_with_topic_and_subtopic_name))
+            skill_services.get_descriptions_of_skills(
+                categorized_skill_ids)[0])
 
         for skill_data in categorized_skill_ids_with_topic_and_subtopic_name:
             topic_name = skill_data.get('topic_name')
