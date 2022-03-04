@@ -182,7 +182,7 @@ class TranslatableContentsCollection:
                 is translatable.
 
         Raises:
-            Exception. If the content_id_to_translatable_content dict already
+            Exception. The content_id_to_translatable_content dict already
                 contains the content_id.
         """
         if content_id in self.content_id_to_translatable_content:
