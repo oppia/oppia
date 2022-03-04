@@ -4948,294 +4948,366 @@ export default {
   // This is linked to SUPPORTED_LANGUAGES in android_validation_constants.
   "SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID": [{
     "code": "en",
-    "description": "English"
+    "description": "English",
+    "decimal_separator": "."
   }],
 
   // List of supported content languages in which we can create explorations or
   // other entities. Each description has a parenthetical part that may be
   // stripped out to give a shorter description.
+  // The decimal separators were derived from https://en.wikipedia.org/w/index.php?title=Decimal_separator&section=9#Usage_worldwide.
   "SUPPORTED_CONTENT_LANGUAGES": [{
     "code": "en",
     "description": "English",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "ar",
     "description": "العربية (Arabic)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "code": "sq",
     "description": "shqip (Albanian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "az",
     "description": "Azeri (Azerbaijani)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "bg",
     "description": "български (Bulgarian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "bn",
     "description": "বাংলা (Bangla)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "ca",
     "description": "català (Catalan)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "zh",
     "description": "中文 (Chinese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "hr",
     "description": "hrvatski (Croatian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "cs",
     "description": "čeština (Czech)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "da",
     "description": "dansk (Danish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "nl",
     "description": "Nederlands (Dutch)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "fat",
     "description": "Fanti",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "tl",
     "description": "Filipino (Filipino)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "fi",
     "description": "suomi (Finnish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "fr",
     "description": "français (French)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "lg",
     "description": "Luganda (Ganda)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "de",
     "description": "Deutsch (German)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "el",
     "description": "ελληνικά (Greek)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ha",
     "description": "Halshen Hausa (Hausa)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "he",
     "description": "עברית (Hebrew)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": "."
   }, {
     "code": "hi",
     "description": "हिन्दी (Hindi)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "hi-en",
     "description": "Hinglish",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "hu",
     "description": "magyar (Hungarian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "id",
     "description": "Bahasa Indonesia (Indonesian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ig",
     "description": "Ásụ̀sụ́ Ìgbò (Igbo)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "it",
     "description": "italiano (Italian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ja",
     "description": "日本語 (Japanese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "kab",
     "description": "Taqbaylit (Kabyle)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ko",
     "description": "한국어 (Korean)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "lv",
     "description": "latviešu (Latvian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "lt",
     "description": "lietuvių (Lithuanian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "mr",
     "description": "मराठी (Marathi)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "no",
     "description": "Norsk (Norwegian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "fa",
     "description": "فارسی (Persian)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "code": "pl",
     "description": "polszczyzna (Polish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "prs",
     "description": "دری (Dari)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "code": "pt",
     "description": "português (Portuguese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ro",
     "description": "română (Romanian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ru",
     "description": "pусский (Russian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "sr",
     "description": "cрпски (Serbian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "sk",
     "description": "slovenčina (Slovak)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "sl",
     "description": "slovenščina (Slovenian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "es",
     "description": "español (Spanish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "sw",
     "description": "kiswahili (Swahili)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "sv",
     "description": "svenska (Swedish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ta",
     "description": "தமிழ் (Tamil)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "th",
     "description": "ภาษาไทย (Thai)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "tr",
     "description": "Türkçe (Turkish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "uk",
     "description": "yкраїнська (Ukrainian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ur",
     "description": "اُردُو (Urdu)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "yo",
     "description": "Èdè Yoùbá (Yoruba)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }],
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the
   // languages are roughly in order of how much support we have for them in
   // terms of lesson content translations.
   // List of supported site languages in which the platform is offered.
+  // The decimal separators were derived from https://en.wikipedia.org/w/index.php?title=Decimal_separator&section=9#Usage_worldwide.
   "SUPPORTED_SITE_LANGUAGES": [{
     "id": "en",
     "text": "English",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "id": "pt-br",
     "text": "Português (Brasil)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "ar",
     "text": "العربية",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "id": "hi",
     "text": "हिन्दी",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "id": "es",
     "text": "Español",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "bn",
     "text": "বাংলা",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "id": "fr",
     "text": "français (French)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "id",
     "text": "Bahasa Indonesia",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "uk",
     "text": "украї́нська мо́ва (Ukrainian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "sk",
     "text": "slovenčina (Slovak)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "nl",
     "text": "Nederlands (Dutch)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "kab",
     "text": "Taqbaylit (Kabyle)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "vi",
     "text": "Tiếng Việt",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "tr",
     "text": "Türkçe (Turkish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "zh-hans",
     "text": "中文(简体)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "id": "zh-hant",
     "text": "中文(繁體)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }],
 
   // List of supported audio languages in which we have audio and translations
