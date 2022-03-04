@@ -1437,7 +1437,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
         return cls.get(instance_id, strict=False)
-        
+
     @classmethod
     def create(
             cls,

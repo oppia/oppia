@@ -29,8 +29,7 @@ from core.domain import stats_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Union, Dict, List, Optional
-from typing_extensions import TypedDict
+from typing import Any, Union, Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -77,9 +76,11 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         self.exploration_stats = self._get_exploration_stats_from_dict(
             self.exploration_stats_dict)
 
-    def _get_exploration_stats_from_dict(self, exploration_stats_dict: stats_domain.ExplorationStatsDict) -> stats_domain.ExplorationStats:
-        """Converts and returns the ExplorationStats object from the given
-        exploration stats dict.
+    def _get_exploration_stats_from_dict(
+        self, exploration_stats_dict:
+        stats_domain.ExplorationStatsDict) -> stats_domain.ExplorationStats:
+        """Converts and returns the ExplorationStats
+        object from the given exploration stats dict.
         """
         state_stats_mapping = {}
         for state_name in exploration_stats_dict['state_stats_mapping']:
@@ -126,7 +127,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         }
         observed_exploration_stats = self._get_exploration_stats_from_dict(
             expected_exploration_stats_dict)
-        # using ignore[arg-type] because assertDictEqual method
+        # Using ignore[arg-type] because assertDictEqual method
         # expects both arguments to be of type Dict[Any, Any]
         self.assertDictEqual(
             expected_exploration_stats_dict, # type: ignore[arg-type]
@@ -140,25 +141,25 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     def test_validate_for_exploration_stats_with_correct_data(self) -> None:
         self.exploration_stats.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test method
-    # validate() input type. 
+    # validate() input type.
     def test_validate_with_int_exp_id(self) -> None:
         self.exploration_stats.exp_id = 10 # type: ignore[assignment]
         with self.assertRaisesRegex(utils.ValidationError, ( # type: ignore[no-untyped-call]
             'Expected exp_id to be a string')):
             self.exploration_stats.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test method
-    # validate() input type. 
+    # validate() input type.
     def test_validation_with_string_num_actual_starts(self) -> None:
         self.exploration_stats.num_actual_starts_v2 = '0' # type: ignore[assignment]
         with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
             'Expected num_actual_starts_v2 to be an int')):
             self.exploration_stats.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test method
     # validate() input type.
     def test_validation_with_list_state_stats_mapping(self) -> None:
@@ -166,16 +167,16 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
             'Expected state_stats_mapping to be a dict')):
             self.exploration_stats.validate()
- 
+
     def test_validation_with_negative_num_completions(self) -> None:
-        self.exploration_stats.num_completions_v2 = -5 
+        self.exploration_stats.num_completions_v2 = -5
         with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
             '%s cannot have negative values' % ('num_completions_v2'))):
             self.exploration_stats.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # method validate(). 
+    # method validate().
     def test_validate_exp_version(self) -> None:
         self.exploration_stats.exp_version = 'invalid_exp_version' # type: ignore[assignment]
         with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
@@ -231,7 +232,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         }
 
         exploration_stats = self._get_exploration_stats_from_dict(
-            exploration_stats_dict)  
+            exploration_stats_dict)
 
         self.assertEqual(
             exploration_stats.to_frontend_dict(), expected_frontend_dict)
@@ -415,7 +416,7 @@ class StateStatsTests(test_utils.GenericTestBase):
         state_stats = stats_domain.StateStats.create_default()
         different_stats = DifferentStats()
 
-        #TODO(#13528): Remove this test after the backend is fully 
+        # TODO(#13528): Remove this test after the backend is fully
         # type-annotated. Here ignore[arg-type] is used to test method
         # aggregate_from() input type.
         with self.assertRaisesRegex(TypeError, 'can not be aggregated from'):  # type: ignore[no-untyped-call]
@@ -441,16 +442,18 @@ class StateStatsTests(test_utils.GenericTestBase):
     def test_validation_for_state_stats_with_correct_data(self) -> None:
         self.state_stats.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test method
-    # validate() input type. 
-    def test_validation_for_state_stats_with_string_total_answers_count(self) -> None:
+    # validate() input type.
+    def test_validation_for_state_stats_with_string_total_answers_count(
+        self) -> None:
         self.state_stats.total_answers_count_v2 = '10' # type: ignore[assignment]
         with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
             'Expected total_answers_count_v2 to be an int')):
             self.state_stats.validate()
 
-    def test_validation_for_state_stats_with_negative_total_answers_count(self) -> None:
+    def test_validation_for_state_stats_with_negative_total_answers_count(
+        self) -> None:
         self.state_stats.total_answers_count_v2 = -5
         with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
             '%s cannot have negative values' % ('total_answers_count_v2'))):
@@ -688,7 +691,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     def test_validate_for_exp_issues_with_correct_data(self) -> None:
         self.exp_issues.validate()
 
-     #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test method
     # validate() input type.
     def test_validate_with_int_exp_id(self) -> None:
@@ -697,9 +700,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             'Expected exp_id to be a string, received %s' % (type(5)))):
             self.exp_issues.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # the validate() method input type. 
+    # the validate() method input type.
     def test_validate_exp_version(self) -> None:
         self.exp_issues.exp_version = 'invalid_version' # type: ignore[assignment]
 
@@ -707,9 +710,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             'Expected exp_version to be an int')):
             self.exp_issues.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # the validate() method input type. 
+    # the validate() method input type.
     def test_validate_unresolved_issues(self) -> None:
         self.exp_issues.unresolved_issues = 0 # type: ignore[assignment]
 
@@ -858,13 +861,13 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'exp_id not in playthrough data dict.'):
             stats_domain.Playthrough.from_dict(playthrough_dict)
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test method
     # validate() input type.
     def test_validate_with_string_exp_version(self) -> None:
         self.playthrough.exp_version = '1' # type: ignore[assignment]
         with self.assertRaisesRegex(utils.ValidationError, ( # type: ignore[no-untyped-call]
-            'Expected exp_version to be an int, received %s' % (type('1')))):  
+            'Expected exp_version to be an int, received %s' % (type('1')))):
             self.playthrough.validate()
 
     def test_validate_with_invalid_issue_type(self) -> None:
@@ -888,9 +891,9 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'Invalid action type: %s' % 'InvalidActionType')):
             self.playthrough.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # method validate(). 
+    # method validate().
     def test_validate_non_str_exp_id(self) -> None:
         self.playthrough.exp_id = 0 # type: ignore[assignment]
 
@@ -898,9 +901,9 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'Expected exp_id to be a string')):
             self.playthrough.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # method validate(). 
+    # method validate().
     def test_validate_non_str_issue_type(self) -> None:
         self.playthrough.issue_type = 0 # type: ignore[assignment]
 
@@ -908,7 +911,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'Expected issue_type to be a string')):
             self.playthrough.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
     # method validate()
     def test_validate_non_list_actions(self) -> None:
@@ -918,9 +921,9 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'Expected actions to be a list')):
             self.playthrough.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # validate() method input type. 
+    # validate() method input type.
     def test_validate_non_dict_issue_customization_args(self) -> None:
         self.playthrough.issue_customization_args = 0 # type: ignore[assignment]
 
@@ -943,7 +946,8 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
                 'time_spent_in_exp_in_msecs': {'value': 0}
             }, [], 1, True)
 
-    def _dummy_convert_issue_v1_dict_to_v2_dict(self, issue_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def _dummy_convert_issue_v1_dict_to_v2_dict(
+        self, issue_dict: Dict[str, Any]) -> Dict[str, Any]:
         """A test implementation of schema conversion function. It sets all the
         "time spent" fields for EarlyQuit issues to DUMMY_TIME_SPENT_IN_MSECS.
         """
@@ -1030,7 +1034,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             'EarlyQuit',
             {
                 'time_spent_in_exp_in_msecs': {
-                    'value': 0 
+                    'value': 0
                 },
                 'state_name': {
                     'value': ''
@@ -1090,7 +1094,8 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             exp_issue_from_model1.unresolved_issues[0].issue_type,
             'MultipleIncorrectSubmissions')
 
-    def test_cannot_update_exp_issue_from_invalid_schema_version_model(self) -> None:
+    def test_cannot_update_exp_issue_from_invalid_schema_version_model(
+        self) -> None:
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 4, True)
         exp_issue_dict = exp_issue.to_dict()
         stats_models.ExplorationIssuesModel.create(
@@ -1106,7 +1111,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
             stats_services.get_exp_issues_from_model(exp_issues_model)  # type: ignore[no-untyped-call]
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[arg-type] is used to test
     # updating exp_issue with no schema_version.
     def test_cannot_update_exp_issue_with_no_schema_version(self) -> None:
@@ -1142,18 +1147,18 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     def test_validate_for_exp_issues_with_correct_data(self) -> None:
         self.exp_issue.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # the validate() method input type. 
+    # the validate() method input type.
     def test_validate_with_int_issue_type(self) -> None:
         self.exp_issue.issue_type = 5 # type: ignore[assignment]
         with self.assertRaisesRegex(utils.ValidationError, ( # type: ignore[no-untyped-call]
-            'Expected issue_type to be a string, received %s' % (type(5)))): 
+            'Expected issue_type to be a string, received %s' % (type(5)))):
             self.exp_issue.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # the validate() method input type 
+    # the validate() method input type.
     def test_validate_with_string_schema_version(self) -> None:
         self.exp_issue.schema_version = '1' # type: ignore[assignment]
         with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
@@ -1166,26 +1171,26 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             'Invalid issue type')):
             self.exp_issue.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # the validate() method input type. 
+    # the validate() method input type.
     def test_validate_playthrough_ids(self) -> None:
         self.exp_issue.playthrough_ids = 'invalid_playthrough_ids' # type: ignore[assignment]
         with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
             'Expected playthrough_ids to be a list')):
             self.exp_issue.validate()
 
-    
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[list-item] is used to test
-    # that playthrough_id is a string. 
+    # that playthrough_id is a string.
     def test_validate_playthrough_id_type(self) -> None:
         self.exp_issue.playthrough_ids = [0, 1] # type: ignore[list-item]
         with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
             'Expected each playthrough_id to be a string')):
             self.exp_issue.validate()
 
-    def test_comparison_between_exploration_issues_returns_correctly(self) -> None:
+    def test_comparison_between_exploration_issues_returns_correctly(
+        self) -> None:
         expected_customization_args: Dict[str, Dict[str, Union[str, int]]] = {
             'time_spent_in_exp_in_msecs': {
                 'value': 0
@@ -1234,12 +1239,14 @@ class LearnerActionTests(test_utils.GenericTestBase):
                 }
             }, 1)
 
-    def _dummy_convert_action_v1_dict_to_v2_dict(self, action_dict: stats_domain.LearnerActionDict) -> stats_domain.LearnerActionDict:
+    def _dummy_convert_action_v1_dict_to_v2_dict(
+        self, action_dict:
+        stats_domain.LearnerActionDict) -> stats_domain.LearnerActionDict:
         """A test implementation of schema conversion function."""
         action_dict['schema_version'] = 2
         if action_dict['action_type'] == 'ExplorationStart':
             action_dict['action_type'] = 'ExplorationStart1'
-            action_dict['action_customization_args']['new_key'] = 5 
+            action_dict['action_customization_args']['new_key'] = 5
 
         return action_dict
 
@@ -1349,11 +1356,11 @@ class LearnerActionTests(test_utils.GenericTestBase):
             Exception,
             'Sorry, we can only process v1-v%d and unversioned action schemas'
             ' at present.' %
-            stats_models.CURRENT_ISSUE_SCHEMA_VERSION):  
+            stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
             stats_services.get_playthrough_from_model(  # type: ignore[no-untyped-call]
                 playthrough_model)
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[arg-type] is used to test
     # updating learner_action with no schema_version.
     def test_cannot_update_learner_action_with_no_schema_version(self) -> None:
@@ -1361,7 +1368,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
             'ExplorationStart', {}, None) # type: ignore[arg-type]
         learner_action_dict = learner_action.to_dict()
 
-        playthrough_id = stats_models.PlaythroughModel.create( 
+        playthrough_id = stats_models.PlaythroughModel.create(
             'exp_id', 1, 'EarlyQuit', {
                 'state_name': {
                     'value': 'state_name1'
@@ -1396,7 +1403,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
     def test_validate_for_learner_action_with_correct_data(self) -> None:
         self.learner_action.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test method
     # validate() input type.
     def test_validate_with_int_action_type(self) -> None:
@@ -1405,20 +1412,21 @@ class LearnerActionTests(test_utils.GenericTestBase):
             'Expected action_type to be a string, received %s' % (type(5)))):
             self.learner_action.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test method
     # validate() input type.
     def test_validate_with_string_schema_version(self) -> None:
         self.learner_action.schema_version = '1' # type: ignore[assignment]
         with self.assertRaisesRegex(utils.ValidationError, ( # type: ignore[no-untyped-call]
-            'Expected schema_version to be an int, received %s' % (type('1')))):  
+            'Expected schema_version to be an int, received %s' % (type('1')))):
             self.learner_action.validate()
 
 
 class StateAnswersTests(test_utils.GenericTestBase):
     """Tests the StateAnswers domain object."""
 
-    def test_can_retrieve_properly_constructed_submitted_answer_dict_list(self) -> None:
+    def test_can_retrieve_properly_constructed_submitted_answer_dict_list(
+        self) -> None:
         state_answers = stats_domain.StateAnswers(
             'exp_id', '1', 'initial_state', 'TextInput', [
                 stats_domain.SubmittedAnswer(
@@ -1470,30 +1478,30 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
         # The canonical object should have no validation problems.
         self.state_answers.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test the
-    # type of exploration_id. 
+    # type of exploration_id.
     def test_exploration_id_must_be_string(self) -> None:
         self.state_answers.exploration_id = 0 # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             self.state_answers, 'Expected exploration_id to be a string')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test that
-    # state_name is a string. 
+    # state_name is a string.
     def test_state_name_must_be_string(self) -> None:
         self.state_answers.state_name = ['state'] # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             self.state_answers, 'Expected state_name to be a string')
 
-    #TODO(#13528): Remove this test after the backend is fully 
-    # type-annotated. Here ignore[assignment] is used to test 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[assignment] is used to test
     # the type of interaction_id.
     def test_interaction_id_can_be_none(self) -> None:
         self.state_answers.interaction_id = None # type: ignore[assignment]
         self.state_answers.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test the
     # type of interaction_id.
     def test_interaction_id_must_otherwise_be_string(self) -> None:
@@ -1506,7 +1514,7 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             self.state_answers, 'Unknown interaction_id: FakeInteraction')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test the
     # type of submitted_answer_list.
     def test_submitted_answer_list_must_be_list(self) -> None:
@@ -1519,10 +1527,11 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             self.state_answers, 'Expected schema_version to be an integer')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test that
     # schema_version is between one and current version.
-    def test_schema_version_must_be_between_one_and_current_version(self) -> None:
+    def test_schema_version_must_be_between_one_and_current_version(
+        self) -> None:
         self.state_answers.schema_version = 0 # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             self.state_answers, 'schema_version < 1: 0')
@@ -1533,7 +1542,7 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
             self.state_answers,
             'schema_version > feconf\\.CURRENT_STATE_ANSWERS_SCHEMA_VERSION')
 
-        self.state_answers.schema_version = 1 #type: ignore[assignment]
+        self.state_answers.schema_version = 1 # type: ignore[assignment]
         self.state_answers.validate()
 
 
@@ -1572,7 +1581,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
     def test_dict_may_not_include_rule_spec_str_or_answer_str(self) -> None:
         submitted_answer = stats_domain.SubmittedAnswer(
             'Text', 'TextInput', 0, 1, exp_domain.EXPLICIT_CLASSIFICATION, {},
-            'sess', 10.5) 
+            'sess', 10.5)
         self.assertEqual(submitted_answer.to_dict(), {
             'answer': 'Text',
             'interaction_id': 'TextInput',
@@ -1636,7 +1645,8 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 'time_spent_in_sec': 10.5
             })
 
-    def test_requires_classification_categ_to_be_created_from_dict(self) -> None:
+    def test_requires_classification_categ_to_be_created_from_dict(
+        self) -> None:
         with self.assertRaisesRegex(KeyError, 'classification_categorization'):  # type: ignore[no-untyped-call]
             stats_domain.SubmittedAnswer.from_dict({
                 'answer': 'Text',
@@ -1714,7 +1724,8 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(submitted_answer.rule_spec_str, 'rule spec str')
         self.assertEqual(submitted_answer.answer_str, 'answer str')
 
-    def test_can_be_created_from_dict_missing_rule_spec_and_answer(self) -> None:
+    def test_can_be_created_from_dict_missing_rule_spec_and_answer(
+        self) -> None:
         submitted_answer = stats_domain.SubmittedAnswer.from_dict({
             'answer': 'Text',
             'interaction_id': 'TextInput',
@@ -1724,7 +1735,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'params': {},
             'session_id': 'sess',
-            'time_spent_in_sec': 10.5 
+            'time_spent_in_sec': 10.5
         })
         self.assertEqual(submitted_answer.answer, 'Text')
         self.assertEqual(submitted_answer.interaction_id, 'TextInput')
@@ -1752,9 +1763,9 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
         # The canonical object should have no validation problems.
         self.submitted_answer.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # the type of answer. 
+    # the type of answer.
     def test_answer_may_be_none_only_for_linear_interaction(self) -> None:
         # It's valid for answer to be None if the interaction type is Continue.
         self.submitted_answer.answer = None # type: ignore[assignment]
@@ -1766,7 +1777,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
         self.submitted_answer.interaction_id = 'Continue'
         self.submitted_answer.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
     # that time_spent_in_sec is not None.
     def test_time_spent_in_sec_must_not_be_none(self) -> None:
@@ -1775,9 +1786,9 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
             self.submitted_answer,
             'SubmittedAnswers must have a provided time_spent_in_sec')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that time_spent_in_sec is int. 
+    # that time_spent_in_sec is int.
     def test_time_spent_in_sec_must_be_number(self) -> None:
         self.submitted_answer.time_spent_in_sec = '0' # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
@@ -1789,59 +1800,59 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
             self.submitted_answer,
             'Expected time_spent_in_sec to be non-negative')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that session_id is not None. 
+    # that session_id is not None.
     def test_session_id_must_not_be_none(self) -> None:
         self.submitted_answer.session_id = None # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.submitted_answer,
             'SubmittedAnswers must have a provided session_id')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that session_id is a string. 
+    # that session_id is a string.
     def test_session_id_must_be_string(self) -> None:
         self.submitted_answer.session_id = 90 # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.submitted_answer, 'Expected session_id to be a string')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that params is a dict. 
+    # that params is a dict.
     def test_params_must_be_dict(self) -> None:
         self.submitted_answer.params = [] # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.submitted_answer, 'Expected params to be a dict')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that answer_group_index is int. 
+    # that answer_group_index is int.
     def test_answer_group_index_must_be_integer(self) -> None:
         self.submitted_answer.answer_group_index = '0' # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.submitted_answer,
             'Expected answer_group_index to be an integer')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that answer_group_index is positive. 
+    # that answer_group_index is positive.
     def test_answer_group_index_must_be_positive(self) -> None:
         self.submitted_answer.answer_group_index = -1
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.submitted_answer,
             'Expected answer_group_index to be non-negative')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # type of rule_spec_index. 
+    # type of rule_spec_index.
     def test_rule_spec_index_can_be_none(self) -> None:
         self.submitted_answer.rule_spec_index = None # type: ignore[assignment]
         self.submitted_answer.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that rule_spec_index is int. 
+    # that rule_spec_index is int.
     def test_rule_spec_index_must_be_integer(self) -> None:
         self.submitted_answer.rule_spec_index = '0' # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
@@ -1876,9 +1887,9 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
             self.submitted_answer,
             'Expected valid classification_categorization')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that rule_spec_str is None or str. 
+    # that rule_spec_str is None or str.
     def test_rule_spec_str_must_be_none_or_string(self) -> None:
         self.submitted_answer.rule_spec_str = 10 # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
@@ -1891,7 +1902,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
         self.submitted_answer.rule_spec_str = None
         self.submitted_answer.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
     # that answer_str is None or str.
     def test_answer_str_must_be_none_or_string(self) -> None:
@@ -2031,33 +2042,33 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(StateAnswersCalcOutputValidationTests, self).setUp()
         self.state_answers_calc_output = stats_domain.StateAnswersCalcOutput(
-            'exp_id', '1', 'initial_state', 'TextInput', 'AnswerFrequencies', 
+            'exp_id', '1', 'initial_state', 'TextInput', 'AnswerFrequencies',
             stats_domain.AnswerFrequencyList.from_raw_type([]))
 
         # The canonical object should have no validation problems.
         self.state_answers_calc_output.validate()
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that exploration_id is a string. 
+    # that exploration_id is a string.
     def test_exploration_id_must_be_string(self) -> None:
         self.state_answers_calc_output.exploration_id = 0 # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.state_answers_calc_output,
             'Expected exploration_id to be a string')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that sstate_name is a string. 
+    # that sstate_name is a string.
     def test_state_name_must_be_string(self) -> None:
         self.state_answers_calc_output.state_name = ['state'] # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.state_answers_calc_output,
             'Expected state_name to be a string')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that calculation_id is a string. 
+    # that calculation_id is a string.
     def test_calculation_id_must_be_string(self) -> None:
         self.state_answers_calc_output.calculation_id = ['calculation id'] # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
@@ -2071,7 +2082,8 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
             self.state_answers_calc_output,
             'Expected calculation output to be one of')
 
-    def test_calculation_output_must_be_less_than_one_million_bytes(self) -> None:
+    def test_calculation_output_must_be_less_than_one_million_bytes(
+        self) -> None:
         occurred_answer = stats_domain.AnswerOccurrence(
             'This is not a long sentence.', 1)
         self.state_answers_calc_output.calculation_output = (
@@ -2213,7 +2225,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             self.learner_answer_details.state_reference,
             'exp_id_1:state_name_1')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
     # that state_reference is str.
     def test_state_reference_must_be_string(self) -> None:
@@ -2222,9 +2234,9 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             self.learner_answer_details,
             'Expected state_reference to be a string')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that entity_type is str. 
+    # that entity_type is str.
     def test_entity_type_must_be_string(self) -> None:
         self.learner_answer_details.entity_type = 0 # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
@@ -2256,9 +2268,9 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             self.learner_answer_details,
             'Unknown interaction_id: MyInteraction')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that interaction_id is str. 
+    # that interaction_id is str.
     def test_interaction_id_must_be_string(self) -> None:
         self.learner_answer_details.interaction_id = 0 # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
@@ -2272,34 +2284,35 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             'The Continue interaction does not support '
             'soliciting answer details')
 
-    def test_end_exploration_interaction_cannot_solicit_answer_details(self) -> None:
+    def test_end_exploration_interaction_cannot_solicit_answer_details(
+        self) -> None:
         self.learner_answer_details.interaction_id = 'EndExploration'
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.learner_answer_details,
             'The EndExploration interaction does not support '
             'soliciting answer details')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that learner_answer_info is a List. 
+    # that learner_answer_info is a List.
     def test_learner_answer_info_must_be_list(self) -> None:
         self.learner_answer_details.learner_answer_info_list = 'list' # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.learner_answer_details,
             'Expected learner_answer_info_list to be a list')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that learner_answer_info_schema_version is int. 
+    # that learner_answer_info_schema_version is int.
     def test_learner_answer_info_schema_version_must_be_int(self) -> None:
         self.learner_answer_details.learner_answer_info_schema_version = 'v' # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.learner_answer_details,
             'Expected learner_answer_info_schema_version to be an int')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
-    # that accumulated_answer_info_json_size_bytes is a string. 
+    # that accumulated_answer_info_json_size_bytes is a string.
     def test_accumulated_answer_info_json_size_bytes_must_be_int(self) -> None:
         self.learner_answer_details.accumulated_answer_info_json_size_bytes = (
             'size') # type: ignore[assignment]
@@ -2353,7 +2366,7 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
             'created_on': '2019-06-19 13:59:29.153073'
         }
         learner_answer_info = stats_domain.LearnerAnswerInfo.from_dict(
-            learner_answer_info_dict) 
+            learner_answer_info_dict)
         self.assertEqual(learner_answer_info.id, 'id_1')
         self.assertEqual(learner_answer_info.answer, 'This is my answer')
         self.assertEqual(
@@ -2376,7 +2389,7 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         self.assertNotEqual(learner_answer_info_id, None)
         self.assertTrue(isinstance(learner_answer_info_id, str))
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test
     # id type.
     def test_id_must_be_string(self) -> None:
@@ -2402,16 +2415,16 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
             self.learner_answer_info,
             'The answer submitted cannot be an empty string')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test method
-    # that answer_details from learner_answer_info is not None. 
+    # that answer_details from learner_answer_info is not None.
     def test_answer_details_must_not_be_none(self) -> None:
         self.learner_answer_info.answer_details = None # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.learner_answer_info,
             'Expected answer_details to be a string')
 
-    #TODO(#13528): Remove this test after the backend is fully 
+    # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[assignment] is used to test that
     # answer_details is str.
     def test_answer_details_must_be_string(self) -> None:
@@ -2432,9 +2445,9 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
             self.learner_answer_info,
             'The answer details size is to large to be stored')
 
-    #TODO(#13528): Remove this test after the backend is fully 
-    # type-annotated. Here ignore[assignment] is used to test 
-    # that created_on is a datetime. 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[assignment] is used to test
+    # that created_on is a datetime.
     def test_created_on_must_be_datetime_type(self) -> None:
         self.learner_answer_info.created_on = '19 June 2019' # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
