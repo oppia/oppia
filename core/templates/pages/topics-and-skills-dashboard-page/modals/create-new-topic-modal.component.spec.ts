@@ -158,6 +158,13 @@ describe('Create new topic modal', () => {
         .not.toHaveBeenCalled();
     });
 
+  it('should remove unnecessary spaces from topic name',
+    () => {
+      componentInstance.newlyCreatedTopic.name = ' extra  spaces ';
+      componentInstance.onTopicNameChange();
+      expect(componentInstance.newlyCreatedTopic.name).toBe('extra spaces');
+    });
+
   it('should not update topic url fragment if not provided by user',
     () => {
       componentInstance.newlyCreatedTopic.urlFragment = '';

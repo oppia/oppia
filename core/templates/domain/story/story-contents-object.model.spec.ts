@@ -16,24 +16,16 @@
  * @fileoverview Tests for StoryContentsObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
-import { StoryContents, StoryContentsBackendDict, StoryContentsObjectFactory } from
-  'domain/story/StoryContentsObjectFactory';
+import { StoryContents, StoryContentsBackendDict } from
+  'domain/story/story-contents-object.model';
 import { StoryNode } from './story-node.model';
 
 describe('Story contents object factory', () => {
-  let storyContentsObjectFactory: StoryContentsObjectFactory;
   let _sampleStoryContents: StoryContents;
   let sampleStoryContentsBackendDict: StoryContentsBackendDict;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [StoryContentsObjectFactory]
-    });
-
-    storyContentsObjectFactory = TestBed.get(StoryContentsObjectFactory);
-
     sampleStoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
@@ -64,7 +56,7 @@ describe('Story contents object factory', () => {
         }],
       next_node_id: 'node_3'
     };
-    _sampleStoryContents = storyContentsObjectFactory.createFromBackendDict(
+    _sampleStoryContents = StoryContents.createFromBackendDict(
       sampleStoryContentsBackendDict);
   });
 
@@ -107,7 +99,7 @@ describe('Story contents object factory', () => {
     sampleStoryContentsBackendDict.nodes[0].prerequisite_skill_ids =
       ['skill_2'];
     let _invalidSampleStoryContents =
-      storyContentsObjectFactory.createFromBackendDict(
+      StoryContents.createFromBackendDict(
         sampleStoryContentsBackendDict);
 
     expect(_invalidSampleStoryContents.validate())
@@ -120,7 +112,7 @@ describe('Story contents object factory', () => {
     () => {
       sampleStoryContentsBackendDict.nodes[1].id = 'node_1';
       let _invalidSampleStoryContents =
-      storyContentsObjectFactory.createFromBackendDict(
+      StoryContents.createFromBackendDict(
         sampleStoryContentsBackendDict);
 
       expect(() => {
@@ -132,7 +124,7 @@ describe('Story contents object factory', () => {
     () => {
       sampleStoryContentsBackendDict.next_node_id = 'node_1';
       let _invalidSampleStoryContents =
-      storyContentsObjectFactory.createFromBackendDict(
+      StoryContents.createFromBackendDict(
         sampleStoryContentsBackendDict);
 
       expect(() => {
@@ -143,7 +135,7 @@ describe('Story contents object factory', () => {
   it('should throw error when the node does not exist', () => {
     sampleStoryContentsBackendDict.nodes[1].destination_node_ids = ['node_4'];
     let _invalidSampleStoryContents =
-    storyContentsObjectFactory.createFromBackendDict(
+    StoryContents.createFromBackendDict(
       sampleStoryContentsBackendDict);
 
     expect(_invalidSampleStoryContents.validate())
@@ -152,7 +144,7 @@ describe('Story contents object factory', () => {
 
   it('should throw error when initial node of the story is not present', () => {
     let _invalidSampleStoryContents =
-    storyContentsObjectFactory.createFromBackendDict(
+    StoryContents.createFromBackendDict(
       sampleStoryContentsBackendDict);
     _invalidSampleStoryContents._initialNodeId = null;
 
@@ -164,7 +156,7 @@ describe('Story contents object factory', () => {
   it('should set initial node Id when user drags the nodes', () => {
     sampleStoryContentsBackendDict.initial_node_id = '';
     let _sampleStoryContents =
-    storyContentsObjectFactory.createFromBackendDict(
+    StoryContents.createFromBackendDict(
       sampleStoryContentsBackendDict);
 
     _sampleStoryContents.setInitialNodeId('node_1');
@@ -353,7 +345,7 @@ describe('Story contents object factory', () => {
       next_node_id: 'node_1',
       nodes: []
     };
-    var storyContents = storyContentsObjectFactory.createFromBackendDict(
+    var storyContents = StoryContents.createFromBackendDict(
       sampleStoryContentsBackendDict);
     storyContents._initialNodeId = null;
 
