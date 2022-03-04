@@ -469,29 +469,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
-    def get_in_review_translation_suggestions(
-        cls, user_id: str, language_codes: List[str]
-    ) -> Sequence[GeneralSuggestionModel]:
-        """Gets all translation suggestions which are in review.
-
-        Args:
-            user_id: str. The id of the user trying to make this query.
-                As a user cannot review their own suggestions, suggestions
-                authored by the user will be excluded.
-            language_codes: list(str). The list of language codes.
-
-        Returns:
-            list(SuggestionModel). A list of suggestions that are of the given
-            type, which are in review, but not created by the given user.
-        """
-        return cls.get_all().filter(datastore_services.all_of(
-            cls.status == STATUS_IN_REVIEW,
-            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            cls.author_id != user_id,
-            cls.language_code.IN(language_codes)
-        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
-
-    @classmethod
     def get_in_review_translation_suggestions_by_offset(
             cls,
             limit: int,
@@ -560,27 +537,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.target_id.IN(exp_ids),
             cls.language_code == language_code
-        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
-
-    @classmethod
-    def get_in_review_question_suggestions(
-        cls, user_id: str
-    ) -> Sequence[GeneralSuggestionModel]:
-        """Gets all question suggestions which are in review.
-
-        Args:
-            user_id: str. The id of the user trying to make this query.
-                As a user cannot review their own suggestions, suggestions
-                authored by the user will be excluded.
-
-        Returns:
-            list(SuggestionModel). A list of suggestions that are of the given
-            type, which are in review, but not created by the given user.
-        """
-        return cls.get_all().filter(datastore_services.all_of(
-            cls.status == STATUS_IN_REVIEW,
-            cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            cls.author_id != user_id
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
