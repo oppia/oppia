@@ -95,10 +95,11 @@ export class ExplorationImprovementsService implements OnInit {
   }
 
   async isImprovementsTabEnabledAsync(): Promise<boolean> {
-    await this.initPromise;
+    await this.initAsync();
 
-    return this.improvementsTabIsAccessible &&
-      this.config.improvementsTabIsEnabled;
+    return (
+      this.improvementsTabIsAccessible &&
+      this.config.improvementsTabIsEnabled);
   }
 
   async doInitAsync(): Promise<void> {
