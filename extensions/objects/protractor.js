@@ -149,7 +149,7 @@ var NonnegativeIntEditor = function(elem) {
 var NormalizedStringEditor = function(elem) {
   return {
     setValue: async function(value) {
-      debugger;
+      
       await elem.element(by.tagName('input')).clear();
       // while debugging i caught that value stored is 'correct'
       // error may be in elem
@@ -158,7 +158,7 @@ var NormalizedStringEditor = function(elem) {
       var valueThatIsRead =
         await elem.element(by.tagName('input')).getAttribute('value');
       console.log(valueThatIsRead);
-      debugger;
+      
     },
     expectValueToBe: async function(expectedValue) {
       var value = await elem.element(by.tagName('input')).getAttribute('value');
@@ -243,7 +243,7 @@ var TranslatableSetOfNormalizedStringEditor = function(elem) {
         // this came from 149 line
         const normalizedStringEditor = await forms.ListEditor(elem).addItem(
           'NormalizedString');
-        debugger;
+        
         await normalizedStringEditor.setValue(normalizedStrings[i]);
       }
     }
