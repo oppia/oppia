@@ -17,6 +17,7 @@
 """Validation Jobs for exploration"""
 
 from __future__ import annotations
+from asyncio.windows_events import NULL
 
 from core.constants import constants
 from core.domain import exp_fetchers
@@ -45,24 +46,34 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
         total_explorations = (
             self.pipeline
             | 'Get all Explorations' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all(include_deleted=False))
+                exp_models.ExpSummaryModel.get_all(include_deleted=False))
             | 'Get exploration from model' >> beam.Map(
                 exp_fetchers.get_exploration_from_model)
         )
 
-        exp_ids_with_category_not_in_contants = (
+        published_explorations = (
             total_explorations
-            | 'Combine exploration id and category' >> beam.Map(
+            | 'Get published explorations' >> beam.Filter(
+                lambda exp: not exp.first_published_msec == None
+            )
+        )
+
+        exp_ids_with_category_not_in_contants = ( 
+            published_explorations
+            | 'Combine exp id and category and published_info' >> beam.Map(
                 lambda exp: (exp.id, exp.category))
             | 'Filter exploraton with category not in constants.ts' >>
-                beam.Filter(
-                    lambda exp: len(exp[1]) > 0 and
-                    not exp[1] in constants.ALL_CATEGORIES
-                    )
+                beam.Filter(lambda exp: not exp[1] in constants.ALL_CATEGORIES)
         )
 
         report_number_of_exps_queried = (
             total_explorations
+            | 'Report count of exp models' >> (
+                job_result_transforms.CountObjectsToJobRunResult('EXPS'))
+        )
+
+        report_number_of_published_exps = (
+            published_explorations
             | 'Report count of exp models' >> (
                 job_result_transforms.CountObjectsToJobRunResult('EXPS'))
         )
@@ -85,6 +96,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
         return (
             (
                 report_number_of_exps_queried,
+                report_number_of_published_exps,
                 report_number_of_invalid_exps,
                 report_invalid_ids_and_their_category
             )
