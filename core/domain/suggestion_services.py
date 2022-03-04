@@ -604,7 +604,9 @@ def get_reviewable_suggestions(user_id, suggestion_type,
             are fetched. If list is empty and a valid topic name is
             specified, an empty list is returned.
         topic_name: str or None. The name of the topic for which
-            suggestions are to be fetched.
+            suggestions are to be fetched. If passed topic is None
+            and exploratio ID list is also empty, all translation
+            suggestions are returned.
 
     Returns:
         list(Suggestion). A list of suggestions which the given user is allowed

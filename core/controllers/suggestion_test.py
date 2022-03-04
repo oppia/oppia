@@ -2332,7 +2332,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID, 'story-b')
-
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
