@@ -363,7 +363,8 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
-  it('should delete interactions cleanly', async function() {
+  // eslint-disable-next-line oppia/no-test-blockers
+  fit('should delete interactions cleanly', async function() {
     await users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
     await users.login('user8@editorAndPlayer.com');
 

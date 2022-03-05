@@ -26,7 +26,7 @@
                                [disabled]="disabled"
                                [ngModel]="localValue[idx]"
                                [ngModelOptions]="{standalone: true}"
-                               (localValueChange)="setValue($event, idx)"
+                               (ngModelChange)="setValue($event, idx)"
                                [name]="idx"
                                [labelForFocusTarget]="getFocusLabel(idx)"
                                (inputBlur)="(idx === localValue.length - 1 ? lastElementOnBlur() : showAddItemButton())"
