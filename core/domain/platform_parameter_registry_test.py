@@ -44,7 +44,7 @@ class ParamNames(enum.Enum):
 class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     """Tests for the platform parameter Registry."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(PlatformParameterRegistryTests, self).setUp()
 
         self.original_param_registry = registry.Registry.parameter_registry
@@ -56,12 +56,12 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             parameter_names)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         super(PlatformParameterRegistryTests, self).tearDown()
 
         registry.Registry.parameter_registry = self.original_param_registry
 
-    def _create_example_parameter_with_name(self, name):
+    def _create_example_parameter_with_name(self, name: str) -> None:
         """Creates and returns an example parameter with the given name."""
         registry.Registry.init_platform_parameter_from_dict({
             'name': name,
@@ -85,13 +85,13 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'feature_stage': None,
         })
 
-    def test_create_platform_parameter(self):
+    def test_create_platform_parameter(self) -> None:
         parameter = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_A, 'test', DataTypes.BOOL)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
         parameter.validate()
 
-    def test_create_platform_parameter_with_invalid_type_failure(self):
+    def test_create_platform_parameter_with_invalid_type_failure(self) -> None:
         class DataType(enum.Enum):
             """Enum for data type."""
 
@@ -101,14 +101,14 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             registry.Registry.create_platform_parameter(
                 ParamNames.PARAMETER_A, 'test', DataType.INVALID)
 
-    def test_create_platform_parameter_with_the_same_name_failure(self):
+    def test_create_platform_parameter_with_the_same_name_failure(self) -> None:
         param_name = 'parameter_a'
         self._create_example_parameter_with_name(param_name)
         with self.assertRaisesRegex(
             Exception, 'Parameter with name %s already exists' % param_name):
             self._create_example_parameter_with_name(param_name)
 
-    def test_create_feature_flag(self):
+    def test_create_feature_flag(self) -> None:
         feature = registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'test feature', FeatureStages.DEV)
         self.assertEqual(feature.data_type, DataTypes.BOOL.value)
@@ -116,36 +116,36 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertEqual(feature.feature_stage, FeatureStages.DEV.value)
         feature.validate()
 
-    def test_default_value_of_bool_platform_parameter(self):
+    def test_default_value_of_bool_platform_parameter(self) -> None:
         parameter = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_A, 'test feature', DataTypes.BOOL)
         parameter.validate()
         self.assertEqual(parameter.default_value, False)
 
-    def test_default_value_of_string_platform_parameter(self):
+    def test_default_value_of_string_platform_parameter(self) -> None:
         parameter = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_A, 'test', DataTypes.STRING)
         parameter.validate()
         self.assertEqual(parameter.default_value, '')
 
-    def test_default_value_of_number_platform_parameter(self):
+    def test_default_value_of_number_platform_parameter(self) -> None:
         parameter = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_A, 'test', DataTypes.NUMBER)
         parameter.validate()
         self.assertEqual(parameter.default_value, 0)
 
-    def test_get_platform_parameter(self):
+    def test_get_platform_parameter(self) -> None:
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
         parameter = registry.Registry.get_platform_parameter(parameter_name)
         self.assertIsNotNone(parameter)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
 
-    def test_get_non_existing_parameter_failure(self):
+    def test_get_non_existing_parameter_failure(self) -> None:
         with self.assertRaisesRegex(Exception, 'not found'):
             registry.Registry.get_platform_parameter('parameter_a')
 
-    def test_get_all_parameter_names(self):
+    def test_get_all_parameter_names(self) -> None:
         parameter_names = ['parameter_a', 'parameter_b']
         for parameter_name in parameter_names:
             self._create_example_parameter_with_name(parameter_name)
@@ -153,7 +153,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             sorted(registry.Registry.get_all_platform_parameter_names()),
             sorted(parameter_names))
 
-    def test_memcache_is_set_after_getting(self):
+    def test_memcache_is_set_after_getting(self) -> None:
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
 
@@ -165,7 +165,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             registry.Registry.load_platform_parameter_from_memcache(
                 parameter_name))
 
-    def test_update_parameter(self):
+    def test_update_parameter(self) -> None:
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
 
@@ -193,7 +193,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertEqual(
             parameter_updated.rules[0].value_when_matched, 'updated')
 
-    def test_cached_value_is_invalidated_after_update(self):
+    def test_cached_value_is_invalidated_after_update(self) -> None:
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
 
@@ -217,7 +217,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             registry.Registry.load_platform_parameter_from_memcache(
                 parameter_name))
 
-    def test_update_parameter_with_invalid_rules_failure(self):
+    def test_update_parameter_with_invalid_rules_failure(self) -> None:
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
 
@@ -244,7 +244,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             )
 
     def test_update_dev_feature_with_rule_enabled_for_test_raises_exception(
-            self):
+            self) -> None:
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
@@ -271,7 +271,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             )
 
     def test_update_dev_feature_with_rule_enabled_for_prod_raises_exception(
-            self):
+            self) -> None:
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
@@ -298,7 +298,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             )
 
     def test_update_test_feature_with_rule_enabled_for_prod_raises_exception(
-            self):
+            self) -> None:
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.TEST)
@@ -324,7 +324,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 ],
             )
 
-    def test_updated_parameter_is_saved_in_storage(self):
+    def test_updated_parameter_is_saved_in_storage(self) -> None:
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
         self.assertIsNone(
@@ -354,7 +354,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         )
         self.assertIsNotNone(parameter_updated)
 
-    def test_evaluate_all_parameters(self):
+    def test_evaluate_all_parameters(self) -> None:
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
