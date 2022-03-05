@@ -584,7 +584,7 @@ describe('Story update service', () => {
       cmd: 'update_story_node_property',
       property_name: 'exploration_id',
       new_value: 'exp_2',
-      old_value: null,
+      old_value: 'Description 1',
       node_id: 'node_1'
     }]);
   });

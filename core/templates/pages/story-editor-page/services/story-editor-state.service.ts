@@ -42,13 +42,13 @@ export class StoryEditorStateService {
   _storyIsInitialized: boolean = false;
   _storyIsLoading: boolean = false;
   _storyIsBeingSaved: boolean = false;
-  _topicName: string = null;
+  _topicName: string = 'Topic name';
   _storyIsPublished: boolean = false;
   _skillSummaries: SkillSummaryBackendDict[] = [];
   _expIdsChanged: boolean = false;
   _storyWithUrlFragmentExists: boolean = false;
-  _classroomUrlFragment: string = null;
-  _topicUrlFragment: string = null;
+  _classroomUrlFragment: string = 'Url Fragment';
+  _topicUrlFragment: string = 'Url Fragment';
 
   _storyInitializedEventEmitter = new EventEmitter();
   _storyReinitializedEventEmitter = new EventEmitter();

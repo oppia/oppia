@@ -20,11 +20,12 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { Subscription } from 'rxjs';
 
-import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { StoryBackendDict, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { importAllAngularServices, TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
 import { AlertsService } from 'services/alerts.service';
+import { StoryUpdateService } from 'domain/story/story-update.service';
 
 require('domain/story/story-update.service.ts');
 
@@ -85,12 +86,12 @@ class MockEditableStoryBackendApiService {
 }
 
 describe('Story editor state service', () => {
-  var alertsService = null;
-  var storyEditorStateService = null;
-  var storyObjectFactory = null;
-  var storyUpdateService = null;
-  var fakeEditableStoryBackendApiService = null;
-  var secondBackendStoryObject = null;
+  var alertsService: AlertsService;
+  var storyEditorStateService: StoryEditorStateService;
+  var storyObjectFactory: StoryObjectFactory;
+  var storyUpdateService: StoryUpdateService;
+  var fakeEditableStoryBackendApiService: EditableStoryBackendApiService;
+  var secondBackendStoryObject: StoryBackendDict;
   var testSubscriptions: Subscription;
 
   importAllAngularServices();

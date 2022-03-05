@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import { BackendChangeObject, Change } from 'domain/editor/undo_redo/change.model';
+import { BackendChangeObject, Change, DomainObject } from 'domain/editor/undo_redo/change.model';
 import cloneDeep from 'lodash/cloneDeep';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StoryChange } from 'domain/editor/undo_redo/change.model';
@@ -35,6 +35,12 @@ import { StoryNode } from './story-node.model';
 
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
 type StoryUpdateReverse = (storyChange: StoryChange, story: Story) => void;
+type Apply = (
+  backendChangeObject: BackendChangeObject,
+  domainObject: DomainObject) => void;
+type Reverse = (
+  backendChangeObject: BackendChangeObject,
+  domainObject: DomainObject) => void;
 
 // For properties like initialNodeId, thumbnailBackdroundColor
 // old value can be null.
@@ -67,7 +73,7 @@ export class StoryUpdateService {
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     let changeDict = cloneDeep(params) as BackendChangeObject;
     changeDict.cmd = command;
-    let changeObj = new Change(changeDict, apply, reverse);
+    let changeObj = new Change(changeDict, apply as Apply, reverse as Reverse);
     try {
       this._undoRedoService.applyChange(changeObj, story);
     } catch (err: unknown) {
@@ -80,7 +86,7 @@ export class StoryUpdateService {
 
   _getParameterFromChangeDict(
       changeDict: BackendChangeObject, paramName: string): string {
-    return changeDict[paramName];
+    return changeDict[paramName as keyof BackendChangeObject];
   }
 
   _getNodeIdFromChangeDict(changeDict: BackendChangeObject): string {
