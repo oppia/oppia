@@ -38,13 +38,13 @@ export class DisplayHintModalComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   index!: number;
-  hint!: SubtitledHtml | null;
   // Null is allowed here because displayhint() funtion in
   // Hints-and-solution-manager.service.ts can return null.
-  hintContentId!: string | null;
+  hint!: SubtitledHtml | null;
   // Null is allowed here because in SubtitledHtml class in the
   // Subtitled-html.model.ts file the type of contentID is
   // Defined as string | null.
+  hintContentId!: string | null;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
