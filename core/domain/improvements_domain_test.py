@@ -74,7 +74,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
             constants.TASK_STATUS_RESOLVED, self.owner_id,
             self.MOCK_DATE)
         self.assertEqual(
-            task_entry.to_dict(), # type: ignore[no-untyped-call]
+            task_entry.to_dict(),
             {
             'entity_type': 'exploration',
             'entity_id': self.exp_id,
