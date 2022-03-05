@@ -8,23 +8,23 @@
     <div class="oppia-learner-view-card-top-section">
       <oppia-content-language-selector></oppia-content-language-selector>
       <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
-          [href]="OPPIA_AVATAR_LINK_URL"
-          target="_blank"
-          rel="noopener">
+         [href]="OPPIA_AVATAR_LINK_URL"
+         target="_blank"
+         rel="noopener">
         <img class="conversation-skin-oppia-avatar"
-              [src]="OPPIA_AVATAR_IMAGE_URL" alt=""
-              *ngIf="avatarImageIsShown">
+             [src]="OPPIA_AVATAR_IMAGE_URL" alt=""
+             *ngIf="avatarImageIsShown">
       </a>
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
-            [ngClass]="getContentAudioHighlightClass()"
-            [oppiaFocusOn]="getContentFocusLabel($index)">
+           [ngClass]="getContentAudioHighlightClass()"
+           [oppiaFocusOn]="getContentFocusLabel($index)">
         <div tabindex="1">
           <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()"
                                     class="protractor-test-conversation-content">
           </oppia-rte-output-display>
         </div>
         <div *ngIf="isContentAudioTranslationAvailable()"
-              class="conversation-skin-audio-controls">
+             class="conversation-skin-audio-controls">
         </div>
       </div>
     </div>
@@ -44,14 +44,14 @@
     </div>
 
     <div class="conversation-skin-tutor-card-middle-section"
-          *ngIf="(arePreviousResponsesShown && !conceptCardIsBeingShown)" [@expandInOut]>
+         *ngIf="(arePreviousResponsesShown && !conceptCardIsBeingShown)" [@expandInOut]>
       <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
         <div *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
           <oppia-input-response-pair [data]="responsePair"
-                                      [profilePicture]="profilePicture"
-                                      [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
-                                      [inputResponsePairId]="getInputResponsePairId($index)"
-                                      [isLastPair]="false">
+                                     [profilePicture]="profilePicture"
+                                     [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
+                                     [inputResponsePairId]="getInputResponsePairId($index)"
+                                     [isLastPair]="false">
           </oppia-input-response-pair>
         </div>
       </div>
@@ -60,11 +60,11 @@
     <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
     <div class="conversation-skin-tutor-card-bottom-section" *ngIf="isInteractionInline() && displayedCard.getInputResponsePairs().length > 0">
       <oppia-input-response-pair [data]="displayedCard.getInputResponsePairs()[displayedCard.getInputResponsePairs().length - 1]"
-                                  [bottomSection]="true"
-                                  [profilePicture]="profilePicture"
-                                  [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
-                                  [inputResponsePairId]="getInputResponsePairId(displayedCard.getInputResponsePairs().length - 1)"
-                                  [isLastPair]="true">
+                                 [bottomSection]="true"
+                                 [profilePicture]="profilePicture"
+                                 [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
+                                 [inputResponsePairId]="getInputResponsePairId(displayedCard.getInputResponsePairs().length - 1)"
+                                 [isLastPair]="true">
       </oppia-input-response-pair>
     </div>
 
@@ -85,7 +85,7 @@
           non-inline interactions. -->
         <div *ngIf="isInteractionInline() && displayedCard.getInteractionHtml() && !displayedCard.isCompleted() && !conceptCardIsBeingShown">
           <angular-html-bind-wrapper classStr="protractor-test-conversation-input"
-                                      [htmlData]="displayedCard.getInteractionHtml()">
+                                     [htmlData]="displayedCard.getInteractionHtml()">
           </angular-html-bind-wrapper>
         </div>
       </div>
