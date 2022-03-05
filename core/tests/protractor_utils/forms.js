@@ -29,9 +29,8 @@ var action = require('./action.js');
 var DictionaryEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
-      var entry = elem.element(
-        await by.repeater('property in propertySchemas()').
-          row(index));
+      var entry = await elem.all(
+        by.css('.protractor-test-schema-based-dict-editor')).get(index);
       var editor = getEditor(objectType);
       return await editor(entry);
     }
@@ -300,8 +299,8 @@ var RichTextEditor = async function(elem) {
 var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
-      var entry = elem.element(
-        await by.repeater('property in propertySchemas()').row(index));
+      var entry = await elem.all(
+        by.css('.protractor-test-schema-based-dict-editor')).get(index);
       var editor = getEditor(objectType);
       return await editor(entry);
     }
