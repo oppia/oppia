@@ -215,10 +215,17 @@ def managed_elasticsearch_dev_server():
     if os.path.exists(common.ES_PATH_DATA_DIR):
         shutil.rmtree(common.ES_PATH_DATA_DIR)
 
-    # -q is the quiet flag.
-    es_args = ['%s/bin/elasticsearch' % common.ES_PATH, '-q']
+    es_args = [
+        '%s/bin/elasticsearch' % common.ES_PATH,
+        # -q is the quiet flag.
+        '-q'
+    ]
     # Override the default path to ElasticSearch config files.
-    es_env = {'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR}
+    es_env = {
+        'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
+        # Set the minimum heap size to 100 MB and maximum to 500 MB.
+        'ES_JAVA_OPTS': '-Xms100m -Xmx500m'
+    }
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
@@ -369,6 +376,9 @@ def managed_webpack_compiler(
 
     Yields:
         psutil.Process. The Webpack compiler process.
+
+    Raises:
+        OSError. First build never completed.
     """
     if config_path is not None:
         pass
@@ -503,6 +513,9 @@ def managed_webdriver_server(chrome_version=None):
 
     Yields:
         psutil.Process. The Webdriver process.
+
+    Raises:
+        Exception. Space instead of '\'.
     """
     if chrome_version is None:
         # Although there are spaces between Google and Chrome in the path, we
@@ -601,6 +614,9 @@ def managed_protractor_server(
 
     Yields:
         psutil.Process. The protractor process.
+
+    Raises:
+        ValueError. Number of sharding instances are less than 0.
     """
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')
