@@ -19,6 +19,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormControl } from '@angular/forms';
 import { RealEditorComponent } from './real-editor.component';
 
 describe('RealEditorComponent', () => {
@@ -38,9 +39,11 @@ describe('RealEditorComponent', () => {
 
     component.ngOnInit();
     component.writeValue(0);
-    component.registerOnTouched(null);
-    component.registerOnChange(null);
-    component.registerOnValidatorChange(() => {});
+    component.registerOnTouched(() => void 0);
+    component.registerOnChange(() => void 0);
+    if (component.registerOnValidatorChange !== undefined) {
+      component.registerOnValidatorChange(() => void 0);
+    }
   });
 
   it('should initialise component when user edits a number', () => {
@@ -50,7 +53,7 @@ describe('RealEditorComponent', () => {
   });
 
   it('should get empty object on validating', () => {
-    expect(component.validate(null)).toEqual({});
+    expect(component.validate(new FormControl(2))).toEqual({});
   });
 
   it('should initialise with old value if present', () => {

@@ -24,6 +24,12 @@ import { NumberConversionService } from 'services/number-conversion.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
+interface OppiaValidator {
+  id: string;
+  'min_value': number;
+  'max_value': number;
+}
+
 @Component({
   selector: 'schema-based-float-editor',
   templateUrl: './schema-based-float-editor.component.html',
@@ -44,9 +50,9 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 export class SchemaBasedFloatEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
   localValue: number;
-  @Input() disabled;
-  @Input() validators;
-  @Input() labelForFocusTarget;
+  @Input() disabled: boolean = false;
+  @Input() validators: OppiaValidator[];
+  @Input() labelForFocusTarget: string;
   @Output() inputBlur = new EventEmitter<void>();
   @Output() inputFocus = new EventEmitter<void>();
   @ViewChild('floatform', {'static': true}) floatForm: NgForm;
@@ -59,7 +65,7 @@ implements ControlValueAccessor, OnInit, Validator {
   @Input() uiConfig: {checkRequireNonnegativeInput: boolean};
   checkRequireNonnegativeInputValue: boolean = false;
   minValue: number;
-  localStringValue: string = '';
+  localStringValue: string;
   constructor(
     private focusManagerService: FocusManagerService,
     private numberConversionService: NumberConversionService,
@@ -202,7 +208,7 @@ implements ControlValueAccessor, OnInit, Validator {
 
   currentDecimalSeparator(): string {
     return this.numberConversionService.currentDecimalSeparator();
-  };
+  }
 
   parseInput(): void {
     let regex = this.numberConversionService.getInputValidationRegex();
@@ -219,7 +225,7 @@ implements ControlValueAccessor, OnInit, Validator {
       this.errorStringI18nKey = undefined;
     } else {
       // Make sure number is in a correct format.
-      let error = NumericInputValidationService
+      let error = this.numericInputValidationService
         .validateNumericString(
           this.localStringValue,
           this.currentDecimalSeparator());
@@ -235,7 +241,7 @@ implements ControlValueAccessor, OnInit, Validator {
         this.generateErrors();
       }
     }
-  };
+  }
 }
 
 angular.module('oppia').directive('schemaBasedFloatEditor', downgradeComponent({

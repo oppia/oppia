@@ -24,6 +24,7 @@ import { SchemaFormSubmittedService } from 'services/schema-form-submitted.servi
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SchemaBasedFloatEditorComponent } from './schema-based-float-editor.component';
+import { NumberConversionService } from 'services/number-conversion.service';
 
 class MockFocusManagerService {
   setFocusWithoutScroll(value: string) {}
@@ -40,6 +41,8 @@ describe('Schema based float editor component', function() {
   let fixture: ComponentFixture<SchemaBasedFloatEditorComponent>;
   let schemaFormSubmittedService: SchemaFormSubmittedService;
   let numericInputValidationService: NumericInputValidationService;
+  let numberConversionService: NumberConversionService;
+  let validator: NumericInputValidationService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -67,16 +70,20 @@ describe('Schema based float editor component', function() {
     component.validators = [
       {
         id: 'is_at_least',
-        min_value: 1.1
+        min_value: 1.1,
+        max_value: 2.2
       },
       {
         id: 'is_at_most',
-        max_value: 3.5
+        max_value: 3.5,
+        min_value: 4.4
       }
     ];
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
     numericInputValidationService =
       TestBed.inject(NumericInputValidationService);
+    numberConversionService = TestBed.inject(NumberConversionService);
+    validator = TestBed.inject(NumericInputValidationService);
     fixture.detectChanges();
   });
 
@@ -89,6 +96,7 @@ describe('Schema based float editor component', function() {
     expect(component.hasFocusedAtLeastOnce).toBe(false);
     expect(component.errorStringI18nKey).toBe('');
     expect(component.localValue).toBe(0.0);
+    expect(component.localStringValue).toBe('');
     expect(component.checkRequireNonnegativeInputValue).toBe(false);
     expect(component.labelForErrorFocusTarget).toBe('FocusLabel');
 
@@ -173,7 +181,7 @@ describe('Schema based float editor component', function() {
   }));
 
   it('should generate error for wrong input', fakeAsync(() => {
-    spyOn(numericInputValidationService, 'getErrorStringI18nKey')
+    spyOn(numericInputValidationService, 'validateNumber')
       .and.returnValue('I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
     component.localValue = null;
     component.generateErrors();
@@ -190,5 +198,50 @@ describe('Schema based float editor component', function() {
       .toEqual({});
     expect(component.validate(new FormControl(null)))
       .toEqual({error: 'invalid'});
+  });
+
+  it('should get current decimal separator', ()=>{
+    spyOn(numberConversionService, 'currentDecimalSeparator')
+      .and.returnValues('.', ',');
+
+    expect(component.currentDecimalSeparator()).toEqual('.');
+    expect(component.currentDecimalSeparator()).toEqual(',');
+  });
+
+  it('should remove any invalid character from the input', ()=>{
+    spyOn(numberConversionService, 'getInputValidationRegex')
+      .and.returnValues(/[^e0-9\.\-]/g, /[^e0-9\,\-]/g);
+
+    component.localStringValue = 'a';
+    component.parseInput();
+    expect(component.localStringValue).toEqual('');
+
+    component.localStringValue = '12.';
+    component.parseInput();
+    expect(component.localStringValue).toEqual('12');
+  });
+
+  it('should parse the string to a number on input', ()=>{
+    spyOn(numberConversionService, 'getInputValidationRegex')
+      .and.returnValue(/[^e0-9\.\-]/g);
+    spyOn(component, 'currentDecimalSeparator').and.returnValues('.', ',');
+
+    component.localStringValue = '';
+    component.parseInput();
+    expect(component.localValue).toEqual(null);
+
+    component.localStringValue = '-12';
+    component.parseInput();
+    expect(component.localValue).toEqual(-12);
+
+    component.localStringValue = '-12e1';
+    component.parseInput();
+    expect(component.localValue).toEqual(-120);
+
+    spyOn(validator, 'validateNumericString').and.returnValue('Error');
+    component.localStringValue = '--12';
+    component.parseInput();
+    expect(component.localValue).toEqual(null);
+    expect(component.errorStringI18nKey).toEqual('Error');
   });
 });
