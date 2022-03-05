@@ -1153,13 +1153,13 @@ def get_categorized_and_untriaged_skills_dicts(
     skill_summary_dicts, skill_ids_assigned_to_some_topic, merged_skill_ids
 ):
     """Fetches the categorized and untriaged skills' descriptions and ids.
-    
+
     Args:
-        skill_summary_dicts: list[dict[str, Any]]. The list of skill summary dicts.
+        skill_summary_dicts: list[dict[str, Any]]. The list of
+            skill summary dicts.
         skill_ids_assigned_to_some_topic: set(str). The set of skill ids which
             are assigned to some topic.
         merged_skill_ids: list(str). List of skill IDs of merged skills.
-        topic: list[Topic]. The list of topics.
 
     Returns:
         dict, list[dict[str, Any]]. The categorized skills dict and list of
@@ -1204,7 +1204,7 @@ def get_categorized_and_untriaged_skills_dicts(
             'skill_id': skill_id,
             'skill_description': skills_descriptions[skill_id]
         }
-        if (skill_type == 'uncategorized'):
+        if skill_type == 'uncategorized':
             categorized_skills_dict[topic_name]['uncategorized'].append(
                 skill_dict)
         else:
