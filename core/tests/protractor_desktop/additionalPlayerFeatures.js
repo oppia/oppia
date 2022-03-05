@@ -291,7 +291,7 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.addHint('Try language of Finland');
     // Error.
     await explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'F',
+      correctAnswer: 'Finnish',
       explanation: 'Finland language'
     });
     await explorationEditorMainTab.moveToState('End');

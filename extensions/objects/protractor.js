@@ -153,11 +153,9 @@ var NormalizedStringEditor = function(elem) {
       // while debugging i caught that value stored is 'correct'
       // error may be in elem
       await elem.element(by.tagName('input')).sendKeys(value);
-      debugger;
       var valueThatIsRead =
         await elem.element(by.tagName('input')).getAttribute('value');
       console.log(valueThatIsRead);
-      debugger;
     },
     expectValueToBe: async function(expectedValue) {
       var value = await elem.element(by.tagName('input')).getAttribute('value');
