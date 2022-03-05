@@ -69,54 +69,54 @@ class REPORT_TYPE(enum.Enum): # pylint: disable=invalid-name
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
-class CATEGORY(enum.Enum): # pylint: disable=invalid-name
+class Category(enum.Enum): # pylint: disable=invalid-name
     """Enum for categories."""
 
-    feature_suggestion = 'feature_suggestion' # pylint: disable=invalid-name
-    language_suggestion = 'language_suggestion' # pylint: disable=invalid-name
-    other_suggestion = 'other_suggestion' # pylint: disable=invalid-name
-    lesson_question_issue = 'lesson_question_issue' # pylint: disable=invalid-name
-    language_general_issue = 'language_general_issue' # pylint: disable=invalid-name
-    language_audio_issue = 'language_audio_issue' # pylint: disable=invalid-name
-    language_text_issue = 'language_text_issue' # pylint: disable=invalid-name
-    topics_issue = 'topics_issue' # pylint: disable=invalid-name
-    profile_issue = 'profile_issue' # pylint: disable=invalid-name
-    other_issue = 'other_issue' # pylint: disable=invalid-name
-    lesson_player_crash = 'lesson_player_crash' # pylint: disable=invalid-name
-    practice_questions_crash = 'practice_questions_crash' # pylint: disable=invalid-name
-    options_page_crash = 'options_page_crash' # pylint: disable=invalid-name
-    profile_page_crash = 'profile_page_crash' # pylint: disable=invalid-name
-    other_crash = 'other_crash' # pylint: disable=invalid-name
+    FEATURE_SUGGESTION = 'feature_suggestion' # pylint: disable=invalid-name
+    LANGUAGE_SUGGESTION = 'language_suggestion' # pylint: disable=invalid-name
+    OTHER_SUGGESTION = 'other_suggestion' # pylint: disable=invalid-name
+    LESSON_QUESTION_ISSUE = 'lesson_question_issue' # pylint: disable=invalid-name
+    LANGUAGE_GENERAL_ISSUE = 'language_general_issue' # pylint: disable=invalid-name
+    LANGUAGE_AUDIO_ISSUE = 'language_audio_issue' # pylint: disable=invalid-name
+    LANGUAGE_TEXT_ISSUE = 'language_text_issue' # pylint: disable=invalid-name
+    TOPICS_ISSUE = 'topics_issue' # pylint: disable=invalid-name
+    PROFILE_ISSUE = 'profile_issue' # pylint: disable=invalid-name
+    OTHER_ISSUE = 'other_issue' # pylint: disable=invalid-name
+    LESSON_PLAYER_CRASH = 'lesson_player_crash' # pylint: disable=invalid-name
+    PRACTICE_QUESTION_CRASH = 'practice_questions_crash' # pylint: disable=invalid-name
+    OPTIONS_PAGE_CRASH = 'options_page_crash' # pylint: disable=invalid-name
+    PROFILE_PAGE_CRASH = 'profile_page_crash' # pylint: disable=invalid-name
+    OTHER_CRASH = 'other_crash' # pylint: disable=invalid-name
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
-class ENTRY_POINT(enum.Enum): # pylint: disable=invalid-name
+class EntryPoint(enum.Enum): # pylint: disable=invalid-name
     """Enum for entry points."""
 
-    navigation_drawer = 'navigation_drawer' # pylint: disable=invalid-name
-    lesson_player = 'lesson_player' # pylint: disable=invalid-name
-    revision_card = 'revision_card' # pylint: disable=invalid-name
-    crash = 'crash' # pylint: disable=invalid-name
+    NAVIGATION_DRAWER = 'navigation_drawer' # pylint: disable=invalid-name
+    LESSON_PLAYER = 'lesson_player' # pylint: disable=invalid-name
+    REVISION_CARD = 'revision_card' # pylint: disable=invalid-name
+    CRASH = 'crash' # pylint: disable=invalid-name
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
-class STATS_PARAMETER_NAMES(enum.Enum): # pylint: disable=invalid-name
+class StatsParameterNames(enum.Enum): # pylint: disable=invalid-name
     """Enum for stats parameter names."""
 
-    platform = 'platform' # pylint: disable=invalid-name
-    report_type = 'report_type' # pylint: disable=invalid-name
-    country_locale_code = 'country_locale_code' # pylint: disable=invalid-name
-    entry_point_name = 'entry_point_name' # pylint: disable=invalid-name
-    text_language_code = 'text_language_code' # pylint: disable=invalid-name
-    audio_language_code = 'audio_language_code' # pylint: disable=invalid-name
-    android_sdk_version = 'android_sdk_version' # pylint: disable=invalid-name
-    version_name = 'version_name' # pylint: disable=invalid-name
+    PLATFORM = 'platform' # pylint: disable=invalid-name
+    REPORT_TYPE = 'report_type' # pylint: disable=invalid-name
+    COUNTRY_LOCALE_CODE = 'country_locale_code' # pylint: disable=invalid-name
+    ENTRY_POINT_NAME = 'entry_point_name' # pylint: disable=invalid-name
+    TEXT_LANGUAGE_CODE = 'text_language_code' # pylint: disable=invalid-name
+    AUDIO_LANGUAGE_CODE = 'audio_language_code' # pylint: disable=invalid-name
+    ANDROID_SDK_VERSION = 'android_sdk_version' # pylint: disable=invalid-name
+    VERSION_NAME = 'version_name' # pylint: disable=invalid-name
 
 
 class AndroidTextSize(enum.Enum):
@@ -140,36 +140,36 @@ class AndroidNetworkType(enum.Enum):
 FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
 
 ANDROID_ENTRY_POINT = [
-    ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
-    ENTRY_POINT.revision_card, ENTRY_POINT.crash]
+    EntryPoint.NAVIGATION_DRAWER, EntryPoint.LESSON_PLAYER,
+    EntryPoint.REVISION_CARD, EntryPoint.CRASH]
 ALLOWED_REPORT_TYPES = [
     REPORT_TYPE.suggestion, REPORT_TYPE.issue, REPORT_TYPE.crash]
 ALLOWED_CATEGORIES = [
-    CATEGORY.feature_suggestion, CATEGORY.language_suggestion,
-    CATEGORY.other_suggestion, CATEGORY.language_general_issue,
-    CATEGORY.language_audio_issue, CATEGORY.language_text_issue,
-    CATEGORY.topics_issue, CATEGORY.profile_issue, CATEGORY.other_issue,
-    CATEGORY.lesson_player_crash, CATEGORY.practice_questions_crash,
-    CATEGORY.options_page_crash, CATEGORY.profile_page_crash,
-    CATEGORY.other_crash]
+    Category.FEATURE_SUGGESTION, Category.LANGUAGE_SUGGESTION,
+    Category.OTHER_SUGGESTION, Category.LANGUAGE_GENERAL_ISSUE,
+    Category.LANGUAGE_AUDIO_ISSUE, Category.LANGUAGE_TEXT_ISSUE,
+    Category.TOPICS_ISSUE, Category.PROFILE_ISSUE, Category.OTHER_ISSUE,
+    Category.LESSON_PLAYER_CRASH, Category.PRACTICE_QUESTION_CRASH,
+    Category.OPTIONS_PAGE_CRASH, Category.PROFILE_PAGE_CRASH,
+    Category.OTHER_CRASH]
 ALLOWED_ONLY_INPUT_TEXT_CATEGORIES = [
-    CATEGORY.feature_suggestion, CATEGORY.language_suggestion,
-    CATEGORY.other_suggestion, CATEGORY.other_issue,
-    CATEGORY.lesson_player_crash, CATEGORY.practice_questions_crash,
-    CATEGORY.options_page_crash, CATEGORY.profile_page_crash,
-    CATEGORY.other_crash]
+    Category.FEATURE_SUGGESTION, Category.LANGUAGE_SUGGESTION,
+    Category.OTHER_SUGGESTION, Category.OTHER_ISSUE,
+    Category.LESSON_PLAYER_CRASH, Category.PRACTICE_QUESTION_CRASH,
+    Category.OPTIONS_PAGE_CRASH, Category.PROFILE_PAGE_CRASH,
+    Category.OTHER_CRASH]
 ALLOWED_SELECTION_ITEMS_CATEGORIES = [
-    CATEGORY.language_audio_issue, CATEGORY.language_text_issue,
-    CATEGORY.topics_issue, CATEGORY.profile_issue]
+    Category.LANGUAGE_AUDIO_ISSUE, Category.LANGUAGE_TEXT_ISSUE,
+    Category.TOPICS_ISSUE, Category.PROFILE_ISSUE]
 ALLOWED_STATS_PARAMETERS = [
-    STATS_PARAMETER_NAMES.platform,
-    STATS_PARAMETER_NAMES.report_type,
-    STATS_PARAMETER_NAMES.country_locale_code,
-    STATS_PARAMETER_NAMES.entry_point_name,
-    STATS_PARAMETER_NAMES.text_language_code,
-    STATS_PARAMETER_NAMES.audio_language_code,
-    STATS_PARAMETER_NAMES.android_sdk_version,
-    STATS_PARAMETER_NAMES.version_name]
+    StatsParameterNames.PLATFORM,
+    StatsParameterNames.REPORT_TYPE,
+    StatsParameterNames.COUNTRY_LOCALE_CODE,
+    StatsParameterNames.ENTRY_POINT_NAME,
+    StatsParameterNames.TEXT_LANGUAGE_CODE,
+    StatsParameterNames.AUDIO_LANGUAGE_CODE,
+    StatsParameterNames.ANDROID_SDK_VERSION,
+    StatsParameterNames.VERSION_NAME]
 ALLOWED_FILTERS = [
     FILTER_FIELD_NAMES.report_type, FILTER_FIELD_NAMES.platform,
     FILTER_FIELD_NAMES.entry_point, FILTER_FIELD_NAMES.submitted_on,
