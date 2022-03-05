@@ -72,7 +72,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
         )
 
         report_number_of_invalid_exps = (
-            exp_ids_with_category_not_in_contants
+            exp_ids_with_category_not_in_constants
             | 'Report count of invalid exp models' >> (
                 job_result_transforms.CountObjectsToJobRunResult('INVALID'))
         )
