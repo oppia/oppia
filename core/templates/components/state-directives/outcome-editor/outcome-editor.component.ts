@@ -71,10 +71,6 @@ angular.module('oppia').component('outcomeEditor', {
         return StateEditorService.getCorrectnessFeedbackEnabled();
       };
 
-      ctrl.getChanges = function() {
-        $rootScope.$applyAsync();
-      };
-
       // This returns false if the current interaction ID is null.
       ctrl.isCurrentInteractionLinear = function() {
         var interactionId = ctrl.getCurrentInteractionId();

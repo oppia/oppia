@@ -82,7 +82,6 @@ describe('OutcomeEditorComponent', () => {
     expect(ctrl.savedOutcome).toBe(undefined);
 
     ctrl.$onInit();
-    ctrl.getChanges();
 
     expect(ctrl.editOutcomeForm).toEqual({});
     expect(ctrl.canAddPrerequisiteSkill).toBe(false);
