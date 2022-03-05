@@ -124,6 +124,25 @@ def update_translation_related_change(
         opportunity_services.update_opportunity_with_updated_exploration(
             exploration_id)
 
-def get_entity_translation_domain_object_from_model():
-    # todo.
-    pass
+def get_entity_translation_domain_object_from_model(
+    entity_translation_model
+):
+    """Returns the EntityTranslation domain object from its model representation
+    (EntityTranslationModel).
+
+    Args:
+        entity_translation_model: EntityTranslatioModel. An instance of
+            EntityTranslationModel.
+
+    Returns:
+        EntityTranslation. An instance of EntityTranslation object, created from
+        its model.
+    """
+    entity_translation = translation_domain.EntityTranslation(
+        entity_translation_model.entity_id,
+        entity_translation_model.entity_type,
+        entity_translation_model.entity_version,
+        entity_translation_model.language_code,
+        entity_translation_model.translations
+    )
+    return entity_translation

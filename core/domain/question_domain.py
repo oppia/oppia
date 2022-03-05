@@ -176,7 +176,7 @@ class Question(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Registers all of translatable fields/objects in the question.
+        """Get all translatable fields in the question.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.

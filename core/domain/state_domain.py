@@ -306,7 +306,7 @@ class Hint(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the hint.
+        """Get all translatable fields in the hint.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -404,7 +404,7 @@ class Solution(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the solution.
+        """Get all translatable fields in the solution.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -574,7 +574,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the interaction instance.
+        """Get all translatable fields in the interaction instance.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -1062,8 +1062,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the interaction customization
-        args.
+        """Get all translatable fields in the interaction customization args.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -1430,7 +1429,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the outcome.
+        """Get all translatable fields in the outcome.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -2223,7 +2222,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the rule spec.
+        """Get all translatable fields in the rule spec.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -2689,7 +2688,7 @@ class State(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields/objects in the state.
+        """Get all translatable fields in the state.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
