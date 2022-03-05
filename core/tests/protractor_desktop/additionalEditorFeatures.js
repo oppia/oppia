@@ -375,9 +375,11 @@ describe('Full exploration editor', function() {
     await explorationEditorPage.navigateToPreviewTab();
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.setInteraction('TextInput');
+
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Happy!'), null, false, 'Equals',
       ['happy']);
+
     await explorationEditorMainTab.expectInteractionToMatch('TextInput');
     await explorationEditorPage.saveChanges();
     await explorationEditorMainTab.deleteInteraction();

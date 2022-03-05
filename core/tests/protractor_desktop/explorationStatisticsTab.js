@@ -93,7 +93,7 @@ describe('Statistics tab', function() {
     await explorationEditorMainTab.addHint('The number 2 in words.');
     // Error.
     await explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'T',
+      correctAnswer: 'Two',
       explanation: 'The English equivalent of 2'
     });
     await explorationEditorMainTab.moveToState('Three');
