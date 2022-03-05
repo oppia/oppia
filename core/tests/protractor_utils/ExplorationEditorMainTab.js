@@ -269,7 +269,6 @@ var ExplorationEditorMainTab = function() {
   this.addResponse = async function(
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
-    
     await action.waitForAutosave();
     // Open the "Add Response" modal if it is not already open.
     await action.click('Response Editor Button', addResponseButton);
@@ -280,7 +279,6 @@ var ExplorationEditorMainTab = function() {
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
     // Set the rule description.
-    
     var args = [addResponseDetails, interactionId, ruleName];
     for (var i = 5; i < arguments.length; i++) {
       args.push(arguments[i]);

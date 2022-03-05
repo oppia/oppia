@@ -213,7 +213,7 @@ describe('Topics and skills dashboard functionality', function() {
     // Changed Part.
     console.log('error');
     await explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'c',
+      correctAnswer: 'correct',
       explanation: 'It is correct'
     });
     await skillEditorPage.saveQuestion();
