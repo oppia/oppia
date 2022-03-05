@@ -19,6 +19,7 @@
 import { DOCUMENT } from '@angular/common';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NavigationEnd, Router } from '@angular/router';
 import { AppConstants } from 'app.constants';
 import { LimitToPipe } from 'filters/limit-to.pipe';
 import { CookieModule, CookieService } from 'ngx-cookie';
@@ -59,6 +60,13 @@ describe('Base Content Component', () => {
     isIframed(): boolean {
       return isIframed;
     }
+  }
+
+  class MockRouteService {
+    public events: Observable<NavigationEnd> = (
+      of(new NavigationEnd(
+        0, 'http://localhost:8181', 'http://localhost:8181')
+      ));
   }
 
   class MockWindowRef {
@@ -103,6 +111,10 @@ describe('Base Content Component', () => {
         LimitToPipe
       ],
       providers: [
+        {
+          provide: Router,
+          useClass: MockRouteService
+        },
         {
           provide: WindowRef,
           useClass: MockWindowRef
