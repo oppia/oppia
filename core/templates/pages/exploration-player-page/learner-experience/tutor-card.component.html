@@ -92,7 +92,7 @@
     </div>
 
     <div *ngIf="!isInteractionInline() && !conceptCardIsBeingShown"
-          class="conversation-skin-inline-interaction">
+         class="conversation-skin-inline-interaction">
       <div class="oppia-conversation-skin-instruction-container">
         <span [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}">
           {{ interactionInstructions | translate }}
