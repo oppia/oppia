@@ -1,5 +1,5 @@
 <div role="form">
-  <div *ngFor="let property of propertySchemas; let idx = index" id="protractor-test-schema-based-dict-editor">
+  <div class="protractor-test-schema-based-dict-editor" *ngFor="let property of propertySchemas; let idx = index">
     <div class="form-group">
       <label for="{{fieldIds[property.name]}}">{{getHumanReadablePropertyDescription(property)}}</label>
       <!-- TODO(sll): This is in the wrong place. It should be on the input field. -->

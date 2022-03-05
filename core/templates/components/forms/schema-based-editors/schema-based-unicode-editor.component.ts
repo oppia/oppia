@@ -74,7 +74,7 @@ implements ControlValueAccessor, OnInit, Validator {
   } = {
     // Convert tabs to spaces.
       extraKeys: {
-        Tab: (cm) => {
+        Tab: function(cm) {
           var spaces = Array(
             cm.getOption('indentUnit') + 1).join(' ');
           cm.replaceSelection(spaces);
