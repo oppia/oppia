@@ -19,6 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { StoryContents } from './story-contents-object.model';
 
 describe('Story object factory', () => {
   let storyObjectFactory: StoryObjectFactory;
@@ -70,17 +71,38 @@ describe('Story object factory', () => {
   });
 
   it('should be able to create an interstitial story object', () => {
+    let sampleStoryContentsBackendDict = {
+      initial_node_id: '',
+      nodes: [
+        {
+          id: '',
+          title: '',
+          description: '',
+          prerequisite_skill_ids: [''],
+          acquired_skill_ids: [''],
+          destination_node_ids: [''],
+          outline: '',
+          exploration_id: '',
+          outline_is_finalized: false,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null
+        }],
+      next_node_id: ''
+    };
+    let mockStoryContent = StoryContents.createFromBackendDict(
+      sampleStoryContentsBackendDict);
+
     var story = storyObjectFactory.createInterstitialStory();
-    expect(story.getId()).toEqual(null);
+    expect(story.getId()).toEqual('Id loading');
     expect(story.getThumbnailFilename()).toEqual(null);
     expect(story.getThumbnailBgColor()).toEqual(null);
     expect(story.getTitle()).toEqual('Story title loading');
     expect(story.getDescription()).toEqual('Story description loading');
     expect(story.getLanguageCode()).toBe('en');
-    expect(story.getStoryContents()).toEqual(null);
+    expect(story.getStoryContents()).toEqual(mockStoryContent);
     expect(story.getNotes()).toEqual('Story notes loading');
-    expect(story.getCorrespondingTopicId()).toEqual(null);
-    expect(story.getUrlFragment()).toEqual(null);
+    expect(story.getCorrespondingTopicId()).toEqual('');
+    expect(story.getUrlFragment()).toEqual('');
   });
 
   it('should correctly validate a valid story', () => {

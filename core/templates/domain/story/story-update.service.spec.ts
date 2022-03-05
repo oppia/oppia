@@ -23,7 +23,6 @@ import { TestBed } from '@angular/core/testing';
 import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { StoryContents } from './story-contents-object.model';
 
 describe('Story update service', () => {
   let storyObjectFactory: StoryObjectFactory;
@@ -91,20 +90,17 @@ describe('Story update service', () => {
   it('should add/remove a prerequisite skill id to/from a node in the story',
     () => {
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getPrerequisiteSkillIds()
+        _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1']);
       storyUpdateService.addPrerequisiteSkillIdToNode(
         _sampleStory, 'node_1', 'skill_3');
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getPrerequisiteSkillIds()
+        _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1', 'skill_3']);
 
       undoRedoService.undoChange(_sampleStory);
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getPrerequisiteSkillIds()
+        _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1']);
     }
   );
@@ -126,20 +122,17 @@ describe('Story update service', () => {
   it('should add/remove an acquired skill id to/from a node in the story',
     () => {
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getAcquiredSkillIds()
+        _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2']);
       storyUpdateService.addAcquiredSkillIdToNode(
         _sampleStory, 'node_1', 'skill_4');
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getAcquiredSkillIds()
+        _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2', 'skill_4']);
 
       undoRedoService.undoChange(_sampleStory);
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getAcquiredSkillIds()
+        _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2']);
     }
   );
@@ -161,8 +154,7 @@ describe('Story update service', () => {
   it('should add/remove a destination node id to/from a node in the story',
     () => {
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getDestinationNodeIds()
+        _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
       ).toEqual([]);
       storyUpdateService.addDestinationNodeIdToNode(
         _sampleStory, 'node_1', 'node_2');
@@ -174,14 +166,12 @@ describe('Story update service', () => {
       }).toThrowError('The destination node with given id doesn\'t exist');
 
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getDestinationNodeIds()
+        _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
       ).toEqual(['node_2']);
 
       undoRedoService.undoChange(_sampleStory);
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getDestinationNodeIds()
+        _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
       ).toEqual([]);
     }
   );
@@ -203,20 +193,17 @@ describe('Story update service', () => {
   it('should remove/add a prerequisite skill id from/to a node in the story',
     () => {
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getPrerequisiteSkillIds()
+        _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1']);
       storyUpdateService.removePrerequisiteSkillIdFromNode(
         _sampleStory, 'node_1', 'skill_1');
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getPrerequisiteSkillIds()
+        _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual([]);
 
       undoRedoService.undoChange(_sampleStory);
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getPrerequisiteSkillIds()
+        _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1']);
     }
   );
@@ -224,8 +211,7 @@ describe('Story update service', () => {
   it('should not remove a prerequisite skill ' +
     'from a node if given id is invalid', () => {
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getPrerequisiteSkillIds()
+      _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
     ).toEqual(['skill_1']);
 
     expect(() => {
@@ -234,8 +220,7 @@ describe('Story update service', () => {
     }).toThrowError('The given prerequisite skill is not part of the node');
 
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getPrerequisiteSkillIds()
+      _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
     ).toEqual(['skill_1']);
   });
 
@@ -256,20 +241,17 @@ describe('Story update service', () => {
   it('should remove/add an acquired skill id from/to a node in the story',
     () => {
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getAcquiredSkillIds()
+        _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2']);
       storyUpdateService.removeAcquiredSkillIdFromNode(
         _sampleStory, 'node_1', 'skill_2');
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getAcquiredSkillIds()
+        _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual([]);
 
       undoRedoService.undoChange(_sampleStory);
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[0].getAcquiredSkillIds()
+        _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2']);
     }
   );
@@ -277,8 +259,7 @@ describe('Story update service', () => {
   it('should not remove an acquired skill id ' +
     'from a node if given id is invalid', () => {
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getAcquiredSkillIds()
+      _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
     ).toEqual(['skill_2']);
 
     expect(() => {
@@ -287,8 +268,7 @@ describe('Story update service', () => {
     }).toThrowError('The given acquired skill id is not part of the node');
 
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getAcquiredSkillIds()
+      _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
     ).toEqual(['skill_2']);
   });
 
@@ -309,21 +289,18 @@ describe('Story update service', () => {
   it('should remove/add a destination node id from/to a node in the story',
     () => {
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[1].getDestinationNodeIds()
+        _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
       ).toEqual(['node_1']);
       storyUpdateService.removeDestinationNodeIdFromNode(
         _sampleStory, 'node_2', 'node_1');
 
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[1].getDestinationNodeIds()
+        _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
       ).toEqual([]);
 
       undoRedoService.undoChange(_sampleStory);
       expect(
-        (_sampleStory.getStoryContents() as StoryContents)
-          .getNodes()[1].getDestinationNodeIds()
+        _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
       ).toEqual(['node_1']);
     }
   );
@@ -331,8 +308,7 @@ describe('Story update service', () => {
   it('should not remove a destination node id from a node in the story ' +
     'if given id is invalid', () => {
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[1].getDestinationNodeIds()
+      _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
     ).toEqual(['node_1']);
 
     expect(() => {
@@ -346,8 +322,7 @@ describe('Story update service', () => {
     }).toThrowError('The given node doesn\'t exist');
 
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[1].getDestinationNodeIds()
+      _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
     ).toEqual(['node_1']);
   });
 
@@ -366,28 +341,18 @@ describe('Story update service', () => {
   });
 
   it('should add/remove a story node', () => {
-    expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes().length).toEqual(2);
+    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
     storyUpdateService.addStoryNode(_sampleStory, 'Title 2');
+    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(3);
+    expect(_sampleStory.getStoryContents().getNextNodeId()).toEqual('node_4');
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes().length).toEqual(3);
+      _sampleStory.getStoryContents().getNodes()[2].getId()).toEqual('node_3');
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNextNodeId()).toEqual('node_4');
-    expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[2].getId()).toEqual('node_3');
-    expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[2].getTitle()).toEqual(
+      _sampleStory.getStoryContents().getNodes()[2].getTitle()).toEqual(
       'Title 2');
 
     undoRedoService.undoChange(_sampleStory);
-    expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes().length).toEqual(2);
+    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
   });
 
   it('should create a proper backend change dict for adding a story node',
@@ -405,20 +370,15 @@ describe('Story update service', () => {
     expect(() => {
       storyUpdateService.deleteStoryNode(_sampleStory, 'node_2');
     }).toThrowError('Cannot delete initial story node');
+    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes().length).toEqual(2);
-    expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[1].getDestinationNodeIds()
+      _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
     ).toEqual(['node_1']);
     storyUpdateService.deleteStoryNode(_sampleStory, 'node_1');
     // Initial node should not be deleted.
     storyUpdateService.deleteStoryNode(_sampleStory, 'node_2');
     expect(_sampleStory.getStoryContents().getInitialNodeId()).toEqual(null);
-    expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes().length).toEqual(0);
+    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(0);
 
     expect(() => {
       undoRedoService.undoChange(_sampleStory);
@@ -437,19 +397,16 @@ describe('Story update service', () => {
 
   it('should finalize a story node outline', () => {
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getOutlineStatus()
+      _sampleStory.getStoryContents().getNodes()[0].getOutlineStatus()
     ).toBe(false);
     storyUpdateService.finalizeStoryNodeOutline(_sampleStory, 'node_1');
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getOutlineStatus()
+      _sampleStory.getStoryContents().getNodes()[0].getOutlineStatus()
     ).toBe(true);
 
     undoRedoService.undoChange(_sampleStory);
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getOutlineStatus()
+      _sampleStory.getStoryContents().getNodes()[0].getOutlineStatus()
     ).toBe(false);
   });
 
@@ -475,19 +432,16 @@ describe('Story update service', () => {
 
   it('should unfinalize a story node outline', () => {
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[1].getOutlineStatus()
+      _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
     ).toBe(true);
     storyUpdateService.unfinalizeStoryNodeOutline(_sampleStory, 'node_2');
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[1].getOutlineStatus()
+      _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
     ).toBe(false);
 
     undoRedoService.undoChange(_sampleStory);
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[1].getOutlineStatus()
+      _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
     ).toBe(true);
   });
 
@@ -511,20 +465,17 @@ describe('Story update service', () => {
 
   it('should set a story node outline', () => {
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getOutline()
+      _sampleStory.getStoryContents().getNodes()[0].getOutline()
     ).toBe('Outline');
     storyUpdateService.setStoryNodeOutline(
       _sampleStory, 'node_1', 'new outline');
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getOutline()
+      _sampleStory.getStoryContents().getNodes()[0].getOutline()
     ).toBe('new outline');
 
     undoRedoService.undoChange(_sampleStory);
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getOutline()
+      _sampleStory.getStoryContents().getNodes()[0].getOutline()
     ).toBe('Outline');
   });
 
@@ -544,20 +495,17 @@ describe('Story update service', () => {
 
   it('should set a story node title', () => {
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getTitle()
+      _sampleStory.getStoryContents().getNodes()[0].getTitle()
     ).toBe('Title 1');
     storyUpdateService.setStoryNodeTitle(
       _sampleStory, 'node_1', 'new title');
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getTitle()
+      _sampleStory.getStoryContents().getNodes()[0].getTitle()
     ).toBe('new title');
 
     undoRedoService.undoChange(_sampleStory);
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getTitle()
+      _sampleStory.getStoryContents().getNodes()[0].getTitle()
     ).toBe('Title 1');
   });
 
@@ -577,20 +525,17 @@ describe('Story update service', () => {
 
   it('should set a story node description', () => {
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getDescription()
+      _sampleStory.getStoryContents().getNodes()[0].getDescription()
     ).toBe('Description 1');
     storyUpdateService.setStoryNodeDescription(
       _sampleStory, 'node_1', 'new description');
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getDescription()
+      _sampleStory.getStoryContents().getNodes()[0].getDescription()
     ).toBe('new description');
 
     undoRedoService.undoChange(_sampleStory);
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getDescription()
+      _sampleStory.getStoryContents().getNodes()[0].getDescription()
     ).toBe('Description 1');
   });
 
@@ -610,14 +555,12 @@ describe('Story update service', () => {
 
   it('should set the exploration id of a story node', () => {
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getExplorationId()
+      _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
     ).toBe(null);
     storyUpdateService.setStoryNodeExplorationId(
       _sampleStory, 'node_1', 'exp_2');
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getExplorationId()
+      _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
     ).toBe('exp_2');
 
     // Adding an already existing exploration in the story should throw an
@@ -629,8 +572,7 @@ describe('Story update service', () => {
 
     undoRedoService.undoChange(_sampleStory);
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getExplorationId()
+      _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
     ).toBe(null);
   });
 
@@ -649,17 +591,14 @@ describe('Story update service', () => {
 
   it('should set/unset the initial node of the story', () => {
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getInitialNodeId()).toEqual('node_2');
+      _sampleStory.getStoryContents().getInitialNodeId()).toEqual('node_2');
     storyUpdateService.setInitialNodeId(_sampleStory, 'node_1');
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getInitialNodeId()).toEqual('node_1');
+      _sampleStory.getStoryContents().getInitialNodeId()).toEqual('node_1');
 
     undoRedoService.undoChange(_sampleStory);
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getInitialNodeId()).toEqual('node_2');
+      _sampleStory.getStoryContents().getInitialNodeId()).toEqual('node_2');
   });
 
   it('should create a proper backend change dict for setting initial node',
@@ -763,28 +702,22 @@ describe('Story update service', () => {
     storyUpdateService.rearrangeNodeInStory(
       _sampleStory, 0, 1);
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getId()).toBe('node_2');
+      _sampleStory.getStoryContents().getNodes()[0].getId()).toBe('node_2');
 
     undoRedoService.undoChange(_sampleStory);
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getId()).toBe('node_1');
+      _sampleStory.getStoryContents().getNodes()[0].getId()).toBe('node_1');
   });
 
   it('should set story node thumbnail background color when calling ' +
     '\'setStoryNodeThumbnailBgColor\'', () => {
     storyUpdateService.setStoryNodeThumbnailBgColor(
       _sampleStory, 'node_1', 'red');
-    expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getThumbnailBgColor())
+    expect(_sampleStory.getStoryContents().getNodes()[0].getThumbnailBgColor())
       .toBe('red');
 
     undoRedoService.undoChange(_sampleStory);
-    expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getThumbnailBgColor())
+    expect(_sampleStory.getStoryContents().getNodes()[0].getThumbnailBgColor())
       .toBe('blue');
   });
 
@@ -793,14 +726,12 @@ describe('Story update service', () => {
     storyUpdateService.setStoryNodeThumbnailFilename(
       _sampleStory, 'node_1', 'newName');
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getThumbnailFilename())
+      _sampleStory.getStoryContents().getNodes()[0].getThumbnailFilename())
       .toBe('newName');
 
     undoRedoService.undoChange(_sampleStory);
     expect(
-      (_sampleStory.getStoryContents() as StoryContents)
-        .getNodes()[0].getThumbnailFilename())
+      _sampleStory.getStoryContents().getNodes()[0].getThumbnailFilename())
       .toBe('fileName');
   });
 

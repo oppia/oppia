@@ -36,10 +36,12 @@ import { StoryNode } from './story-node.model';
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
 type StoryUpdateReverse = (storyChange: StoryChange, story: Story) => void;
 
+// For properties like initialNodeId, thumbnailBackdroundColor
+// old value can be null.
 interface Params {
   'node_id'?: string;
   'title'?: string;
-  'old_value'?: string | string[] | boolean | number;
+  'old_value'?: string | string[] | boolean | number | null;
   'new_value'?: string | string[] | boolean | number;
   'property_name'?: string;
   'cmd'?: string;
@@ -68,8 +70,10 @@ export class StoryUpdateService {
     let changeObj = new Change(changeDict, apply, reverse);
     try {
       this._undoRedoService.applyChange(changeObj, story);
-    } catch (err) {
-      this._alertsService.addWarning(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        this._alertsService.addWarning(err.message);
+      }
       throw err;
     }
   }
@@ -95,7 +99,7 @@ export class StoryUpdateService {
   // for details on the other behavior of this function.
   _applyStoryPropertyChange(
       story: Story, propertyName: string,
-      oldValue: string, newValue: string,
+      oldValue: string | null, newValue: string,
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     this._applyChange(story, StoryDomainConstants.CMD_UPDATE_STORY_PROPERTY, {
       property_name: propertyName,
@@ -106,7 +110,7 @@ export class StoryUpdateService {
 
   _applyStoryContentsPropertyChange(
       story: Story, propertyName: string,
-      oldValue: string | number, newValue: string | number,
+      oldValue: string | number | null, newValue: string | number,
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     this._applyChange(
       story, StoryDomainConstants.CMD_UPDATE_STORY_CONTENTS_PROPERTY, {
@@ -118,7 +122,7 @@ export class StoryUpdateService {
 
   _applyStoryNodePropertyChange(
       story: Story, propertyName: string,
-      nodeId: string, oldValue: string | string[],
+      nodeId: string, oldValue: string | string[] | null,
       newValue: string | string[],
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     this._applyChange(

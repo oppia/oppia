@@ -43,27 +43,24 @@ export interface StoryBackendDict {
 }
 
 export class Story {
-  // Assigning union type of "string | null" to some fields,
-  // Because we are assigning null to those fields when we create
-  // interstitial story.
-  _id: string | null;
+  _id: string;
   _title: string;
   _description: string;
   _notes: string;
-  _storyContents: StoryContents | null;
+  _storyContents: StoryContents;
   _languageCode: string;
   _version: number;
-  _correspondingTopicId: string | null;
+  _correspondingTopicId: string;
   _thumbnailFilename: string | null;
   _thumbnailBgColor: string | null;
-  _urlFragment: string | null;
+  _urlFragment: string;
   _metaTagContent: string;
   constructor(
-      id: string | null, title: string, description: string,
-      notes: string, storyContents: StoryContents | null, languageCode: string,
-      version: number, correspondingTopicId: string | null,
+      id: string, title: string, description: string,
+      notes: string, storyContents: StoryContents, languageCode: string,
+      version: number, correspondingTopicId: string,
       thumbnailBgColor: string | null, thumbnailFilename: string | null,
-      urlFragment: string | null, metaTagContent: string) {
+      urlFragment: string, metaTagContent: string) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -78,10 +75,7 @@ export class Story {
     this._metaTagContent = metaTagContent;
   }
 
-  // Some methods have either string or null return value,
-  // because when we create interstitial story object
-  // their fields get null value.
-  getId(): string | null {
+  getId(): string {
     return this._id;
   }
 
@@ -129,11 +123,11 @@ export class Story {
     return this._version;
   }
 
-  getStoryContents(): StoryContents | null {
+  getStoryContents(): StoryContents {
     return this._storyContents;
   }
 
-  getCorrespondingTopicId(): string | null {
+  getCorrespondingTopicId(): string {
     return this._correspondingTopicId;
   }
 
@@ -141,7 +135,7 @@ export class Story {
     return this._thumbnailFilename;
   }
 
-  setThumbnailFilename(thumbnailFilename: string): void {
+  setThumbnailFilename(thumbnailFilename: string | null): void {
     this._thumbnailFilename = thumbnailFilename;
   }
 
@@ -149,11 +143,11 @@ export class Story {
     return this._thumbnailBgColor;
   }
 
-  setThumbnailBgColor(thumbnailBgColor: string): void {
+  setThumbnailBgColor(thumbnailBgColor: string | null): void {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  getUrlFragment(): string | null {
+  getUrlFragment(): string {
     return this._urlFragment;
   }
 
@@ -185,9 +179,7 @@ export class Story {
           `${constants.MAX_CHARS_IN_STORY_URL_FRAGMENT} characters`);
       }
     }
-    if (this._storyContents !== null) {
-      issues = issues.concat(this._storyContents.validate());
-    }
+    issues = issues.concat(this._storyContents.validate());
     return issues;
   }
 
@@ -245,16 +237,34 @@ export class StoryObjectFactory {
     );
   }
 
-  /**
- * TODO(#14169): Remove the interstitial story so that full story can be
- * created from start.
- */
   // Create an interstitial story that would be displayed in the editor until
   // the actual story is fetched from the backend.
   createInterstitialStory(): Story {
+    let sampleStoryContentsBackendDict = {
+      initial_node_id: '',
+      nodes: [
+        {
+          id: '',
+          title: '',
+          description: '',
+          prerequisite_skill_ids: [''],
+          acquired_skill_ids: [''],
+          destination_node_ids: [''],
+          outline: '',
+          exploration_id: '',
+          outline_is_finalized: false,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null
+        }],
+      next_node_id: ''
+    };
+    let mockStoryContent = StoryContents.createFromBackendDict(
+      sampleStoryContentsBackendDict);
+
     return new Story(
-      null, 'Story title loading', 'Story description loading',
-      'Story notes loading', null, 'en', 1, null, null, null, null, '');
+      'Id loading', 'Story title loading', 'Story description loading',
+      'Story notes loading', mockStoryContent, 'en', 1, 'Topic id loading',
+      null, null, '', '');
   }
 }
 
