@@ -27,6 +27,7 @@ from core.controllers import improvements
 from core.domain import improvements_domain
 from core.tests import test_utils
 
+
 class TaskEntryTests(test_utils.GenericTestBase):
     """Unit tests for the TaskEntry domain object."""
 
