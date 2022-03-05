@@ -152,6 +152,7 @@ var NormalizedStringEditor = function(elem) {
       await elem.element(by.tagName('input')).clear();
       // while debugging i caught that value stored is 'correct'
       // error may be in elem
+      await browser.wait(2500);
       await elem.element(by.tagName('input')).sendKeys(value);
       var valueThatIsRead =
         await elem.element(by.tagName('input')).getAttribute('value');

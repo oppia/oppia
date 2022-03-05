@@ -96,12 +96,15 @@ implements ControlValueAccessor, OnInit, Validator {
   ) {}
 
   updateLocalValue(value: string): void {
+    console.log('before ' + this.localValue);
     this.localValue = value;
-    // if (this.onChange) {
-    //   this.onChange(this.localValue);
-    // } else {
-    //   console.log('working');
-    // }
+    console.log(this.onChange);
+    console.log('after ' + this.localValue);
+    if (this.onChange) {
+      this.onChange(this.localValue);
+    } else {
+      console.log('working');
+    }
   }
 
   writeValue(value: string): void {
