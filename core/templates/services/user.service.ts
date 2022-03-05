@@ -108,6 +108,15 @@ export class UserService {
       return data.default_dashboard;
     });
   }
+
+  async getCanUserAccessTopicsAndSkillsDashboard(): Promise<boolean> {
+    return this.getUserInfoAsync().then((userInfo) => {
+      return (
+        userInfo.isLoggedIn() &&
+        (userInfo.isCurriculumAdmin() || userInfo.isTopicManager())
+      );
+    });
+  }
 }
 
 angular.module('oppia').factory(

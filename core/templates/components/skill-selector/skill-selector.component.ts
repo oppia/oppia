@@ -24,6 +24,7 @@ import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import cloneDeep from 'lodash/cloneDeep';
 import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { UserService } from 'services/user.service';
 
 interface SubTopicFilterDict {
   [topicName: string]: { subTopicName: string; checked: boolean }[];
@@ -47,7 +48,6 @@ export class SkillSelectorComponent implements OnInit {
   @Input() categorizedSkills!: CategorizedSkills;
   @Input() untriagedSkillSummaries!: SkillSummary[];
   @Input() allowSkillsFromOtherTopics!: boolean;
-  @Input() isEditableByUser!: boolean;
   @Output() selectedSkillIdChange: EventEmitter<string> = new EventEmitter();
   currCategorizedSkills!: CategorizedSkills;
   selectedSkill!: string;
@@ -55,9 +55,11 @@ export class SkillSelectorComponent implements OnInit {
   topicFilterList: { topicName: string ; checked: boolean }[] = [];
   subTopicFilterDict: SubTopicFilterDict = {};
   initialSubTopicFilterDict: SubTopicFilterDict = {};
+  userCanEditSkills: boolean = false;
 
   constructor(
-    private filterForMatchingSubstringPipe: FilterForMatchingSubstringPipe
+    private filterForMatchingSubstringPipe: FilterForMatchingSubstringPipe,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -79,6 +81,11 @@ export class SkillSelectorComponent implements OnInit {
       }
     }
     this.initialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
+
+    this.userService.getCanUserAccessTopicsAndSkillsDashboard()
+      .then((canUserAccessTopicsAndSkillsDashboard) => {
+        this.userCanEditSkills = canUserAccessTopicsAndSkillsDashboard;
+      });
   }
 
   checkIfEmpty(skills: Object[]): boolean {

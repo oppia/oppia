@@ -32,7 +32,6 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   untriagedSkillSummaries: SkillSummary[];
   allowSkillsFromOtherTopics: boolean;
   selectedSkillId: string = null;
-  isEditableByUser: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal

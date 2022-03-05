@@ -36,7 +36,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UserService } from 'services/user.service';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { UserInfo } from 'domain/user/user-info.model';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 
 
@@ -168,6 +167,12 @@ describe('State Skill Editor Component', () => {
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
   });
 
+  beforeEach(() => {
+    spyOn(
+      userService, 'getCanUserAccessTopicsAndSkillsDashboard'
+    ).and.returnValue(Promise.resolve(true));
+  });
+
   it('should create', () => {
     expect(componentInstance).toBeDefined();
   });
@@ -233,47 +238,6 @@ describe('State Skill Editor Component', () => {
     fixture.detectChanges();
     expect(componentInstance.skillEditorIsShown).toEqual(false);
   });
-
-  it('should not allow user to update skill when ' +
-      'user does not have access to topics and skills dashboard page',
-  fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(UserInfo.createDefault()));
-
-    expect(componentInstance.isEditableByUser).toBeFalse();
-
-    componentInstance.ngOnInit();
-    tick();
-
-    expect(componentInstance.isEditableByUser).toBeFalse();
-  }));
-
-  it('should show allow user to update skill when ' +
-      'user has access to topics and skills dashboard page',
-  fakeAsync(() => {
-    const userInfo = UserInfo.createFromBackendDict({
-      roles: ['USER_ROLE'],
-      is_moderator: true,
-      is_curriculum_admin: true,
-      is_super_admin: true,
-      is_topic_manager: false,
-      can_create_collections: true,
-      preferred_site_language_code: 'en',
-      username: 'tester',
-      email: 'tester@example.org',
-      user_is_logged_in: true
-    });
-    spyOn(
-      userService, 'getUserInfoAsync'
-    ).and.returnValue(Promise.resolve(userInfo));
-
-    expect(componentInstance.isEditableByUser).toBeFalse();
-
-    componentInstance.ngOnInit();
-    tick();
-
-    expect(componentInstance.isEditableByUser).toBeTrue();
-  }));
 
   it('should fetch the linked skill name to be displayed from linked skill id',
     fakeAsync(() => {
