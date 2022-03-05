@@ -100,7 +100,7 @@ implements ControlValueAccessor, OnInit, Validator {
   updateLocalValue(values: InputEvent): void {
     console.log('work' + values.target.value);
     this.onChange(values.target.value);
-    debugger;
+    // debugger;
     // this.onChange(this.localValue);
   }
 
@@ -109,7 +109,7 @@ implements ControlValueAccessor, OnInit, Validator {
     this.localValue = values.target.value;
     console.log('working in end' + this.localValue);
     this.changeDetectorRef.detectChanges();
-    debugger;
+    // debugger;
   }
 
   writeValue(value: string): void {

@@ -237,7 +237,7 @@ var TranslatableSetOfNormalizedStringEditor = function(elem) {
         // this came from 149 line
         const normalizedStringEditor = await forms.ListEditor(elem).addItem(
           'NormalizedString');
-        debugger;
+        // debugger;
         await normalizedStringEditor.setValue(normalizedStrings[i]);
         await normalizedStringEditor.expectValueToBe(normalizedStrings[i]);
       }
