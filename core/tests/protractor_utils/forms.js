@@ -29,9 +29,8 @@ var action = require('./action.js');
 var DictionaryEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
-      var entry = elem.element(
-        await by.repeater('property in propertySchemas()').
-          row(index));
+      var entry = await elem.all(
+        by.css('.protractor-test-schema-based-dict-editor')).get(index);
       var editor = getEditor(objectType);
       return await editor(entry);
     }
@@ -169,7 +168,7 @@ var ListEditor = function(elem) {
       var startingLength = await elem.all(by.id(
         'protractor-test-schema-based-list-editor-table-row')).all(
         by.tagName('tr')).count();
-      for (var i = startingLength; i < desiredLength; i++) {
+      for (var i = startingLength + 1; i < desiredLength; i++) {
         await addItem();
       }
       for (var j = startingLength - 1; j >= desiredLength; j--) {
@@ -300,8 +299,8 @@ var RichTextEditor = async function(elem) {
 var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
-      var entry = elem.element(
-        await by.repeater('property in propertySchemas()').row(index));
+      var entry = await elem.all(
+        by.css('.protractor-test-schema-based-dict-editor')).get(index);
       var editor = getEditor(objectType);
       return await editor(entry);
     }

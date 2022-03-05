@@ -1,8 +1,8 @@
 <span>
   <textarea *ngIf="!getCodingMode() && getRows()"
             class="form-control"
-            [ngModel]="localValue"
-            (ngModelChange)="updateLocalValue($event)"
+            [(ngModel)]="localValue"
+            (input)="updateLocalValue($event)"
             [disabled]="disabled"
             (blur)="inputBlur.emit()"
             (focus)="inputFocus.emit()"
@@ -16,8 +16,8 @@
   <span *ngIf="!getCodingMode() && !getRows()">
     <input type="text"
            class="form-control display-inline"
-           [ngModel]="localValue"
-           (ngModelChange)="updateLocalValue($event)"
+           [(ngModel)]="localValue"
+           (input)="updateLocalValue($event)"
            [disabled]="disabled"
            (blur)="inputBlur.emit()"
            (focus)="inputFocus.emit()"
