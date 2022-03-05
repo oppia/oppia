@@ -95,9 +95,10 @@ implements ControlValueAccessor, OnInit, Validator {
     private translateService: TranslateService
   ) {}
 
-  updateLocalValue(value: string): void {
-    this.localValue = value;
-    this.onChange(this.localValue);
+  updateLocalValue(): void {
+    setTimeout(() => {
+      this.onChange(this.localValue);
+    });
   }
 
   writeValue(value: string): void {
