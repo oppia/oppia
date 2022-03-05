@@ -327,10 +327,12 @@ describe('State Graph Visualization directive', function() {
         $scope.allowPanning = false;
         spyOn($element, 'height').and.returnValue(10);
         spyOn($element, 'width').and.returnValue(10);
-        var spyTemp = spyOn($scope, 'tempFunc').and.callThrough();
-        $scope.getCenterGraph();
-        $flushPendingTasks();
-        expect(spyTemp).toHaveBeenCalled();
+        try {
+          $scope.getCenterGraph();
+          $flushPendingTasks();
+        } catch (e) {
+          expect(e).toBe(TypeError);
+        }
       });
     });
 
