@@ -152,11 +152,15 @@ var NormalizedStringEditor = function(elem) {
       await elem.element(by.tagName('input')).clear();
       // while debugging i caught that value stored is 'correct'
       // error may be in elem
+<<<<<<< HEAD
       await browser.wait(2500);
       await elem.element(by.tagName('input')).sendKeys(value);
       var valueThatIsRead =
         await elem.element(by.tagName('input')).getAttribute('value');
       console.log(valueThatIsRead);
+=======
+      await elem.element(by.tagName('input')).sendKeys(value);
+>>>>>>> lastTest
     },
     expectValueToBe: async function(expectedValue) {
       var value = await elem.element(by.tagName('input')).getAttribute('value');
@@ -241,7 +245,7 @@ var TranslatableSetOfNormalizedStringEditor = function(elem) {
         // this came from 149 line
         const normalizedStringEditor = await forms.ListEditor(elem).addItem(
           'NormalizedString');
-        
+        // debugger;
         await normalizedStringEditor.setValue(normalizedStrings[i]);
       }
     }

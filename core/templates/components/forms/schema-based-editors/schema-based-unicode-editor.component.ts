@@ -17,7 +17,7 @@
  */
 
 require('third-party-imports/ui-codemirror.import.ts');
-import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, forwardRef, Input, NgZone, OnInit, Output } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
@@ -92,19 +92,24 @@ implements ControlValueAccessor, OnInit, Validator {
     private focusManagerService: FocusManagerService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private stateCustomizationArgsService: StateCustomizationArgsService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private ngZone: NgZone,
+    private changeDetectorRef: ChangeDetectorRef,
   ) {}
 
-  updateLocalValue(value: string): void {
-    console.log('before ' + this.localValue);
-    this.localValue = value;
-    console.log(this.onChange);
-    console.log('after ' + this.localValue);
-    if (this.onChange) {
-      this.onChange(this.localValue);
-    } else {
-      console.log('working');
-    }
+  updateLocalValue(values: InputEvent): void {
+    console.log('work' + values.target.value);
+    this.onChange(values.target.value);
+    // debugger;
+    // this.onChange(this.localValue);
+  }
+
+  change(values: any): void {
+    console.log(values);
+    this.localValue = values.target.value;
+    console.log('working in end' + this.localValue);
+    this.changeDetectorRef.detectChanges();
+    // debugger;
   }
 
   writeValue(value: string): void {
