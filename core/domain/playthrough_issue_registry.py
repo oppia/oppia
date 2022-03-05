@@ -30,14 +30,12 @@ from typing import Dict, List
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
+
 class Registry:
     """Registry of all issues."""
 
-    
-
     # Dict mapping issue types to instances of the issues.
     _issues: Dict[str, base.BaseExplorationIssueSpec] = {}
-    
 
     @classmethod
     def get_all_issue_types(cls) -> List[str]:
@@ -80,7 +78,8 @@ class Registry:
         return list(cls._issues.values())
 
     @classmethod
-    def get_issue_by_type(cls, issue_type: str) -> base.BaseExplorationIssueSpec:
+    def get_issue_by_type(cls,
+    issue_type: str) -> base.BaseExplorationIssueSpec:
         """Gets an issue by its type.
 
         Refreshes once if the issue is not found; subsequently, throws a

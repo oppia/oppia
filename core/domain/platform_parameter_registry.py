@@ -19,14 +19,14 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain.platform_parameter_list import PARAM_NAMES
 from core.domain import caching_services
 from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
 from core.platform import models
-from core.storage.config.gae_models import PlatformParameterModel
-from typing import Any, Dict, List, Optional, Union
+from core.storage.config import gae_models
 from mypy_imports import config_models
 
+from typing import Any, Dict, List, Optional, Union
 
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
@@ -44,12 +44,14 @@ class Registry:
     # The keys of parameter_registry are the property names, and the values
     # are PlatformParameter instances with initial settings defined in this
     # file.
-    parameter_registry: Dict[str,platform_parameter_domain.PlatformParameter]= {}
+    parameter_registry: Dict[str, platform_parameter_domain.PlatformParameter] = {}  # pylint: disable=line-too-long
 
     @classmethod
     def create_platform_parameter(
-            cls, name: PARAM_NAMES, description: str, data_type: platform_parameter_domain.DataTypes, is_feature: bool =False,
-            feature_stage: Optional[platform_parameter_domain.FeatureStages] =None) -> platform_parameter_domain.PlatformParameter:
+            cls, name: platform_parameter_list.PARAM_NAMES, description: str,
+            data_type: platform_parameter_domain.DataTypes,
+            is_feature: bool =False,
+            feature_stage: Optional[platform_parameter_domain.FeatureStages] =None) -> platform_parameter_domain.PlatformParameter: # pylint: disable=line-too-long
         """Creates, registers and returns a platform parameter.
 
         Args:
@@ -93,7 +95,8 @@ class Registry:
 
     @classmethod
     def create_feature_flag(
-            cls, name: PARAM_NAMES, description: str, stage: platform_parameter_domain.FeatureStages) -> platform_parameter_domain.PlatformParameter:
+            cls, name: platform_parameter_list.PARAM_NAMES, description: str,
+            stage: platform_parameter_domain.FeatureStages) -> platform_parameter_domain.PlatformParameter: # pylint: disable=line-too-long
         """Creates, registers and returns a platform parameter that is also a
         feature flag.
 
@@ -110,7 +113,9 @@ class Registry:
             is_feature=True, feature_stage=stage)
 
     @classmethod
-    def init_platform_parameter(cls, name: str, instance: platform_parameter_domain.PlatformParameter) -> None:
+    def init_platform_parameter(
+            cls, name: str,
+            instance: platform_parameter_domain.PlatformParameter) -> None:
         """Initializes parameter_registry with keys as the parameter names and
         values as instances of the specified parameter.
 
@@ -126,7 +131,8 @@ class Registry:
         cls.parameter_registry[name] = instance
 
     @classmethod
-    def get_platform_parameter(cls, name: str) -> platform_parameter_domain.PlatformParameter:
+    def get_platform_parameter(
+            cls, name: str) -> platform_parameter_domain.PlatformParameter:
         """Returns the instance of the specified name of the platform
         parameter.
 
@@ -162,8 +168,9 @@ class Registry:
 
     @classmethod
     def update_platform_parameter(
-        cls, name: str, committer_id: str, commit_message: str, new_rules: List[platform_parameter_domain.PlatformParameterRule]
-    ) -> None:
+            cls, name: str, committer_id: str,
+            commit_message: str,
+            new_rules: List[platform_parameter_domain.PlatformParameterRule]) -> None: # pylint: disable=line-too-long
         """Updates the platform parameter with new rules.
 
         Args:
@@ -212,7 +219,7 @@ class Registry:
         return list(cls.parameter_registry.keys())
 
     @classmethod
-    def evaluate_all_platform_parameters(cls, context: platform_parameter_domain.EvaluationContext) -> Dict[str, Union[str, bool, int]]:
+    def evaluate_all_platform_parameters(cls, context: platform_parameter_domain.EvaluationContext) -> Dict[str, Union[str, bool, int]]: # pylint: disable=line-too-long
         """Evaluate all platform parameters with the given context.
 
         Args:
@@ -229,7 +236,7 @@ class Registry:
         return result_dict
 
     @classmethod
-    def init_platform_parameter_from_dict(cls, parameter_dict: Dict[str, Any]) -> platform_parameter_domain.PlatformParameter:
+    def init_platform_parameter_from_dict(cls, parameter_dict: Dict[str, Any]) -> platform_parameter_domain.PlatformParameter: # pylint: disable=line-too-long
         """Creates, registers and returns a platform parameter using the given
         dict representation of a platform parameter.
 
@@ -248,7 +255,8 @@ class Registry:
         return parameter
 
     @classmethod
-    def load_platform_parameter_from_storage(cls, name: str) -> Optional[platform_parameter_domain.PlatformParameter]:
+    def load_platform_parameter_from_storage(
+        cls, name: str) -> Optional[platform_parameter_domain.PlatformParameter]: # pylint: disable=line-too-long
         """Loads platform parameter from storage.
 
         Args:
@@ -260,7 +268,7 @@ class Registry:
         """
         parameter_model = config_models.PlatformParameterModel.get(
             name, strict=False)
-            
+
         if parameter_model:
             assert cls.load_platform_parameter_from_storage is None
             param_with_init_settings = cls.parameter_registry.get(name)
@@ -278,7 +286,8 @@ class Registry:
             return None
 
     @classmethod
-    def load_platform_parameter_from_memcache(cls, name: str) -> Optional[platform_parameter_domain.PlatformParameter]:
+    def load_platform_parameter_from_memcache(
+        cls, name: str) -> Optional[platform_parameter_domain.PlatformParameter]: # pylint: disable=line-too-long
         """Loads cached platform parameter from memcache.
 
         Args:
@@ -294,7 +303,7 @@ class Registry:
         return cached_parameter
 
     @classmethod
-    def _to_platform_parameter_model(cls, param: platform_parameter_domain.PlatformParameter) -> PlatformParameterModel:
+    def _to_platform_parameter_model(cls, param: platform_parameter_domain.PlatformParameter) -> gae_models.PlatformParameterModel: # pylint: disable=line-too-long
         """Returns the platform parameter model corresponding to the given
         domain object.
 
