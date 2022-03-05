@@ -19,12 +19,12 @@
 from __future__ import annotations
 
 from core import feconf
-from core.controllers.admin_test import PARAM_NAMES, FeatureStages
+from core.domain.platform_parameter_list import PARAM_NAMES
 from core.domain import caching_services
 from core.domain import platform_parameter_domain
 from core.platform import models
-from typing import Any, Dict, List, Optional, Union
 from core.storage.config.gae_models import PlatformParameterModel
+from typing import Any, Dict, List, Optional, Union
 from mypy_imports import config_models
 
 
@@ -49,7 +49,7 @@ class Registry:
     @classmethod
     def create_platform_parameter(
             cls, name: PARAM_NAMES, description: str, data_type: platform_parameter_domain.DataTypes, is_feature: bool =False,
-            feature_stage: Optional[FeatureStages] =None) -> platform_parameter_domain.PlatformParameter:
+            feature_stage: Optional[platform_parameter_domain.FeatureStages] =None) -> platform_parameter_domain.PlatformParameter:
         """Creates, registers and returns a platform parameter.
 
         Args:
@@ -93,7 +93,7 @@ class Registry:
 
     @classmethod
     def create_feature_flag(
-            cls, name: PARAM_NAMES, description: str, stage: FeatureStages) -> platform_parameter_domain.PlatformParameter:
+            cls, name: PARAM_NAMES, description: str, stage: platform_parameter_domain.FeatureStages) -> platform_parameter_domain.PlatformParameter:
         """Creates, registers and returns a platform parameter that is also a
         feature flag.
 
@@ -181,8 +181,8 @@ class Registry:
         new_rule_dicts = [rules.to_dict() for rules in new_rules] # type: ignore[no-untyped-call]
         param_dict = param.to_dict() # type: ignore[no-untyped-call]
         param_dict['rules'] = new_rule_dicts
-        updated_param = param.from_dict(param_dict) # type: ignore[no-untyped-call]
-        updated_param.validate()
+        updated_param = param.from_dict(param_dict)
+        updated_param.validate() # type: ignore[no-untyped-call]
 
         model_instance = cls._to_platform_parameter_model(param)
         param.set_rules(new_rules) # type: ignore[no-untyped-call]
@@ -240,7 +240,7 @@ class Registry:
         Returns:
             PlatformParameter. The created platform parameter.
         """
-        parameter = platform_parameter_domain.PlatformParameter.from_dict( # type: ignore[no-untyped-call]
+        parameter = platform_parameter_domain.PlatformParameter.from_dict(
             parameter_dict)
 
         cls.init_platform_parameter(parameter.name, parameter)
@@ -262,8 +262,9 @@ class Registry:
             name, strict=False)
             
         if parameter_model:
+            assert cls.load_platform_parameter_from_storage is None
             param_with_init_settings = cls.parameter_registry.get(name)
-            return platform_parameter_domain.PlatformParameter.from_dict({ # type: ignore[no-untyped-call]
+            return platform_parameter_domain.PlatformParameter.from_dict({
                 'name': param_with_init_settings.name,
                 'description': param_with_init_settings.description,
                 'data_type': param_with_init_settings.data_type,
