@@ -282,7 +282,8 @@ def open_new_tab_in_browser_if_possible(url):
     browser_cmds = ['brave', 'chromium-browser', 'google-chrome', 'firefox']
     print(
         'Please choose your default browser from the list using a number. '
-        'It will be given a preference over other available options.')
+        'It will be given a preference over other available options.'
+    )
     for index, browser in enumerate(browser_cmds):
         print('%s). %s' % (index + 1, browser))
 
