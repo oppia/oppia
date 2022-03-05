@@ -58,6 +58,7 @@ from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 
@@ -396,11 +397,6 @@ def apply_change_list(exploration_id, change_list):
                       exp_domain.STATE_PROPERTY_INTERACTION_ID):
                     state.update_interaction_id(change.new_value)
                 elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
-                    next_content_id_index = max(
-                        change.new_value, state.next_content_id_index)
-                    state.update_next_content_id_index(next_content_id_index)
-                elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
                     state.update_linked_skill_id(change.new_value)
                 elif (change.property_name ==
@@ -552,6 +548,11 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'correctness_feedback_enabled':
                     exploration.update_correctness_feedback_enabled(
                         change.new_value)
+                elif change.property_name == 'next_content_id_index':
+                    next_content_id_index = max(
+                        change.new_value, exploration.next_content_id_index)
+                    exploration.update_next_content_id_index(
+                        next_content_id_index)
             elif (change.cmd ==
                   exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
@@ -638,6 +639,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
     exploration_model.correctness_feedback_enabled = (
         exploration.correctness_feedback_enabled)
+    exploration_model.next_content_id_index = exploration.next_content_id_index
 
     change_list_dict = [change.to_dict() for change in change_list]
     exploration_model.commit(committer_id, commit_message, change_list_dict)
@@ -718,7 +720,8 @@ def _create_exploration(
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
-        correctness_feedback_enabled=exploration.correctness_feedback_enabled
+        correctness_feedback_enabled=exploration.correctness_feedback_enabled,
+        next_content_id_index=exploration.next_content_id_index
     )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmds_dict)
@@ -1155,10 +1158,30 @@ def update_exploration(
     updated_exploration = apply_change_list(exploration_id, change_list)
     if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
+
+    # List which will contain exploration changes related to translation, these
+    # changes will be performed in the task queue.
+    changes_related_to_translation = []
+    translation_related_cmds = [
+        exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE,
+        exp_domain.CMD_REMOVE_TRANSLATION
+    ]
+    for change in change_list:
+        if change.cmd in translation_related_cmds:
+            changes_related_to_translation.append(change)
+
     _save_exploration(
         committer_id, updated_exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)
+
+    # Update translations related changes, in the datastore.
+    taskqueue_services.defer(
+        taskqueue_services.FUNCTION_ID_UPDATE_TRANSLATION_RELATED_CHANGE,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_id,
+        updated_exploration.version, changes_related_to_translation,
+        updated_exploration.get_content_count()
+        )
 
     # Update summary of changed exploration in a deferred task.
     taskqueue_services.defer(
@@ -1173,10 +1196,7 @@ def update_exploration(
             user_services.update_first_contribution_msec_if_not_set(
                 committer_id, utils.get_current_time_in_millisecs())
 
-    if opportunity_services.is_exploration_available_for_contribution(
-            exploration_id):
-        opportunity_services.update_opportunity_with_updated_exploration(
-            exploration_id)
+    # This code relocated in translation service as a part of taskqueue.
 
 
 def regenerate_exploration_summary_with_new_contributor(

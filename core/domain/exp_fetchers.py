@@ -178,6 +178,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.param_specs, exploration_model.param_changes,
         exploration_model.version, exploration_model.auto_tts_enabled,
         exploration_model.correctness_feedback_enabled,
+        exploration_model.next_content_id_index,
         created_on=exploration_model.created_on,
         last_updated=exploration_model.last_updated)
 

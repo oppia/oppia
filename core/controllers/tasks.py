@@ -29,6 +29,7 @@ from core.domain import rights_manager
 from core.domain import stats_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
+from core.domain import translation_services
 from core.domain import wipeout_service
 
 
@@ -188,7 +189,9 @@ class DeferredTasksHandler(base.BaseHandler):
             question_services.untag_deleted_misconceptions),
         taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: (
             wipeout_service
-            .remove_user_from_activities_with_associated_rights_models)
+            .remove_user_from_activities_with_associated_rights_models),
+        taskqueue_services.FUNCTION_ID_UPDATE_TRANSLATION_RELATED_CHANGE: (
+            translation_services.update_translation_related_change)
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue

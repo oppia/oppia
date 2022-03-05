@@ -60,7 +60,6 @@ STATE_PROPERTY_CARD_IS_CHECKPOINT = 'card_is_checkpoint'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
-STATE_PROPERTY_NEXT_CONTENT_ID_INDEX = 'next_content_id_index'
 STATE_PROPERTY_LINKED_SKILL_ID = 'linked_skill_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
@@ -105,8 +104,9 @@ CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation'
 CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE = (
     'mark_written_translation_as_needing_update')
 # This takes additional 'content_id' and 'state_name' parameters.
-CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (
-    'mark_written_translations_as_needing_update')
+CMD_MARK_TRANSLATION_NEEDS_UPDATE = 'mark_translations_as_needing_update'
+# This takes additional 'content_id' and 'state_name' parameters.
+CMD_REMOVE_TRANSLATION = 'mark_to_remove_translation'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -256,7 +256,6 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
-        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
         STATE_PROPERTY_LINKED_SKILL_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
@@ -274,7 +273,8 @@ class ExplorationChange(change_domain.BaseChange):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
+        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
+        'next_content_id_index')
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -560,7 +560,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             states_schema_version, init_state_name, states_dict,
             param_specs_dict, param_changes_list, version,
             auto_tts_enabled, correctness_feedback_enabled,
-            created_on=None, last_updated=None):
+            next_content_id_index, created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -621,6 +621,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
+        self.next_content_id_index = next_content_id_index
 
     def get_translatable_contents_collection(
         self
@@ -672,7 +673,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED,
-            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED)
+            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED,
+            feconf.DEFUALT_NEXT_CONTENT_ID_INDEX)
 
     @classmethod
     def from_dict(
@@ -711,6 +713,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
         exploration.correctness_feedback_enabled = exploration_dict[
             'correctness_feedback_enabled']
+        exploration.next_content_id_index = exploration_dict[
+            'next_content_id_index']
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
@@ -940,6 +944,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected correctness_feedback_enabled to be a bool, received '
                 '%s' % self.correctness_feedback_enabled)
+
+        if not isinstance(self.next_content_id_index, int):
+            raise utils.ValidationError(
+                'Expected next_content_id_index to be an int, received '
+                '%s' % self.next_content_id_index)
 
         for param_name in self.param_specs:
             if not isinstance(param_name, str):
@@ -1455,6 +1464,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
+    def update_next_content_id_index(self, next_content_id_index):
+        """Update the interaction next content id index attribute.
+
+        Args:
+            next_content_id_index: int. The new next content id index to set.
+        """
+        self.next_content_id_index = next_content_id_index
+
     # Methods relating to states.
     def add_states(self, state_names):
         """Adds multiple states to the exploration.
@@ -1643,10 +1660,23 @@ class Exploration(translation_domain.BaseTranslatableObject):
             translation available in that language as the value.
         """
         exploration_translation_counts = collections.defaultdict(int)
-        for state in self.states.values():
-            state_translation_counts = state.get_translation_counts()
-            for language, count in state_translation_counts.items():
-                exploration_translation_counts[language] += count
+        entity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all_for_entity(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.id,
+                self.version
+            )
+        )
+        for model in entity_translation_models:
+            if model is None:
+                continue
+
+            lang_code = model.language_code
+            translations = model.translations
+            count = 0
+            for content_id, translated_content in translations:
+                count += 1
+            exploration_translation_counts[lang_code] += count
 
         return dict(exploration_translation_counts)
 
@@ -1661,10 +1691,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             int. The total number of distinct content fields available inside
             the exploration.
         """
-        content_count = 0
-        for state in self.states.values():
-            content_count += state.get_translatable_content_count()
-
+        content_count = (
+            len(self.get_all_contents_which_need_translations(
+            translation_domain.create_empty_translation_object()))
+        )
         return content_count
 
     @classmethod
@@ -2854,7 +2884,6 @@ class ExplorationChangeMergeVerifier:
     # in which if there are any changes then they are always mergeable.
     NON_CONFLICTING_PROPERTIES = [
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
-        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
         STATE_PROPERTY_LINKED_SKILL_ID,
         STATE_PROPERTY_CARD_IS_CHECKPOINT]
 

@@ -34,6 +34,7 @@ from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 
@@ -650,15 +651,51 @@ class SuggestionTranslateContent(BaseSuggestion):
                 state_domain.WrittenTranslation.is_data_format_list(
                     self.change.data_format)
         ):
-            exp_services.update_exploration(
-                self.final_reviewer_id, self.target_id, [self.change],
-                commit_message, is_suggestion=True)
+            translated_content_dict = translation_domain.TranslatedContent(
+                    self.change.translation_html,
+                    needs_update=False
+                ).to_dict()
+            translation = {self.change.content_id: translated_content_dict}
+
+            entity_translation_model = (
+                translation_models.EntityTranslationsModel.get_model(
+                    self.target_type,
+                    self.target_id,
+                    self.target_version_at_submission,
+                    self.language_code
+                )
+            )
+            if entity_translation_model is None:
+                model = translation_models.EntityTranslationsModel.create_new(
+                    self.target_type,
+                    self.target_id,
+                    self.target_version_at_submission,
+                    self.language_code,
+                    translation
+                )
+                translation_models.EntityTranslationsModel.put(model)
+            else:
+                # Update of entity translation model.
+                entity_translation_model.translation = translation
+                translation_models.EntityTranslationsModel.put(
+                    entity_translation_model)
+
+            opportunity_services.update_opportunity_with_updated_exploration(
+                self.target_id)
+
+            # These are not variables we calclulate atm.
+            # Needs translation in language code. remove language code.
+
+            # update translation opportunity model
+                # 1. if no translation count then set it to 1.
+                    # ,Increase translation_count[language_code] by 1
+                # . If updated translation count == content count.
             return
 
         self._copy_new_images_to_target_entity_storage()
-        exp_services.update_exploration(
-            self.final_reviewer_id, self.target_id, [self.change],
-            commit_message, is_suggestion=True)
+        # exp_services.update_exploration(
+        #     self.final_reviewer_id, self.target_id, [self.change],
+        #     commit_message, is_suggestion=True)
 
     def get_all_html_content_strings(self):
         """Gets all html content strings used in this suggestion.

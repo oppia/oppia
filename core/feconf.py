@@ -411,6 +411,8 @@ DEFAULT_AUTO_TTS_ENABLED = False
 # Whether new explorations should have correctness-feedback enabled
 # by default.
 DEFAULT_CORRECTNESS_FEEDBACK_ENABLED = True
+# Default value for next_content_id_index in exploration/question.
+DEFUALT_NEXT_CONTENT_ID_INDEX = 0
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''

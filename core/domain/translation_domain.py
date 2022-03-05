@@ -172,6 +172,21 @@ class EntityTranslation:
         self.language_code = language_code
         self.translations = translations
 
+    @classmethod
+    def create_empty_translation_object(cls):
+        return cls(
+            empty_entity_id='',
+            empty_entity_type='',
+            initial_entity_version=0,
+            empty_language_code='',
+            translations={
+                '': TranslatedContent.from_dict(
+                    'content':'',
+                    'needs_update': False
+                )
+            }
+        )
+
 
 class TranslatableContent:
     """TranslatableContent represents a content of a translatable object which

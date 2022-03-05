@@ -2990,7 +2990,7 @@ class State(translation_domain.BaseTranslatableObject):
         self.written_translations.translations_mapping[content_id][
             language_code] = written_translation
 
-    def mark_written_translation_as_needing_update(
+    def mark_translation_as_needing_update(
             self, content_id, language_code):
         """Marks translation as needing update for the given content id and
         language code.
@@ -2999,18 +2999,33 @@ class State(translation_domain.BaseTranslatableObject):
             content_id: str. The id of the content.
             language_code: str. The language code.
         """
-        self.written_translations.mark_written_translation_as_needing_update(
-            content_id, language_code)
+        # self.written_translations.mark_written_translation_as_needing_update(
+        #     content_id, language_code)
 
-    def mark_written_translations_as_needing_update(self, content_id):
-        """Marks translation as needing update for the given content id in all
-        languages.
+        # Change this to call from Translated content.
+        pass
+
+    def remove_translation(
+            self, content_id, language_code):
+        """Remove translation which are out of date.
 
         Args:
             content_id: str. The id of the content.
+            language_code: str. The language code.
         """
-        self.written_translations.mark_written_translations_as_needing_update(
-            content_id)
+        # Delete translated content from entity translation model.
+        pass
+
+
+    # def mark_written_translations_as_needing_update(self, content_id):
+    #     """Marks translation as needing update for the given content id in all
+    #     languages.
+
+    #     Args:
+    #         content_id: str. The id of the content.
+    #     """
+    #     self.written_translations.mark_written_translations_as_needing_update(
+    #         content_id)
 
     def update_content(self, content):
         """Update the content of this state.
@@ -3061,13 +3076,13 @@ class State(translation_domain.BaseTranslatableObject):
         self.interaction.id = interaction_id
         self.interaction.answer_groups = []
 
-    def update_next_content_id_index(self, next_content_id_index):
-        """Update the interaction next content id index attribute.
+    # def update_next_content_id_index(self, next_content_id_index):
+    #     """Update the interaction next content id index attribute.
 
-        Args:
-            next_content_id_index: int. The new next content id index to set.
-        """
-        self.next_content_id_index = next_content_id_index
+    #     Args:
+    #         next_content_id_index: int. The new next content id index to set.
+    #     """
+    #     self.next_content_id_index = next_content_id_index
 
     def update_linked_skill_id(self, linked_skill_id):
         """Update the state linked skill id attribute.

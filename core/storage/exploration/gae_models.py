@@ -232,6 +232,9 @@ class ExplorationModel(base_models.VersionedModel):
     # exploration.
     correctness_feedback_enabled = datastore_services.BooleanProperty(
         default=False, indexed=True)
+    # The next_content_id index to use for generation of new content ids.
+    next_content_id_index = datastore_services.IntegerProperty(
+        required=True, default=0, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -262,7 +265,8 @@ class ExplorationModel(base_models.VersionedModel):
             'param_changes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'correctness_feedback_enabled':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

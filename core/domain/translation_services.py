@@ -74,3 +74,56 @@ def get_and_cache_machine_translation(
         )
 
     return translated_text
+
+
+def update_translation_related_change(
+    exploration_id,
+    exploration_version,
+    changes_related_to_translation,
+    content_count
+):
+    old_translation_models = (
+        translation_models.EntityTranslationsModel.get_all_for_entity(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exploration_id,
+            exploration_version)
+    )
+    # Create new_translation_models with updated id and entity version.
+    new_translation_models = []
+    translation_counts = {}
+    for entity_translation_model in old_translation_models:
+        new_translation_model = (
+            translation_models.EntityTranslationsModel.create_new(
+                entity_translation_model.entity_type,
+                entity_translation_model.entity_id,
+                entity_translation_model.exploration_version + 1,
+                entity_translation_model.language_code,
+                entity_translation_model.translations
+            )
+        )
+        translation_counts[new_translation_model.language_code] = (
+            len(new_translation_model.translation))
+        for change in changes_related_to_translation:
+            if change.content_id not in new_translation_model.translation:
+                continue
+
+            if change.cmd == exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE:
+                new_translation_model.translations[
+                    change.content_id].needs_update = True
+            else:
+                # CMD_REMOVE_TRANSLATION:
+                del new_translation_model.translations[change.content_id]
+            translation_counts[new_translation_model.language_code] -= 1
+
+        new_translation_models.append(new_translation_model)
+
+    translation_model.EntityTranslationsModel.put_multi(
+        new_translation_models)
+    if opportunity_services.is_exploration_available_for_contribution(
+            exploration_id):
+        opportunity_services.update_opportunity_with_updated_exploration(
+            exploration_id)
+
+def get_entity_translation_domain_object_from_model():
+    # todo.
+    pass
