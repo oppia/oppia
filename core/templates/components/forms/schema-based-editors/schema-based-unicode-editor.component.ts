@@ -96,6 +96,9 @@ implements ControlValueAccessor, OnInit, Validator {
   ) {}
 
   updateLocalValue(value: string): void {
+    if (this.localValue === value) {
+      return;
+    }
     this.localValue = value;
     this.onChange(this.localValue);
   }
