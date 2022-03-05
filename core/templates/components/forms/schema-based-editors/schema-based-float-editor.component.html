@@ -13,7 +13,8 @@
              [oppiaFocusOn]="labelForFocusTarget"
              (keypress)="onKeypress($event)"
              applyValidation [validators]="validators"
-             (blur)="onBlur()" (focus)="onFocus()">
+             (blur)="onBlur()" (focus)="onFocus()"
+             inputmode="numeric">
       <span *ngIf="errorStringI18nKey" class="oppia-form-error oppia-numeric-input-error">
         {{errorStringI18nKey | translate}}
       </span>
