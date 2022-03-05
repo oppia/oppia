@@ -1552,3 +1552,23 @@ TASK_ENTRY_ID_TEMPLATE = '%s.%s.%d.%s.%s.%s'
 
 # The composite entity ID template used by the task entry model.
 COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
+
+# The data type for the translated or translatable content in any
+# BaseTranslatableObject.
+ContentValueType = Union[str, List[str]]
+
+
+class TranslatableEntityType(enum.Enum):
+    """Represents all possible entity types which support new translations
+    architecture.
+    """
+
+    EXPLORATION = 'exploration'
+    QUESTION = 'question'
+
+
+class TranslatedContentDict(TypedDict):
+    """Dictionary representing TranslatedContent object."""
+
+    content_value: ContentValueType
+    needs_update: bool
