@@ -98,43 +98,15 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             topic_summary_dict['classroom'] = topic_classroom_dict.get(
                 topic_summary_dict['id'], None)
 
-        untriaged_skill_summary_dicts = []
         mergeable_skill_summary_dicts = []
-        categorized_skills_dict = {}
-        topics = topic_fetchers.get_all_topics()
-        for topic in topics:
-            subtopics = topic.subtopics
-            categorized_skills_dict[topic.name] = {}
-            uncategorized_skills = (
-                skill_services.get_descriptions_of_skills(
-                    topic.uncategorized_skill_ids)[0])
-            skills_list = []
-            for skill_id in topic.uncategorized_skill_ids:
-                skill_dict = {
-                    'skill_id': skill_id,
-                    'skill_description': uncategorized_skills[skill_id]
-                }
-                skills_list.append(skill_dict)
-            categorized_skills_dict[topic.name]['uncategorized'] = (
-                skills_list)
-            for subtopic in subtopics:
-                skills = (skill_services.get_descriptions_of_skills(
-                    subtopic.skill_ids))[0]
-                skills_list = []
-                for skill_id in subtopic.skill_ids:
-                    skill_dict = {
-                        'skill_id': skill_id,
-                        'skill_description': skills[skill_id]
-                    }
-                    skills_list.append(skill_dict)
-                categorized_skills_dict[topic.name][
-                    subtopic.title] = skills_list
+
+        catrgorized_and_untriaged_skills_dicts = (
+            skill_services.get_categorized_and_untriaged_skills_dicts(
+                skill_summary_dicts, skill_ids_assigned_to_some_topic,
+                merged_skill_ids))
 
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
-            if (skill_id not in skill_ids_assigned_to_some_topic) and (
-                    skill_id not in merged_skill_ids):
-                untriaged_skill_summary_dicts.append(skill_summary_dict)
             if (skill_id in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
@@ -152,7 +124,8 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
         self.values.update({
-            'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
+            'untriaged_skill_summary_dicts': (
+                catrgorized_and_untriaged_skills_dicts[1]),
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
             'total_skill_count': len(skill_summary_dicts),
@@ -161,7 +134,8 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'can_create_topic': can_create_topic,
             'can_delete_skill': can_delete_skill,
             'can_create_skill': can_create_skill,
-            'categorized_skills_dict': categorized_skills_dict
+            'categorized_skills_dict': (
+                catrgorized_and_untriaged_skills_dicts[0])
         })
         self.render_json(self.values)
 
@@ -179,90 +153,23 @@ class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-
         skill_summaries = skill_services.get_all_skill_summaries()
         skill_summary_dicts = [
-            summary.to_dict() for summary in skill_summaries]
-
+          summary.to_dict() for summary in skill_summaries]
         skill_ids_assigned_to_some_topic = (
             topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
-        merged_skill_ids = (
-            skill_services.get_merged_skill_ids())
+        merged_skill_ids = skill_services.get_merged_skill_ids()
 
-        untriaged_skill_summary_dicts = []
-        categorized_skills_dict = {}
-        topics = topic_fetchers.get_all_topics()
-
-        uncategorized_skills_ids_and_topic_names = []
-        uncategorized_skill_ids = []
-        categorized_skill_ids_with_topic_and_subtopic_name = []
-        categorized_skill_ids = []
-
-        for topic in topics:
-            subtopics = topic.subtopics
-            categorized_skills_dict[topic.name] = {}
-            categorized_skills_dict[topic.name]['uncategorized'] = []
-
-            for skill_id in topic.uncategorized_skill_ids:
-                uncategorized_skill_ids.append(skill_id)
-                uncategorized_skills_ids_and_topic_names.append({
-                    'skill_id': skill_id,
-                    'topic_name': topic.name
-                })
-            for subtopic in subtopics:
-                categorized_skills_dict[topic.name][subtopic.title] = []
-                for skill_id in subtopic.skill_ids:
-                    categorized_skill_ids.append(skill_id)
-                    categorized_skill_ids_with_topic_and_subtopic_name.append({
-                        'skill_id': skill_id,
-                        'topic_name': topic.name,
-                        'subtopic_title': subtopic.title
-                    })
-
-        uncategorized_skills_descriptions = (
-            skill_services.get_descriptions_of_skills(
-                uncategorized_skill_ids)[0])
-        for skill_data in uncategorized_skills_ids_and_topic_names:
-            topic_name = skill_data.get('topic_name')
-            skill_dict = {
-                'skill_id': skill_data.get('skill_id'),
-                'skill_description': (
-                    uncategorized_skills_descriptions[
-                        skill_data.get('skill_id')
-                    ]
-                )
-            }
-            categorized_skills_dict[topic_name]['uncategorized'].append(
-                skill_dict
-            )
-
-        categorized_skill_descriptions = (
-            skill_services.get_descriptions_of_skills(
-                categorized_skill_ids)[0])
-        for skill_data in categorized_skill_ids_with_topic_and_subtopic_name:
-            topic_name = skill_data.get('topic_name')
-            subtopic_title = skill_data.get('subtopic_title')
-            skill_dict = {
-                'skill_id': skill_data.get('skill_id'),
-                'skill_description': (
-                    categorized_skill_descriptions[
-                        skill_data.get('skill_id')
-                    ]
-                )
-            }
-            categorized_skills_dict[topic_name][subtopic_title].append(
-                skill_dict
-            )
-
-        for skill_summary_dict in skill_summary_dicts:
-            skill_id = skill_summary_dict['id']
-            if (skill_id not in skill_ids_assigned_to_some_topic) and (
-                    skill_id not in merged_skill_ids):
-                untriaged_skill_summary_dicts.append(skill_summary_dict)
+        catrgorized_and_untriaged_skills_dicts = (
+            skill_services.get_categorized_and_untriaged_skills_dicts(
+                skill_summary_dicts, skill_ids_assigned_to_some_topic,
+                merged_skill_ids))
 
         self.values.update({
-            'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
-            'categorized_skills_dict': categorized_skills_dict
+            'untriaged_skill_summary_dicts': (
+                catrgorized_and_untriaged_skills_dicts[1]),
+            'categorized_skills_dict': (
+                catrgorized_and_untriaged_skills_dicts[0])
         })
         self.render_json(self.values)
 

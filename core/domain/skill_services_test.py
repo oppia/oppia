@@ -1325,6 +1325,64 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Updated misconception feedback.')
 
+    def test_get_categorized_and_untriaged_skills_dicts(self):
+        topic_id = topic_fetchers.get_new_topic_id()
+        linked_skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            linked_skill_id, self.user_id_admin, description='Description 3')
+        subtopic_skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            subtopic_skill_id, self.user_id_admin,
+            description='Subtopic Skill')
+
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title')
+        subtopic.skill_ids = [subtopic_skill_id]
+
+        self.save_new_topic(
+            topic_id, self.user_id_admin, name='Name',
+            abbreviated_name='name', url_fragment='name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[linked_skill_id],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+        skill_summaries = skill_services.get_all_skill_summaries()
+        skill_summary_dicts = [
+          summary.to_dict() for summary in skill_summaries]
+        skill_ids_assigned_to_some_topic = (
+            topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
+        merged_skill_ids = skill_services.get_merged_skill_ids()
+
+        expected_categorized_skill_dict = {
+            'Name': {
+                'uncategorized': [{
+                    'skill_id': linked_skill_id,
+                    'skill_description': 'Description 3',
+                }],
+                'Subtopic Title': [{
+                    'skill_id': subtopic_skill_id,
+                    'skill_description': 'Subtopic Skill'
+                }]
+            }
+        }
+
+        skill_summary = skill_services.get_skill_summary_by_id(self.SKILL_ID)
+        skill_summary_dict = skill_summary.to_dict()
+        expected_untriaged_skills_dict = [skill_summary_dict]
+
+        catrgorized_and_untriaged_skills_dicts = (
+            skill_services.get_categorized_and_untriaged_skills_dicts(
+                skill_summary_dicts, skill_ids_assigned_to_some_topic,
+                merged_skill_ids))
+
+        self.assertEqual(
+            catrgorized_and_untriaged_skills_dicts[0],
+            expected_categorized_skill_dict)
+        self.assertEqual(
+            catrgorized_and_untriaged_skills_dicts[1],
+            expected_untriaged_skills_dict)
+
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
     """Test the skill mastery services module."""
