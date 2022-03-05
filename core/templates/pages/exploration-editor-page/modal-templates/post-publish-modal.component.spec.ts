@@ -151,7 +151,7 @@ describe('Post Publish Modal Controller', function() {
     expect(component.explorationLinkCopied).toBe(true);
   });
 
-  it('should not select text if selection is null', () => {
+  it('should throw error if selection is null', () => {
     spyOn(window, 'getSelection').and.returnValue(null);
 
     let firstChild = document.createElement('div');
