@@ -167,10 +167,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
             }, 10);
           };
 
-          $scope.tempFunc = function(){
-            let a = 1, b = 1, c = 0;
-            c = a + b;
-          };
+          $scope.tempFunc = function() {};
 
           var centerGraph = function() {
             if ($scope.graphData() && $scope.centerAtCurrentState) {
