@@ -367,7 +367,7 @@ describe('Learner dashboard functionality', function() {
     await explorationEditorMainTab.addHint('Hint 1');
     // Error.
     await explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'c',
+      correctAnswer: 'correct',
       explanation: 'It is correct'
     });
     await skillEditorPage.saveQuestion();
