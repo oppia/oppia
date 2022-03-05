@@ -288,6 +288,9 @@ def open_new_tab_in_browser_if_possible(url):
         print('%s). %s' % (index + 1, browser))
 
     default_index = int(input().strip()) - 1
+    # Re-order the browsers by moving the user selected browser to the
+    # first position and copying over the browsers before and after
+    # the selected browser in the same order as they were present.
     ordered_browser_cmds = (
         [browser_cmds[default_index]] + browser_cmds[:default_index] +
         browser_cmds[default_index + 1:])
