@@ -57,7 +57,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
             )
         )
 
-        exp_ids_with_category_not_in_contants = (
+        exp_ids_with_category_not_in_constants = (
             published_explorations
             | 'Combine exp id and category' >> beam.Map(
                 lambda exp: (exp.id, exp.category))
