@@ -21,6 +21,7 @@ import { EventEmitter } from '@angular/core';
 import { Injectable } from '@angular/core';
 
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
 
 @Injectable({
@@ -46,12 +47,11 @@ export class TranslationTabActiveContentIdService {
 
   setActiveContent(contentId: string, dataFormat: string): void {
     const displayStateRecordedVoiceovers = (
-      this._stateRecordedVoiceoversService.displayed);
-    if (displayStateRecordedVoiceovers !== null) {
-      var allContentIds = displayStateRecordedVoiceovers.getAllContentIds();
-      if (allContentIds.indexOf(contentId) === -1) {
-        throw new Error('Invalid active content id: ' + contentId);
-      }
+      this._stateRecordedVoiceoversService.displayed
+    ) as RecordedVoiceovers;
+    var allContentIds = displayStateRecordedVoiceovers.getAllContentIds();
+    if (allContentIds.indexOf(contentId) === -1) {
+      throw new Error('Invalid active content id: ' + contentId);
     }
     this.activeContentId = contentId;
     this.activeDataFormat = dataFormat;
