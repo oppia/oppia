@@ -181,6 +181,8 @@ class TaskEntry:
             'target_id': self.target_id,
             'issue_description': self.issue_description,
             'status': self.status,
+            'resolver_username': None,
+            'resolver_profile_picture_data_url': None,
             'resolved_on_msecs': (
                 None if not self.resolved_on
                 else utils.get_time_in_millisecs(self.resolved_on)),

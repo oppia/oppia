@@ -74,7 +74,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
             constants.TASK_STATUS_RESOLVED, self.owner_id,
             self.MOCK_DATE)
         self.assertEqual(
-            task_entry.toDict(task_entry), # type: ignore[no-untyped-call]
+            task_entry.to_dict(), # type: ignore[no-untyped-call]
             {
             'entity_type': 'exploration',
             'entity_id': self.exp_id,
@@ -84,6 +84,8 @@ class TaskEntryTests(test_utils.GenericTestBase):
             'target_id': 'Introduction',
             'issue_description': 'issue description',
             'status': 'resolved',
+            'resolver_username': None,
+            'resolver_profile_picture_data_url': None,
             'resolved_on_msecs': utils.get_time_in_millisecs(self.MOCK_DATE),
         })
 
