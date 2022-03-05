@@ -173,11 +173,19 @@ class Question(translation_domain.BaseTranslatableObject):
         self.created_on = created_on
         self.last_updated = last_updated
 
-    def get_translatable_contents_collection(self) -> None:
-        """Registers all of translatable fields/objects in the question."""
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Registers all of translatable fields/objects in the question.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
-        translatable_contents_collection.add_translatable_object(
+
+        translatable_contents_collection.add_fields_from_translatable_object(
             self.question_state_data)
         return translatable_contents_collection
 

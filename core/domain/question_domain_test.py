@@ -1724,7 +1724,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_get_all_translatable_content_for_question(self):
         """Get all translatable fields from exploration."""
         translatable_contents = [
-            translatable_content.content
+            translatable_content.content_value
             for translatable_content in
             self.question.get_all_contents_which_need_translations(
                 self.dummy_entity_translations)

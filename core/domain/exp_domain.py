@@ -633,6 +633,25 @@ class Exploration(translation_domain.BaseTranslatableObject):
             translatable_contents_collection.add_translatable_object(state)
         return translatable_contents_collection
 
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the exploration.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        for state in self.states.values():
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(state)
+            )
+        return translatable_contents_collection
+
     @classmethod
     def create_default_exploration(
             cls, exploration_id, title=feconf.DEFAULT_EXPLORATION_TITLE,
@@ -2719,6 +2738,14 @@ class ExplorationSummary:
                 raise utils.ValidationError(
                     'Expected each id in viewer_ids to '
                     'be string, received %s' % viewer_id)
+
+        all_user_ids_with_rights = (
+            self.owner_ids + self.editor_ids + self.voice_artist_ids +
+            self.viewer_ids)
+        if len(all_user_ids_with_rights) != len(set(all_user_ids_with_rights)):
+            raise utils.ValidationError(
+                'Users should not be assigned to multiple roles at once, '
+                'received users: %s' % ', '.join(all_user_ids_with_rights))
 
         if not isinstance(self.contributor_ids, list):
             raise utils.ValidationError(

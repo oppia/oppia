@@ -52,8 +52,8 @@ class EntityTranslationsModel(base_models.BaseModel):
     # The ISO 639-1 code for the language an entity is written in.
     language_code = datastore_services.StringProperty(
         required=True, indexed=True)
-    # Represents the translated content of the TranslatableContent object. The
-    # format is of type dict(str, TranslatedContent).
+    # A dict representing content-id as keys and dict(TranslatedContent)
+    # as values.
     translations = datastore_services.JsonProperty(required=True)
 
     @staticmethod
@@ -85,14 +85,13 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_version: int,
         language_code: str
     ) -> str:
-        """The method use to generate unique id for entity translations model.
+        """Generates the ID for an entity translations model.
 
         Args:
-            entity_type: TranslatableEntityType. Type
-                of the entity to fetch.
-            entity_id: str. Id of an entity.
-            entity_version: int. Version of an entity.
-            language_code: str. Language code for a given entity.
+            entity_type: TranslatableEntityType. The type of the entity.
+            entity_id: str. The ID of the entity.
+            entity_version: int. The version of the entity.
+            language_code: str. The language code for the entity.
 
         Returns:
             str. Returns a unique id of the form
@@ -113,11 +112,14 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_version and language_code.
 
         Args:
-            entity_type: TranslatableEntityType. Type
-                of the entity to fetch.
-            entity_id: str. Id of an entity.
-            entity_version: int. Version of an entity.
-            language_code: str. Language code for a given entity.
+            entity_type: TranslatableEntityType. The type of the entity whose
+                translations are to be fetched.
+            entity_id: str. The ID of the entity whose translations are to be
+                fetched.
+            entity_version: int. The version of the entity whose translations
+                are to be fetched.
+            language_code: str. The language code of the entity whose
+                translations are to be fetched.
 
         Returns:
             EntityTranslationsModel. The EntityTranslationsModel
@@ -139,10 +141,12 @@ class EntityTranslationsModel(base_models.BaseModel):
         all languages in which such models exist.
 
         Args:
-            entity_type: TranslatableEntityType. Type
-                of an entity to fetch.
-            entity_id: str. Id of an entity.
-            entity_version: int. Version of an entity.
+            entity_type: TranslatableEntityType. The type of the entity whose
+                translations are to be fetched.
+            entity_id: str. The ID of the entity whose translations are to be
+                fetched.
+            entity_version: int. The version of the entity whose translations
+                are to be fetched.
 
         Returns:
             list(EntityTranslationsModel|None). The EntityTranslationsModel
@@ -167,13 +171,12 @@ class EntityTranslationsModel(base_models.BaseModel):
         """Creates and returns a new EntityTranslationsModel instance.
 
         Args:
-            entity_type: TranslatableEntityType. Type
-                of an entity to fetch.
-            entity_id: str. Id of an entity.
-            entity_version: int. Version of an entity.
-            language_code: str. Language code for a given entity.
-            translations: dict(str, TranslatedContentDict). The contents which
-                are already translated.
+            entity_type: TranslatableEntityType. The type of the entity.
+            entity_id: str. The ID of the entity.
+            entity_version: int. The version of the entity.
+            language_code: str. The language code for the entity.
+            translations: dict(str, TranslatedContentDict). A dict representing
+                content-id as keys and dict(TranslatedContent) as values.
 
         Returns:
             EntityTranslationsModel. Returns a new EntityTranslationsModel.

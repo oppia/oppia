@@ -4393,7 +4393,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         translatable_contents = [
-            translatable_content.content
+            translatable_content.content_value
             for translatable_content in
             state.get_all_contents_which_need_translations(
                 self.dummy_entity_translations)
@@ -4403,28 +4403,31 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             translatable_contents, ['<p>state content html</p>']
         )
 
-    def test_get_all_translatable_content_for_answer_groups(self):
+    def test_get_all_translatable_content_for_text_input_answer_groups(self):
         """Get all the translatable fields for answer group."""
         state = state_domain.State.create_default_state('state_1')
-        state_answer_group = [state_domain.AnswerGroup(
-            state_domain.Outcome(
-                'destination', state_domain.SubtitledHtml(
-                    'feedback_1', '<p>state outcome html</p>'),
-                False, [], None, None), [
+        state_answer_group = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'destination', state_domain.SubtitledHtml(
+                        'feedback_1', '<p>state outcome html</p>'),
+                    False, [], None, None),
+                [
                     state_domain.RuleSpec(
                         'Equals', {
                             'x': {
-                                'contentId': 'rule_input_Equals',
+                                'contentId': 'rule_input_1',
                                 'normalizedStrSet': ['Test rule spec.']
                                 }})
-                    ],
-            [],
-            None
-        )]
+                ],
+                [],
+                None
+            )
+        ]
         state.update_interaction_id('TextInput')
         state.update_interaction_answer_groups(state_answer_group)
         translatable_contents = [
-            translatable_content.content
+            translatable_content.content_value
             for translatable_content in
             state.get_all_contents_which_need_translations(
                 self.dummy_entity_translations)
@@ -4434,6 +4437,45 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             translatable_contents, [
                 '<p>state outcome html</p>',
                 ['Test rule spec.']]
+        )
+
+    def test_get_all_translatable_content_for_set_input_answer_groups(self):
+        """Get all the translatable fields for answer group."""
+        state = state_domain.State.create_default_state('state_1')
+        state_answer_group = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'destination', state_domain.SubtitledHtml(
+                        'feedback', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': {
+                                'contentId': 'rule_input_2',
+                                'unicodeStrSet': ['Input1', 'Input2']
+                                }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+        state.update_interaction_id('SetInput')
+        state.update_interaction_answer_groups(state_answer_group)
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            state.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents, [
+                '<p>Feedback</p>',
+                ['Input1', 'Input2']
+            ]
         )
 
     def test_get_all_translatable_content_for_solution(self):
@@ -4452,7 +4494,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
         translatable_contents = [
-            translatable_content.content
+            translatable_content.content_value
             for translatable_content in
             state.get_all_contents_which_need_translations(
                 self.dummy_entity_translations)
@@ -4461,7 +4503,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             translatable_contents, ['<p>This is solution for state_1</p>'])
 
-    def test_test_get_all_translatable_content_for_customization_args(self):
+    def test_test_get_all_translatable_content_for_unicode_cust_args(self):
         """Get all the translatable fields for customization args."""
         state = state_domain.State.create_default_state('state_1')
         state_interaction_cust_args = {
@@ -4476,7 +4518,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args(state_interaction_cust_args)
         translatable_contents = [
-            translatable_content.content
+            translatable_content.content_value
             for translatable_content in
             state.get_all_contents_which_need_translations(
                 self.dummy_entity_translations)
@@ -4485,12 +4527,39 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             translatable_contents, ['Translatable cust args.'])
 
+    def test_get_all_translatable_content_for_html_in_cust_args(self):
+        state = state_domain.State.create_default_state('state_1')
+        state.update_interaction_id('MultipleChoiceInput')
+        state_interaction_cust_args = {
+            'showChoicesInShuffledOrder': {
+                'value': True
+            },
+            'choices': {
+                'value': [
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': 'Hello world!'
+                    }
+                ]
+            }
+        }
+        state.update_interaction_customization_args(state_interaction_cust_args)
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            state.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents, ['Hello world!'])
+
     def test_get_all_translatable_content_for_hints(self):
         """Get all translatable fields for hints."""
         hint = state_domain.Hint(state_domain.SubtitledHtml(
             'hint_1', '<p>Hello, this is html1 for state_1</p>'))
         translatable_contents = [
-            translatable_content.content
+            translatable_content.content_value
             for translatable_content in
             hint.get_all_contents_which_need_translations(
                 self.dummy_entity_translations)
