@@ -30,12 +30,12 @@ import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFact
 import { FetchExplorationBackendResponse } from 'domain/exploration/read-only-exploration-backend-api.service';
 
 describe('Exploration data service', function() {
-  let eds: ExplorationDataService = null;
-  let eebas: EditableExplorationBackendApiService = null;
-  let lss: LocalStorageService = null;
-  let ls: LoggerService = null;
+  let eds: ExplorationDataService;
+  let eebas: EditableExplorationBackendApiService;
+  let lss: LocalStorageService;
+  let ls: LoggerService;
   let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
+  let csrfService: CsrfTokenService;
   let sampleDataResults: ExplorationBackendDict = {
     draft_change_list_id: 3,
     version: 1,

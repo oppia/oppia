@@ -70,10 +70,11 @@ export class PostPublishModalComponent
     range.setStartBefore((codeDiv as HTMLDivElement).firstChild as Node);
     range.setEndAfter((codeDiv as HTMLDivElement).lastChild as Node);
     let selection = window.getSelection();
-    if (selection !== null) {
-      selection.removeAllRanges();
-      selection.addRange(range);
+    if (selection === null) {
+      throw new Error('Selection cannot be null');
     }
+    selection.removeAllRanges();
+    selection.addRange(range);
     document.execCommand('copy');
     this.explorationLinkCopied = true;
   }

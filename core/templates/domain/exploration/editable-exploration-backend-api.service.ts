@@ -43,10 +43,9 @@ export class EditableExplorationBackendApiService {
       this._getExplorationUrl(explorationId, applyDraft)).toPromise();
   }
 
-  // The version number is null, whenever we create a deafult exploration.
   private async _updateExplorationAsync(
       explorationId: string,
-      explorationVersion: number | null,
+      explorationVersion: number,
       commitMessage: string,
       changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
     const putData = {
@@ -118,7 +117,7 @@ export class EditableExplorationBackendApiService {
    */
   async updateExplorationAsync(
       explorationId: string,
-      explorationVersion: number | null,
+      explorationVersion: number,
       commitMessage: string,
       changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
     return this._updateExplorationAsync(

@@ -150,4 +150,20 @@ describe('Post Publish Modal Controller', function() {
     expect(mockWindow.document.execCommand).not.toHaveBeenCalled();
     expect(component.explorationLinkCopied).toBe(true);
   });
+
+  it('should not select text if selection is null', () => {
+    spyOn(window, 'getSelection').and.returnValue(null);
+
+    let firstChild = document.createElement('div');
+    let lastChild = document.createElement('div');
+    let element = document.createElement('div');
+    element.appendChild(firstChild);
+    element.appendChild(lastChild);
+
+    element.onclick = function(event) {
+      expect(() => component.selectText(event))
+        .toThrowError('Selection cannot be null');
+    };
+    element.click();
+  });
 });

@@ -54,7 +54,6 @@ class MockWindowRef {
         if (this._hashChange === null) {
           return;
         }
-        this._hashChange;
       },
       reload: (val: number) => val
     },

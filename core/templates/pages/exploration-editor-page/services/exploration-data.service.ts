@@ -210,26 +210,26 @@ export class ExplorationDataService {
         isDraftVersionvalid: boolean,
         draftChanges: ExplorationChange[]) => void,
       errorCallback: (errorResponse?: object) => void): void {
-    let dataVersion = null;
-    if (this.data && (this.data.version !== undefined)) {
+    let dataVersion = 0;
+    if (this.data && this.data.version !== undefined) {
       dataVersion = this.data.version;
     }
     this.editableExplorationBackendApiService.updateExplorationAsync(
       this.explorationId,
-      dataVersion, commitMessage, changeList).then(
-      response => {
-        this.alertsService.clearWarnings();
-        this.data = response;
-        if (successCallback) {
-          successCallback(
-            response.is_version_of_draft_valid,
-            response.draft_changes);
-        }
-      }, (response) => {
-        if (errorCallback) {
-          errorCallback(response);
-        }
+      dataVersion, commitMessage, changeList
+    ).then(response => {
+      this.alertsService.clearWarnings();
+      this.data = response;
+      if (successCallback) {
+        successCallback(
+          response.is_version_of_draft_valid,
+          response.draft_changes);
       }
+    }, (response) => {
+      if (errorCallback) {
+        errorCallback(response);
+      }
+    }
     );
   }
 }
