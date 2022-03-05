@@ -20,6 +20,7 @@ import { Component, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild }
 import { AbstractControl, ControlValueAccessor, NgForm, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NumericInputValidationService } from 'interactions/NumericInput/directives/numeric-input-validation.service';
+import { NumberConversionService } from 'services/number-conversion.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
@@ -55,11 +56,13 @@ implements ControlValueAccessor, OnInit, Validator {
   labelForErrorFocusTarget: string;
   hasLoaded: boolean;
   onChange: (value: number) => void = () => {};
-  @Input() uiConfig: {checkRequireNonnegativeInput: unknown};
-  checkRequireNonnegativeInputValue: unknown;
+  @Input() uiConfig: {checkRequireNonnegativeInput: boolean};
+  checkRequireNonnegativeInputValue: boolean = false;
   minValue: number;
+  localStringValue: string = '';
   constructor(
     private focusManagerService: FocusManagerService,
+    private numberConversionService: NumberConversionService,
     private numericInputValidationService: NumericInputValidationService,
     private schemaFormSubmittedService: SchemaFormSubmittedService
   ) { }
@@ -98,7 +101,7 @@ implements ControlValueAccessor, OnInit, Validator {
       localValue !== undefined &&
       localValue !== null &&
       localValue !== '' &&
-      this.numericInputValidationService.getErrorStringI18nKey(
+      this.numericInputValidationService.validateNumber(
         +localValue, checkRequireNonnegativeInputValue as boolean
       ) === undefined)
     ;
@@ -120,6 +123,9 @@ implements ControlValueAccessor, OnInit, Validator {
     );
     if (this.localValue === undefined) {
       this.localValue = 0.0;
+    }
+    if (this.localStringValue === undefined) {
+      this.localStringValue = '';
     }
     // To check checkRequireNonnegativeInput customization argument
     // Value of numeric input interaction.
@@ -171,8 +177,10 @@ implements ControlValueAccessor, OnInit, Validator {
 
   generateErrors(): void {
     this.errorStringI18nKey = (
-      this.numericInputValidationService.getErrorStringI18nKey(
-        this.localValue, false));
+      this.numericInputValidationService.validateNumber(
+        this.localValue,
+        this.checkRequireNonnegativeInputValue,
+        this.currentDecimalSeparator()));
   }
 
   onKeypress(evt: KeyboardEvent): void {
@@ -191,6 +199,43 @@ implements ControlValueAccessor, OnInit, Validator {
       this.isUserCurrentlyTyping = true;
     }
   }
+
+  currentDecimalSeparator(): string {
+    return this.numberConversionService.currentDecimalSeparator();
+  };
+
+  parseInput(): void {
+    let regex = this.numberConversionService.getInputValidationRegex();
+
+    // Remove anything that isn't a number,
+    // minus sign, exponent (e) sign or a decimal separator.
+    this.localStringValue = this.localStringValue
+      .replace(regex, '');
+
+    // If input is empty, the number value should be null.
+    if (this.localStringValue === '') {
+      this.localValue = null;
+      // Clear errors if input is empty.
+      this.errorStringI18nKey = undefined;
+    } else {
+      // Make sure number is in a correct format.
+      let error = NumericInputValidationService
+        .validateNumericString(
+          this.localStringValue,
+          this.currentDecimalSeparator());
+      if (error !== undefined) {
+        this.localValue = null;
+        this.errorStringI18nKey = error;
+      } else { // Parse number if the string is in proper format.
+        // Exploration Player.
+        this.localValue = this.numberConversionService
+          .convertToEnglishDecimal(this.localStringValue);
+
+        // Generate errors (if any).
+        this.generateErrors();
+      }
+    }
+  };
 }
 
 angular.module('oppia').directive('schemaBasedFloatEditor', downgradeComponent({
