@@ -57,7 +57,7 @@ import socket
 import sys
 import threading
 
-from core import python_utils
+from core import utils
 
 _PROTOCOLS = [(socket.SOCK_STREAM, socket.IPPROTO_TCP),
               (socket.SOCK_DGRAM, socket.IPPROTO_UDP)]
@@ -73,7 +73,7 @@ def _get_process_command_line(pid):
         str. The command that started the process.
     """
     try:
-        with python_utils.open_file(
+        with utils.open_file(
             '/proc/{}/cmdline'.format(pid), 'rt'
         ) as f:
             return f.read()
@@ -91,7 +91,7 @@ def _get_process_start_time(pid):
         str. The time when the process started.
     """
     try:
-        with python_utils.open_file(
+        with utils.open_file(
             '/proc/{}/stat'.format(pid), 'rt'
         ) as f:
             return int(f.readline().split()[21])
@@ -229,6 +229,9 @@ class _PortPool:
 
         Returns:
             int. Allocated port or 0 if none could be allocated.
+
+        Raises:
+            RuntimeError. No ports being managed.
         """
         if not self._port_queue:
             raise RuntimeError('No ports being managed.')
@@ -265,6 +268,9 @@ class _PortPool:
 
         Args:
             port: int. The port number to add to the pool.
+
+        Raises:
+            ValueError. The given port not in [1, 65535] range.
         """
         if port < 1 or port > 65535:
             raise ValueError(
@@ -471,6 +477,9 @@ class Server:
 
         Returns:
             Socket. A new socket object bound to the socket file.
+
+        Raises:
+            RuntimeError. Failed to bind socket to the given path.
         """
         sock = self._get_socket()
         try:
@@ -478,7 +487,7 @@ class Server:
         except socket.error as err:
             raise RuntimeError(
                 'Failed to bind socket {}. Error: {}'.format(path, err)
-            )
+            ) from err
         sock.listen(self.max_backlog)
         return sock
 

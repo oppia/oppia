@@ -35,13 +35,15 @@ require(
 require('services/generate-content-id.service.ts');
 
 angular.module('oppia').controller('AddAnswerGroupModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
+  '$controller', '$rootScope', '$scope', '$uibModalInstance',
+  'EditorFirstTimeEventsService',
   'EventBusService', 'GenerateContentIdService', 'OutcomeObjectFactory',
   'PopulateRuleContentIdsService', 'RuleObjectFactory', 'StateEditorService',
   'addState', 'currentInteractionId', 'stateName', 'COMPONENT_NAME_FEEDBACK',
   'INTERACTION_SPECS',
   function(
-      $controller, $scope, $uibModalInstance, EditorFirstTimeEventsService,
+      $controller, $rootScope, $scope, $uibModalInstance,
+      EditorFirstTimeEventsService,
       EventBusService, GenerateContentIdService, OutcomeObjectFactory,
       PopulateRuleContentIdsService, RuleObjectFactory, StateEditorService,
       addState, currentInteractionId, stateName, COMPONENT_NAME_FEEDBACK,
@@ -68,11 +70,15 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     $scope.updateAnswerGroupFeedback = function(outcome) {
       $scope.openFeedbackEditor();
       $scope.tmpOutcome.feedback = outcome.feedback;
+      // TODO(#8521): Remove the use of $rootScope.$apply()
+      // once the controller is migrated to angular.
+      $rootScope.$apply();
     };
     $scope.updateTaggedMisconception = function(
-        misconceptionId, skillId) {
+        taggedMisconception) {
       $scope.tmpTaggedSkillMisconceptionId = (
-        `${skillId}-${misconceptionId}`);
+        `${taggedMisconception.skillId}-${
+          taggedMisconception.misconceptionId}`);
     };
     $scope.openFeedbackEditor = function() {
       $scope.feedbackEditorIsOpen = true;
@@ -98,6 +104,12 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
       return (
         tmpOutcome.dest ===
         stateName && !tmpOutcome.hasNonemptyFeedback());
+    };
+
+    // Remove this function once this controller is migrated to
+    // Angular 2+.
+    $scope.getChanges = function() {
+      $rootScope.$apply();
     };
 
     $scope.isFeedbackLengthExceeded = function(tmpOutcome) {

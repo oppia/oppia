@@ -30,6 +30,7 @@ import { ThreadStatusDisplayService } from '../services/thread-status-display.se
 export class ThreadTableComponent {
   @Output() rowClick: EventEmitter<string> = (
     new EventEmitter());
+
   @Input() threads: SuggestionThread[] = [];
   constructor(
     private dateTimeFormatService: DateTimeFormatService,

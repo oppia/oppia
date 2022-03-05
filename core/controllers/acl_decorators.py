@@ -150,6 +150,10 @@ def does_classroom_exist(handler):
 
         Returns:
             handler. function. The newly decorated function.
+
+        Raises:
+            Exception. This decorator is not expected to be used with other
+                handler types.
         """
         classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
@@ -228,12 +232,11 @@ def can_view_skills(handler):
         can view multiple given skills.
     """
 
-    def test_can_view(self, comma_separated_skill_ids, **kwargs):
+    def test_can_view(self, selected_skill_ids, **kwargs):
         """Checks if the user can view the skills.
 
         Args:
-            comma_separated_skill_ids: str. The skill ids
-                separated by commas.
+            selected_skill_ids: list(str). List of skill ids.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -245,20 +248,19 @@ def can_view_skills(handler):
         # This is a temporary check, since a decorator is required for every
         # method. Once skill publishing is done, whether given skill is
         # published should be checked here.
-        skill_ids = comma_separated_skill_ids.split(',')
 
         try:
-            for skill_id in skill_ids:
+            for skill_id in selected_skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.InvalidInputException
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         try:
-            skill_fetchers.get_multi_skills(skill_ids)
+            skill_fetchers.get_multi_skills(selected_skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        return handler(self, comma_separated_skill_ids, **kwargs)
+        return handler(self, selected_skill_ids, **kwargs)
     test_can_view.__wrapped__ = True
 
     return test_can_view
@@ -2183,11 +2185,17 @@ def can_access_learner_dashboard(handler):
 
         Raises:
             NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have
+                credentials to access the page.
         """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
         if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.user.actions:
             return handler(self, **kwargs)
         else:
-            raise self.NotLoggedInException
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
     test_can_access.__wrapped__ = True
 
     return test_can_access

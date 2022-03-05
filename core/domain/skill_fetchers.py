@@ -37,6 +37,9 @@ def get_multi_skills(skill_ids, strict=True):
 
     Returns:
         list(Skill). The list of skills matching the provided IDs.
+
+    Raises:
+        Exception. No skill exists for given ID.
     """
     local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
     for skill_id, skill_model in zip(skill_ids, local_skill_models):

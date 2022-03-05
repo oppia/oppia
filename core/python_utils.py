@@ -26,18 +26,11 @@ import sys
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
-sys.path.insert(0, _YAML_PATH)
-
 _CERTIFI_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
 sys.path.insert(0, _CERTIFI_PATH)
 
-import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 MAP = builtins.map
@@ -128,30 +121,6 @@ def get_args_of_function_node(function_node, args_to_ignore):
         ]
 
 
-def open_file(filename, mode, encoding='utf-8', newline=None):
-    """Open file and return a corresponding file object.
-
-    Args:
-        filename: str. The file to be opened.
-        mode: str. Mode in which the file is opened.
-        encoding: str. Encoding in which the file is opened.
-        newline: None|str. Controls how universal newlines work.
-
-    Returns:
-        _io.TextIOWrapper. The file object.
-
-    Raises:
-        IOError. The file cannot be opened.
-    """
-    # The try/except is needed here to unify the errors because io.open in
-    # Python 3 throws FileNotFoundError while in Python 2 it throws an IOError.
-    # This should be removed after we fully migrate to Python 3.
-    try:
-        return io.open(filename, mode, encoding=encoding, newline=newline)
-    except:
-        raise IOError('Unable to open file: %s' % filename)
-
-
 def get_package_file_contents(package: str, filepath: str) -> str:
     """Open file and return its contents. This needs to be used for files that
     are loaded by the Python code directly, like constants.ts or
@@ -172,25 +141,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return file.read()
     except FileNotFoundError:
         return pkgutil.get_data(package, filepath).decode('utf-8')
-
-
-def parse_query_string(query_string):
-    """Parse a query string given as a string argument
-    (data of type application/x-www-form-urlencoded) using urlparse.parse_qs if
-    run under Python 2 and urllib.parse.parse_qs if run under Python 3.
-
-    Args:
-        query_string: str. The query string.
-
-    Returns:
-        dict. The keys are the unique query variable names and the values are
-        lists of values for each name.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.parse_qs(query_string)  # pylint: disable=disallowed-function-calls
 
 
 def url_quote(content):
@@ -230,20 +180,6 @@ def url_encode(query, doseq=False):
     return urlparse.urlencode(query, doseq=doseq)
 
 
-def divide(number1, number2):
-    """This function divides number1 by number2 in the Python 2 way, i.e it
-    performs an integer division.
-
-    Args:
-        number1: int. The dividend.
-        number2: int. The divisor.
-
-    Returns:
-        int. The quotent.
-    """
-    return past.utils.old_div(number1, number2)
-
-
 def _recursively_convert_to_str(value):
     """Convert all builtins.bytes and builtins.str elements in a data structure
     to bytes and unicode respectively. This is required for the
@@ -272,18 +208,3 @@ def _recursively_convert_to_str(value):
         return value.decode('utf-8')
     else:
         return value
-
-
-def yaml_from_dict(dictionary, width=80):
-    """Gets the YAML representation of a dict.
-
-    Args:
-        dictionary: dict. Dictionary for conversion into yaml.
-        width: int. Width for the yaml representation, default value
-            is set to be of 80.
-
-    Returns:
-        str. Converted yaml of the passed dictionary.
-    """
-    dictionary = _recursively_convert_to_str(dictionary)
-    return yaml.safe_dump(dictionary, default_flow_style=False, width=width)

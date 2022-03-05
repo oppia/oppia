@@ -1,4 +1,6 @@
-<div [ngClass]="{'rtl-navbar-header': isLanguageRTL(), 'float-right': isLanguageRTL(), 'float-left': !isLanguageRTL()}"
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.rtl.css" as="style">
+<div [ngClass]="{'float-right': isLanguageRTL(), 'float-left': !isLanguageRTL()}"
      class="navbar-header protractor-test-navbar-header">
   <a *ngIf="windowIsNarrow"
      (click)="toggleSidebar($event)"
@@ -41,7 +43,7 @@
     {{ subheaderText }}
   </span>
 </div>
-<div [ngClass]="{'rtl-navbar-header': isLanguageRTL(), 'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}"
+<div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}"
      class="navbar-header"
      *ngIf="userMenuIsShown">
   <ul class="nav oppia-navbar-nav"
@@ -99,15 +101,17 @@
               autofocus>
             <li class="nav-item">
               <div class="nav-item-main d-flex">
-                <div *ngIf="CLASSROOM_PROMOS_ARE_ENABLED" class="nav-item-left d-flex flex-column justify-content-between">
+                <a *ngIf="CLASSROOM_PROMOS_ARE_ENABLED" class="nav-item-left d-flex flex-column justify-content-between"
+                   tabindex="0" href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
+                   (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)">
                   <div class="nav-item-top d-flex justify-content-between">
                     <div class="nav-content d-flex flex-column">
-                      <a (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                         (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)"
-                         class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link"
-                         href="#">
-                          {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
-                      </a>
+                      <div class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link">
+                        <div (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
+                             class="nav-item-left-head">
+                             {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
+                        </div>
+                      </div>
                       <div class="des">{{ 'I18N_TOPNAV_LEARN_DESCRIPTION_1' | translate }}</div>
                     </div>
                     <picture>
@@ -122,36 +126,44 @@
                   </div>
                   <div class="nav-item-bottom d-flex flex-column" *ngIf="!userIsLoggedIn">
                     <div *ngIf="classroomData.length > 0">
-                      <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3)">
+                      <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
                         <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                            (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment())"
                            tabindex="0"
+                           class="underline"
                            href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/{{topicSummary.getUrlFragment()}}">
+                          <span *ngIf="!isHackyTopicTitleTranslationDisplayed(idx)">
                             {{ topicSummary.getName() }}
+                          </span>
+                          <span *ngIf="isHackyTopicTitleTranslationDisplayed(idx)">
+                            {{ topicTitlesTranslationKeys[idx] | translate }}
+                          </span>
                         </a>
                       </div>
                     </div>
-                    <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})" class="nav-item-bottom-link" href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
-                      <span>{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }} </span>
-                      <span class="material-icons">arrow_right_alt</span>
-                    </a>
+                    <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
+                         class="nav-item-bottom-link">
+                      <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
+                      <span class="material-icons arrow-forward">arrow_forward</span>
+                    </div>
                   </div>
-                  <a *ngIf="userIsLoggedIn"
-                     (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                     class="nav-item-bottom-link-logged"
-                     href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
-                    <span>{{ 'I18N_TOPNAV_LEARN_LINK_2' | translate }} </span>
-                    <span class="material-icons">arrow_right_alt</span>
-                  </a>
-                </div>
-                <div class="nav-content nav-item-right d-flex flex-column">
+                  <div *ngIf="userIsLoggedIn"
+                       (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
+                       class="nav-item-bottom-link-logged">
+                    <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
+                    <span class="material-icons arrow-forward">arrow_forward</span>
+                  </div>
+                </a>
+                <a class="nav-content nav-item-right d-flex flex-column" tabindex="0"
+                   href="/community-library" (click)="navigateToClassroomPage('/community-library')">
                   <div class="nav-item-right-head">{{ 'I18N_TOPNAV_LEARN_HEADING' | translate }}</div>
                   <div class="des">{{ 'I18N_TOPNAV_LIBRARY_DESCRIPTION' | translate }}</div>
-                  <a (keydown)="onMenuKeypress($event, 'learnMenu', {action: ACTION_CLOSE})" class="nav-item-bottom-link" href="/community-library">
-                    <span>{{ 'I18N_TOPNAV_LIBRARY' | translate }} </span>
-                    <span class="material-icons">arrow_right_alt</span>
-                  </a>
-                </div>
+                  <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
+                       class="nav-item-bottom-link">
+                    <span class="link">{{ 'I18N_TOPNAV_LIBRARY' | translate }}</span>
+                    <span class="material-icons arrow-forward">arrow_forward</span>
+                  </div>
+                </a>
               </div>
             </li>
           </ul>
@@ -174,32 +186,34 @@
             </span>
           </a>
           <ul ngbDropdownMenu
-              class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
+              class="dropdown-menu dropdown-menu oppia-navbar-dropdown about-dropdown-menu"
               (mouseover)="openSubmenu($event, 'aboutMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
               autofocus>
             <li class="nav-item">
               <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                 class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link"
+                 class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link about-link"
                  href="/about"
-                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
-                 [innerHTML]="'I18N_TOPNAV_ABOUT_OPPIA' | translate">
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
+                <span class="link">{{'I18N_TOPNAV_ABOUT_OPPIA' | translate}}</span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content"
+              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
                  href="/about-foundation"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
-                 rel="noopener"
-                 [innerHTML]="'I18N_TOPNAV_OPPIA_FOUNDATION' | translate">
+                 rel="noopener">
+                <span class="link">{{'I18N_TOPNAV_OPPIA_FOUNDATION' | translate}}</span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content"
+              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
                  href="https://medium.com/oppia-org"
+                 target="_blank"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
-                 rel="noopener"
-                 [innerHTML]="'I18N_TOPNAV_BLOG' | translate">
+                 rel="noopener">
+                <span class="link">{{'I18N_TOPNAV_BLOG' | translate}}</span>
+                <span class="material-icons launch">launch</span>
               </a>
             </li>
           </ul>
@@ -227,27 +241,28 @@
               (mouseleave)="closeSubmenuIfNotMobile($event)">
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
-                <a class="item item-border d-flex flex-column"
-                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                   href="/partnerships"
+                <a class="item item-border d-flex flex-column innvolved-item"
+                   (click)="navigateToPage('/partnerships')" href="/partnerships"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
-                   rel="noopener">
+                   rel="noopener"
+                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
                   <div class="heading">
-                    <span class="material-icons language">language</span>
-                    {{'I18N_TOPNAV_PARTNERSHIPS' | translate}}
+                    <span class="material-icons language mx-1">language</span>
+                    <span class="heading-text">{{'I18N_TOPNAV_PARTNERSHIPS' | translate}}</span>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_PARTNERSHIPS_DESCRIPTION' | translate}}
                   </div>
                 </a>
-                <a class="item d-flex flex-column"
+                <a class="item d-flex flex-column innvolved-item"
+                   (click)="navigateToPage('/volunteer')"
                    href="/volunteer"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
-                    <span class="material-icons volunteer">supervisor_account</span>
-                    {{'I18N_HEADING_VOLUNTEER'| translate}}
+                    <span class="material-icons volunteer mx-1">supervisor_account</span>
+                    <span class="heading-text">{{'I18N_HEADING_VOLUNTEER'| translate}}</span>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_VOLUNTEER_DESCRIPTION' | translate}}
@@ -255,27 +270,29 @@
                 </a>
               </div>
               <div class="bottom-section d-flex">
-                <a class="item item-border d-flex flex-column"
+                <a class="item item-border d-flex flex-column innvolved-item"
+                   (click)="navigateToPage('/contact')"
                    href="/contact"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
-                    <span class="material-icons contact">mail</span>
-                    {{'I18N_TOPNAV_CONTACT_US' | translate}}
+                    <span class="material-icons contact mx-1">mail</span>
+                    <span class="heading-text">{{'I18N_TOPNAV_CONTACT_US' | translate}}</span>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_CONTACT_US_DESCRIPTION' | translate}}
                   </div>
                 </a>
-                <a class="item d-flex flex-column"
+                <a class="item d-flex flex-column innvolved-item"
+                   (click)="navigateToPage('/donate')"
                    href="/donate"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
-                    <span class="material-icons fav">favorite</span>
-                    {{'I18N_TOPNAV_DONATE' | translate}}
+                    <span class="material-icons fav mx-1">favorite</span>
+                    <span class="heading-text">{{'I18N_TOPNAV_DONATE' | translate}}</span>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_DONATE_DESCRIPTION' | translate}}
@@ -288,39 +305,19 @@
         <li [ngClass]="{'open': activeMenuName === 'donateMenu'}"
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_DONATE"
-            class="nav-item oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
-          <a ngbDropdownToggle (keydown)="onMenuKeypress($event, 'donateMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-             class="nav-link oppia-navbar-tab dropdown-toggle donate-tab"
+            class="nav-item protractor-test-about-oppia-list-item">
+          <a class="nav-link oppia-navbar-tab donate-tab"
              aria-haspopup="true"
              aria-expanded="false"
              tabindex="0"
-             (mouseover)="openSubmenu($event, 'donateMenu')"
-             (mouseleave)="closeSubmenuIfNotMobile($event)"
+             href="/donate"
+             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+             rel="noopener"
              autofocus>
             <span class="oppia-navbar-tab-content"
                  [innerHTML]="'I18N_TOPNAV_DONATE' | translate">
             </span>
           </a>
-          <ul ngbDropdownMenu
-              [ngStyle]="{'left.px': donateMenuOffset}"
-              class="dropdown-menu oppia-navbar-dropdown oppia-navbar-dropdown-right"
-              (mouseover)="openSubmenu($event, 'donateMenu')"
-              (mouseleave)="closeSubmenuIfNotMobile($event)">
-            <li class="nav-item oppia-navbar-dropdown-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content oppia-navbar-tab-content-heading"
-                 href="/donate"
-                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-                 (keydown)="onMenuKeypress($event, 'donateMenu', {enter: ACTION_CLOSE})"
-                 rel="noopener"
-              >
-                <i class="material-icons oppia-navbar-dropdown-heart-icon">&#xE87D;</i>
-                <span [innerHTML]="'I18N_TOPNAV_DONATE' | translate"></span>
-              </a>
-              <span class="nav-link-desc oppia-navbar-tab-content-desc"
-                  [innerHTML]="'I18N_TOPNAV_DONATE_DESCRIPTION' | translate">
-              </span>
-            </li>
-          </ul>
         </li>
       </ul>
     </li>
@@ -340,7 +337,9 @@
           <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>
       </div>
-      <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown" [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
+      <ul ngbDropdownMenu
+          class="dropdown-menu oppia-navbar-dropdown language-dropdown"
+          [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
           (mouseover)="openSubmenu($event, 'languageMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)">
         <li class="nav-item" [ngClass]="'protractor-test-i18n-language-' + language.id" *ngFor="let language of supportedSiteLanguages">
@@ -511,7 +510,7 @@
         <li class="nav-item">
           <a (click)="onLoginButtonClicked()"
              class="nav-link oppia-nav-link">
-            <div class="oppia-nav-right-dropdown">
+            <div class="signin-dropdown oppia-nav-right-dropdown">
               <div class="oppia-signin-g-icon">
                 <img [src]="googleSignInIconUrl" alt="Google signin icon">
               </div>
@@ -532,389 +531,5 @@
     </li>
   </ul>
 </div>
-<style>
-  .nav-item-links a {
-    color: #212121;
-    text-decoration: none;
-  }
-  .nav-link:focus {
-    background-color: #fff;
-    color: #00645c;
-  }
-  .get-involved-dropdown {
-    min-width: 574px;
-    padding: 0;
-  }
-  .get-involved-dropdown .nav-item {
-    width: 100%;
-  }
-  .get-involved-dropdown .heading {
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 18.75px;
-    padding: 0;
-  }
-  .get-involved-dropdown a {
-    text-decoration: none;
-  }
-  .dropdown-menu a:focus {
-    text-decoration: underline;
-  }
-  .get-involved-dropdown .language {
-    color: #f2994a;
-  }
-  .get-involved-dropdown .volunteer {
-    color: #2d9cdb;
-  }
-  .get-involved-dropdown .contact {
-    color: #b4bbc3;
-  }
-  .get-involved-dropdown .fav {
-    color: #eb5757;
-  }
-  .get-involved-dropdown .des {
-    color: #767676;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 20px;
-    padding: 0;
-    padding-left: 28px;
-    text-overflow: clip;
-  }
-  .top-section {
-    border-bottom: 1px solid #2121211a;
-  }
-  .item-border {
-    border-right: 1px solid #2121211a;
-  }
-  .item {
-    padding: 32px;
-    width: 287px;
-  }
-  .item:hover, .item:focus {
-    background-color: #21212107;
-  }
-  .top-section .item {
-    padding-bottom: 27px;
-  }
-  .bottom-section .item {
-    padding-top: 27px;
-  }
-  .rtl-navbar-header {
-    display: flex;
-    margin-left: -30px;
-  }
-  .dropdown-toggle::after {
-    margin-right: 0.255em;
-  }
-  .learn-dropdown-menu {
-    border-radius: 3px;
-    /* left: 0 !important; */
-    padding: 0;
-  }
-  .classroom-enabled {
-    min-width: 688px;
-  }
-  .classroom-disabled {
-    min-width: 300px;
-  }
-  .learn {
-    height: 66.5px;
-  }
-  .learn-dropdown-menu .nav-item-top-link {
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 18.75px;
-    padding: 0;
-    padding-bottom: 8px;
-  }
-  .learn-dropdown-menu .nav-item-right-head {
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.2px;
-    line-height: 14.06px;
-    padding: 0;
-    padding-bottom: 8px;
-    text-transform: uppercase;
-  }
-  .learn-dropdown-menu .nav-item-links {
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 16.41px;
-    padding: 0;
-    padding-top: 16px;
-    text-transform: capitalize;
-  }
-  .learn-dropdown-menu .nav-item-left {
-    border-right: 1px solid #0000000d;
-    padding: 32px;
-    width: 388px;
-  }
-  .learn-dropdown-menu .nav-item-right {
-    min-width: 300px;
-    padding: 32px;
-  }
-  .learn-dropdown-menu .nav-content {
-    color: #767676;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 20px;
-    width: 224px;
-  }
-  .learn-dropdown-menu .nav-item-bottom-link {
-    color: #00645c;
-    font-family: 'Inter', 'Roboto', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 16.41px;
-    padding: 0;
-    padding-top: 16px;
-  }
-  .learn-dropdown-menu .nav-item-bottom-link-logged {
-    color: #00645c;
-    font-family: 'Inter', 'Roboto', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 16.41px;
-    padding: 0;
-  }
-  .dropdown-menu {
-    border-radius: 3px;
-  }
-  .rtl-navbar-header .dropdown-menu {
-    left: 0 !important;
-    right: auto !important;
-    text-align: right;
-  }
-  .language-icon {
-    margin-top: -3px;
-  }
-  .language-padding-left {
-    padding-left: 26px;
-  }
-  .oppia-navbar-brand-name:focus {
-    outline: 1px dotted #fff;
-    outline: auto 5px -webkit-focus-ring-color;
-  }
-  .oppia-nav-right-dropdown {
-    background-color: #fff;
-    border-radius: 5px;
-    border-width: 0;
-    box-shadow: 1px 1px 0 1px rgba(0,0,0,0.05);
-    color: #737373;
-    font-family: Roboto, arial, sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    height: 40px;
-    padding-left: 8px;
-    padding-right: 8px;
-    vertical-align: middle;
-    white-space: nowrap;
-  }
-  .language-element {
-    border-radius: 0;
-    box-shadow: 0 0;
-    color: #34665c;
-  }
-  .language-element:hover {
-    background-color: rgb(52, 102, 92, 0.1);
-  }
-  .language-element-selected {
-    background-color: rgb(52, 102, 92, 0.1);
-  }
-  .oppia-nav-right-dropdown:focus,
-  .oppia-nav-right-dropdown:hover {
-    box-shadow: 1px 4px 5px 1px rgba(0,0,0,0.1);
-  }
-  .oppia-nav-right-dropdown:active {
-    background-color: #e5e5e5;
-    box-shadow: none;
-    transition-duration: 10ms;
-  }
-  .oppia-signin-g-icon {
-    float: left;
-    padding: 10px 24px 10px 0;
-  }
-  .oppia-navbar-menu-icon {
-    color: #fff;
-    margin-top: -5px;
-  }
-  .oppia-navbar-dashboard-indicator-text {
-    bottom: 0;
-    color: white;
-    font-size: 1.12rem;
-    font-weight: bold;
-    position: absolute;
-    right: 4px;
-  }
-  .nav-mobile-header-text-container {
-    display: none;
-  }
-  .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
-    display: block;
-  }
-  .oppia-navbar-role-text {
-    bottom: 0;
-    color: white;
-    font-size: 11px;
-    font-weight: bold;
-    position: absolute;
-    right: 3px;
-  }
-  .oppia-navbar-dashboard-indicator {
-    background-color: #f7a541;
-    border-radius: 20px;
-    height: 15px;
-    position: absolute;
-    right: 25px;
-    top: 8px;
-    width: 15px;
-  }
-  .oppia-navbar-menu {
-    margin-left: 10px;
-    opacity: 0.9;
-    outline-color: transparent;
-    padding-top: 20px;
-  }
-  .oppia-navbar-menu:hover {
-    opacity: 1;
-  }
-  .oppia-navbar-menu:focus {
-    outline: 1px dotted #212121;
-    outline: 5px -webkit-focus-ring-color;
-  }
-  .oppia-navbar-profile {
-    float: right;
-  }
-  .oppia-navbar-role-indicator {
-    background-color: #f7a541;
-    border-radius: 20px;
-    bottom: 10px;
-    height: 15px;
-    position: absolute;
-    right: 25px;
-    width: 15px;
-  }
-  .oppia-navbar-close-icon {
-    color: #fff;
-    margin-right: 4px;
-    margin-top: -10px;
-  }
-  .oppia-signin-text {
-    font-family: Roboto, arial, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: .21px;
-    line-height: 38px;
-  }
-  .oppia-user-avatar-icon {
-    margin-top: -1px;
-  }
-  .oppia-admin-text {
-    right: 4px;
-  }
-  .oppia-navbar-button-container-extra-info {
-    margin-right: 10px;
-  }
-  .oppia-navbar-dropdown-menu {
-    margin-right: 15px;
-    padding: 0;
-  }
-  .oppia-nav-link {
-    padding: 0;
-    width: 190px;
-  }
-  .oppia-navbar-dropdown-item {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: 30px;
-  }
-  .oppia-navbar-tab-content-heading {
-    color: #212121;
-    font-size: 16px;
-    font-weight: 500;
-    padding: 0;
-  }
-  .oppia-navbar-tab-content-heading:after {
-    border-style: solid;
-    border-width: 0 0 1.59px;
-    bottom: 1px;
-    content: '';
-    left: 28px;
-    position: absolute;
-    width: 50.5px;
-  }
-  .rtl-navbar-header .oppia-navbar-tab-content-heading:after {
-    right: 28px;
-  }
-  .oppia-navbar-dropdown-heart-icon {
-    color: #eb5757;
-    font-size: 22px;
-    padding-right: 6px;
-  }
-  .oppia-navbar-tab-content-desc {
-    color: #767676;
-    line-height: 20px;
-    margin-left: 28px;
-    opacity: 0.9;
-  }
-  .oppia-navbar-dropdown-right {
-    left: 0;
-    min-width: 285px;
-    padding: 0;
-    right: auto;
-  }
-  .oppia-navbar-profile .profile-dropdown:hover {
-    background-color: #fff;
-  }
-
-  @media screen and (max-width: 880px) {
-    .oppia-logo-wide {
-      margin-left: 0;
-    }
-  }
-
-  @media screen and (max-width: 840px) {
-    .desktop-view-language-code {
-      display: none;
-    }
-  }
-
-  @media screen and (max-width: 768px) {
-    .nav-mobile-header-text-container {
-      display: inline-block;
-      font-size: 1px;
-      margin-top: 2px;
-      max-height: 56px;
-      text-overflow: ellipsis;
-      width: 50%;
-    }
-    .nav-mobile-header-editor {
-      color: #fff;
-      display: block;
-      font-family: Roboto, arial, sans-serif;
-      font-size: 19px;
-    }
-    .nav-mobile-header-text {
-      color: #fff;
-      display: inline-block;
-      font-size: 15px;
-      max-width: 205px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      width: 100%;
-    }
-  }
-</style>
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.rtl.css">

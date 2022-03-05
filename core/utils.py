@@ -35,14 +35,14 @@ import urllib
 import zlib
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
-    Union)
+    IO, Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple,
+    TypeVar, Union, overload)
+from typing_extensions import Literal
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  # pylint: disable=wrong-import-position
@@ -56,6 +56,9 @@ SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
+
+TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
+BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
 # TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
 # because python_utils is untyped and will be removed in python3.
@@ -91,6 +94,48 @@ class ExplorationConversionError(Exception):
     pass
 
 
+@overload
+def open_file(
+    filename: str,
+    mode: TextModeTypes,
+    encoding: str = 'utf-8',
+    newline: Union[str, None] = None
+) -> IO[str]: ...
+
+
+@overload
+def open_file(
+    filename: str,
+    mode: BinaryModeTypes,
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None
+) -> IO[bytes]: ...
+
+
+def open_file(
+    filename: str,
+    mode: Union[TextModeTypes, BinaryModeTypes],
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None
+) -> IO[Any]:
+    """Open file and return a corresponding file object.
+
+    Args:
+        filename: str. The file to be opened.
+        mode: Literal. Mode in which the file is opened.
+        encoding: str. Encoding in which the file is opened.
+        newline: None|str. Controls how universal newlines work.
+
+    Returns:
+        IO[Any]. The file object.
+
+    Raises:
+        FileNotFoundError. The file cannot be found.
+    """
+    file = open(filename, mode, encoding=encoding, newline=newline)
+    return file
+
+
 def get_file_contents(
         filepath: str, raw_bytes: bool = False, mode: str = 'r'
 ) -> bytes:
@@ -112,7 +157,7 @@ def get_file_contents(
     else:
         encoding = 'utf-8'
 
-    with python_utils.open_file( # type: ignore[no-untyped-call]
+    with open(
         filepath, mode, encoding=encoding) as f:
         return f.read() # type: ignore[no-any-return]
 
@@ -223,7 +268,7 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         dict. Parsed dict representation of the yaml string.
 
     Raises:
-        InavlidInputException. If the yaml string sent as the
+        InvalidInputException. If the yaml string sent as the
             parameter is unable to get parsed, them this error gets
             raised.
     """
@@ -232,7 +277,25 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         assert isinstance(retrieved_dict, dict)
         return retrieved_dict
     except (AssertionError, yaml.YAMLError) as e:
-        raise InvalidInputException(e)
+        raise InvalidInputException(e) from e
+
+
+def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> str:
+    """Gets the YAML representation of a dict.
+
+    Args:
+        dictionary: dict. Dictionary for conversion into yaml.
+        width: int. Width for the yaml representation, default value
+            is set to be of 80.
+
+    Returns:
+        str. Converted yaml of the passed dictionary.
+    """
+    # The type ignore is needed, because typestubs define the return type
+    # of 'dump' as 'Any' which is wrong.
+    return yaml.dump( # type: ignore[no-any-return]
+        dictionary, allow_unicode=True, width=width
+    )
 
 
 # Here obj has a recursive structure. The list element or dictionary value
@@ -410,7 +473,7 @@ def set_url_query_parameter(
             % param_name)
 
     scheme, netloc, path, query_string, fragment = urllib.parse.urlsplit(url)
-    query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
+    query_params = urllib.parse.parse_qs(query_string)
 
     query_params[param_name] = [param_value]
     new_query_string = urllib.parse.urlencode(query_params, doseq=True)
@@ -490,7 +553,7 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
         float. The time in milliseconds since the Epoch.
     """
     msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
-    return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0) # type: ignore[no-any-return, no-untyped-call]
+    return msecs + (datetime_obj.microsecond / 1000.0)
 
 
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
@@ -545,7 +608,7 @@ def get_human_readable_time_string(time_msec: float) -> str:
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
     return time.strftime(
-        '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0))) # type: ignore[arg-type, no-untyped-call]
+        '%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
 
 
 def create_string_from_largest_unit_in_timedelta(

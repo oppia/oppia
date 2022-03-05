@@ -46,6 +46,19 @@
     </div>
   </div>
 
+  <div *ngIf="inStoryMode && !userIsLoggedIn" class="conversation-skin-login-container">
+    <div class="conversation-skin-congratulations-text" translate="I18N_CHAPTER_COMPLETION"></div>
+    <span class="conversation-skin-login-text text-secondary" translate="I18N_SAVE_PROGRESS"></span>
+    <div class="mt-2">
+      <button mat-button class="md-raised oppia-login-button text-light protractor-test-login-button m-2" (click)="signIn()">
+        LOGIN
+      </button>
+      <button mat-button class="md-raised oppia-sign-up-button text-light m-2" (click)="signIn()">
+        SIGN UP
+      </button>
+    </div>
+  </div>
+
   <div *ngIf="inStoryMode" class="conversation-skin-back-to-collection-container">
     <a [href]="storyViewerUrl" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_STORY"></a>
   </div>
@@ -55,21 +68,22 @@
   <div *ngIf="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
     <a [href]="'/collection/' + collectionId" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
   </div>
-  <div *ngIf="inStoryMode && !userIsLoggedIn" class="conversation-skin-login-container">
-    <div class="conversation-skin-congratulations-text" translate="I18N_CHAPTER_COMPLETION"></div>
-    <span class="conversation-skin-login-text text-secondary" translate="I18N_SAVE_PROGRESS"></span>
-    <div class="mt-2">
-      <button #matButton class="md-raised oppia-login-button text-light protractor-test-login-button" (click)="signIn()">
-        LOGIN
-      </button>
-      <button #matButton class="md-raised oppia-sign-up-button text-light" (click)="signIn()">
-        SIGN UP
-      </button>
-    </div>
-  </div>
 </div>
 
 <style>
+  .oppia-login-button {
+    background-color: #00645c;
+    font-size: 1em;
+    min-width: max-content;
+    width: 154px;
+  }
+
+  .oppia-sign-up-button {
+    background-color: #00609c;
+    font-size: 1em;
+    min-width: max-content;
+    width: 154px;
+  }
   .conversation-skin-final-summary {
     margin-bottom: 25px;
     margin-top: 20px;
@@ -109,7 +123,7 @@
 
   .conversation-skin-back-to-collection-container {
     margin-bottom: 92px;
-    margin-top: 25px;
+    margin-top: 24px;
     text-align: center;
   }
 
@@ -120,7 +134,8 @@
 
   .conversation-skin-login-container {
     background-color: #fff;
-    margin: -52px auto 92px;
+    margin-bottom: 24px;
+    margin-top: 24px;
     padding: 1.5em 2em;
     text-align: center;
     width: 100%;
@@ -147,5 +162,17 @@
       padding-bottom: 24px;
       padding-top: 24px;
       width: 100vw;
+  }
+
+  @media screen and (max-width: 959px) {
+    .conversation-skin-final-summary {
+      margin: 0 auto;
+      max-width: 650px;
+      width: 100%;
+    }
+    .conversation-skin-final-ratings {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+      width: 100%;
+    }
   }
 </style>

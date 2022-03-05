@@ -30,7 +30,6 @@ import types
 
 from core import feconf
 from core import handler_schema_constants
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -567,8 +566,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         destroy_auth_session_call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
-        response = self.get_json('/url_handler')
-
+        response = self.get_json('/url_handler?current_url=login')
         self.assertIn('login_url', response)
         self.assertIsNone(response['login_url'])
         self.assertNotIn('error', response)
@@ -885,7 +883,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n'))
         for filename in filenames:
-            with python_utils.open_file(
+            with utils.open_file(
                 os.path.join(os.getcwd(), 'assets', 'i18n', filename),
                 mode='r') as f:
                 lines = f.readlines()
@@ -899,6 +897,17 @@ class I18nDictsTests(test_utils.GenericTestBase):
                     if not key.startswith('"I18N_'):
                         self.log_line('Bad line in file: %s' % filename)
                 self.assertEqual(sorted(key_list), key_list)
+
+    # TODO(#14645): Remove this method when translation service is extended.
+    def test_hacky_tranlsation_keys_match_constants_en(self):
+        """Tests that the hacky translation keys present in constants file
+        are also present in en.json.
+        """
+        en_key_list = self._extract_keys_from_json_file('en.json')
+        hacky_translation_keys = constants.HACKY_TRANSLATION_KEYS
+        missing_hacky_translation_keys = list(
+            set(hacky_translation_keys) - set(en_key_list))
+        self.assertEqual(missing_hacky_translation_keys, [])
 
     def test_keys_match_en_qqq(self):
         """Tests that en.json and qqq.json have the exact same set of keys."""
@@ -2099,7 +2108,7 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
         user_id = user_services.get_user_id_from_username('testlearneruser')
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:

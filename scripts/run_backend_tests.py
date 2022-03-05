@@ -66,7 +66,7 @@ from . import install_third_party_libs
 # libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
 
-from core import python_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from core import utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -248,7 +248,7 @@ def _get_all_test_targets_from_shard(shard_name):
     Returns:
         list(str). The dotted module names that belong to the shard.
     """
-    with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+    with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
     return shards_spec[shard_name]
 
@@ -262,8 +262,11 @@ def _check_shards_match_tests(include_load_tests=True):
     Returns:
         str. A description of any problems found, or an empty string if
         the shards match the tests.
+
+    Raises:
+        Exception. Failed to find duplicated module in shards.
     """
-    with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+    with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
     shard_modules = sorted([
         module for shard in shards_spec.values() for module in shard])
@@ -459,7 +462,7 @@ def main(args=None):
                 total_failures += failures
                 print('FAILED    %s: %s errors, %s failures' % (
                     spec.test_target, errors, failures))
-            except AttributeError:
+            except AttributeError as e:
                 # There was an internal error, and the tests did not run (The
                 # error message did not match `tests_failed_regex_match`).
                 test_count = 0
@@ -470,7 +473,7 @@ def main(args=None):
                 print('')
                 print('    This is most likely due to an import error.')
                 print('------------------------------------------------------')
-                raise task.exception
+                raise task.exception from e
         else:
             try:
                 tests_run_regex_match = re.search(
@@ -550,6 +553,9 @@ def _check_coverage(
     Returns:
         str, float. Tuple of the coverage report and the coverage
         percentage.
+
+    Raises:
+        RuntimeError. Subprocess failure.
     """
     if combine:
         combine_process = subprocess.run(

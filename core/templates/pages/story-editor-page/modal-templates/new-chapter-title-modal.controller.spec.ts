@@ -23,8 +23,6 @@ import { AlertsService } from 'services/alerts.service';
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { StoryContentsObjectFactory } from
-  'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { ExplorationIdValidationService } from
   'domain/exploration/exploration-id-validation.service';
@@ -67,7 +65,7 @@ describe('Create New Chapter Modal Controller', function() {
         EditableStoryBackendApiService));
     $provide.value(
       'StoryObjectFactory',
-      new StoryObjectFactory(new StoryContentsObjectFactory()));
+      new StoryObjectFactory());
     $provide.value('AlertsService', new AlertsService(new LoggerService()));
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -138,6 +136,7 @@ describe('Create New Chapter Modal Controller', function() {
     function() {
       expect($scope.nodeTitles).toEqual(nodeTitles);
       expect($scope.errorMsg).toBe(null);
+      expect($scope.correctnessFeedbackDisabled).toBe(false);
     });
 
   it('should validate explorationId correctly',
@@ -215,19 +214,13 @@ describe('Create New Chapter Modal Controller', function() {
 
   it('should close the modal when saving a chapter with a valid exploration id',
     function() {
-      spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
-      var deferred = $q.defer();
-      deferred.resolve(true);
-      spyOn(explorationIdValidationService, 'isExpPublishedAsync')
-        .and.returnValue(deferred.promise);
-      $scope.save();
+      $scope.updateExplorationId();
       $rootScope.$apply();
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
   it('should set story node exploration id when updating exploration id',
     function() {
-      spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(false);
       var storyUpdateSpy = spyOn(
         StoryUpdateService, 'setStoryNodeExplorationId');
       $scope.updateExplorationId();
@@ -240,6 +233,58 @@ describe('Create New Chapter Modal Controller', function() {
     expect($scope.errorMsg).toBe('A chapter with this title already exists');
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
+
+  it('should prevent exploration from being added if it doesn\'t exist ' +
+    'or isn\'t published yet', function() {
+    $scope.title = 'dummy_title';
+    var deferred = $q.defer();
+    deferred.resolve(false);
+    spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+      .and.returnValue(deferred.promise);
+    const correctnessFeedbackSpy =
+      spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled');
+    $scope.save();
+    $rootScope.$apply();
+    expect($scope.invalidExpId).toEqual(true);
+    expect(correctnessFeedbackSpy).not.toHaveBeenCalled();
+    expect($uibModalInstance.close).not.toHaveBeenCalled();
+  });
+
+  it('should prevent exploration from being added if its correctness ' +
+  'feedback is disabled', function() {
+    $scope.title = 'dummy_title';
+    var deferred = $q.defer();
+    deferred.resolve(true);
+    spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+      .and.returnValue(deferred.promise);
+    var deferred2 = $q.defer();
+    deferred2.resolve(false);
+    spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
+      .and.returnValue(deferred2.promise);
+    $scope.save();
+    $rootScope.$apply();
+    expect($scope.correctnessFeedbackDisabled).toBe(true);
+    expect($uibModalInstance.close).not.toHaveBeenCalled();
+  });
+
+  it('should attempt to save exploration when all validation checks pass',
+    function() {
+      $scope.title = 'dummy_title';
+      var deferred = $q.defer();
+      deferred.resolve(true);
+      spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+        .and.returnValue(deferred.promise);
+      var deferred2 = $q.defer();
+      deferred2.resolve(true);
+      spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
+        .and.returnValue(deferred2.promise);
+      const updateExplorationIdSpy = spyOn($scope, 'updateExplorationId');
+      const updateTitleSpy = spyOn($scope, 'updateTitle');
+      $scope.save();
+      $rootScope.$apply();
+      expect(updateTitleSpy).toHaveBeenCalled();
+      expect(updateExplorationIdSpy).toHaveBeenCalled();
+    });
 
   it('should clear error message when changing exploration id', function() {
     $scope.title = nodeTitles[0];

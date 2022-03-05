@@ -30,13 +30,13 @@ import re
 import string
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import param_domain
 from core.domain import state_domain
+from core.domain import translation_domain
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -551,7 +551,7 @@ class VersionedExplorationInteractionIdsMapping:
         self.state_interaction_ids_dict = state_interaction_ids_dict
 
 
-class Exploration:
+class Exploration(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia exploration."""
 
     def __init__(
@@ -622,6 +622,25 @@ class Exploration:
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the exploration.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        for state in self.states.values():
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(state)
+            )
+        return translatable_contents_collection
+
     @classmethod
     def create_default_exploration(
             cls, exploration_id, title=feconf.DEFAULT_EXPLORATION_TITLE,
@@ -661,7 +680,8 @@ class Exploration:
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED, False)
+            feconf.DEFAULT_AUTO_TTS_ENABLED,
+            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED)
 
     @classmethod
     def from_dict(
@@ -681,6 +701,10 @@ class Exploration:
 
         Returns:
             Exploration. The corresponding Exploration domain object.
+
+        Raises:
+            Exception. Some parameter was used in a state but not declared
+                in the Exploration dict.
         """
         # NOTE TO DEVELOPERS: It is absolutely ESSENTIAL this conversion to and
         # from an ExplorationModel/dictionary MUST be exhaustive and complete.
@@ -1407,6 +1431,9 @@ class Exploration:
 
         Args:
             init_state_name: str. The new name of the initial state.
+
+        Raises:
+            Exception. Invalid initial state name.
         """
         old_init_state_name = self.init_state_name
         if init_state_name not in self.states:
@@ -2329,7 +2356,7 @@ class Exploration:
         # YAML representation.
         del exp_dict['id']
 
-        return python_utils.yaml_from_dict(exp_dict)
+        return utils.yaml_from_dict(exp_dict)
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all
@@ -2621,7 +2648,7 @@ class ExplorationSummary:
                     'Expected value to be non-negative, received %s' % (
                         value))
 
-        if not isinstance(self.scaled_average_rating, float):
+        if not isinstance(self.scaled_average_rating, (float, int)):
             raise utils.ValidationError(
                 'Expected scaled_average_rating to be float, received %s' % (
                     self.scaled_average_rating))
@@ -2671,6 +2698,14 @@ class ExplorationSummary:
                 raise utils.ValidationError(
                     'Expected each id in viewer_ids to '
                     'be string, received %s' % viewer_id)
+
+        all_user_ids_with_rights = (
+            self.owner_ids + self.editor_ids + self.voice_artist_ids +
+            self.viewer_ids)
+        if len(all_user_ids_with_rights) != len(set(all_user_ids_with_rights)):
+            raise utils.ValidationError(
+                'Users should not be assigned to multiple roles at once, '
+                'received users: %s' % ', '.join(all_user_ids_with_rights))
 
         if not isinstance(self.contributor_ids, list):
             raise utils.ValidationError(

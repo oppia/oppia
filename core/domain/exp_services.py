@@ -35,7 +35,6 @@ import zipfile
 
 from core import android_validation_constants
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import activity_services
@@ -345,8 +344,10 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
         exploration_id, version=version)
     exploration_dict = {}
     for state in exploration.states:
-        exploration_dict[state] = python_utils.yaml_from_dict(
-            exploration.states[state].to_dict(), width=width)
+        exploration_dict[state] = utils.yaml_from_dict(
+            exploration.states[state].to_dict(),
+            width=width
+        )
     return exploration_dict
 
 
@@ -1036,14 +1037,15 @@ def validate_exploration_for_story(exp, strict):
             android_validation_constants.SUPPORTED_LANGUAGES):
         error_string = (
             'Invalid language %s found for exploration '
-            'with ID %s.' % (exp.language_code, exp.id))
+            'with ID %s. This language is not supported for explorations '
+            'in a story on the mobile app.' % (exp.language_code, exp.id))
         if strict:
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
 
     if exp.param_specs or exp.param_changes:
         error_string = (
-            'Expected no exploration to have parameter '
+            'Expected no exploration in a story to have parameter '
             'values in it. Invalid exploration: %s' % exp.id)
         if strict:
             raise utils.ValidationError(error_string)
@@ -1051,7 +1053,8 @@ def validate_exploration_for_story(exp, strict):
 
     if not exp.correctness_feedback_enabled:
         error_string = (
-            'Expected all explorations to have correctness feedback '
+            'Expected all explorations in a story to '
+            'have correctness feedback '
             'enabled. Invalid exploration: %s' % exp.id)
         if strict:
             raise utils.ValidationError(error_string)
@@ -1062,7 +1065,9 @@ def validate_exploration_for_story(exp, strict):
         if not state.interaction.is_supported_on_android_app():
             error_string = (
                 'Invalid interaction %s in exploration '
-                'with ID: %s.' % (state.interaction.id, exp.id))
+                'with ID: %s. This interaction is not supported for '
+                'explorations in a story on the '
+                'mobile app.' % (state.interaction.id, exp.id))
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
@@ -1070,8 +1075,8 @@ def validate_exploration_for_story(exp, strict):
         if not state.is_rte_content_supported_on_android():
             error_string = (
                 'RTE content in state %s of exploration '
-                'with ID %s is not supported on mobile.'
-                % (state_name, exp.id))
+                'with ID %s is not supported on mobile for explorations '
+                'in a story.' % (state_name, exp.id))
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
@@ -1082,9 +1087,10 @@ def validate_exploration_for_story(exp, strict):
                     'recommendedExplorationIds'].value)
             if len(recommended_exploration_ids) != 0:
                 error_string = (
-                    'Exploration with ID: %s contains exploration '
-                    'recommendations in its EndExploration interaction.'
-                    % (exp.id))
+                    'Explorations in a story are not expected to contain '
+                    'exploration recommendations. Exploration with ID: '
+                    '%s contains exploration recommendations in its '
+                    'EndExploration interaction.' % (exp.id))
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
@@ -1184,10 +1190,14 @@ def regenerate_exploration_summary_with_new_contributor(
         contributor_id: str. ID of the contributor to be added to
             the exploration summary.
     """
-    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = _compute_summary_of_exploration(exploration)
-    exp_summary.add_contribution_by_user(contributor_id)
-    save_exploration_summary(exp_summary)
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=False)
+    if exploration is not None:
+        exp_summary = _compute_summary_of_exploration(exploration)
+        exp_summary.add_contribution_by_user(contributor_id)
+        save_exploration_summary(exp_summary)
+    else:
+        logging.error('Could not find exploration with ID %s', exploration_id)
 
 
 def regenerate_exploration_and_contributors_summaries(exploration_id):
@@ -1232,8 +1242,7 @@ def _compute_summary_of_exploration(exploration):
     contributor_ids = list(contributors_summary.keys())
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        python_utils.divide(
-            get_last_updated_by_human_ms(exploration.id), 1000.0))
+        get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
@@ -1664,7 +1673,7 @@ def get_average_rating(ratings):
 
         for rating_value, rating_count in ratings.items():
             rating_sum += rating_weightings[rating_value] * rating_count
-        return python_utils.divide(rating_sum, (number_of_ratings * 1.0))
+        return rating_sum / number_of_ratings
 
 
 def get_scaled_average_rating(ratings):
@@ -1684,15 +1693,12 @@ def get_scaled_average_rating(ratings):
         return 0
     average_rating = get_average_rating(ratings)
     z = 1.9599639715843482
-    x = python_utils.divide((average_rating - 1), 4)
+    x = (average_rating - 1) / 4
     # The following calculates the lower bound Wilson Score as documented
     # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
-    a = x + python_utils.divide((z**2), (2 * n))
-    b = z * math.sqrt(
-        python_utils.divide((x * (1 - x)), n) + python_utils.divide(
-            (z**2), (4 * n**2)))
-    wilson_score_lower_bound = python_utils.divide(
-        (a - b), (1 + python_utils.divide(z**2, n)))
+    a = x + ((z**2) / (2 * n))
+    b = z * math.sqrt(((x * (1 - x)) / n) + ((z**2) / (4 * n**2)))
+    wilson_score_lower_bound = (a - b) / (1 + ((z**2) / n))
     return 1 + 4 * wilson_score_lower_bound
 
 
@@ -1742,6 +1748,9 @@ def get_composite_change_list(exp_id, from_version, to_version):
     Returns:
         list(ExplorationChange). List of ExplorationChange domain objects
         consisting of changes from from_version to to_version.
+
+    Raises:
+        Exception. From version is higher than to version.
     """
     if from_version > to_version:
         raise Exception(

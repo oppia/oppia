@@ -43,9 +43,10 @@ class MockWindowRef {
   _window = {
     location: {
       href: '',
-      reload: (val) => val
+      reload: (val: boolean) => val
     },
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -112,8 +113,7 @@ describe('Practice tab component', function() {
     component.subtopicIds = [1, 2, 3];
     component.subtopicMastery = {
       1: 0,
-      2: 1,
-      3: undefined
+      2: 1
     };
     fixture.detectChanges();
   });
