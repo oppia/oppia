@@ -45,12 +45,11 @@ def get_task_dict_with_username_and_profile_picture(task_entry):
     task_entry_dict = task_entry.to_dict()
     if task_entry.resolver_id:
         resolver_settings = user_services.get_user_settings(
-                task_entry.resolver_id, strict=True) # type: ignore[no-untyped-call]
-        if resolver_settings:
-            task_entry_dict['resolver_username'] = (
-                resolver_settings.username)
-            task_entry_dict['resolver_profile_picture_data_url'] = (
-                resolver_settings.profile_picture_data_url)
+            task_entry.resolver_id, strict=True) # type: ignore[no-untyped-call]
+        task_entry_dict['resolver_username'] = (
+            resolver_settings.username)
+        task_entry_dict['resolver_profile_picture_data_url'] = (
+            resolver_settings.profile_picture_data_url)
     return task_entry_dict
 
 

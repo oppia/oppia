@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.constants import constants
 from core.platform import models
 
@@ -226,7 +227,7 @@ class TaskEntryModel(base_models.BaseModel):
         Returns:
             str. The ID for the given task.
         """
-        return '%s.%s.%d.%s.%s.%s' % (
+        return feconf.TASK_ENTRY_ID_TEMPLATE % (
             entity_type, entity_id, entity_version, task_type, target_type,
             target_id)
 
@@ -248,7 +249,8 @@ class TaskEntryModel(base_models.BaseModel):
         Returns:
             str. The composite_entity_id for the given task.
         """
-        return '%s.%s.%d' % (entity_type, entity_id, entity_version)
+        return feconf.COMPOSITE_ENTITY_ID_TEMPLATE % (
+            entity_type, entity_id, entity_version)
 
     @classmethod
     def create(

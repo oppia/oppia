@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import feconf
 from core import utils
 from core.constants import constants
 
@@ -125,7 +126,7 @@ class TaskEntry:
         Returns:
             str. The ID of this task.
         """
-        return '%s.%s.%d.%s.%s.%s' % (
+        return feconf.TASK_ENTRY_ID_TEMPLATE % (
             self.entity_type, self.entity_id, self.entity_version,
             self.task_type, self.target_type, self.target_id)
 
@@ -139,7 +140,7 @@ class TaskEntry:
         Returns:
             str. The value of the utility field.
         """
-        return '%s.%s.%d' % (
+        return feconf.COMPOSITE_ENTITY_ID_TEMPLATE % (
             self.entity_type, self.entity_id, self.entity_version)
 
     def to_dict(self) -> TaskEntryDict:
@@ -180,8 +181,6 @@ class TaskEntry:
             'target_id': self.target_id,
             'issue_description': self.issue_description,
             'status': self.status,
-            'resolver_username': None,
-            'resolver_profile_picture_data_url': None,
             'resolved_on_msecs': (
                 None if not self.resolved_on
                 else utils.get_time_in_millisecs(self.resolved_on)),
