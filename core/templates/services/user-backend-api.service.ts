@@ -141,11 +141,9 @@ export class UserBackendApiService {
   }
 
   async updatePreferencesDataAsync(
-      updateType: string,
       data: boolean | string | string[] | EmailPreferencesBackendDict
   ): Promise<UpdatePreferencesResponse> {
     return this.http.put<UpdatePreferencesResponse>(this.PREFERENCES_DATA_URL, {
-      update_type: updateType,
       data: data
     }).toPromise();
   }
