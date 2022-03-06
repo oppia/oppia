@@ -77,6 +77,7 @@ describe('Schema Based Unicode Editor', () => {
     component.onChange = (val: string) => {
       return;
     };
+    component.updateLocalValue();
 
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
   });
@@ -139,14 +140,6 @@ describe('Schema Based Unicode Editor', () => {
     component.writeValue('val');
 
     expect(component.localValue).toBe('val');
-  });
-
-  it('should update local value', () => {
-    component.localValue = 'old value';
-
-    component.updateLocalValue('new value');
-
-    expect(component.localValue).toBe('new value');
   });
 
   it('should get coding mode', () => {
