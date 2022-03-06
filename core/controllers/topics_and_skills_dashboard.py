@@ -100,7 +100,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
 
         mergeable_skill_summary_dicts = []
 
-        catrgorized_and_untriaged_skills_dicts = (
+        categorized_and_untriaged_skills_dicts = (
             skill_services.get_categorized_and_untriaged_skills_dicts(
                 skill_summary_dicts, skill_ids_assigned_to_some_topic,
                 merged_skill_ids))
@@ -125,7 +125,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
 
         self.values.update({
             'untriaged_skill_summary_dicts': (
-                catrgorized_and_untriaged_skills_dicts[1]),
+                categorized_and_untriaged_skills_dicts[1]),
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
             'total_skill_count': len(skill_summary_dicts),
@@ -135,7 +135,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'can_delete_skill': can_delete_skill,
             'can_create_skill': can_create_skill,
             'categorized_skills_dict': (
-                catrgorized_and_untriaged_skills_dicts[0])
+                categorized_and_untriaged_skills_dicts[0])
         })
         self.render_json(self.values)
 
@@ -160,16 +160,16 @@ class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
             topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
         merged_skill_ids = skill_services.get_merged_skill_ids()
 
-        catrgorized_and_untriaged_skills_dicts = (
+        categorized_and_untriaged_skills_dicts = (
             skill_services.get_categorized_and_untriaged_skills_dicts(
                 skill_summary_dicts, skill_ids_assigned_to_some_topic,
                 merged_skill_ids))
 
         self.values.update({
             'untriaged_skill_summary_dicts': (
-                catrgorized_and_untriaged_skills_dicts[1]),
+                categorized_and_untriaged_skills_dicts[1]),
             'categorized_skills_dict': (
-                catrgorized_and_untriaged_skills_dicts[0])
+                categorized_and_untriaged_skills_dicts[0])
         })
         self.render_json(self.values)
 

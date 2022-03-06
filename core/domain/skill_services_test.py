@@ -1371,16 +1371,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_summary_dict = skill_summary.to_dict()
         expected_untriaged_skills_dict = [skill_summary_dict]
 
-        catrgorized_and_untriaged_skills_dicts = (
+        categorized_and_untriaged_skills_dicts = (
             skill_services.get_categorized_and_untriaged_skills_dicts(
                 skill_summary_dicts, skill_ids_assigned_to_some_topic,
                 merged_skill_ids))
 
         self.assertEqual(
-            catrgorized_and_untriaged_skills_dicts[0],
+            categorized_and_untriaged_skills_dicts[0],
             expected_categorized_skill_dict)
         self.assertEqual(
-            catrgorized_and_untriaged_skills_dicts[1],
+            categorized_and_untriaged_skills_dicts[1],
             expected_untriaged_skills_dict)
 
 
