@@ -1,14 +1,20 @@
 <mat-card class="oppia-lesson-info-card">
   <div class="oppia-lesson-info-content">
-    <p class="oppia-story-title">
-        {{ storyTitleTranslationKey | translate}}
+    <p class="oppia-story-title" *ngIf="hasStoryTitle">
+      {{ storyTitleTranslationKey | translate}}
     </p>
     <hr>
-    <h3 class="oppia-chapter-title">
-        Chapter {{ chapterNumber }}: {{ storyNodeTitleTranslationKey | translate}}
+    <h3 class="oppia-exploration-header" *ngIf="!isHackyExpTitleTranslationDisplayed()">
+      {{ expTitle }}
     </h3>
-    <h4 class="oppia-chapter-description">
-        {{ storyNodeDescTranslationKey | translate}}
+    <h3 class="oppia-exploration-header" *ngIf="isHackyExpTitleTranslationDisplayed()">
+      {{ expTitleTranslationKey | translate }}
+    </h3>
+    <h4 class="oppia-exploration-description" *ngIf="!isHackyExpDescTranslationDisplayed()">
+      {{ expDesc | truncateAndCapitalize: 70 }}
+    </h4>
+    <h4 class="oppia-exploration-description" *ngIf="isHackyExpDescTranslationDisplayed()">
+      {{ expDescTranslationKey | translate | truncateAndCapitalize: 70 }}
     </h4>
     <p class="progress-text">Progress</p>
     <div class="progress under_part">
@@ -54,10 +60,8 @@
     border: 0;
     border-radius: 0;
     margin: 0;
-    /* max-height:50px; */
     max-width: 350px;
     min-width: 260px;
-    /* overflow-y: auto; */
     top: 0.5px;
     width: 100%;
   }
@@ -78,7 +82,7 @@
       padding-bottom: 0;
   }
 
-  .oppia-chapter-description {
+  .oppia-exploration-description {
       color: #5e5d5d;
       font-size: 18px;
       padding-bottom: 10px;

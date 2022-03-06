@@ -5,7 +5,7 @@
   <div class="row">
     <div [ngClass]="{'col-sm-5': isLanguageRTL(), 'col-sm-3': !isLanguageRTL()}">
       <ul class="oppia-lesson-info"
-          (click)="openInformationCardModal()">
+          (click)="showInformationCard()">
         <li
             [ngbTooltip]="'I18N_PLAYER_INFO_TOOLTIP' | translate"
             class="oppia-exploration-info-icon protractor-test-exploration-info-icon">

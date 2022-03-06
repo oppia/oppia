@@ -23,9 +23,16 @@ import { ConfirmOrCancelModal } from
   'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
-import { ContextService } from 'services/context.service';
+import { LearnerExplorationSummaryBackendDict } from
+// eslint-disable-next-line max-len
+  'domain/summary/learner-exploration-summary.model';
+import { ContextService } from
+// eslint-disable-next-line max-len
+  'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService, TranslationKeyType } from
+// eslint-disable-next-line max-len
+  'services/i18n-language-code.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 
@@ -40,14 +47,19 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   storyTitleTranslationKey!: string;
   storyPlaythroughObject!: StoryPlaythrough;
   storyId!: string;
-  storyNodeTitleTranslationKey!: string;
-  storyNodeDescTranslationKey!: string;
+  expTitleTranslationKey!: string;
+  expDescTranslationKey!: string;
   displayedCard!: StateCard;
   explorationId!: string;
-  contributorNames: string[] = [];
+  expTitle!: string;
+  expDesc!: string;
+  contributorNames!: string[];
+  hasStoryTitle!: boolean;
+  chapterTitle!: string;
+  chapterDesc!: string;
   chapterNumber!: string;
-  currentNodeId: string = '';
   numberofCheckpoints!: number;
+  expInfo: LearnerExplorationSummaryBackendDict;
   startedWidth: number = 0;
   completedWidth!: number;
   separatorWidth: number = 0;
@@ -68,28 +80,27 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   ngOnInit(): void {
     this.explorationId = this.contextService.getExplorationId();
+    this.expTitle = this.expInfo.title;
+    this.expDesc = this.expInfo.objective;
     this.storyId = this.urlService.getUrlParams().story_id;
+    this.hasStoryTitle = (this.storyId !== undefined) ? true : false;
+
     this.storyTitleTranslationKey = (
       this.i18nLanguageCodeService
         .getStoryTranslationKey(
           this.storyId, TranslationKeyType.TITLE));
 
-    this.storyNodeTitleTranslationKey = (
+    this.expTitleTranslationKey = (
       this.i18nLanguageCodeService.
         getExplorationTranslationKey(
           this.explorationId, TranslationKeyType.TITLE)
     );
-    this.storyNodeDescTranslationKey = (
+    this.expDescTranslationKey = (
       this.i18nLanguageCodeService.
         getExplorationTranslationKey(
           this.explorationId, TranslationKeyType.DESCRIPTION)
     );
 
-    // The following code generates the chapterNumber
-    // Since fetched via url, doesn't work on localhost.
-    this.currentNodeId = this.urlService.getUrlParams().node_id;
-    let nodeId: string = this.currentNodeId;
-    this.chapterNumber = nodeId.charAt(nodeId.length - 1);
 
     // The purpose of separatorArray is for the working of
     // for loop in lesson-information-card-modal.component.html.
@@ -108,5 +119,21 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       this.completedWidth = 100;
       this.startedWidth = 0;
     }
+  }
+
+  isHackyExpTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.expTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyExpDescTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.expDescTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }

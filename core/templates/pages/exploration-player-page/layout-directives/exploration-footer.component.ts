@@ -21,16 +21,19 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 
@@ -48,9 +51,9 @@ export class ExplorationFooterComponent {
   resizeSubscription!: Subscription;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
-  expInfo!: LearnerExplorationSummaryBackendDict;
-  numberofCheckpoints!: number;
+  numberofCheckpoints: number = 0;
   checkpointArray: number[] = [0];
+  expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth: number = 0;
 
   constructor(
@@ -58,12 +61,15 @@ export class ExplorationFooterComponent {
     private explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private explorationStatesService: ExplorationStatesService,
     private ngbModal: NgbModal,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private questionPlayerStateService: QuestionPlayerStateService,
+    private readOnlyExplorationBackendApiService:
+      ReadOnlyExplorationBackendApiService,
+    private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
+    private loggerService: LoggerService,
     private playerPositionService: PlayerPositionService,
     private explorationEngineService: ExplorationEngineService
   ) {}
@@ -83,9 +89,17 @@ export class ExplorationFooterComponent {
     // that the component behaves properly at both the places.
     try {
       this.explorationId = this.contextService.getExplorationId();
-      this.numberofCheckpoints = this.explorationStatesService.
-        getCheckpointCount();
-      // Testing: this.numberofCheckpoints = 4;
+
+      // Fetching the number of checkpoints.
+      let count = 0;
+      this.getStates(this.explorationId).then(data => {
+        for (const [, value] of Object.entries(data)) {
+          if (value.card_is_checkpoint) {
+            count++;
+          }
+        }
+        this.numberofCheckpoints = count;
+      });
       this.iframed = this.urlService.isIframed();
       this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
       this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
@@ -141,7 +155,8 @@ export class ExplorationFooterComponent {
       completedCheckpoints = completedCheckpoints + this.checkpointArray[i];
     }
     this.completedWidth = (
-      100 / (this.numberofCheckpoints)) * completedCheckpoints;
+      (100 / (this.numberofCheckpoints)) * completedCheckpoints
+    );
 
     if (index > 0) {
       let state = this.explorationEngineService.getState();
@@ -155,6 +170,7 @@ export class ExplorationFooterComponent {
     }
     modalRef.componentInstance.completedWidth = this.completedWidth;
     modalRef.componentInstance.contributorNames = this.contributorNames;
+    modalRef.componentInstance.expInfo = this.expInfo;
 
     modalRef.result.then(() => {}, () => {
       // Note to developers:
@@ -163,10 +179,39 @@ export class ExplorationFooterComponent {
     });
   }
 
+  showInformationCard(): void {
+    let stringifiedExpIds = JSON.stringify(
+      [this.explorationId]);
+    let includePrivateExplorations = JSON.stringify(true);
+    if (this.expInfo) {
+      this.openInformationCardModal();
+    } else {
+      this.learnerViewInfoBackendApiService.fetchLearnerInfoAsync(
+        stringifiedExpIds,
+        includePrivateExplorations
+      ).then((response) => {
+        this.expInfo = response.summaries[0];
+        this.openInformationCardModal();
+      }, () => {
+        this.loggerService.error(
+          'Information card failed to load for exploration ' +
+          this.explorationId);
+      });
+    }
+  }
+
   ngOnDestroy(): void {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
     }
+  }
+
+  async getStates(explorationId: string): Promise<StateObjectsBackendDict> {
+    return this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(explorationId, null).then(
+        (response: FetchExplorationBackendResponse) => {
+          return response.exploration.states;
+        });
   }
 
   isLanguageRTL(): boolean {
