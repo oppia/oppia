@@ -1349,7 +1349,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         skill_summaries = skill_services.get_all_skill_summaries()
         skill_summary_dicts = [
-          summary.to_dict() for summary in skill_summaries]
+            summary.to_dict() for summary in skill_summaries]
         skill_ids_assigned_to_some_topic = (
             topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
         merged_skill_ids = skill_services.get_merged_skill_ids()
