@@ -66,10 +66,9 @@ export class BaseContentComponent {
      * through the static pages.
      */
     this.router.events.subscribe((evt) => {
-      if (!(evt instanceof NavigationEnd)) {
-        return;
+      if (evt instanceof NavigationEnd) {
+        window.scrollTo(0, 0);
       }
-      window.scrollTo(0, 0);
     });
     /**
      * Redirect any developers using the old appspot URL to the

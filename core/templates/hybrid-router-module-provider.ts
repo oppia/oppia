@@ -34,10 +34,10 @@ export class MockRouterLink {
 }
 
 @Injectable()
-class MockRouter {
+export class MockRouter {
   events = new EventEmitter<void>();
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.events.emit();
   }
 }
