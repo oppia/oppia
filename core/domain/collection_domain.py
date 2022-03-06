@@ -596,7 +596,8 @@ class Collection:
         # MyPy doesn't allow key deletion from TypedDict, also we are ignoring
         # it because we are in the convert function. In convert function, we
         # are dealing with some additional fields which are not mentioned in
-        # CollectionDict. Thus we added an ignore here.
+        # CollectionDict. Because CollectionDict is defined to match the current
+        # version of domain object. Thus we added an ignore here.
         del collection_dict['skills'] # type: ignore[misc]
         del collection_dict['next_skill_index'] # type: ignore[misc]
 
@@ -725,8 +726,8 @@ class Collection:
 
         skill_names = set()
         for node in collection_contents['nodes']:
-            # CollectionNodeDict is defined to the match current domain object
-            # and here In convert function, we are dealing with some additional
+            # CollectionNodeDict is defined to match the current domain object
+            # and here in convert function, we are dealing with some additional
             # fields which are not mentioned in CollectionNodeDict. Thus we
             # added an ignore here.
             skill_names.update(node['acquired_skills']) # type: ignore[misc]
@@ -750,7 +751,9 @@ class Collection:
 
         # Here in convert function, we are dealing with some additional
         # fields like skills, which are not mentioned in CollectionDict.
-        # Thus we can ignore it because we are in the convert function.
+        # Because CollectionDict is defined to match the current version
+        # of domain object. Thus we can ignore it because we are in the
+        # convert function.
         collection_contents['skills'] = { # type: ignore[misc]
             skill_id: {
                 'name': skill_name,
