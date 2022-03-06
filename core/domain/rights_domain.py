@@ -22,9 +22,6 @@ from core.constants import constants
 from core.domain import change_domain
 
 from typing import List, Optional
-from typing_extensions import TypedDict
-
-from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -54,19 +51,6 @@ ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Changed role of %s from %s to %s'
 ASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Changed role of (.*) from (.*) to (.*)$'
 DEASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Remove %s from role %s'
 DEASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Remove (.*) from role (.*)$'
-
-
-class ActivityRightsDict(TypedDict):
-    """A dict version of ActivityRights suitable for use by the frontend."""
-
-    cloned_from: Optional[str]
-    status: str
-    community_owned: bool
-    owner_names: List[str]
-    editor_names: List[str]
-    voice_artist_names: List[str]
-    viewer_names: List[str]
-    viewable_if_private: bool
 
 
 class ActivityRights:
@@ -155,40 +139,6 @@ class ActivityRights:
         if not self.community_owned and len(self.owner_ids) == 0:
             raise utils.ValidationError(
                 'Activity should have atleast one owner.')
-
-    def to_dict(self) -> ActivityRightsDict:
-        """Returns a dict suitable for use by the frontend.
-
-        Returns:
-            dict. A dict version of ActivityRights suitable for use by the
-            frontend.
-        """
-        if self.community_owned:
-            return {
-                'cloned_from': self.cloned_from,
-                'status': self.status,
-                'community_owned': True,
-                'owner_names': [],
-                'editor_names': [],
-                'voice_artist_names': [],
-                'viewer_names': [],
-                'viewable_if_private': self.viewable_if_private,
-            }
-        else:
-            return {
-                'cloned_from': self.cloned_from,
-                'status': self.status,
-                'community_owned': False,
-                'owner_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
-                    self.owner_ids),
-                'editor_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
-                    self.editor_ids),
-                'voice_artist_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
-                    self.voice_artist_ids),
-                'viewer_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
-                    self.viewer_ids),
-                'viewable_if_private': self.viewable_if_private,
-            }
 
     def is_owner(self, user_id: str) -> bool:
         """Checks whether given user is owner of activity.

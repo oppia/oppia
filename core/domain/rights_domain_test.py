@@ -209,28 +209,6 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             'Activity should have atleast one owner.'):
             self.activity_rights.validate()
 
-    def test_to_dict(self) -> None:
-        sample_activity_rights_dict: rights_domain.ActivityRightsDict = {
-            'cloned_from': None,
-            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
-            'community_owned': False,
-            'owner_names': ['owner'],
-            'editor_names': [],
-            'voice_artist_names': [],
-            'viewer_names': [],
-            'viewable_if_private': False,
-        }
-        self.assertEqual(
-            self.activity_rights.to_dict(), sample_activity_rights_dict
-        )
-
-        self.activity_rights.community_owned = True
-        sample_activity_rights_dict['community_owned'] = True
-        sample_activity_rights_dict['owner_names'] = []
-        self.assertEqual(
-            self.activity_rights.to_dict(), sample_activity_rights_dict
-        )
-
     def test_is_editor(self) -> None:
         self.activity_rights.editor_ids = ['123456']
         self.assertTrue(self.activity_rights.is_editor('123456'))
@@ -475,19 +453,6 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             exploration_rights_change_object.new_status,
             rights_domain.ACTIVITY_STATUS_PUBLIC)
 
-    def test_to_dict(self) -> None:
-        exploration_rights_change_dict = {
-            'cmd': 'change_private_viewability',
-            'old_viewable_if_private': 'old_viewable_if_private',
-            'new_viewable_if_private': 'new_viewable_if_private'
-        }
-        exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange(
-                exploration_rights_change_dict))
-        self.assertEqual(
-            exploration_rights_change_object.to_dict(),
-            exploration_rights_change_dict)
-
 
 class CollectionRightsChangeTests(test_utils.GenericTestBase):
 
@@ -637,15 +602,3 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection_rights_change_object.new_status,
             rights_domain.ACTIVITY_STATUS_PUBLIC)
-
-    def test_to_dict(self) -> None:
-        collection_rights_change_dict = {
-            'cmd': 'change_private_viewability',
-            'old_viewable_if_private': 'old_viewable_if_private',
-            'new_viewable_if_private': 'new_viewable_if_private'
-        }
-        collection_rights_change_object = rights_domain.CollectionRightsChange(
-            collection_rights_change_dict)
-        self.assertEqual(
-            collection_rights_change_object.to_dict(),
-            collection_rights_change_dict)
