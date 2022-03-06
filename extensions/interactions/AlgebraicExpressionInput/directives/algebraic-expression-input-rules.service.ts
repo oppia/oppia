@@ -58,8 +58,12 @@ export class AlgebraicExpressionInputRulesService {
   MatchesUpToTrivialManipulations(
       answer: AlgebraicExpressionAnswer,
       inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
+    let mis = new MathInteractionsService();
     let numericExpressionRuleService = (
       new NumericExpressionInputRulesService());
+    // Inserting '*' signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
     return numericExpressionRuleService.MatchesUpToTrivialManipulations(
       answer, inputs);
   }

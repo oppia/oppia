@@ -166,12 +166,12 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '((x)^(2)-x)/(z)-4*y', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
-      '((x)^(2)-x)/(z)-(8*y)/(2)', {x: inputString})).toBeTrue();
-    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '-4*y+((x)^(2)-x)/(z)', {x: inputString})).toBeTrue();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '((x)^(2)-x)*(z)^(-1)-4*y', {x: inputString})).toBeTrue();
 
+    expect(algebraicRulesService.MatchesUpToTrivialManipulations(
+      '((x)^(2)-x)/(z)-(8*y)/(2)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
       '(x*(x-1))/(z)-4*y', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesUpToTrivialManipulations(
