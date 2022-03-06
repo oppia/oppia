@@ -53,7 +53,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
         published_explorations = (
             total_explorations
             | 'Get published explorations' >> beam.Filter(
-                lambda exp: exp.first_published_msec is not None
+                lambda exp: exp.status == constants.ACTIVITY_STATUS_PUBLIC
             )
         )
 

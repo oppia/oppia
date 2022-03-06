@@ -54,7 +54,7 @@ class GetExpWithInvalidCategoryJobTests(
             ratings=4,
             scaled_average_rating=3,
             community_owned=True,
-            first_published_msec=123425.09
+            status=constants.ACTIVITY_STATUS_PUBLIC
         )
 
         # This is an valid model with category in constants.ts.
@@ -69,7 +69,7 @@ class GetExpWithInvalidCategoryJobTests(
             ratings=4,
             scaled_average_rating=4,
             community_owned=True,
-            first_published_msec=57529.00
+            status=constants.ACTIVITY_STATUS_PUBLIC
         )
 
         # This is an invalid model with category not in constants.ts.
@@ -84,7 +84,7 @@ class GetExpWithInvalidCategoryJobTests(
             ratings=4,
             scaled_average_rating=-1,
             community_owned=True,
-            first_published_msec=797
+            status=constants.ACTIVITY_STATUS_PUBLIC
         )
 
         # This is an unpublished model with empty category.
@@ -99,7 +99,7 @@ class GetExpWithInvalidCategoryJobTests(
             ratings=4,
             scaled_average_rating=-1,
             community_owned=True,
-            first_published_msec=None
+            status=constants.ACTIVITY_STATUS_PRIVATE
         )
 
     def test_run_with_no_models(self) -> None:
@@ -117,8 +117,8 @@ class GetExpWithInvalidCategoryJobTests(
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                f'The id of exp is {self.EXPLORATION_ID_1} and its category '
-                + f'is {self.exp_1.category}'),
+                f'The id of exp is "{self.EXPLORATION_ID_1}" and its category '
+                + f'is "{self.exp_1.category}"'),
         ])
 
     def test_run_with_mixed_models(self) -> None:
@@ -127,11 +127,11 @@ class GetExpWithInvalidCategoryJobTests(
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 3'),
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
             job_run_result.JobRunResult.as_stderr(
-                f'The id of exp is {self.EXPLORATION_ID_1} and its category '
-                + f'is {self.exp_1.category}'),
+                f'The id of exp is "{self.EXPLORATION_ID_1}" and its category '
+                + f'is "{self.exp_1.category}"'),
             job_run_result.JobRunResult.as_stderr(
-                f'The id of exp is {self.EXPLORATION_ID_3} and its category '
-                + f'is {self.exp_3.category}'),
+                f'The id of exp is "{self.EXPLORATION_ID_3}" and its category '
+                + f'is "{self.exp_3.category}"'),
         ])
 
 
