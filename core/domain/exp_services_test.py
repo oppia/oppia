@@ -1282,7 +1282,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     'postCode': {
                         'value': ''
                     }
-                    }
+                }
             })
         ]
         exp_services.update_exploration(
