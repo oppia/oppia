@@ -127,8 +127,8 @@ describe('Edit Thumbnail Modal Component', () => {
     spyOn(component, 'isValidFilename').and.returnValue(true);
     spyOn(svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri')
       .and.returnValue({ tags: [], attrs: [] });
-    spyOn(svgSanitizerService, 'removeTagsAndAttributes').and.returnValue(
-      fileContent);
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes')
+      .and.returnValue(fileContent);
     let file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
     component.invalidImageWarningIsShown = false;
     component.invalidFilenameWarningIsShown = false;
@@ -267,8 +267,8 @@ describe('Edit Thumbnail Modal Component', () => {
     spyOn(component, 'isValidFilename').and.returnValue(true);
     spyOn(svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri')
       .and.returnValue({ tags: [], attrs: [] });
-    spyOn(svgSanitizerService, 'removeTagsAndAttributes').and.returnValue(
-      fileContent);
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes')
+      .and.returnValue(fileContent);
     let file = new File([fileContent], 'triangle.svg', {type: 'image/svg'});
     component.uploadedImageMimeType = 'image/svg+xml';
     expect(component.thumbnailHasChanged).toBeFalse();

@@ -872,8 +872,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         if (file.name.endsWith('.svg')) {
           this.invalidTagsAndAttributes = this.svgSanitizerService
             .getInvalidSvgTagsAndAttrsFromDataUri(this.imgData);
-          this.imgData = this.svgSanitizerService.removeTagsAndAttributes(
-            this.imgData);
+          this.imgData = this.svgSanitizerService
+            .removeAllInvalidTagsAndAttributes(this.imgData);
           imageData = this.svgSanitizerService.getTrustedSvgResourceUrl(
             this.imgData);
         }

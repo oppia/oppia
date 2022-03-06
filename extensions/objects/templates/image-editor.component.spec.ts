@@ -1653,8 +1653,8 @@ describe('ImageEditor', () => {
       dataSvg.uploadedImageData);
     spyOn(svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri')
       .and.returnValue({ tags: [], attrs: [] });
-    spyOn(svgSanitizerService, 'removeTagsAndAttributes').and.returnValue(
-      dataSvg.uploadedImageData.toString());
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes')
+      .and.returnValue(dataSvg.uploadedImageData.toString());
 
     component.onFileChanged(dataSvg.uploadedFile);
 

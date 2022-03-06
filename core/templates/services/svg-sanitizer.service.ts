@@ -154,7 +154,7 @@ export class SvgSanitizerService {
     return { tags: invalidTags, attrs: invalidAttrs };
   }
 
-  // SVG is considered an XMLDocument and DOMParser's parseFromtString method
+  // SVG is considered an XMLDocument and DOMParser's parseFromString method
   // returns either a HTMLDocument or XMLDocument. Visit here for more info:
   // https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString
   // Document is the interface that both HTMLDocument and XMLDocument inherit
@@ -167,13 +167,13 @@ export class SvgSanitizerService {
     return domParser.parseFromString(svgString, 'image/svg+xml');
   }
 
-  removeTagsAndAttributes(dataURI: string): string {
-    // We are removing the attributes which are currently is not in
+  removeAllInvalidTagsAndAttributes(svgDataURI: string): string {
+    // We are removing the attributes which are currently not in
     // the allowlist of valid attributes. The allowlist is based on
     // the list of tags and attributes specified in this project:
     // https://github.com/cure53/DOMPurify
     // Complete list is present at 'assets/constants.ts'.
-    let svg = this.getSvgFromDataUri(dataURI);
+    let svg = this.getSvgFromDataUri(svgDataURI);
     let invalidTagsAndAttributes = this._getInvalidSvgTagsAndAttrs(svg);
     let tagsToBeRemoved = invalidTagsAndAttributes.tags;
     let attrsToBeRemoved = invalidTagsAndAttributes.attrs;
@@ -236,7 +236,7 @@ export class SvgSanitizerService {
    */
   getTrustedSvgResourceUrl(base64ImageData: string): SafeResourceUrl | null {
     if (this.isBase64Svg(base64ImageData)) {
-      const sanitizedBase64ImageData = this.removeTagsAndAttributes(
+      const sanitizedBase64ImageData = this.removeAllInvalidTagsAndAttributes(
         base64ImageData);
 
       // eslint-disable-next-line oppia/no-bypass-security-phrase

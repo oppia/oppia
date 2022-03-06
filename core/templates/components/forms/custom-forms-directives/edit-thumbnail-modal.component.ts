@@ -119,8 +119,8 @@ export class EditThumbnailModalComponent {
       this.invalidTagsAndAttributes = (
         this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
           this.imgSrc));
-      this.uploadedImage = this.svgSanitizerService.removeTagsAndAttributes(
-        this.uploadedImage);
+      this.uploadedImage = this.svgSanitizerService
+        .removeAllInvalidTagsAndAttributes(this.uploadedImage);
       this.thumbnailHasChanged = true;
     };
     reader.readAsDataURL(file);
