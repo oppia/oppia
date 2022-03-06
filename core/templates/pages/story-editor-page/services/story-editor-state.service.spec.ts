@@ -26,12 +26,13 @@ import { StoryEditorStateService } from 'pages/story-editor-page/services/story-
 import { importAllAngularServices, TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
 import { AlertsService } from 'services/alerts.service';
 import { StoryUpdateService } from 'domain/story/story-update.service';
+import { StoryContents } from 'domain/story/story-contents-object.model';
 
 require('domain/story/story-update.service.ts');
 
 class MockEditableStoryBackendApiService {
-  newBackendStoryObject = null;
-  failure = null;
+  newBackendStoryObject: StoryBackendDict;
+  failure: string | null = null;
 
   async fetchStoryAsync() {
     return new Promise((resolve, reject) => {
@@ -42,7 +43,13 @@ class MockEditableStoryBackendApiService {
           storyIsPublished: false,
           skillSummaries: [{
             id: 'Skill 1',
-            description: 'Skill Description'
+            description: 'Skill Description',
+            language_code: 'en',
+            version: 1,
+            misconception_count: 0,
+            worked_examples_count: 0,
+            skill_model_created_on: null,
+            skill_model_last_updated: null,
           }],
           classroomUrlFragment: 'classroomUrlFragment',
           topicUrlFragment: 'topicUrlFragment'
@@ -90,7 +97,7 @@ describe('Story editor state service', () => {
   var storyEditorStateService: StoryEditorStateService;
   var storyObjectFactory: StoryObjectFactory;
   var storyUpdateService: StoryUpdateService;
-  var fakeEditableStoryBackendApiService: EditableStoryBackendApiService;
+  var fakeEditableStoryBackendApiService: MockEditableStoryBackendApiService;
   var secondBackendStoryObject: StoryBackendDict;
   var testSubscriptions: Subscription;
 
@@ -117,9 +124,12 @@ describe('Story editor state service', () => {
         nodes: []
       },
       language_code: 'en',
-      story_contents_schema_version: '1',
-      version: '1',
-      corresponding_topic_id: 'topic_id'
+      version: 1,
+      corresponding_topic_id: 'topic_id',
+      thumbnail_filename: '',
+      thumbnail_bg_color: null,
+      url_fragment: '',
+      meta_tag_content: ''
     };
 
     secondBackendStoryObject = {
@@ -133,9 +143,12 @@ describe('Story editor state service', () => {
         nodes: []
       },
       language_code: 'en',
-      story_contents_schema_version: '1',
-      version: '1',
-      corresponding_topic_id: 'topic_id'
+      version: 1,
+      corresponding_topic_id: 'topic_id',
+      thumbnail_filename: '',
+      thumbnail_bg_color: null,
+      url_fragment: '',
+      meta_tag_content: ''
     };
 
     TestBed.configureTestingModule({
@@ -147,9 +160,9 @@ describe('Story editor state service', () => {
       ]
     }).compileComponents();
 
-    alertsService = TestBed.get(AlertsService);
-    storyEditorStateService = TestBed.get(StoryEditorStateService);
-    storyObjectFactory = TestBed.get(StoryObjectFactory);
+    alertsService = TestBed.inject(AlertsService);
+    storyEditorStateService = TestBed.inject(StoryEditorStateService);
+    storyObjectFactory = TestBed.inject(StoryObjectFactory);
   });
 
   beforeEach(() => {
@@ -241,12 +254,33 @@ describe('Story editor state service', () => {
   });
 
   it('should initially return an interstitial story', () => {
+    let sampleStoryContentsBackendDict = {
+      initial_node_id: '',
+      nodes: [
+        {
+          id: '',
+          title: '',
+          description: '',
+          prerequisite_skill_ids: [''],
+          acquired_skill_ids: [''],
+          destination_node_ids: [''],
+          outline: '',
+          exploration_id: '',
+          outline_is_finalized: false,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null
+        }],
+      next_node_id: ''
+    };
+    let mockStoryContent = StoryContents.createFromBackendDict(
+      sampleStoryContentsBackendDict);
     var story = storyEditorStateService.getStory();
-    expect(story.getId()).toEqual(null);
+
+    expect(story.getId()).toEqual('Id loading');
     expect(story.getTitle()).toEqual('Story title loading');
     expect(story.getDescription()).toEqual('Story description loading');
     expect(story.getNotes()).toEqual('Story notes loading');
-    expect(story.getStoryContents()).toEqual(null);
+    expect(story.getStoryContents()).toEqual(mockStoryContent);
   });
 
   it('should be able to set a new story with an in-place copy', () => {
@@ -266,16 +300,24 @@ describe('Story editor state service', () => {
 
   it('should fail to save the story without first loading one', () => {
     expect(() => {
-      storyEditorStateService.saveStory('Commit message');
+      const successCallback = jasmine.createSpy('successCallback');
+      const errorCallback = jasmine.createSpy('errorCallback');
+
+      storyEditorStateService.saveStory(
+        'Commit message', successCallback, errorCallback);
     }).toThrowError('Cannot save a story before one is loaded.');
   });
 
   it('should not save the story if there are no pending changes',
     fakeAsync(() => {
+      const successCallback = jasmine.createSpy('successCallback');
+      const errorCallback = jasmine.createSpy('errorCallback');
+
       storyEditorStateService.loadStory('storyId_0');
       tick(1000);
 
-      expect(storyEditorStateService.saveStory('Commit message')).toBe(false);
+      expect(storyEditorStateService.saveStory(
+        'Commit message', successCallback, errorCallback)).toBe(false);
     }));
 
   it('should be able to save the story and pending changes', fakeAsync(() => {
@@ -283,25 +325,31 @@ describe('Story editor state service', () => {
       fakeEditableStoryBackendApiService,
       'updateStoryAsync').and.callThrough();
     var successCallback = jasmine.createSpy('successCallback');
+    var errorCallback = jasmine.createSpy('errorCallback');
 
     storyEditorStateService.loadStory('storyId_0');
     storyUpdateService.setStoryTitle(
       storyEditorStateService.getStory(), 'New title');
     tick(1000);
 
-    expect(
-      storyEditorStateService.saveStory('Commit message', successCallback)
-    ).toBe(true);
+    expect(storyEditorStateService.saveStory(
+      'Commit message', successCallback, errorCallback)).toBe(true);
     tick(1000);
 
     var expectedId = 'storyId_0';
-    var expectedVersion = '1';
+    var expectedVersion = 1;
     var expectedCommitMessage = 'Commit message';
+    var expectedObject = {
+      property_name: 'title',
+      new_value: 'New title',
+      old_value: 'Story title loading',
+      cmd: 'update_story_property'
+    };
     var updateStorySpy = (
       fakeEditableStoryBackendApiService.updateStoryAsync);
     expect(updateStorySpy).toHaveBeenCalledWith(
       expectedId, expectedVersion,
-      expectedCommitMessage, jasmine.any(Object));
+      expectedCommitMessage, [expectedObject]);
     expect(successCallback).toHaveBeenCalled();
   }));
 
@@ -311,7 +359,7 @@ describe('Story editor state service', () => {
       'changeStoryPublicationStatusAsync').and.callThrough();
     var successCallback = jasmine.createSpy('successCallback');
 
-    storyEditorStateService.loadStory('topicId_1', 'storyId_0');
+    storyEditorStateService.loadStory('storyId_0');
     tick(1000);
 
     expect(storyEditorStateService.isStoryPublished()).toBe(false);
@@ -330,19 +378,20 @@ describe('Story editor state service', () => {
   }));
 
   it('should warn user when story is not published', fakeAsync(() => {
+    const successCallback = jasmine.createSpy('successCallback');
     spyOn(
       fakeEditableStoryBackendApiService,
       'changeStoryPublicationStatusAsync').and.callThrough();
     spyOn(alertsService, 'addWarning');
 
-    storyEditorStateService.loadStory('topicId_1', 'storyId_0');
+    storyEditorStateService.loadStory('storyId_0');
     tick(1000);
     fakeEditableStoryBackendApiService.failure = 'Internal 500 error';
 
     expect(storyEditorStateService.isStoryPublished()).toBe(false);
     expect(
       storyEditorStateService.changeStoryPublicationStatus(
-        true)).toBe(true);
+        true, successCallback)).toBe(true);
     tick(1000);
 
     var expectedId = 'storyId_0';
@@ -358,34 +407,42 @@ describe('Story editor state service', () => {
 
   it('should warn user when user attepts to publish story before it loads',
     fakeAsync(() => {
+      const successCallback = jasmine.createSpy('successCallback');
       spyOn(alertsService, 'fatalWarning');
       storyEditorStateService._storyIsInitialized = false;
 
-      storyEditorStateService.changeStoryPublicationStatus(true);
+      storyEditorStateService.changeStoryPublicationStatus(
+        true, successCallback);
 
       expect(alertsService.fatalWarning)
         .toHaveBeenCalledWith('Cannot publish a story before one is loaded.');
     }));
 
   it('should fire an update event after saving the story', fakeAsync(() => {
+    const successCallback = jasmine.createSpy('successCallback');
+    const errorCallback = jasmine.createSpy('errorCallback');
     storyEditorStateService.loadStory('storyId_0');
     storyUpdateService.setStoryTitle(
       storyEditorStateService.getStory(), 'New title');
     tick(1000);
 
-    storyEditorStateService.saveStory('Commit message');
+    storyEditorStateService.saveStory(
+      'Commit message', successCallback, errorCallback);
     tick(1000);
     expect(storyReinitializedSpy).toHaveBeenCalled();
   }));
 
   it('should track whether it is currently saving the story', fakeAsync(() => {
+    const successCallback = jasmine.createSpy('successCallback');
+    const errorCallback = jasmine.createSpy('errorCallback');
     storyEditorStateService.loadStory('storyId_0');
     storyUpdateService.setStoryTitle(
       storyEditorStateService.getStory(), 'New title');
     tick(1000);
 
     expect(storyEditorStateService.isSavingStory()).toBe(false);
-    storyEditorStateService.saveStory('Commit message');
+    storyEditorStateService.saveStory(
+      'Commit message', successCallback, errorCallback);
     expect(storyEditorStateService.isSavingStory()).toBe(true);
 
     tick(1000);
@@ -414,6 +471,8 @@ describe('Story editor state service', () => {
 
   it('should indicate a story is no longer saving after an error',
     fakeAsync(() => {
+      const successCallback = jasmine.createSpy('successCallback');
+      const errorCallback = jasmine.createSpy('errorCallback');
       storyEditorStateService.loadStory('storyId_0');
       storyUpdateService.setStoryTitle(
         storyEditorStateService.getStory(), 'New title');
@@ -422,7 +481,8 @@ describe('Story editor state service', () => {
       expect(storyEditorStateService.isSavingStory()).toBe(false);
       fakeEditableStoryBackendApiService.failure = 'Internal 500 error';
 
-      storyEditorStateService.saveStory('Commit message');
+      storyEditorStateService.saveStory(
+        'Commit message', successCallback, errorCallback);
       expect(storyEditorStateService.isSavingStory()).toBe(true);
 
       tick(1000);
@@ -518,7 +578,13 @@ describe('Story editor state service', () => {
 
     expect(storyEditorStateService.getSkillSummaries()).toEqual([{
       id: 'Skill 1',
-      description: 'Skill Description'
+      description: 'Skill Description',
+      language_code: 'en',
+      version: 1,
+      misconception_count: 0,
+      worked_examples_count: 0,
+      skill_model_created_on: null,
+      skill_model_last_updated: null,
     }]);
   }));
 });

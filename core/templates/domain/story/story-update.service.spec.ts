@@ -57,7 +57,7 @@ describe('Story update service', () => {
             acquired_skill_ids: ['skill_2'],
             destination_node_ids: [],
             outline: 'Outline',
-            exploration_id: null,
+            exploration_id: 'exp_id',
             outline_is_finalized: false,
             thumbnail_filename: 'fileName',
             thumbnail_bg_color: 'blue',
@@ -584,7 +584,7 @@ describe('Story update service', () => {
       cmd: 'update_story_node_property',
       property_name: 'exploration_id',
       new_value: 'exp_2',
-      old_value: 'Description 1',
+      old_value: 'exp_id',
       node_id: 'node_1'
     }]);
   });

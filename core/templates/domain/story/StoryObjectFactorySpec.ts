@@ -101,7 +101,7 @@ describe('Story object factory', () => {
     expect(story.getLanguageCode()).toBe('en');
     expect(story.getStoryContents()).toEqual(mockStoryContent);
     expect(story.getNotes()).toEqual('Story notes loading');
-    expect(story.getCorrespondingTopicId()).toEqual('');
+    expect(story.getCorrespondingTopicId()).toEqual('Topic id loading');
     expect(story.getUrlFragment()).toEqual('');
   });
 
