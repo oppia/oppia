@@ -28,13 +28,16 @@ import { AlertsService } from 'services/alerts.service';
   templateUrl: './topic-manager-role-editor-modal.component.html',
 })
 export class TopicManagerRoleEditorModalComponent implements OnInit {
-  @Input() managedTopicIds;
-  @Input() topicIdToName;
-  @Input() username;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() managedTopicIds!: string[];
+  @Input() topicIdToName!: {[topicId: string]: string};
+  @Input() username!: string;
 
-  newTopicId = null;
-  topicIdsForSelection = [];
-  topicIdInUpdate = null;
+  newTopicId: string | null = null;
+  topicIdsForSelection: string[] = [];
+  topicIdInUpdate: string | null = null;
 
   constructor(
     private activeModal: NgbActiveModal,
@@ -49,15 +52,16 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   }
 
   addTopic(): void {
-    this.managedTopicIds.push(this.newTopicId);
+    this.managedTopicIds.push(this.newTopicId as string);
     this.topicIdInUpdate = this.newTopicId;
     this.newTopicId = null;
     this.adminBackendApiService.assignManagerToTopicAsync(
-      this.username, this.topicIdInUpdate).then(()=> {
+      this.username, this.topicIdInUpdate as string).then(()=> {
       this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();
     }, errorMessage => {
-      let topicIdIndex = this.managedTopicIds.indexOf(this.newTopicId);
+      let topicIdIndex = this.managedTopicIds.indexOf(
+        this.newTopicId as string);
       this.managedTopicIds.splice(topicIdIndex, 1);
       this.alertsService.addWarning(
         errorMessage || 'Error communicating with server.');

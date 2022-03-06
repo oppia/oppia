@@ -34,14 +34,18 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
   templateUrl: './translation-language-selector.component.html'
 })
 export class TranslationLanguageSelectorComponent implements OnInit {
-  @Input() activeLanguageCode: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() activeLanguageCode!: string;
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
-  @ViewChild('dropdown', {'static': false}) dropdownRef;
+  @ViewChild('dropdown', {'static': false}) dropdownRef!:
+    { nativeElement: { contains: (arg0: HTMLElement) => never}};
 
-  options: { id: string; description: string }[];
+  options!: { id: string; description: string }[];
+  languageSelection!: string;
   languageIdToDescription: {[id: string]: string} = {};
   featuredLanguages: FeaturedTranslationLanguage[] = [];
-  languageSelection: string;
 
   dropdownShown = false;
   explanationPopupShown = false;

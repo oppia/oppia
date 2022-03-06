@@ -84,9 +84,10 @@ export class ContributionAndReviewBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
+  // Return undefined if the suggestion is not found.
   async fetchSuggestionsAsync(
       fetchType: string
-  ): Promise<FetchSuggestionsResponse> {
+  ): Promise<FetchSuggestionsResponse | undefined> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync('skill', 'add_question');
     }

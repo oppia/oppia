@@ -22,6 +22,7 @@ import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { UserService } from 'services/user.service';
 import { BlogAdminNavbarComponent } from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
 import { MockRouterModule } from 'hybrid-router-module-provider';
+import { UserInfo } from 'domain/user/user-info.model';
 
 
 describe('Blog Admin navbar component', () => {
@@ -51,7 +52,7 @@ describe('Blog Admin navbar component', () => {
     spyOn(userService, 'getProfileImageDataUrlAsync')
       .and.resolveTo(userProfileImage);
     spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo);
+      .and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
   }));

@@ -36,24 +36,27 @@ export class AdminMiscTabComponent {
   irreversibleActionMessage: string = (
     'This action is irreversible. Are you sure?');
 
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  showDataExtractionQueryStatus!: boolean;
+  dataExtractionQueryStatusMessage!: string;
+  oldUsername!: string;
+  newUsername!: string;
+  usernameToGrant!: string;
+  usernameToRevoke!: string;
+  userIdToGet!: string;
+  userIdToDelete!: string;
+  usernameToDelete!: string;
+  expVersion!: number;
+  stateName!: string;
+  numAnswers!: number;
+  expId!: string;
+  topicIdForRegeneratingOpportunities!: string;
+  blogPostId!: string;
+  authorUsername!: string;
+  publishedOn!: string;
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
-  showDataExtractionQueryStatus: boolean;
-  dataExtractionQueryStatusMessage: string;
-  oldUsername: string;
-  newUsername: string;
-  usernameToGrant: string;
-  usernameToRevoke: string;
-  userIdToGet: string;
-  userIdToDelete: string;
-  usernameToDelete: string;
-  expVersion: number;
-  stateName: string;
-  numAnswers: number;
-  expId: string;
-  topicIdForRegeneratingOpportunities: string;
-  blogPostId: string;
-  authorUsername: string;
-  publishedOn: string;
 
   constructor(
     private windowRef: WindowRef,
@@ -101,9 +104,17 @@ export class AdminMiscTabComponent {
   }
 
   uploadTopicSimilaritiesFile(): void {
-    let file = (
-      document.getElementById(
-        'topicSimilaritiesFile') as HTMLInputElement).files[0];
+    // 'getElementById' can return null if the element provided as
+    // an argument is invalid.
+    let element = document.getElementById(
+      'topicSimilaritiesFile') as HTMLInputElement;
+    if (element === null) {
+      throw new Error('No label found for uploading files.');
+    }
+    if (element.files === null) {
+      throw new Error('No files found.');
+    }
+    let file = element.files[0];
     let reader = new FileReader();
     reader.onload = (e) => {
       let data = (e.target as FileReader).result;

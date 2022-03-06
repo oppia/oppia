@@ -30,11 +30,24 @@ export interface OpportunityDict {
   'skill_description': string;
 }
 
+interface FetchSuggestionsResponseData {
+  'target_id_to_opportunity_dict': {
+    [targetId: string]: OpportunityDict;
+  };
+  suggestions: SuggestionBackendDict[];
+}
+
 interface FetchSuggestionsResponse {
   [targetId: string]: {
     suggestion: SuggestionBackendDict;
     details: OpportunityDict;
   };
+}
+
+interface ReviewExplorationSuggestionRequestBody {
+  action: string;
+  'review_message': string;
+  'commit_message': string;
 }
 
 @Injectable({
@@ -52,7 +65,8 @@ export class ContributionAndReviewService {
     return (
       this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
         fetchType
-      ).then((responseBody) => {
+      ).then((response) => {
+        let responseBody = response as FetchSuggestionsResponseData;
         const suggestionIdToSuggestions: FetchSuggestionsResponse = {};
         const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
         responseBody.suggestions.forEach((suggestion) => {
@@ -90,7 +104,7 @@ export class ContributionAndReviewService {
       targetId: string, suggestionId: string, action: string,
       reviewMessage: string, commitMessage: string,
       onSuccess: (suggestionId: string) => void,
-      onFailure: (error) => void
+      onFailure: (error: Error) => void
   ): Promise<void> {
     const requestBody = {
       action: action,
@@ -103,7 +117,8 @@ export class ContributionAndReviewService {
 
     return this.contributionAndReviewBackendApiService
       .reviewExplorationSuggestionAsync(
-        targetId, suggestionId, requestBody
+        targetId, suggestionId,
+        requestBody as ReviewExplorationSuggestionRequestBody
       ).then(() => {
         onSuccess(suggestionId);
       }, (error) => {
@@ -136,7 +151,7 @@ export class ContributionAndReviewService {
   async updateTranslationSuggestionAsync(
       suggestionId: string, translationHtml: string,
       onSuccess: () => void,
-      onFailure: (error) => void
+      onFailure: (error: Error) => void
   ): Promise<void> {
     const requestBody = {
       translation_html: translationHtml

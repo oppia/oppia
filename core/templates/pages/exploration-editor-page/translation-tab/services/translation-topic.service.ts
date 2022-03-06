@@ -31,7 +31,7 @@ import { LoggerService } from 'services/contextual/logger.service';
   providedIn: 'root'
 })
 export class TranslationTopicService {
-  private activeTopicName: string = null;
+  private activeTopicName: string | null = null;
   private _activeTopicChangedEventEmitter = new EventEmitter<void>();
 
   constructor(
@@ -39,7 +39,7 @@ export class TranslationTopicService {
     private loggerService: LoggerService) {}
 
   getActiveTopicName(): string {
-    return this.activeTopicName;
+    return this.activeTopicName as string;
   }
 
   setActiveTopicName(newActiveTopicName: string): void {

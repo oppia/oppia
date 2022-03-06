@@ -50,9 +50,10 @@ describe('Blog Dashboard Page Component', () => {
       location: {
         href: '',
         hash: '/',
+        _hashChange: null,
         reload: () => {}
       },
-      open: (url) => {},
+      open: (url: string) => {},
       onhashchange() {
         return this.location._hashChange;
       },

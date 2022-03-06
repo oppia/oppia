@@ -30,11 +30,15 @@ import { ContributionOpportunitiesBackendApiService } from
   templateUrl: './translation-topic-selector.component.html'
 })
 export class TranslationTopicSelectorComponent implements OnInit {
-  @Input() activeTopicName: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() activeTopicName!: string;
   @Output() setActiveTopicName: EventEmitter<string> = new EventEmitter();
-  @ViewChild('dropdown', {'static': false}) dropdownRef;
+  @ViewChild('dropdown', {'static': false}) dropdownRef!:
+    { nativeElement: { contains: (arg0: HTMLElement) => never}};
 
-  options: string[];
+  options!: string[];
   dropdownShown = false;
 
   constructor(

@@ -92,26 +92,43 @@ describe('Translation Suggestion Review Modal Component', function() {
     const reviewable = true;
     const subheading = 'subheading_title';
     const suggestion1 = {
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      status: 'status',
       suggestion_id: 'suggestion_1',
       target_id: '1',
+      target_type: 'target_type',
       suggestion_type: 'translate_content',
       change: {
         content_id: 'hint_1',
         content_html: '<p>content</p><p>&nbsp;</p>',
         translation_html: 'Tradução',
-        state_name: 'StateName'
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
       },
       exploration_content_html: '<p>content</p><p>&nbsp;</p>'
     };
+
     const suggestion2 = {
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      status: 'status',
       suggestion_id: 'suggestion_2',
       target_id: '2',
+      target_type: 'target_type',
       suggestion_type: 'translate_content',
       change: {
         content_id: 'hint_1',
         content_html: '<p>content</p>',
         translation_html: 'Tradução',
-        state_name: 'StateName'
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
       },
       exploration_content_html: '<p>content CHANGED</p>'
     };
@@ -332,9 +349,9 @@ describe('Translation Suggestion Review Modal Component', function() {
             targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
           let dummyErrorResponse = new Error('Error');
-          if (errorCallback) {
-            return Promise.reject(errorCallback(dummyErrorResponse));
-          }
+          return Promise.reject(
+            errorCallback(dummyErrorResponse)
+          );
         });
       spyOn(alertsService, 'addWarning');
 
@@ -450,10 +467,17 @@ describe('Translation Suggestion Review Modal Component', function() {
         content_id: 'hint_1',
         content_html: ['Translation1', 'Translation2'],
         translation_html: 'Tradução',
-        state_name: 'StateName'
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
       },
       exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
-      status: 'rejected'
+      status: 'rejected',
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      target_type: 'target_type',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -463,9 +487,17 @@ describe('Translation Suggestion Review Modal Component', function() {
         content_id: 'hint_1',
         content_html: 'Translation',
         translation_html: 'Tradução',
-        state_name: 'StateName'
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
       },
-      exploration_content_html: 'Translation'
+      exploration_content_html: 'Translation',
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      status: 'status',
+      target_type: 'target_type',
     };
 
     const contribution1 = {
@@ -539,10 +571,17 @@ describe('Translation Suggestion Review Modal Component', function() {
         content_id: 'hint_1',
         content_html: ['Translation1', 'Translation2'],
         translation_html: 'Tradução',
-        state_name: 'StateName'
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
       },
       exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
-      status: 'rejected'
+      status: 'rejected',
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      target_type: 'target_type',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -552,9 +591,17 @@ describe('Translation Suggestion Review Modal Component', function() {
         content_id: 'hint_1',
         content_html: 'Translation',
         translation_html: 'Tradução',
-        state_name: 'StateName'
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
       },
-      exploration_content_html: 'Translation'
+      exploration_content_html: 'Translation',
+      status: 'rejected',
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      target_type: 'target_type',
     };
 
     const contribution1 = {
@@ -626,9 +673,17 @@ describe('Translation Suggestion Review Modal Component', function() {
         content_id: 'hint_1',
         content_html: '<p>content</p><p>&nbsp;</p>',
         translation_html: 'Tradução',
-        state_name: 'StateName'
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
       },
-      exploration_content_html: '<p>content</p><p>&nbsp;</p>'
+      exploration_content_html: '<p>content</p><p>&nbsp;</p>',
+      status: 'rejected',
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      target_type: 'target_type',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -638,14 +693,26 @@ describe('Translation Suggestion Review Modal Component', function() {
         content_id: 'hint_1',
         content_html: '<p>content</p>',
         translation_html: 'Tradução',
-        state_name: 'StateName'
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
       },
-      exploration_content_html: '<p>content CHANGED</p>'
+      exploration_content_html: '<p>content CHANGED</p>',
+      status: 'rejected',
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      target_type: 'target_type',
     };
 
     const contribution1 = {
       suggestion: suggestion1,
-      details: null
+      details: {
+        topic_name: '',
+        story_title: '',
+        chapter_title: ''
+      }
     };
     const contribution2 = {
       suggestion: suggestion2,

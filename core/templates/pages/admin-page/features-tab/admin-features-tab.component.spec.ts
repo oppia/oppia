@@ -66,7 +66,7 @@ describe('Admin page feature tab', function() {
   let updateApiSpy: jasmine.Spy;
 
   let mockConfirmResult: (val: boolean) => void;
-  let mockPromptResult: (msg: string) => void;
+  let mockPromptResult: (msg: string | null) => void;
 
   beforeEach(async(() => {
     TestBed
@@ -90,7 +90,7 @@ describe('Admin page feature tab', function() {
     adminTaskManagerService = TestBed.get(AdminTaskManagerService);
 
     let confirmResult = true;
-    let promptResult = 'mock msg';
+    let promptResult: string | null = 'mock msg';
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       confirm: () => confirmResult,
       prompt: () => promptResult,
@@ -126,7 +126,7 @@ describe('Admin page feature tab', function() {
     } as AdminPageData);
 
     updateApiSpy = spyOn(featureApiService, 'updateFeatureFlag')
-      .and.resolveTo(null);
+      .and.resolveTo();
 
     component.ngOnInit();
   }));
@@ -462,16 +462,18 @@ describe('Admin page feature tab', function() {
   });
 
   describe('server mode option filter', () => {
+    type optionFilterType = (
+      (feature: PlatformParameter, option: string) => boolean);
     let options: readonly string[];
-    let optionFilter: (feature: PlatformParameter, option: string) => boolean;
+    let optionFilter: optionFilterType;
 
     beforeEach(() => {
       options = component
         .filterTypeToContext[PlatformParameterFilterType.ServerMode]
-        .options;
+        .options as readonly string[];
       optionFilter = component
         .filterTypeToContext[PlatformParameterFilterType.ServerMode]
-        .optionFilter;
+        .optionFilter as optionFilterType;
     });
 
     it('should return [\'dev\'] for feature in dev stage', () => {
@@ -681,7 +683,7 @@ describe('Admin page feature tab', function() {
       dummyApiService = TestBed.get(PlatformFeatureDummyBackendApiService);
 
       dummyApiSpy = spyOn(dummyApiService, 'isHandlerEnabled')
-        .and.resolveTo(null);
+        .and.resolveTo();
     });
 
     it('should not request dummy handler if the dummy feature is disabled',

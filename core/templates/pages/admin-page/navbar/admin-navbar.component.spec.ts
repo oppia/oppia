@@ -27,7 +27,7 @@ import { AdminNavbarComponent } from './admin-navbar.component';
 describe('Admin Navbar component', () => {
   let component: AdminNavbarComponent;
   let userService = null;
-  let adminRouterService = null;
+  let adminRouterService: AdminRouterService;
   let userProfileImage = 'profile-data-url';
   let userInfo = {
     isModerator: () => true,

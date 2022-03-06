@@ -24,6 +24,10 @@ import { CollectionEditorPageConstants } from '../collection-editor-page.constan
 import { CollectionEditorRoutingService } from '../services/collection-editor-routing.service';
 import { CollectionEditorStateService } from '../services/collection-editor-state.service';
 
+interface TabNamesToHumanReadableNames {
+  [tabName: string]: string;
+}
+
 // TODO(bhenning): After the navbar is moved to a directive, this directive
 // should be updated to say 'Loading...' if the collection editor's controller
 // is not yet finished loading the collection. Also, this directive should
@@ -36,15 +40,18 @@ import { CollectionEditorStateService } from '../services/collection-editor-stat
   templateUrl: './collection-editor-navbar-breadcrumb.component.html'
 })
 export class CollectionEditorNavbarBreadcrumbComponent {
-  _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  activeTabName!: string;
+  collection!: Collection;
+
+  _TAB_NAMES_TO_HUMAN_READABLE_NAMES: TabNamesToHumanReadableNames = {
     edit: 'Edit',
     settings: 'Settings',
     stats: 'Statistics',
     history: 'History',
   };
-
-  activeTabName: string;
-  collection: Collection;
 
   constructor(
     private collectionEditorStateService: CollectionEditorStateService,

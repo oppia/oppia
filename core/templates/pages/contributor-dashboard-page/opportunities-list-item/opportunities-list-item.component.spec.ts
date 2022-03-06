@@ -21,7 +21,7 @@ import { LazyLoadingComponent } from 'components/common-layout-directives/common
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
-import { OpportunitiesListItemComponent } from './opportunities-list-item.component';
+import { ExplorationOpportunity, OpportunitiesListItemComponent } from './opportunities-list-item.component';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 describe('Opportunities List Item Component', () => {
@@ -83,7 +83,8 @@ describe('Opportunities List Item Component', () => {
     describe('when opportunity subheading corresponds to deleted ' +
       'opportunity', () => {
       beforeEach(() => {
-        component.opportunity.subheading = (
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.subheading = (
           ContributorDashboardConstants
             .CORRESPONDING_DELETED_OPPORTUNITY_TEXT);
         fixture.detectChanges();
@@ -134,7 +135,8 @@ describe('Opportunities List Item Component', () => {
     describe('when opportunity subheading corresponds to deleted ' +
       'opportunity', () => {
       beforeEach(() => {
-        component.opportunity.subheading = (
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.subheading = (
           ContributorDashboardConstants
             .CORRESPONDING_DELETED_OPPORTUNITY_TEXT);
         fixture.detectChanges();
@@ -150,13 +152,13 @@ describe('Opportunities List Item Component', () => {
 
   describe('when opportunity is not provided', () => {
     beforeEach(() => {
-      component.opportunity = null;
-      component.opportunityType = null;
+      component.opportunity = undefined;
+      component.opportunityType = '';
       component.clickActionButton.emit =
         () => jasmine.createSpy('click', () => {});
       component.labelRequired = true;
       component.progressBarRequired = true;
-      component.opportunityHeadingTruncationLength = null;
+      component.opportunityHeadingTruncationLength = 0;
       component.opportunityType = '';
       fixture.detectChanges();
       component.ngOnInit();
@@ -164,11 +166,11 @@ describe('Opportunities List Item Component', () => {
 
     it('should initialize $scope properties after controller is initialized',
       () => {
-        expect(component.opportunityDataIsLoading).toBe(true);
-        expect(component.labelText).toBe(undefined);
-        expect(component.labelStyle).toBe(undefined);
+        expect(component.opportunityDataIsLoading).toBeTrue();
+        expect(component.labelText).toBeUndefined();
+        expect(component.labelStyle).toBeUndefined();
         expect(component.opportunityHeadingTruncationLength).toBe(40);
-        expect(component.correspondingOpportunityDeleted).toBe(false);
+        expect(component.correspondingOpportunityDeleted).toBeFalse();
       });
   });
 });

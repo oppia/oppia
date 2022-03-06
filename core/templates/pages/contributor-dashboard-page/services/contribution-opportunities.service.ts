@@ -104,15 +104,18 @@ export class ContributionOpportunitiesService {
     return this._getTranslationOpportunitiesAsync(languageCode, topicName, '');
   }
 
-  async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
+  // Return undefined if the given opportunity is not found.
+  async getMoreSkillOpportunitiesAsync():
+    Promise<SkillOpportunitiesDict | undefined> {
     if (this._moreSkillOpportunitiesAvailable) {
       return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
     }
   }
 
+  // Return undefined if the given opportunity is not found.
   async getMoreTranslationOpportunitiesAsync(
       languageCode: string, topicName: string):
-  Promise<ExplorationOpportunitiesDict> {
+  Promise<ExplorationOpportunitiesDict | undefined> {
     if (this._moreTranslationOpportunitiesAvailable) {
       return this._getTranslationOpportunitiesAsync(
         languageCode, topicName, this._translationOpportunitiesCursor);

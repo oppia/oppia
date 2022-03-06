@@ -30,15 +30,18 @@ import { UserService } from 'services/user.service';
   templateUrl: './blog-admin-navbar.component.html',
 })
 export class BlogAdminNavbarComponent implements OnInit {
-  profilePictureDataUrl: string;
-  username: string;
-  profileUrl: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  profilePictureDataUrl!: string;
+  username!: string;
+  profileUrl!: string;
+  logoWebpImageSrc!: string;
+  logoPngImageSrc!: string;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   profileDropdownIsActive: boolean = false;
-  logoWebpImageSrc: string;
-  logoPngImageSrc: string;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -61,7 +64,7 @@ export class BlogAdminNavbarComponent implements OnInit {
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
 
-    this.username = userInfo.getUsername();
+    this.username = userInfo.getUsername() as string;
     this.profileUrl = (
       this.urlInterpolationService.interpolateUrl(
         '/profile/<username>', {

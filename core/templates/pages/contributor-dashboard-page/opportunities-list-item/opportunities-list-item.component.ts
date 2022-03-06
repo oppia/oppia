@@ -39,23 +39,27 @@ export interface ExplorationOpportunity {
   styleUrls: []
 })
 export class OpportunitiesListItemComponent {
-  @Input() opportunity: ExplorationOpportunity;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() opportunity!: ExplorationOpportunity | undefined;
+  @Input() labelRequired!: boolean;
+  @Input() progressBarRequired!: boolean;
+  @Input() opportunityHeadingTruncationLength!: number;
+  @Input() opportunityType!: string;
+
+  labelText!: string;
+  labelStyle!: { 'background-color': string };
+  progressPercentage!: string;
+  progressBarStyle!: { width: string };
+  translatedProgressStyle!: { width: string };
+  inReviewProgressStyle!: { width: string };
+  untranslatedProgressStyle!: { width: string };
+
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter());
 
-  @Input() labelRequired: boolean;
-  @Input() progressBarRequired: boolean;
-  @Input() opportunityHeadingTruncationLength: number;
-  @Input() opportunityType: string;
-
   opportunityDataIsLoading: boolean = true;
-  labelText: string;
-  labelStyle: { 'background-color': string };
-  progressPercentage: string;
-  progressBarStyle: { width: string };
-  translatedProgressStyle: { width: string };
-  inReviewProgressStyle: { width: string };
-  untranslatedProgressStyle: { width: string };
   correspondingOpportunityDeleted: boolean = false;
   translationProgressBar: boolean = false;
   opportunityButtonDisabled: boolean = false;

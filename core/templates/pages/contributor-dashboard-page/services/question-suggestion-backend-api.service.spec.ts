@@ -20,6 +20,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
 import { Question } from 'domain/question/QuestionObjectFactory';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { QuestionSuggestionBackendApiService } from './question-suggestion-backend-api.service';
@@ -57,7 +58,7 @@ describe('Question Suggestion Backend Api Service', () => {
     };
     let associatedSkill = new Skill(
       'test_skill', 'description', [], [],
-      null, 'en', 1, null, 'test_id', false, []);
+      {} as ConceptCard, 'en', 1, 0, 'test_id', false, []);
 
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');

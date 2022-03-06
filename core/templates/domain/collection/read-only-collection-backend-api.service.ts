@@ -92,9 +92,9 @@ export class ReadOnlyCollectionBackendApiService {
 
   private _cacheCollectionDetails(
       details: ReadOnlyCollectionBackendResponse): void {
-    this._collectionDetailsCache[details.collection.id] = {
+    this._collectionDetailsCache[details.collection.id as string] = {
       canEdit: details.can_edit,
-      title: details.collection.title,
+      title: details.collection.title as string,
     };
   }
 

@@ -181,8 +181,9 @@ export class CollectionEditorStateService {
     }
     this._collectionIsBeingSaved = true;
     this.editableCollectionBackendApiService.updateCollectionAsync(
-      this._collection.getId(), this._collection.getVersion(),
-      commitMessage, this.undoRedoService.getCommittableChangeList()).then(
+      this._collection.getId() as string,
+      this._collection.getVersion() as number, commitMessage,
+      this.undoRedoService.getCommittableChangeList()).then(
       (collectionObject) => {
         this._updateCollection(collectionObject);
         this.undoRedoService.clearChanges();

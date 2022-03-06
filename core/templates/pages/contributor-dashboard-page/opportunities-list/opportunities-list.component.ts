@@ -32,23 +32,29 @@ import { Subscription } from 'rxjs';
   styleUrls: []
 })
 export class OpportunitiesListComponent {
-  @Input() loadOpportunities: () => Promise<{
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() loadOpportunities!: () => Promise<{
     opportunitiesDicts: ExplorationOpportunity[]; more: boolean; }>;
 
-  @Input() labelRequired: boolean;
-  @Input() progressBarRequired: boolean;
-  @Input() loadMoreOpportunities;
+  @Input() labelRequired!: boolean;
+  @Input() progressBarRequired!: boolean;
+  @Input() loadMoreOpportunities!: () => Promise<{
+    opportunitiesDicts: ExplorationOpportunity[]; more: boolean; }>;
+
+  @Input() opportunityHeadingTruncationLength!: number;
+  @Input() opportunityType!: string;
+
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter()
   );
 
-  @Input() opportunityHeadingTruncationLength: number;
-  @Input() opportunityType: string;
 
   loadingOpportunityData: boolean = true;
   lastPageNumber: number = 1000;
   opportunities: ExplorationOpportunity[] = [];
-  visibleOpportunities = [];
+  visibleOpportunities: ExplorationOpportunity[] = [];
   directiveSubscriptions = new Subscription();
   activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;

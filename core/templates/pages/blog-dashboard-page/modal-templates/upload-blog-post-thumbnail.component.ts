@@ -30,14 +30,17 @@ require('cropperjs/dist/cropper.min.css');
   templateUrl: './upload-blog-post-thumbnail.component.html'
 })
 export class UploadBlogPostThumbnailComponent implements OnInit {
-  uploadedImage: SafeResourceUrl;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  uploadedImage!: SafeResourceUrl;
+  croppedFilename!: string;
+  windowIsNarrow!: boolean;
+  cropper!: Cropper;
+  @ViewChild('croppableImage') croppableImageRef!: ElementRef;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
-  croppedFilename: string;
-  windowIsNarrow: boolean;
-  cropper;
-  @ViewChild('croppableImage') croppableImageRef: ElementRef;
   @Output() imageLocallySaved: EventEmitter<string> = new EventEmitter();
   @Output() cancelThumbnailUpload: EventEmitter<void> = new EventEmitter();
   constructor(
@@ -74,7 +77,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     let reader = new FileReader();
     reader.onload = (e) => {
       this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        (e.target as FileReader).result as string);
+        (e.target as FileReader).result as string) as SafeResourceUrl;
       if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
           (e.target as FileReader).result as string);
@@ -86,7 +89,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   }
 
   reset(): void {
-    this.uploadedImage = null;
+    this.uploadedImage = false;
     this.cropppedImageDataUrl = '';
   }
 
@@ -105,7 +108,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     this.imageLocalStorageService.saveImage(
       this.croppedFilename, this.cropppedImageDataUrl);
     this.imageLocallySaved.emit(this.cropppedImageDataUrl);
-    this.uploadedImage = null;
+    this.uploadedImage = false;
   }
 
   cancel(): void {

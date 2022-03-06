@@ -35,6 +35,11 @@ import { UrlInterpolationService } from
 import { Schema } from 'services/schema-default-value.service';
 
 
+export interface NewConfigPropertyValues {
+  [property: string]: (
+    number | boolean | string | string[] | Object | Object[]);
+}
+
 export interface UserRolesBackendResponse {
   roles: string[];
   'managed_topic_ids': string[];
@@ -438,7 +443,7 @@ export class AdminBackendApiService {
   }
 
   async saveConfigPropertiesAsync(
-      newConfigPropertyValues: ConfigPropertyValues):
+      newConfigPropertyValues: NewConfigPropertyValues):
       Promise<void> {
     let action = 'save_config_properties';
     let payload = {

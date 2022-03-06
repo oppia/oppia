@@ -18,7 +18,7 @@
 
 import { Component, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { AdminBackendApiService, ConfigPropertiesBackendResponse, ConfigPropertyValues } from 'domain/admin/admin-backend-api.service';
+import { AdminBackendApiService, ConfigPropertiesBackendResponse, NewConfigPropertyValues } from 'domain/admin/admin-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { Schema } from 'services/schema-default-value.service';
 import { AdminDataService } from '../services/admin-data.service';
@@ -86,13 +86,13 @@ export class AdminConfigTabComponent {
     this.setStatusMessage.emit('Saving...');
 
     this.adminTaskManagerService.startTask();
-    let newConfigPropertyValues = {};
+    let newConfigPropertyValues: NewConfigPropertyValues = {};
     for (let property in this.configProperties) {
       newConfigPropertyValues[property] = this.configProperties[property].value;
     }
 
     this.adminBackendApiService.saveConfigPropertiesAsync(
-      newConfigPropertyValues as ConfigPropertyValues).then(() => {
+      newConfigPropertyValues).then(() => {
       this.setStatusMessage.emit('Data saved successfully.');
       this.adminTaskManagerService.finishTask();
     }, errorResponse => {
