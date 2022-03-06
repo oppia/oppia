@@ -1217,7 +1217,7 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
 
 
 class CategorizedSkillsTests(test_utils.GenericTestBase):
-      
+
     def setUp(self):
         super(CategorizedSkillsTests, self).setUp()
         self.categorized_skills = skill_domain.CategorizedSkills()
@@ -1244,7 +1244,7 @@ class CategorizedSkillsTests(test_utils.GenericTestBase):
         self.categorized_skills.initialize_uncategorized_skills('Topic Name')
         self.categorized_skills.initialize_subtopic_skills(
             'Topic Name', 'Subtopic Title')
-        
+
         self.assertEqual(self.categorized_skills.to_dict(), {
             'Topic Name': {
                 'uncategorized': [],

@@ -1334,13 +1334,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         untriaged_skill_summary_dicts = (
             skill_services.get_untriaged_skill_summaries(
                 skill_summaries, skill_ids_assigned_to_some_topic,
-                merged_skill_ids))        
+                merged_skill_ids))
 
         skill_summary = skill_services.get_skill_summary_by_id(self.SKILL_ID)
         skill_summary_dict = skill_summary.to_dict()
         expected_untriaged_skill_summary_dicts = [skill_summary_dict]
 
-        self.assertEqual(untriaged_skill_summary_dicts,
+        self.assertEqual(
+            untriaged_skill_summary_dicts,
             expected_untriaged_skill_summary_dicts)
 
     def test_get_categorized_skill_ids_and_descriptions(self):
@@ -1379,8 +1380,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         }
         categorized_skills_dict = (
             skill_services.get_categorized_skill_ids_and_descriptions())
-        
-        self.assertEqual(categorized_skills_dict,
+
+        self.assertEqual(
+            categorized_skills_dict,
             expected_categorized_skills_dict)
 
 

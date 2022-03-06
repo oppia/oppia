@@ -1780,7 +1780,8 @@ class UserSkillMastery:
 
 class CategorizedSkills:
     """Domain object for representing categorized skills' ids and
-    descriptions."""
+    descriptions.
+    """
 
     def __init__(self):
         """Constructs a CategorizedSkills domain object."""
@@ -1794,7 +1795,7 @@ class CategorizedSkills:
             topic_name: str. The name of the topic.
         """
         self.categorized_skills[topic_name] = {}
-    
+
     def initialize_uncategorized_skills(self, topic_name):
         """Initializes the uncategorized skills for a topic as an empty list.
 

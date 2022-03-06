@@ -1163,7 +1163,7 @@ def get_untriaged_skill_summaries(
 
     Returns:
         list(dict). A list of skill summary dicts for all skills that
-            are untriaged.
+        are untriaged.
     """
     untriaged_skill_summary_dicts = []
 
@@ -1229,5 +1229,5 @@ def get_categorized_skill_ids_and_descriptions():
         else:
             categorized_skills.update_subtopic_skills(
                 topic_name, subtopic_title, skill_id, skill_description)
-      
+
     return categorized_skills.to_dict()
