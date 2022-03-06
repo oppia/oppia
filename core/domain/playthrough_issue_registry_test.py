@@ -41,34 +41,33 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
                 MultipleIncorrectSubmissions.MultipleIncorrectSubmissions)
             }
         self.invalid_issue_type = 'InvalidIssueType'
-        self.Registry = playthrough_issue_registry.Registry()
 
     def tearDown(self):
         super(IssueRegistryUnitTests, self).tearDown()
-        self.Registry._issues = {} # pylint: disable=protected-access
+        playthrough_issue_registry.Registry._issues = {} # pylint: disable=protected-access
 
-    def test_01_issue_registry(self):
+    def test_issue_registry(self):
         """Do some sanity checks on the issue registry."""
         self.assertEqual(
-            len(self.Registry.get_all_issues()), 3)
+            len(playthrough_issue_registry.Registry.get_all_issues()), 3)
 
-    def test_02_correct_issue_registry_types(self):
+    def test_correct_issue_registry_types(self):
         """Tests issue registry for fetching of issue instances of correct
         issue types.
         """
         for issue_type, instance in self.issues_dict.items():
             self.assertIsInstance(
-                self.Registry.get_issue_by_type(
+                playthrough_issue_registry.Registry.get_issue_by_type(
                     issue_type), instance)
 
-    def test_03_incorrect_issue_registry_types(self):
+    def test_incorrect_issue_registry_types(self):
         """Tests issue registry for raising error on passing incorrect issues
         types.
         """
         with self.assertRaisesRegex(utils.ValidationError, (
             'Invalid issue type: %s' % self.invalid_issue_type)):
             try:
-                self.Registry.get_issue_by_type(
+                playthrough_issue_registry.Registry.get_issue_by_type(
                     self.invalid_issue_type)
             except KeyError as e:
                 raise utils.ValidationError('Invalid issue type: %s' % (
