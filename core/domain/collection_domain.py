@@ -559,7 +559,7 @@ class Collection:
             cls._convert_collection_contents_v3_dict_to_v4_dict(
                 collection_dict))
         # CollectionDict is defined to match the current version of domain
-        # object and here In _convert_* functions, we are dealing with some
+        # object and here in _convert_* functions, we are dealing with some
         # additional fields which are not mentioned in CollectionDict. Thus
         # to prevent MyPy errors, we can ignore it.
         collection_dict['skills'] = new_collection_dict['skills'] # type: ignore[misc]
