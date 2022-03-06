@@ -2355,7 +2355,8 @@ describe('ImageEditor', () => {
     component.saveUploadedFile();
 
     expect(component.saveImage).toHaveBeenCalled();
-    expect(component.setSavedImageFilename).toHaveBeenCalled();
+    expect(component.setSavedImageFilename).toHaveBeenCalledWith(
+      component.data.metadata.savedImageFilename, true);
     expect(component.data.mode).toBe(component.MODE_SAVED);
   });
 
