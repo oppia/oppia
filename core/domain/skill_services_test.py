@@ -1325,7 +1325,25 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Updated misconception feedback.')
 
-    def test_get_categorized_and_untriaged_skills_dicts(self):
+    def test_get_untriaged_skill_summaries(self):
+        skill_summaries = skill_services.get_all_skill_summaries()
+        skill_ids_assigned_to_some_topic = (
+            topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
+        merged_skill_ids = skill_services.get_merged_skill_ids()
+
+        untriaged_skill_summary_dicts = (
+            skill_services.get_untriaged_skill_summaries(
+                skill_summaries, skill_ids_assigned_to_some_topic,
+                merged_skill_ids))        
+
+        skill_summary = skill_services.get_skill_summary_by_id(self.SKILL_ID)
+        skill_summary_dict = skill_summary.to_dict()
+        expected_untriaged_skill_summary_dicts = [skill_summary_dict]
+
+        self.assertEqual(untriaged_skill_summary_dicts,
+            expected_untriaged_skill_summary_dicts)
+
+    def test_get_categorized_skill_ids_and_descriptions(self):
         topic_id = topic_fetchers.get_new_topic_id()
         linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -1347,12 +1365,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[linked_skill_id],
             subtopics=[subtopic], next_subtopic_id=2)
 
-        skill_summaries = skill_services.get_all_skill_summaries()
-        skill_ids_assigned_to_some_topic = (
-            topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
-        merged_skill_ids = skill_services.get_merged_skill_ids()
-
-        expected_categorized_skill_dict = {
+        expected_categorized_skills_dict = {
             'Topic Name': {
                 'uncategorized': [{
                     'skill_id': linked_skill_id,
@@ -1364,22 +1377,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 }]
             }
         }
-
-        skill_summary = skill_services.get_skill_summary_by_id(self.SKILL_ID)
-        skill_summary_dict = skill_summary.to_dict()
-        expected_untriaged_skills_dict = [skill_summary_dict]
-
-        categorized_and_untriaged_skills_dicts = (
-            skill_services.get_categorized_and_untriaged_skills_dicts(
-                skill_summaries, skill_ids_assigned_to_some_topic,
-                merged_skill_ids))
-
-        self.assertEqual(
-            categorized_and_untriaged_skills_dicts[0],
-            expected_categorized_skill_dict)
-        self.assertEqual(
-            categorized_and_untriaged_skills_dicts[1],
-            expected_untriaged_skills_dict)
+        categorized_skills_dict = (
+            skill_services.get_categorized_skill_ids_and_descriptions())
+        
+        self.assertEqual(categorized_skills_dict,
+            expected_categorized_skills_dict)
 
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):

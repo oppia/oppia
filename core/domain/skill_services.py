@@ -1149,65 +1149,23 @@ def filter_skills_by_mastery(user_id, skill_ids):
     return arranged_filtered_skill_ids
 
 
-def get_categorized_and_untriaged_skills_dicts(
+def get_untriaged_skill_summaries(
     skill_summaries, skill_ids_assigned_to_some_topic, merged_skill_ids):
-    """Fetches the categorized and untriaged skills' descriptions and ids.
+    """Returns a list of skill summary dicts for all skills that are
+    untriaged.
 
     Args:
-        skill_summaries: list(SkillSummary). The list of
-            all skill summary domain objects.
+        skill_summaries: list(SkillSummary). The list of all skill summary
+            domain objects.
         skill_ids_assigned_to_some_topic: set(str). The set of skill ids which
             are assigned to some topic.
         merged_skill_ids: list(str). List of skill IDs of merged skills.
 
     Returns:
-        dict, list(dict). The categorized and untriaged skills' descriptions
-        and ids.
+        list(dict). A list of skill summary dicts for all skills that
+            are untriaged.
     """
-    topics = topic_fetchers.get_all_topics()
-
     untriaged_skill_summary_dicts = []
-    categorized_skills_dict = {}
-
-    skill_ids_and_details = []
-    skill_ids = []
-
-    for topic in topics:
-        subtopics = topic.subtopics
-        categorized_skills_dict[topic.name] = {}
-        categorized_skills_dict[topic.name]['uncategorized'] = []
-        for skill_id in topic.uncategorized_skill_ids:
-            skill_ids.append(skill_id)
-            skill_ids_and_details.append({
-                'skill_id': skill_id,
-                'topic_name': topic.name,
-                'subtopic_title': None
-            })
-        for subtopic in subtopics:
-            categorized_skills_dict[topic.name][subtopic.title] = []
-            for skill_id in subtopic.skill_ids:
-                skill_ids.append(skill_id)
-                skill_ids_and_details.append({
-                    'skill_id': skill_id,
-                    'topic_name': topic.name,
-                    'subtopic_title': subtopic.title
-                })
-
-    skill_descriptions = get_descriptions_of_skills(skill_ids)[0]
-    for skill_detail in skill_ids_and_details:
-        skill_id = skill_detail['skill_id']
-        topic_name = skill_detail['topic_name']
-        subtopic_title = skill_detail['subtopic_title']
-        skill_dict = {
-            'skill_id': skill_id,
-            'skill_description': skill_descriptions[skill_id]
-        }
-        if subtopic_title is None:
-            categorized_skills_dict[topic_name]['uncategorized'].append(
-                skill_dict)
-        else:
-            categorized_skills_dict[topic_name][subtopic_title].append(
-                skill_dict)
 
     skill_summary_dicts = [
         summary.to_dict() for summary in skill_summaries]
@@ -1217,4 +1175,59 @@ def get_categorized_and_untriaged_skills_dicts(
                 skill_id not in merged_skill_ids):
             untriaged_skill_summary_dicts.append(skill_summary_dict)
 
-    return categorized_skills_dict, untriaged_skill_summary_dicts
+    return untriaged_skill_summary_dicts
+
+
+def get_categorized_skill_ids_and_descriptions():
+    """Returns a dict of skill ids and descriptions for skills that are
+    categorized.
+
+    Returns:
+        dict. A dict of CategorizedSkills for all skills that are
+        linked to some topic or subtopic.
+    """
+    topics = topic_fetchers.get_all_topics()
+
+    categorized_skills = skill_domain.CategorizedSkills()
+
+    skill_ids_and_details = []
+    skill_ids = []
+
+    for topic in topics:
+        subtopics = topic.subtopics
+        categorized_skills.add_topic(topic.name)
+        categorized_skills.initialize_uncategorized_skills(topic.name)
+        for skill_id in topic.uncategorized_skill_ids:
+            skill_ids.append(skill_id)
+            skill_ids_and_details.append({
+                'skill_id': skill_id,
+                'topic_name': topic.name,
+                'subtopic_title': None
+            })
+        for subtopic in subtopics:
+            categorized_skills.initialize_subtopic_skills(
+                topic.name, subtopic.title)
+            for skill_id in subtopic.skill_ids:
+                skill_ids.append(skill_id)
+                skill_ids_and_details.append({
+                    'skill_id': skill_id,
+                    'topic_name': topic.name,
+                    'subtopic_title': subtopic.title
+                })
+
+    skill_descriptions = get_descriptions_of_skills(skill_ids)[0]
+
+    for skill_detail in skill_ids_and_details:
+        skill_id = skill_detail['skill_id']
+        skill_description = skill_descriptions[skill_id]
+        topic_name = skill_detail['topic_name']
+        subtopic_title = skill_detail['subtopic_title']
+
+        if subtopic_title is None:
+            categorized_skills.update_uncategorized_skills(
+                topic_name, skill_id, skill_description)
+        else:
+            categorized_skills.update_subtopic_skills(
+                topic_name, subtopic_title, skill_id, skill_description)
+      
+    return categorized_skills.to_dict()

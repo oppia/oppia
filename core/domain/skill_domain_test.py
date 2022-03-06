@@ -1214,3 +1214,81 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.topic_assignments.to_dict(),
             topic_assignments_dict)
+
+
+class CategorizedSkillsTests(test_utils.GenericTestBase):
+      
+    def setUp(self):
+        super(CategorizedSkillsTests, self).setUp()
+        self.categorized_skills = skill_domain.CategorizedSkills()
+
+    def test_topic_name_gets_added(self):
+        self.categorized_skills.add_topic('Topic Name')
+
+        self.assertEqual(self.categorized_skills.to_dict(), {
+            'Topic Name': {}
+        })
+
+    def test_uncategorized_skills_get_initialized(self):
+        self.categorized_skills.add_topic('Topic Name')
+        self.categorized_skills.initialize_uncategorized_skills('Topic Name')
+
+        self.assertEqual(self.categorized_skills.to_dict(), {
+            'Topic Name': {
+                'uncategorized': []
+            }
+        })
+
+    def test_subtopic_skills_get_initialized(self):
+        self.categorized_skills.add_topic('Topic Name')
+        self.categorized_skills.initialize_uncategorized_skills('Topic Name')
+        self.categorized_skills.initialize_subtopic_skills(
+            'Topic Name', 'Subtopic Title')
+        
+        self.assertEqual(self.categorized_skills.to_dict(), {
+            'Topic Name': {
+                'uncategorized': [],
+                'Subtopic Title': []
+            }
+        })
+
+    def test_uncategorized_skills_get_updated(self):
+        self.categorized_skills.add_topic('Topic Name')
+        self.categorized_skills.initialize_uncategorized_skills('Topic Name')
+        self.categorized_skills.initialize_subtopic_skills(
+            'Topic Name', 'Subtopic Title')
+        self.categorized_skills.update_uncategorized_skills(
+            'Topic Name', 'uncategorized_skill', 'Description 3')
+
+        self.assertEqual(self.categorized_skills.to_dict(), {
+            'Topic Name': {
+                'uncategorized': [{
+                    'skill_id': 'uncategorized_skill',
+                    'skill_description': 'Description 3',
+                }],
+                'Subtopic Title': []
+            }
+        })
+
+    def test_subtopic_skills_get_updated(self):
+        self.categorized_skills.add_topic('Topic Name')
+        self.categorized_skills.initialize_uncategorized_skills('Topic Name')
+        self.categorized_skills.initialize_subtopic_skills(
+            'Topic Name', 'Subtopic Title')
+        self.categorized_skills.update_uncategorized_skills(
+            'Topic Name', 'uncategorized_skill', 'Description 3')
+        self.categorized_skills.update_subtopic_skills(
+            'Topic Name', 'Subtopic Title', 'subtopic_skill', 'Subtopic Skill')
+
+        self.assertEqual(self.categorized_skills.to_dict(), {
+            'Topic Name': {
+                'uncategorized': [{
+                    'skill_id': 'uncategorized_skill',
+                    'skill_description': 'Description 3',
+                }],
+                'Subtopic Title': [{
+                    'skill_id': 'subtopic_skill',
+                    'skill_description': 'Subtopic Skill'
+                }]
+            }
+        })

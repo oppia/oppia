@@ -1776,3 +1776,71 @@ class UserSkillMastery:
             skill_mastery_dict['skill_id'],
             skill_mastery_dict['degree_of_mastery']
         )
+
+
+class CategorizedSkills:
+    """Domain object for representing categorized skills' ids and
+    descriptions."""
+
+    def __init__(self):
+        """Constructs a CategorizedSkills domain object."""
+        self.categorized_skills = {}
+
+    def add_topic(self, topic_name):
+        """Adds a topic to the categorized skills and initializes its value
+        as an empty dict.
+
+        Args:
+            topic_name: str. The name of the topic.
+        """
+        self.categorized_skills[topic_name] = {}
+    
+    def initialize_uncategorized_skills(self, topic_name):
+        """Initializes the uncategorized skills for a topic as an empty list.
+
+        Args:
+            topic_name: str. The name of the topic.
+        """
+        self.categorized_skills[topic_name]['uncategorized'] = []
+
+    def initialize_subtopic_skills(self, topic_name, subtopic_title):
+        """Initializes the subtopic skills for a topic as an empty list.
+
+        Args:
+            topic_name: str. The name of the topic.
+            subtopic_title: str. The title of the subtopic.
+        """
+        self.categorized_skills[topic_name][subtopic_title] = []
+
+    def update_uncategorized_skills(
+        self, topic_name, skill_id, skill_description):
+        """Updates the uncategorized skills for a topic.
+
+        Args:
+            topic_name: str. The name of the topic.
+            skill_id: str. The id of the skill.
+            skill_description: str. The description of the skill.
+        """
+        self.categorized_skills[topic_name]['uncategorized'].append({
+                'skill_id': skill_id,
+                'skill_description': skill_description
+            })
+
+    def update_subtopic_skills(
+        self, topic_name, subtopic_title, skill_id, skill_description):
+        """Updates the subtopic skills for a topic.
+
+        Args:
+            topic_name: str. The name of the topic.
+            subtopic_title: str. The title of the subtopic.
+            skill_id: str. The id of the skill.
+            skill_description: str. The description of the skill.
+        """
+        self.categorized_skills[topic_name][subtopic_title].append({
+                'skill_id': skill_id,
+                'skill_description': skill_description
+            })
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object."""
+        return self.categorized_skills
