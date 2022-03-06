@@ -81,7 +81,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
             exp_ids_with_category_not_in_constants
             | 'Save info on invalid exps' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The id of exp is %s and its category is %s'
+                    'The id of exp is "%s" and its category is "%s"'
                     % (objects[0], objects[1])
                 ))
         )
