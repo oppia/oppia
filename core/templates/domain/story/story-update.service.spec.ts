@@ -556,7 +556,7 @@ describe('Story update service', () => {
   it('should set the exploration id of a story node', () => {
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
-    ).toBe(null);
+    ).toBe('exp_id');
     storyUpdateService.setStoryNodeExplorationId(
       _sampleStory, 'node_1', 'exp_2');
     expect(
@@ -573,7 +573,7 @@ describe('Story update service', () => {
     undoRedoService.undoChange(_sampleStory);
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
-    ).toBe(null);
+    ).toBe('exp_id');
   });
 
   it('should create a proper backend change dict for setting the exploration ' +
