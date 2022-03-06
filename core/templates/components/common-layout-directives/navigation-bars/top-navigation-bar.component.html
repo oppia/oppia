@@ -128,7 +128,7 @@
                     <div *ngIf="classroomData.length > 0">
                       <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
                         <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                           (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment())"
+                           (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment()); $event.stopPropagation()"
                            tabindex="0"
                            class="underline"
                            href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/{{topicSummary.getUrlFragment()}}">
