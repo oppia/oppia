@@ -1181,7 +1181,7 @@ def get_categorized_and_untriaged_skills_dicts(
             skill_ids_and_details.append({
                 'skill_id': skill_id,
                 'topic_name': topic.name,
-                'skill_type': 'uncategorized'
+                'subtopic_title': None
             })
         for subtopic in subtopics:
             categorized_skills_dict[topic.name][subtopic.title] = []
@@ -1190,24 +1190,22 @@ def get_categorized_and_untriaged_skills_dicts(
                 skill_ids_and_details.append({
                     'skill_id': skill_id,
                     'topic_name': topic.name,
-                    'skill_type': 'categorized',
                     'subtopic_title': subtopic.title
                 })
 
-    skills_descriptions = get_descriptions_of_skills(skill_ids)[0]
+    skill_descriptions = get_descriptions_of_skills(skill_ids)[0]
     for skill_detail in skill_ids_and_details:
         skill_id = skill_detail['skill_id']
-        skill_type = skill_detail['skill_type']
         topic_name = skill_detail['topic_name']
+        subtopic_title = skill_detail['subtopic_title']
         skill_dict = {
             'skill_id': skill_id,
-            'skill_description': skills_descriptions[skill_id]
+            'skill_description': skill_descriptions[skill_id]
         }
-        if skill_type == 'uncategorized':
+        if subtopic_title is None:
             categorized_skills_dict[topic_name]['uncategorized'].append(
                 skill_dict)
         else:
-            subtopic_title = skill_detail['subtopic_title']
             categorized_skills_dict[topic_name][subtopic_title].append(
                 skill_dict)
 

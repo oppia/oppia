@@ -1340,8 +1340,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         subtopic.skill_ids = [subtopic_skill_id]
 
         self.save_new_topic(
-            topic_id, self.user_id_admin, name='Name',
-            abbreviated_name='name', url_fragment='name',
+            topic_id, self.user_id_admin, name='Topic Name',
+            abbreviated_name='topic', url_fragment='topic-name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[linked_skill_id],
@@ -1355,7 +1355,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         merged_skill_ids = skill_services.get_merged_skill_ids()
 
         expected_categorized_skill_dict = {
-            'Name': {
+            'Topic Name': {
                 'uncategorized': [{
                     'skill_id': linked_skill_id,
                     'skill_description': 'Description 3',
