@@ -290,6 +290,7 @@
         "core.jobs.types.blog_validation_errors_test",
         "core.jobs.batch_jobs.exp_title_validation_jobs_test",
         "core.jobs.batch_jobs.blog_validation_jobs_test",
+        "core.jobs.batch_jobs.exp_tags_validation_jobs_test",
         "core.jobs.transforms.validation.blog_validation_test",
         "core.jobs.transforms.validation.skill_validation_test",
         "core.jobs.transforms.validation.story_validation_test",
