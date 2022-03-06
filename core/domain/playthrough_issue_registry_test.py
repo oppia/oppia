@@ -41,17 +41,16 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
                 MultipleIncorrectSubmissions.MultipleIncorrectSubmissions)
             }
         self.invalid_issue_type = 'InvalidIssueType'
+        self.Registry = playthrough_issue_registry.Registry()
 
-# Adding test execution order with 01, 02, 03 because playthrough_issue_registry
-# has _issues as a class argument in Registry class . Thus we are maintaing a
-# single copy of _issues for all objects and class itself . This creates a small
-# coverage issue when _issues is already updated by other function whereas it is
-# required to be empty by some other function .
+    def tearDown(self):
+        super(IssueRegistryUnitTests, self).tearDown()
+        self.Registry._issues = {} # pylint: disable=protected-access
 
     def test_01_issue_registry(self):
         """Do some sanity checks on the issue registry."""
         self.assertEqual(
-            len(playthrough_issue_registry.Registry.get_all_issues()), 3)
+            len(self.Registry.get_all_issues()), 3)
 
     def test_02_correct_issue_registry_types(self):
         """Tests issue registry for fetching of issue instances of correct
@@ -59,7 +58,7 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         """
         for issue_type, instance in self.issues_dict.items():
             self.assertIsInstance(
-                playthrough_issue_registry.Registry.get_issue_by_type(
+                self.Registry.get_issue_by_type(
                     issue_type), instance)
 
     def test_03_incorrect_issue_registry_types(self):
@@ -69,7 +68,7 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(utils.ValidationError, (
             'Invalid issue type: %s' % self.invalid_issue_type)):
             try:
-                playthrough_issue_registry.Registry.get_issue_by_type(
+                self.Registry.get_issue_by_type(
                     self.invalid_issue_type)
             except KeyError as e:
                 raise utils.ValidationError('Invalid issue type: %s' % (
