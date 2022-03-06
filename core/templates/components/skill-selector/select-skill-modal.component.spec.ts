@@ -27,6 +27,7 @@ import { SkillSelectorComponent } from './skill-selector.component';
 import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 import { ShortSkillSummary, ShortSkillSummaryBackendDict } from 'domain/skill/short-skill-summary.model';
 import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 
 describe('Select Skill Modal', () => {
@@ -66,7 +67,8 @@ describe('Select Skill Modal', () => {
         MatCardModule,
         MatRadioModule,
         MatCheckboxModule,
-        FormsModule
+        FormsModule,
+        HttpClientTestingModule
       ],
       declarations: [
         SelectSkillModalComponent,
