@@ -1150,19 +1150,19 @@ def filter_skills_by_mastery(user_id, skill_ids):
 
 
 def get_categorized_and_untriaged_skills_dicts(
-    skill_summary_dicts, skill_ids_assigned_to_some_topic, merged_skill_ids):
+    skill_summaries, skill_ids_assigned_to_some_topic, merged_skill_ids):
     """Fetches the categorized and untriaged skills' descriptions and ids.
 
     Args:
-        skill_summary_dicts: list(dict). The list of
-            skill summary dicts.
+        skill_summaries: list(SkillSummary). The list of
+            all skill summary domain objects.
         skill_ids_assigned_to_some_topic: set(str). The set of skill ids which
             are assigned to some topic.
         merged_skill_ids: list(str). List of skill IDs of merged skills.
 
     Returns:
-        dict, list(dict). The categorized skills dict and list of
-        skill summaries of skills which are not assigned to any topic.
+        dict, list(dict). The categorized and untriaged skills' descriptions
+        and ids.
     """
     topics = topic_fetchers.get_all_topics()
 
@@ -1209,6 +1209,8 @@ def get_categorized_and_untriaged_skills_dicts(
             categorized_skills_dict[topic_name][subtopic_title].append(
                 skill_dict)
 
+    skill_summary_dicts = [
+        summary.to_dict() for summary in skill_summaries]
     for skill_summary_dict in skill_summary_dicts:
         skill_id = skill_summary_dict['id']
         if (skill_id not in skill_ids_assigned_to_some_topic) and (
