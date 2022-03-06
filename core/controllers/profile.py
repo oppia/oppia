@@ -530,6 +530,20 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'site_language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': list(map(
+                        lambda x: x['id'], constants.SUPPORTED_SITE_LANGUAGES
+                    ))
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
@@ -541,8 +555,12 @@ class SiteLanguageHandler(base.BaseHandler):
 
 class UserInfoHandler(base.BaseHandler):
     """Provides info about user. If user is not logged in,
-    return dict containing false as logged in status.
-    """
+    return dict containing false as logged in status."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -585,16 +603,22 @@ class UrlHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'current_url': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     @acl_decorators.open_access
     def get(self):
         if self.user_id:
             self.render_json({'login_url': None})
         else:
-            if self.request and self.request.get('current_url'):
-                target_url = self.request.get('current_url')
-                login_url = user_services.create_login_url(target_url)
-                self.render_json({'login_url': login_url})
-            else:
-                raise self.InvalidInputException(
-                    'Incomplete or empty GET parameters passed'
-                )
+            target_url = self.normalized_request.get('current_url')
+            login_url = user_services.create_login_url(target_url)
+            self.render_json({'login_url': login_url})

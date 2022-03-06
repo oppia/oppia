@@ -114,6 +114,36 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             expected_blog_post_summary.to_dict(), blog_post_summary.to_dict())
 
+    def test_get_published_blog_post_summaries(self):
+        self.assertIsNone(
+            blog_services.get_published_blog_post_summaries()
+        )
+        blog_services.update_blog_post(
+            self.blog_post_a_id,
+            self.change_dict_two)
+        blog_services.publish_blog_post(self.blog_post_a_id)
+        self.assertEqual(
+            len(blog_services.get_published_blog_post_summaries()),
+            1
+        )
+
+    def test_get_published_blog_post_summaries_by_user_id(self):
+        self.assertIsNone(
+            blog_services.get_published_blog_post_summaries_by_user_id(
+                self.user_id_a, 20
+            )
+        )
+        blog_services.update_blog_post(
+            self.blog_post_a_id,
+            self.change_dict_two)
+        blog_services.publish_blog_post(self.blog_post_a_id)
+        self.assertEqual(
+            len(blog_services.get_published_blog_post_summaries_by_user_id(
+                self.user_id_a,
+                20
+            )), 1
+        )
+
     def test_get_blog_post_summary_from_model(self):
         blog_post_summary_model = (
             blog_models.BlogPostSummaryModel.get(self.blog_post_a_id))
