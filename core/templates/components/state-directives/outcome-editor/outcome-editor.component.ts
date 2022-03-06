@@ -134,10 +134,6 @@ angular.module('oppia').component('outcomeEditor', {
         return false;
       };
 
-      ctrl.updateView = function() {
-        $rootScope.$applyAsync();
-      };
-
       ctrl.invalidStateAfterFeedbackSave = function() {
         var tmpOutcome = angular.copy(ctrl.savedOutcome);
         tmpOutcome.feedback = angular.copy(ctrl.outcome.feedback);
