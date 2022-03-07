@@ -98,7 +98,7 @@ export class SchemaValidators {
 
   static isNonempty(): (control: AbstractControl) => ValidationErrors | null {
     return (control: AbstractControl): ValidationErrors | null => {
-      if (control.value === null || control.value.length === 0) {
+      if (control.value === null || control.value?.length === 0) {
         return {isNonempty: true};
       }
       return null;
