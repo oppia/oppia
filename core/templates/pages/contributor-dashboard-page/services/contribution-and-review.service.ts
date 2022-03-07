@@ -102,69 +102,44 @@ export class ContributionAndReviewService {
       fetcher.offset = 0;
       fetcher.suggestionIdToDetails = {};
     }
-    // If fetcher does not have items, fetch 2 pages and return the 1st page.
-    // We fetch ahead to compute whether there exists more items after this
-    // fetch.
-    if (Object.keys(fetcher.suggestionIdToDetails).length === 0) {
-      return (
-        this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
-          fetcher.type,
-          // Fetch two pages at a time to compute if we have more results.
-          AppConstants.OPPORTUNITIES_PAGE_SIZE * 2,
-          fetcher.offset
-        ).then((responseBody) => {
-          const responseSuggestionIdToDetails: SuggestionDetailsDict = {};
-          const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
-          responseBody.suggestions.forEach((suggestion, i) => {
-            const suggestionDetails = {
-              suggestion: suggestion,
-              details: targetIdToDetails[suggestion.target_id]
-            };
-            if (i < AppConstants.OPPORTUNITIES_PAGE_SIZE) {
-              // Populate the response with the first page.
-              responseSuggestionIdToDetails[
-                suggestion.suggestion_id] = suggestionDetails;
-            } else {
-              // Cache the 2nd page.
-              fetcher.suggestionIdToDetails[
-                suggestion.suggestion_id] = suggestionDetails;
-            }
-          });
-          fetcher.offset = responseBody.next_offset;
-          return {
-            suggestionIdToDetails: responseSuggestionIdToDetails,
-            more: Object.keys(fetcher.suggestionIdToDetails).length > 0
+    const currentCacheSize: number = Object.keys(
+      fetcher.suggestionIdToDetails).length;
+    return (
+      this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
+        fetcher.type,
+        // Fetch up to two pages at a time to compute if we have more results.
+        // The first page of results is returned to the caller and the second
+        // page is cached.
+        (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
+        fetcher.offset
+      ).then((responseBody) => {
+        const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
+        fetcher.suggestionIdToDetails = {};
+        const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
+        responseBody.suggestions.forEach((suggestion) => {
+          const suggestionDetails = {
+            suggestion: suggestion,
+            details: targetIdToDetails[suggestion.target_id]
           };
-        })
-      );
-    } else {
-      // If fetcher has items, return fetcher items and fetch 1 extra page to
-      // refill fetcher cache.
-      return (
-        this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
-          fetcher.type,
-          AppConstants.OPPORTUNITIES_PAGE_SIZE,
-          fetcher.offset
-        ).then((responseBody) => {
-          const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
-          fetcher.suggestionIdToDetails = {};
-          const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
-          responseBody.suggestions.forEach(suggestion => {
-            const suggestionDetails = {
-              suggestion: suggestion,
-              details: targetIdToDetails[suggestion.target_id]
-            };
+          const responseSize: number = Object.keys(
+            responseSuggestionIdToDetails).length;
+          if (responseSize < AppConstants.OPPORTUNITIES_PAGE_SIZE) {
+            // Populate the response with up to a page's worth of results.
+            responseSuggestionIdToDetails[
+              suggestion.suggestion_id] = suggestionDetails;
+          } else {
+            // Cache the 2nd page.
             fetcher.suggestionIdToDetails[
               suggestion.suggestion_id] = suggestionDetails;
-          });
-          fetcher.offset = responseBody.next_offset;
-          return {
-            suggestionIdToDetails: responseSuggestionIdToDetails,
-            more: Object.keys(fetcher.suggestionIdToDetails).length > 0
-          };
-        })
-      );
-    }
+          }
+        });
+        fetcher.offset = responseBody.next_offset;
+        return {
+          suggestionIdToDetails: responseSuggestionIdToDetails,
+          more: Object.keys(fetcher.suggestionIdToDetails).length > 0
+        };
+      })
+    );
   }
 
   async getUserCreatedQuestionSuggestionsAsync(

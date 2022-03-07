@@ -184,37 +184,21 @@ describe('Contribution and review service', () => {
           .target_id_to_opportunity_dict.skill_id_4
       };
 
-      // Return a 4th suggestion from the backend.
+      // Return a 4th suggestion from the backend that was not available in the
+      // first fetch.
       fetchSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve(suggestion4BackendFetchResponse));
 
-      // Return the cached 3rd suggestion and update the cache with the 4th.
+      // Return both the cached 3rd suggestion and the new 4th suggestion to the
+      // caller.
       cars.getUserCreatedQuestionSuggestionsAsync(false)
         .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_3)
             .toEqual(expectedSuggestion3Dict);
-          expect(Object.keys(response.suggestionIdToDetails).length)
-            .toEqual(1);
-          expect(response.more).toBeTrue();
-        });
-
-      flushMicrotasks();
-
-      // No more results from the backend.
-      fetchSuggestionsAsyncSpy.and.returnValue(
-        Promise.resolve({
-          suggestions: [],
-          target_id_to_opportunity_dict: {},
-          next_offset: 4
-        }));
-
-      // Return the cached 4th suggestion.
-      cars.getUserCreatedQuestionSuggestionsAsync(false)
-        .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_4)
             .toEqual(expectedSuggestion4Dict);
           expect(Object.keys(response.suggestionIdToDetails).length)
-            .toEqual(1);
+            .toEqual(2);
           expect(response.more).toBeFalse();
         });
     }));
