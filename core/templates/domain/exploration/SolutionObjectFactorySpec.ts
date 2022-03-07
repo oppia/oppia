@@ -26,15 +26,15 @@ import {
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
-import { Solution, SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
+import { Solution, Solutions } from
+  'domain/exploration/solution.model';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 import { Interaction } from './InteractionObjectFactory';
 
 describe('Solution object factory', () => {
-  describe('SolutionObjectFactory', () => {
-    let sof: SolutionObjectFactory, solution: Solution;
+  describe('Solutions', () => {
+    let sof: Solutions, solution: Solution;
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
@@ -44,7 +44,7 @@ describe('Solution object factory', () => {
           FormatRtePreviewPipe
         ]
       });
-      sof = TestBed.inject(SolutionObjectFactory);
+      sof = TestBed.inject(Solutions);
       solution = sof.createFromBackendDict({
         answer_is_exclusive: false,
         correct_answer: 'This is a correct answer!',

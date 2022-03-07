@@ -20,14 +20,14 @@ import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 
 import { Hint, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { Solution, Solutions } from 'domain/exploration/solution.model';
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 
 describe('HintsAndSolutionManager service', () => {
   let hasms: HintsAndSolutionManagerService;
   let hof: HintObjectFactory;
-  let sof: SolutionObjectFactory;
+  let sof: Solutions;
   let firstHint: Hint;
   let secondHint: Hint;
   let thirdHint: Hint;
@@ -47,7 +47,7 @@ describe('HintsAndSolutionManager service', () => {
       mockNewCardAvailableEmitter);
     hasms = TestBed.inject(HintsAndSolutionManagerService);
     hof = TestBed.inject(HintObjectFactory);
-    sof = TestBed.inject(SolutionObjectFactory);
+    sof = TestBed.inject(Solutions);
 
     firstHint = hof.createFromBackendDict({
       hint_content: {

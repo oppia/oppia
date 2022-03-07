@@ -51,8 +51,8 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
+import { Solutions } from
+  'domain/exploration/solution.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -78,7 +78,7 @@ describe('Exploration editor tab component', function() {
   var routerService = null;
   var siteAnalyticsService = null;
   var stateEditorRefreshService = null;
-  var solutionObjectFactory = null;
+  var solution = null;
   var stateCardIsCheckpointService = null;
   var stateEditorService = null;
   var userExplorationPermissionsService = null;
@@ -116,7 +116,7 @@ describe('Exploration editor tab component', function() {
     explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
     hintObjectFactory = TestBed.get(HintObjectFactory);
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
-    solutionObjectFactory = TestBed.get(SolutionObjectFactory);
+    solution = TestBed.get(Solutions);
     focusManagerService = TestBed.get(FocusManagerService);
   });
 
@@ -564,7 +564,7 @@ describe('Exploration editor tab component', function() {
       explorationStatesService.getState('First State').interaction);
 
     expect(stateEditorService.interaction.solution).toEqual(
-      solutionObjectFactory.createFromBackendDict({
+      solution.createFromBackendDict({
         correct_answer: 'This is the correct answer',
         answer_is_exclusive: false,
         explanation: {
@@ -573,7 +573,7 @@ describe('Exploration editor tab component', function() {
         }
       }));
 
-    var displayedValue = solutionObjectFactory.createFromBackendDict({
+    var displayedValue = solution.createFromBackendDict({
       correct_answer: 'This is the second correct answer',
       answer_is_exclusive: true,
       explanation: {

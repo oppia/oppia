@@ -25,7 +25,7 @@ import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFa
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
@@ -34,7 +34,7 @@ import { Subscription } from 'rxjs';
 describe('Editor state service', () => {
   let ecs: StateEditorService;
   let suof: SubtitledUnicodeObjectFactory;
-  let sof: SolutionObjectFactory;
+  let sof: Solutions;
   let hof: HintObjectFactory;
   let interactionObjectFactory: InteractionObjectFactory;
   let answerGroupObjectFactory: AnswerGroupObjectFactory;
@@ -60,7 +60,7 @@ describe('Editor state service', () => {
 
     ecs = TestBed.inject(StateEditorService);
     suof = TestBed.inject(SubtitledUnicodeObjectFactory);
-    sof = TestBed.inject(SolutionObjectFactory);
+    sof = TestBed.inject(Solutions);
     hof = TestBed.inject(HintObjectFactory);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
@@ -538,7 +538,7 @@ describe('Editor state service', () => {
     // Set 'Hola' as the active state.
     ecs.activeStateName = 'Hola';
     // At present, we are not keeping track of the solution's validity. So, we
-    // initialize the Solution Validity Service with the state. Upon,
+    // initialize the Solutions Validity Service with the state. Upon,
     // initialization the solution validity is set as true.
     expect(ecs.isCurrentSolutionValid()).toBeFalse();
     solutionValidityService.init(['Hola']);

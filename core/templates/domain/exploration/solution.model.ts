@@ -17,9 +17,6 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
   CapitalizePipe
 } from 'filters/string-utility-filters/capitalize.pipe';
@@ -155,10 +152,7 @@ export class Solution {
   }
 }
 
-@Injectable({
-  providedIn: 'root'
-})
-export class SolutionObjectFactory {
+export class Solutions {
   constructor(
     private ehfs: ExplorationHtmlFormatterService) {}
 
@@ -182,8 +176,3 @@ export class SolutionObjectFactory {
         explanationHtml, explanationId));
   }
 }
-
-
-angular.module('oppia').factory(
-  'SolutionObjectFactory',
-  downgradeInjectable(SolutionObjectFactory));

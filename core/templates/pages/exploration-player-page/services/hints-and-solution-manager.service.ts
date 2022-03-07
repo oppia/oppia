@@ -20,7 +20,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { Hint } from 'domain/exploration/HintObjectFactory';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
@@ -32,7 +32,7 @@ export class HintsAndSolutionManagerService {
   // This in initialized using the the class methods
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  solutionForLatestCard!: Solution;
+  solutionForLatestCard!: Solutions;
   // The following are set to null when the timeouts are cleared
   // or when the service is reset.
   timeout: NodeJS.Timeout | null = null;
@@ -139,7 +139,7 @@ export class HintsAndSolutionManagerService {
     }
   }
 
-  reset(newHints: Hint[], newSolution: Solution): void {
+  reset(newHints: Hint[], newSolution: Solutions): void {
     this.numHintsReleased = 0;
     this.numHintsConsumed = 0;
     this.solutionReleased = false;
@@ -180,7 +180,7 @@ export class HintsAndSolutionManagerService {
     return null;
   }
 
-  displaySolution(): Solution {
+  displaySolution(): Solutions {
     this.hintsDiscovered = true;
     this.solutionConsumed = true;
     this._solutionViewedEventEmitter.emit();

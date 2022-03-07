@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
@@ -76,7 +76,7 @@ describe('Solution Verification Service', () => {
 
     siis = TestBed.get(StateInteractionIdService);
     scas = TestBed.get(StateCustomizationArgsService);
-    sof = TestBed.get(SolutionObjectFactory);
+    sof = TestBed.get(Solutions);
     see = TestBed.get(StateEditorService);
     svs = TestBed.get(SolutionVerificationService);
   });

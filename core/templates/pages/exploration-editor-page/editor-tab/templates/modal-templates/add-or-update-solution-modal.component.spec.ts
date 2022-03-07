@@ -22,7 +22,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { ShortAnswerResponse, Solution, SolutionBackendDict, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { ShortAnswerResponse, Solution, SolutionBackendDict, Solutions } from 'domain/exploration/solution.model';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
@@ -48,7 +48,7 @@ describe('Add Or Update Solution Modal Component', () => {
   let currentInteractionService: CurrentInteractionService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let ngbActiveModal: NgbActiveModal;
-  let solutionObjectFactory: SolutionObjectFactory;
+  let solution: Solutions;
   let stateInteractionIdService: StateInteractionIdService;
   let stateSolutionService: StateSolutionService;
 
@@ -82,7 +82,7 @@ describe('Add Or Update Solution Modal Component', () => {
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    solution = TestBed.inject(Solutions);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     stateSolutionService = TestBed.inject(StateSolutionService);
   });
@@ -239,7 +239,7 @@ describe('Add Or Update Solution Modal Component', () => {
       component.saveSolution();
 
       expect(ngbActiveModal.close).toHaveBeenCalledWith({
-        solution: solutionObjectFactory.createNew(
+        solution: solution.createNew(
           true, 'answer', 'Explanation html', 'cont_1')
       });
     });

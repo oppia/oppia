@@ -30,7 +30,7 @@ import { StateSolutionService } from '../state-editor-properties-services/state-
 import { AlertsService } from 'services/alerts.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { HintBackendDict, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 
 class MockStateHintsService {
   displayed = [
@@ -102,7 +102,7 @@ describe('StateHintsEditorComponent', () => {
   let stateInteractionIdService: StateInteractionIdService;
   let stateSolutionService: StateSolutionService;
   let alertsService: AlertsService;
-  let solutionObjectFactory: SolutionObjectFactory;
+  let solution: Solutions;
   let ngbModalSpy: jasmine.Spy;
   let hintObjectFactory: HintObjectFactory;
 
@@ -123,7 +123,7 @@ describe('StateHintsEditorComponent', () => {
         StateInteractionIdService,
         StateSolutionService,
         AlertsService,
-        SolutionObjectFactory,
+        Solutions,
         HintObjectFactory
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -141,10 +141,10 @@ describe('StateHintsEditorComponent', () => {
     stateSolutionService = TestBed.inject(StateSolutionService);
     ngbModal = TestBed.inject(NgbModal);
     alertsService = TestBed.inject(AlertsService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    solution = TestBed.inject(Solutions);
     hintObjectFactory = TestBed.inject(HintObjectFactory);
 
-    stateSolutionService.savedMemento = solutionObjectFactory.createNew(
+    stateSolutionService.savedMemento = solution.createNew(
       true, 'correct_answer', '<p> Hint Index 0 </p>', '0'
     );
 

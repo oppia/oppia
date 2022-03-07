@@ -37,7 +37,7 @@ import { ExternalSaveService } from 'services/external-save.service';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { DeleteHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
 import { DeleteLastHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 
 interface DeleteValueResponse {
   index: number;
@@ -54,7 +54,7 @@ interface AddHintModalResponse {
 })
 export class StateHintsEditorComponent implements OnInit {
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
-  @Output() onSaveSolution = new EventEmitter<Solution>();
+  @Output() onSaveSolution = new EventEmitter<Solutions>();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
     new EventEmitter<string[]>();
 

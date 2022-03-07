@@ -47,7 +47,7 @@ import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
@@ -120,7 +120,7 @@ export class ExplorationStatesService {
     param_specs: (paramSpecs: ParamSpecs) => {
       return paramSpecs.toBackendDict();
     },
-    solution: (solution: Solution) => {
+    solution: (solution: Solutions) => {
       if (solution) {
         return solution.toBackendDict();
       } else {

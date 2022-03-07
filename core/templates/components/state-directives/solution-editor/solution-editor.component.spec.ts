@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for Solution Editor Component.
+ * @fileoverview Unit test for Solutions Editor Component.
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { SolutionEditor } from './solution-editor.component';
 import { EditabilityService } from 'services/editability.service';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -52,11 +52,11 @@ class MockEditabilityService {
   }
 }
 
-describe('Solution editor component', () => {
+describe('Solutions editor component', () => {
   let component: SolutionEditor;
   let fixture: ComponentFixture<SolutionEditor>;
   let editabilityService: EditabilityService;
-  let solutionObjectFactory: SolutionObjectFactory;
+  let solution: Solutions;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -64,7 +64,7 @@ describe('Solution editor component', () => {
         SolutionEditor
       ],
       providers: [
-        SolutionObjectFactory,
+        Solutions,
         {
           provide: EditabilityService,
           useClass: MockEditabilityService
@@ -94,7 +94,7 @@ describe('Solution editor component', () => {
     fixture = TestBed.createComponent(SolutionEditor);
     component = fixture.componentInstance;
 
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    solution = TestBed.inject(Solutions);
     editabilityService = TestBed.inject(EditabilityService);
 
     fixture.detectChanges();
@@ -135,7 +135,7 @@ describe('Solution editor component', () => {
   });
 
   it('should save new solution', () => {
-    let solution = solutionObjectFactory.createNew(
+    let solution = solution.createNew(
       true, null, 'Html', 'XyzID');
     spyOn(component.saveSolution, 'emit').and.stub();
 

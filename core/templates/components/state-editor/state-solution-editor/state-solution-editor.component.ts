@@ -34,7 +34,7 @@ import { StateEditorService } from '../state-editor-properties-services/state-ed
 import { StateHintsService } from '../state-editor-properties-services/state-hints.service';
 import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 import { AppConstants } from 'app.constants';
 import { StateEditorConstants } from '../state-editor.constants';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -50,11 +50,11 @@ interface DeleteValue {
   templateUrl: './state-solution-editor.component.html'
 })
 export class StateSolutionEditorComponent implements OnInit {
-  @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
+  @Output() saveSolution: EventEmitter<Solutions> = new EventEmitter();
   @Output() refreshWarnings: EventEmitter<void> = new EventEmitter();
   @Output() getSolutionChange: EventEmitter<void> = new EventEmitter();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
-  EventEmitter<Solution> = (new EventEmitter());
+  EventEmitter<Solutions> = (new EventEmitter());
 
   correctAnswer: string;
   inlineSolutionEditorIsActive: boolean;
@@ -136,7 +136,7 @@ export class StateSolutionEditorComponent implements OnInit {
     return solutionAsPlainText;
   }
 
-  savedMemento(): Solution {
+  savedMemento(): Solutions {
     return this.stateSolutionService.savedMemento;
   }
 
@@ -149,11 +149,11 @@ export class StateSolutionEditorComponent implements OnInit {
       ].is_linear);
   }
 
-  onSaveSolution(value: Solution): void {
+  onSaveSolution(value: Solutions): void {
     this.saveSolution.emit(value);
   }
 
-  openMarkAllAudioAsNeedingUpdateModalIfRequired(value: Solution): void {
+  openMarkAllAudioAsNeedingUpdateModalIfRequired(value: Solutions): void {
     this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(value);
   }
 

@@ -21,7 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { HintBackendDict } from 'domain/exploration/HintObjectFactory';
-import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { Solution, Solutions } from 'domain/exploration/solution.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
@@ -53,7 +53,7 @@ describe('State Solution Editor Component', () => {
   let windowDimensionsService: WindowDimensionsService;
 
   let solution: Solution;
-  let solutionObjectFactory: SolutionObjectFactory;
+  let solutions: Solutions;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -95,9 +95,9 @@ describe('State Solution Editor Component', () => {
     solutionValidityService = TestBed.inject(SolutionValidityService);
     alertsService = TestBed.inject(AlertsService);
     solutionVerificationService = TestBed.inject(SolutionVerificationService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    solutions = TestBed.inject(Solutions);
 
-    solution = solutionObjectFactory.createFromBackendDict({
+    solution = solutions.createFromBackendDict({
       answer_is_exclusive: false,
       correct_answer: 'This is a correct answer!',
       explanation: {

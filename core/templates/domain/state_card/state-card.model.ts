@@ -28,7 +28,7 @@ import { BindableVoiceovers, RecordedVoiceovers } from
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Hint } from 'domain/exploration/HintObjectFactory';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 
 import { WrittenTranslations } from
   'domain/exploration/WrittenTranslationsObjectFactory';
@@ -126,7 +126,7 @@ export class StateCard {
 
   // A null 'solution' indicates that this Interaction does not have a hint
   // or there is a hint, but no solution.
-  getSolution(): Solution | null {
+  getSolution(): Solutions | null {
     return this.getInteraction().solution;
   }
 

@@ -34,13 +34,13 @@ import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 import { Voiceover } from 'domain/exploration/voiceover.model';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 
 
 describe('State card object factory', () => {
   let interactionObjectFactory: InteractionObjectFactory;
   let hintObjectFactory: HintObjectFactory;
-  let solutionObjectFactory: SolutionObjectFactory;
+  let solutions: Solutions;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let _sampleCard1: StateCard;
@@ -53,7 +53,7 @@ describe('State card object factory', () => {
 
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     hintObjectFactory = TestBed.inject(HintObjectFactory);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    solutions = TestBed.inject(Solutions);
     writtenTranslationsObjectFactory = TestBed.inject(
       WrittenTranslationsObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
@@ -294,7 +294,7 @@ describe('State card object factory', () => {
   });
 
   it('should get interaction solution', () => {
-    let expectedResult = solutionObjectFactory.createFromBackendDict({
+    let expectedResult = solutions.createFromBackendDict({
       answer_is_exclusive: true,
       correct_answer: 'correct answer',
       explanation: {

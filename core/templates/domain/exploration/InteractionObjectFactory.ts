@@ -27,8 +27,8 @@ import { HintBackendDict, Hint, HintObjectFactory } from
   'domain/exploration/HintObjectFactory';
 import { OutcomeBackendDict, Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { SolutionBackendDict, Solution, SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
+import { SolutionBackendDict, Solution, Solutions } from
+  'domain/exploration/solution.model';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import {
   AlgebraicExpressionInputCustomizationArgs,
@@ -249,7 +249,7 @@ export class InteractionObjectFactory {
   constructor(
       private answerGroupFactory: AnswerGroupObjectFactory,
       private hintFactory: HintObjectFactory,
-      private solutionFactory: SolutionObjectFactory,
+      private solutionFactory: Solutions,
       private outcomeFactory: OutcomeObjectFactory,
       private subtitledUnicodeFactory: SubtitledUnicodeObjectFactory,
   ) {}

@@ -23,7 +23,7 @@ import { EditabilityService } from 'services/editability.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 
 interface ExplanationFormSchema {
   type: string;
@@ -35,7 +35,7 @@ interface ExplanationFormSchema {
   templateUrl: './solution-editor.component.html'
 })
 export class SolutionEditor implements OnInit {
-  @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
+  @Output() saveSolution: EventEmitter<Solutions> = new EventEmitter();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
     EventEmitter<string[]> = new EventEmitter();
 
@@ -59,7 +59,7 @@ export class SolutionEditor implements OnInit {
       this.stateCustomizationArgsService.savedMemento);
   }
 
-  updateNewSolution(value: Solution): void {
+  updateNewSolution(value: Solutions): void {
     this.saveSolution.emit(value);
   }
 

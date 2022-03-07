@@ -28,7 +28,7 @@ import { InteractionAnswer } from 'interactions/answer-defs';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { Solution, Solutions } from 'domain/exploration/solution.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 interface HtmlFormSchema {
@@ -78,7 +78,7 @@ export class AddOrUpdateSolutionModalComponent
     private currentInteractionService: CurrentInteractionService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private ngbActiveModal: NgbActiveModal,
-    private solutionObjectFactory: SolutionObjectFactory,
+    private solution: Solutions,
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateInteractionIdService: StateInteractionIdService,
     private stateSolutionService: StateSolutionService
@@ -128,7 +128,7 @@ export class AddOrUpdateSolutionModalComponent
        this.data.correctAnswer !== null &&
         this.data.explanation !== '') {
       this.ngbActiveModal.close({
-        solution: this.solutionObjectFactory.createNew(
+        solution: this.solution.createNew(
           this.data.answerIsExclusive,
           this.data.correctAnswer,
           this.data.explanationHtml,

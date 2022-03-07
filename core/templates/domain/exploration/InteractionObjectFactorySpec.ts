@@ -27,8 +27,8 @@ import { InteractionObjectFactory, Interaction, InteractionBackendDict } from
   'domain/exploration/InteractionObjectFactory';
 import { OutcomeBackendDict, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { SolutionBackendDict, SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
+import { SolutionBackendDict, Solutions } from
+  'domain/exploration/solution.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -40,7 +40,7 @@ describe('Interaction object factory', () => {
   let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
   let hof: HintObjectFactory;
-  let sof: SolutionObjectFactory;
+  let sof: Solutions;
   let answerGroupsDict: AnswerGroupBackendDict[];
   let defaultOutcomeDict: OutcomeBackendDict;
   let solutionDict: SolutionBackendDict;
@@ -55,7 +55,7 @@ describe('Interaction object factory', () => {
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
     hof = TestBed.inject(HintObjectFactory);
-    sof = TestBed.inject(SolutionObjectFactory);
+    sof = TestBed.inject(Solutions);
     defaultOutcomeDict = {
       dest: 'dest_default',
       feedback: {

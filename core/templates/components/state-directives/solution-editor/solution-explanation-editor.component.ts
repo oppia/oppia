@@ -23,7 +23,7 @@ import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 
 interface ExplanationFormSchema {
   type: string;
@@ -36,7 +36,7 @@ interface ExplanationFormSchema {
 })
 export class SolutionExplanationEditor
   implements OnDestroy, OnInit {
-  @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
+  @Output() saveSolution: EventEmitter<Solutions> = new EventEmitter();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
     EventEmitter<string[]> = new EventEmitter();
 

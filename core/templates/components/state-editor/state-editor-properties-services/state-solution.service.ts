@@ -19,14 +19,14 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 import { StatePropertyService } from 'components/state-editor/state-editor-properties-services/state-property.service';
 import { UtilsService } from 'services/utils.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class StateSolutionService extends StatePropertyService<Solution> {
+export class StateSolutionService extends StatePropertyService<Solutions> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveSolution';

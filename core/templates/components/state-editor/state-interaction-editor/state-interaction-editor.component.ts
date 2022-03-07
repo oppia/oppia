@@ -39,7 +39,7 @@ import { StateContentService } from '../state-editor-properties-services/state-c
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { Solutions } from 'domain/exploration/solution.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { State } from 'domain/state/StateObjectFactory';
@@ -58,7 +58,7 @@ export class StateInteractionEditorComponent
 
   @Output() onSaveInteractionId = new EventEmitter<string>();
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
-  @Output() onSaveSolution = new EventEmitter<Solution>();
+  @Output() onSaveSolution = new EventEmitter<Solutions>();
   @Output() onSaveStateContent = new EventEmitter<SubtitledHtml>();
   @Output() recomputeGraph = new EventEmitter<void>();
 

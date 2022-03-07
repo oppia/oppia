@@ -371,8 +371,8 @@ import { SkillMasteryBackendApiService } from
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service';
-import { SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
+import { Solutions } from
+  'domain/exploration/solution.model';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { SpeechSynthesisChunkerService } from
@@ -1203,7 +1203,7 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
 
     // Topological level: 6.
-    upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
+    upgradedServices['Solutions'] = new Solutions(
       upgradedServices['ExplorationHtmlFormatterService']);
     upgradedServices['StateInteractionStatsService'] =
       new StateInteractionStatsService(
@@ -1220,7 +1220,7 @@ export class UpgradedServices {
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
       upgradedServices['AnswerGroupObjectFactory'],
       upgradedServices['HintObjectFactory'],
-      upgradedServices['SolutionObjectFactory'],
+      upgradedServices['Solutions'],
       upgradedServices['OutcomeObjectFactory'],
       upgradedServices['SubtitledUnicodeObjectFactory']);
 

@@ -89,7 +89,7 @@ angular.module('oppia').directive('oppiaRoot', [
               'SchemaDefaultValueService',
               'SchemaUndefinedLastElementService', 'SidebarStatusService',
               'SiteAnalyticsService', 'SkillObjectFactory',
-              'SolutionObjectFactory', 'SpeechSynthesisChunkerService',
+              'Solutions', 'SpeechSynthesisChunkerService',
               'StateClassifierMappingService', 'StateInteractionStatsService',
               'StateObjectFactory', 'StateTopAnswersStatsBackendApiService',
               'StateTopAnswersStatsService', 'StatesObjectFactory',
