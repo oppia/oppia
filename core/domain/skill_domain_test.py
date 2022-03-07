@@ -1221,74 +1221,40 @@ class CategorizedSkillsTests(test_utils.GenericTestBase):
     def setUp(self):
         super(CategorizedSkillsTests, self).setUp()
         self.categorized_skills = skill_domain.CategorizedSkills()
+        self.subtopic_titles = ['Subtopic Title 1', 'Subtopic Title 2']
+        self.categorized_skills.add_topic('Topic Name', self.subtopic_titles)
 
-    def test_topic_name_gets_added(self):
-        self.categorized_skills.add_topic('Topic Name')
-
-        self.assertEqual(self.categorized_skills.to_dict(), {
-            'Topic Name': {}
-        })
-
-    def test_uncategorized_skills_get_initialized(self):
-        self.categorized_skills.add_topic('Topic Name')
-        self.categorized_skills.initialize_uncategorized_skills('Topic Name')
+    def test_uncategorized_skill_gets_added(self):
+        self.categorized_skills.add_uncategorized_skill(
+            'Topic Name', 'skill_1', 'Description 1')
 
         self.assertEqual(self.categorized_skills.to_dict(), {
             'Topic Name': {
-                'uncategorized': []
+                'uncategorized': [{
+                    'skill_id': 'skill_1',
+                    'skill_description': 'Description 1',
+                }],
+                'Subtopic Title 1': [],
+                'Subtopic Title 2': []
             }
         })
 
-    def test_subtopic_skills_get_initialized(self):
-        self.categorized_skills.add_topic('Topic Name')
-        self.categorized_skills.initialize_uncategorized_skills('Topic Name')
-        self.categorized_skills.initialize_subtopic_skills(
-            'Topic Name', 'Subtopic Title')
+    def test_subtopic_skill_gets_added(self):
+        self.categorized_skills.add_subtopic_skill(
+            'Topic Name', 'Subtopic Title 1','skill_2', 'Description 2')
+        self.categorized_skills.add_subtopic_skill(
+            'Topic Name', 'Subtopic Title 2','skill_3', 'Description 3')
 
         self.assertEqual(self.categorized_skills.to_dict(), {
             'Topic Name': {
                 'uncategorized': [],
-                'Subtopic Title': []
-            }
-        })
-
-    def test_uncategorized_skills_get_updated(self):
-        self.categorized_skills.add_topic('Topic Name')
-        self.categorized_skills.initialize_uncategorized_skills('Topic Name')
-        self.categorized_skills.initialize_subtopic_skills(
-            'Topic Name', 'Subtopic Title')
-        self.categorized_skills.update_uncategorized_skills(
-            'Topic Name', 'uncategorized_skill', 'Description 3')
-
-        self.assertEqual(self.categorized_skills.to_dict(), {
-            'Topic Name': {
-                'uncategorized': [{
-                    'skill_id': 'uncategorized_skill',
-                    'skill_description': 'Description 3',
+                'Subtopic Title 1': [{
+                    'skill_id': 'skill_2',
+                    'skill_description': 'Description 2'
                 }],
-                'Subtopic Title': []
-            }
-        })
-
-    def test_subtopic_skills_get_updated(self):
-        self.categorized_skills.add_topic('Topic Name')
-        self.categorized_skills.initialize_uncategorized_skills('Topic Name')
-        self.categorized_skills.initialize_subtopic_skills(
-            'Topic Name', 'Subtopic Title')
-        self.categorized_skills.update_uncategorized_skills(
-            'Topic Name', 'uncategorized_skill', 'Description 3')
-        self.categorized_skills.update_subtopic_skills(
-            'Topic Name', 'Subtopic Title', 'subtopic_skill', 'Subtopic Skill')
-
-        self.assertEqual(self.categorized_skills.to_dict(), {
-            'Topic Name': {
-                'uncategorized': [{
-                    'skill_id': 'uncategorized_skill',
-                    'skill_description': 'Description 3',
-                }],
-                'Subtopic Title': [{
-                    'skill_id': 'subtopic_skill',
-                    'skill_description': 'Subtopic Skill'
+                'Subtopic Title 2': [{
+                    'skill_id': 'skill_3',
+                    'skill_description': 'Description 3'
                 }]
             }
         })

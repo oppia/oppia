@@ -1195,8 +1195,9 @@ def get_categorized_skill_ids_and_descriptions():
 
     for topic in topics:
         subtopics = topic.subtopics
-        categorized_skills.add_topic(topic.name)
-        categorized_skills.initialize_uncategorized_skills(topic.name)
+        subtopic_titles = [subtopic.title for subtopic in subtopics]
+        categorized_skills.add_topic(topic.name, subtopic_titles)
+
         for skill_id in topic.uncategorized_skill_ids:
             skill_ids.append(skill_id)
             skill_ids_and_details.append({
@@ -1205,8 +1206,6 @@ def get_categorized_skill_ids_and_descriptions():
                 'subtopic_title': None
             })
         for subtopic in subtopics:
-            categorized_skills.initialize_subtopic_skills(
-                topic.name, subtopic.title)
             for skill_id in subtopic.skill_ids:
                 skill_ids.append(skill_id)
                 skill_ids_and_details.append({
@@ -1224,10 +1223,10 @@ def get_categorized_skill_ids_and_descriptions():
         subtopic_title = skill_detail['subtopic_title']
 
         if subtopic_title is None:
-            categorized_skills.update_uncategorized_skills(
+            categorized_skills.add_uncategorized_skill(
                 topic_name, skill_id, skill_description)
         else:
-            categorized_skills.update_subtopic_skills(
+            categorized_skills.add_subtopic_skill(
                 topic_name, subtopic_title, skill_id, skill_description)
 
     return categorized_skills.to_dict()
