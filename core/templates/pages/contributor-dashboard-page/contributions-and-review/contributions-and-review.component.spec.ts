@@ -49,9 +49,6 @@ describe('Contributions and review component', function() {
   var skillBackendApiService = null;
   var skillObjectFactory = null;
   var userService = null;
-  var TranslationTopicService = null;
-  var ContributionOpportunitiesService = null;
-  var LocalStorageService = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -69,10 +66,6 @@ describe('Contributions and review component', function() {
     }));
 
     beforeEach(angular.mock.inject(function($injector, $componentController) {
-      ContributionOpportunitiesService =
-        $injector.get('ContributionOpportunitiesService');
-      LocalStorageService = $injector.get('LocalStorageService');
-      TranslationTopicService = $injector.get('TranslationTopicService');
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
@@ -88,11 +81,6 @@ describe('Contributions and review component', function() {
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
 
-      spyOn(ContributionOpportunitiesService, 'getAllTopicNamesAsync')
-        .and.returnValue($q.resolve(['Topic 1', 'Topic 2']));
-      spyOn(LocalStorageService, 'getLastSelectedTranslationTopicName').and
-        .returnValue('Topic 1');
-      spyOn(TranslationTopicService, 'setActiveTopicName').and.callThrough();
       spyOn(userService, 'getUserInfoAsync')
         .and.returnValue($q.resolve({
           isLoggedIn: () => true
@@ -260,19 +248,6 @@ describe('Contributions and review component', function() {
           });
         });
     });
-
-    it('should change active topic when clicking on topic selector',
-      function() {
-        spyOn(LocalStorageService, 'updateLastSelectedTranslationTopicName')
-          .and.callThrough();
-
-        ctrl.onChangeTopic('Topic 2');
-
-        expect(TranslationTopicService.setActiveTopicName)
-          .toHaveBeenCalledWith('Topic 2');
-        expect(LocalStorageService.updateLastSelectedTranslationTopicName)
-          .toHaveBeenCalledWith('Topic 2');
-      });
 
     it('should open show translation suggestion modal when clicking on' +
       ' suggestion', function() {
