@@ -1804,7 +1804,7 @@ class CategorizedSkills:
             subtopic_titles: list(str). The list of subtopic titles of the
                 topic.
         """
-        if topic_name in self.categorized_skills.keys():
+        if topic_name in self.categorized_skills:
             raise utils.ValidationError(
                 'Topic name \'%s\' is already added.' % topic_name)
 
@@ -1847,11 +1847,11 @@ class CategorizedSkills:
 
         Args:
             topic_name: str. The name of the topic.
-        
+
         Raises:
             ValidationError. Topic name is not added.
         """
-        if not topic_name in self.categorized_skills.keys():
+        if not topic_name in self.categorized_skills:
             raise utils.ValidationError(
                 'Topic name \'%s\' is not added.' % topic_name)
 
@@ -1862,7 +1862,7 @@ class CategorizedSkills:
         Args:
             topic_name: str. The name of the topic.
             subtopic_title: str. The name of the subtopic.
-        
+
         Raises:
             ValidationError. Subtopic name is not added.
         """
@@ -1874,9 +1874,9 @@ class CategorizedSkills:
         """Returns a dictionary representation of this domain object."""
         categorized_skills_dict = copy.deepcopy(self.categorized_skills)
 
-        for topic_name in categorized_skills_dict.keys():
+        for topic_name in categorized_skills_dict:
             # The key 'uncategorized' will also be covered by this loop.
-            for subtopic_title in categorized_skills_dict[topic_name].keys():
+            for subtopic_title in categorized_skills_dict[topic_name]:
                 categorized_skills_dict[topic_name][subtopic_title] = [
                     short_skill_summary.to_dict() for short_skill_summary in
                     categorized_skills_dict[topic_name][subtopic_title]

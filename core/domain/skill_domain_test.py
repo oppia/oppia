@@ -1254,9 +1254,9 @@ class CategorizedSkillsTests(test_utils.GenericTestBase):
 
     def test_subtopic_skill_gets_added(self):
         self.categorized_skills.add_subtopic_skill(
-            'Topic Name', 'Subtopic Title 1','skill_2', 'Description 2')
+            'Topic Name', 'Subtopic Title 1', 'skill_2', 'Description 2')
         self.categorized_skills.add_subtopic_skill(
-            'Topic Name', 'Subtopic Title 2','skill_3', 'Description 3')
+            'Topic Name', 'Subtopic Title 2', 'skill_3', 'Description 3')
 
         self.assertEqual(self.categorized_skills.to_dict(), {
             'Topic Name': {
