@@ -33,18 +33,17 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(IssueRegistryUnitTests, self).setUp()
         self.issues_dict = {
-            'EarlyQuit': (
-                EarlyQuit.EarlyQuit),
+            'EarlyQuit': EarlyQuit.EarlyQuit,
             'CyclicStateTransitions': (
                 CyclicStateTransitions.CyclicStateTransitions),
             'MultipleIncorrectSubmissions': (
                 MultipleIncorrectSubmissions.MultipleIncorrectSubmissions)
-            }
+        }
         self.invalid_issue_type = 'InvalidIssueType'
 
     def tearDown(self):
-        super(IssueRegistryUnitTests, self).tearDown()
         playthrough_issue_registry.Registry._issues = {} # pylint: disable=protected-access
+        super(IssueRegistryUnitTests, self).tearDown()
 
     def test_issue_registry(self):
         """Do some sanity checks on the issue registry."""
@@ -55,14 +54,14 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         """Tests issue registry for fetching of issue instances of correct
         issue types.
         """
-        for issue_type, instance in self.issues_dict.items():
+        for issue_type, _class in self.issues_dict.items():
             self.assertIsInstance(
                 playthrough_issue_registry.Registry.get_issue_by_type(
-                    issue_type), instance)
+                    issue_type), _class)
 
     def test_incorrect_issue_registry_types(self):
-        """Tests issue registry for raising error on passing incorrect issues
-        types.
+        """Tests that an error is raised when fetching an incorrect issue
+        type.
         """
         with self.assertRaisesRegex(utils.ValidationError, (
             'Invalid issue type: %s' % self.invalid_issue_type)):
