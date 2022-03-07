@@ -34,45 +34,44 @@ class MockTruncteAndCapitalizePipe {
     return value;
   }
 }
- 
- describe('Lesson Information card modal component', () => {
-   let fixture: ComponentFixture<LessonInformationCardModalComponent>;
-   let componentInstance: LessonInformationCardModalComponent;
-   let urlService: UrlService;
-   let i18nLanguageCodeService: I18nLanguageCodeService;
+
+describe('Lesson Information card modal component', () => {
+  let fixture: ComponentFixture<LessonInformationCardModalComponent>;
+  let componentInstance: LessonInformationCardModalComponent;
+  let urlService: UrlService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
-  let expDesc = 'Exploration Objective'
+  let expDesc = 'Exploration Objective';
   let rating: ExplorationRatings;
   let storyId = 'storyId';
   let nodeId = 'nodeId';
- 
-   beforeEach(waitForAsync(() => {
-     TestBed.configureTestingModule({
-       imports: [
-         HttpClientTestingModule
-       ],
-       declarations: [
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
         LessonInformationCardModalComponent,
         MockTranslatePipe,
         MockTruncteAndCapitalizePipe,
-       ],
-       providers: [
-         NgbActiveModal,
-         PlayerTranscriptService,
-         ExplorationEngineService,
-
-       ],
-       schemas: [NO_ERRORS_SCHEMA]
-     }).compileComponents();
-   }));
+      ],
+      providers: [
+        NgbActiveModal,
+        PlayerTranscriptService,
+        ExplorationEngineService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
  
-   beforeEach(() => {
-     fixture = TestBed.createComponent(LessonInformationCardModalComponent);
-     componentInstance = fixture.componentInstance;
+  beforeEach(() => {
+    fixture = TestBed.createComponent(LessonInformationCardModalComponent);
+    componentInstance = fixture.componentInstance;
 
-     componentInstance.expInfo = {
+    componentInstance.expInfo = {
       category: '',
       community_owned: true,
       activity_type: '',
@@ -105,8 +104,7 @@ class MockTruncteAndCapitalizePipe {
       .and.returnValue(true);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
       .and.returnValue(false);
-
-   });
+  });
 
   it('should intialize the component and set values', fakeAsync(() => {
     componentInstance.ngOnInit();
@@ -131,7 +129,7 @@ class MockTruncteAndCapitalizePipe {
 
   it('should set hasStoryTitle true when' +
       'storyId is not undefined',
-    fakeAsync(() => {
+  fakeAsync(() => {
     spyOn(urlService, 'getUrlParams').and.returnValue({
       story_id: storyId,
       node_id: nodeId
@@ -143,9 +141,9 @@ class MockTruncteAndCapitalizePipe {
       'I18N_STORY_storyId_TITLE');
   }));
 
-  it('should set hasStoryTitle false when' + 
+  it('should set hasStoryTitle false when' +
       'storyId is undefined',
-    fakeAsync(() => {
+  fakeAsync(() => {
     spyOn(urlService, 'getUrlParams').and.returnValue({
       story_id: undefined,
       node_id: undefined
@@ -155,4 +153,4 @@ class MockTruncteAndCapitalizePipe {
     expect(componentInstance.hasStoryTitle).toBe(false);
   }));
 });
- 
+
