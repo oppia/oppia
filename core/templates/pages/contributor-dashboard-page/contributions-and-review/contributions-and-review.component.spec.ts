@@ -80,7 +80,6 @@ describe('Contributions and review component', function() {
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
-
       spyOn(userService, 'getUserInfoAsync')
         .and.returnValue($q.resolve({
           isLoggedIn: () => true
