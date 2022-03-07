@@ -66,7 +66,7 @@ describe('Lesson Information card modal component', () => {
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
- 
+
   beforeEach(() => {
     fixture = TestBed.createComponent(LessonInformationCardModalComponent);
     componentInstance = fixture.componentInstance;
@@ -153,4 +153,3 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.hasStoryTitle).toBe(false);
   }));
 });
-
