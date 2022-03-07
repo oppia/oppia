@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import utils
 from core.domain import playthrough_issue_registry
 from core.tests import test_utils
 from extensions.issues.CyclicStateTransitions import CyclicStateTransitions
@@ -63,11 +62,6 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         """Tests that an error is raised when fetching an incorrect issue
         type.
         """
-        with self.assertRaisesRegex(utils.ValidationError, (
-            'Invalid issue type: %s' % self.invalid_issue_type)):
-            try:
-                playthrough_issue_registry.Registry.get_issue_by_type(
-                    self.invalid_issue_type)
-            except KeyError as e:
-                raise utils.ValidationError('Invalid issue type: %s' % (
-                    self.invalid_issue_type)) from e
+        with self.assertRaisesRegex(KeyError, self.invalid_issue_type):
+            playthrough_issue_registry.Registry.get_issue_by_type(
+                self.invalid_issue_type)
