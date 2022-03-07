@@ -65,8 +65,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/email_manager_test.py',
     'core/domain/email_services.py',
     'core/domain/email_services_test.py',
-    'core/domain/email_subscription_services.py',
-    'core/domain/email_subscription_services_test.py',
     'core/domain/event_services.py',
     'core/domain/event_services_test.py',
     'core/domain/exp_domain.py',

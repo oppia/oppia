@@ -24,6 +24,13 @@ from core.domain import subscription_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Sequence
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import email_models
+    from mypy_imports import user_models
+
 (email_models, user_models) = models.Registry.import_models([
     models.NAMES.email, models.NAMES.user])
 
@@ -39,19 +46,19 @@ class InformSubscribersTest(test_utils.EmailTestBase):
     USER_NAME_2 = 'user2'
     USER_EMAIL_2 = 'user2@test.com'
 
-    def setUp(self):
-        super(InformSubscribersTest, self).setUp()
+    def setUp(self) -> None:
+        super(InformSubscribersTest, self).setUp()  # type: ignore[no-untyped-call]
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.USER_EMAIL, self.USER_NAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.USER_EMAIL_2, self.USER_NAME_2)
 
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.user_id_2 = self.get_user_id_from_email(self.USER_EMAIL_2)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_id_2 = self.get_user_id_from_email(self.USER_EMAIL_2)  # type: ignore[no-untyped-call]
 
-        self.exploration = self.save_new_default_exploration(
+        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
             'A', self.editor_id, title='Title')
 
         self.can_send_emails_ctx = self.swap(
@@ -59,12 +66,12 @@ class InformSubscribersTest(test_utils.EmailTestBase):
         self.can_send_subscription_email_ctx = self.swap(
             feconf, 'CAN_SEND_SUBSCRIPTION_EMAILS', True)
 
-    def test_inform_subscribers(self):
-        subscription_services.subscribe_to_creator(
+    def test_inform_subscribers(self) -> None:
+        subscription_services.subscribe_to_creator(  # type: ignore[no-untyped-call]
             self.user_id_2, self.editor_id)
-        subscription_services.subscribe_to_creator(
+        subscription_services.subscribe_to_creator(  # type: ignore[no-untyped-call]
             self.new_user_id, self.editor_id)
-        subscription_services.subscribe_to_creator(
+        subscription_services.subscribe_to_creator(  # type: ignore[no-untyped-call]
             self.user_id, self.editor_id)
 
         email_preferences_model = user_models.UserEmailPreferencesModel.get(
@@ -84,17 +91,18 @@ class InformSubscribersTest(test_utils.EmailTestBase):
             # Make sure correct number of emails is sent and no email is sent
             # to the person who has unsubscribed from subscription emails.
             messages = (
-                self._get_sent_email_messages(self.NEW_USER_EMAIL))
+                self._get_sent_email_messages(self.NEW_USER_EMAIL))  # type: ignore[no-untyped-call]
             self.assertEqual(len(messages), 1)
             messages = (
-                self._get_sent_email_messages(self.NEW_USER_EMAIL))
+                self._get_sent_email_messages(self.NEW_USER_EMAIL))  # type: ignore[no-untyped-call]
             self.assertEqual(len(messages), 1)
             messages = (
-                self._get_sent_email_messages(self.USER_EMAIL_2))
+                self._get_sent_email_messages(self.USER_EMAIL_2))  # type: ignore[no-untyped-call]
             self.assertEqual(len(messages), 0)
 
             # Make sure correct email models are stored.
-            all_models = email_models.SentEmailModel.get_all().fetch()
+            all_models: Sequence[email_models.SentEmailModel] = (
+                email_models.SentEmailModel.get_all().fetch())
             self.assertEqual(True, any(
                 model.recipient_id == self.user_id for model in all_models))
             self.assertEqual(True, any(
