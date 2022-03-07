@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
+from core import android_validation_constants, feconf
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -70,7 +70,13 @@ class TopicEditorStoryHandler(base.BaseHandler):
             },
             'description': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': (
+                            android_validation_constants.
+                                MAX_CHARS_IN_STORY_DESCRIPTION)
+                    }]
                 }
             },
             'filename': {
