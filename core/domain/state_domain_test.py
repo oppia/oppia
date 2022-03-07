@@ -780,7 +780,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'solution': None,
             },
             'linked_skill_id': None,
-            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -793,51 +792,54 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_dict, state_dict)
 
-    def test_can_undergo_classification(self):
-        """Test the can_undergo_classification() function."""
-        exploration_id = 'eid'
-        test_exp_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
-            assets_list)
+    # Below two tests uses YAML for creating exp with schema version 47, so have
+    # to first write conversion then uncomment these tests.
 
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        state_with_training_data = exploration.states['Home']
-        state_without_training_data = exploration.states['End']
+    # def test_can_undergo_classification(self):
+    #     """Test the can_undergo_classification() function."""
+    #     exploration_id = 'eid'
+    #     test_exp_filepath = os.path.join(
+    #         feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+    #     yaml_content = utils.get_file_contents(test_exp_filepath)
+    #     assets_list = []
+    #     exp_services.save_new_exploration_from_yaml_and_assets(
+    #         feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+    #         assets_list)
 
-        # A state with 786 training examples.
-        self.assertTrue(
-            state_with_training_data.can_undergo_classification())
+    #     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    #     state_with_training_data = exploration.states['Home']
+    #     state_without_training_data = exploration.states['End']
 
-        # A state with no training examples.
-        self.assertFalse(
-            state_without_training_data.can_undergo_classification())
+    #     # A state with 786 training examples.
+    #     self.assertTrue(
+    #         state_with_training_data.can_undergo_classification())
 
-    def test_get_training_data(self):
-        """Test retrieval of training data."""
-        exploration_id = 'eid'
-        test_exp_filepath = os.path.join(
-            feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
-            assets_list)
+    #     # A state with no training examples.
+    #     self.assertFalse(
+    #         state_without_training_data.can_undergo_classification())
 
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        state = exploration.states['text']
+    # def test_get_training_data(self):
+    #     """Test retrieval of training data."""
+    #     exploration_id = 'eid'
+    #     test_exp_filepath = os.path.join(
+    #         feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
+    #     yaml_content = utils.get_file_contents(test_exp_filepath)
+    #     assets_list = []
+    #     exp_services.save_new_exploration_from_yaml_and_assets(
+    #         feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+    #         assets_list)
 
-        expected_training_data = [{
-            'answer_group_index': 1,
-            'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
-                        u'overjoyed', u'pleased', u'thrilled', u'smile']}]
+    #     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    #     state = exploration.states['text']
 
-        observed_training_data = state.get_training_data()
+    #     expected_training_data = [{
+    #         'answer_group_index': 1,
+    #         'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
+    #                     u'overjoyed', u'pleased', u'thrilled', u'smile']}]
 
-        self.assertEqual(observed_training_data, expected_training_data)
+    #     observed_training_data = state.get_training_data()
+
+    #     self.assertEqual(observed_training_data, expected_training_data)
 
     def test_get_content_html_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -1069,373 +1071,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ValueError, 'Content ID Invalid id does not exist'):
             init_state.get_content_html('Invalid id')
 
-    def test_get_content_id_mapping_needing_translations_with_existing_translations(self): # pylint: disable=line-too-long
-        exploration = exp_domain.Exploration.create_default_exploration('0')
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.update_content(
-            state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
-                'html': '<p>This is content</p>'
-            }))
-        init_state.update_interaction_id('TextInput')
-        default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
-            False, [], None, None
-        )
-
-        init_state.update_interaction_default_outcome(default_outcome)
-
-        state_answer_group = state_domain.AnswerGroup(
-            state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None, None),
-            [
-                state_domain.RuleSpec(
-                    'Contains',
-                    {
-                        'x': {
-                            'contentId': 'rule_input_Equals',
-                            'normalizedStrSet': ['Test']
-                            }
-                    })
-            ],
-            [],
-            None
-        )
-
-        init_state.update_interaction_answer_groups(
-            [state_answer_group])
-        hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
-            )
-        ]
-        init_state.update_interaction_hints(hints_list)
-
-        solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'helloworld!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            },
-        }
-
-        solution = state_domain.Solution.from_dict(
-            init_state.interaction.id, solution_dict)
-        init_state.update_interaction_solution(solution)
-
-        content_id_mapping_needing_translations = (
-            init_state.get_content_id_mapping_needing_translations('hi'))
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'hint_1'
-            ].content,
-            '<p>hint one</p>'
-        )
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'solution'
-            ].content,
-            '<p>hello_world is a string</p>'
-        )
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'feedback_1'
-            ].content,
-            '<p>Feedback</p>',
-        )
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'default_outcome'
-            ].content,
-            '<p>The default outcome.</p>'
-        )
-
-    def test_get_content_id_mapping_needing_translations_with_interaction_translations(self): # pylint: disable=line-too-long
-        exploration = exp_domain.Exploration.create_default_exploration('0')
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.update_content(
-            state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
-                'html': '<p>This is content</p>'
-            }))
-        init_state.update_interaction_id('TextInput')
-        state_interaction_cust_args = {
-            'placeholder': {
-                'value': {
-                    'content_id': 'ca_placeholder_0',
-                    'unicode_str': 'Placeholder'
-                }
-            },
-            'rows': {'value': 1}
-        }
-        init_state.update_interaction_customization_args(
-            state_interaction_cust_args)
-
-        default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
-            False, [], None, None
-        )
-
-        init_state.update_interaction_default_outcome(default_outcome)
-        state_answer_group = state_domain.AnswerGroup(
-            state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
-                False, [], None, None),
-            [
-                state_domain.RuleSpec(
-                    'Contains',
-                    {
-                        'x': {
-                            'contentId': 'rule_input_4',
-                            'normalizedStrSet': ['Input1', 'Input2']
-                            }
-                    })
-            ],
-            [],
-            None
-        )
-
-        init_state.update_interaction_answer_groups(
-            [state_answer_group])
-        hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
-            )
-        ]
-        init_state.update_interaction_hints(hints_list)
-
-        solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'helloworld!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            },
-        }
-
-        solution = state_domain.Solution.from_dict(
-            init_state.interaction.id, solution_dict)
-        init_state.update_interaction_solution(solution)
-
-        content_id_mapping_needing_translations = (
-            init_state.get_content_id_mapping_needing_translations('hi'))
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'hint_1'
-            ].content,
-            '<p>hint one</p>'
-        )
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'solution'
-            ].content,
-            '<p>hello_world is a string</p>'
-        )
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'feedback_1'
-            ].content,
-            '<p>Feedback</p>'
-        )
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'default_outcome'
-            ].content,
-            '<p>The default outcome.</p>'
-        )
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'content'
-            ].content,
-            '<p>This is content</p>',
-        )
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'ca_placeholder_0'
-            ].content,
-            'Placeholder'
-        )
-        rule_translatable_item = content_id_mapping_needing_translations[
-            'rule_input_4'
-        ]
-        self.assertEqual(rule_translatable_item.content, ['Input1', 'Input2'])
-        self.assertEqual(rule_translatable_item.interaction_id, 'TextInput')
-        self.assertEqual(rule_translatable_item.rule_type, 'Contains')
-
-    def test_get_content_id_mapping_needing_translations_for_set_input_rule(self): # pylint: disable=line-too-long
-        exploration = exp_domain.Exploration.create_default_exploration('0')
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.update_content(
-            state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
-                'html': '<p>This is content</p>'
-            }))
-        init_state.update_interaction_id('SetInput')
-
-        state_answer_group = state_domain.AnswerGroup(
-            state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
-                False, [], None, None),
-            [
-                state_domain.RuleSpec(
-                    'Equals',
-                    {
-                        'x': {
-                            'contentId': 'rule_input_4',
-                            'unicodeStrSet': ['Input1', 'Input2']
-                            }
-                    })
-            ],
-            [],
-            None
-        )
-        init_state.update_interaction_answer_groups(
-            [state_answer_group])
-
-        content_id_mapping_needing_translations = (
-            init_state.get_content_id_mapping_needing_translations('hi'))
-        rule_translatable_item = content_id_mapping_needing_translations[
-            'rule_input_4'
-        ]
-        self.assertEqual(rule_translatable_item.content, ['Input1', 'Input2'])
-        self.assertEqual(rule_translatable_item.interaction_id, 'SetInput')
-        self.assertEqual(rule_translatable_item.rule_type, 'Equals')
-
-    def test_get_content_id_mapping_needing_translations_does_not_return_numeric_content(self): # pylint: disable=line-too-long
-        exploration = exp_domain.Exploration.create_default_exploration('0')
-        init_state = exploration.states[exploration.init_state_name]
-        # Set the content.
-        init_state.update_content(
-            state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
-                'html': '<p>This is content</p>'
-            }))
-        # Set the multiple choice interaction.
-        init_state.update_interaction_id('MultipleChoiceInput')
-        state_interaction_cust_args = {
-            'showChoicesInShuffledOrder': {
-                'value': True
-            },
-            'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': '\u003cp\u003eoption 1\u003c/p\u003e'
-                    },
-                    {
-                        'content_id': 'ca_choices_1',
-                        'html': '1,000'
-                    },
-                    {
-                        'content_id': 'ca_choices_2',
-                        'html': '100'
-                    }
-                ]
-            }
-        }
-        init_state.update_interaction_customization_args(
-            state_interaction_cust_args)
-        # Set the default outcome.
-        default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
-            False, [], None, None
-        )
-        init_state.update_interaction_default_outcome(default_outcome)
-
-        # Choice 2 should not be returned as its value is numeric.
-        content_id_mapping_needing_translations = (
-            init_state.get_content_id_mapping_needing_translations('hi'))
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'content'
-            ].content, '<p>This is content</p>')
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'default_outcome'
-            ].content, '<p>The default outcome.</p>')
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'ca_choices_0'
-            ].content, '\u003cp\u003eoption 1\u003c/p\u003e')
-        self.assertEqual(
-            content_id_mapping_needing_translations[
-                'ca_choices_1'
-            ].content, '1,000')
-        self.assertFalse(
-            'ca_choices_2' in content_id_mapping_needing_translations)
-
-    def test_content_id_existance_checks_work_correctly(self):
-        exploration = exp_domain.Exploration.create_default_exploration('0')
-        init_state = exploration.states[exploration.init_state_name]
-
-        self.assertEqual(init_state.has_content_id('content'), True)
-        with self.assertRaisesRegex(
-            ValueError, 'Content ID content0 does not exist'):
-            init_state.get_content_html('content0')
-        self.assertEqual(init_state.has_content_id('content0'), False)
-
-    def test_add_translation_works_correctly(self):
-        exploration = exp_domain.Exploration.create_default_exploration('0')
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.update_content(
-            state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
-                'html': '<p>This is content</p>'
-            }))
-
-        self.assertEqual(init_state.get_translation_counts(), {})
-
-        init_state.add_translation('content', 'hi', '<p>Translated text</p>')
-
-        self.assertEqual(init_state.get_translation_counts(), {'hi': 1})
-
-    def test_get_translation_counts_returns_correct_value(self):
-        state = state_domain.State.create_default_state(None)
-        state.update_content(
-            state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
-                'html': '<p>This is content</p>'
-            }))
-
-        self.set_interaction_for_state(state, 'TextInput')
-
-        hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))]
-        state.update_interaction_hints(hints_list)
-
-        solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'helloworld!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            },
-        }
-
-        solution = state_domain.Solution.from_dict(
-            state.interaction.id, solution_dict)
-
-        state.update_interaction_solution(solution)
-        state.validate({}, True)
-        state.add_translation('hint_1', 'hi', 'Some translation')
-        state.add_translation('content', 'hi', 'Some translation')
-
-        self.assertEqual(state.get_translation_counts(), {'hi': 2})
-
-        # Adding interaction placeholder translation won't be reflected in
-        # get_translation_counts method.
-        state.add_translation('ca_placeholder_0', 'hi', 'Some translation')
-
-        self.assertEqual(state.get_translation_counts(), {'hi': 2})
-
     def test_state_operations(self):
         """Test adding, updating and checking existence of states."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -1577,62 +1212,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
-        written_translations_dict_with_old_math_schema = {
-            'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': html_with_old_math_schema,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': html_with_old_math_schema,
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-        written_translations_dict_with_new_math_schema = {
-            'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': html_with_new_math_schema,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': html_with_new_math_schema,
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
 
         answer_group_dict_with_old_math_schema = {
             'outcome': {
@@ -1797,9 +1376,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     }
                 }
 
-            },
-            'written_translations': (
-                written_translations_dict_with_old_math_schema)
+            }
         }
 
         state_dict_with_new_math_schema = {
@@ -1879,9 +1456,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     }
                 }
 
-            },
-            'written_translations': (
-                written_translations_dict_with_new_math_schema)
+            }
         }
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
@@ -2469,284 +2044,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_dict_with_old_math_schema,
                 html_validation_service.
                 add_math_content_to_math_rte_components),
-            state_dict_with_new_math_schema)
-
-    def test_convert_html_fields_in_state_with_old_written_translations(self):
-        """Test the method for converting all the HTML in a state having
-        written_translations in the old format. This is needed for converting
-        older snapshots (prior to state schema version 35) properly.
-
-        TODO(#11950): Remove this test once old schema migration functions are
-        deleted.
-        """
-        html_with_old_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
-        html_with_new_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>')
-        written_translations_dict_with_old_math_schema_and_old_format = {
-            'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'html': html_with_old_math_schema,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'html': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'html': html_with_old_math_schema,
-                        'needs_update': False
-                    },
-                    'en': {
-                        'html': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-        written_translations_dict_with_new_math_schema_and_old_format = {
-            'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'html': html_with_new_math_schema,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'html': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'html': html_with_new_math_schema,
-                        'needs_update': False
-                    },
-                    'en': {
-                        'html': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-
-        answer_group_dict_with_old_math_schema = {
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[html_with_old_math_schema]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
-        answer_group_dict_with_new_math_schema = {
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[html_with_new_math_schema]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
-        state_dict_with_old_math_schema = {
-            'content': {
-                'content_id': 'content', 'html': 'Hello!'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'card_is_checkpoint': False,
-            'linked_skill_id': None,
-            'classifier_model_id': None,
-            'interaction': {
-                'answer_groups': [answer_group_dict_with_old_math_schema],
-                'default_outcome': {
-                    'param_changes': [],
-                    'feedback': {
-                        'content_id': 'default_outcome',
-                        'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {
-                    'choices': {
-                        'value': [{
-                            'content_id': 'ca_choices_0',
-                            'html': html_with_old_math_schema
-                        }, {
-                            'content_id': 'ca_choices_1',
-                            'html': '<p>2</p>'
-                        }, {
-                            'content_id': 'ca_choices_2',
-                            'html': '<p>3</p>'
-                        }, {
-                            'content_id': 'ca_choices_3',
-                            'html': '<p>4</p>'
-                        }]
-                    },
-                    'allowMultipleItemsInSamePosition': {'value': True}
-                },
-                'confirmed_unclassified_answers': [],
-                'id': 'DragAndDropSortInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
-                        }
-                    },
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
-                        }
-                    }
-                ],
-                'solution': {
-                    'answer_is_exclusive': True,
-                    'correct_answer': [
-                        [html_with_old_math_schema],
-                        ['<p>2</p>'],
-                        ['<p>3</p>'],
-                        ['<p>4</p>']
-                    ],
-                    'explanation': {
-                        'content_id': 'solution',
-                        'html': '<p>This is solution for state1</p>'
-                    }
-                }
-
-            },
-            'written_translations': (
-                written_translations_dict_with_old_math_schema_and_old_format)
-        }
-
-        state_dict_with_new_math_schema = {
-            'content': {
-                'content_id': 'content', 'html': 'Hello!'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'card_is_checkpoint': False,
-            'linked_skill_id': None,
-            'classifier_model_id': None,
-            'interaction': {
-                'answer_groups': [answer_group_dict_with_new_math_schema],
-                'default_outcome': {
-                    'param_changes': [],
-                    'feedback': {
-                        'content_id': 'default_outcome',
-                        'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {
-                    'choices': {
-                        'value': [{
-                            'content_id': 'ca_choices_0',
-                            'html': html_with_new_math_schema
-                        }, {
-                            'content_id': 'ca_choices_1',
-                            'html': '<p>2</p>'
-                        }, {
-                            'content_id': 'ca_choices_2',
-                            'html': '<p>3</p>'
-                        }, {
-                            'content_id': 'ca_choices_3',
-                            'html': '<p>4</p>'
-                        }]
-                    },
-                    'allowMultipleItemsInSamePosition': {'value': True}
-                },
-                'confirmed_unclassified_answers': [],
-                'id': 'DragAndDropSortInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_new_math_schema
-                        }
-                    },
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_new_math_schema
-                        }
-                    }
-                ],
-                'solution': {
-                    'answer_is_exclusive': True,
-                    'correct_answer': [
-                        [html_with_new_math_schema],
-                        ['<p>2</p>'],
-                        ['<p>3</p>'],
-                        ['<p>4</p>']
-                    ],
-                    'explanation': {
-                        'content_id': 'solution',
-                        'html': '<p>This is solution for state1</p>'
-                    }
-                }
-
-            },
-            'written_translations': (
-                written_translations_dict_with_new_math_schema_and_old_format)
-        }
-        self.assertEqual(
-            state_domain.State.convert_html_fields_in_state(
-                state_dict_with_old_math_schema,
-                html_validation_service.
-                add_math_content_to_math_rte_components,
-                state_uses_old_rule_template_schema=True),
             state_dict_with_new_math_schema)
 
     def test_convert_html_fields_in_state_having_rule_spec_with_invalid_format(

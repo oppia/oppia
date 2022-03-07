@@ -325,7 +325,6 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
                 {
                     exploration_id: exploration
                 })
-            print(exploration.to_dict())
             return exploration
         else:
             return None

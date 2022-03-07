@@ -2181,7 +2181,7 @@ class State(translation_domain.BaseTranslatableObject):
 
     def __init__(
             self, content, param_changes, interaction, recorded_voiceovers,
-            solicit_answer_details, card_is_checkpoint, next_content_id_index,
+            solicit_answer_details, card_is_checkpoint,
             linked_skill_id=None, classifier_model_id=None):
         """Initializes a State domain object.
 
@@ -2199,8 +2199,6 @@ class State(translation_domain.BaseTranslatableObject):
                 particular answer while playing the exploration.
             card_is_checkpoint: bool. If the card is marked as a checkpoint by
                 the creator or not.
-            next_content_id_index: int. The next content_id index to use for
-                generation of new content_ids.
             linked_skill_id: str or None. The linked skill ID associated with
                 this state.
             classifier_model_id: str or None. The classifier model ID
@@ -2224,7 +2222,6 @@ class State(translation_domain.BaseTranslatableObject):
         self.linked_skill_id = linked_skill_id
         self.solicit_answer_details = solicit_answer_details
         self.card_is_checkpoint = card_is_checkpoint
-        self.next_content_id_index = next_content_id_index
 
     def get_translatable_contents_collection(
         self
@@ -2332,21 +2329,6 @@ class State(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected all content_ids to be unique, '
                 'received %s' % content_id_list)
-
-        for content_id in content_id_list:
-            content_id_suffix = content_id.split('_')[-1]
-
-            # Possible values of content_id_suffix are a digit, or from
-            # a 'outcome' (from 'default_outcome'). If the content_id_suffix
-            # is not a digit, we disregard it here.
-            if (
-                    content_id_suffix.isdigit() and
-                    int(content_id_suffix) > self.next_content_id_index
-            ):
-                raise utils.ValidationError(
-                    'Expected all content id indexes to be less than the "next '
-                    'content id index", but received content id %s' % content_id
-                )
 
         if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
@@ -2512,11 +2494,12 @@ class State(translation_domain.BaseTranslatableObject):
             translation: str|list(str). The translated content.
             data_format: str. The data format of the translated content.
         """
-        # TODO: Modify this method.
-        written_translation = WrittenTranslation(
-            data_format, translation, False)
-        self.written_translations.translations_mapping[content_id][
-            language_code] = written_translation
+        # # TODO: Modify this method.
+        # written_translation = WrittenTranslation(
+        #     data_format, translation, False)
+        # self.written_translations.translations_mapping[content_id][
+        #     language_code] = written_translation
+        pass
 
     def update_content(self, content):
         """Update the content of this state.
@@ -2848,8 +2831,7 @@ class State(translation_domain.BaseTranslatableObject):
             'linked_skill_id': self.linked_skill_id,
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'solicit_answer_details': self.solicit_answer_details,
-            'card_is_checkpoint': self.card_is_checkpoint,
-            'next_content_id_index': self.next_content_id_index
+            'card_is_checkpoint': self.card_is_checkpoint
         }
 
     @classmethod
@@ -2872,7 +2854,6 @@ class State(translation_domain.BaseTranslatableObject):
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             state_dict['solicit_answer_details'],
             state_dict['card_is_checkpoint'],
-            state_dict['next_content_id_index'],
             state_dict['linked_skill_id'],
             state_dict['classifier_model_id'])
 
@@ -2899,7 +2880,7 @@ class State(translation_domain.BaseTranslatableObject):
                 default_dest_state_name),
             RecordedVoiceovers.from_dict(copy.deepcopy(
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
-            False, is_initial_state, 0)
+            False, is_initial_state)
 
     @classmethod
     def convert_html_fields_in_state(
@@ -2953,11 +2934,11 @@ class State(translation_domain.BaseTranslatableObject):
                     answer_group, conversion_fn, html_field_types_to_rule_specs)
             )
 
-        if 'written_translations' in state_dict.keys():
-            state_dict['written_translations'] = (
-                WrittenTranslations.
-                convert_html_in_written_translations(
-                    state_dict['written_translations'], conversion_fn))
+        # if 'written_translations' in state_dict.keys():
+        #     state_dict['written_translations'] = (
+        #         WrittenTranslations.
+        #         convert_html_in_written_translations(
+        #             state_dict['written_translations'], conversion_fn))
 
         for hint_index, hint in enumerate(state_dict['interaction']['hints']):
             state_dict['interaction']['hints'][hint_index] = (
@@ -3044,3 +3025,31 @@ class State(translation_domain.BaseTranslatableObject):
                 ))
 
         return state_dict
+
+    def get_all_html_content_strings(self):
+        """Get all html content strings in the state.
+        Returns:
+            list(str). The list of all html content strings in the interaction.
+        """
+        html_list = (
+            self.interaction.get_all_html_content_strings() + [
+                self.content.html])
+        return html_list
+
+    def get_content_html(self, content_id):
+        """Returns the content belongs to a given content id of the object.
+        Args:
+            content_id: str. The id of the content.
+        Returns:
+            str. The html content corresponding to the given content id.
+        Raises:
+            ValueError. The given content_id does not exist.
+        """
+        content_id_to_translatable_content = (
+            self.get_translatable_contents_collection()
+            .content_id_to_translatable_content)
+
+        if content_id not in content_id_to_translatable_content:
+            raise ValueError('Content ID %s does not exist' % content_id)
+
+        return content_id_to_translatable_content[content_id].content_value

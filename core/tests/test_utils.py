@@ -2517,7 +2517,7 @@ title: Title
 
         # We wrap next_content_id_index in a dict so that modifying it in the
         # inner function modifies the value.
-        next_content_id_index_dict = {'value': state.next_content_id_index}
+        next_content_id_index_dict = {'value': 0} #Here 0 is written by @Nik-09
 
         def traverse_schema_and_assign_content_ids(value, schema, contentId):
             """Generates content_id from recursively traversing the schema, and
