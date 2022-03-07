@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { ContributionAndReviewBackendApiService }
   from './contribution-and-review-backend-api.service';
@@ -53,7 +53,7 @@ export class ContributionAndReviewService {
     return this.activeTabType;
   }
 
-  setActiveTabType(activeTabType): void {
+  setActiveTabType(activeTabType: string): void {
     this.activeTabType = activeTabType;
   }
 
@@ -61,7 +61,7 @@ export class ContributionAndReviewService {
     return this.activeSuggestionType;
   }
 
-  setActiveSuggestionType(activeSuggestionType): void {
+  setActiveSuggestionType(activeSuggestionType: string): void {
     this.activeSuggestionType = activeSuggestionType;
   }
 
