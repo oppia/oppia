@@ -1781,6 +1781,14 @@ class UserSkillMastery:
 class CategorizedSkills:
     """Domain object for representing categorized skills' ids and
     descriptions.
+
+    Attributes:
+        categorized_skills: dict[str, dict[str, list(ShortSkillSummary)].
+            A dict with keys as topic names and values as dicts with keys
+            as subtopic names and values as a list of ShortSkillSummary.
+            An extra key is present in the inner dicts for each topic name
+            called 'uncategorized' to represent skills that are not
+            assigned to some topic.
     """
 
     def __init__(self):
@@ -1815,10 +1823,8 @@ class CategorizedSkills:
             skill_description: str. The description of the skill.
         """
         self.require_valid_topic_name(topic_name)
-        self.categorized_skills[topic_name]['uncategorized'].append({
-            'skill_id': skill_id,
-            'skill_description': skill_description
-        })
+        self.categorized_skills[topic_name]['uncategorized'].append(
+            ShortSkillSummary(skill_id, skill_description))
 
     def add_subtopic_skill(
         self, topic_name, subtopic_title, skill_id, skill_description):
@@ -1832,10 +1838,8 @@ class CategorizedSkills:
         """
         self.require_valid_topic_name(topic_name)
         self.require_valid_subtopic_title(topic_name, subtopic_title)
-        self.categorized_skills[topic_name][subtopic_title].append({
-            'skill_id': skill_id,
-            'skill_description': skill_description
-        })
+        self.categorized_skills[topic_name][subtopic_title].append(
+            ShortSkillSummary(skill_id, skill_description))
 
     def require_valid_topic_name(self, topic_name):
         """Checks whether the given topic name is valid i.e. added to the
@@ -1868,4 +1872,40 @@ class CategorizedSkills:
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object."""
-        return self.categorized_skills
+        categorized_skills_dict = copy.deepcopy(self.categorized_skills)
+
+        for topic_name in categorized_skills_dict.keys():
+            # The key 'uncategorized' will also be covered by this loop.
+            for subtopic_title in categorized_skills_dict[topic_name].keys():
+                categorized_skills_dict[topic_name][subtopic_title] = [
+                    short_skill_summary.to_dict() for short_skill_summary in
+                    categorized_skills_dict[topic_name][subtopic_title]
+                ]
+        return categorized_skills_dict
+
+
+class ShortSkillSummary:
+    """Domain object for a short skill summary. It is similar to SkillSummary
+    but has fewer fields.
+    """
+
+    def __init__(self, skill_id, skill_description):
+        """Constructs a ShortSkillSummary domain object.
+
+        Args:
+            skill_id: str. The id of the skill.
+            skill_description: str. The description of the skill.
+        """
+        self.skill_id = skill_id
+        self.skill_description = skill_description
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this ShortSkillSummary object.
+        """
+        return {
+            'skill_id': self.skill_id,
+            'skill_description': self.skill_description
+        }

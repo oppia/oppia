@@ -1278,3 +1278,20 @@ class CategorizedSkillsTests(test_utils.GenericTestBase):
             'Subtopic title \'Subtopic Title 3\' is not added.'):
             self.categorized_skills.add_subtopic_skill(
                 'Topic Name', 'Subtopic Title 3', 'skill_1', 'Description 1')
+
+
+class ShortSkillSummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ShortSkillSummaryTests, self).setUp()
+        self.short_skill_summary = skill_domain.ShortSkillSummary(
+            'skill_1', 'Description 1')
+
+    def test_short_skill_summary_gets_created(self):
+        short_skill_summary_dict = {
+            'skill_id': 'skill_1',
+            'skill_description': 'Description 1',
+        }
+        self.assertEqual(
+            self.short_skill_summary.to_dict(),
+            short_skill_summary_dict)
