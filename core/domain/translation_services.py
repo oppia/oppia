@@ -23,6 +23,14 @@ import logging
 from core.domain import translation_fetchers
 from core.platform import models
 
+from typing import Optional, cast
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import translate_services
+    from mypy_imports import translation_models
+
+
 translate_services = models.Registry.import_translate_services()
 
 (translation_models,) = models.Registry.import_models([
@@ -30,7 +38,10 @@ translate_services = models.Registry.import_translate_services()
 
 
 def get_and_cache_machine_translation(
-        source_language_code, target_language_code, source_text):
+    source_language_code: str,
+    target_language_code: str,
+    source_text: str
+) -> Optional[str]:
     """Gets a machine translation of the source text for the given source and
     target languages. If no translation exists in the datastore for the given
     input, generates a machine translation using cloud_translate_services and
@@ -46,13 +57,13 @@ def get_and_cache_machine_translation(
     Returns:
         str|None. The translated text or None if no translation is found.
     """
-    translation = translation_fetchers.get_machine_translation(
+    translation = translation_fetchers.get_machine_translation(  # type: ignore[no-untyped-call]
         source_language_code,
         target_language_code,
         source_text.strip()
     )
     if translation is not None:
-        return translation.translated_text
+        return cast(str, translation.translated_text)
 
     translated_text = None
     try:

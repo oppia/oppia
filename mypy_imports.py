@@ -29,6 +29,8 @@ from core.platform.datastore import (
 from core.platform.search import elastic_search_services as search_services
 from core.platform.transactions import (
     cloud_transaction_services as transaction_services)
+from core.platform.translate import (
+    dev_mode_translate_services as translate_services)
 from core.storage.activity import gae_models as activity_models
 from core.storage.app_feedback_report import (
     gae_models as app_feedback_report_models)
@@ -86,6 +88,7 @@ __all__ = [
     'suggestion_models',
     'topic_models',
     'translation_models',
+    'translate_services',
     'transaction_services',
     'user_models'
 ]
