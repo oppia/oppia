@@ -242,7 +242,7 @@
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/partnerships')" href="/partnerships"
+                   href="/partnerships"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
                    rel="noopener"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
@@ -255,7 +255,6 @@
                   </div>
                 </a>
                 <a class="item d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/volunteer')"
                    href="/volunteer"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -271,7 +270,6 @@
               </div>
               <div class="bottom-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/contact')"
                    href="/contact"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -285,7 +283,6 @@
                   </div>
                 </a>
                 <a class="item d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/donate')"
                    href="/donate"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
