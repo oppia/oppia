@@ -82,10 +82,9 @@
               </em>
             </span>
             <div ng-if="$ctrl.schemaEditorIsShown">
-              <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
+              <schema-based-editor [schema]="$ctrl.SUBTOPIC_PAGE_SCHEMA"
                                    class="protractor-test-edit-subtopic-page-contents"
-                                   ng-model="$ctrl.htmlData"
-                                   ng-model-change="$applyAsync()">
+                                   [(local-value)]="$ctrl.htmlData">
               </schema-based-editor>
               <div class="text-right pt-3">
                 <button class="btn btn-outline-dark" ng-click="$ctrl.cancelHtmlDataChange()">Cancel</button>
