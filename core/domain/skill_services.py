@@ -1151,8 +1151,7 @@ def filter_skills_by_mastery(user_id, skill_ids):
 
 def get_untriaged_skill_summaries(
     skill_summaries, skill_ids_assigned_to_some_topic, merged_skill_ids):
-    """Returns a list of skill summary dicts for all skills that are
-    untriaged.
+    """Returns a list of skill summaries for all skills that are untriaged.
 
     Args:
         skill_summaries: list(SkillSummary). The list of all skill summary
@@ -1162,29 +1161,27 @@ def get_untriaged_skill_summaries(
         merged_skill_ids: list(str). List of skill IDs of merged skills.
 
     Returns:
-        list(dict). A list of skill summary dicts for all skills that
+        list(SkillSummary). A list of skill summaries for all skills that
         are untriaged.
     """
-    untriaged_skill_summary_dicts = []
+    untriaged_skill_summaries = []
 
-    skill_summary_dicts = [
-        summary.to_dict() for summary in skill_summaries]
-    for skill_summary_dict in skill_summary_dicts:
-        skill_id = skill_summary_dict['id']
+    for skill_summary in skill_summaries:
+        skill_id = skill_summary.id
         if (skill_id not in skill_ids_assigned_to_some_topic) and (
                 skill_id not in merged_skill_ids):
-            untriaged_skill_summary_dicts.append(skill_summary_dict)
+            untriaged_skill_summaries.append(skill_summary)
 
-    return untriaged_skill_summary_dicts
+    return untriaged_skill_summaries
 
 
 def get_categorized_skill_ids_and_descriptions():
-    """Returns a dict of skill ids and descriptions for skills that are
+    """Returns a CategorizedSkills domain object for all the skills that are
     categorized.
 
     Returns:
-        dict. A dict of CategorizedSkills for all skills that are
-        linked to some topic or subtopic.
+        CategorizedSkills. An instance of the CategorizedSkills domain object
+        for all the skills that are categorized.
     """
     topics = topic_fetchers.get_all_topics()
 
@@ -1229,4 +1226,4 @@ def get_categorized_skill_ids_and_descriptions():
             categorized_skills.add_subtopic_skill(
                 topic_name, subtopic_title, skill_id, skill_description)
 
-    return categorized_skills.to_dict()
+    return categorized_skills
