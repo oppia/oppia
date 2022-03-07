@@ -58,7 +58,7 @@ STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = 'solicit_answer_details'
 STATE_PROPERTY_CARD_IS_CHECKPOINT = 'card_is_checkpoint'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
-STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
+DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_LINKED_SKILL_ID = 'linked_skill_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
@@ -101,10 +101,10 @@ DEPRECATED_CMD_ADD_TRANSLATION = 'add_translation'
 CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation'
 # This takes additional 'content_id', 'language_code' and 'state_name'
 # parameters.
-CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE = (
+DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE = (
     'mark_written_translation_as_needing_update')
 # This takes additional 'content_id' and 'state_name' parameters.
-CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (
+DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (
     'mark_written_translations_as_needing_update')
 CMD_MARK_TRANSLATION_NEEDS_UPDATE = 'mark_translations_as_needing_update'
 # This takes additional 'content_id' and 'state_name' parameters.
@@ -256,7 +256,6 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
         STATE_PROPERTY_CARD_IS_CHECKPOINT,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
-        STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_LINKED_SKILL_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
@@ -313,7 +312,7 @@ class ExplorationChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
-        'name': CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
+        'name': DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
         'required_attribute_names': [
             'content_id',
             'language_code',
@@ -322,7 +321,7 @@ class ExplorationChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
-        'name': CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
+        'name': DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
         'required_attribute_names': ['content_id', 'state_name'],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
@@ -788,11 +787,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 state_domain.RecordedVoiceovers.from_dict(
                     sdict['recorded_voiceovers']))
 
-            state.written_translations = (
-                state_domain.WrittenTranslations.from_dict(
-                    sdict['written_translations']))
-
-            state.next_content_id_index = sdict['next_content_id_index']
 
             state.linked_skill_id = sdict['linked_skill_id']
 
@@ -2831,7 +2825,6 @@ class ExplorationChangeMergeVerifier:
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_INTERACTION_HINTS,
-        STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
         STATE_PROPERTY_INTERACTION_CUST_ARGS]
@@ -2937,7 +2930,7 @@ class ExplorationChangeMergeVerifier:
             self.changed_translations[state_name].add(
                 changed_property)
             self.changed_properties[state_name].add(
-                STATE_PROPERTY_WRITTEN_TRANSLATIONS)
+                DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS)
 
     def is_change_list_mergeable(
             self, change_list,
@@ -3145,9 +3138,11 @@ class ExplorationChangeMergeVerifier:
                     change_is_mergeable = True
                 if not self.changed_properties[state_name]:
                     change_is_mergeable = True
-            elif change.cmd == CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE:
+            elif change.cmd == (
+                DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE):
                 change_is_mergeable = True
-            elif change.cmd == CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE:
+            elif change.cmd == (
+                DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
                 change_is_mergeable = True
             elif change.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
                 change_is_mergeable = (

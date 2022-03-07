@@ -2567,7 +2567,6 @@ title: Title
 
         state.update_interaction_id(interaction_id)
         state.update_interaction_customization_args(customization_args)
-        state.update_next_content_id_index(next_content_id_index_dict['value'])
 
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
@@ -3392,7 +3391,6 @@ title: Title
             },
             'rows': {'value': 1},
         })
-        state.update_next_content_id_index(2)
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         return state

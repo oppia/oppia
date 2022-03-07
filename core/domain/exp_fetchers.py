@@ -303,11 +303,14 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
         Exploration. The domain object corresponding to the given exploration.
     """
     sub_namespace = str(version) if version else None
-    cached_exploration = caching_services.get_multi(
-        caching_services.CACHE_NAMESPACE_EXPLORATION,
-        sub_namespace,
-        [exploration_id]
-    ).get(exploration_id)
+    # cached_exploration = caching_services.get_multi(
+    #     caching_services.CACHE_NAMESPACE_EXPLORATION,
+    #     sub_namespace,
+    #     [exploration_id]
+    # ).get(exploration_id)
+
+    # Remove this after discussing with @DubeySandeep.
+    cached_exploration = None
 
     if cached_exploration is not None:
         return cached_exploration
@@ -322,6 +325,7 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
                 {
                     exploration_id: exploration
                 })
+            print(exploration.to_dict())
             return exploration
         else:
             return None

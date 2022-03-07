@@ -268,16 +268,11 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         state.update_linked_skill_id(None)
         state.update_content(state_domain.SubtitledHtml('1', question_content))
         recorded_voiceovers = state_domain.RecordedVoiceovers({})
-        written_translations = state_domain.WrittenTranslations({})
         recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')
         recorded_voiceovers.add_content_id_for_voiceover('1')
         recorded_voiceovers.add_content_id_for_voiceover('default_outcome')
-        written_translations.add_content_id_for_translation('ca_placeholder_0')
-        written_translations.add_content_id_for_translation('1')
-        written_translations.add_content_id_for_translation('default_outcome')
 
         state.update_recorded_voiceovers(recorded_voiceovers)
-        state.update_written_translations(written_translations)
         solution = state_domain.Solution(
             'TextInput', False, 'Solution', state_domain.SubtitledHtml(
                 'solution', '<p>This is a solution.</p>'))

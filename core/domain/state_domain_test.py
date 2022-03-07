@@ -137,159 +137,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
-        state_written_translations_dict = {
-            'translations_mapping': {
-                'content': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation':
-                            '<p>state written_translation content-en</p>',
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation':
-                            '<p>state written_translation content-hi</p>',
-                        'needs_update': False
-                    }
-                },
-                'ca_choices_0': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation':
-                            (
-                                '<p>state written_translation ca_choices_0-hi'
-                                '</p>'
-                            ),
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation':
-                            (
-                                '<p>state written_translation ca_choices_0'
-                                '-en</p>'
-                            ),
-                        'needs_update': False
-                    }
-                },
-                'ca_choices_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation':
-                            (
-                                '<p>state written_translation ca_choices_1-hi'
-                                '</p>'
-                            ),
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation':
-                            (
-                                '<p>state written_translation ca_choices_1-en'
-                                '</p>'
-                            ),
-                        'needs_update': False
-                    }
-                },
-                'ca_choices_2': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation':
-                            (
-                                '<p>state written_translation ca_choices_2-hi'
-                                '</p>'
-                            ),
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation':
-                            (
-                                '<p>state written_translation ca_choices_2-en'
-                                '</p>'
-                            ),
-                        'needs_update': False
-                    }
-                },
-                'ca_choices_3': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': (
-                            '<p>state written_translation ca_choices_3-hi'
-                            '</p>'
-                        ),
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation':
-                            (
-                                '<p>state written_translation ca_choices_3-en'
-                                '</p>'
-                            ),
-                        'needs_update': False
-                    }
-                },
-                'default_outcome': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation':
-                            '<p>state written_translation outcome-hi</p>',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation':
-                            '<p>state written_translation outcome-en</p>',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation':
-                            '<p>state written_translation feedback-hi</p>',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation':
-                            '<p>state written_translation feedback-en</p>',
-                        'needs_update': False
-                    }
-                },
-                'hint_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation':
-                            '<p>state written_translation hint_1-hi</p>',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation':
-                            '<p>state written_translation hint_1-en</p>',
-                        'needs_update': False
-                    }
-                },
-                'solution': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation':
-                            '<p>state written_translation solution-hi</p>',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation':
-                            '<p>state written_translation solution-en</p>',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
         state_hint_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
@@ -317,7 +164,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('DragAndDropSortInput')
         state.update_interaction_customization_args(
             state_customization_args_dict)
-        state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
 
         solution = state_domain.Solution.from_dict(
@@ -325,9 +171,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_solution(solution)
         state.update_interaction_answer_groups(
             [state_answer_group])
-        state.update_written_translations(
-            state_domain.WrittenTranslations.from_dict(
-                state_written_translations_dict))
 
         exp_services.save_new_exploration('owner_id', exploration)
 
@@ -357,24 +200,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             html_list,
             [
-                '<p>state written_translation solution-hi</p>',
-                '<p>state written_translation solution-en</p>',
-                '<p>state written_translation content-hi</p>',
-                '<p>state written_translation content-en</p>',
-                '<p>state written_translation feedback-hi</p>',
-                '<p>state written_translation feedback-en</p>',
-                '<p>state written_translation hint_1-hi</p>',
-                '<p>state written_translation hint_1-en</p>',
-                '<p>state written_translation outcome-hi</p>',
-                '<p>state written_translation outcome-en</p>',
-                '<p>state written_translation ca_choices_0-hi</p>',
-                '<p>state written_translation ca_choices_0-en</p>',
-                '<p>state written_translation ca_choices_1-hi</p>',
-                '<p>state written_translation ca_choices_1-en</p>',
-                '<p>state written_translation ca_choices_2-hi</p>',
-                '<p>state written_translation ca_choices_2-en</p>',
-                '<p>state written_translation ca_choices_3-hi</p>',
-                '<p>state written_translation ca_choices_3-en</p>',
                 '<p>State Feedback</p>',
                 '<p>IsEqualToOrdering rule_spec htmls</p>',
                 '<p>HasElementXAtPositionY rule_spec html</p>',
@@ -461,7 +286,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rows': {'value': 1}
         }
 
-        state.update_next_content_id_index(3)
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('TextInput')
@@ -583,7 +407,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_answer_groups([state_answer_group])
         state.update_interaction_customization_args(
             state_customization_args_dict)
-        state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
 
         solution = state_domain.Solution.from_dict(
@@ -877,7 +700,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('DragAndDropSortInput')
         state.update_interaction_customization_args(
             state_customization_args_dict)
-        state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
@@ -967,13 +789,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
             },
             'solicit_answer_details': False,
-            'card_is_checkpoint': False,
-            'written_translations': {
-                'translations_mapping': {
-                    'content': {},
-                    'default_outcome': {}
-                }
-            }
+            'card_is_checkpoint': False
         }
         self.assertEqual(expected_dict, state_dict)
 
@@ -1310,26 +1126,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
 
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>hello!</p>',
-                        'needs_update': False
-                    }
-                },
-                'hint_1': {},
-                'default_outcome': {},
-                'solution': {},
-                'feedback_1': {}
-            }
-        }
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-
-        init_state.update_written_translations(written_translations)
-
         content_id_mapping_needing_translations = (
             init_state.get_content_id_mapping_needing_translations('hi'))
         self.assertEqual(
@@ -1426,22 +1222,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
 
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {},
-                'hint_1': {},
-                'default_outcome': {},
-                'solution': {},
-                'feedback_1': {},
-                'ca_placeholder_0': {},
-                'rule_input_4': {}
-            }
-        }
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-
-        init_state.update_written_translations(written_translations)
-
         content_id_mapping_needing_translations = (
             init_state.get_content_id_mapping_needing_translations('hi'))
         self.assertEqual(
@@ -1518,17 +1298,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(
             [state_answer_group])
 
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {},
-                'feedback_1': {},
-                'rule_input_4': {}
-            }
-        }
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-        init_state.update_written_translations(written_translations)
-
         content_id_mapping_needing_translations = (
             init_state.get_content_id_mapping_needing_translations('hi'))
         rule_translatable_item = content_id_mapping_needing_translations[
@@ -1579,19 +1348,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             False, [], None, None
         )
         init_state.update_interaction_default_outcome(default_outcome)
-        # Set the translations.
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {},
-                'default_outcome': {},
-                'ca_choices_0': {},
-                'ca_choices_1': {},
-                'ca_choices_2': {}
-            }
-        }
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-        init_state.update_written_translations(written_translations)
 
         # Choice 2 should not be returned as its value is numeric.
         content_id_mapping_needing_translations = (
@@ -3532,35 +3288,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(audio_voiceover, 'duration_secs', -3.45):
                 audio_voiceover.validate()
 
-    def test_written_translation_validation(self):
-        """Test validation of translation script."""
-        written_translation = state_domain.WrittenTranslation(
-            'html', 'Test.', True)
-        written_translation.validate()
-
-        with self.assertRaisesRegex(
-            AssertionError, 'Expected unicode HTML string, received 30'):
-            with self.swap(written_translation, 'translation', 30):
-                written_translation.validate()
-
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected needs_update to be a bool'
-        ):
-            with self.swap(written_translation, 'needs_update', 20):
-                written_translation.validate()
-
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid data_format'
-        ):
-            with self.swap(written_translation, 'data_format', 'int'):
-                written_translation.validate()
-
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid data_format'
-        ):
-            with self.swap(written_translation, 'data_format', 2):
-                written_translation.validate()
-
     def test_hints_validation(self):
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -3611,7 +3338,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         del hints_list[1]
         init_state.update_interaction_hints(hints_list)
-        init_state.update_next_content_id_index(4)
 
         self.assertEqual(len(init_state.interaction.hints), 2)
         exploration.validate()
@@ -3712,28 +3438,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'content'
             ):
                 exploration.validate()
-
-    def test_validate_state_content_id_indexes(self):
-        exploration = exp_domain.Exploration.create_default_exploration('eid')
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('MultipleChoiceInput')
-        init_state.update_interaction_customization_args({
-            'choices': {
-                'value': [{
-                    'content_id': 'ca_choices_10',
-                    'html': 'one'
-                }]
-            },
-            'showChoicesInShuffledOrder': {'value': True}
-        })
-        init_state.update_next_content_id_index(9)
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected all content id indexes to be less than the "next '
-            'content id index"'
-        ):
-            exploration.validate()
 
     def test_validate_state_solicit_answer_details(self):
         """Test validation of solicit_answer_details."""
@@ -3988,47 +3692,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(captured_logs), 1)
         self.assertIn('Bad state dict: invalid_state_dict', captured_logs[0])
 
-    def test_cannot_update_hints_with_content_id_not_in_written_translations(
-            self):
-        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        old_hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
-            )
-        ]
-        new_hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
-            )
-        ]
-
-        exploration.init_state.update_interaction_hints(old_hints_list)
-
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Test!</p>',
-                        'needs_update': True
-                    }
-                },
-                'default_outcome': {}
-            }
-        }
-        written_translations = (
-            state_domain.WrittenTranslations.from_dict(
-                written_translations_dict))
-
-        exploration.init_state.update_written_translations(written_translations)
-
-        with self.assertRaisesRegex(
-            Exception,
-            'The content_id hint_1 does not exist in written_translations'):
-            exploration.init_state.update_interaction_hints(new_hints_list)
-
     def test_cannot_update_hints_with_content_id_not_in_recorded_voiceovers(
             self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -4068,54 +3731,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception,
             'The content_id hint_1 does not exist in recorded_voiceovers'):
-            exploration.init_state.update_interaction_hints(new_hints_list)
-
-    def test_cannot_update_hints_with_new_content_id_in_written_translations(
-            self):
-        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        old_hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
-            )
-        ]
-        new_hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
-            )
-        ]
-
-        exploration.init_state.update_interaction_hints(old_hints_list)
-
-        written_translations_dict = {
-            'translations_mapping': {
-                'hint_2': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Test!</p>',
-                        'needs_update': True
-                    }
-                },
-                'hint_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Test1!</p>',
-                        'needs_update': True
-                    }
-                },
-                'default_outcome': {}
-            }
-        }
-        written_translations = (
-            state_domain.WrittenTranslations.from_dict(
-                written_translations_dict))
-
-        exploration.init_state.update_written_translations(written_translations)
-
-        with self.assertRaisesRegex(
-            Exception,
-            'The content_id hint_2 already exists in written_translations'):
             exploration.init_state.update_interaction_hints(new_hints_list)
 
     def test_cannot_update_hints_with_new_content_id_in_recorded_voiceovers(
@@ -4662,355 +4277,6 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'id',
             'unicode_str': ''
         })
-
-
-class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
-    """Test methods operating on written transcripts."""
-
-    def test_data_formats_are_correct_and_complete(self):
-        translatable_class_names_in_data_formats = sorted(
-            state_domain.WrittenTranslation.
-            DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE.values())
-        self.assertEqual(
-            translatable_class_names_in_data_formats,
-            translatable_object_registry.Registry.get_all_class_names())
-
-    def test_from_and_to_dict_works_correctly(self):
-        written_translations_dict = {
-            'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello',
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    },
-                    'fr': {
-                        'data_format': 'set_of_normalized_string',
-                        'translation': ['test1', 'test2'],
-                        'needs_update': False
-                    },
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    },
-                    'fr': {
-                        'data_format': 'set_of_normalized_string',
-                        'translation': ['test1', 'test2'],
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-        self.assertEqual(
-            written_translations.to_dict(), written_translations_dict)
-
-    def test_get_content_ids_for_text_translation_return_correct_list_of_content_id(self): # pylint: disable=line-too-long
-        written_translations = state_domain.WrittenTranslations.from_dict({
-            'translations_mapping': {}
-        })
-        self.assertEqual(
-            written_translations.get_content_ids_for_text_translation(), [])
-
-        written_translations.add_content_id_for_translation('feedback_1')
-        written_translations.add_content_id_for_translation('feedback_2')
-        self.assertItemsEqual(
-            written_translations.get_content_ids_for_text_translation(), [
-                'feedback_2', 'feedback_1'])
-
-    def test_get_translated_content_in_non_existing_language_raise_error(self):
-        written_translations = state_domain.WrittenTranslations.from_dict({
-            'translations_mapping': {
-                'content': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': '<p> In English.</p>',
-                        'needs_update': False
-                    }
-                }
-            }
-        })
-        translated_content = written_translations.get_translated_content(
-            'content', 'en')
-        self.assertEqual(translated_content, '<p> In English.</p>')
-
-        with self.assertRaisesRegex(
-            Exception, 'Translation for the given content_id content does not '
-            'exist in hi language code'):
-            written_translations.get_translated_content('content', 'hi')
-
-    def test_get_translated_content_for_invalid_content_id_raise_error(self):
-        written_translations = state_domain.WrittenTranslations.from_dict({
-            'translations_mapping': {
-                'content': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': '<p> In English.</p>',
-                        'needs_update': False
-                    }
-                }
-            }
-        })
-        translated_content = written_translations.get_translated_content(
-            'content', 'en')
-        self.assertEqual(translated_content, '<p> In English.</p>')
-
-        with self.assertRaisesRegex(
-            Exception, 'Invalid content_id: invalid_id'):
-            written_translations.get_translated_content('invalid_id', 'hi')
-
-    def test_add_content_id_for_translations_adds_content_id(self):
-        written_translations = state_domain.WrittenTranslations.from_dict({
-            'translations_mapping': {}
-        })
-
-        self.assertEqual(
-            len(written_translations.get_content_ids_for_text_translation()), 0)
-
-        new_content_id = 'content_id'
-        written_translations.add_content_id_for_translation(new_content_id)
-
-        self.assertEqual(
-            len(written_translations.get_content_ids_for_text_translation()), 1)
-        self.assertEqual(
-            written_translations.get_content_ids_for_text_translation(),
-            ['content_id'])
-
-    def test_add_content_id_for_translation_with_invalid_content_id_raise_error(
-            self):
-        written_translations = state_domain.WrittenTranslations.from_dict({
-            'translations_mapping': {}
-        })
-        invalid_content_id = 123
-        with self.assertRaisesRegex(
-            Exception, 'Expected content_id to be a string, received 123'):
-            written_translations.add_content_id_for_translation(
-                invalid_content_id)
-
-    def test_add_content_id_for_translation_with_existing_content_id_raise_error( # pylint: disable=line-too-long
-            self):
-        written_translations_dict = {
-            'translations_mapping': {
-                'feedback_1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-        existing_content_id = 'feedback_1'
-        with self.assertRaisesRegex(
-            Exception, 'The content_id feedback_1 already exist.'):
-            written_translations.add_content_id_for_translation(
-                existing_content_id)
-
-    def test_delete_content_id_for_translations_deletes_content_id(self):
-        old_written_translations_dict = {
-            'translations_mapping': {
-                'content': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            old_written_translations_dict)
-        self.assertEqual(
-            len(written_translations.get_content_ids_for_text_translation()), 1)
-
-        written_translations.delete_content_id_for_translation('content')
-
-        self.assertEqual(
-            len(written_translations.get_content_ids_for_text_translation()), 0)
-
-    def test_delete_content_id_for_translation_with_nonexisting_content_id_raise_error(self): # pylint: disable=line-too-long
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {}
-            }
-        }
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-        nonexisting_content_id_to_delete = 'feedback_1'
-        with self.assertRaisesRegex(
-            Exception, 'The content_id feedback_1 does not exist.'):
-            written_translations.delete_content_id_for_translation(
-                nonexisting_content_id_to_delete)
-
-    def test_delete_content_id_for_translation_with_invalid_content_id_raise_error(self): # pylint: disable=line-too-long
-        written_translations = state_domain.WrittenTranslations.from_dict({
-            'translations_mapping': {}
-        })
-        invalid_content_id_to_delete = 123
-        with self.assertRaisesRegex(
-            Exception, 'Expected content_id to be a string, '):
-            written_translations.delete_content_id_for_translation(
-                invalid_content_id_to_delete)
-
-    def test_validation_with_invalid_content_id_raise_error(self):
-        written_translations_dict = {
-            'translations_mapping': {
-                123: {}
-            }
-        }
-
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-
-        with self.assertRaisesRegex(
-            Exception, 'Expected content_id to be a string, '):
-            written_translations.validate([123])
-
-    def test_validate_non_dict_language_code_to_written_translation(self):
-        written_translations = state_domain.WrittenTranslations({
-            'en': []
-        })
-
-        with self.assertRaisesRegex(
-            Exception,
-            re.escape('Expected content_id value to be a dict, received []')):
-            written_translations.validate(None)
-
-    def test_validation_with_invalid_type_language_code_raise_error(self):
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {
-                    123: {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-
-        with self.assertRaisesRegex(
-            Exception, 'Expected language_code to be a string, '):
-            written_translations.validate(['content'])
-
-    def test_validation_with_unknown_language_code_raise_error(self):
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {
-                    'ed': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-
-        with self.assertRaisesRegex(Exception, 'Invalid language_code: ed'):
-            written_translations.validate(['content'])
-
-    def test_validation_with_invalid_content_id_list(self):
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': '<p>hello!</p>',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-
-        with self.assertRaisesRegex(
-            Exception,
-            re.escape(
-                'Expected state written_translations to match the listed '
-                'content ids [\'invalid_content\']')):
-            written_translations.validate(['invalid_content'])
-
-    def test_get_content_ids_that_are_correctly_translated(self):
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {},
-                'hint_1': {}
-            }
-        }
-
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-
-        self.assertEqual(
-            written_translations.get_content_ids_that_are_correctly_translated(
-                'hi'), [])
-
-    def test_get_content_ids_that_are_correctly_translated_with_some_existing_translations(self): # pylint: disable=line-too-long
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>hello!</p>',
-                        'needs_update': False
-                    }
-                },
-                'hint_1': {}
-            }
-        }
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-
-        self.assertEqual(
-            written_translations.get_content_ids_that_are_correctly_translated(
-                'hi'), ['content'])
-
-    def test_get_content_ids_that_are_correctly_translated_with_some_existing_translations_needs_update(self): # pylint: disable=line-too-long
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>hello!</p>',
-                        'needs_update': True
-                    }
-                },
-                'hint_1': {}
-            }
-        }
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-
-        self.assertEqual(
-            written_translations.get_content_ids_that_are_correctly_translated(
-                'hi'), [])
 
 
 class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):

@@ -33,6 +33,7 @@ from core.domain import opportunity_services
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
+from core.domain import translation_domain
 
 
 class SuggestionHandler(base.BaseHandler):
@@ -115,10 +116,10 @@ class SuggestionHandler(base.BaseHandler):
                 suggestion_change.cmd == 'add_written_translation' and
                 suggestion_change.data_format in
                 (
-                    state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING,
-                    state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_UNICODE_STRING
+                    translation_domain.TranslatableContentFormat
+                    .SET_OF_NORMALIZED_STRING,
+                    translation_domain.TranslatableContentFormat
+                    .SET_OF_UNICODE_STRING
                 )
         ):
             self.render_json(self.values)
