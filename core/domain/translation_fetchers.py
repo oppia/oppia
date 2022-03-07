@@ -68,3 +68,75 @@ def get_machine_translation(
     if translation_model is None:
         return None
     return get_translation_from_model(translation_model)
+
+
+def get_entity_translation_from_model(entity_translation_model):
+    """Returns the EntityTranslation domain object from its model representation
+    (EntityTranslationModel).
+
+    Args:
+        entity_translation_model: EntityTranslatioModel. An instance of
+            EntityTranslationModel.
+
+    Returns:
+        EntityTranslation. An instance of EntityTranslation object, created from
+        its model.
+    """
+    entity_translation = translation_domain.EntityTranslation(
+        entity_translation_model.entity_id,
+        entity_translation_model.entity_type,
+        entity_translation_model.entity_version,
+        entity_translation_model.language_code,
+        entity_translation_model.translations
+    )
+    return entity_translation
+
+
+def get_all_entity_translation_objects_for_entity(
+        entity_type, entity_id, entity_version):
+    """Returns a list of entity translation domain objects.
+
+    Args:
+        entity_type:
+        entity_id:
+        entity_version:
+
+    Returns:
+        list(EnitityTranslation).
+    """
+    entity_translation_models = (
+        translation_models.EntityTranslationsModel.get_all_for_entity(
+            entity_type, entity_id, entity_version)
+    )
+    entity_translation_objects = []
+
+    for model in entity_translation_models:
+        if model:
+            domain_object = get_entity_translation_from_model(model)
+            entity_translation_objects.append(domain_object)
+
+    return entity_translation_objects
+
+def get_unique_entity_translation_object(
+        entity_type, entity_id, entity_version, language_code):
+    """Returns a unique entity translation domain object.
+
+    Args:
+        entity_type:
+        entity_id:
+        entity_version:
+        language_code:
+
+    Returns:
+        EnitityTranslation.
+    """
+    entity_translation_model = (
+        translation_models.EntityTranslationsModel.get_model(
+            entity_type, entity_id, entity_version, language_code)
+    )
+
+    if entity_translation_model:
+        domain_object = get_entity_translation_from_model(
+            entity_translation_model)
+        return domain_object
+    return None

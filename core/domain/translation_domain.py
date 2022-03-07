@@ -305,6 +305,72 @@ class EntityTranslation:
         self.language_code = language_code
         self.translations = translations
 
+    def to_dict(entity_translation):
+        translations_dict = {}
+        for content_id, translated_content in entity_translation.translations:
+            translations_dict[content_id] = translated_content.to_dict()
+
+        return {
+            'entity_id': entity_translation.entity_id,
+            'entity_type': entity_translation.entity_type,
+            'entity_version': entity_translation.entity_version,
+            'language_code': entity_translation.language_code,
+            'translations': translations_dict
+        }
+
+    @classmethod
+    def from_dict(cls, entity_translation_dict):
+        content_id_to_translated_content = {}
+        for content_id, translations in entity_translation_dict.items():
+            content_id_to_translated_content[content_id] = (
+                translations.from_dict())
+
+        return cls(
+            entity_translation_dict['entity_type'],
+            entity_translation_dict['entity_id'],
+            entity_translation_dict['entity_version'],
+            entity_translation_dict['language_code'],
+            content_id_to_translated_content
+        )
+
+    def validate(self):
+        """TODO
+        """
+        if not isinstance(self.entity_type, str):
+            raise utils.ValidationError(
+                'entity_type must be a string, but got %r' % self.entity_type)
+        if not isinstance(self.entity_id, str):
+            raise utils.ValidationError(
+                'entity_id must be a string, but got %r' % self.entity_id)
+        if not isinstance(self.entity_version, int):
+            raise utils.ValidationError(
+                'entity_version must be a string, but got %r' %
+                self.entity_version)
+        if not isinstance(self.language_code, str):
+            raise utils.ValidationError(
+                'language_code must be a string, but got %r' %
+                self.language_code)
+
+        for content_id, translated_content in self.translations:
+            if not isinstance(content_id, str):
+                raise utils.ValidationError(
+                    'content_id must be a string, but got %r' % content_id)
+            if not isinstance(translated_content.needs_update, bool):
+                raise utils.ValidationError(
+                    'needs_update must be a bool, but got %r' %
+                    translated_content.needs_update)
+            if isinstance(translated_content.content_value, list):
+                for content_value in translated_content.content_value:
+                    if not isinstance(translated_content.content_value, str):
+                        raise utils.ValidationError(
+                            'content_value must be a string, but got %r' %
+                            content_value)
+            else:
+                if not isinstance(translated_content.content_value, str):
+                    raise utils.ValidationError(
+                        'content_value must be a string, but got %r' %
+                        content_value)
+
 
 class MachineTranslation:
     """Domain object for machine translation of exploration content."""

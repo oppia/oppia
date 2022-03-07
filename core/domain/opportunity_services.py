@@ -298,6 +298,35 @@ def update_opportunity_with_updated_exploration(exp_id):
         [exploration_opportunity_summary])
 
 
+def update_opportunity_with_accepted_suggestion(
+        exploration_id, language_code):
+    """
+    TODO
+    """
+    model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+        exploration_id)
+    exp_opportunity_summary = (
+        get_exploration_opportunity_summary_from_model(model))
+
+    if language_code in exp_opportunity_summary.translation_counts:
+        exp_opportunity_summary.translation_counts[language_code] += 1
+    else:
+        exp_opportunity_summary.translation_counts[language_code] = 1
+
+    if (
+        exp_opportunity_summary.content_count ==
+        exp_opportunity_summary.translation_counts[language_code]
+    ):
+        exp_opportunity_summary.incomplete_translation_language_codes.remove(
+            language_code)
+
+    # confirm with @DubeySandeep.
+    # exp_opportunity_summary.translation_in_review_counts[language_code] += 1
+
+    exp_opportunity_summary.validate()
+    _save_multi_exploration_opportunity_summary([exp_opportunity_summary])
+
+
 def update_exploration_opportunities_with_story_changes(story, exp_ids):
     """Updates the opportunities models with the story changes.
 
@@ -884,3 +913,5 @@ def regenerate_opportunities_related_to_topic(
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
     return len(exploration_opportunity_summary_list)
+
+

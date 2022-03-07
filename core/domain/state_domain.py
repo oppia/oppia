@@ -2944,28 +2944,6 @@ class State(translation_domain.BaseTranslatableObject):
 
         return utils.yaml_from_dict(state.to_dict(), width=width)
 
-    def get_translation_counts(self):
-        """Return a dict representing the number of translations available in a
-        languages in which there exists at least one translation in the state
-        object.
-
-        Note: This method only counts the translations which are translatable as
-        per _get_all_translatable_content method.
-
-        Returns:
-            dict(str, int). A dict with language code as a key and number of
-            translations available in that language as the value.
-        """
-        translation_counts = collections.defaultdict(int)
-        translations_mapping = self.written_translations.translations_mapping
-
-        for content_id in self._get_all_translatable_content():
-            for language_code, translation in (
-                    translations_mapping[content_id].items()):
-                if not translation.needs_update:
-                    translation_counts[language_code] += 1
-        return translation_counts
-
     def get_translatable_content_count(self):
         """Returns the number of content fields available for translation in
         the object.

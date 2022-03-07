@@ -104,6 +104,8 @@ CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation'
 CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE = (
     'mark_written_translation_as_needing_update')
 # This takes additional 'content_id' and 'state_name' parameters.
+CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (
+    'mark_written_translations_as_needing_update')
 CMD_MARK_TRANSLATION_NEEDS_UPDATE = 'mark_translations_as_needing_update'
 # This takes additional 'content_id' and 'state_name' parameters.
 CMD_REMOVE_TRANSLATION = 'mark_to_remove_translation'
@@ -1642,69 +1644,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         new_state_name)
 
         return trainable_states_dict
-
-    def get_languages_with_complete_translation(self):
-        """Returns a list of language code in which the exploration translation
-        is 100%.
-
-        Returns:
-            list(str). A list of language code in which the translation for the
-            exploration is complete i.e, 100%.
-        """
-        content_count = self.get_content_count()
-        language_code_list = []
-        for language_code, count in self.get_translation_counts().items():
-            if count == content_count:
-                language_code_list.append(language_code)
-
-        return language_code_list
-
-    def get_translation_counts(self):
-        """Returns a dict representing the number of translations available in a
-        language for which there exists at least one translation in the
-        exploration.
-
-        Returns:
-            dict(str, int). A dict with language code as a key and number of
-            translation available in that language as the value.
-        """
-        exploration_translation_counts = collections.defaultdict(int)
-        entity_translation_models = (
-            translation_models.EntityTranslationsModel.get_all_for_entity(
-                feconf.ENTITY_TYPE_EXPLORATION,
-                self.id,
-                self.version
-            )
-        )
-        for model in entity_translation_models:
-            if model is None:
-                continue
-
-            lang_code = model.language_code
-            translations = model.translations
-            count = 0
-            for content_id, translated_content in translations:
-                count += 1
-            exploration_translation_counts[lang_code] += count
-
-        return dict(exploration_translation_counts)
-
-    def get_content_count(self):
-        """Returns the total number of distinct content fields available in the
-        exploration which are user facing and can be translated into
-        different languages.
-
-        (The content field includes state content, feedback, hints, solutions.)
-
-        Returns:
-            int. The total number of distinct content fields available inside
-            the exploration.
-        """
-        content_count = (
-            len(self.get_all_contents_which_need_translations(
-            translation_domain.create_empty_translation_object()))
-        )
-        return content_count
 
     @classmethod
     def _convert_states_v41_dict_to_v42_dict(cls, states_dict):

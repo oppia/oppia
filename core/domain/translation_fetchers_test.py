@@ -27,7 +27,7 @@ from core.tests import test_utils
     models.NAMES.translation])
 
 
-class TranslationFetchersTests(test_utils.GenericTestBase):
+class MachineTranslationFetchersTests(test_utils.GenericTestBase):
 
     def test_get_translation_from_model(self):
         model_id = (
@@ -56,3 +56,19 @@ class TranslationFetchersTests(test_utils.GenericTestBase):
             'en', 'es', 'hello world'
         )
         self.assertEqual(translation.translated_text, 'hola mundo')
+
+
+class EntityTranslationFetchersTests(test_utils.GenericTestBase):
+
+    def test_get_entity_translation_from_model(self):
+        pass
+
+    def test_get_all_entity_translation_objects_for_entity_returns_correclty(
+            self):
+        pass
+
+    def test_get_unique_entity_translation_object_returns_none(self):
+        pass
+
+    def test_get_unique_entity_translation_object_returns_correctly(self):
+        pass

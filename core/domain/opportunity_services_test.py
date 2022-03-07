@@ -945,3 +945,53 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             lambda: (
                 opportunity_services.regenerate_opportunities_related_to_topic(
                     self.TOPIC_ID)))
+
+
+class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
+        test_utils.GenericTestBase):
+    """TODO
+    """
+
+    def setUp(self):
+        super(OpportunityUpdateOnAcceeptingSuggestionUnitTest, self).setUp()
+        supported_language_codes = set(
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
+        self.new_incomplete_translation_language_codes = list(
+            supported_language_codes - set(['en']))
+
+        self.opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel(
+                id='exp_1',
+                topic_id='topic_id',
+                topic_name='topic_name',
+                story_id='story_id',
+                story_title='story_title',
+                chapter_title='chapter_title',
+                content_count=1,
+                incomplete_translation_language_codes=(
+                    self.new_incomplete_translation_language_codes),
+                translation_counts={},
+                language_codes_needing_voice_artists=['en'],
+                language_codes_with_assigned_voice_artists=[]
+            ))
+        self.opportunity_model.put()
+
+    def test_update_opportunity_with_accepted_suggestion(self):
+        self.assertEqual(
+            self.opportunity_model.translation_counts, {})
+        self.assertItemsEqual(
+            self.opportunity_model.incomplete_translation_language_codes,
+            self.new_incomplete_translation_language_codes
+        )
+
+        opportunity_services.update_opportunity_with_accepted_suggestion(
+            'exp_1', 'hi')
+
+        self.assertEqual(
+            self.opportunity_model.translation_counts,
+            {'hi': 1}
+        )
+        self.assertItemsEqual(
+            self.opportunity_model.incomplete_translation_language_codes,
+            self.new_incomplete_translation_language_codes
+        )
