@@ -52,14 +52,16 @@ angular.module('oppia').component('contributorDashboardPage', {
   template: require('./contributor-dashboard-page.component.html'),
   controller: [
     '$rootScope', '$timeout', 'ContributionOpportunitiesService',
-    'FocusManagerService', 'LanguageUtilService', 'LocalStorageService',
+    'ContributionAndReviewService', 'FocusManagerService',
+    'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'TranslationTopicService',
     'UrlInterpolationService', 'UserService', 'WindowRef',
     'CONTRIBUTOR_DASHBOARD_TABS_DETAILS', 'DEFAULT_OPPORTUNITY_TOPIC_NAME',
     'OPPIA_AVATAR_LINK_URL',
     function(
-        $rootScope, $timeout, ContributionOpportunitiesService,
-        FocusManagerService, LanguageUtilService, LocalStorageService,
+        $rootScope, $timeout, ContributionOpportunitiesService, 
+        ContributionAndReviewService, FocusManagerService,
+        LanguageUtilService, LocalStorageService,
         TranslationLanguageService, TranslationTopicService,
         UrlInterpolationService, UserService, WindowRef,
         CONTRIBUTOR_DASHBOARD_TABS_DETAILS, DEFAULT_OPPORTUNITY_TOPIC_NAME,
@@ -102,7 +104,12 @@ angular.module('oppia').component('contributorDashboardPage', {
 
       ctrl.showTopicSelector = function() {
         var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
-        return activeTabDetail.customizationOptions.includes('topic');
+        var activeSuggestionType = ContributionAndReviewService.getActiveSuggestionType();
+        var activeTabType = ContributionAndReviewService.getActiveTabType();
+        return activeTabDetail.customizationOptions.includes('topic') ||
+          (activeTabType === "reviews" &&
+          activeSuggestionType === "translate_content" &&
+          ctrl.activeTabName !== "submitQuestionTab");
       };
 
       ctrl.onTabClick = function(activeTabName) {

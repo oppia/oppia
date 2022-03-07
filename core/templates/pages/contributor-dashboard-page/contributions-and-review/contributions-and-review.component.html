@@ -61,13 +61,6 @@
     <div class="oppia-login-required" ng-if="!$ctrl.userDetailsLoading && !$ctrl.userIsLoggedIn">
       <login-required-message></login-required-message>
     </div>
-    <div class="oppia-dashboard-topic-container"
-         ng-if="$ctrl.isActiveTab($ctrl.TAB_TYPE_REVIEWS, $ctrl.SUGGESTION_TYPE_TRANSLATE)">
-      <span class="oppia-dashboard-topic-container-label">Filter by Topics</span>
-      <translation-topic-selector class="oppia-topic-selector" [active-topic-name]="$ctrl.topicName"
-                                  (set-active-topic-name)="$ctrl.onChangeTopic($event)">
-      </translation-topic-selector>
-    </div>
     <div class="oppia-login-required" ng-if="$ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
       <oppia-opportunities-list [load-opportunities]="$ctrl.loadContributions"
                                 (click-action-button)="$ctrl.onClickViewSuggestion($event)"

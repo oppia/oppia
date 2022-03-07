@@ -346,6 +346,8 @@ angular.module('oppia').component('contributionsAndReview', {
       ctrl.switchToTab = function(tabType, suggestionType) {
         ctrl.activeSuggestionType = suggestionType;
         ctrl.activeTabType = tabType;
+        ContributionAndReviewService.setActiveTabType(tabType);
+        ContributionAndReviewService.setActiveSuggestionType(suggestionType);
         ctrl.activeDropdownTabChoice = ctrl.getActiveDropdownTabChoice();
         ctrl.dropdownShown = false;
         ctrl.contributions = {};
@@ -391,13 +393,6 @@ angular.module('oppia').component('contributionsAndReview', {
         $rootScope.$apply();
       };
 
-      ctrl.onChangeTopic = function(topicName: string) {
-        ctrl.topicName = topicName;
-        TranslationTopicService.setActiveTopicName(ctrl.topicName);
-        LocalStorageService.updateLastSelectedTranslationTopicName(
-          ctrl.topicName);
-        $rootScope.$applyAsync();
-      };
 
 
       ctrl.$onInit = function() {

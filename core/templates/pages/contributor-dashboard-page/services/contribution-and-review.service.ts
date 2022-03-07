@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { ContributionAndReviewBackendApiService }
   from './contribution-and-review-backend-api.service';
@@ -41,10 +41,29 @@ interface FetchSuggestionsResponse {
   providedIn: 'root',
 })
 export class ContributionAndReviewService {
+  private activeTabType: string = null;
+  private activeSuggestionType: string = null;
+
   constructor(
     private contributionAndReviewBackendApiService:
       ContributionAndReviewBackendApiService
   ) {}
+
+  getActiveTabType(): string {
+    return this.activeTabType;
+  }
+
+  setActiveTabType(activeTabType): void {
+    this.activeTabType = activeTabType;
+  }
+
+  getActiveSuggestionType(): string {
+    return this.activeSuggestionType;
+  }
+
+  setActiveSuggestionType(activeSuggestionType): void {
+    this.activeSuggestionType = activeSuggestionType;
+  }
 
   private async fetchSuggestionsAsync(
       fetchType: string, topicName: string
