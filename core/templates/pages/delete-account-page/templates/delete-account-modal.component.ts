@@ -26,17 +26,16 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './delete-account-modal.component.html'
 })
 export class DeleteAccountModalComponent implements OnInit {
-  expectedUsername: string;
-  username: string;
+  expectedUsername!: string;
+  username!: string;
   constructor(
     private userService: UserService,
     private ngbActiveModal: NgbActiveModal,
   ) {}
 
   ngOnInit(): void {
-    this.expectedUsername = null;
     this.userService.getUserInfoAsync().then((userInfo) => {
-      this.expectedUsername = userInfo.getUsername();
+      this.expectedUsername = userInfo.getUsername() as string;
     });
   }
 
