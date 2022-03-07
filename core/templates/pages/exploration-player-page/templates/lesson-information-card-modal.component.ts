@@ -26,15 +26,10 @@ import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { LearnerExplorationSummaryBackendDict } from
 // eslint-disable-next-line max-len
   'domain/summary/learner-exploration-summary.model';
-import { ContextService } from
-// eslint-disable-next-line max-len
-  'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
 // eslint-disable-next-line max-len
   'services/i18n-language-code.service';
-import { PlayerPositionService } from '../services/player-position.service';
-import { PlayerTranscriptService } from '../services/player-transcript.service';
 
  @Component({
    selector: 'oppia-lesson-information-card-modal',
@@ -69,17 +64,14 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   constructor(
     private ngbModal: NgbModal,
     private ngbActiveModal: NgbActiveModal,
-    private contextService: ContextService,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private playerPositionService: PlayerPositionService,
-    private playerTranscriptService: PlayerTranscriptService,
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
-    this.explorationId = this.contextService.getExplorationId();
+    this.explorationId = this.expInfo.id;
     this.expTitle = this.expInfo.title;
     this.expDesc = this.expInfo.objective;
     this.storyId = this.urlService.getUrlParams().story_id;
@@ -107,18 +99,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     this.separatorArray = new Array(this.numberofCheckpoints);
     this.separatorWidth = 100 / (this.numberofCheckpoints);
 
-    this.startedWidth = 100 / (this.numberofCheckpoints);
-
-    if (this.completedWidth >= 99) {
-      this.startedWidth = 0;
-    }
-
-    let index = this.playerPositionService.getDisplayedCardIndex();
-    this.displayedCard = this.playerTranscriptService.getCard(index);
-    if (this.displayedCard.isTerminal()) {
-      this.completedWidth = 100;
-      this.startedWidth = 0;
-    }
+    this.startedWidth = 100 - this.completedWidth;
   }
 
   isHackyExpTitleTranslationDisplayed(): boolean {

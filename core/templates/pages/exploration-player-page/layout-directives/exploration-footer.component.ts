@@ -25,7 +25,6 @@ import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService }
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -64,7 +63,6 @@ export class ExplorationFooterComponent {
     private ngbModal: NgbModal,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private urlInterpolationService: UrlInterpolationService,
     private questionPlayerStateService: QuestionPlayerStateService,
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
@@ -73,10 +71,6 @@ export class ExplorationFooterComponent {
     private playerPositionService: PlayerPositionService,
     private explorationEngineService: ExplorationEngineService
   ) {}
-
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
 
   ngOnInit(): void {
     // TODO(#13494): Implement a different footer for practice-session-page.
@@ -89,17 +83,6 @@ export class ExplorationFooterComponent {
     // that the component behaves properly at both the places.
     try {
       this.explorationId = this.contextService.getExplorationId();
-
-      // Fetching the number of checkpoints.
-      let count = 0;
-      this.getStates(this.explorationId).then(data => {
-        for (const [, value] of Object.entries(data)) {
-          if (value.card_is_checkpoint) {
-            count++;
-          }
-        }
-        this.numberofCheckpoints = count;
-      });
       this.iframed = this.urlService.isIframed();
       this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
       this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
@@ -128,6 +111,16 @@ export class ExplorationFooterComponent {
             }
           });
       }
+      // Fetching the number of checkpoints.
+      let count = 0;
+      this.getStates(this.explorationId).then(data => {
+        for (const [, value] of Object.entries(data)) {
+          if (value.card_is_checkpoint) {
+            count++;
+          }
+        }
+        this.numberofCheckpoints = count;
+      });
     } catch (err) { }
 
     if (this.contextService.isInQuestionPlayerMode()) {
