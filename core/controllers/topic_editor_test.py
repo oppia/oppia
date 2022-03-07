@@ -227,7 +227,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             expected_status_int=400)
 
         invalid_description = 'Story Description' * 60
-        self.assertEqual(json_response['error'],
+        self.assertEqual(
+            json_response['error'],
             'Schema validation for \'description\' failed: '
             'Validation failed: has_length_at_most '
             f'({{\'max_value\': {constants.MAX_CHARS_IN_STORY_DESCRIPTION}}}) '
