@@ -210,7 +210,7 @@ export class ExplorationDataService {
         isDraftVersionvalid: boolean,
         draftChanges: ExplorationChange[]) => void,
       errorCallback: (errorResponse?: object) => void): void {
-    let dataVersion = 0;
+    let dataVersion = 1;
     if (this.data && this.data.version !== undefined) {
       dataVersion = this.data.version;
     }
