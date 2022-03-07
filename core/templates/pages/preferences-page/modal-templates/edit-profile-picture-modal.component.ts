@@ -23,6 +23,7 @@ import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import Cropper from 'cropperjs';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 require('cropperjs/dist/cropper.min.css');
 
 @Component({
@@ -34,6 +35,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   uploadedImage: SafeResourceUrl | null = null;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
+  windowIsNarrow: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
   // 'cropper' is initialized before it is to be used, hence we need to do
   // non-null assertion, for more information see
@@ -44,6 +46,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private ngbActiveModal: NgbActiveModal,
+    private windowDimensionService: WindowDimensionsService,
     private svgSanitizerService: SvgSanitizerService,
   ) {
     super(ngbActiveModal);
@@ -52,11 +55,19 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   initializeCropper(): void {
     if (this.croppableImageRef) {
       let profilePicture = this.croppableImageRef.nativeElement;
-      this.cropper = new Cropper(profilePicture, {
-        minContainerWidth: 500,
-        minContainerHeight: 350,
-        aspectRatio: 1
-      });
+      if (!this.windowIsNarrow) {
+        this.cropper = new Cropper(profilePicture, {
+          minContainerWidth: 500,
+          minContainerHeight: 350,
+          aspectRatio: 1
+        });
+      } else {
+        this.cropper = new Cropper(profilePicture, {
+          minContainerWidth: 200,
+          minContainerHeight: 200,
+          aspectRatio: 1
+        });
+      }
     }
   }
 
@@ -104,5 +115,13 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
         width: 150
       }).toDataURL());
     super.confirm(this.cropppedImageDataUrl);
+  }
+
+  ngOnInit(): void {
+    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+
+    this.windowDimensionService.getResizeEvent().subscribe(() => {
+      this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    });
   }
 }
