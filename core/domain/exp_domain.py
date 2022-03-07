@@ -36,6 +36,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import param_domain
 from core.domain import state_domain
+from core.domain import translation_domain
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -550,7 +551,7 @@ class VersionedExplorationInteractionIdsMapping:
         self.state_interaction_ids_dict = state_interaction_ids_dict
 
 
-class Exploration:
+class Exploration(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia exploration."""
 
     def __init__(
@@ -620,6 +621,25 @@ class Exploration:
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
+
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the exploration.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        for state in self.states.values():
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(state)
+            )
+        return translatable_contents_collection
 
     @classmethod
     def create_default_exploration(
@@ -2678,6 +2698,14 @@ class ExplorationSummary:
                 raise utils.ValidationError(
                     'Expected each id in viewer_ids to '
                     'be string, received %s' % viewer_id)
+
+        all_user_ids_with_rights = (
+            self.owner_ids + self.editor_ids + self.voice_artist_ids +
+            self.viewer_ids)
+        if len(all_user_ids_with_rights) != len(set(all_user_ids_with_rights)):
+            raise utils.ValidationError(
+                'Users should not be assigned to multiple roles at once, '
+                'received users: %s' % ', '.join(all_user_ids_with_rights))
 
         if not isinstance(self.contributor_ids, list):
             raise utils.ValidationError(
