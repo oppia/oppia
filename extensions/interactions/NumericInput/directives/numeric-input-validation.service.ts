@@ -43,6 +43,7 @@ interface Range {
   providedIn: 'root'
 })
 export class NumericInputValidationService {
+  static validateNumericString;
   constructor(
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}

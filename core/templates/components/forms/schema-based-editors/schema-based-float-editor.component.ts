@@ -202,7 +202,7 @@ implements ControlValueAccessor, OnInit, Validator {
 
   currentDecimalSeparator(): string {
     return this.numberConversionService.currentDecimalSeparator();
-  };
+  }
 
   parseInput(): void {
     let regex = this.numberConversionService.getInputValidationRegex();
@@ -235,7 +235,7 @@ implements ControlValueAccessor, OnInit, Validator {
         this.generateErrors();
       }
     }
-  };
+  }
 }
 
 angular.module('oppia').directive('schemaBasedFloatEditor', downgradeComponent({
