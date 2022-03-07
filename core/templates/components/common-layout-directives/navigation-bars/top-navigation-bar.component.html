@@ -201,6 +201,7 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
                  href="/about-foundation"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">{{'I18N_TOPNAV_OPPIA_FOUNDATION' | translate}}</span>
