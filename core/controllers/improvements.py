@@ -96,7 +96,9 @@ class ExplorationImprovementsHandler(base.BaseHandler):
         self.render_json({
             'open_tasks': [
                 get_task_dict_with_username_and_profile_picture(
-                    t) for t in open_tasks],
+                    task
+                ) for task in open_tasks
+            ],
             'resolved_task_types_by_state_name': (
                 resolved_task_types_by_state_name),
         })
@@ -169,7 +171,9 @@ class ExplorationImprovementsHistoryHandler(base.BaseHandler):
         self.render_json({
             'results': [
                 get_task_dict_with_username_and_profile_picture(
-                    t) for t in results],
+                    task
+                ) for task in results
+            ],
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })

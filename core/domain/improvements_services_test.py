@@ -292,8 +292,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
             improvements_services.fetch_exploration_tasks(self.exp))
 
         self.assertItemsEqual(
-            [t.to_dict() for t in open_tasks],
-            [tasks[3].to_dict()])
+            [t.to_dict() for t in open_tasks], [tasks[3].to_dict()])
         self.assertEqual(
             resolved_task_types_by_state_name, {
                 'B': ['high_bounce_rate'],
@@ -387,11 +386,11 @@ class PutTasksTests(ImprovementsServicesTestBase):
             improvements_models.TaskEntryModel.get_by_id(resolved_task.task_id))
 
         open_task_entry = improvements_services.get_task_entry_from_model(
-                open_task_model)
+            open_task_model)
         obsolete_task_entry = improvements_services.get_task_entry_from_model(
-                obsolete_task_model)
+            obsolete_task_model)
         resolved_task_entry = improvements_services.get_task_entry_from_model(
-                resolved_task_model)
+            resolved_task_model)
         self.assertEqual(open_task.to_dict(), open_task_entry.to_dict())
         self.assertEqual(
             obsolete_task.to_dict(),

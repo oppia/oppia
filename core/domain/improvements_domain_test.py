@@ -89,21 +89,6 @@ class TaskEntryTests(test_utils.GenericTestBase):
             'resolved_on_msecs': utils.get_time_in_millisecs(self.MOCK_DATE),
         })
 
-    def test_to_dict_with_non_existing_resolver_id_raises_exception(
-        self
-    ) -> None:
-        invalid_resolver_id = 'non_existing_user_id'
-        task_entry = improvements_domain.TaskEntry(
-            constants.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-            constants.TASK_STATUS_RESOLVED, invalid_resolver_id,
-            self.MOCK_DATE)
-        with self.assertRaisesRegex(Exception, 'User not found'): # type: ignore[no-untyped-call]
-            improvements.get_task_dict_with_username_and_profile_picture( # type: ignore[no-untyped-call]
-             task_entry)
-
     def test_can_create_open_task_with_corresponding_values(self) -> None:
         task_entry = improvements_domain.TaskEntry(
             constants.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
