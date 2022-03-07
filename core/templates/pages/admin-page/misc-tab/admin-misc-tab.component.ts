@@ -109,7 +109,7 @@ export class AdminMiscTabComponent {
     let element = document.getElementById(
       'topicSimilaritiesFile') as HTMLInputElement;
     if (element === null) {
-      throw new Error('No label found for uploading files.');
+      throw new Error('No element with id topicSimilaritiesFile found.');
     }
     if (element.files === null) {
       throw new Error('No files found.');

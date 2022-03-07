@@ -257,6 +257,31 @@ describe('Admin misc tab component ', () => {
       expect(statusMessageSpy).toHaveBeenCalledWith(
         'Server error: Internal Server Error.');
     }));
+
+    it('should throw error if no label is found for uploading files', () => {
+      spyOn(document, 'getElementById').and.returnValue(null);
+      expect(() => {
+        component.uploadTopicSimilaritiesFile();
+      }).toThrowError('No element with id topicSimilaritiesFile found.');
+    });
+
+    it('should throw error if no files are uploaded', () => {
+      // This throws "Argument of type '() => { files: { size: number;
+      // name: string; }[]; }' is not assignable to parameter of type
+      // '(elementId: string) => HTMLElement'.". This is because the
+      // actual 'getElementById' returns more properties than just "files".
+      // We need to suppress this error because we need only "files"
+      // property for testing.
+      // @ts-expect-error
+      spyOn(document, 'getElementById').and.callFake(() => {
+        return {
+          files: null
+        };
+      });
+      expect(() => {
+        component.uploadTopicSimilaritiesFile();
+      }).toThrowError('No files found.');
+    });
   });
 
   it('should download topic similarities csv file ' +
