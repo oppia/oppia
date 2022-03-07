@@ -122,7 +122,7 @@
 	"I18N_INTERACTIONS_GRAPH_DELETE": "מחיקה",
 	"I18N_INTERACTIONS_GRAPH_ERROR_INVALID": "תרשים שגוי!",
 	"I18N_INTERACTIONS_GRAPH_MOVE": "העברה",
-	"I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS": "התשובה יכולה להכיל 15 ספרות לכל היותר (0-9) לא כולל תווים מיוחדים (. או -).",
+	"I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_DOT": "התשובה יכולה להכיל 15 ספרות לכל היותר (0-9) לא כולל תווים מיוחדים (. או -).",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER": "התשובה יכולה להכיל רק ספרות (0-9) ואת התו נקודה (.).",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO": "התשובה צריכה להיות גדולה או שווה ל-0. היא אינה יכולה להכיל את תו המינוס (-).",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "ביטול",

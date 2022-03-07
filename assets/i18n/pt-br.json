@@ -456,7 +456,7 @@
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_UNIT_CHARS": "Certifique-se de que a unidade contém apenas números, letras, (, ), *, ^, /, -",
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_VALUE": "Certifique-se de que o valor seja uma fração ou um número",
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "Formatos de unidade possíveis",
-	"I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS": "A resposta pode conter no máximo 15 dígitos (0–9) excluindo símbolos (. ou -).",
+	"I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_DOT": "A resposta pode conter no máximo 15 dígitos (0–9) excluindo símbolos (. ou -).",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER": "A resposta pode conter apenas números (0-9) ou símbolos (.).",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO": "A resposta deve ser maior ou igual a zero. Não deve conter o símbolo de menos (-).",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "Tem certeza de que deseja redefinir seu código?",
