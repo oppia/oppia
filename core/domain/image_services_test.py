@@ -37,7 +37,7 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
     TEST_IMAGE_WIDTH = 3000
     TEST_IMAGE_HEIGHT = 2092
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(ImageServicesUnitTests, self).setUp()
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'dummy_large_image.jpg'),
@@ -48,13 +48,13 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
             'rb', encoding=None) as f:
             self.png_raw_image = f.read()
 
-    def test_image_dimensions_are_output_correctly(self):
+    def test_image_dimensions_are_output_correctly(self) -> None:
         height, width = (
             image_services.get_image_dimensions(self.jpeg_raw_image))
         self.assertEqual(self.TEST_IMAGE_HEIGHT, height)
         self.assertEqual(self.TEST_IMAGE_WIDTH, width)
 
-    def test_compress_image_returns_correct_dimensions(self):
+    def test_compress_image_returns_correct_dimensions(self) -> None:
         compressed_image = (
             image_services.compress_image(self.jpeg_raw_image, 0.5))
         height, width = (
@@ -62,8 +62,8 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.TEST_IMAGE_HEIGHT * 0.5, height)
         self.assertEqual(self.TEST_IMAGE_WIDTH * 0.5, width)
 
-    def test_invalid_scaling_factor_triggers_value_error(self):
-        value_exception = self.assertRaisesRegex(
+    def test_invalid_scaling_factor_triggers_value_error(self) -> None:
+        value_exception = self.assertRaisesRegex(# type: ignore[no-untyped-call]
             ValueError,
             re.escape(
                 'Scaling factor should be in the interval (0, 1], '
@@ -71,7 +71,7 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         with value_exception:
             image_services.compress_image(self.jpeg_raw_image, 1.1)
 
-        value_exception = self.assertRaisesRegex(
+        value_exception = self.assertRaisesRegex(# type: ignore[no-untyped-call]
             ValueError,
             re.escape(
                 'Scaling factor should be in the interval (0, 1], '
@@ -79,7 +79,7 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         with value_exception:
             image_services.compress_image(self.jpeg_raw_image, 0)
 
-        value_exception = self.assertRaisesRegex(
+        value_exception = self.assertRaisesRegex(# type: ignore[no-untyped-call]
             ValueError,
             re.escape(
                 'Scaling factor should be in the interval (0, 1], '
@@ -87,7 +87,7 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         with value_exception:
             image_services.compress_image(self.jpeg_raw_image, -1)
 
-    def test_compression_results_in_correct_format(self):
+    def test_compression_results_in_correct_format(self) -> None:
         compressed_image = (
             image_services.compress_image(self.jpeg_raw_image, 0.7))
         pil_image = Image.open(io.BytesIO(compressed_image))
@@ -98,7 +98,7 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         pil_image = Image.open(io.BytesIO(compressed_image))
         self.assertEqual(pil_image.format, 'PNG')
 
-    def test_compression_results_in_identical_files(self):
+    def test_compression_results_in_identical_files(self) -> None:
         with utils.open_file(
             os.path.join(
                 feconf.TESTS_DATA_DIR, 'compressed_image.jpg'),

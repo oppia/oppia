@@ -21,9 +21,10 @@ from __future__ import annotations
 import io
 
 from PIL import Image
+from typing import Tuple
 
 
-def _get_pil_image_dimensions(pil_image):
+def _get_pil_image_dimensions(pil_image: Image) -> Tuple[int, int]:
     """Gets the dimensions of the Pillow Image.
 
     Args:
@@ -36,7 +37,7 @@ def _get_pil_image_dimensions(pil_image):
     return height, width
 
 
-def get_image_dimensions(file_content):
+def get_image_dimensions(file_content: bytes) -> Tuple[int, int]:
     """Gets the dimensions of the image with the given file_content.
 
     Args:
@@ -49,7 +50,7 @@ def get_image_dimensions(file_content):
     return _get_pil_image_dimensions(image)
 
 
-def compress_image(image_content, scaling_factor):
+def compress_image(image_content: bytes, scaling_factor: float) -> bytes:
     """Compresses the image by resizing the image with the scaling factor.
 
     Args:
