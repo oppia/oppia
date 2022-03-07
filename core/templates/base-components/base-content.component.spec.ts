@@ -62,6 +62,8 @@ describe('Base Content Component', () => {
     }
   }
 
+  // We are mocking Router service to return the NavigationEnd object,
+  // so that we can test the routing event in our base component.
   class MockRouteService {
     public events: Observable<NavigationEnd> = (
       of(new NavigationEnd(
