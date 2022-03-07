@@ -1224,6 +1224,12 @@ class CategorizedSkillsTests(test_utils.GenericTestBase):
         self.subtopic_titles = ['Subtopic Title 1', 'Subtopic Title 2']
         self.categorized_skills.add_topic('Topic Name', self.subtopic_titles)
 
+    def test_validation_fails_with_duplicate_topic_name(self):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Topic name \'Topic Name\' is already added.'):
+            self.categorized_skills.add_topic('Topic Name', [])
+
     def test_uncategorized_skill_gets_added(self):
         self.categorized_skills.add_uncategorized_skill(
             'Topic Name', 'skill_1', 'Description 1')
@@ -1238,6 +1244,13 @@ class CategorizedSkillsTests(test_utils.GenericTestBase):
                 'Subtopic Title 2': []
             }
         })
+
+    def test_validation_fails_with_topic_name_not_added(self):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Topic name \'Topic Name 1\' is not added.'):
+            self.categorized_skills.add_uncategorized_skill(
+                'Topic Name 1', 'skill_1', 'Description 1')
 
     def test_subtopic_skill_gets_added(self):
         self.categorized_skills.add_subtopic_skill(
@@ -1258,3 +1271,10 @@ class CategorizedSkillsTests(test_utils.GenericTestBase):
                 }]
             }
         })
+
+    def test_validation_fails_with_subtopic_title_not_added(self):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Subtopic title \'Subtopic Title 3\' is not added.'):
+            self.categorized_skills.add_subtopic_skill(
+                'Topic Name', 'Subtopic Title 3', 'skill_1', 'Description 1')

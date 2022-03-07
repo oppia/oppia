@@ -1796,6 +1796,10 @@ class CategorizedSkills:
             subtopic_titles: list(str). The list of subtopic titles of the
                 topic.
         """
+        if topic_name in self.categorized_skills.keys():
+            raise utils.ValidationError(
+                'Topic name \'%s\' is already added.' % topic_name)
+
         self.categorized_skills[topic_name] = {}
         self.categorized_skills[topic_name]['uncategorized'] = []
         for subtopic_title in subtopic_titles:
@@ -1810,6 +1814,7 @@ class CategorizedSkills:
             skill_id: str. The id of the skill.
             skill_description: str. The description of the skill.
         """
+        self.require_valid_topic_name(topic_name)
         self.categorized_skills[topic_name]['uncategorized'].append({
             'skill_id': skill_id,
             'skill_description': skill_description
@@ -1825,10 +1830,41 @@ class CategorizedSkills:
             skill_id: str. The id of the skill.
             skill_description: str. The description of the skill.
         """
+        self.require_valid_topic_name(topic_name)
+        self.require_valid_subtopic_title(topic_name, subtopic_title)
         self.categorized_skills[topic_name][subtopic_title].append({
             'skill_id': skill_id,
             'skill_description': skill_description
         })
+
+    def require_valid_topic_name(self, topic_name):
+        """Checks whether the given topic name is valid i.e. added to the
+        categorized skills dict.
+
+        Args:
+            topic_name: str. The name of the topic.
+        
+        Raises:
+            ValidationError. Topic name is not added.
+        """
+        if not topic_name in self.categorized_skills.keys():
+            raise utils.ValidationError(
+                'Topic name \'%s\' is not added.' % topic_name)
+
+    def require_valid_subtopic_title(self, topic_name, subtopic_title):
+        """Checks whether the given subtopic name is added to the
+        categorized skills dict under the given topic name.
+
+        Args:
+            topic_name: str. The name of the topic.
+            subtopic_title: str. The name of the subtopic.
+        
+        Raises:
+            ValidationError. Subtopic name is not added.
+        """
+        if not subtopic_title in self.categorized_skills[topic_name]:
+            raise utils.ValidationError(
+                'Subtopic title \'%s\' is not added.' % subtopic_title)
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object."""
