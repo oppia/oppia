@@ -4947,294 +4947,366 @@ export default {
   // This is linked to SUPPORTED_LANGUAGES in android_validation_constants.
   "SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID": [{
     "code": "en",
-    "description": "English"
+    "description": "English",
+    "decimal_separator": "."
   }],
 
   // List of supported content languages in which we can create explorations or
   // other entities. Each description has a parenthetical part that may be
   // stripped out to give a shorter description.
+  // The decimal separators were derived from https://en.wikipedia.org/w/index.php?title=Decimal_separator&section=9#Usage_worldwide.
   "SUPPORTED_CONTENT_LANGUAGES": [{
     "code": "en",
     "description": "English",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "ar",
     "description": "العربية (Arabic)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "code": "sq",
     "description": "shqip (Albanian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "az",
     "description": "Azeri (Azerbaijani)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "bg",
     "description": "български (Bulgarian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "bn",
     "description": "বাংলা (Bangla)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "ca",
     "description": "català (Catalan)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "zh",
     "description": "中文 (Chinese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "hr",
     "description": "hrvatski (Croatian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "cs",
     "description": "čeština (Czech)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "da",
     "description": "dansk (Danish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "nl",
     "description": "Nederlands (Dutch)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "fat",
     "description": "Fanti",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "tl",
     "description": "Filipino (Filipino)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "fi",
     "description": "suomi (Finnish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "fr",
     "description": "français (French)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "lg",
     "description": "Luganda (Ganda)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "de",
     "description": "Deutsch (German)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "el",
     "description": "ελληνικά (Greek)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ha",
     "description": "Halshen Hausa (Hausa)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "he",
     "description": "עברית (Hebrew)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": "."
   }, {
     "code": "hi",
     "description": "हिन्दी (Hindi)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "hi-en",
     "description": "Hinglish",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "hu",
     "description": "magyar (Hungarian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "id",
     "description": "Bahasa Indonesia (Indonesian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ig",
     "description": "Ásụ̀sụ́ Ìgbò (Igbo)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "it",
     "description": "italiano (Italian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ja",
     "description": "日本語 (Japanese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "kab",
     "description": "Taqbaylit (Kabyle)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ko",
     "description": "한국어 (Korean)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "lv",
     "description": "latviešu (Latvian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "lt",
     "description": "lietuvių (Lithuanian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "mr",
     "description": "मराठी (Marathi)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "no",
     "description": "Norsk (Norwegian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "fa",
     "description": "فارسی (Persian)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "code": "pl",
     "description": "polszczyzna (Polish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "prs",
     "description": "دری (Dari)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "code": "pt",
     "description": "português (Portuguese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ro",
     "description": "română (Romanian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ru",
     "description": "pусский (Russian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "sr",
     "description": "cрпски (Serbian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "sk",
     "description": "slovenčina (Slovak)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "sl",
     "description": "slovenščina (Slovenian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "es",
     "description": "español (Spanish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "sw",
     "description": "kiswahili (Swahili)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "sv",
     "description": "svenska (Swedish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ta",
     "description": "தமிழ் (Tamil)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "th",
     "description": "ภาษาไทย (Thai)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "tr",
     "description": "Türkçe (Turkish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "uk",
     "description": "yкраїнська (Ukrainian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ur",
     "description": "اُردُو (Urdu)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "yo",
-    "description": "Èdè Yorùbá (Yoruba)",
-    "direction": "ltr"
+    "description": "Èdè Yoùbá (Yoruba)",
+    "direction": "ltr",
+    "decimal_separator": "."
   }],
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the
   // languages are roughly in order of how much support we have for them in
   // terms of lesson content translations.
   // List of supported site languages in which the platform is offered.
+  // The decimal separators were derived from https://en.wikipedia.org/w/index.php?title=Decimal_separator&section=9#Usage_worldwide.
   "SUPPORTED_SITE_LANGUAGES": [{
     "id": "en",
     "text": "English",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "id": "pt-br",
     "text": "Português (Brasil)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "ar",
     "text": "العربية",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "id": "hi",
     "text": "हिन्दी",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "id": "es",
     "text": "Español",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "bn",
     "text": "বাংলা",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "id": "fr",
     "text": "français (French)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "id",
     "text": "Bahasa Indonesia",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "uk",
     "text": "украї́нська мо́ва (Ukrainian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "sk",
     "text": "slovenčina (Slovak)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "nl",
     "text": "Nederlands (Dutch)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "kab",
     "text": "Taqbaylit (Kabyle)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "vi",
     "text": "Tiếng Việt",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "tr",
     "text": "Türkçe (Turkish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "zh-hans",
     "text": "中文(简体)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "id": "zh-hant",
     "text": "中文(繁體)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }],
 
   // List of supported audio languages in which we have audio and translations
@@ -5248,132 +5320,132 @@ export default {
     "direction": "ltr"
   }, {
     "id": "ak",
-    "description": "Akan",
+    "description": "Ákán (Akan)",
     "relatedLanguages": ["ak"],
     "direction": "ltr"
   }, {
     "id": "sq",
-    "description": "Albanian",
+    "description": "shqip (Albanian)",
     "relatedLanguages": ["sq"],
     "direction": "ltr"
   }, {
     "id": "ar",
-    "description": "Arabic",
+    "description": "العربية (Arabic)",
     "relatedLanguages": ["ar"],
     "direction": "rtl"
   }, {
     "id": "az",
-    "description": "Azerbaijani",
+    "description": "Azeri (Azerbaijani)",
     "relatedLanguages": ["az"],
     "direction": "ltr"
   }, {
     "id": "bg",
-    "description": "Bulgarian",
+    "description": "български (Bulgarian)",
     "relatedLanguages": ["bg"],
     "direction": "ltr"
   }, {
     "id": "bn",
-    "description": "Bangla",
+    "description": "বাংলা (Bangla)",
     "relatedLanguages": ["bn"],
     "direction": "ltr"
   }, {
     "id": "ms",
-    "description": "Bahasa Melayu",
+    "description": "بهاس ملايو(Bahasa Melayu)",
     "relatedLanguages": ["ms"],
     "direction": "ltr"
   }, {
     "id": "ca",
-    "description": "Catalan",
+    "description": "català (Catalan)",
     "relatedLanguages": ["ca"],
     "direction": "ltr"
   }, {
     "id": "zh",
-    "description": "Chinese",
+    "description": "中文 (Chinese)",
     "relatedLanguages": ["zh"],
     "direction": "ltr"
   }, {
     "id": "hr",
-    "description": "Croatian",
+    "description": "hrvatski (Croatian)",
     "relatedLanguages": ["hr"],
     "direction": "ltr"
   }, {
     "id": "cs",
-    "description": "Czech",
+    "description": "čeština (Czech)",
     "relatedLanguages": ["cs"],
     "direction": "ltr"
   }, {
     "id": "da",
-    "description": "Danish",
+    "description": "dansk (Danish)",
     "relatedLanguages": ["da"],
     "direction": "ltr"
   }, {
     "id": "prs",
-    "description": "Dari",
+    "description": "دری (Dari)",
     "relatedLanguages": ["prs"],
     "direction": "rtl"
   }, {
     "id": "nl",
-    "description": "Dutch",
+    "description": "Nederlands (Dutch)",
     "relatedLanguages": ["nl"],
     "direction": "ltr"
   }, {
     "id": "ee",
-    "description": "Ewe",
+    "description": "Eʋegbe (Ewe)",
     "relatedLanguages": ["ee"],
     "direction": "ltr"
   }, {
     "id": "fat",
-    "description": "Fanti",
+    "description": "Fante (Fanti)",
     "relatedLanguages": ["ak", "fat"],
     "direction": "ltr"
   }, {
     "id": "tl",
-    "description": "Filipino",
+    "description": "Filipino (Filipino)",
     "relatedLanguages": ["tl"],
     "direction": "ltr"
   }, {
     "id": "fi",
-    "description": "Finnish",
+    "description": "suomi (Finnish)",
     "relatedLanguages": ["fi"],
     "direction": "ltr"
   }, {
     "id": "fr",
-    "description": "French",
+    "description": "français (French)",
     "relatedLanguages": ["fr"],
     "direction": "ltr"
   }, {
     "id": "lg",
-    "description": "Ganda",
+    "description": "Luganda (Ganda)",
     "relatedLanguages": ["lg"],
     "direction": "ltr"
   }, {
     "id": "de",
-    "description": "German",
+    "description": "Deutsch (German)",
     "relatedLanguages": ["de"],
     "direction": "ltr"
   }, {
     "id": "el",
-    "description": "Greek",
+    "description": "ελληνικά (Greek)",
     "relatedLanguages": ["el"],
     "direction": "ltr"
   }, {
     "id": "gaa",
-    "description": "Ga",
+    "description": "Gã (Ga)",
     "relatedLanguages": ["gaa"],
     "direction": "ltr"
   }, {
     "id": "ha",
-    "description": "Hausa",
+    "description": "Halshen Hausa (Hausa)",
     "relatedLanguages": ["ha"],
     "direction": "ltr"
   }, {
     "id": "he",
-    "description": "Hebrew",
+    "description": "עברית (Hebrew)",
     "relatedLanguages": ["he"],
     "direction": "rtl"
   }, {
     "id": "hi",
-    "description": "Hindi",
+    "description": "हिन्दी (Hindi)",
     "relatedLanguages": ["hi"],
     "direction": "ltr"
   }, {
@@ -5383,157 +5455,157 @@ export default {
     "direction": "ltr"
   }, {
     "id": "hu",
-    "description": "Hungarian",
+    "description": "magyar (Hungarian)",
     "relatedLanguages": ["hu"],
     "direction": "ltr"
   }, {
     "id": "id",
-    "description": "Indonesian",
+    "description": "Bahasa Indonesia (Indonesian)",
     "relatedLanguages": ["id"],
     "direction": "ltr"
   }, {
     "id": "ig",
-    "description": "Igbo",
+    "description": "Ásụ̀sụ́ Ìgbò (Igbo)",
     "relatedLanguages": ["igbo"],
     "direction": "ltr"
   }, {
     "id": "it",
-    "description": "Italian",
+    "description": "italiano (Italian)",
     "relatedLanguages": ["it"],
     "direction": "ltr"
   }, {
     "id": "ja",
-    "description": "Japanese",
+    "description": "日本語 (Japanese)",
     "relatedLanguages": ["ja"],
     "direction": "ltr"
   }, {
     "id": "kab",
-    "description": "Kabyle",
+    "description": "Taqbaylit (Kabyle)",
     "relatedLanguages": ["kab"],
     "direction": "ltr"
   }, {
     "id": "ko",
-    "description": "Korean",
+    "description": "한국어 (Korean)",
     "relatedLanguages": ["ko"],
     "direction": "ltr"
   }, {
     "id": "lv",
-    "description": "Latvian",
+    "description": "latviešu (Latvian)",
     "relatedLanguages": ["lv"],
     "direction": "ltr"
   }, {
     "id": "lt",
-    "description": "Lithuanian",
+    "description": "lietuvių (Lithuanian)",
     "relatedLanguages": ["lt"],
     "direction": "ltr"
   }, {
     "id": "mr",
-    "description": "Marathi",
+    "description": "मराठी (Marathi)",
     "relatedLanguages": ["mr"],
     "direction": "ltr"
   }, {
     "id": "no",
-    "description": "Norwegian",
+    "description": "Norsk (Norwegian)",
     "relatedLanguages": ["no"],
     "direction": "ltr"
   }, {
     "id": "fa",
-    "description": "Persian",
+    "description": "فارسی (Persian)",
     "relatedLanguages": ["fa"],
     "direction": "rtl"
   }, {
     "id": "pl",
-    "description": "Polish",
+    "description": "polszczyzna (Polish)",
     "relatedLanguages": ["pl"],
     "direction": "ltr"
   }, {
     "id": "pt",
-    "description": "Portuguese",
+    "description": "português (Portuguese)",
     "relatedLanguages": ["pt"],
     "direction": "ltr"
   }, {
     "id": "ps",
-    "description": "Pashto",
+    "description": "پښتو (Pashto)",
     "relatedLanguages": ["ps"],
     "direction": "rtl"
   }, {
     "id": "ro",
-    "description": "Romanian",
+    "description": "română (Romanian)",
     "relatedLanguages": ["ro"],
     "direction": "ltr"
   }, {
     "id": "ru",
-    "description": "Russian",
+    "description": "pусский (Russian)",
     "relatedLanguages": ["ru"],
     "direction": "ltr"
   }, {
     "id": "sr",
-    "description": "Serbian",
+    "description": "cрпски (Serbian)",
     "relatedLanguages": ["sr"],
     "direction": "ltr"
   }, {
     "id": "sk",
-    "description": "Slovak",
+    "description": "slovenčina (Slovak)",
     "relatedLanguages": ["sk"],
     "direction": "ltr"
   }, {
     "id": "sl",
-    "description": "Slovenian",
+    "description": "slovenščina (Slovenian)",
     "relatedLanguages": ["sl"],
     "direction": "ltr"
   }, {
     "id": "es",
-    "description": "Spanish",
+    "description": "español (Spanish)",
     "relatedLanguages": ["es"],
     "direction": "ltr"
   }, {
     "id": "sw",
-    "description": "Swahili",
+    "description": "kiswahili (Swahili)",
     "relatedLanguages": ["sw"],
     "direction": "ltr"
   }, {
     "id": "sv",
-    "description": "Swedish",
+    "description": "svenska (Swedish)",
     "relatedLanguages": ["sv"],
     "direction": "ltr"
   }, {
     "id": "ta",
-    "description": "Tamil",
+    "description": "தமிழ் (Tamil)",
     "relatedLanguages": ["ta"],
     "direction": "ltr"
   }, {
     "id": "te",
-    "description": "Telugu",
+    "description": "తెలుగు (Telugu)",
     "relatedLanguages": ["te"],
     "direction": "ltr"
   }, {
     "id": "th",
-    "description": "Thai",
+    "description": "ภาษาไทย (Thai)",
     "relatedLanguages": ["th"],
     "direction": "ltr"
   }, {
     "id": "tr",
-    "description": "Turkish",
+    "description": "Türkçe (Turkish)",
     "relatedLanguages": ["tr"],
     "direction": "ltr"
   }, {
     "id": "uk",
-    "description": "Ukrainian",
+    "description": "yкраїнська (Ukrainian)",
     "relatedLanguages": ["uk"],
     "direction": "ltr"
   }, {
     "id": "ur",
-    "description": "Urdu",
+    "description": "اُردُو (Urdu)",
     "relatedLanguages": ["ur"],
     "direction": "rtl"
   }, {
     "id": "vi",
-    "description": "Vietnamese",
+    "description": "Tiếng Việt (Vietnamese)",
     "relatedLanguages": ["vi"],
     "direction": "ltr"
   }, {
     "id": "yo",
-    "description": "Yoruba",
+    "description": "Èdè Yoùbá (Yoruba)",
     "relatedLanguages": ["yo"],
     "direction": "ltr"
   }],

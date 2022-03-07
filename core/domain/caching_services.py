@@ -151,7 +151,7 @@ SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
     CACHE_NAMESPACE_EXPLORATION: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
     CACHE_NAMESPACE_SKILL: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
     CACHE_NAMESPACE_STORY: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
-    CACHE_NAMESPACE_TOPIC: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
+    CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
     CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
     CACHE_NAMESPACE_CONFIG: json.dumps,
     CACHE_NAMESPACE_DEFAULT: json.dumps
@@ -177,7 +177,7 @@ def _get_memcache_key(
         obj_id: str. The id of the value to store in the memory cache.
 
     Raises:
-        Exception. The sub-namespace contains a ':'.
+        ValueError. The sub-namespace contains a ':'.
 
     Returns:
         str. The generated key for use in the memory cache in order to

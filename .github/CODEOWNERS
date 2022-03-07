@@ -193,9 +193,9 @@
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/linters/ @Hudda @DubeySandeep
-/scripts/linters/codeowner_linter*.py @sajalasati @DubeySandeep
-/scripts/linters/pylint_extensions*.py @sajalasati @DubeySandeep
-/scripts/linters/python_linter*.py @sajalasati @DubeySandeep
+/scripts/linters/codeowner_linter*.py @DubeySandeep
+/scripts/linters/pylint_extensions*.py @DubeySandeep
+/scripts/linters/python_linter*.py @DubeySandeep
 /ubuntu_dockerfile @DubeySandeep
 
 
@@ -261,6 +261,7 @@
 /core/templates/components/common-layout-directives/common-elements/alert-message.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.ts @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.css @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @srijanreddy98
@@ -310,6 +311,7 @@
 /core/templates/services/contextual/window-ref.service*.ts @srijanreddy98
 /core/templates/services/internet-connectivity.service*.ts @srijanreddy98
 /core/templates/services/server-connection-backend-api.service*.ts @srijanreddy98
+/core/templates/services/number-conversion.service*.ts @srijanreddy98
 
 
 # Global stylesheet.
@@ -741,3 +743,4 @@
 /core/controllers/android_e2e_config*.py @seanlip
 /core/android_validation_constants*.py @seanlip
 /extensions/interactions/rule_templates.json @seanlip
+/.rtlcssrc @aks681

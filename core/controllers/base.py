@@ -29,7 +29,6 @@ import urllib
 
 from core import feconf
 from core import handler_schema_constants
-from core import python_utils
 from core import utils
 from core.controllers import payload_validator
 from core.domain import auth_domain
@@ -70,7 +69,7 @@ def load_template(filename):
         str. The HTML file content.
     """
     filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
-    with python_utils.open_file(filepath, 'r') as f:
+    with utils.open_file(filepath, 'r') as f:
         html_text = f.read()
     return html_text
 
@@ -441,10 +440,10 @@ class BaseHandler(webapp2.RequestHandler):
         try:
             schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
                 request_method]
-        except Exception:
+        except Exception as e:
             raise NotImplementedError(
                 'Missing schema for %s method in %s handler class.' % (
-                    request_method, handler_class_name))
+                    request_method, handler_class_name)) from e
 
         allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
         normalized_arg_values, errors = (
@@ -587,6 +586,9 @@ class BaseHandler(webapp2.RequestHandler):
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
+
+        Raises:
+            Exception. Invalid X-Frame-Options.
         """
 
         # The 'no-store' must be used to properly invalidate the cache when we

@@ -32,6 +32,7 @@ from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import expression_parser
 from core.domain import state_domain
+from core.domain import translation_domain
 from extensions import domain
 
 from pylatexenc import latex2text
@@ -130,7 +131,7 @@ class QuestionSuggestionChange(change_domain.BaseChange):
     ]
 
 
-class Question:
+class Question(translation_domain.BaseTranslatableObject):
     """Domain object for a question."""
 
     def __init__(
@@ -171,6 +172,22 @@ class Question:
             inapplicable_skill_misconception_ids)
         self.created_on = created_on
         self.last_updated = last_updated
+
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Registers all of translatable fields/objects in the question.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        translatable_contents_collection.add_fields_from_translatable_object(
+            self.question_state_data)
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this Question domain object.
@@ -682,13 +699,13 @@ class Question:
         Returns:
             dict. The converted question_state_dict.
         """
-        if question_state_dict['interaction']['id'] != 'TextInput':
-            return question_state_dict
-        answer_group_dicts = question_state_dict['interaction']['answer_groups']
-        for answer_group_dict in answer_group_dicts:
-            for rule_spec_dict in answer_group_dict['rule_specs']:
-                if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
-                    rule_spec_dict['rule_type'] = 'Equals'
+        if question_state_dict['interaction']['id'] == 'TextInput':
+            answer_group_dicts = question_state_dict[
+                'interaction']['answer_groups']
+            for answer_group_dict in answer_group_dicts:
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
+                        rule_spec_dict['rule_type'] = 'Equals'
 
         return question_state_dict
 
@@ -778,20 +795,19 @@ class Question:
         Returns:
             dict. The converted question_state_dict.
         """
-        if question_state_dict['interaction']['id'] != 'TextInput':
-            return question_state_dict
-
-        answer_group_dicts = question_state_dict['interaction']['answer_groups']
-        for answer_group_dict in answer_group_dicts:
-            rule_type_to_inputs = collections.defaultdict(set)
-            for rule_spec_dict in answer_group_dict['rule_specs']:
-                rule_type = rule_spec_dict['rule_type']
-                rule_inputs = rule_spec_dict['inputs']['x']
-                rule_type_to_inputs[rule_type].add(rule_inputs)
-            answer_group_dict['rule_specs'] = [{
-                'rule_type': rule_type,
-                'inputs': {'x': list(rule_type_to_inputs[rule_type])}
-            } for rule_type in rule_type_to_inputs]
+        if question_state_dict['interaction']['id'] == 'TextInput':
+            answer_group_dicts = question_state_dict[
+                'interaction']['answer_groups']
+            for answer_group_dict in answer_group_dicts:
+                rule_type_to_inputs = collections.defaultdict(set)
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    rule_type = rule_spec_dict['rule_type']
+                    rule_inputs = rule_spec_dict['inputs']['x']
+                    rule_type_to_inputs[rule_type].add(rule_inputs)
+                answer_group_dict['rule_specs'] = [{
+                    'rule_type': rule_type,
+                    'inputs': {'x': list(rule_type_to_inputs[rule_type])}
+                } for rule_type in rule_type_to_inputs]
 
         return question_state_dict
 
@@ -845,37 +861,36 @@ class Question:
         # TextInput and SetInput have translatable rule inputs, and every rule
         # for these interactions takes exactly one translatable input named x.
         interaction_id = question_state_dict['interaction']['id']
-        if interaction_id not in ['TextInput', 'SetInput']:
-            return question_state_dict
-
-        content_id_counter = ContentIdCounter(
-            question_state_dict['next_content_id_index'])
-        answer_group_dicts = question_state_dict['interaction']['answer_groups']
-        for answer_group_dict in answer_group_dicts:
-            for rule_spec_dict in answer_group_dict['rule_specs']:
-                content_id = content_id_counter.generate_content_id(
-                    'rule_input_')
-                if interaction_id == 'TextInput':
-                    # Convert to TranslatableSetOfNormalizedString.
-                    rule_spec_dict['inputs']['x'] = {
-                        'contentId': content_id,
-                        'normalizedStrSet': rule_spec_dict['inputs']['x']
-                    }
-                elif interaction_id == 'SetInput':
-                    # Convert to TranslatableSetOfUnicodeString.
-                    rule_spec_dict['inputs']['x'] = {
-                        'contentId': content_id,
-                        'unicodeStrSet': rule_spec_dict['inputs']['x']
-                    }
-        question_state_dict['next_content_id_index'] = (
-            content_id_counter.next_content_id_index)
-        for new_content_id in content_id_counter.new_content_ids:
-            question_state_dict[
-                'written_translations'][
-                    'translations_mapping'][new_content_id] = {}
-            question_state_dict[
-                'recorded_voiceovers'][
-                    'voiceovers_mapping'][new_content_id] = {}
+        if interaction_id in ['TextInput', 'SetInput']:
+            content_id_counter = ContentIdCounter(
+                question_state_dict['next_content_id_index'])
+            answer_group_dicts = question_state_dict[
+                'interaction']['answer_groups']
+            for answer_group_dict in answer_group_dicts:
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    content_id = content_id_counter.generate_content_id(
+                        'rule_input_')
+                    if interaction_id == 'TextInput':
+                        # Convert to TranslatableSetOfNormalizedString.
+                        rule_spec_dict['inputs']['x'] = {
+                            'contentId': content_id,
+                            'normalizedStrSet': rule_spec_dict['inputs']['x']
+                        }
+                    elif interaction_id == 'SetInput':
+                        # Convert to TranslatableSetOfUnicodeString.
+                        rule_spec_dict['inputs']['x'] = {
+                            'contentId': content_id,
+                            'unicodeStrSet': rule_spec_dict['inputs']['x']
+                        }
+            question_state_dict['next_content_id_index'] = (
+                content_id_counter.next_content_id_index)
+            for new_content_id in content_id_counter.new_content_ids:
+                question_state_dict[
+                    'written_translations'][
+                        'translations_mapping'][new_content_id] = {}
+                question_state_dict[
+                    'recorded_voiceovers'][
+                        'voiceovers_mapping'][new_content_id] = {}
 
         return question_state_dict
 
@@ -949,85 +964,83 @@ class Question:
                 ]
 
         interaction_id = question_state_dict['interaction']['id']
-        if interaction_id not in [
-                'DragAndDropSortInput', 'ItemSelectionInput']:
-            return question_state_dict
+        if interaction_id in ['DragAndDropSortInput', 'ItemSelectionInput']:
+            solution = question_state_dict['interaction']['solution']
+            choices = question_state_dict['interaction'][
+                'customization_args']['choices']['value']
 
-        solution = question_state_dict['interaction']['solution']
-        choices = question_state_dict['interaction']['customization_args'][
-            'choices']['value']
-
-        if interaction_id == 'ItemSelectionInput':
-            # The solution type will be migrated from SetOfHtmlString to
-            # SetOfTranslatableHtmlContentIds.
-            if solution is not None:
-                solution['correct_answer'] = (
-                    migrate_rule_inputs_and_answers(
-                        'SetOfTranslatableHtmlContentIds',
-                        solution['correct_answer'],
-                        choices)
-                )
-        if interaction_id == 'DragAndDropSortInput':
-            # The solution type will be migrated from ListOfSetsOfHtmlString
-            # to ListOfSetsOfTranslatableHtmlContentIds.
-            if solution is not None:
-                solution['correct_answer'] = (
-                    migrate_rule_inputs_and_answers(
-                        'ListOfSetsOfTranslatableHtmlContentIds',
-                        solution['correct_answer'],
-                        choices)
-                )
-
-        answer_group_dicts = question_state_dict['interaction']['answer_groups']
-        for answer_group_dict in answer_group_dicts:
-            for rule_spec_dict in answer_group_dict['rule_specs']:
-                rule_type = rule_spec_dict['rule_type']
-                rule_inputs = rule_spec_dict['inputs']
-
-                if interaction_id == 'ItemSelectionInput':
-                    # All rule inputs for ItemSelectionInput will be
-                    # migrated from SetOfHtmlString to
-                    # SetOfTranslatableHtmlContentIds.
-                    rule_inputs['x'] = migrate_rule_inputs_and_answers(
-                        'SetOfTranslatableHtmlContentIds',
-                        rule_inputs['x'],
-                        choices)
-                if interaction_id == 'DragAndDropSortInput':
-                    rule_types_with_list_of_sets = [
-                        'IsEqualToOrdering',
-                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'
-                    ]
-                    if rule_type in rule_types_with_list_of_sets:
-                        # For rule type IsEqualToOrdering and
-                        # IsEqualToOrderingWithOneItemAtIncorrectPosition,
-                        # the x input will be migrated from
-                        # ListOfSetsOfHtmlStrings to
-                        # ListOfSetsOfTranslatableHtmlContentIds.
-                        rule_inputs['x'] = migrate_rule_inputs_and_answers(
+            if interaction_id == 'ItemSelectionInput':
+                # The solution type will be migrated from SetOfHtmlString to
+                # SetOfTranslatableHtmlContentIds.
+                if solution is not None:
+                    solution['correct_answer'] = (
+                        migrate_rule_inputs_and_answers(
+                            'SetOfTranslatableHtmlContentIds',
+                            solution['correct_answer'],
+                            choices)
+                    )
+            if interaction_id == 'DragAndDropSortInput':
+                # The solution type will be migrated from ListOfSetsOfHtmlString
+                # to ListOfSetsOfTranslatableHtmlContentIds.
+                if solution is not None:
+                    solution['correct_answer'] = (
+                        migrate_rule_inputs_and_answers(
                             'ListOfSetsOfTranslatableHtmlContentIds',
-                            rule_inputs['x'],
+                            solution['correct_answer'],
                             choices)
-                    elif rule_type == 'HasElementXAtPositionY':
-                        # For rule type HasElementXAtPositionY,
-                        # the x input will be migrated from
-                        # DragAndDropHtmlString to
-                        # TranslatableHtmlContentId, and the y input will
-                        # remain as DragAndDropPositiveInt.
+                    )
+
+            answer_group_dicts = question_state_dict[
+                'interaction']['answer_groups']
+            for answer_group_dict in answer_group_dicts:
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    rule_type = rule_spec_dict['rule_type']
+                    rule_inputs = rule_spec_dict['inputs']
+
+                    if interaction_id == 'ItemSelectionInput':
+                        # All rule inputs for ItemSelectionInput will be
+                        # migrated from SetOfHtmlString to
+                        # SetOfTranslatableHtmlContentIds.
                         rule_inputs['x'] = migrate_rule_inputs_and_answers(
-                            'TranslatableHtmlContentId',
+                            'SetOfTranslatableHtmlContentIds',
                             rule_inputs['x'],
                             choices)
-                    elif rule_type == 'HasElementXBeforeElementY':
-                        # For rule type HasElementXBeforeElementY,
-                        # the x and y inputs will be migrated from
-                        # DragAndDropHtmlString to
-                        # TranslatableHtmlContentId.
-                        for rule_input_name in ['x', 'y']:
-                            rule_inputs[rule_input_name] = (
-                                migrate_rule_inputs_and_answers(
-                                    'TranslatableHtmlContentId',
-                                    rule_inputs[rule_input_name],
-                                    choices))
+                    if interaction_id == 'DragAndDropSortInput':
+                        rule_types_with_list_of_sets = [
+                            'IsEqualToOrdering',
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                        ]
+                        if rule_type in rule_types_with_list_of_sets:
+                            # For rule type IsEqualToOrdering and
+                            # IsEqualToOrderingWithOneItemAtIncorrectPosition,
+                            # the x input will be migrated from
+                            # ListOfSetsOfHtmlStrings to
+                            # ListOfSetsOfTranslatableHtmlContentIds.
+                            rule_inputs['x'] = migrate_rule_inputs_and_answers(
+                                'ListOfSetsOfTranslatableHtmlContentIds',
+                                rule_inputs['x'],
+                                choices)
+                        elif rule_type == 'HasElementXAtPositionY':
+                            # For rule type HasElementXAtPositionY,
+                            # the x input will be migrated from
+                            # DragAndDropHtmlString to
+                            # TranslatableHtmlContentId, and the y input will
+                            # remain as DragAndDropPositiveInt.
+                            rule_inputs['x'] = migrate_rule_inputs_and_answers(
+                                'TranslatableHtmlContentId',
+                                rule_inputs['x'],
+                                choices)
+                        elif rule_type == 'HasElementXBeforeElementY':
+                            # For rule type HasElementXBeforeElementY,
+                            # the x and y inputs will be migrated from
+                            # DragAndDropHtmlString to
+                            # TranslatableHtmlContentId.
+                            for rule_input_name in ['x', 'y']:
+                                rule_inputs[rule_input_name] = (
+                                    migrate_rule_inputs_and_answers(
+                                        'TranslatableHtmlContentId',
+                                        rule_inputs[rule_input_name],
+                                        choices))
 
         return question_state_dict
 

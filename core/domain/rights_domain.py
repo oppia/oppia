@@ -270,6 +270,9 @@ class ActivityRights:
 
         Returns:
             str. The previous role of the user.
+
+        Raises:
+            Exception. If previous role is assigned again.
         """
         old_role = ROLE_NONE
         if new_role == ROLE_VIEWER:

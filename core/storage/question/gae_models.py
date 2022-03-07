@@ -20,7 +20,6 @@ import math
 import random
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.platform import models
@@ -441,6 +440,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             each skill. If not evenly divisible, it will be rounded up.
             If not enough questions for a skill, just return all questions
             it links to.
+
+        Raises:
+            Exception. The number of skill IDs exceeds 20.
         """
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             raise Exception('Please keep the number of skill IDs below 20.')
@@ -449,8 +451,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             return []
 
         question_count_per_skill = int(
-            math.ceil(python_utils.divide( # type: ignore[no-untyped-call]
-                float(total_question_count), float(len(skill_ids)))))
+            math.ceil(float(total_question_count) / float(len(skill_ids))))
 
         question_skill_link_mapping = {}
 
@@ -583,6 +584,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             each skill. If not evenly divisible, it will be rounded up.
             If not enough questions for a skill, just return all questions
             it links to.
+
+        Raises:
+            Exception. The number of skill IDs exceeds 20.
         """
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             raise Exception('Please keep the number of skill IDs below 20.')
@@ -592,8 +596,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         question_count_per_skill = int(
             math.ceil(
-                python_utils.divide( # type: ignore[no-untyped-call]
-                    float(total_question_count), float(len(skill_ids)))))
+                float(total_question_count) / float(len(skill_ids))))
         question_skill_link_models = []
         existing_question_ids = []
 
