@@ -45,17 +45,14 @@ export class OpportunitiesListComponent {
   @Input() opportunityHeadingTruncationLength: number;
   @Input() opportunityType: string;
 
-  // The initial last page number before we've loaded the first opportunities.
-  private static readonly INITIAL_LAST_PAGE_NUMBER = 1000;
-
   loadingOpportunityData: boolean = true;
-  lastPageNumber: number = OpportunitiesListComponent.INITIAL_LAST_PAGE_NUMBER;
   opportunities: ExplorationOpportunity[] = [];
   visibleOpportunities = [];
   directiveSubscriptions = new Subscription();
   activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
   more: boolean = false;
+  isOnLastPage: boolean = true;
 
   constructor(
     private zone: NgZone,
@@ -90,8 +87,7 @@ export class OpportunitiesListComponent {
           });
           this.visibleOpportunities = this.opportunities.slice(
             0, this.OPPORTUNITIES_PAGE_SIZE);
-          this.lastPageNumber = Math.ceil(
-            this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
+          this.isOnLastPage = this.calculateIsOnLastPage();
         }));
   }
 
@@ -102,7 +98,6 @@ export class OpportunitiesListComponent {
   ngOnInit(): void {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
-    this.lastPageNumber = OpportunitiesListComponent.INITIAL_LAST_PAGE_NUMBER;
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.
@@ -111,8 +106,7 @@ export class OpportunitiesListComponent {
         this.more = more;
         this.visibleOpportunities = this.opportunities.slice(
           0, this.OPPORTUNITIES_PAGE_SIZE);
-        this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
-          this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
+        this.isOnLastPage = this.calculateIsOnLastPage();
         this.loadingOpportunityData = false;
       });
     });
@@ -132,8 +126,7 @@ export class OpportunitiesListComponent {
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
-          this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
-            this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
+          this.isOnLastPage = this.calculateIsOnLastPage();
           this.loadingOpportunityData = false;
         });
     } else {
@@ -141,6 +134,13 @@ export class OpportunitiesListComponent {
         startIndex, endIndex);
     }
     this.activePageNumber = pageNumber;
+    this.isOnLastPage = this.calculateIsOnLastPage();
+  }
+
+  calculateIsOnLastPage(): boolean {
+    const lastPageNumber = Math.ceil(
+      this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
+    return this.activePageNumber >= lastPageNumber && !this.more;
   }
 }
 

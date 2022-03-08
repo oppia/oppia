@@ -22,7 +22,7 @@
     <button type="button"
             class="oppia-pagination-button"
             (click)="gotoPage(activePageNumber + 1)"
-            [disabled]="loadingOpportunityData || activePageNumber >= lastPageNumber">
+            [disabled]="loadingOpportunityData || isOnLastPage">
       Next<span class="material-icons">navigate_next</span>
     </button>
   </div>
