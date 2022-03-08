@@ -37,7 +37,6 @@ from core import android_validation_constants
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.controllers.editor import replace_ids_with_names_in_dict
 from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import classifier_services
@@ -1883,7 +1882,8 @@ def get_user_exploration_data(
         'objective': exploration.objective,
         'param_changes': exploration.param_change_dicts,
         'param_specs': exploration.param_specs_dict,
-        'rights': replace_ids_with_names_in_dict(exploration_id),
+        'rights': rights_manager.get_exploration_rights(
+            exploration_id).to_dict(),
         'show_state_editor_tutorial_on_load': None,
         'show_state_translation_tutorial_on_load': None,
         'states': states,

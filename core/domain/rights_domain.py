@@ -24,11 +24,6 @@ from core.domain import change_domain
 from typing import List, Optional
 from typing_extensions import TypedDict
 
-from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
-
 # IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
 # backward-compatibility with previous exploration snapshots in the datastore.
 # Do not modify the definitions of CMD keys that already exist.

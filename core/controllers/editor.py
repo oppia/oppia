@@ -70,10 +70,13 @@ SCHEMA_FOR_VERSION = {
     }]
 }
 
+
 def replace_ids_with_names_in_dict(exploration_id):
     """Replace ids with the names and return rights as a dictionary.
+
     Args:
         exploration_id: str. ID of the exploration.
+
     Returns:
         dict. The dictionary where ids are replaced with corresponding names.
     """
