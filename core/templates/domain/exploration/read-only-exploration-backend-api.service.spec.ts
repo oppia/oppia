@@ -232,6 +232,7 @@ describe('Read only exploration backend API service', () => {
       auto_tts_enabled: false,
       correctness_feedback_enabled: false,
       record_playthrough_probability: 1,
+      draft_change_list_id: 0,
       preferred_language_codes: []
     });
     expect(failHandler).not.toHaveBeenCalled();
