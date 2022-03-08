@@ -420,6 +420,7 @@ describe('Exploration Player State Service', () => {
         param_specs: null,
         states: null,
         title: '',
+        draft_change_list_id: 0,
         language_code: ''
       }));
     spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
