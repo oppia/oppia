@@ -26,7 +26,7 @@ describe('Contribution and review backend API service', () => {
   let carbas: ContributionAndReviewBackendApiService;
   let http: HttpTestingController;
 
-  const topic_name1 = 'Topic1'
+  const topicName1 = 'Topic1';
   const suggestion1 = {
     suggestion_id: 'suggestion_id_1',
     target_id: 'skill_id_1',
@@ -138,14 +138,14 @@ describe('Contribution and review backend API service', () => {
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
-  
+
     it('should fetch reviewable suggestions from Topic1', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
       const url = '/getreviewablesuggestions/exploration' +
         '/translate_content?topic_name=Topic1';
 
       carbas.fetchSuggestionsAsync(
-        'REVIEWABLE_TRANSLATION_SUGGESTIONS', topic_name1
+        'REVIEWABLE_TRANSLATION_SUGGESTIONS', topicName1
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
@@ -153,7 +153,7 @@ describe('Contribution and review backend API service', () => {
       flushMicrotasks();
 
       expect(carbas.fetchReviewableSuggestionsAsync)
-        .toHaveBeenCalledWith('exploration', 'translate_content', topic_name1);
+        .toHaveBeenCalledWith('exploration', 'translate_content', topicName1);
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
