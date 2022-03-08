@@ -1129,7 +1129,7 @@ class ModifiableUserData:
             display_alias: str. Display alias of the user shown on Android.
             pin: str or None. PIN of the user used for PIN based authentication
                 on Android. None if it hasn't been set till now.
-            preferred_language_codes: list(str) or None. Exploration language
+            preferred_language_codes: list(str). Exploration language
                 preferences specified by the user.
             preferred_site_language_code: str or None. System language
                 preference.
