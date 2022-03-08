@@ -27,11 +27,13 @@ import sys
 
 from core import utils
 
+from typing import List
+
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 15000
 
 
-def _get_skip_files_list():
+def _get_skip_files_list() -> List[str]:
     """This function returns the list of the files which are skipped when
     Oppia is deployed to GAE.
 
@@ -57,7 +59,7 @@ def _get_skip_files_list():
         sys.exit(1)
 
 
-def _check_size_in_dir(dir_path, skip_files_list):
+def _check_size_in_dir(dir_path: str, skip_files_list: List[str]) -> int:
     """Recursive method that checks the number of files inside the given
     directory.
 
@@ -89,7 +91,7 @@ def _check_size_in_dir(dir_path, skip_files_list):
     return number_of_files_in_dir
 
 
-def _check_third_party_size():
+def _check_third_party_size() -> None:
     """Checks if the third-party size limit has been exceeded."""
     skip_files_list = _get_skip_files_list()
     number_of_files_in_third_party = _check_size_in_dir(
