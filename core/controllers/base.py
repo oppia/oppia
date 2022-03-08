@@ -694,9 +694,8 @@ class BaseHandler(webapp2.RequestHandler):
             # GET_HANDLER_ERROR_RETURN_TYPE.
             # Otherwise, we check whether self.payload exists.
 
-            # Even if payload exists the request will throw 401 since
-            # self.payload is replaced by ThrowGetError object hence the below
-            # check.
+            # This check is to avoid throwing of 401 when payload doesn't
+            # exists and self.payload is replaced by ThrowGetError object.
             # TODO(#13155): Change this to self.normalized_payload
             #  once schema is implemented for all handlers.
             payload_exists = (self.payload is not None and not isinstance(
