@@ -49,7 +49,7 @@ class GetNumberOfTopicsExceedsMaxAbbNameJob(base_jobs.JobBase):
         )
 
         topic_ids_with_exceeding_abb_name = (
-            total_topics            
+            total_topics
             | 'Filter topics with abb. name greater than 39' >>
                 beam.Filter(lambda topic: len(topic[1]) > 39)
         )
