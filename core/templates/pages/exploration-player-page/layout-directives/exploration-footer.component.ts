@@ -22,6 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { Subscription } from 'rxjs';
@@ -34,7 +35,6 @@ import { ExplorationEngineService } from '../services/exploration-engine.service
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
-import { StateObjectsBackendDict } from '/home/manan/opensource/oppia/core/templates/domain/exploration/StatesObjectFactory';
 
 @Component({
   selector: 'oppia-exploration-footer',
