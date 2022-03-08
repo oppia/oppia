@@ -491,31 +491,32 @@ describe('SvgSanitizerService', () => {
     });
   });
 
-  it('should return correct GitHub issue URL', () => {
+  it('should return correct GitHub issue URL when invalid Tags and attributes' +
+    'in the SVG are removed', () => {
     const testCases = [
       {
         invalidTagsAndAttributes: {
           tags: [], attrs: ['svg:data-custom']
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20Image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A Attributes: svg:data-custom'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A%20%20Attributes:%20svg:data-custom'
       },
       {
         invalidTagsAndAttributes: {
           tags: ['paht'], attrs: []
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20Image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A Tags: paht'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A%20%20Tags:%20paht'
       },
       {
         invalidTagsAndAttributes: {
           tags: ['paht', 'circel'], attrs: []
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20Image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A Tags: paht,circel'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A%20%20Tags:%20paht,circel'
       },
       {
         invalidTagsAndAttributes: {
           tags: ['circel'], attrs: ['svg:data-name']
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20Image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A Tags: circel Attributes: svg:data-name'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A%20%20Tags:%20circel%0A%20%20Attributes:%20svg:data-name'
       }
     ];
     testCases.forEach(testCase => {

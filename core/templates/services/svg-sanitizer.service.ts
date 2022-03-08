@@ -248,15 +248,21 @@ export class SvgSanitizerService {
 
   getIssueURL(
       invalidTagsAndAttributes: { tags: string[]; attrs: string[] }): string {
-    const baseURL = 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20Image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A';
+    const baseURL = 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:';
     let updatedURL = baseURL;
-    if (invalidTagsAndAttributes.tags.length) {
-      updatedURL = updatedURL + ' Tags: ' + (
-        invalidTagsAndAttributes.tags);
+    let invalidTags = invalidTagsAndAttributes.tags;
+    let invalidAttributes = invalidTagsAndAttributes.attrs;
+    if (invalidTags.length) {
+      updatedURL = updatedURL + '%0A%20%20Tags:';
+      for (let i = 0; i < Math.min(invalidTags.length, 20); i++) {
+        updatedURL = updatedURL + '%20' + invalidTags[i];
+      }
     }
-    if (invalidTagsAndAttributes.attrs.length) {
-      updatedURL = updatedURL + ' Attributes: ' + (
-        invalidTagsAndAttributes.attrs);
+    if (invalidAttributes.length) {
+      updatedURL = updatedURL + '%0A%20%20Attributes:';
+      for (let i = 0; i < Math.min(invalidAttributes.length, 20); i++) {
+        updatedURL = updatedURL + '%20' + invalidAttributes[i];
+      }
     }
     return updatedURL;
   }
