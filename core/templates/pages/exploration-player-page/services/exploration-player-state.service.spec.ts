@@ -66,6 +66,7 @@ describe('Exploration Player State Service', () => {
 
   let returnDict = {
     can_edit: true,
+    draft_change_list_id: 0,
     exploration: {
       init_state_name: 'state_name',
       param_changes: [],
