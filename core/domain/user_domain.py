@@ -44,7 +44,7 @@ class UserSettingsDict(TypedDict):
     last_created_an_exploration: Optional[datetime.datetime]
     last_edited_an_exploration: Optional[datetime.datetime]
     profile_picture_data_url: Optional[str]
-    default_dashboard: Optional[str]
+    default_dashboard: str
     creator_dashboard_display_pref: str
     user_bio: str
     subject_interests: Optional[List[str]]
@@ -79,7 +79,7 @@ class UserSettings:
             last edited an exploration.
         profile_picture_data_url: str or None. User uploaded profile picture as
             a dataURI string.
-        default_dashboard: str or None. The default dashboard of the user.
+        default_dashboard: str. The default dashboard of the user.
         user_bio: str. User-specified biography.
         subject_interests: list(str) or None. Subject interests specified by
             the user.
@@ -113,7 +113,7 @@ class UserSettings:
         last_edited_an_exploration: (
             Optional[datetime.datetime]) = None,
         profile_picture_data_url: Optional[str]=None,
-        default_dashboard: Optional[str] = None,
+        default_dashboard: str = constants.DASHBOARD_TYPE_LEARNER,
         creator_dashboard_display_pref: str = (
             constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
         user_bio: str = '',
@@ -149,7 +149,7 @@ class UserSettings:
                 user last edited an exploration.
             profile_picture_data_url: str or None. User uploaded profile
                 picture as a dataURI string.
-            default_dashboard: str|None. The default dashboard of the user.
+            default_dashboard: str. The default dashboard of the user.
             creator_dashboard_display_pref: str. The creator dashboard of the
                 user.
             user_bio: str. User-specified biography.
