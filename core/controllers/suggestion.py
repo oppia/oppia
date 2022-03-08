@@ -354,22 +354,25 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
             target_type, suggestion_type)
         topic_name = self.request.get('topic_name', None)
 
-        opportunity_summary_exp_ids_specific_to_topic = []
+        opportunity_summary_exp_ids_specific_to_topic = None
         if topic_name is not None:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if topic is not None:
                 exploration_opportunity_summaries = (
                     opportunity_services.
                     get_exploration_opportunity_summaries_by_topic_id(
-                    topic.id))
+                        topic.id))
 
                 opportunity_summary_exp_ids_specific_to_topic = [
                     opportunity.id for opportunity
                     in exploration_opportunity_summaries]
+            else:
+                raise self.InvalidInputException(
+                    'The supplied input topic: %s is not valid' % topic_name)
 
         suggestions = suggestion_services.get_reviewable_suggestions(
             self.user_id, suggestion_type,
-            opportunity_summary_exp_ids_specific_to_topic, topic_name)
+            opportunity_summary_exp_ids_specific_to_topic)
         self._render_suggestions(target_type, suggestions)
 
 

@@ -472,7 +472,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
     def get_in_review_translation_suggestions(
         cls, user_id: str, language_codes: List[str]
     ) -> Sequence[GeneralSuggestionModel]:
-        """Gets all translation suggestions which are in review.
+        """Gets all translation suggestions for the given
+        language codes which are in review.
 
         Args:
             user_id: str. The id of the user trying to make this query.
@@ -481,8 +482,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             language_codes: list(str). The list of language codes.
 
         Returns:
-            list(SuggestionModel). A list of suggestions that are of the given
-            type, which are in review, but not created by the given user.
+            list(SuggestionModel). A list of suggestions which are in review,
+            but not created by the given user.
         """
 
         return cls.get_all().filter(datastore_services.all_of(
@@ -497,8 +498,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls, user_id: str, language_codes: List[str],
             exp_ids: List[str]
     ) -> Sequence[GeneralSuggestionModel]:
-        """Gets all translation suggestions which are in review
-        and belong to the passed exp_ids.
+        """Gets all translation suggestions for the given language
+        codes which are in review and belong to the passed exp_ids.
 
         Args:
             user_id: str. The id of the user trying to make this query.
@@ -509,9 +510,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 translation suggestions.
 
         Returns:
-            list(SuggestionModel). A list of suggestions that are of the given
-            type, which are in review, not created by the given user and
-            specific to the exploration IDs passed.
+            list(SuggestionModel). A list of suggestions which are in
+            review, not created by the given user and correspond to the
+            given exploration IDs.
         """
         return cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,

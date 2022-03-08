@@ -2493,13 +2493,15 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_exploration_handler_returns_data_with_valid_topic_and_no_exp_id( # pylint: disable=line-too-long
+    def test_exploration_handler_returns_data_with_invalid_topic_and_no_exp_id( # pylint: disable=line-too-long
             self):
-        response = self.get_json(
+        with self.assertRaisesRegex(
+              Exception,
+                'The supplied input topic: invalid_topic is not valid'):
+            self.get_json(
             '/getreviewablesuggestions/exploration/translate_content', params={
                 'topic_name': 'invalid_topic'
             })
-        self.assertEqual(len(response['suggestions']), 0)
 
     def test_get_reviewable_suggestions_when_state_of_a_target_is_removed(
         self):
