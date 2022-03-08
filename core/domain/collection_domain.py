@@ -568,8 +568,8 @@ class Collection:
             cls._convert_collection_contents_v3_dict_to_v4_dict(
                 collection_dict))
         # CollectionDict is defined to match the current version of domain
-	    # object and here in _convert_* functions, we can ignore some MyPy
-	    # errors as we work with the previous versions of the domain objects.
+        # object and here in _convert_* functions, we can ignore some MyPy
+        # errors as we work with the previous versions of the domain objects.
         collection_dict['skills'] = new_collection_dict['skills'] # type: ignore[misc]
         collection_dict['next_skill_id'] = ( # type: ignore[misc]
             new_collection_dict['next_skill_id']) # type: ignore[misc]
@@ -733,9 +733,10 @@ class Collection:
 
         skill_names = set()
         for node in collection_contents['nodes']:
-            # CollectionNodeDict is defined to match the current version of domain
-	        # object and here in _convert_* functions, we can ignore some MyPy
-	        # errors as we work with the previous versions of the domain objects.
+            # CollectionNodeDict is defined to match the current version of
+            # domain object and here in _convert_* functions, we can ignore
+            # some MyPy errors as we work with the previous versions of the
+            # domain objects.
             skill_names.update(node['acquired_skills']) # type: ignore[misc]
             skill_names.update(node['prerequisite_skills']) # type: ignore[misc]
         skill_names_to_ids = {
@@ -756,8 +757,8 @@ class Collection:
         } for node in collection_contents['nodes']]
 
         # CollectionDict is defined to match the current version of domain
-	    # object and here in _convert_* functions, we can ignore some MyPy
-	    # errors as we work with the previous versions of the domain objects.
+        # object and here in _convert_* functions, we can ignore some MyPy
+        # errors as we work with the previous versions of the domain objects.
         collection_contents['skills'] = { # type: ignore[misc]
             skill_id: {
                 'name': skill_name,
@@ -787,8 +788,8 @@ class Collection:
             dict. The updated collection_contents dict.
         """
         # CollectionDict is defined to match the current version of domain
-	    # object and here in _convert_* functions, we can ignore some MyPy
-	    # errors as we work with the previous versions of the domain objects.
+        # object and here in _convert_* functions, we can ignore some MyPy
+        # errors as we work with the previous versions of the domain objects.
         collection_contents['next_skill_index'] = collection_contents[ # type: ignore[misc]
             'next_skill_id'] # type: ignore[misc]
         # MyPy doesn't allow key deletion from TypedDict, also we are ignoring
