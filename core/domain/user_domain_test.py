@@ -46,7 +46,7 @@ class MockModifiableUserDataDict(TypedDict):
     display_alias: str
     schema_version: int
     pin: Optional[str]
-    preferred_language_codes: Optional[List[str]]
+    preferred_language_codes: List[str]
     preferred_site_language_code: Optional[str]
     preferred_audio_language_code: Optional[str]
     user_id: Optional[str]
@@ -66,7 +66,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
         self,
         display_alias: str,
         pin: Optional[str],
-        preferred_language_codes: Optional[List[str]],
+        preferred_language_codes: List[str],
         preferred_site_language_code: Optional[str],
         preferred_audio_language_code: Optional[str],
         user_id: Optional[str]=None,

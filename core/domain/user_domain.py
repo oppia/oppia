@@ -1096,7 +1096,7 @@ class ModifiableUserDataDict(TypedDict):
 
     display_alias: str
     pin: Optional[str]
-    preferred_language_codes: Optional[List[str]]
+    preferred_language_codes: List[str]
     preferred_site_language_code: Optional[str]
     preferred_audio_language_code: Optional[str]
     user_id: Optional[str]
@@ -1108,7 +1108,7 @@ class RawUserDataDict(TypedDict):
     schema_version: int
     display_alias: str
     pin: Optional[str]
-    preferred_language_codes: Optional[List[str]]
+    preferred_language_codes: List[str]
     preferred_site_language_code: Optional[str]
     preferred_audio_language_code: Optional[str]
     user_id: Optional[str]
@@ -1123,7 +1123,7 @@ class ModifiableUserData:
         self,
         display_alias: str,
         pin: Optional[str],
-        preferred_language_codes: Optional[List[str]],
+        preferred_language_codes: List[str],
         preferred_site_language_code: Optional[str],
         preferred_audio_language_code: Optional[str],
         user_id: Optional[str] = None
