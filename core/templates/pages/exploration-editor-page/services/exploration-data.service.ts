@@ -150,9 +150,7 @@ export class ExplorationDataService {
             this.explorationId).then((response) => {
             this.loggerService.info('Retrieved exploration data.');
             this.loggerService.info(JSON.stringify(response));
-            if (response.draft_change_list_id) {
-              this.draftChangeListId = response.draft_change_list_id;
-            }
+            this.draftChangeListId = response.draft_change_list_id;
             this.data = response;
             const draft = this.localStorageService.getExplorationDraft(
               this.explorationId);
