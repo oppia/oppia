@@ -87,7 +87,7 @@ export class OpportunitiesListComponent {
           });
           this.visibleOpportunities = this.opportunities.slice(
             0, this.OPPORTUNITIES_PAGE_SIZE);
-          this.isOnLastPage = this.calculateIsOnLastPage();
+          this.updateIsOnLastPage();
         }));
   }
 
@@ -106,7 +106,7 @@ export class OpportunitiesListComponent {
         this.more = more;
         this.visibleOpportunities = this.opportunities.slice(
           0, this.OPPORTUNITIES_PAGE_SIZE);
-        this.isOnLastPage = this.calculateIsOnLastPage();
+        this.updateIsOnLastPage();
         this.loadingOpportunityData = false;
       });
     });
@@ -126,7 +126,7 @@ export class OpportunitiesListComponent {
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
-          this.isOnLastPage = this.calculateIsOnLastPage();
+          this.updateIsOnLastPage();
           this.loadingOpportunityData = false;
         });
     } else {
@@ -134,13 +134,13 @@ export class OpportunitiesListComponent {
         startIndex, endIndex);
     }
     this.activePageNumber = pageNumber;
-    this.isOnLastPage = this.calculateIsOnLastPage();
+    this.updateIsOnLastPage();
   }
 
-  calculateIsOnLastPage(): boolean {
+  updateIsOnLastPage(): void {
     const lastPageNumber = Math.ceil(
       this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
-    return this.activePageNumber >= lastPageNumber && !this.more;
+    this.isOnLastPage = this.activePageNumber >= lastPageNumber && !this.more;
   }
 }
 
