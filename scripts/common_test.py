@@ -180,7 +180,7 @@ class CommonTests(test_utils.GenericTestBase):
                 'check_call_gets_called': False
             }
             expected_check_function_calls = {
-                'input_gets_called': 1,
+                'input_gets_called': 2,
                 'check_call_gets_called': True
             }
             def mock_call(unused_cmd_tokens):
@@ -189,6 +189,8 @@ class CommonTests(test_utils.GenericTestBase):
                 check_function_calls['check_call_gets_called'] = True
             def mock_input():
                 check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 2:
+                    return '1'
                 return 'y'
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
@@ -209,7 +211,7 @@ class CommonTests(test_utils.GenericTestBase):
                 'check_call_gets_called': False
             }
             expected_check_function_calls = {
-                'input_gets_called': 2,
+                'input_gets_called': 3,
                 'check_call_gets_called': False
             }
             def mock_call(unused_cmd_tokens):
@@ -218,6 +220,8 @@ class CommonTests(test_utils.GenericTestBase):
                 check_function_calls['check_call_gets_called'] = True
             def mock_input():
                 check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 2:
+                    return '1'
                 return 'y'
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
