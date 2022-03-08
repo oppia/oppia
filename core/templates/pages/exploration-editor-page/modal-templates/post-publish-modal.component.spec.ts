@@ -160,7 +160,7 @@ describe('Post Publish Modal Controller', function() {
     element.appendChild(firstChild);
     element.appendChild(lastChild);
 
-    element.onclick = function(event) {
+    element.onclick = (event) => {
       expect(() => component.selectText(event))
         .toThrowError('Selection cannot be null');
     };

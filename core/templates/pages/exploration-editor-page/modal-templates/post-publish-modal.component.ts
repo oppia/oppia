@@ -37,9 +37,9 @@ export class PostPublishModalComponent
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   congratsImgUrl!: string;
-  explorationLinkCopied!: boolean;
   explorationLink!: string;
   explorationId!: string;
+  explorationLinkCopied: boolean = false;
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,

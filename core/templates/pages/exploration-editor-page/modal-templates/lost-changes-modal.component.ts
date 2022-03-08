@@ -30,11 +30,11 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class LostChangesModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  // These properties are initialized using Angular lifecycle hooks
+  // The property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() lostChanges!: LostChange[];
-  hasLostChanges!: boolean;
+  hasLostChanges: boolean = false;
 
   constructor(
     private elRef: ElementRef,
@@ -57,6 +57,9 @@ export class LostChangesModalComponent
   }
 
   exportChangesAndClose(): void {
+    // The selector return null if the class name is not found,
+    // but here we are sure that the class name is available,
+    // so we are explicitly typecasting it to remove type error.
     let lostChangesData = (
       this.elRef.nativeElement.getElementsByClassName(
         'oppia-lost-changes'))[0] as HTMLInputElement;

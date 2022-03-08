@@ -31,10 +31,10 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 export class SaveVersionMismatchModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   MSECS_TO_REFRESH: number = 20;
-  // These properties are initialized using Angular lifecycle hooks
+  hasLostChanges: boolean = false;
+  // The property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  hasLostChanges!: boolean;
   @Input() lostChanges!: LostChange[];
 
   constructor(
@@ -69,6 +69,9 @@ export class SaveVersionMismatchModalComponent
   }
 
   exportAndDiscardChanges(): void {
+    // The selector return null if the class name is not found,
+    // but here we are sure that the class name is available,
+    // so we are explicitly typecasting it to remove type error.
     let lostChangesData = (
       this.elRef.nativeElement.getElementsByClassName(
         'oppia-lost-changes')[0]) as HTMLInputElement;
