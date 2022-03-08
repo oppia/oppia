@@ -142,7 +142,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewQuestions = false;
         ctrl.defaultHeaderVisible = true;
 
-        var prevSelectedTopicName = (
+        const prevSelectedTopicName = (
           LocalStorageService.getLastSelectedTranslationTopicName());
 
         WindowRef.nativeWindow.addEventListener('scroll', function() {

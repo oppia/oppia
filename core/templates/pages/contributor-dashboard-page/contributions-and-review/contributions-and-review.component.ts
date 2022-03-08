@@ -393,8 +393,6 @@ angular.module('oppia').component('contributionsAndReview', {
         $rootScope.$apply();
       };
 
-
-
       ctrl.$onInit = function() {
         ctrl.contributions = [];
         ctrl.userDetailsLoading = true;
@@ -416,21 +414,6 @@ angular.module('oppia').component('contributionsAndReview', {
             enabled: true
           }
         ];
-
-        var prevSelectedTopicName = (
-          LocalStorageService.getLastSelectedTranslationTopicName());
-
-        ctrl.topicName = DEFAULT_OPPORTUNITY_TOPIC_NAME;
-        TranslationTopicService.setActiveTopicName(ctrl.topicName);
-
-        ContributionOpportunitiesService.getAllTopicNamesAsync()
-          .then(function(topicNames) {
-            if (topicNames.indexOf(prevSelectedTopicName) !== -1) {
-              ctrl.topicName = prevSelectedTopicName;
-              TranslationTopicService.setActiveTopicName(ctrl.topicName);
-            }
-            $rootScope.$applyAsync();
-          });
 
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
