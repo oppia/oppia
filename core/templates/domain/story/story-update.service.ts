@@ -35,18 +35,15 @@ import { StoryNode } from './story-node.model';
 
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
 type StoryUpdateReverse = (storyChange: StoryChange, story: Story) => void;
-type Apply = (
-  backendChangeObject: BackendChangeObject,
-  domainObject: DomainObject) => void;
-type Reverse = (
+type changeBackendDict = (
   backendChangeObject: BackendChangeObject,
   domainObject: DomainObject) => void;
 
-// For properties like initialNodeId, thumbnailBackdroundColor
-// old value can be null.
 interface Params {
   'node_id'?: string;
   'title'?: string;
+  // For properties like initialNodeId, thumbnailBackdroundColor
+  // old value can be null.
   'old_value'?: string | string[] | boolean | number | null;
   'new_value'?: string | string[] | boolean | number;
   'property_name'?: string;
@@ -73,9 +70,13 @@ export class StoryUpdateService {
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     let changeDict = cloneDeep(params) as BackendChangeObject;
     changeDict.cmd = command;
-    let changeObj = new Change(changeDict, apply as Apply, reverse as Reverse);
+    let changeObj = new Change(
+      changeDict, apply as changeBackendDict, reverse as changeBackendDict);
     try {
       this._undoRedoService.applyChange(changeObj, story);
+      // The catch parameter type can only be any or unknown. The type 'unknown'
+      // is safer than type 'any' because it reminds us that we need to perform
+      // some sorts of type-checks before operating on our values.
     } catch (err: unknown) {
       if (err instanceof Error) {
         this._alertsService.addWarning(err.message);

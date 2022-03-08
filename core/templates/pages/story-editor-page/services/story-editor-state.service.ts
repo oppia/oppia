@@ -42,13 +42,16 @@ export class StoryEditorStateService {
   _storyIsInitialized: boolean = false;
   _storyIsLoading: boolean = false;
   _storyIsBeingSaved: boolean = false;
-  _topicName: string = 'Topic name';
   _storyIsPublished: boolean = false;
   _skillSummaries: SkillSummaryBackendDict[] = [];
   _expIdsChanged: boolean = false;
   _storyWithUrlFragmentExists: boolean = false;
-  _classroomUrlFragment: string = 'Url Fragment';
-  _topicUrlFragment: string = 'Url Fragment';
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  _topicName!: string;
+  _classroomUrlFragment!: string;
+  _topicUrlFragment!: string;
 
   _storyInitializedEventEmitter = new EventEmitter();
   _storyReinitializedEventEmitter = new EventEmitter();
