@@ -70,7 +70,9 @@ class BuildTests(test_utils.GenericTestBase):
             subprocess.CalledProcessError,
             'returned non-zero exit status 1') as called_process:
             build.minify_func(
-                INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH, INVALID_FILENAME)
+                INVALID_INPUT_FILEPATH,
+                INVALID_OUTPUT_FILEPATH,
+                INVALID_FILENAME)
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
@@ -448,7 +450,9 @@ class BuildTests(test_utils.GenericTestBase):
             task = threading.Thread(
                 target=build.minify_func,
                 args=(
-                    INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH, INVALID_FILENAME))
+                    INVALID_INPUT_FILEPATH,
+                    INVALID_OUTPUT_FILEPATH,
+                    INVALID_FILENAME))
             build_tasks.append(task)
             count -= 1
 
