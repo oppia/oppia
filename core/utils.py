@@ -18,8 +18,6 @@ from __future__ import annotations
 
 import base64
 import binascii
-import bleach
-import bs4
 import collections
 import datetime
 import hashlib
@@ -51,6 +49,8 @@ sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  # pylint: disable=wrong-import-position
 import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import bleach # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import bs4 # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
