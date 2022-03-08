@@ -100,10 +100,10 @@ export class AudioPreloaderService {
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
     const languageCode = (
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
-    let allVoiceovers = null;
-    if (languageCode !== null) {
-      allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
+    if (languageCode === null) {
+      throw new Error ('Language code must be provided');
     }
+    let allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
     const initialStateName = this.exploration.getInitialState().name;
     let bfsTraversalOfStates: string[] = [];
     if (initialStateName !== null) {
@@ -114,10 +114,8 @@ export class AudioPreloaderService {
     }
     const audioFilenamesInBfsOrder = [];
     for (const stateName of bfsTraversalOfStates) {
-      if (allVoiceovers !== null) {
-        for (const voiceover of allVoiceovers[stateName]) {
-          audioFilenamesInBfsOrder.push(voiceover.filename);
-        }
+      for (const voiceover of allVoiceovers[stateName]) {
+        audioFilenamesInBfsOrder.push(voiceover.filename);
       }
     }
     return audioFilenamesInBfsOrder;

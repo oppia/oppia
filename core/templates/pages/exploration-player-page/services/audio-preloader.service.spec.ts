@@ -367,6 +367,20 @@ describe('Audio preloader service', () => {
         .toEqual([]);
     }));
 
+  it('should throw error if no language code is selected', () => {
+    spyOn(audioTranslationLanguageService, 'getCurrentAudioLanguageCode')
+      .and.returnValue(null);
+
+    const exploration = (
+      explorationObjectFactory.createFromBackendDict(explorationDict));
+    audioPreloaderService.init(exploration);
+    audioTranslationLanguageService.init(['en'], 'en', 'en', false);
+
+    expect(() => audioPreloaderService.kickOffAudioPreloader(
+      exploration.getInitialState().name as string))
+      .toThrowError('Language code must be provided');
+  });
+
   it('should properly restart pre-loading from a new state', () => {
     const exploration = (
       explorationObjectFactory.createFromBackendDict(explorationDict));
