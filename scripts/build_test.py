@@ -47,11 +47,11 @@ MOCK_TEMPLATES_DEV_DIR = os.path.join(TEST_SOURCE_DIR, 'templates', '')
 
 MOCK_TSC_OUTPUT_LOG_FILEPATH = os.path.join(
     TEST_SOURCE_DIR, 'mock_tsc_output_log.txt')
-FILENAME = 'filename.js'
+INVALID_FILENAME = 'invalid_filename.js'
 INVALID_INPUT_FILEPATH = os.path.join(
-    TEST_DIR, FILENAME)
+    TEST_DIR, INVALID_FILENAME)
 INVALID_OUTPUT_FILEPATH = os.path.join(
-    TEST_DIR, FILENAME)
+    TEST_DIR, INVALID_FILENAME)
 
 EMPTY_DIR = os.path.join(TEST_DIR, 'empty', '')
 
@@ -70,7 +70,7 @@ class BuildTests(test_utils.GenericTestBase):
             subprocess.CalledProcessError,
             'returned non-zero exit status 1') as called_process:
             build.minify_func(
-                INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH, FILENAME)
+                INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH, INVALID_FILENAME)
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
@@ -448,7 +448,7 @@ class BuildTests(test_utils.GenericTestBase):
             task = threading.Thread(
                 target=build.minify_func,
                 args=(
-                    INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH, FILENAME))
+                    INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH, INVALID_FILENAME))
             build_tasks.append(task)
             count -= 1
 
