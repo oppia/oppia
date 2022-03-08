@@ -26,7 +26,6 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
@@ -202,8 +201,8 @@ class Misconception:
         """
         self.id = misconception_id
         self.name = name
-        self.notes = html_cleaner.clean(notes)
-        self.feedback = html_cleaner.clean(feedback)
+        self.notes = utils.clean(notes)
+        self.feedback = utils.clean(feedback)
         self.must_be_addressed = must_be_addressed
 
     def to_dict(self):
@@ -302,7 +301,7 @@ class Rubric:
         """
         self.difficulty = difficulty
         self.explanations = [
-            html_cleaner.clean(explanation) for explanation in explanations]
+            utils.clean(explanation) for explanation in explanations]
 
     def to_dict(self):
         """Returns a dict representing this Rubric domain object.

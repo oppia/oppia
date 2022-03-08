@@ -34,7 +34,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import expression_parser
-from core.domain import html_cleaner
 from core.domain import user_domain
 
 from typing import Any, Callable, Dict, List, Optional, cast
@@ -180,7 +179,7 @@ def normalize_against_schema(
             obj = str(obj)
         assert isinstance(obj, str), (
             'Expected unicode, received %s' % obj)
-        normalized_obj = html_cleaner.clean(obj) # type: ignore[no-untyped-call]
+        normalized_obj = utils.clean(obj) # type: ignore[no-untyped-call]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
@@ -356,7 +355,7 @@ class Normalizers:
             urllib.parse.quote(component) for component in url_components]
         raw = urllib.parse.urlunsplit(quoted_url_components)
 
-        acceptable = html_cleaner.filter_a('a', 'href', obj) # type: ignore[no-untyped-call]
+        acceptable = utils.filter_a('a', 'href', obj) # type: ignore[no-untyped-call]
         assert acceptable, (
             'Invalid URL: Sanitized URL should start with '
             '\'http://\' or \'https://\'; received %s' % raw)

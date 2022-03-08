@@ -24,7 +24,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import blog_domain
-from core.domain import html_cleaner
 from core.domain import role_services
 from core.platform import models
 
@@ -490,7 +489,7 @@ def generate_summary_of_blog_post(content):
     Returns:
         str. The summary of the blog post.
     """
-    raw_text = html_cleaner.strip_html_tags(content)
+    raw_text = utils.strip_html_tags(content)
     max_chars_in_summary = constants.MAX_CHARS_IN_BLOG_POST_SUMMARY - 3
     if len(raw_text) > max_chars_in_summary:
         summary = raw_text[:max_chars_in_summary] + '...'

@@ -34,7 +34,6 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
@@ -2495,7 +2494,7 @@ class SubtitledHtml:
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
 
-        self.html = html_cleaner.clean(self.html)
+        self.html = utils.clean(self.html)
 
     @classmethod
     def create_default_subtitled_html(cls, content_id):
@@ -2871,7 +2870,7 @@ class State(translation_domain.BaseTranslatableObject):
             component_name_prefix = 'oppia-noninteractive-'
             component_names = set(
                 component['id'].replace(component_name_prefix, '')
-                for component in html_cleaner.get_rte_components(html))
+                for component in utils.get_rte_components(html))
             return any(component_names.difference(
                 android_validation_constants.VALID_RTE_COMPONENTS))
 
@@ -3034,7 +3033,7 @@ class State(translation_domain.BaseTranslatableObject):
             language_code: str. The language code.
             translation_html: str. The translated html content.
         """
-        translation_html = html_cleaner.clean(translation_html)
+        translation_html = utils.clean(translation_html)
         self.written_translations.add_translation(
             content_id, language_code, translation_html)
 

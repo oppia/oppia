@@ -20,10 +20,10 @@ import collections
 import logging
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import config_domain
-from core.domain import html_cleaner
 from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
@@ -410,7 +410,7 @@ def get_image_filenames_from_skill(skill):
         list(str). List containing the name of the image files in skill.
     """
     html_list = skill.get_all_html_content_strings()
-    return html_cleaner.get_image_filenames_from_html_strings(html_list)
+    return utils.get_image_filenames_from_html_strings(html_list)
 
 
 def get_all_topic_assignments_for_skill(skill_id):

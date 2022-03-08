@@ -23,11 +23,11 @@ import logging
 import re
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
-from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import question_domain
 from core.domain import suggestion_registry
@@ -762,7 +762,7 @@ def _get_plain_text_from_html_content_string(html_content_string):
         r'<oppia-noninteractive-[^>]+>(.*?)</oppia-noninteractive-[^>]+>',
         _replace_rte_tag, html_content_string)
     # Get rid of all of the other html tags.
-    plain_text = html_cleaner.strip_html_tags(
+    plain_text = utils.strip_html_tags(
         html_content_string_with_rte_tags_replaced)
     # Remove trailing and leading whitespace and ensure that all words are
     # separated by a single space.
@@ -1367,7 +1367,7 @@ def update_translation_suggestion(suggestion_id, translation_html):
 
     # Clean the translation HTML if not a list of strings.
     suggestion.change.translation_html = (
-        html_cleaner.clean(translation_html)
+        utils.clean(translation_html)
         if isinstance(translation_html, str)
         else translation_html
     )

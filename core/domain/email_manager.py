@@ -27,7 +27,6 @@ from core import utils
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import email_services
-from core.domain import html_cleaner
 from core.domain import rights_domain
 from core.domain import subscription_services
 from core.domain import user_services
@@ -436,7 +435,7 @@ def _send_email(
     if recipient_email is None:
         recipient_email = user_services.get_email_from_user_id(recipient_id)
 
-    cleaned_html_body = html_cleaner.clean(email_html_body)
+    cleaned_html_body = utils.clean(email_html_body)
     if cleaned_html_body != email_html_body:
         log_new_error(
             'Original email HTML body does not match cleaned HTML body:\n'
@@ -446,7 +445,7 @@ def _send_email(
 
     raw_plaintext_body = cleaned_html_body.replace('<br/>', '\n').replace(
         '<br>', '\n').replace('<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
-    cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
+    cleaned_plaintext_body = utils.strip_html_tags(raw_plaintext_body)
 
     if email_models.SentEmailModel.check_duplicate_message(
             recipient_id, email_subject, cleaned_plaintext_body):
@@ -491,7 +490,7 @@ def _send_bulk_mail(
     recipients_settings = user_services.get_users_settings(recipient_ids)
     recipient_emails = [user.email for user in recipients_settings]
 
-    cleaned_html_body = html_cleaner.clean(email_html_body)
+    cleaned_html_body = utils.clean(email_html_body)
     if cleaned_html_body != email_html_body:
         log_new_error(
             'Original email HTML body does not match cleaned HTML body:\n'
@@ -501,7 +500,7 @@ def _send_bulk_mail(
 
     raw_plaintext_body = cleaned_html_body.replace('<br/>', '\n').replace(
         '<br>', '\n').replace('<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
-    cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
+    cleaned_plaintext_body = utils.strip_html_tags(raw_plaintext_body)
 
     @transaction_services.run_in_transaction_wrapper
     def _send_bulk_mail_transactional(instance_id):

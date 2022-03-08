@@ -21,12 +21,12 @@ import logging
 import types
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
-from core.domain import html_cleaner
 from core.domain import question_domain
 from core.domain import rights_domain
 from core.domain import subscription_services
@@ -957,11 +957,11 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
-            cleaned_html_body = html_cleaner.clean(self.new_email_html_body)
+            cleaned_html_body = utils.clean(self.new_email_html_body)
             raw_plaintext_body = cleaned_html_body.replace(
                 '<br/>', '\n').replace('<br>', '\n').replace(
                     '<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
-            cleaned_plaintext_body = html_cleaner.strip_html_tags(
+            cleaned_plaintext_body = utils.strip_html_tags(
                 raw_plaintext_body)
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,

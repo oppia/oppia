@@ -25,8 +25,6 @@ import pkgutil
 from core import constants
 from core import feconf
 from core import python_utils
-from core import utils
-
 
 class Registry:
     """Registry of all custom rich-text components."""
@@ -48,31 +46,6 @@ class Registry:
         if not cls._rte_components:
             cls._refresh()
         return cls._rte_components
-
-    @classmethod
-    def get_tag_list_with_attrs(cls):
-        """Returns a dict of HTML tag names and attributes for RTE components.
-
-        The keys are tag names starting with 'oppia-noninteractive-', followed
-        by the hyphenated version of the name of the RTE component. The values
-        are lists of allowed attributes of the form
-        [PARAM_NAME]-with-[CUSTOMIZATION_ARG_NAME].
-        """
-        # TODO(sll): Cache this computation and update it on each refresh.
-        # Better still, bring this into the build process so it doesn't have
-        # to be manually computed each time.
-        component_list = list(cls.get_all_rte_components().values())
-
-        component_tags = {}
-        for component_specs in component_list:
-            tag_name = 'oppia-noninteractive-%s' % (
-                utils.camelcase_to_hyphenated(component_specs['backend_id']))
-
-            component_tags[tag_name] = [
-                '%s-with-value' % ca_spec['name']
-                for ca_spec in component_specs['customization_arg_specs']]
-
-        return component_tags
 
     @classmethod
     def get_component_types_to_component_classes(cls):

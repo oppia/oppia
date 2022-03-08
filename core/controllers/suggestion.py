@@ -21,13 +21,13 @@ from __future__ import annotations
 import base64
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator
 from core.domain import exp_fetchers
 from core.domain import fs_services
-from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import skill_fetchers
@@ -243,7 +243,7 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
             target_entity_html_list = (
                 suggestion.get_target_entity_html_strings())
             target_image_filenames = (
-                html_cleaner.get_image_filenames_from_html_strings(
+                utils.get_image_filenames_from_html_strings(
                     target_entity_html_list))
 
             fs_services.copy_images(
@@ -607,7 +607,7 @@ def _upload_suggestion_images(files, suggestion, filenames):
 
     target_entity_html_list = suggestion.get_target_entity_html_strings()
     target_image_filenames = (
-        html_cleaner.get_image_filenames_from_html_strings(
+        utils.get_image_filenames_from_html_strings(
             target_entity_html_list))
 
     fs_services.copy_images(

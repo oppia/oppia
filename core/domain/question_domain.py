@@ -37,7 +37,6 @@ from extensions import domain
 
 from pylatexenc import latex2text
 
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 
@@ -1431,7 +1430,7 @@ class QuestionSummary:
                 when the question model was last updated.
         """
         self.id = question_id
-        self.question_content = html_cleaner.clean(question_content)
+        self.question_content = utils.clean(question_content)
         self.misconception_ids = misconception_ids
         self.interaction_id = interaction_id
         self.created_on = question_model_created_on

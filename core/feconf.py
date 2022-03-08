@@ -762,6 +762,36 @@ SYSTEM_USERS = {
         APP_FEEDBACK_REPORT_SCRUBBER_BOT_USERNAME)
 }
 
+# Dict of HTML tag names and attributes for RTE components.
+# The keys are tag names starting with 'oppia-noninteractive-', followed
+# by the hyphenated version of the name of the RTE component. The values
+# are lists of allowed attributes of the form
+# [PARAM_NAME]-with-[CUSTOMIZATION_ARG_NAME].
+OPPIA_CUSTOM_TAGS = {
+    'oppia-noninteractive-collapsible': [
+        'heading-with-value', 'content-with-value'
+    ],
+    'oppia-noninteractive-image': [
+        'filepath-with-value', 'caption-with-value', 'alt-with-value'
+    ],
+    'oppia-noninteractive-link': [
+        'url-with-value', 'text-with-value'
+    ],
+    'oppia-noninteractive-math': [
+        'math_content-with-value'
+    ],
+    'oppia-noninteractive-skillreview': [
+        'text-with-value', 'skill_id-with-value'
+    ],
+    'oppia-noninteractive-tabs': [
+        'tab_contents-with-value'
+    ],
+    'oppia-noninteractive-video': [
+        'video_id-with-value', 'start-with-value', 'end-with-value',
+        'autoplay-with-value'
+    ]
+}
+
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
     'Collapsible': {

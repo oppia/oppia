@@ -25,6 +25,7 @@ import os
 import urllib
 
 from core import feconf
+from core import python_utils
 from core import utils
 from core.constants import constants
 from core.tests import test_utils
@@ -794,3 +795,237 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(response.getcode(), 200) # type: ignore[attr-defined]
         self.assertEqual(
             response.url, 'http://www.google.com') # type: ignore[attr-defined]
+
+    def test_oppia_custom_tags(self) -> None:
+
+        rte_components = {}
+        package, filepath = os.path.split(
+            feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
+        rte_components = constants.parse_json_from_ts(
+            python_utils.get_package_file_contents(package, filepath))
+        component_list = list(rte_components.values())
+
+        component_tags = {}
+        for component_specs in component_list:
+            tag_name = 'oppia-noninteractive-%s' % (
+                utils.camelcase_to_hyphenated(component_specs['backend_id']))
+
+            component_tags[tag_name] = [
+                '%s-with-value' % ca_spec['name']
+                for ca_spec in component_specs['customization_arg_specs']]
+        self.assertEqual(feconf.OPPIA_CUSTOM_TAGS, component_tags)
+
+    def test_whitelisted_tags(self):
+
+        self.assertTrue(
+            utils.filter_a('a', 'href', 'http://www.oppia.com'))
+
+        self.assertFalse(
+            utils.filter_a('a', 'href', '<code>http://www.oppia.com'))
+
+        self.assertTrue(
+            utils.filter_a('a', 'title', 'http://www.oppia.com'))
+
+        with self.assertRaisesRegex(
+            Exception, 'The filter_a method should only be used for a tags.'):
+            utils.filter_a('link', 'href', 'http://www.oppia.com')
+
+    def test_good_tags_allowed(self):
+        test_data = [(
+            '<a href="http://www.google.com">Hello</a>',
+            '<a href="http://www.google.com">Hello</a>'
+        ), (
+            '<a href="http://www.google.com" target="_blank">Hello</a>',
+            '<a href="http://www.google.com" target="_blank">Hello</a>'
+        ), (
+            '<a href="http://www.google.com" title="Hello">Hello</a>',
+            '<a href="http://www.google.com" title="Hello">Hello</a>'
+        ), (
+            'Just some text 12345',
+            'Just some text 12345'
+        ), (
+            '<code>Unfinished HTML',
+            '<code>Unfinished HTML</code>',
+        ), (
+            '<br/>',
+            '<br>'
+        ), (
+            'A big mix <div>Hello</div> Yes <span>No</span>',
+            'A big mix <div>Hello</div> Yes <span>No</span>'
+        )]
+
+        for datum in test_data:
+            self.assertEqual(
+                utils.clean(datum[0]), datum[1],
+                msg='\n\nOriginal text: %s' % datum[0])
+
+    def test_bad_tags_suppressed(self):
+        test_data = [(
+            '<incomplete-bad-tag>',
+            ''
+        ), (
+            '<complete-bad-tag></complete-bad-tag>',
+            ''
+        ), (
+            '<incomplete-bad-tag><div>OK tag</div>',
+            '<div>OK tag</div>'
+        ), (
+            '<complete-bad-tag></complete-bad-tag><span>OK tag</span>',
+            '<span>OK tag</span>'
+        ), (
+            '<bad-tag></bad-tag>Just some text 12345',
+            'Just some text 12345'
+        ), (
+            '<script>alert(\'Here is some JS\');</script>',
+            'alert(\'Here is some JS\');'
+        ), (
+            '<iframe src="https://oppiaserver.appspot.com"></iframe>',
+            ''
+        )]
+
+        for datum in test_data:
+            self.assertEqual(
+                utils.clean(datum[0]), datum[1],
+                msg='\n\nOriginal text: %s' % datum[0])
+
+    def test_oppia_custom_tags(self):
+        test_data = [(
+            '<oppia-noninteractive-image filepath-with-value="1"/>',
+            '<oppia-noninteractive-image filepath-with-value="1">'
+            '</oppia-noninteractive-image>'
+        ), (
+            '<oppia-noninteractive-image filepath-with-value="1">'
+            '</oppia-noninteractive-image>',
+            '<oppia-noninteractive-image filepath-with-value="1">'
+            '</oppia-noninteractive-image>'
+        ), (
+            '<oppia-fake-tag></oppia-fake-tag>',
+            ''
+        )]
+
+        for datum in test_data:
+            self.assertEqual(
+                utils.clean(datum[0]), datum[1],
+                msg='\n\nOriginal text: %s' % datum[0])
+
+
+    def test_strip_html_tags(self):
+        test_data = [(
+            '<a href="http://www.google.com">Hello</a>',
+            'Hello',
+        ), (
+            'Just some text 12345',
+            'Just some text 12345',
+        ), (
+            '<code>Unfinished HTML',
+            'Unfinished HTML',
+        ), (
+            '<br/>',
+            '',
+        ), (
+            'A big mix <div>Hello</div> Yes <span>No</span>',
+            'A big mix Hello Yes No',
+        ), (
+            'Text with\nnewlines',
+            'Text with\nnewlines',
+        )]
+
+        for datum in test_data:
+            self.assertEqual(utils.strip_html_tags(datum[0]), datum[1])
+
+
+    def test_get_rte_components(self):
+        test_data = (
+            '<p>Test text&nbsp;'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;qu'
+            'ot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:'
+            '&amp;quot;&amp;quot;}">'
+            '</oppia-noninteractive-math></p><p>&nbsp;'
+            '<oppia-noninteractive-link '
+            'text-with-value='
+            '"&amp;quot;Link\\&amp;quot;quoted text\\&amp;quot;'
+            '&amp;#39;singlequotes&amp;#39;&amp;quot;" '
+            'url-with-value="&amp;quot;https://www.example.com&amp;quot;">'
+            '</oppia-noninteractive-link>.</p>'
+            '<p>Video</p>'
+            '<p><oppia-noninteractive-video autoplay-with-value="false" '
+            'end-with-value="0" start-with-value="0" '
+            'video_id-with-value="&amp;quot;'
+            'https://www.youtube.com/watch?v=Ntcw0H0hwPU&amp;quot;">'
+            '</oppia-noninteractive-video><br></p>'
+        )
+
+        expected_components = [
+            {
+                'customization_args': {
+                    'text-with-value': u'Link"quoted text"\'singlequotes\'',
+                    'url-with-value': u'https://www.example.com'},
+                'id': 'oppia-noninteractive-link'
+            },
+            {
+                'customization_args': {
+                    'start-with-value': 0,
+                    'end-with-value': 0,
+                    'video_id-with-value': (
+                        u'https://www.youtube.com/watch?'
+                        u'v=Ntcw0H0hwPU'),
+                    'autoplay-with-value': False
+                },
+                'id': 'oppia-noninteractive-video'
+            },
+            {
+                'customization_args': {
+                    'math_content-with-value': {
+                        u'raw_latex': u'\\frac{x}{y}',
+                        u'svg_filename': u''
+                    }
+                },
+                'id': 'oppia-noninteractive-math'
+            }
+        ]
+
+        components = utils.get_rte_components(test_data)
+
+        self.assertEqual(len(components), len(expected_components))
+        for component in components:
+            self.assertIn(component, expected_components)
+
+    def test_get_image_filenames_from_html_strings(self):
+        html_strings = [
+            '<oppia-noninteractive-image '
+            'filepath-with-value="&quot;img.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image><oppia-noninteractive-image '
+            'filepath-with-value="&quot;img2.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>',
+            '<oppia-noninteractive-image '
+            'filepath-with-value="&quot;img3.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image><oppia-noninteractive-image '
+            'filepath-with-value="&quot;img4.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>',
+            '<oppia-noninteractive-image '
+            'filepath-with-value="&quot;img5.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;quot;,&amp;quot;sv'
+            'g_filename&amp;quot;:&amp;quot;math1.svg&amp;quot;}"></oppia-n'
+            'oninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;:&amp;quot;x^2&amp;quot;,&amp;quot;sv'
+            'g_filename&amp;quot;:&amp;quot;math2.svg&amp;quot;}"></oppia-n'
+            'oninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;:&amp;quot;(x-1)(x-2)^2&amp;quot;,&amp;quot'
+            ';svg_filename&amp;quot;:&amp;quot;math3.svg&amp;quot;}"></oppia-n'
+            'oninteractive-math>'
+        ]
+        self.assertItemsEqual(
+            [
+                'img.svg', 'img2.svg', 'img3.svg', 'img4.svg',
+                'img5.svg', 'math1.svg', 'math2.svg', 'math3.svg'],
+            utils.get_image_filenames_from_html_strings(html_strings))

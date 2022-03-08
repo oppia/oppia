@@ -27,11 +27,6 @@ from core.constants import constants
 from typing import List, Optional
 from typing_extensions import TypedDict
 
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
-
 # This is same as base_models.ID_Length.
 BLOG_POST_ID_LENGTH = 12
 
@@ -105,7 +100,7 @@ class BlogPost:
         self.id = blog_post_id
         self.author_id = author_id
         self.title = title
-        self.content = html_cleaner.clean(content) # type: ignore[no-untyped-call]
+        self.content = utils.clean(content) # type: ignore[no-untyped-call]
         self.url_fragment = url_fragment
         self.tags = tags
         self.thumbnail_filename = thumbnail_filename
@@ -362,7 +357,7 @@ class BlogPost:
         Args:
             content: str. The new content of the blog post.
         """
-        self.content = html_cleaner.clean(content) # type: ignore[no-untyped-call]
+        self.content = utils.clean(content) # type: ignore[no-untyped-call]
 
     def update_tags(self, tags: List[str]) -> None:
         """Updates the tags list of the blog post.

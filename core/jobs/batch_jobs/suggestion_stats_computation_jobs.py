@@ -22,7 +22,6 @@ import datetime
 
 from core import feconf
 from core.domain import exp_domain
-from core.domain import html_cleaner
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
 from core.domain import state_domain
@@ -198,7 +197,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 for item in content_items:
                     # Count the number of words in the original content,
                     # ignoring any HTML tags and attributes.
-                    content_plain_text = html_cleaner.strip_html_tags(item) # type: ignore[no-untyped-call,attr-defined]
+                    content_plain_text = utils.strip_html_tags(item) # type: ignore[no-untyped-call,attr-defined]
                     content_word_count += len(content_plain_text.split())
 
                 translation_contribution_stats_dict = {

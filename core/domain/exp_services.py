@@ -47,7 +47,6 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import fs_domain
-from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import param_domain
@@ -310,7 +309,7 @@ def export_to_zip_file(exploration_id, version=None):
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         html_string_list = exploration.get_all_html_content_strings()
         image_filenames = (
-            html_cleaner.get_image_filenames_from_html_strings(
+            utils.get_image_filenames_from_html_strings(
                 html_string_list))
 
         for filename in image_filenames:
@@ -497,7 +496,7 @@ def apply_change_list(exploration_id, change_list):
                     cleaned_written_translations_dict = (
                         state_domain.WrittenTranslations
                         .convert_html_in_written_translations(
-                            change.new_value, html_cleaner.clean))
+                            change.new_value, utils.clean))
                     written_translations = (
                         state_domain.WrittenTranslations.from_dict(
                             cleaned_written_translations_dict))
@@ -1634,7 +1633,7 @@ def get_image_filenames_from_exploration(exploration):
 
     html_list = exploration.get_all_html_content_strings()
     filenames.extend(
-        html_cleaner.get_image_filenames_from_html_strings(html_list))
+        utils.get_image_filenames_from_html_strings(html_list))
     return filenames
 
 

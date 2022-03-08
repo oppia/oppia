@@ -28,7 +28,6 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
-from core.domain import html_cleaner
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -293,11 +292,11 @@ class BaseSuggestion:
         """
         html_list = self.get_all_html_content_strings()
         all_image_filenames = (
-            html_cleaner.get_image_filenames_from_html_strings(html_list))
+            utils.get_image_filenames_from_html_strings(html_list))
 
         target_entity_html_list = self.get_target_entity_html_strings()
         target_image_filenames = (
-            html_cleaner.get_image_filenames_from_html_strings(
+            utils.get_image_filenames_from_html_strings(
                 target_entity_html_list))
 
         new_image_filenames = utils.compute_list_difference(

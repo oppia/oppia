@@ -38,7 +38,6 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
@@ -1943,7 +1942,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             written_translation['data_format'] = (
                                 schema_utils.SCHEMA_TYPE_UNICODE)
                             written_translation['translation'] = (
-                                html_cleaner.strip_html_tags(
+                                utils.strip_html_tags(
                                     written_translation['translation']))
         return states_dict
 

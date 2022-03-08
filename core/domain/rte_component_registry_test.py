@@ -234,25 +234,6 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(set(obtained_components), set(actual_components))
 
-    def test_get_tag_list_with_attrs(self):
-        """Test get_tag_list_with_attrs method."""
-        obtained_tag_list_with_attrs = (
-            rte_component_registry.Registry.get_tag_list_with_attrs())
-        actual_tag_list_with_attrs = {}
-        component_specs = (
-            rte_component_registry.Registry.get_all_rte_components())
-        for component_spec in component_specs.values():
-            tag_name = 'oppia-noninteractive-%s' % component_spec['frontend_id']
-            attr_names = [
-                '%s-with-value' % attr['name'] for attr in component_spec[
-                    'customization_arg_specs']]
-            actual_tag_list_with_attrs[tag_name] = attr_names
-        self.assertEqual(
-            set(obtained_tag_list_with_attrs.keys()),
-            set(actual_tag_list_with_attrs.keys()))
-        for key, attrs in obtained_tag_list_with_attrs.items():
-            self.assertEqual(set(attrs), set(actual_tag_list_with_attrs[key]))
-
     def test_get_component_types_to_component_classes(self):
         """Test get_component_types_to_component_classes method."""
         component_types_to_component_classes = rte_component_registry.Registry.get_component_types_to_component_classes() # pylint: disable=line-too-long
