@@ -253,18 +253,18 @@ export class SvgSanitizerService {
     let invalidTags = invalidTagsAndAttributes.tags;
     let invalidAttributes = invalidTagsAndAttributes.attrs;
     if (invalidTags.length) {
-      updatedURL = updatedURL + '%0A%20%20Tags:';
+      updatedURL = updatedURL + '%0A%20%20Tags:%20';
       for (let i = 0; i < Math.min(invalidTags.length, 20); i++) {
-        updatedURL = updatedURL + '%20' + invalidTags[i];
+        updatedURL = updatedURL + invalidTags[i] + ',%20';
       }
     }
     if (invalidAttributes.length) {
-      updatedURL = updatedURL + '%0A%20%20Attributes:';
+      updatedURL = updatedURL + '%0A%20%20Attributes:%20';
       for (let i = 0; i < Math.min(invalidAttributes.length, 20); i++) {
-        updatedURL = updatedURL + '%20' + invalidAttributes[i];
+        updatedURL = updatedURL + invalidAttributes[i] + ',%20';
       }
     }
-    return updatedURL;
+    return updatedURL.substring(0, updatedURL.length - 4);
   }
 }
 
