@@ -22,7 +22,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { Subscription } from 'rxjs';
@@ -35,6 +34,7 @@ import { ExplorationEngineService } from '../services/exploration-engine.service
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
+import { StateObjectsBackendDict } from '/home/manan/opensource/oppia/core/templates/domain/exploration/StatesObjectFactory';
 
 @Component({
   selector: 'oppia-exploration-footer',
@@ -54,6 +54,7 @@ export class ExplorationFooterComponent {
   checkpointArray: number[] = [0];
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth: number = 0;
+  expStates: StateObjectsBackendDict;
 
   constructor(
     private contextService: ContextService,
@@ -112,15 +113,7 @@ export class ExplorationFooterComponent {
           });
       }
       // Fetching the number of checkpoints.
-      let count = 0;
-      this.getStates(this.explorationId).then(data => {
-        for (const [, value] of Object.entries(data)) {
-          if (value.card_is_checkpoint) {
-            count++;
-          }
-        }
-        this.numberofCheckpoints = count;
-      });
+      this.getCheckpointCount(this.explorationId);
     } catch (err) { }
 
     if (this.contextService.isInQuestionPlayerMode()) {
@@ -199,11 +192,18 @@ export class ExplorationFooterComponent {
     }
   }
 
-  async getStates(explorationId: string): Promise<StateObjectsBackendDict> {
+  async getCheckpointCount(explorationId: string): Promise<void> {
     return this.readOnlyExplorationBackendApiService
       .fetchExplorationAsync(explorationId, null).then(
         (response: FetchExplorationBackendResponse) => {
-          return response.exploration.states;
+          this.expStates = response.exploration.states;
+          let count = 0;
+          for (let [, value] of Object.entries(this.expStates)) {
+            if (value.card_is_checkpoint) {
+              count++;
+            }
+          }
+          this.numberofCheckpoints = count;
         });
   }
 
