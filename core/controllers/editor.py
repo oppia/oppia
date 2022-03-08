@@ -70,6 +70,42 @@ SCHEMA_FOR_VERSION = {
     }]
 }
 
+def replace_ids_with_names_in_dict(exploration_id):
+    """Replace ids with the names and return rights as a dictionary.
+    Args:
+        exploration_id: str. ID of the exploration.
+    Returns:
+        dict. The dictionary where ids are replaced with corresponding names.
+    """
+
+    rights_dict = rights_manager.get_exploration_rights(
+        exploration_id).to_dict()
+
+    if rights_dict['community_owned']:
+        rights_dict['owner_names'] = []
+        rights_dict['editor_names'] = []
+        rights_dict['voice_artist_names'] = []
+        rights_dict['viewer_names'] = []
+    else:
+        rights_dict['owner_names'] = (
+            user_services.get_human_readable_user_ids(
+                rights_dict['owner_ids']))
+        rights_dict['editor_names'] = (
+            user_services.get_human_readable_user_ids(
+                rights_dict['editor_ids']))
+        rights_dict['voice_artist_names'] = (
+            user_services.get_human_readable_user_ids(
+                rights_dict['voice_artist_ids']))
+        rights_dict['viewer_names'] = (
+            user_services.get_human_readable_user_ids(
+                rights_dict['viewer_ids']))
+
+    rights_dict.pop('owner_ids')
+    rights_dict.pop('editor_ids')
+    rights_dict.pop('voice_artist_ids')
+    rights_dict.pop('viewer_ids')
+    return rights_dict
+
 
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
@@ -379,8 +415,7 @@ class ExplorationRightsHandler(EditorHandler):
                 'No change was made to this exploration.')
 
         self.render_json({
-            'rights': rights_manager.get_exploration_rights(
-                exploration_id).to_dict()
+            'rights': replace_ids_with_names_in_dict(exploration_id)
         })
 
     @acl_decorators.can_modify_exploration_roles
@@ -398,8 +433,7 @@ class ExplorationRightsHandler(EditorHandler):
         rights_manager.deassign_role_for_exploration(
             self.user, exploration_id, user_id)
         self.render_json({
-            'rights': rights_manager.get_exploration_rights(
-                exploration_id).to_dict()
+            'rights': replace_ids_with_names_in_dict(exploration_id)
         })
 
 
@@ -449,8 +483,7 @@ class ExplorationStatusHandler(EditorHandler):
             self._publish_exploration(exploration_id)
 
         self.render_json({
-            'rights': rights_manager.get_exploration_rights(
-                exploration_id).to_dict()
+            'rights': replace_ids_with_names_in_dict(exploration_id)
         })
 
 
@@ -508,7 +541,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
                     exploration.title, email_body)
 
         self.render_json({
-            'rights': exp_rights.to_dict(),
+            'rights': replace_ids_with_names_in_dict(exploration_id),
         })
 
 

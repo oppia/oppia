@@ -62,10 +62,10 @@ class ActivityRightsDict(TypedDict):
     cloned_from: Optional[str]
     status: str
     community_owned: bool
-    owner_names: List[str]
-    editor_names: List[str]
-    voice_artist_names: List[str]
-    viewer_names: List[str]
+    owner_ids: List[str]
+    editor_ids: List[str]
+    voice_artist_ids: List[str]
+    viewer_ids: List[str]
     viewable_if_private: bool
 
 
@@ -168,10 +168,10 @@ class ActivityRights:
                 'cloned_from': self.cloned_from,
                 'status': self.status,
                 'community_owned': True,
-                'owner_names': [],
-                'editor_names': [],
-                'voice_artist_names': [],
-                'viewer_names': [],
+                'owner_ids': [],
+                'editor_ids': [],
+                'voice_artist_ids': [],
+                'viewer_ids': [],
                 'viewable_if_private': self.viewable_if_private,
             }
         else:
@@ -179,14 +179,10 @@ class ActivityRights:
                 'cloned_from': self.cloned_from,
                 'status': self.status,
                 'community_owned': False,
-                'owner_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
-                    self.owner_ids),
-                'editor_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
-                    self.editor_ids),
-                'voice_artist_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
-                    self.voice_artist_ids),
-                'viewer_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
-                    self.viewer_ids),
+                'owner_ids': self.owner_ids,
+                'editor_ids': self.editor_ids,
+                'voice_artist_ids': self.voice_artist_ids,
+                'viewer_ids': self.viewer_ids,
                 'viewable_if_private': self.viewable_if_private,
             }
 

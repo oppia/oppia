@@ -214,10 +214,10 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             'cloned_from': None,
             'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
             'community_owned': False,
-            'owner_names': ['owner'],
-            'editor_names': [],
-            'voice_artist_names': [],
-            'viewer_names': [],
+            'owner_ids': [self.owner_id],
+            'editor_ids': [],
+            'voice_artist_ids': [],
+            'viewer_ids': [],
             'viewable_if_private': False,
         }
         self.assertEqual(
@@ -226,7 +226,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
 
         self.activity_rights.community_owned = True
         sample_activity_rights_dict['community_owned'] = True
-        sample_activity_rights_dict['owner_names'] = []
+        sample_activity_rights_dict['owner_ids'] = []
         self.assertEqual(
             self.activity_rights.to_dict(), sample_activity_rights_dict
         )
