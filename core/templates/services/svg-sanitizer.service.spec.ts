@@ -516,7 +516,7 @@ describe('SvgSanitizerService', () => {
         invalidTagsAndAttributes: {
           tags: ['circel'], attrs: ['svg:data-name']
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A%20%20Tags:%20circel%0A%20%20Attributes:%20svg:data-name'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A%20%20Tags:%20circel,%20%0A%20%20Attributes:%20svg:data-name'
       }
     ];
     testCases.forEach(testCase => {
