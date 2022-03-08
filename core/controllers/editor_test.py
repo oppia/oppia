@@ -1575,7 +1575,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
         self.assertNotIn(
             self.COLLABORATOR2_USERNAME,
-            reader_dict['rights']['editor_names']
+            reader_dict['rights']['editor_ids']
         )
 
         response = self.put_json(
@@ -1595,7 +1595,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
         self.assertNotIn(
             self.COLLABORATOR2_USERNAME,
-            reader_dict['rights']['editor_names']
+            reader_dict['rights']['editor_ids']
         )
         self.logout()
 
@@ -1692,7 +1692,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
         self.assertNotIn(
             self.COLLABORATOR2_USERNAME,
-            reader_dict['rights']['editor_names']
+            reader_dict['rights']['editor_ids']
         )
 
         response = self.put_json(
@@ -1712,7 +1712,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
         self.assertNotIn(
             self.COLLABORATOR2_USERNAME,
-            reader_dict['rights']['editor_names']
+            reader_dict['rights']['editor_ids']
         )
         self.logout()
 
@@ -1800,7 +1800,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
         self.assertNotIn(
             self.COLLABORATOR2_USERNAME,
-            reader_dict['rights']['editor_names']
+            reader_dict['rights']['editor_ids']
         )
 
         response = self.put_json(
@@ -1821,7 +1821,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
         self.assertNotIn(
             self.COLLABORATOR2_USERNAME,
-            reader_dict['rights']['editor_names']
+            reader_dict['rights']['editor_ids']
         )
         self.logout()
 
