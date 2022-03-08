@@ -264,14 +264,8 @@ describe('Topics and Skills Dashboard backend API service', () => {
     categorizedAndUntriagedSkillsDataBackendDict = {
       untriaged_skill_summary_dicts: [
         {
-          version: 1,
-          language_code: 'en',
-          description: 'Dummy Skill 3',
-          skill_model_created_on: 1623851495022.93,
-          skill_model_last_updated: 1623851495022.942,
-          worked_examples_count: 0,
-          id: '4P77sLaU14DE',
-          misconception_count: 0
+          skill_description: 'Dummy Skill 3',
+          skill_id: '4P77sLaU14DE',
         }
       ],
       categorized_skills_dict: {
@@ -297,8 +291,8 @@ describe('Topics and Skills Dashboard backend API service', () => {
 
     categorizedAndUntriagedSkillsDataBackendResponse = {
       untriagedSkillSummaries: [
-        SkillSummary.createFromBackendDict(
-          topicAndSkillsDashboardDataBackendDict
+        ShortSkillSummary.createFromBackendDict(
+          categorizedAndUntriagedSkillsDataBackendDict
             .untriaged_skill_summary_dicts[0]),
       ],
       categorizedSkillsDict: {

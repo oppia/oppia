@@ -167,16 +167,20 @@ class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
             skill_services.get_untriaged_skill_summaries(
                 skill_summaries, skill_ids_assigned_to_some_topic,
                 merged_skill_ids))
-        untriaged_skill_summary_dicts = [
-            skill_summary.to_dict()
+        minified_untriaged_skill_summaries = [
+            skill_domain.ShortSkillSummary.from_skill_summary(skill_summary)
             for skill_summary in untriaged_skill_summaries]
+        minified_untriaged_skill_summary_dicts = [
+            short_skill_summary.to_dict()
+            for short_skill_summary in minified_untriaged_skill_summaries]
 
         categorized_skills = (
             skill_services.get_categorized_skill_ids_and_descriptions())
         categorized_skills_dict = categorized_skills.to_dict()
 
         self.values.update({
-            'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
+            'untriaged_skill_summary_dicts': (
+                minified_untriaged_skill_summary_dicts),
             'categorized_skills_dict': categorized_skills_dict
         })
         self.render_json(self.values)

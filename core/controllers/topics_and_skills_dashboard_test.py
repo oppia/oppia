@@ -189,7 +189,7 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
         self.assertEqual(
             len(json_response['untriaged_skill_summary_dicts']), 1)
         self.assertEqual(
-            json_response['untriaged_skill_summary_dicts'][0]['id'],
+            json_response['untriaged_skill_summary_dicts'][0]['skill_id'],
             skill_id)
         self.assertEqual(
             len(json_response['categorized_skills_dict']), 1)
@@ -204,7 +204,7 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
         self.assertEqual(
             len(json_response['untriaged_skill_summary_dicts']), 1)
         self.assertEqual(
-            json_response['untriaged_skill_summary_dicts'][0]['id'],
+            json_response['untriaged_skill_summary_dicts'][0]['skill_id'],
             skill_id)
         self.assertEqual(
             len(json_response['categorized_skills_dict']), 1)

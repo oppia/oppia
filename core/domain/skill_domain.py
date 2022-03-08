@@ -1909,3 +1909,18 @@ class ShortSkillSummary:
             'skill_id': self.skill_id,
             'skill_description': self.skill_description
         }
+
+    @classmethod
+    def from_skill_summary(cls, skill_summary):
+        """Returns a ShortSkillSummary domain object from the given skill
+        summary.
+
+        Args:
+            skill_summary: SkillSummary. The skill summary domain object.
+
+        Returns:
+            ShortSkillSummary. The ShortSkillSummary domain object.
+        """
+        return cls(
+            skill_summary.id,
+            skill_summary.description)

@@ -80,7 +80,7 @@ export interface TopicsAndSkillsDashboardDataBackendDict {
 }
 
 export interface CategorizedAndUntriagedSkillsDataBackendDict {
-  'untriaged_skill_summary_dicts': SkillSummaryBackendDict[];
+  'untriaged_skill_summary_dicts': ShortSkillSummaryBackendDict[];
   'categorized_skills_dict': CategorizedSkillsBackendDict;
 }
 
@@ -98,7 +98,7 @@ export interface TopicsAndSkillDashboardData {
 }
 
 export interface CategorizedAndUntriagedSkillsData {
-  untriagedSkillSummaries: SkillSummary[];
+  untriagedSkillSummaries: ShortSkillSummary[];
   categorizedSkillsDict: CategorizedSkills;
 }
 
@@ -197,7 +197,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
       return {
         untriagedSkillSummaries: (
           response.untriaged_skill_summary_dicts.map(
-            backendDict => SkillSummary
+            backendDict => ShortSkillSummary
               .createFromBackendDict(backendDict))),
         categorizedSkillsDict: categorizedSkills
       };

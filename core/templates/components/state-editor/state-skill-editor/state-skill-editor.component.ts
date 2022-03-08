@@ -17,7 +17,7 @@
 */
 
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { SkillSummary, SkillSummaryBackendDict } from 'core/templates/domain/skill/skill-summary.model';
+import { SkillSummaryBackendDict } from 'core/templates/domain/skill/skill-summary.model';
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
 import { DeleteStateSkillModalComponent } from
   // eslint-disable-next-line max-len
@@ -33,6 +33,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { downgradeComponent } from '@angular/upgrade/static';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { UserService } from 'services/user.service';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
 @Component({
   selector: 'state-skill-editor',
@@ -46,7 +47,7 @@ export class StateSkillEditorComponent implements OnInit {
     new EventEmitter<string>());
 
   categorizedSkills: SkillsCategorizedByTopics = null;
-  untriagedSkillSummaries: SkillSummary[] = null;
+  untriagedSkillSummaries: ShortSkillSummary[] = null;
   skillEditorIsShown: boolean = true;
   skillName: string = null;
   userCanEditSkills: boolean = false;

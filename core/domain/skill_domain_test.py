@@ -1284,6 +1284,9 @@ class ShortSkillSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ShortSkillSummaryTests, self).setUp()
+        self.skill_summary = skill_domain.SkillSummary(
+            'skill_1', 'Description 1', 'en', 1,
+            0, 0, datetime.datetime.now(), datetime.datetime.now())
         self.short_skill_summary = skill_domain.ShortSkillSummary(
             'skill_1', 'Description 1')
 
@@ -1295,3 +1298,11 @@ class ShortSkillSummaryTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.short_skill_summary.to_dict(),
             short_skill_summary_dict)
+
+    def test_short_skill_summary_gets_created_from_skill_summary(self):
+        short_skill_summary = (
+            skill_domain.ShortSkillSummary.from_skill_summary(
+                self.skill_summary))
+        self.assertEqual(
+            short_skill_summary.to_dict(),
+            self.short_skill_summary.to_dict())
