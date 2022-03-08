@@ -698,6 +698,30 @@ class Story:
         self.meta_tag_content = meta_tag_content
 
     @classmethod
+    def require_valid_description(cls, description):
+        """Checks whether the description is a valid string.
+
+        Args:
+            description: str. The description to be checked.
+
+        Raises:
+            ValidationError. The description is not a valid string.
+        """
+        if not isinstance(description, str):
+            raise utils.ValidationError(
+                'Story description should be a string.')
+        if description == '':
+            raise utils.ValidationError(
+                'Story description field should not be empty.')
+
+        description_limit = (
+            android_validation_constants.MAX_CHARS_IN_STORY_DESCRIPTION)
+        if len(description) > description_limit:
+            raise utils.ValidationError(
+                'Story description should be less than %d chars, received %s.'
+                % (description_limit, len(description)))
+
+    @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
         """Checks whether the thumbnail filename of the story is a valid
             one.
@@ -729,11 +753,7 @@ class Story:
             ValidationError. One or more attributes of story are invalid.
         """
         self.require_valid_title(self.title)
-
-        if not isinstance(self.description, str):
-            raise utils.ValidationError(
-                'Expected description to be a string, received %s'
-                % self.description)
+        self.require_valid_description(self.description)
 
         if self.url_fragment is not None:
             utils.require_valid_url_fragment(
