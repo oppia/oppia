@@ -277,6 +277,14 @@ class CollectionDict(TypedDict):
     nodes: List[CollectionNodeDict]
 
 
+class SerializerCollectionDict(CollectionDict):
+    """Type for the serializer's collection_dict variable."""
+
+    version: int
+    created_on: str
+    last_updated: str
+
+
 class VersionedCollectionDict(TypedDict):
     """Type for the argument versioned_collection_contents."""
 
@@ -463,7 +471,11 @@ class Collection:
             str. JSON-encoded str encoding all of the information composing
             the object.
         """
-        collection_dict = self.to_dict()
+        # Here, to_dict() method return TypeDict which is defined to match the
+        # current version of domain object but collection_dict expecting a
+        # TypeDict which contain full version of domain object. Thus to avoid
+        # MyPy error we added an ignore here.
+        collection_dict: SerializerCollectionDict = self.to_dict() # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
         # yaml encoding/decoding of this object does not handle the version
         # parameter.
@@ -472,17 +484,14 @@ class Collection:
         # files must add a version parameter to their files with the correct
         # version of this object. The line below must then be moved to
         # to_dict().
-        # CollectionDict is defined to match the current version of domain
-        # object. So, it does not contain keys like version, created_on and
-        # last_updated. Thus to prevent MyPy error, we added an ignore here.
-        collection_dict['version'] = self.version # type: ignore[misc]
+        collection_dict['version'] = self.version
 
         if self.created_on:
-            collection_dict['created_on'] = ( # type: ignore[misc]
+            collection_dict['created_on'] = (
                 utils.convert_naive_datetime_to_string(self.created_on))
 
         if self.last_updated:
-            collection_dict['last_updated'] = ( # type: ignore[misc]
+            collection_dict['last_updated'] = (
                 utils.convert_naive_datetime_to_string(self.last_updated))
 
         return json.dumps(collection_dict)
@@ -559,9 +568,8 @@ class Collection:
             cls._convert_collection_contents_v3_dict_to_v4_dict(
                 collection_dict))
         # CollectionDict is defined to match the current version of domain
-        # object and here in _convert_* functions, we are dealing with some
-        # additional fields which are not mentioned in CollectionDict. Thus
-        # to prevent MyPy errors, we can ignore it.
+	    # object and here in _convert_* functions, we can ignore some MyPy
+	    # errors as we work with the previous versions of the domain objects.
         collection_dict['skills'] = new_collection_dict['skills'] # type: ignore[misc]
         collection_dict['next_skill_id'] = ( # type: ignore[misc]
             new_collection_dict['next_skill_id']) # type: ignore[misc]
@@ -594,10 +602,9 @@ class Collection:
         """
 
         # MyPy doesn't allow key deletion from TypedDict, also we are ignoring
-        # it because we are in the convert function. In convert function, we
-        # are dealing with some additional fields which are not mentioned in
-        # CollectionDict. Because CollectionDict is defined to match the current
-        # version of domain object. Thus we added an ignore here.
+        # it because we are in the convert function. In _convert_* functions,
+        # we can ignore some MyPy errors as we work with the previous versions
+        # of the domain objects.
         del collection_dict['skills'] # type: ignore[misc]
         del collection_dict['next_skill_index'] # type: ignore[misc]
 
@@ -726,10 +733,9 @@ class Collection:
 
         skill_names = set()
         for node in collection_contents['nodes']:
-            # CollectionNodeDict is defined to match the current domain object
-            # and here in convert function, we are dealing with some additional
-            # fields which are not mentioned in CollectionNodeDict. Thus we
-            # added an ignore here.
+            # CollectionNodeDict is defined to match the current version of domain
+	        # object and here in _convert_* functions, we can ignore some MyPy
+	        # errors as we work with the previous versions of the domain objects.
             skill_names.update(node['acquired_skills']) # type: ignore[misc]
             skill_names.update(node['prerequisite_skills']) # type: ignore[misc]
         skill_names_to_ids = {
@@ -749,11 +755,9 @@ class Collection:
                 for acquired_skill_name in node['acquired_skills']]
         } for node in collection_contents['nodes']]
 
-        # Here in convert function, we are dealing with some additional
-        # fields like skills, which are not mentioned in CollectionDict.
-        # Because CollectionDict is defined to match the current version
-        # of domain object. Thus we can ignore it because we are in the
-        # convert function.
+        # CollectionDict is defined to match the current version of domain
+	    # object and here in _convert_* functions, we can ignore some MyPy
+	    # errors as we work with the previous versions of the domain objects.
         collection_contents['skills'] = { # type: ignore[misc]
             skill_id: {
                 'name': skill_name,
@@ -782,15 +786,15 @@ class Collection:
         Returns:
             dict. The updated collection_contents dict.
         """
-        # Since, collection_contents is of CollectionDict type and here
-        # in convert function, we are dealing with some additional fields
-        # which are not mentioned in CollectionDict. Thus we add an ignore.
+        # CollectionDict is defined to match the current version of domain
+	    # object and here in _convert_* functions, we can ignore some MyPy
+	    # errors as we work with the previous versions of the domain objects.
         collection_contents['next_skill_index'] = collection_contents[ # type: ignore[misc]
             'next_skill_id'] # type: ignore[misc]
         # MyPy doesn't allow key deletion from TypedDict, also we are ignoring
-        # it because we are in the convert function. In convert functions, we
-        # are dealing with some additional fields which are not mentioned in
-        # CollectionDict. Thus we added an ignore here.
+        # it because we are in the convert function. In _convert_* functions,
+        # we can ignore some MyPy errors as we work with the previous versions
+        # of the domain objects.
         del collection_contents['next_skill_id'] # type: ignore[misc]
 
         return collection_contents
@@ -811,9 +815,9 @@ class Collection:
             dict. The updated collection_contents dict.
         """
         # MyPy doesn't allow key deletion from TypedDict, also we are ignoring
-        # it because we are in the convert function. In convert functions, we
-        # are dealing with some additional fields which are not mentioned in
-        # CollectionDict. Thus we add an ignore.
+        # it because we are in the convert function. In _convert_* functions,
+        # we can ignore some MyPy errors as we work with the previous versions
+        # of the domain objects.
         for node in collection_contents['nodes']:
             del node['prerequisite_skill_ids'] # type: ignore[misc]
             del node['acquired_skill_ids'] # type: ignore[misc]
