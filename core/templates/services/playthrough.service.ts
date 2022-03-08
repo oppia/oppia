@@ -297,8 +297,11 @@ export class PlaythroughService {
    * If none of the issue types have been discovered, returns null instead.
    */
   private createNewPlaythrough(): Playthrough | null {
-    if (this.misTracker && this.misTracker.foundAnIssue() && (
-      this.recordedLearnerActions !== null)) {
+    if (
+      this.misTracker &&
+      this.misTracker.foundAnIssue() &&
+      this.recordedLearnerActions !== null
+    ) {
       return this.playthroughObjectFactory
         .createNewMultipleIncorrectSubmissionsPlaythrough(
           this.explorationId, this.explorationVersion,
@@ -334,7 +337,7 @@ export class PlaythroughService {
       this.recordedLearnerActions !== null);
   }
 
-  // Return Undefined if Learner has not begun recording.
+  // Return undefined if learner has not begun recording.
   private hasRecordingFinished(): boolean | undefined {
     if (this.recordedLearnerActions !== null) {
       return (
@@ -347,9 +350,11 @@ export class PlaythroughService {
 
   private isRecordedPlaythroughHelpful(): boolean {
     const hasRecordedPlayFinished = this.hasRecordingFinished();
-    if (this.recordedLearnerActions !== null && (
-      this.playthroughDurationInSecs !== null) && (
-      hasRecordedPlayFinished !== undefined)) {
+    if (
+      this.recordedLearnerActions !== null &&
+      this.playthroughDurationInSecs !== null &&
+      hasRecordedPlayFinished !== undefined
+    ) {
       return (
         // Playthroughs are only helpful in their entirety.
         hasRecordedPlayFinished &&

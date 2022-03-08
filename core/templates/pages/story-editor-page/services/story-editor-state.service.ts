@@ -210,7 +210,10 @@ export class StoryEditorStateService {
       return false;
     }
     this._storyIsBeingSaved = true;
-    const storyId = this._story.getId() as string;
+    const storyId = this._story.getId();
+    if (storyId === null) {
+      throw new Error('Story id cannot be null.');
+    }
     this.editableStoryBackendApiService.updateStoryAsync(
       storyId, this._story.getVersion(), commitMessage,
       this.undoRedoService.getCommittableChangeList() as StoryChange[]
@@ -250,7 +253,10 @@ export class StoryEditorStateService {
         'Cannot publish a story before one is loaded.');
     }
 
-    const storyId = this._story.getId() as string;
+    const storyId = this._story.getId();
+    if (storyId === null) {
+      throw new Error('Story id cannot be null.');
+    }
     this.editableStoryBackendApiService.changeStoryPublicationStatusAsync(
       storyId, newStoryStatusIsPublic).then(
       (storyBackendObject) => {
