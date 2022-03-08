@@ -47,7 +47,7 @@ MOCK_TEMPLATES_DEV_DIR = os.path.join(TEST_SOURCE_DIR, 'templates', '')
 
 MOCK_TSC_OUTPUT_LOG_FILEPATH = os.path.join(
     TEST_SOURCE_DIR, 'mock_tsc_output_log.txt')
-FILENAME = 'invalid_filename.js'
+FILENAME = 'filename.js'
 INVALID_INPUT_FILEPATH = os.path.join(
     TEST_DIR, FILENAME)
 INVALID_OUTPUT_FILEPATH = os.path.join(
