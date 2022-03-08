@@ -367,7 +367,7 @@ describe('Audio preloader service', () => {
         .toEqual([]);
     }));
 
-  it('should return empty audioFiles list if no language code is null', () => {
+  it('should return empty audioFiles list if language code is null', () => {
     spyOn(audioTranslationLanguageService, 'getCurrentAudioLanguageCode')
       .and.returnValue(null);
 
