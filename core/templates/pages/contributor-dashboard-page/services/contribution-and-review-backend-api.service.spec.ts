@@ -26,6 +26,7 @@ describe('Contribution and review backend API service', () => {
   let carbas: ContributionAndReviewBackendApiService;
   let http: HttpTestingController;
 
+  const topic_name1 = 'Topic1'
   const suggestion1 = {
     suggestion_id: 'suggestion_id_1',
     target_id: 'skill_id_1',
@@ -119,13 +120,13 @@ describe('Contribution and review backend API service', () => {
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
-    it('should fetch reviewable translation suggestions', fakeAsync(() => {
+    it('should fetch all reviewable translation suggestions', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
       const url = '/getreviewablesuggestions/exploration' +
-        '/translate_content?topic_name=all';
+        '/translate_content?topic_name=All';
 
       carbas.fetchSuggestionsAsync(
-        'REVIEWABLE_TRANSLATION_SUGGESTIONS', 'all'
+        'REVIEWABLE_TRANSLATION_SUGGESTIONS', 'All'
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
@@ -133,7 +134,26 @@ describe('Contribution and review backend API service', () => {
       flushMicrotasks();
 
       expect(carbas.fetchReviewableSuggestionsAsync)
-        .toHaveBeenCalledWith('exploration', 'translate_content', 'all');
+        .toHaveBeenCalledWith('exploration', 'translate_content', 'All');
+      expect(successHandler).toHaveBeenCalled();
+      expect(failureHandler).not.toHaveBeenCalled();
+    }));
+  
+    it('should fetch reviewable suggestions from Topic1', fakeAsync(() => {
+      spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
+      const url = '/getreviewablesuggestions/exploration' +
+        '/translate_content?topic_name=Topic1';
+
+      carbas.fetchSuggestionsAsync(
+        'REVIEWABLE_TRANSLATION_SUGGESTIONS', topic_name1
+      ).then(successHandler, failureHandler);
+      const req = http.expectOne(url);
+      expect(req.request.method).toEqual('GET');
+      req.flush(suggestionsBackendObject);
+      flushMicrotasks();
+
+      expect(carbas.fetchReviewableSuggestionsAsync)
+        .toHaveBeenCalledWith('exploration', 'translate_content', topic_name1);
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
