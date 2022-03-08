@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core import utils
 from core.domain import exp_domain
 from core.domain import opportunity_domain
 from core.domain import opportunity_services

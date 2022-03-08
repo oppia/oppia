@@ -796,7 +796,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             response.url, 'http://www.google.com') # type: ignore[attr-defined]
 
-    def test_oppia_custom_tags(self) -> None:
+    def test_oppia_custom_tags_constant(self) -> None:
 
         rte_components = {}
         package, filepath = os.path.split(
@@ -908,7 +908,6 @@ class UtilsTests(test_utils.GenericTestBase):
                 utils.clean(datum[0]), datum[1],
                 msg='\n\nOriginal text: %s' % datum[0])
 
-
     def test_strip_html_tags(self):
         test_data = [(
             '<a href="http://www.google.com">Hello</a>',
@@ -932,7 +931,6 @@ class UtilsTests(test_utils.GenericTestBase):
 
         for datum in test_data:
             self.assertEqual(utils.strip_html_tags(datum[0]), datum[1])
-
 
     def test_get_rte_components(self):
         test_data = (

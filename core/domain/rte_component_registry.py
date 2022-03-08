@@ -26,6 +26,7 @@ from core import constants
 from core import feconf
 from core import python_utils
 
+
 class Registry:
     """Registry of all custom rich-text components."""
 

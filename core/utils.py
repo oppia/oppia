@@ -1283,6 +1283,7 @@ def url_open(source_url: str) -> str:
     # of 'urlopen' as 'Any' which is wrong.
     return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return]
 
+
 def filter_a(tag, name, value):
     """Returns whether the described attribute of a tag should be
     whitelisted.
