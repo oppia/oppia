@@ -367,6 +367,20 @@ describe('Audio preloader service', () => {
         .toEqual([]);
     }));
 
+  it('should return empty audioFiles list if no language code is null', () => {
+    spyOn(audioTranslationLanguageService, 'getCurrentAudioLanguageCode')
+      .and.returnValue(null);
+
+    const exploration = (
+      explorationObjectFactory.createFromBackendDict(explorationDict));
+    audioPreloaderService.init(exploration);
+    audioTranslationLanguageService.init(['en'], 'en', 'en', false);
+    const audioFiles = audioPreloaderService.kickOffAudioPreloader(
+      exploration.getInitialState().name as string);
+
+    expect(audioFiles).toEqual([]);
+  });
+
   it('should properly restart pre-loading from a new state', () => {
     const exploration = (
       explorationObjectFactory.createFromBackendDict(explorationDict));
