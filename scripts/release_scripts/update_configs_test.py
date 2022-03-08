@@ -380,6 +380,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
         mailchimp_api_key = ('%s-us18' % ('').join(['1'] * 32))
         temp_feconf_path = tempfile.NamedTemporaryFile().name
+        temp_app_yaml = tempfile.NamedTemporaryFile()
+        temp_app_yaml.write(b'')
         feconf_text = (
             'MAILGUN_API_KEY = \'%s\'\n'
             'MAILCHIMP_API_KEY = \'%s\'\n'
@@ -395,10 +397,13 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 mailgun_api_key, mailchimp_api_key))
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        update_configs.verify_feconf(temp_feconf_path, True)
+        update_configs.verify_config_files(
+            temp_feconf_path, temp_app_yaml.name, True)
 
     def test_feconf_verification_with_mailgun_key_absent(self):
         temp_feconf_path = tempfile.NamedTemporaryFile().name
+        temp_app_yaml = tempfile.NamedTemporaryFile()
+        temp_app_yaml.write(b'')
         feconf_text = (
             'REDISHOST = \'192.13.2.1\'\n'
             '# When the site terms were last updated, in UTC.\n'
@@ -411,12 +416,16 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        with self.assertRaisesRegexp(
-            Exception, 'The mailgun API key must be added before deployment.'):
-            update_configs.verify_feconf(temp_feconf_path, True)
+        with self.assertRaisesRegex(
+            Exception, 'The mailgun API key must be added before deployment.'
+        ):
+            update_configs.verify_config_files(
+                temp_feconf_path, temp_app_yaml.name, True)
 
     def test_feconf_verification_with_mailchimp_key_absent(self):
         temp_feconf_path = tempfile.NamedTemporaryFile().name
+        temp_app_yaml = tempfile.NamedTemporaryFile()
+        temp_app_yaml.write(b'')
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
         feconf_text = (
             'MAILGUN_API_KEY = \'%s\'\n'
@@ -432,13 +441,18 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 mailgun_api_key))
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        with self.assertRaisesRegexp(
-            Exception, 'The mailchimp API key must be added before deployment'):
-            update_configs.verify_feconf(temp_feconf_path, True)
+        with self.assertRaisesRegex(
+            Exception, 'The mailchimp API key must be added before deployment'
+        ):
+            update_configs.verify_config_files(
+                temp_feconf_path, temp_app_yaml.name, True)
 
     def test_feconf_verification_with_key_absent_and_verification_disabled(
-            self):
+        self
+    ):
         temp_feconf_path = tempfile.NamedTemporaryFile().name
+        temp_app_yaml = tempfile.NamedTemporaryFile()
+        temp_app_yaml.write(b'')
         feconf_text = (
             'REDISHOST = \'192.13.2.1\'\n'
             '# When the site terms were last updated, in UTC.\n'
@@ -451,12 +465,15 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        update_configs.verify_feconf(temp_feconf_path, False)
+        update_configs.verify_config_files(
+            temp_feconf_path, temp_app_yaml.name, False)
 
     def test_feconf_verification_with_redishost_absent(self):
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
         mailchimp_api_key = ('%s-us18' % ('').join(['1'] * 32))
         temp_feconf_path = tempfile.NamedTemporaryFile().name
+        temp_app_yaml = tempfile.NamedTemporaryFile()
+        temp_app_yaml.write(b'')
         feconf_text = (
             'MAILGUN_API_KEY = \'%s\'\n'
             'MAILCHIMP_API_KEY = \'%s\'\n'
@@ -471,15 +488,82 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 mailgun_api_key, mailchimp_api_key))
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        with self.assertRaisesRegexp(
-            Exception, 'REDISHOST must be updated before deployment.'):
-            update_configs.verify_feconf(temp_feconf_path, True)
+        with self.assertRaisesRegex(
+            Exception, 'REDISHOST must be updated before deployment.'
+        ):
+            update_configs.verify_config_files(
+                temp_feconf_path, temp_app_yaml.name, True)
+
+    def test_app_yaml_verification_with_wildcard_header_present(self):
+        mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
+        mailchimp_api_key = ('%s-us18' % ('').join(['1'] * 32))
+        temp_feconf_path = tempfile.NamedTemporaryFile().name
+        temp_app_yaml_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            'MAILGUN_API_KEY = \'%s\'\n'
+            'MAILCHIMP_API_KEY = \'%s\'\n'
+            'REDISHOST = \'192.13.2.1\'\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
+                mailgun_api_key, mailchimp_api_key))
+        with utils.open_file(temp_feconf_path, 'w') as f:
+            f.write(feconf_text)
+        app_yaml_text = (
+            '- url: /assets\n'
+            '  static_dir: assets\n'
+            '  secure: always\n'
+            '  http_headers:\n'
+            '    Access-Control-Allow-Origin: "*"\n'
+            '  expiration: "0"'
+        )
+        with utils.open_file(temp_app_yaml_path, 'w') as f:
+            f.write(app_yaml_text)
+        with self.assertRaisesRegex(
+            Exception,
+            r'\'Access-Control-Allow-Origin: "\*"\' must be updated to '
+            r'a specific origin before deployment.'
+        ):
+            update_configs.verify_config_files(
+                temp_feconf_path, temp_app_yaml_path, True)
+
+    def test_update_app_yaml_correctly_updates(self):
+        temp_feconf_config_path = tempfile.NamedTemporaryFile().name
+        temp_app_yaml_path = tempfile.NamedTemporaryFile().name
+        feconf_config_text = 'OPPIA_SITE_URL = \'https://oppia.org\'\n'
+        with utils.open_file(temp_feconf_config_path, 'w') as f:
+            f.write(feconf_config_text)
+
+        app_yaml_text = (
+            '- url: /assets\n'
+            '  static_dir: assets\n'
+            '  secure: always\n'
+            '  http_headers:\n'
+            '    Access-Control-Allow-Origin: "*"\n'
+            '  expiration: "0"'
+        )
+        with utils.open_file(temp_app_yaml_path, 'w') as f:
+            f.write(app_yaml_text)
+
+        update_configs.update_app_yaml(
+            temp_app_yaml_path, temp_feconf_config_path)
+
+        with utils.open_file(temp_app_yaml_path, 'r') as f:
+            app_yaml_text = f.read()
+            self.assertIn(
+                'Access-Control-Allow-Origin: https://oppia.org', app_yaml_text)
 
     def test_invalid_config(self):
         with self.assertRaisesRegexp(
             Exception,
             'Invalid line in invalid_feconf_updates.config '
-            'config file: INVALID_KEY: \'invalid\''):
+            'config file: INVALID_KEY: \'invalid\''
+        ):
             update_configs.apply_changes_based_on_config(
                 MOCK_LOCAL_FECONF_PATH,
                 INVALID_FECONF_CONFIG_PATH, update_configs.FECONF_REGEX)
@@ -488,7 +572,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Could not find correct number of lines in '
-            'feconf.txt matching: EXTRA_KEY = \'extra\''):
+            'feconf.txt matching: EXTRA_KEY = \'extra\''
+        ):
             update_configs.apply_changes_based_on_config(
                 MOCK_LOCAL_FECONF_PATH,
                 FECONF_CONFIG_PATH_WITH_EXTRA_LINE, update_configs.FECONF_REGEX)
@@ -516,7 +601,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'add_mailgun_api_key_gets_called': False,
             'add_mailchimp_api_key_gets_called': False,
             'apply_changes_based_on_config_gets_called': False,
-            'verify_feconf_gets_called': False,
+            'verify_config_files_gets_called': False,
+            'update_app_yaml_gets_called': False,
             'mailgun_api_key_is_to_be_verified': False,
             'mailchimp_api_key_is_to_be_verified': False
         }
@@ -525,7 +611,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'add_mailgun_api_key_gets_called': True,
             'add_mailchimp_api_key_gets_called': True,
             'apply_changes_based_on_config_gets_called': True,
-            'verify_feconf_gets_called': True,
+            'verify_config_files_gets_called': True,
+            'update_app_yaml_gets_called': True,
             'mailgun_api_key_is_to_be_verified': True,
             'mailchimp_api_key_is_to_be_verified': True
         }
@@ -542,13 +629,22 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 unused_expected_config_line_regex):
             check_function_calls[
                 'apply_changes_based_on_config_gets_called'] = True
-        def mock_verify_feconf(
-                unused_release_feconf_path, verify_email_api_keys):
-            check_function_calls['verify_feconf_gets_called'] = True
+        def mock_verify_config_files(
+            unused_release_feconf_path,
+            unused_release_app_yaml_path,
+            verify_email_api_keys
+        ):
+            check_function_calls['verify_config_files_gets_called'] = True
             check_function_calls['mailgun_api_key_is_to_be_verified'] = (
                 verify_email_api_keys)
             check_function_calls['mailchimp_api_key_is_to_be_verified'] = (
                 verify_email_api_keys)
+
+        def mock_update_app_yaml(
+            unused_release_app_yaml_path,
+            unused_feconf_config_path
+        ):
+            check_function_calls['update_app_yaml_gets_called'] = True
 
         check_updates_swap = self.swap(
             update_configs, 'check_updates_to_terms_of_service',
@@ -559,12 +655,14 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             update_configs, 'add_mailchimp_api_key', mock_add_mailchimp_api_key)
         apply_changes_swap = self.swap(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
-        verify_feconf_swap = self.swap(
-            update_configs, 'verify_feconf', mock_verify_feconf)
+        verify_config_files_swap = self.swap(
+            update_configs, 'verify_config_files', mock_verify_config_files)
+        update_app_yaml_swap = self.swap(
+            update_configs, 'update_app_yaml', mock_update_app_yaml)
 
         with self.url_open_swap, check_updates_swap, add_mailgun_api_key_swap:
-            with apply_changes_swap, verify_feconf_swap:
-                with add_mailchimp_api_key_swap:
+            with apply_changes_swap, verify_config_files_swap:
+                with add_mailchimp_api_key_swap, update_app_yaml_swap:
                     update_configs.main(
                         args=[
                             '--release_dir_path', 'test-release-dir',
@@ -577,34 +675,50 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
     def test_function_calls_without_prompt_for_feconf_and_terms_update(self):
         check_function_calls = {
             'apply_changes_based_on_config_gets_called': False,
-            'verify_feconf_gets_called': False,
+            'verify_config_files_gets_called': False,
+            'update_app_yaml_gets_called': False,
             'mailgun_api_key_is_to_be_verified': False,
             'mailchimp_api_key_is_to_be_verified': False
         }
         expected_check_function_calls = {
             'apply_changes_based_on_config_gets_called': True,
-            'verify_feconf_gets_called': True,
+            'verify_config_files_gets_called': True,
+            'update_app_yaml_gets_called': True,
             'mailgun_api_key_is_to_be_verified': False,
             'mailchimp_api_key_is_to_be_verified': False
         }
         def mock_apply_changes(
-                unused_local_filepath, unused_config_filepath,
-                unused_expected_config_line_regex):
+            unused_local_filepath,
+            unused_config_filepath,
+            unused_expected_config_line_regex
+        ):
             check_function_calls[
                 'apply_changes_based_on_config_gets_called'] = True
-        def mock_verify_feconf(
-                unused_release_feconf_path, verify_email_api_keys):
-            check_function_calls['verify_feconf_gets_called'] = True
+
+        def mock_verify_config_files(
+            unused_release_feconf_path,
+            unused_release_app_yaml_path,
+            verify_email_api_keys
+        ):
+            check_function_calls['verify_config_files_gets_called'] = True
             check_function_calls['mailgun_api_key_is_to_be_verified'] = (
                 verify_email_api_keys)
             check_function_calls['mailchimp_api_key_is_to_be_verified'] = (
                 verify_email_api_keys)
 
+        def mock_update_app_yaml(
+            unused_release_app_yaml_path,
+            unused_feconf_config_path
+        ):
+            check_function_calls['update_app_yaml_gets_called'] = True
+
         apply_changes_swap = self.swap(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
-        verify_feconf_swap = self.swap(
-            update_configs, 'verify_feconf', mock_verify_feconf)
-        with apply_changes_swap, verify_feconf_swap:
+        verify_config_files_swap = self.swap(
+            update_configs, 'verify_config_files', mock_verify_config_files)
+        update_app_yaml_swap = self.swap(
+            update_configs, 'update_app_yaml', mock_update_app_yaml)
+        with apply_changes_swap, verify_config_files_swap, update_app_yaml_swap:
             update_configs.main(
                 args=[
                     '--release_dir_path', 'test-release-dir',
