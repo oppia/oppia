@@ -44,12 +44,12 @@ class UserSettingsDict(TypedDict):
     last_created_an_exploration: Optional[datetime.datetime]
     last_edited_an_exploration: Optional[datetime.datetime]
     profile_picture_data_url: Optional[str]
-    default_dashboard: str
+    default_dashboard: Optional[str]
     creator_dashboard_display_pref: str
     user_bio: str
-    subject_interests: List[str]
+    subject_interests: Optional[List[str]]
     first_contribution_msec: Optional[float]
-    preferred_language_codes: List[str]
+    preferred_language_codes: Optional[List[str]]
     preferred_site_language_code: Optional[str]
     preferred_audio_language_code: Optional[str]
     pin: Optional[str]
@@ -79,13 +79,13 @@ class UserSettings:
             last edited an exploration.
         profile_picture_data_url: str or None. User uploaded profile picture as
             a dataURI string.
-        default_dashboard: str. The default dashboard of the user.
+        default_dashboard: str or None. The default dashboard of the user.
         user_bio: str. User-specified biography.
-        subject_interests: list(str). Subject interests specified by
+        subject_interests: list(str) or None. Subject interests specified by
             the user.
         first_contribution_msec: float or None. The time in milliseconds when
             the user first contributed to Oppia.
-        preferred_language_codes: list(str). Exploration language
+        preferred_language_codes: list(str) or None. Exploration language
             preferences specified by the user.
         preferred_site_language_code: str or None. System language preference.
         preferred_audio_language_code: str or None. Audio language preference.
@@ -113,13 +113,13 @@ class UserSettings:
         last_edited_an_exploration: (
             Optional[datetime.datetime]) = None,
         profile_picture_data_url: Optional[str]=None,
-        default_dashboard: str = constants.DASHBOARD_TYPE_LEARNER,
+        default_dashboard: Optional[str] = None,
         creator_dashboard_display_pref: str = (
             constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
         user_bio: str = '',
-        subject_interests: List[str] = [],
+        subject_interests: Optional[List[str]] = None,
         first_contribution_msec: Optional[float] = None,
-        preferred_language_codes: List[str] = [],
+        preferred_language_codes: Optional[List[str]] = None,
         preferred_site_language_code: Optional[str] = None,
         preferred_audio_language_code: Optional[str] = None,
         pin: Optional[str] = None,
@@ -149,15 +149,15 @@ class UserSettings:
                 user last edited an exploration.
             profile_picture_data_url: str or None. User uploaded profile
                 picture as a dataURI string.
-            default_dashboard: str. The default dashboard of the user.
+            default_dashboard: str|None. The default dashboard of the user.
             creator_dashboard_display_pref: str. The creator dashboard of the
                 user.
             user_bio: str. User-specified biography.
-            subject_interests: list(str). Subject interests specified by
+            subject_interests: list(str) or None. Subject interests specified by
                 the user.
             first_contribution_msec: float or None. The time in milliseconds
                 when the user first contributed to Oppia.
-            preferred_language_codes: list(str). Exploration language
+            preferred_language_codes: list(str) or None. Exploration language
                 preferences specified by the user.
             preferred_site_language_code: str or None. System language
                 preference.
@@ -187,9 +187,11 @@ class UserSettings:
         self.default_dashboard = default_dashboard
         self.creator_dashboard_display_pref = creator_dashboard_display_pref
         self.user_bio = user_bio
-        self.subject_interests = subject_interests
+        self.subject_interests = (
+            subject_interests if subject_interests else [])
         self.first_contribution_msec = first_contribution_msec
-        self.preferred_language_codes = preferred_language_codes
+        self.preferred_language_codes = (
+            preferred_language_codes if preferred_language_codes else [])
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
         self.pin = pin
