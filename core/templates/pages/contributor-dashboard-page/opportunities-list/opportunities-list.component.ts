@@ -87,7 +87,11 @@ export class OpportunitiesListComponent {
           });
           this.visibleOpportunities = this.opportunities.slice(
             0, this.OPPORTUNITIES_PAGE_SIZE);
-          this.updateIsOnLastPage();
+          this.isOnLastPage = this.calculateIsOnLastPage(
+            this.opportunities,
+            this.OPPORTUNITIES_PAGE_SIZE,
+            this.activePageNumber,
+            this.more);
         }));
   }
 
@@ -106,7 +110,11 @@ export class OpportunitiesListComponent {
         this.more = more;
         this.visibleOpportunities = this.opportunities.slice(
           0, this.OPPORTUNITIES_PAGE_SIZE);
-        this.updateIsOnLastPage();
+        this.isOnLastPage = this.calculateIsOnLastPage(
+          this.opportunities,
+          this.OPPORTUNITIES_PAGE_SIZE,
+          this.activePageNumber,
+          this.more);
         this.loadingOpportunityData = false;
       });
     });
@@ -126,7 +134,11 @@ export class OpportunitiesListComponent {
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
-          this.updateIsOnLastPage();
+          this.isOnLastPage = this.calculateIsOnLastPage(
+            this.opportunities,
+            this.OPPORTUNITIES_PAGE_SIZE,
+            pageNumber,
+            this.more);
           this.loadingOpportunityData = false;
         });
     } else {
@@ -134,13 +146,15 @@ export class OpportunitiesListComponent {
         startIndex, endIndex);
     }
     this.activePageNumber = pageNumber;
-    this.updateIsOnLastPage();
   }
 
-  updateIsOnLastPage(): void {
-    const lastPageNumber = Math.ceil(
-      this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
-    this.isOnLastPage = this.activePageNumber >= lastPageNumber && !this.more;
+  calculateIsOnLastPage(
+      opportunities: ExplorationOpportunity[],
+      pageSize: number,
+      activePageNumber: number,
+      moreResults: boolean): boolean {
+    const lastPageNumber = Math.ceil(opportunities.length / pageSize);
+    return activePageNumber >= lastPageNumber && !moreResults;
   }
 }
 
