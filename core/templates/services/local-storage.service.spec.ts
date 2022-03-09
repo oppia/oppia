@@ -174,6 +174,13 @@ describe('LocalStorageService', () => {
           .OPENED_SKILL_EDITOR_BROWSER_TABS,
       );
 
+      entityEditorBrowserTabsInfo.setLatestVersion(2);
+      localStorageService.updateEntityEditorBrowserTabsInfo(
+        entityEditorBrowserTabsInfo,
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_SKILL_EDITOR_BROWSER_TABS,
+      );
+
       entityEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
       localStorageService.updateEntityEditorBrowserTabsInfo(
         entityEditorBrowserTabsInfo,
