@@ -153,7 +153,7 @@ describe('LocalStorageService', () => {
       expect(localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_TOPIC_EDITOR_BROWSER_TABS,
-        'topic_1').toDict()).toEqual(entityEditorBrowserTabsInfoObject);
+        'topic_1')?.toDict()).toEqual(entityEditorBrowserTabsInfoObject);
     });
 
     it('should update entity editor browser tabs info', () => {

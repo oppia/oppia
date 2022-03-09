@@ -218,7 +218,7 @@ export class LocalStorageService {
       const allEntityEditorBrowserTabsInfoObjects:
         EntityEditorBrowserTabsInfoObject[] = JSON.parse((
         this.storage as Storage).getItem(
-          entityEditorBrowserTabsInfoConstant)) || [];
+          entityEditorBrowserTabsInfoConstant) || '[]');
 
       const requiredEntityEditorBrowserTabsInfoObject = (
         allEntityEditorBrowserTabsInfoObjects.find(
@@ -254,7 +254,7 @@ export class LocalStorageService {
       const allEntityEditorBrowserTabsInfoObjects:
         EntityEditorBrowserTabsInfoObject[] = JSON.parse((
         this.storage as Storage).getItem(
-          entityEditorBrowserTabsInfoConstant)) || [];
+          entityEditorBrowserTabsInfoConstant) || '[]');
 
       const index = allEntityEditorBrowserTabsInfoObjects.findIndex(
         (entityEditorBrowserTabsInfoObject) => {
