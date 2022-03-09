@@ -714,12 +714,12 @@ class Story:
             raise utils.ValidationError(
                 'Story description field should not be empty.')
 
-        description_limit = (
+        description_length_limit = (
             android_validation_constants.MAX_CHARS_IN_STORY_DESCRIPTION)
-        if len(description) > description_limit:
+        if len(description) > description_length_limit:
             raise utils.ValidationError(
                 'Story description should be less than %d chars, received %s.'
-                % (description_limit, len(description)))
+                % (description_length_limit, len(description)))
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
