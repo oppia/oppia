@@ -217,7 +217,8 @@ export class LocalStorageService {
     if (this.isStorageAvailable()) {
       const allEntityEditorBrowserTabsInfoObjects:
         EntityEditorBrowserTabsInfoObject[] = JSON.parse((
-        this.storage as Storage).getItem(entityEditorBrowserTabsInfoConstant));
+        this.storage as Storage).getItem(
+          entityEditorBrowserTabsInfoConstant)) || [];
 
       const requiredEntityEditorBrowserTabsInfoObject = (
         allEntityEditorBrowserTabsInfoObjects.find(
