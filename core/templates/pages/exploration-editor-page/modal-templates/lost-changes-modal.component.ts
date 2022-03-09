@@ -57,9 +57,9 @@ export class LostChangesModalComponent
   }
 
   exportChangesAndClose(): void {
-    // The selector return null if the class name is not found,
-    // but here we are sure that the class name is available,
-    // so we are explicitly typecasting it to remove type error.
+    // 'getElementsByClassName' returns null if the class name is not
+    // found, here we know that the class name is available, so we
+    // are explicitly typecasting it to remove type error.
     let lostChangesData = (
       this.elRef.nativeElement.getElementsByClassName(
         'oppia-lost-changes'))[0] as HTMLInputElement;
