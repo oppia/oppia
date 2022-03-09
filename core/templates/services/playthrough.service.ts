@@ -339,13 +339,9 @@ export class PlaythroughService {
       this.recordedLearnerActions !== null);
   }
 
-  // Return undefined if learner has not begun recording.
-  private hasRecordingFinished(): boolean | undefined {
-    if (this.recordedLearnerActions === null) {
-      throw new Error('Cannot finish recording before beginning.');
-    }
-
+  private hasRecordingFinished(): boolean {
     return (
+      this.recordedLearnerActions !== null &&
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
       this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
