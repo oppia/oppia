@@ -58,7 +58,7 @@ angular.module('oppia').component('contributionsAndReview', {
     '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
     'NgbModal', 'QuestionObjectFactory', 'SkillBackendApiService',
-    'UrlInterpolationService', 'UserService',
+    'TranslationTopicService', 'UrlInterpolationService', 'UserService',
     'CORRESPONDING_DELETED_OPPORTUNITY_TEXT', 'IMAGE_CONTEXT',
     function(
         $filter, $rootScope, $uibModal, AlertsService, ContextService,
@@ -83,30 +83,30 @@ angular.module('oppia').component('contributionsAndReview', {
           color: '#e76c8c'
         }
       };
-      var SUGGESTION_TYPE_QUESTION = 'add_question';
-      var SUGGESTION_TYPE_TRANSLATE = 'translate_content';
+      ctrl.SUGGESTION_TYPE_QUESTION = 'add_question';
+      ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
       ctrl.TAB_TYPE_CONTRIBUTIONS = 'contributions';
       ctrl.TAB_TYPE_REVIEWS = 'reviews';
 
       var tabNameToOpportunityFetchFunction = {
-        [SUGGESTION_TYPE_QUESTION]: {
+        [ctrl.SUGGESTION_TYPE_QUESTION]: {
           [ctrl.TAB_TYPE_CONTRIBUTIONS]: () => {
             return ContributionAndReviewService
-              .getUserCreatedQuestionSuggestionsAsync();
+              .getUserCreatedQuestionSuggestionsAsync(ctrl.topicName);
           },
           [ctrl.TAB_TYPE_REVIEWS]: () => {
             return ContributionAndReviewService
-              .getReviewableQuestionSuggestionsAsync();
+              .getReviewableQuestionSuggestionsAsync(ctrl.topicName);
           }
         },
-        [SUGGESTION_TYPE_TRANSLATE]: {
+        [ctrl.SUGGESTION_TYPE_TRANSLATE]: {
           [ctrl.TAB_TYPE_CONTRIBUTIONS]: () => {
             return ContributionAndReviewService
-              .getUserCreatedTranslationSuggestionsAsync();
+              .getUserCreatedTranslationSuggestionsAsync(ctrl.topicName);
           },
           [ctrl.TAB_TYPE_REVIEWS]: () => {
             return ContributionAndReviewService
-              .getReviewableTranslationSuggestionsAsync();
+              .getReviewableTranslationSuggestionsAsync(ctrl.topicName);
           }
         }
       };
@@ -289,7 +289,7 @@ angular.module('oppia').component('contributionsAndReview', {
       ctrl.onClickViewSuggestion = function(suggestionId) {
         var suggestion = ctrl.contributions[suggestionId].suggestion;
         var reviewable = ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS;
-        if (suggestion.suggestion_type === SUGGESTION_TYPE_QUESTION) {
+        if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_QUESTION) {
           var contributionDetails = ctrl.contributions[suggestionId].details;
           var skillId = suggestion.change.skill_id;
           ContextService.setCustomEntityContext(
@@ -304,7 +304,7 @@ angular.module('oppia').component('contributionsAndReview', {
             $rootScope.$apply();
           });
         }
-        if (suggestion.suggestion_type === SUGGESTION_TYPE_TRANSLATE) {
+        if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_TRANSLATE) {
           const suggestionIdToContribution = {};
           for (let suggestionId in ctrl.contributions) {
             var contribution = ctrl.contributions[suggestionId];
@@ -318,21 +318,22 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       var getContributionSummaries = function(suggestionIdToSuggestions) {
-        if (ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE) {
+        if (ctrl.activeSuggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
           return getTranslationContributionsSummary(suggestionIdToSuggestions);
-        } else if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
+        } else if (
+          ctrl.activeSuggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
           return getQuestionContributionsSummary(suggestionIdToSuggestions);
         }
       };
 
       ctrl.getActiveDropdownTabChoice = function() {
         if (ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS) {
-          if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
+          if (ctrl.activeSuggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
             return 'Review Questions';
           }
           return 'Review Translations';
         }
-        if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
+        if (ctrl.activeSuggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
           return 'Questions';
         }
         return 'Translations';
@@ -341,6 +342,8 @@ angular.module('oppia').component('contributionsAndReview', {
       ctrl.switchToTab = function(tabType, suggestionType) {
         ctrl.activeSuggestionType = suggestionType;
         ctrl.activeTabType = tabType;
+        ContributionAndReviewService.setActiveTabType(tabType);
+        ContributionAndReviewService.setActiveSuggestionType(suggestionType);
         ctrl.activeDropdownTabChoice = ctrl.getActiveDropdownTabChoice();
         ctrl.dropdownShown = false;
         ctrl.contributions = {};
@@ -397,12 +400,12 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.reviewTabs = [];
         ctrl.contributionTabs = [
           {
-            suggestionType: SUGGESTION_TYPE_QUESTION,
+            suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
             text: 'Questions',
             enabled: false
           },
           {
-            suggestionType: SUGGESTION_TYPE_TRANSLATE,
+            suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
             text: 'Translations',
             enabled: true
           }
@@ -424,36 +427,40 @@ angular.module('oppia').component('contributionsAndReview', {
                   userContributionRights.can_suggest_questions);
                 for (var index in ctrl.contributionTabs) {
                   if (ctrl.contributionTabs[index].suggestionType === (
-                    SUGGESTION_TYPE_QUESTION)) {
+                    ctrl.SUGGESTION_TYPE_QUESTION)) {
                     ctrl.contributionTabs[index].enabled = (
                       userCanSuggestQuestions);
                   }
                 }
                 if (userCanReviewQuestionSuggestions) {
                   ctrl.reviewTabs.push({
-                    suggestionType: SUGGESTION_TYPE_QUESTION,
+                    suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
                     text: 'Review Questions'
                   });
-                  userReviewableSuggestionTypes.push(SUGGESTION_TYPE_QUESTION);
+                  userReviewableSuggestionTypes.push(
+                    ctrl.SUGGESTION_TYPE_QUESTION);
                 }
                 if (
                   userCanReviewTranslationSuggestionsInLanguages
                     .length > 0) {
                   ctrl.reviewTabs.push({
-                    suggestionType: SUGGESTION_TYPE_TRANSLATE,
+                    suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
                     text: 'Review Translations'
                   });
-                  userReviewableSuggestionTypes.push(SUGGESTION_TYPE_TRANSLATE);
+                  userReviewableSuggestionTypes.push(
+                    ctrl.SUGGESTION_TYPE_TRANSLATE);
                 }
                 if (userReviewableSuggestionTypes.length > 0) {
                   ctrl.switchToTab(
                     ctrl.TAB_TYPE_REVIEWS, userReviewableSuggestionTypes[0]);
                 } else if (userCanSuggestQuestions) {
                   ctrl.switchToTab(
-                    ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_QUESTION);
+                    ctrl.TAB_TYPE_CONTRIBUTIONS,
+                    ctrl.SUGGESTION_TYPE_QUESTION);
                 } else {
                   ctrl.switchToTab(
-                    ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_TRANSLATE);
+                    ctrl.TAB_TYPE_CONTRIBUTIONS,
+                    ctrl.SUGGESTION_TYPE_TRANSLATE);
                 }
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.

@@ -71,7 +71,7 @@ describe('Contribution and review service', () => {
         spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
           Promise.resolve(suggestionsBackendObject));
 
-        cars.getUserCreatedQuestionSuggestionsAsync()
+        cars.getUserCreatedQuestionSuggestionsAsync('all')
           .then((suggestionIdToSuggestions) => {
             expect(suggestionIdToSuggestions.suggestion_id_1)
               .toEqual(expectedSuggestionDict);
@@ -87,7 +87,7 @@ describe('Contribution and review service', () => {
         spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
           Promise.resolve(suggestionsBackendObject));
 
-        cars.getReviewableQuestionSuggestionsAsync()
+        cars.getReviewableQuestionSuggestionsAsync('all')
           .then((suggestionIdToSuggestions) => {
             expect(suggestionIdToSuggestions.suggestion_id_1)
               .toEqual(expectedSuggestionDict);
@@ -103,7 +103,7 @@ describe('Contribution and review service', () => {
         spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
           Promise.resolve(suggestionsBackendObject));
 
-        cars.getUserCreatedTranslationSuggestionsAsync()
+        cars.getUserCreatedTranslationSuggestionsAsync('all')
           .then((suggestionIdToSuggestions) => {
             expect(suggestionIdToSuggestions.suggestion_id_1)
               .toEqual(expectedSuggestionDict);
@@ -119,7 +119,7 @@ describe('Contribution and review service', () => {
         spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
           Promise.resolve(suggestionsBackendObject));
 
-        cars.getReviewableTranslationSuggestionsAsync()
+        cars.getReviewableTranslationSuggestionsAsync('all')
           .then((suggestionIdToSuggestions) => {
             expect(suggestionIdToSuggestions.suggestion_id_1)
               .toEqual(expectedSuggestionDict);
