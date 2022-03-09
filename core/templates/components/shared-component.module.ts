@@ -101,7 +101,6 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
 import { AddOrUpdateSolutionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
 import { SavePendingChangesModalComponent } from './save-pending-changes/save-pending-changes-modal.component';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
-import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
 import { QuestionMisconceptionSelectorComponent } from './question-directives/question-misconception-selector/question-misconception-selector.component';
 import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
 import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
@@ -230,7 +229,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SelectSkillModalComponent,
     SearchBarComponent,
     SharingLinksComponent,
-    SmoothHeightAnimatorComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     StateContentEditorComponent,
@@ -341,7 +339,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
-    SmoothHeightAnimatorComponent,
     ThumbnailDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
@@ -448,7 +445,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
-    SmoothHeightAnimatorComponent,
     TakeBreakModalComponent,
     ThreadTableComponent,
     ThumbnailDisplayComponent,

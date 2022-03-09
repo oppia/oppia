@@ -50,7 +50,6 @@
 /core/templates/components/code-mirror/ @srijanreddy98 @ashutoshc8101
 /core/templates/components/filter-fields/ @srijanreddy98 @ashutoshc8101
 /core/templates/components/oppia-angular-root.component.* @srijanreddy98 @ashutoshc8101
-/core/templates/components/smooth-height/smooth-height-animator.component.* @srijanreddy98 @ashutoshc8101
 /core/templates/modules/ @srijanreddy98 @ashutoshc8101
 /core/templates/pages/common-imports.ts @srijanreddy98 @ashutoshc8101
 /core/templates/pages/mock-ajs.ts @srijanreddy98 @ashutoshc8101
