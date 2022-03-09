@@ -76,13 +76,13 @@ def _is_sender_email_valid(sender_email: str) -> bool:
 
 
 def send_mail(
-        sender_email: str,
-        recipient_email: str,
-        subject: str,
-        plaintext_body: str,
-        html_body: str,
-        bcc_admin: Optional[bool] = False
-    ) -> None:
+    sender_email: str,
+    recipient_email: str,
+    subject: str,
+    plaintext_body: str,
+    html_body: str,
+    bcc_admin: Optional[bool] = False
+) -> None:
     """Sends an email.
 
     In general this function should only be called from
@@ -132,12 +132,12 @@ def send_mail(
 
 
 def send_bulk_mail(
-        sender_email: str,
-        recipient_emails: List[str],
-        subject: str,
-        plaintext_body: str,
-        html_body: str
-    ) -> None:
+    sender_email: str,
+    recipient_emails: List[str],
+    subject: str,
+    plaintext_body: str,
+    html_body: str
+) -> None:
     """Sends emails to all recipients in recipient_emails.
 
     In general this function should only be called from
