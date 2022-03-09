@@ -19,8 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 import { FaviconService } from './favicon.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Favicon service', () => {
+describe('Favicon service', () => {
   let faviconService: FaviconService;
 
   beforeEach(() => {
