@@ -23,7 +23,7 @@ import logging
 from core.domain import translation_fetchers
 from core.platform import models
 
-from typing import Optional, cast
+from typing import Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -57,13 +57,13 @@ def get_and_cache_machine_translation(
     Returns:
         str|None. The translated text or None if no translation is found.
     """
-    translation = translation_fetchers.get_machine_translation(  # type: ignore[no-untyped-call]
+    translation = translation_fetchers.get_machine_translation(
         source_language_code,
         target_language_code,
         source_text.strip()
     )
     if translation is not None:
-        return cast(str, translation.translated_text)
+        return translation.translated_text
 
     translated_text = None
     try:

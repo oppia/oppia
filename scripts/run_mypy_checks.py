@@ -177,8 +177,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/topic_services_test.py',
     'core/domain/translatable_object_registry.py',
     'core/domain/translatable_object_registry_test.py',
-    'core/domain/translation_fetchers.py',
-    'core/domain/translation_fetchers_test.py',
     'core/domain/user_domain.py',
     'core/domain/user_domain_test.py',
     'core/domain/user_query_domain.py',

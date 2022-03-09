@@ -50,7 +50,7 @@ class TranslationServiceTests(test_utils.GenericTestBase):
                 'en', 'en', 'text to translate')
         )
         self.assertEqual(translated_text, 'text to translate')
-        translation = translation_fetchers.get_machine_translation(  # type: ignore[no-untyped-call]
+        translation = translation_fetchers.get_machine_translation(
             'en', 'en', 'text to translate')
         self.assertIsNone(translation)
 
@@ -98,7 +98,9 @@ class TranslationServiceTests(test_utils.GenericTestBase):
                 'en', 'fr', 'hello world')
         )
         self.assertEqual(translated_text, 'Bonjour le monde')
-        translation = translation_fetchers.get_machine_translation(  # type: ignore[no-untyped-call]
+        translation = translation_fetchers.get_machine_translation(
             'en', 'fr', 'hello world')
         self.assertIsNotNone(translation)
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation is not None
         self.assertEqual(translation.translated_text, 'Bonjour le monde')
