@@ -28,12 +28,16 @@ import {
   ExplorationChange,
   ExplorationDraft
 } from 'domain/exploration/exploration-draft.model';
+import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoObject } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { WindowRef } from './contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocalStorageService {
-  constructor() {}
+  constructor(
+    private windowRef: WindowRef
+  ) {}
 
   // Check that local storage exists and works as expected.
   // If it does storage stores the localStorage object,
@@ -194,6 +198,124 @@ export class LocalStorageService {
           this.LAST_SELECTED_TRANSLATION_TOPIC_NAME));
     }
     return null;
+  }
+
+  /**
+   * Retrieves the entity editor browser tabs info stored in the local storage
+   * for opened tabs of a particular entity type depending upon the
+   * browser tabs info constant.
+   * @param entityEditorBrowserTabsInfoConstant The key of the data stored on
+   * the local storage. It determines the type of the entity
+   * (topic, story, exploration, skill) for which we are retrieving data.
+   * @param entityId The id of the entity.
+   * @returns EntityEditorBrowserTabsInfo if the data is found on the local
+   * storage. Otherwise, returns null.
+   */
+  getEntityEditorBrowserTabsInfo(
+      entityEditorBrowserTabsInfoConstant: string, entityId: string
+  ): EntityEditorBrowserTabsInfo | null {
+    if (this.isStorageAvailable()) {
+      const allEntityEditorBrowserTabsInfoObjects:
+        EntityEditorBrowserTabsInfoObject[] = JSON.parse((
+        this.storage as Storage).getItem(entityEditorBrowserTabsInfoConstant));
+
+      const requiredEntityEditorBrowserTabsInfoObject = (
+        allEntityEditorBrowserTabsInfoObjects.find(
+          (entityEditorBrowserTabsInfoObject) => {
+            return entityEditorBrowserTabsInfoObject.id === entityId;
+          })
+      );
+
+      if (requiredEntityEditorBrowserTabsInfoObject) {
+        return EntityEditorBrowserTabsInfo.createFromDict(
+          requiredEntityEditorBrowserTabsInfoObject);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Updates the entity editor browser tabs info stored on the local storage.
+   * @param entityEditorBrowserTabsInfo The updated entity editor browser
+   * tabs info.
+   * @param entityEditorBrowserTabsInfoConstant The key of the data stored on
+   * the local storage.
+   */
+  updateEntityEditorBrowserTabsInfo(
+      entityEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo,
+      entityEditorBrowserTabsInfoConstant: string
+  ): void {
+    if (this.isStorageAvailable()) {
+      const entityEditorBrowserTabsInfoObject = (
+        entityEditorBrowserTabsInfo.toDict()
+      );
+
+      const allEntityEditorBrowserTabsInfoObjects:
+        EntityEditorBrowserTabsInfoObject[] = JSON.parse((
+        this.storage as Storage).getItem(
+          entityEditorBrowserTabsInfoConstant)) || [];
+
+      const index = allEntityEditorBrowserTabsInfoObjects.findIndex(
+        (entityEditorBrowserTabsInfoObject) => {
+          return (
+            entityEditorBrowserTabsInfoObject.id ===
+              entityEditorBrowserTabsInfo.getId());
+        });
+
+      if (index === -1) {
+        // If index is -1, then the entity editor browser tabs info object
+        // was not present on the local storage earlier.
+        allEntityEditorBrowserTabsInfoObjects.push(
+          entityEditorBrowserTabsInfoObject);
+      } else {
+        if (entityEditorBrowserTabsInfo.getNumberOfOpenedTabs() === 0) {
+          // If number of opened tabs for a particular entity editor becomes
+          // 0, then we should free the local storage by removing its info.
+          allEntityEditorBrowserTabsInfoObjects.splice(index, 1);
+          // If all the editor tabs of a particular entity are closed, then
+          // remove the whole list from the local storage since its length
+          // has become zero.
+          if (allEntityEditorBrowserTabsInfoObjects.length === 0) {
+            this.removeOpenedEntityEditorBrowserTabsInfo(
+              entityEditorBrowserTabsInfoConstant);
+          }
+        } else {
+          // If none of the above mentioned edge cases are present, then just
+          // update the local storage with the updated info.
+          allEntityEditorBrowserTabsInfoObjects[index] = (
+            entityEditorBrowserTabsInfoObject);
+        }
+      }
+
+      (this.storage as Storage).setItem(
+        entityEditorBrowserTabsInfoConstant,
+        JSON.stringify(allEntityEditorBrowserTabsInfoObjects));
+    }
+  }
+
+  /**
+   * Removes the entity editor browser tabs info for a particular type of
+   * entity.
+   * @param entityEditorBrowserTabsInfoConstant The key of the data stored on
+   * the local storage.
+   */
+  removeOpenedEntityEditorBrowserTabsInfo(
+      entityEditorBrowserTabsInfoConstant: string
+  ): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).removeItem(entityEditorBrowserTabsInfoConstant);
+    }
+  }
+
+  /**
+   * Registers a new callback for 'storage' event.
+   * @param callbackFn The callback function to be called when the 'storage'
+   * event is triggered.
+   */
+  registerNewStorageEventListener(callbackFn: Function): void {
+    this.windowRef.nativeWindow.addEventListener('storage', (event) => {
+      callbackFn(event);
+    });
   }
 }
 
