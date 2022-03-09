@@ -1149,3 +1149,11 @@ def get_story_titles_in_topic(topic):
     stories = story_fetchers.get_stories_by_ids(story_ids)
     story_titles = [story.title for story in stories if story is not None]
     return story_titles
+
+
+def populate_topic_model_fields(topic_model, topic):
+    pass
+
+
+def populate_topic_summary_model_fields(topic_summary_model, topic_summary):
+    pass
