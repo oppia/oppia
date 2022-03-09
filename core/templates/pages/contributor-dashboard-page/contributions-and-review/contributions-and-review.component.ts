@@ -56,19 +56,19 @@ angular.module('oppia').component('contributionsAndReview', {
   template: require('./contributions-and-review.component.html'),
   controller: [
     '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
-    'ContributionAndReviewService', 'ContributionOpportunitiesService', 
+    'ContributionAndReviewService', 'ContributionOpportunitiesService',
     'LocalStorageService', 'NgbModal', 'QuestionObjectFactory',
     'SkillBackendApiService', 'TranslationTopicService',
     'UrlInterpolationService', 'UserService',
-    'CORRESPONDING_DELETED_OPPORTUNITY_TEXT', 
+    'CORRESPONDING_DELETED_OPPORTUNITY_TEXT',
     'DEFAULT_OPPORTUNITY_TOPIC_NAME', 'IMAGE_CONTEXT',
     function(
         $filter, $rootScope, $uibModal, AlertsService, ContextService,
-        ContributionAndReviewService, ContributionOpportunitiesService, 
+        ContributionAndReviewService, ContributionOpportunitiesService,
         LocalStorageService, NgbModal, QuestionObjectFactory,
         SkillBackendApiService, TranslationTopicService,
         UrlInterpolationService, UserService,
-        CORRESPONDING_DELETED_OPPORTUNITY_TEXT, 
+        CORRESPONDING_DELETED_OPPORTUNITY_TEXT,
         DEFAULT_OPPORTUNITY_TOPIC_NAME, IMAGE_CONTEXT) {
       var ctrl = this;
       ctrl.contributions = {};
