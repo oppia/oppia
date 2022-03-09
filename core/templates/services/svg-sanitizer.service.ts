@@ -180,6 +180,9 @@ export class SvgSanitizerService {
     svg.querySelectorAll('*').forEach((node) => {
       let nodeTagName: string = node.tagName.toLowerCase();
       if (tagsToBeRemoved.indexOf(nodeTagName) !== -1) {
+        // The parent node will always be the svg tag itself.
+        // A filename with extension '.svg' and having outermost tag other than
+        // <svg></svg> will not qualify as an image file and cannot be uploaded.
         node.parentNode?.removeChild(node);
       } else {
         for (let i = 0; i < node.attributes.length; i++) {
@@ -209,7 +212,7 @@ export class SvgSanitizerService {
   }
 
   /**
-   * Checks the input if it is Base64 encoded.
+   * Checks if the input is base64-encoded.
    *
    * @returns {boolean} True if all the checks pass. False Otherwise.
    */
@@ -248,23 +251,27 @@ export class SvgSanitizerService {
 
   getIssueURL(
       invalidTagsAndAttributes: { tags: string[]; attrs: string[] }): string {
-    const baseURL = 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:';
-    let updatedURL = baseURL;
-    let invalidTags = invalidTagsAndAttributes.tags;
-    let invalidAttributes = invalidTagsAndAttributes.attrs;
+    const baseURL = 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were%3A';
+    let uncodedURL = '';
+    const invalidTags = invalidTagsAndAttributes.tags;
+    const invalidAttributes = invalidTagsAndAttributes.attrs;
+    const spaceBetweenValues = ', ';
+
     if (invalidTags.length) {
-      updatedURL = updatedURL + '%0A%20%20Tags:%20';
+      uncodedURL += '\nTags: ';
       for (let i = 0; i < Math.min(invalidTags.length, 20); i++) {
-        updatedURL = updatedURL + invalidTags[i] + ',%20';
+        uncodedURL += invalidTags[i] + spaceBetweenValues;
       }
     }
     if (invalidAttributes.length) {
-      updatedURL = updatedURL + '%0A%20%20Attributes:%20';
+      uncodedURL += '\nAttributes: ';
       for (let i = 0; i < Math.min(invalidAttributes.length, 20); i++) {
-        updatedURL = updatedURL + invalidAttributes[i] + ',%20';
+        uncodedURL += invalidAttributes[i] + spaceBetweenValues;
       }
     }
-    return updatedURL.substring(0, updatedURL.length - 4);
+
+    return (baseURL + encodeURIComponent(
+      uncodedURL.substring(0, uncodedURL.length - spaceBetweenValues.length)));
   }
 }
 

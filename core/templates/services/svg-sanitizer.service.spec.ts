@@ -62,6 +62,7 @@ describe('SvgSanitizerService', () => {
     () => {
       const testCases = [
         {
+          // Test when SVG has an invalid tag.
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
@@ -82,6 +83,7 @@ describe('SvgSanitizerService', () => {
             'Z"/></g></svg>')
         },
         {
+          // Test when SVG has an invalid attribute.
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
@@ -102,6 +104,7 @@ describe('SvgSanitizerService', () => {
             'Z"/></g></svg>')
         },
         {
+          // Test when SVG has an invalid self closing tag.
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
@@ -110,7 +113,7 @@ describe('SvgSanitizerService', () => {
             ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
             '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
             '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
-            'Z" data-name="dataName"/></g><circel></circel></svg>'),
+            'Z"/></g></svg>'),
           expectedSvgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
@@ -118,11 +121,12 @@ describe('SvgSanitizerService', () => {
             'idth="0" transform="matrix(1 0 0 -1 0 0)"/></svg>')
         },
         {
+          // Test when SVG has more than one invalid tags.
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
             '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
-            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><pth stroke-width="1"' +
             ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
             '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
             '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
@@ -131,17 +135,14 @@ describe('SvgSanitizerService', () => {
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
             '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
-            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
-            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
-            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
-            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
-            'Z"/></g></svg>')
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"/></svg>')
         },
         {
+          // Test when SVG has more than one invalid attributes.
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
-            '.429ex" viewBox="0 -511.5 572.5 615.4" styyle="vertical-align: ' +
-            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" styyle="vertical-align: -' +
+            '0.241ex;"><g strokke="currentColor" fill="currentColor" stroke-w' +
             'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
             ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
             '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
@@ -150,12 +151,25 @@ describe('SvgSanitizerService', () => {
           expectedSvgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4"' +
-            '><g stroke="currentColor" fill="currentColor" stroke-w' +
+            '><g fill="currentColor" stroke-w' +
             'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
             ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
             '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
             '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
             'Z"/></g></svg>')
+        },
+        {
+          // Test when SVG has a hidden script.
+          svgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfi' +
+            'le="full"><polygon id="triangle" points="0,0 0,50 50,0" fill="#' +
+            '009900" stroke="#004400"/><script type="text/javascript">' +
+            'alert(\'This app is probably vulnerable to XSS attacks!\');' +
+            '</script></svg>'),
+          expectedSvgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfi' +
+            'le="full"><polygon id="triangle" points="0,0 0,50 50,0" fill="#' +
+            '009900" stroke="#004400"/></svg>')
         }
       ];
       testCases.forEach(testCase => {
@@ -498,25 +512,25 @@ describe('SvgSanitizerService', () => {
         invalidTagsAndAttributes: {
           tags: [], attrs: ['svg:data-custom']
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A%20%20Attributes:%20svg:data-custom'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were%3A%0AAttributes%3A%20svg%3Adata-custom'
       },
       {
         invalidTagsAndAttributes: {
           tags: ['paht'], attrs: []
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A%20%20Tags:%20paht'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were%3A%0ATags%3A%20paht'
       },
       {
         invalidTagsAndAttributes: {
           tags: ['paht', 'circel'], attrs: []
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A%20%20Tags:%20paht,%20circel'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were%3A%0ATags%3A%20paht%2C%20circel'
       },
       {
         invalidTagsAndAttributes: {
           tags: ['circel'], attrs: ['svg:data-name']
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below:%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem:%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were:%0A%20%20Tags:%20circel,%20%0A%20%20Attributes:%20svg:data-name'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were%3A%0ATags%3A%20circel%2C%20%0AAttributes%3A%20svg%3Adata-name'
       }
     ];
     testCases.forEach(testCase => {
