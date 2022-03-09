@@ -11,10 +11,10 @@
       {{ expTitleTranslationKey | translate }}
     </h3>
     <h4 class="oppia-exploration-description" *ngIf="!isHackyExpDescTranslationDisplayed()">
-      {{ expDesc | truncateAndCapitalize: 70 }}
+      {{ expDesc | truncateAndCapitalize: 90 }}
     </h4>
     <h4 class="oppia-exploration-description" *ngIf="isHackyExpDescTranslationDisplayed()">
-      {{ expDescTranslationKey | translate | truncateAndCapitalize: 70 }}
+      {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
     </h4>
     <p class="progress-text">Progress</p>
     <div class="progress under_part">
@@ -34,11 +34,11 @@
       </div>
     </div>
   </div>
-  <button type="button" class="oppia-close-popover-button" (click)="cancel()">
-    <i class="material-icons md-18">&#xE5CD;</i>
-    <span class="oppia-icon-accessibility-label">Close</span>
-  </button>
 </mat-card>
+<button type="button" class="oppia-close-popover-button" (click)="cancel()">
+  <i class="material-icons md-18">&#xE5CD;</i>
+  <span class="oppia-icon-accessibility-label">Close</span>
+</button>
 <div ngbDropdown>
   <div ngbDropdownToggle class="authors-title">LESSON AUTHORS</div>
   <div ngbDropdownMenu class="dropdown-menu">
@@ -58,33 +58,43 @@
 
   .dropdown-menu {
     border: 0;
-    border-radius: 0;
     margin: 0;
     max-width: 350px;
-    min-width: 260px;
-    top: 0.5px;
+    min-width: 269px;
+    padding-top: 2px;
+    right: 0;
     width: 100%;
   }
 
+  .oppia-exploration-header {
+    font-size: 17px;
+    font-weight: normal;
+    margin: 10px 0 10px 0;
+  }
+
   .oppia-lesson-info-card {
-    border-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    padding: 10px;
+    padding-bottom: 16px;
   }
 
   .oppia-story-title {
-      color: grey;
+      color: #3b3b3b;
       font-family: "Capriola", "Roboto", Arial, sans-serif;
       font-size: 13px;
       margin-bottom: -10px;
   }
 
   .oppia-lesson-info-content {
-      padding: 15px;
+      padding: 12px;
       padding-bottom: 0;
   }
 
   .oppia-exploration-description {
-      color: #5e5d5d;
-      font-size: 18px;
+      color: #333;
+      font-size: 15px;
+      font-weight: normal;
       padding-bottom: 10px;
   }
 
@@ -98,10 +108,21 @@
   }
 
   .progress-text {
-      color: #1b1b1b;
+      color: #000;
       font-size: 12px;
       margin-bottom: 2px;
       margin-left: 5px;
+  }
+
+  .button {
+    outline: none;
+  }
+
+  .oppia-close-popover-button {
+    outline: none;
+    padding: 0;
+    right: 0;
+    top: 0;
   }
 
   .progress-bar {
