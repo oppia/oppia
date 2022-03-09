@@ -200,9 +200,11 @@ export class StoryEditorStateService {
       commitMessage: string,
       successCallback: (value?: Object) => void,
       errorCallback: (value?: Object) => void): boolean {
-    if (!this._storyIsInitialized) {
+    const storyId = this._story.getId();
+    if (!storyId || !this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a story before one is loaded.');
+      return false;
     }
 
     // Don't attempt to save the story if there are no changes pending.
@@ -210,10 +212,6 @@ export class StoryEditorStateService {
       return false;
     }
     this._storyIsBeingSaved = true;
-    const storyId = this._story.getId();
-    if (storyId === null) {
-      throw new Error('Story id cannot be null.');
-    }
     this.editableStoryBackendApiService.updateStoryAsync(
       storyId, this._story.getVersion(), commitMessage,
       this.undoRedoService.getCommittableChangeList() as StoryChange[]
@@ -248,14 +246,11 @@ export class StoryEditorStateService {
   changeStoryPublicationStatus(
       newStoryStatusIsPublic: boolean,
       successCallback: (value?: Object) => void): boolean {
-    if (!this._storyIsInitialized) {
+    const storyId = this._story.getId();
+    if (!storyId || !this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot publish a story before one is loaded.');
-    }
-
-    const storyId = this._story.getId();
-    if (storyId === null) {
-      throw new Error('Story id cannot be null.');
+      return false;
     }
     this.editableStoryBackendApiService.changeStoryPublicationStatusAsync(
       storyId, newStoryStatusIsPublic).then(
