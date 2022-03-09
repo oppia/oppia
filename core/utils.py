@@ -1423,7 +1423,7 @@ def get_rte_components(html_string: str) -> List[Dict[str, Any]]:
     for tag_name, tag_attrs in oppia_custom_tag_attrs.items():
         component_tags = soup.find_all(name=tag_name)
         for component_tag in component_tags:
-            component = {'id': tag_name} # type: Dict[str, Any]
+            component: Dict[str, Any] = {'id': tag_name}
             customization_args = {}
             for attr in tag_attrs:
                 # Unescape special HTML characters such as '&quot;'.
