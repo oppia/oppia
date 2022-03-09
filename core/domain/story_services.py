@@ -114,6 +114,9 @@ def apply_change_list(story_id, change_list):
         Story, list(str), list(str). The resulting story domain object, the
         exploration IDs removed from story and the exploration IDs added to
         the story.
+
+    Raises:
+        Exception. The elements in change list are not of domain object type.
     """
     story = story_fetchers.get_story_by_id(story_id)
     exp_ids_in_old_story = story.story_contents.get_all_linked_exp_ids()
@@ -333,6 +336,7 @@ def validate_explorations_for_story(exp_ids, strict):
             explorations before adding them to a story.
         ValidationError. All explorations in a story should be of the same
             category.
+        Exception. Exploration validation failed for given exploration IDs.
     """
     validation_error_messages = []
 
@@ -390,7 +394,7 @@ def validate_explorations_for_story(exp_ids, strict):
                 logging.exception(
                     'Exploration validation failed for exploration with ID: '
                     '%s. Error: %s' % (exp_id, e))
-                raise Exception(e)
+                raise Exception(e) from e
 
     return validation_error_messages
 
@@ -475,7 +479,8 @@ def _save_story(
             'Unexpected error: trying to update version %s of story '
             'from version %s. Please reload the page and try again.'
             % (story_model.version, story.version))
-    elif story.version < story_model.version:
+
+    if story.version < story_model.version:
         raise Exception(
             'Trying to update version %s of story from version %s, '
             'which is too old. Please reload the page and try again.'
@@ -498,6 +503,10 @@ def is_story_published_and_present_in_topic(story):
 
     Returns:
         bool. Whether the supplied story is published.
+
+    Raises:
+        ValidationError. The story does not belong to any valid topic.
+        Exception. The story does not belong to the expected topic.
     """
     topic = topic_fetchers.get_topic_by_id(
         story.corresponding_topic_id, strict=False)
@@ -539,7 +548,9 @@ def update_story(
             story.
 
     Raises:
+        ValueError. Expected a commit message but received None.
         ValidationError. Exploration is already linked to a different story.
+        ValidationError. Story url fragment is not unique across the site.
     """
     if not commit_message:
         raise ValueError('Expected a commit message but received none.')

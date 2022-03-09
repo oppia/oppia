@@ -21,7 +21,6 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.platform import models
@@ -161,6 +160,10 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results after
                     this batch.
+
+        Raises:
+            ValueError. If the max age is other than datetime.timedelta
+                instance or None.
         """
 
         if not isinstance(max_age, datetime.timedelta) and max_age is not None:
@@ -377,7 +380,7 @@ class ExplorationModel(base_models.VersionedModel):
                 entity_ids, include_deleted=True)
             versioned_models = cls.get_multi(entity_ids, include_deleted=True)
 
-            versioned_and_exp_rights_models = python_utils.ZIP(
+            versioned_and_exp_rights_models = zip(
                 versioned_models, exp_rights_models)
             for model, rights_model in versioned_and_exp_rights_models:
                 # Ruling out the possibility of None for mypy type checking.

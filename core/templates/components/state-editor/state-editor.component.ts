@@ -17,13 +17,7 @@
  */
 
 require(
-  'components/state-editor/state-content-editor/' +
-  'state-content-editor.directive.ts');
-require(
   'components/state-editor/state-hints-editor/state-hints-editor.component.ts');
-require(
-  'components/state-editor/state-interaction-editor/' +
-  'state-interaction-editor.directive.ts');
 require(
   'components/state-editor/state-skill-editor/' +
   'state-skill-editor.component.ts');
@@ -98,7 +92,8 @@ angular.module('oppia').component('stateEditor', {
   },
   template: require('./state-editor.component.html'),
   controller: [
-    '$scope', 'StateCardIsCheckpointService', 'StateContentService',
+    '$rootScope', '$scope', 'StateCardIsCheckpointService',
+    'StateContentService',
     'StateCustomizationArgsService', 'StateEditorService',
     'StateHintsService', 'StateInteractionIdService',
     'StateLinkedSkillIdService', 'StateNameService',
@@ -106,7 +101,7 @@ angular.module('oppia').component('stateEditor', {
     'StateSolicitAnswerDetailsService', 'StateSolutionService',
     'UrlInterpolationService', 'WindowDimensionsService', 'INTERACTION_SPECS',
     function(
-        $scope, StateCardIsCheckpointService, StateContentService,
+        $rootScope, $scope, StateCardIsCheckpointService, StateContentService,
         StateCustomizationArgsService, StateEditorService,
         StateHintsService, StateInteractionIdService,
         StateLinkedSkillIdService, StateNameService,
@@ -123,6 +118,12 @@ angular.module('oppia').component('stateEditor', {
         $scope.currentStateIsTerminal = Boolean(
           $scope.interactionIdIsSet && INTERACTION_SPECS[
             newInteractionId].is_terminal);
+      };
+
+      // Remove this function once this component is migrated to
+      // Angular 2+.
+      $scope.getSolutionChange = function() {
+        $rootScope.$applyAsync();
       };
 
       $scope.reinitializeEditor = function() {

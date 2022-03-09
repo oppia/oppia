@@ -20,10 +20,10 @@ from __future__ import annotations
 
 import copy
 
+from core import feconf
 from core import utils
-from core.platform import models
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+from typing import Dict
 
 
 def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
@@ -119,13 +119,13 @@ class BaseChange:
     # This is a list of common commands which is valid for all subclasses.
     # This should not be overriden by subclasses.
     COMMON_ALLOWED_COMMANDS = [{
-        'name': base_models.VersionedModel.CMD_DELETE_COMMIT,
+        'name': feconf.CMD_DELETE_COMMIT,
         'required_attribute_names': [],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }]
 
-    def __init__(self, change_dict):
+    def __init__(self, change_dict: Dict[str, str]) -> None:
         """Initializes a BaseChange object from a dict.
 
         Args:
@@ -153,7 +153,7 @@ class BaseChange:
         for attribute_name in cmd_attribute_names:
             setattr(self, attribute_name, change_dict.get(attribute_name))
 
-    def validate_dict(self, change_dict):
+    def validate_dict(self, change_dict: Dict[str, str]) -> None:
         """Checks that the command in change dict is valid for the domain
         object.
 
@@ -197,7 +197,7 @@ class BaseChange:
         validate_cmd(
             cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, str]:
         """Returns a dict representing the BaseChange domain object.
 
         Returns:
@@ -223,10 +223,36 @@ class BaseChange:
 
         return base_change_dict
 
+    @classmethod
+    def from_dict(cls, base_change_dict):
+        """Returns a BaseChange domain object from a dict.
+
+        Args:
+            base_change_dict: dict. The dict representation of
+                BaseChange object.
+
+        Returns:
+            BaseChange. The corresponding BaseChange domain object.
+        """
+        return cls(base_change_dict)
+
+    def validate(self):
+        """Validates various properties of the BaseChange object.
+
+        Raises:
+            ValidationError. One or more attributes of the BaseChange are
+                invalid.
+        """
+        # We validate the BaseChange object by converting
+        # it into a dict and using the validate_dict method.
+        # This is done because schema_utils used the validate method
+        # to verify that the domain object is correct.
+        self.validate_dict(self.to_dict())
+
     def __getattr__(self, name: str) -> str:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
         try:
             return self.__dict__[name]
-        except KeyError:
-            raise AttributeError(name)
+        except KeyError as e:
+            raise AttributeError(name) from e

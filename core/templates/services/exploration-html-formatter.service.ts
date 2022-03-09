@@ -39,16 +39,21 @@ export class ExplorationHtmlFormatterService {
     'AlgebraicExpressionInput',
     'CodeRepl',
     'Continue',
+    'DragAndDropSortInput',
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
+    'InteractiveMap',
+    'MathEquationInput',
+    'MultipleChoiceInput',
+    'NumberWithUnits',
+    'ItemSelectionInput',
     'NumericExpressionInput',
     'NumericInput',
-    'InteractiveMap',
-    'MultipleChoiceInput',
+    'PencilCodeEditor',
+    'RatioExpressionInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput'
   ];
 
   constructor(
@@ -56,6 +61,7 @@ export class ExplorationHtmlFormatterService {
       private extensionTagAssembler: ExtensionTagAssemblerService,
       private htmlEscaper: HtmlEscaperService
   ) {}
+
   /**
    * @param {string} interactionId - The interaction id.
    * @param {object} interactionCustomizationArgs - The various
@@ -162,9 +168,14 @@ export class ExplorationHtmlFormatterService {
 
   getAnswerHtml(
       answer: string,
-      interactionId: string,
+      interactionId: string | null,
       interactionCustomizationArgs: InteractionCustomizationArgs
   ): string {
+    // TODO(#14464): Remove this check once interaction ID is
+    // not allowed to be null.
+    if (interactionId === null) {
+      throw new Error('InteractionId cannot be null');
+    }
     var element = document.createElement(
       `oppia-response-${this.camelCaseToHyphens.transform(interactionId)}`);
     element.setAttribute('answer', this.htmlEscaper.objToEscapedJson(answer));

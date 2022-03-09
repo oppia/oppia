@@ -43,7 +43,6 @@ import sys
 sys.path.append(os.getcwd())
 from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
 from scripts import install_backend_python_libs # isort:skip  # pylint: disable=wrong-import-position
-from core import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
@@ -113,6 +112,10 @@ def get_remote_name():
 
     Returns:
         str. The remote name of the local repository.
+
+    Raises:
+        ValueError. Subprocess failed to start.
+        Exception. Upstream not set.
     """
     remote_name = ''
     remote_num = 0
@@ -150,7 +153,8 @@ def get_remote_name():
             'command \'git remote add upstream '
             'https://github.com/oppia/oppia.git\'\n'
         )
-    elif remote_num > 1:
+
+    if remote_num > 1:
         print(
             'Warning: Please keep only one remote branch for oppia:develop '
             'to run the lint checks efficiently.\n')
@@ -219,8 +223,8 @@ def get_merge_base(branch, other_branch):
         ['git', 'merge-base', branch, other_branch])
     if err:
         raise ValueError(err)
-    else:
-        return merge_base.decode('utf-8').strip()
+
+    return merge_base.decode('utf-8').strip()
 
 
 def compare_to_remote(remote, local_branch, remote_branch=None):
@@ -293,7 +297,7 @@ def collect_files_being_pushed(ref_list, remote):
     collected_files = {}
     # Git allows that multiple branches get pushed simultaneously with the "all"
     # flag. Therefore we need to loop over the ref_list provided.
-    for branch, _ in python_utils.ZIP(branches, hashes):
+    for branch, _ in zip(branches, hashes):
         # Get the difference to remote/develop.
         modified_files = compare_to_remote(
             remote, branch, remote_branch=get_parent_branch_name_for_diff())

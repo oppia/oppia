@@ -191,35 +191,33 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 0)
-
         self.add_exploration_0_to_story()
         self.create_translation_suggestion_for_exploration_0_and_verify()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
+
         self.assertEqual(len(translation_opportunities), 1)
         opportunity = translation_opportunities[0]
-        languages_of_translations_in_review = (
-            opportunity.translation_in_review_counts.keys())
-        self.assertEqual(len(languages_of_translations_in_review), 1)
+        self.assertEqual(
+            opportunity.translation_in_review_counts,
+            {'hi': 1})
 
     def test_get_translation_opportunities_with_no_translations_in_review(self):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 0)
-
         self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
+
         self.assertEqual(len(translation_opportunities), 1)
         opportunity = translation_opportunities[0]
-        languages_of_translations_in_review = (
-            opportunity.translation_in_review_counts.keys())
-        self.assertEqual(len(languages_of_translations_in_review), 0)
+        self.assertEqual(opportunity.translation_in_review_counts, {})
 
     def test_opportunity_get_deleted_with_removing_exploration_from_story_node(
             self):
@@ -582,7 +580,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'SkillOpportunity corresponding to skill ID %s already exists.'
             % self.SKILL_ID):
@@ -942,7 +940,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
     def test_regenerate_opportunities_related_to_topic_when_story_deleted(self):
         story_models.StoryModel.delete_by_id(self.STORY_ID)
 
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             Exception, 'Failed to regenerate opportunities',
             lambda: (
                 opportunity_services.regenerate_opportunities_related_to_topic(

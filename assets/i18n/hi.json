@@ -253,6 +253,7 @@
 	"I18N_INTERACTIONS_SET_INPUT_NO_ANSWER": "कोई जवाब नहीं दिया गया है।",
 	"I18N_INTERACTIONS_SUBMIT": "जमा करें",
 	"I18N_LANGUAGE_FOOTER_VIEW_IN": "Oppia को देखे:",
+	"I18N_LEARNER_DASHBOARD_ALL": "सभी",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_SECTION": "पूर्ण",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS": "आपके द्वारा किए गए संग्रह में से <[numberMoved]> को 'प्रगति' अनुभाग में स्थानांतरित किया गया क्योंकि उन्हें नए अन्वेषण जोड़े गए हैं!",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COLLECTION_PLAYLIST": "ऐसा लगता है कि आपकी 'बाद में चलाएं' सूची में कोई संग्रह नहीं है। लाइब्रेरी में जाएं और खुद के चुने पाठों से प्लेलिस्ट बनाएं!",
@@ -295,6 +296,7 @@
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER": "सुझाव:",
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT": "सुझाव",
 	"I18N_LEARNER_DASHBOARD_TOOLTIP": "संग्रह एक से अधिक संबंधित अन्वेषण हैं जिन्हें एक क्रम में पूरा किया जाना है।",
+	"I18N_LEARNER_DASHBOARD_VIEW": "देखें",
 	"I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION": "सुझाव देखें",
 	"I18N_LIBRARY_ACTIVITY_COMPLETED_ICON": "आपने इसे पूरा कर लिया है",
 	"I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST": "प्लेलिस्ट मैं पहले ही शामिल है",
@@ -373,6 +375,7 @@
 	"I18N_LOGOUT_PAGE_TITLE": "लॉग-आउट  करें",
 	"I18N_MODAL_CANCEL_BUTTON": "रद्द करना",
 	"I18N_MODAL_CONTINUE_BUTTON": "जारी रखें",
+	"I18N_NO": "नहीं",
 	"I18N_ONE_SUBSCRIBER_TEXT": "आपके पास 1 ग्राहक है।",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_BREADCRUMB": "खाता हटाना लंबित है",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_HEADING": "खाता हटाया जाना है",
@@ -621,6 +624,7 @@
 	"I18N_TEACH_STUDENT_DETAILS_4": "यममा, सूत्रधार, फ़िलिस्तीन",
 	"I18N_THANKS_PAGE_BREADCRUMB": "धन्यवाद",
 	"I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 पाठ} other{# पाठ}}",
+	"I18N_TOPIC_TITLE": "विषय",
 	"I18N_TOPIC_VIEWER_CHAPTER": "पाठ",
 	"I18N_TOPIC_VIEWER_CHAPTERS": "{count, plural, one{1 अध्याय} other{# अध्याय}}",
 	"I18N_TOPIC_VIEWER_DESCRIPTION": "विवरण",
@@ -651,6 +655,7 @@
 	"I18N_TOPNAV_FORUM": "मंच",
 	"I18N_TOPNAV_GET_INVOLVED": "हमसे जुड़ें",
 	"I18N_TOPNAV_GET_STARTED": "शुरू हो जाओ",
+	"I18N_TOPNAV_HOME": "घर",
 	"I18N_TOPNAV_LEARN": "कक्षा",
 	"I18N_TOPNAV_LEARNER_DASHBOARD": "सीखने वाला डैशबोर्ड",
 	"I18N_TOPNAV_LIBRARY": "पुस्तकालय",
@@ -666,5 +671,6 @@
 	"I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD": "विषय और कौशल डैशबोर्ड",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "आपके पास <[totalSubscribers]> ग्राहकों है।",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "सदस्यता समाप्त",
-	"I18N_WORKED_EXAMPLE": "हल किया गया उदाहरण"
+	"I18N_WORKED_EXAMPLE": "हल किया गया उदाहरण",
+	"I18N_YES": "हाँ"
 }

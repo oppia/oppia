@@ -82,7 +82,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         def mock_verify_current_branch_name(unused_branch_name):
             self.check_function_calls[
                 'verify_current_branch_name_is_called'] = True
-        def mock_get_remote_alias(unused_remote_url):
+        def mock_get_remote_alias(unused_remote_urls):
             self.check_function_calls['get_remote_alias_is_called'] = True
             return 'upstream'
         def mock_check_call(cmd_tokens):
@@ -145,7 +145,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
             'ERROR: The target branch name already exists locally. '
             'Run "git branch -D new-branch" to delete it.'):
@@ -162,7 +162,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
             'ERROR: The target branch name already exists on the remote repo.'):
             (
@@ -184,7 +184,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         def mock_getcode():
             return '404'
         self.mock_response.getcode = mock_getcode
-        with self.url_open_swap, self.assertRaisesRegexp(
+        with self.url_open_swap, self.assertRaisesRegex(
             Exception,
             'ERROR: Failed to fetch latest release info from GitHub.'):
             (
@@ -197,7 +197,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'invalid-tag', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaisesRegexp(
+        with self.url_open_swap, load_swap, self.assertRaisesRegex(
             Exception,
             'ERROR: Could not parse version number of latest GitHub release.'):
             (
@@ -210,7 +210,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'v2.1.1', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaisesRegexp(
+        with self.url_open_swap, load_swap, self.assertRaisesRegex(
             AssertionError, 'Unexpected major version change.'):
             (
                 cut_release_or_hotfix_branch
@@ -222,7 +222,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'v1.2.1', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaisesRegexp(
+        with self.url_open_swap, load_swap, self.assertRaisesRegex(
             AssertionError,
             'The current patch version is not equal to previous '
             'patch version plus one.'):
@@ -236,7 +236,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'v1.0.9', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaisesRegexp(
+        with self.url_open_swap, load_swap, self.assertRaisesRegex(
             AssertionError,
             'The current minor version is not equal to previous minor '
             'version plus one.'):
@@ -251,7 +251,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'v1.1.9', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaisesRegexp(
+        with self.url_open_swap, load_swap, self.assertRaisesRegex(
             AssertionError, 'The current patch version is different than 0.'):
             (
                 cut_release_or_hotfix_branch
@@ -280,7 +280,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             AssertionError,
             'The difference between two continuous hotfix numbers is not one.'):
             (
@@ -298,7 +298,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             AssertionError, 'Release branch is missing.'):
             (
                 cut_release_or_hotfix_branch
@@ -321,7 +321,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                     'upstream', '1.2.3', 3))
 
     def test_exception_is_raised_for_invalid_release_version(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             argparse.ArgumentTypeError,
             'The format of "release_version" should be: x.x.x'):
             (
@@ -336,7 +336,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_missing_release_version(self):
         args_swap = self.swap(
             sys, 'argv', ['cut_release_or_hotfix_branch.py'])
-        with args_swap, self.assertRaisesRegexp(
+        with args_swap, self.assertRaisesRegex(
             Exception, 'ERROR: A "release_version" arg must be specified.'):
             cut_release_or_hotfix_branch.main()
 
@@ -376,7 +376,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             with self.verify_target_branch_swap:
                 with self.verify_target_version_swap, self.open_tab_swap:
                     with self.get_remote_alias_swap, self.check_call_swap:
-                        with input_swap, self.assertRaisesRegexp(
+                        with input_swap, self.assertRaisesRegex(
                             Exception,
                             'Tests should pass on develop before this '
                             'script is run.'):

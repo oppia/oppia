@@ -29,7 +29,7 @@ import subprocess
 import tempfile
 import threading
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 from . import build
@@ -66,7 +66,7 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify(self):
         """Tests _minify with an invalid filepath."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             subprocess.CalledProcessError,
             'returned non-zero exit status 1') as called_process:
             build._minify(INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)  # pylint: disable=protected-access
@@ -75,7 +75,7 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify_and_create_sourcemap(self):
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             subprocess.CalledProcessError,
             'returned non-zero exit status 1') as called_process:
             build._minify_and_create_sourcemap(  # pylint: disable=protected-access
@@ -95,7 +95,7 @@ class BuildTests(test_utils.GenericTestBase):
         error_message = ('File %s does not exist.') % re.escape(
             non_existent_filepaths[0])
         # Exception will be raised at first file determined to be non-existent.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             OSError, error_message):
             build._ensure_files_exist(non_existent_filepaths)  # pylint: disable=protected-access
 
@@ -114,7 +114,7 @@ class BuildTests(test_utils.GenericTestBase):
         for js_filepath in dependency_filepaths['js']:
             if counter == js_file_count:
                 break
-            with python_utils.open_file(js_filepath, 'r') as js_file:
+            with utils.open_file(js_filepath, 'r') as js_file:
                 # Assert that each line is copied over to file_stream object.
                 for line in js_file:
                     self.assertIn(line, third_party_js_stream.getvalue())
@@ -180,7 +180,7 @@ class BuildTests(test_utils.GenericTestBase):
         target_dir_file_count = build.get_file_count(MOCK_ASSETS_DEV_DIR)
         # Ensure that ASSETS_DEV_DIR has at least 1 file.
         assert target_dir_file_count > 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, (
                 '%s files in first dir list != %s files in second dir list') %
             (source_dir_file_count, target_dir_file_count)):
@@ -192,7 +192,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Ensure that MOCK_EXTENSIONS_DIR has at least 1 file.
         assert target_dir_file_count > 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, (
                 '%s files in first dir list != %s files in second dir list') %
             (source_dir_file_count, target_dir_file_count)):
@@ -211,12 +211,12 @@ class BuildTests(test_utils.GenericTestBase):
         # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html.
         file_hashes = {}
         base_filename = 'base.html'
-        with self.assertRaisesRegexp(ValueError, 'Hash dict is empty'):
+        with self.assertRaisesRegex(ValueError, 'Hash dict is empty'):
             build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
 
         # Generate a random hash dict for base.html.
         file_hashes = {base_filename: random.getrandbits(128)}
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, '%s is expected to contain MD5 hash' % base_filename):
             build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
 
@@ -225,13 +225,13 @@ class BuildTests(test_utils.GenericTestBase):
             base_without_hash_filename, file_hashes))
 
         bad_filepath = 'README'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, 'Filepath has less than 2 partitions after splitting'):
             build._verify_filepath_hash(bad_filepath, file_hashes)  # pylint: disable=protected-access
 
         hashed_base_filename = build._insert_hash(  # pylint: disable=protected-access
             base_filename, random.getrandbits(128))
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             KeyError,
             'Hash from file named %s does not match hash dict values' %
             hashed_base_filename):
@@ -246,21 +246,21 @@ class BuildTests(test_utils.GenericTestBase):
         minified_html_file_stream = io.StringIO()
 
         # Assert that base.html has white spaces and has original filepaths.
-        with python_utils.open_file(
+        with utils.open_file(
             base_html_source_path, 'r') as source_base_file:
             source_base_file_content = source_base_file.read()
-            self.assertRegexpMatches(
+            self.assertRegex(
                 source_base_file_content, r'\s{2,}',
                 msg='No white spaces detected in %s unexpectedly'
                 % base_html_source_path)
 
         # Build base.html file.
-        with python_utils.open_file(
+        with utils.open_file(
             base_html_source_path, 'r') as source_base_file:
             build.process_html(source_base_file, minified_html_file_stream)
 
         minified_html_file_content = minified_html_file_stream.getvalue()
-        self.assertNotRegexpMatches(
+        self.assertNotRegex(
             minified_html_file_content, r'\s{2,}',
             msg='All white spaces must be removed from %s' %
             base_html_source_path)
@@ -442,13 +442,13 @@ class BuildTests(test_utils.GenericTestBase):
             with self.swap(build, 'HASHES_JSON_FILEPATH', hashes_path):
                 hashes = {'path/file.js': '123456'}
                 build.save_hashes_to_file(hashes)
-                with python_utils.open_file(hashes_path, 'r') as hashes_file:
+                with utils.open_file(hashes_path, 'r') as hashes_file:
                     self.assertEqual(
                         hashes_file.read(), '{"/path/file.js": "123456"}\n')
 
                 hashes = {'file.js': '123456', 'file.min.js': '654321'}
                 build.save_hashes_to_file(hashes)
-                with python_utils.open_file(hashes_path, 'r') as hashes_file:
+                with utils.open_file(hashes_path, 'r') as hashes_file:
                     self.assertEqual(
                         ast.literal_eval(hashes_file.read()),
                         {'/file.min.js': '654321', '/file.js': '123456'})
@@ -466,9 +466,15 @@ class BuildTests(test_utils.GenericTestBase):
             build_tasks.append(task)
             count -= 1
 
-        self.assertEqual(threading.active_count(), 1)
+        self.assertEqual(
+            threading.active_count(), 1,
+            msg=(
+                'Found more than one thread: %s'
+                % ','.join([thread.name for thread in threading.enumerate()])
+            )
+        )
         build._execute_tasks(build_tasks)  # pylint: disable=protected-access
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             OSError, 'threads can only be started once'):
             build._execute_tasks(build_tasks)  # pylint: disable=protected-access
         # Assert that all threads are joined.
@@ -580,7 +586,7 @@ class BuildTests(test_utils.GenericTestBase):
         temp_file = tempfile.NamedTemporaryFile()
         temp_file_name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
         temp_file.name = temp_file_name
-        with python_utils.open_file(
+        with utils.open_file(
             '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
             tmp.write(u'Some content.')
 
@@ -684,21 +690,21 @@ class BuildTests(test_utils.GenericTestBase):
 
         app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
         app_dev_yaml_temp_file.name = mock_dev_yaml_filepath
-        with python_utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
+        with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
             tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
         app_yaml_temp_file.name = mock_yaml_filepath
-        with python_utils.open_file(mock_yaml_filepath, 'w') as tmp:
+        with utils.open_file(mock_yaml_filepath, 'w') as tmp:
             tmp.write(u'Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
             with env_vars_to_remove_from_deployed_app_yaml_swap:
                 build.generate_app_yaml(deploy_mode=True)
 
-        with python_utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
+        with utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
             content = yaml_file.read()
 
         self.assertEqual(
@@ -725,26 +731,26 @@ class BuildTests(test_utils.GenericTestBase):
 
         app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
         app_dev_yaml_temp_file.name = mock_dev_yaml_filepath
-        with python_utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
+        with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
             tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
         app_yaml_temp_file.name = mock_yaml_filepath
-        with python_utils.open_file(mock_yaml_filepath, 'w') as tmp:
+        with utils.open_file(mock_yaml_filepath, 'w') as tmp:
             tmp.write('Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
             with env_vars_to_remove_from_deployed_app_yaml_swap:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                         Exception,
                         'Environment variable \'DATASTORE_HOST\' to be '
                         'removed does not exist.'
                 ):
                     build.generate_app_yaml(deploy_mode=True)
 
-        with python_utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
+        with utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
             content = yaml_file.read()
 
         self.assertEqual(content, 'Initial content in mock_app.yaml')
@@ -761,7 +767,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         constants_temp_file = tempfile.NamedTemporaryFile()
         constants_temp_file.name = mock_constants_path
-        with python_utils.open_file(mock_constants_path, 'w') as tmp:
+        with utils.open_file(mock_constants_path, 'w') as tmp:
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": true,\n')
             tmp.write('  "EMULATOR_MODE": false,\n')
@@ -769,12 +775,12 @@ class BuildTests(test_utils.GenericTestBase):
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
         feconf_temp_file.name = mock_feconf_path
-        with python_utils.open_file(mock_feconf_path, 'w') as tmp:
+        with utils.open_file(mock_feconf_path, 'w') as tmp:
             tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
 
         with constants_path_swap, feconf_path_swap:
             build.modify_constants(prod_env=True, maintenance_mode=False)
-            with python_utils.open_file(
+            with utils.open_file(
                 mock_constants_path, 'r') as constants_file:
                 self.assertEqual(
                     constants_file.read(),
@@ -782,12 +788,12 @@ class BuildTests(test_utils.GenericTestBase):
                     '  "DEV_MODE": false,\n'
                     '  "EMULATOR_MODE": true,\n'
                     '};')
-            with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
+            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
                     feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
 
             build.modify_constants(prod_env=False, maintenance_mode=True)
-            with python_utils.open_file(
+            with utils.open_file(
                 mock_constants_path, 'r') as constants_file:
                 self.assertEqual(
                     constants_file.read(),
@@ -795,7 +801,7 @@ class BuildTests(test_utils.GenericTestBase):
                     '  "DEV_MODE": true,\n'
                     '  "EMULATOR_MODE": true,\n'
                     '};')
-            with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
+            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
                     feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True')
 
@@ -811,7 +817,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         constants_temp_file = tempfile.NamedTemporaryFile()
         constants_temp_file.name = mock_constants_path
-        with python_utils.open_file(mock_constants_path, 'w') as tmp:
+        with utils.open_file(mock_constants_path, 'w') as tmp:
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": false,\n')
             tmp.write('  "EMULATOR_MODE": false,\n')
@@ -819,12 +825,12 @@ class BuildTests(test_utils.GenericTestBase):
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
         feconf_temp_file.name = mock_feconf_path
-        with python_utils.open_file(mock_feconf_path, 'w') as tmp:
+        with utils.open_file(mock_feconf_path, 'w') as tmp:
             tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
 
         with constants_path_swap, feconf_path_swap:
             build.set_constants_to_default()
-            with python_utils.open_file(
+            with utils.open_file(
                 mock_constants_path, 'r') as constants_file:
                 self.assertEqual(
                     constants_file.read(),
@@ -832,7 +838,7 @@ class BuildTests(test_utils.GenericTestBase):
                     '  "DEV_MODE": true,\n'
                     '  "EMULATOR_MODE": true,\n'
                     '};')
-            with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
+            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
                     feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
 
@@ -842,7 +848,7 @@ class BuildTests(test_utils.GenericTestBase):
     def test_safe_delete_file(self):
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = 'some_file.txt'
-        with python_utils.open_file('some_file.txt', 'w') as tmp:
+        with utils.open_file('some_file.txt', 'w') as tmp:
             tmp.write(u'Some content.')
         self.assertTrue(os.path.isfile('some_file.txt'))
 
@@ -1010,7 +1016,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_cannot_maintenance_mode_in_dev_mode(self):
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'maintenance_mode should only be enabled in prod build.')
         with assert_raises_regexp_context_manager:
@@ -1029,7 +1035,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'minify_third_party_libs_only should not be set in non-prod env.')
         with ensure_files_exist_swap, assert_raises_regexp_context_manager:

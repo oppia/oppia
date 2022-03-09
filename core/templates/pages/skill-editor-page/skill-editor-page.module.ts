@@ -18,11 +18,11 @@
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SavePendingChangesModalComponent } from './modal-templates/save-pending-changes-modal.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -33,12 +33,23 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { DeleteMisconceptionModalComponent } from './modal-templates/delete-misconception-modal.component';
 import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-editor/skill-description-editor.component';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { SkillPrerequisiteSkillsEditorComponent } from './editor-tab/skill-prerequisite-skills-editor/skill-prerequisite-skills-editor.component';
+import { WorkedExampleEditorComponent } from './editor-tab/skill-concept-card-editor/worked-example-editor.component';
+import { MisconceptionEditorComponent } from './editor-tab/skill-misconceptions-editor/misconception-editor.component';
+import { DeleteWorkedExampleComponent } from './modal-templates/delete-worked-example-modal.component';
+import { AddWorkedExampleModalComponent } from './modal-templates/add-worked-example.component';
+import { SkillRubricsEditorComponent } from './editor-tab/skill-rubrics-editor/skill-rubrics-editor.component';
 import { AddMisconceptionModalComponent } from './modal-templates/add-misconception-modal.component';
+import { SkillEditorSaveModalComponent } from './modal-templates/skill-editor-save-modal.component';
+import { SkillMisconceptionsEditorComponent } from './editor-tab/skill-misconceptions-editor/skill-misconceptions-editor.component';
+import { SkillPreviewModalComponent } from './editor-tab/skill-preview-modal.component';
+import { SkillConceptCardEditorComponent } from './editor-tab/skill-concept-card-editor/skill-concept-card-editor.component';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    DragDropModule,
     HttpClientModule,
     InteractionExtensionsModule,
     SharedComponentsModule,
@@ -46,17 +57,35 @@ import { AddMisconceptionModalComponent } from './modal-templates/add-misconcept
   ],
   declarations: [
     DeleteMisconceptionModalComponent,
-    SavePendingChangesModalComponent,
+    SkillConceptCardEditorComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
-    AddMisconceptionModalComponent
+    SkillPrerequisiteSkillsEditorComponent,
+    SkillPreviewModalComponent,
+    SkillEditorSaveModalComponent,
+    WorkedExampleEditorComponent,
+    MisconceptionEditorComponent,
+    AddWorkedExampleModalComponent,
+    DeleteWorkedExampleComponent,
+    SkillRubricsEditorComponent,
+    AddMisconceptionModalComponent,
+    SkillMisconceptionsEditorComponent
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
-    SavePendingChangesModalComponent,
+    SkillConceptCardEditorComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
-    AddMisconceptionModalComponent
+    SkillPrerequisiteSkillsEditorComponent,
+    SkillPreviewModalComponent,
+    SkillEditorSaveModalComponent,
+    WorkedExampleEditorComponent,
+    MisconceptionEditorComponent,
+    AddWorkedExampleModalComponent,
+    DeleteWorkedExampleComponent,
+    SkillRubricsEditorComponent,
+    AddMisconceptionModalComponent,
+    SkillMisconceptionsEditorComponent
   ],
   providers: [
     {

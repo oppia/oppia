@@ -252,7 +252,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         mock_web_report_model = self.android_report_model
         mock_web_report_model.platform = self.PLATFORM_WEB
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             NotImplementedError,
             'Web app feedback report domain objects must be defined.'):
             app_feedback_report_services.get_report_from_model(
@@ -305,7 +305,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.android_report_model.android_report_info[
                 'build_fingerprint'])
         self.assertEqual(
-            device_system_context.network_type.name,
+            device_system_context.network_type.value,
             self.android_report_model.android_report_info[
                 'network_type'])
 
@@ -326,7 +326,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_context.audio_language_code,
             self.android_report_model.audio_language_code)
         self.assertEqual(
-            app_context.text_size.name,
+            app_context.text_size.value,
             self.android_report_model.android_report_info['text_size'])
         self.assertEqual(
             app_context.only_allows_wifi_download_and_update,
@@ -351,7 +351,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.android_report_model.android_report_info_schema_version = (
             feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION - 1)
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             NotImplementedError,
             'Android app feedback report migrations must be added for new '
             'report schemas implemented.'):
@@ -382,7 +382,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         mock_web_report_obj = self.android_report_obj
         mock_web_report_obj.platform = self.PLATFORM_WEB
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'Web report domain objects have not been defined.'):
             app_feedback_report_services.save_feedback_report_to_storage(
@@ -561,7 +561,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         web_dict = {
             'platform_type': 'web'
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             NotImplementedError,
             'Domain objects for web reports must be implemented.'):
             app_feedback_report_services.create_report_from_json(web_dict)
@@ -1188,7 +1188,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         mock_web_report_obj = self.android_report_obj
         mock_web_report_obj.platform = self.PLATFORM_WEB
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             NotImplementedError,
             'Assigning web reports to tickets has not been implemented yet.'):
             app_feedback_report_services.reassign_ticket(
@@ -1199,7 +1199,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         # Set an invalid ticket_id so that the stats model calculates an invalid
         # id for this ticket's stats model.
         self.android_report_obj.ticket_id = 'invalid_id'
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'The report is being removed from an invalid ticket id'):
             app_feedback_report_services.reassign_ticket(
@@ -1342,7 +1342,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         mock_web_report_obj.platform = (
             app_feedback_report_constants.PLATFORM_CHOICE_WEB)
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             NotImplementedError,
             'Stats aggregation for incoming web reports have not been '
             'implemented yet.'):
@@ -1369,7 +1369,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         }
         delta = -1
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'Cannot decrement a count for a parameter value that does '
             'not exist'):

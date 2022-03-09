@@ -25,7 +25,7 @@ import subprocess
 import sys
 import tempfile
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 from . import common
@@ -148,7 +148,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             return process
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        with popen_swap, self.assertRaisesRegexp(ValueError, 'Error'):
+        with popen_swap, self.assertRaisesRegex(ValueError, 'Error'):
             pre_push_hook.get_remote_name()
 
     def test_get_remote_name_with_error_in_obtaining_remote_url(self):
@@ -167,7 +167,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 return process_for_remote
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        with popen_swap, self.assertRaisesRegexp(ValueError, 'Error'):
+        with popen_swap, self.assertRaisesRegex(ValueError, 'Error'):
             pre_push_hook.get_remote_name()
 
     def test_get_remote_name_with_no_remote_set(self):
@@ -188,7 +188,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             else:
                 return process_for_remote
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        with popen_swap, self.assertRaisesRegexp(
+        with popen_swap, self.assertRaisesRegex(
             Exception,
             'Error: Please set upstream for the lint checks to run '
             'efficiently. To do that follow these steps:\n'
@@ -247,7 +247,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
-        with subprocess_swap, self.assertRaisesRegexp(ValueError, 'Error'):
+        with subprocess_swap, self.assertRaisesRegex(ValueError, 'Error'):
             pre_push_hook.git_diff_name_status(
                 'left', 'right', diff_filter='filter')
 
@@ -292,7 +292,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
-        with subprocess_swap, self.assertRaisesRegexp(ValueError, 'Test'):
+        with subprocess_swap, self.assertRaisesRegex(ValueError, 'Test'):
             pre_push_hook.get_merge_base('A', 'B')
 
     def test_get_merge_base_returns_merge_base(self):
@@ -392,9 +392,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_get_refs(self):
         temp_stdin_file = tempfile.NamedTemporaryFile().name
-        with python_utils.open_file(temp_stdin_file, 'w') as f:
+        with utils.open_file(temp_stdin_file, 'w') as f:
             f.write('local_ref local_sha1 remote_ref remote_sha1')
-        with python_utils.open_file(temp_stdin_file, 'r') as f:
+        with utils.open_file(temp_stdin_file, 'r') as f:
             with self.swap(sys, 'stdin', f):
                 self.assertEqual(
                     pre_push_hook.get_refs(),
@@ -460,7 +460,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             mock_start_subprocess_for_result)
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
-            with self.assertRaisesRegexp(ValueError, 'Error'):
+            with self.assertRaisesRegex(ValueError, 'Error'):
                 pre_push_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertFalse(
@@ -603,7 +603,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook, 'has_uncommitted_files', mock_has_uncommitted_files)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, uncommitted_files_swap:
-                with self.assertRaisesRegexp(SystemExit, '1'):
+                with self.assertRaisesRegex(SystemExit, '1'):
                     with self.swap_check_backend_python_libs:
                         pre_push_hook.main(args=[])
         self.assertTrue(
@@ -620,7 +620,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
-                with check_output_swap, self.assertRaisesRegexp(
+                with check_output_swap, self.assertRaisesRegex(
                     SystemExit, '1'
                 ):
                     with self.swap_check_backend_python_libs:
@@ -638,7 +638,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.execute_mypy_checks_swap:
-                        with self.assertRaisesRegexp(SystemExit, '1'):
+                        with self.assertRaisesRegex(SystemExit, '1'):
                             with self.swap_check_backend_python_libs:
                                 pre_push_hook.main(args=[])
         self.assertTrue(
@@ -651,7 +651,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.execute_mypy_checks_swap:
-                        with self.assertRaisesRegexp(SystemExit, '1'):
+                        with self.assertRaisesRegex(SystemExit, '1'):
                             with self.swap_check_backend_python_libs:
                                 pre_push_hook.main(args=[])
         self.assertIn(
@@ -670,7 +670,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 with self.check_output_swap, self.start_linter_swap:
                     with self.ts_swap, run_script_and_get_returncode_swap:
                         with self.execute_mypy_checks_swap:
-                            with self.assertRaisesRegexp(SystemExit, '1'):
+                            with self.assertRaisesRegex(SystemExit, '1'):
                                 with self.swap_check_backend_python_libs:
                                     pre_push_hook.main(args=[])
         self.assertTrue(
@@ -691,7 +691,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 with self.check_output_swap, self.start_linter_swap:
                     with self.ts_swap, run_script_and_get_returncode_swap:
                         with self.execute_mypy_checks_swap:
-                            with self.assertRaisesRegexp(SystemExit, '1'):
+                            with self.assertRaisesRegex(SystemExit, '1'):
                                 with self.swap_check_backend_python_libs:
                                     pre_push_hook.main(args=[])
         self.assertTrue(
@@ -710,7 +710,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 with self.check_output_swap, self.start_linter_swap:
                     with self.js_or_ts_swap, run_script_and_get_returncode_swap:
                         with self.execute_mypy_checks_swap:
-                            with self.assertRaisesRegexp(SystemExit, '1'):
+                            with self.assertRaisesRegex(SystemExit, '1'):
                                 with self.swap_check_backend_python_libs:
                                     pre_push_hook.main(args=[])
         self.assertTrue(
@@ -730,7 +730,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                     with run_script_and_get_returncode_swap:
                         with self.ci_config_or_js_files_swap:
                             with self.execute_mypy_checks_swap:
-                                with self.assertRaisesRegexp(SystemExit, '1'):
+                                with self.assertRaisesRegex(SystemExit, '1'):
                                     with self.swap_check_backend_python_libs:
                                         pre_push_hook.main(args=[])
         self.assertTrue(

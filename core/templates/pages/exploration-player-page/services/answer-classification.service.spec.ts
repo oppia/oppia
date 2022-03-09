@@ -19,31 +19,26 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerClassificationResult } from
-  'domain/classifier/answer-classification-result.model';
-import { AnswerClassificationService, InteractionRulesService } from
-  'pages/exploration-player-page/services/answer-classification.service';
+import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
+import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AppService } from 'services/app.service';
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { Classifier } from 'domain/classifier/classifier.model';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { PredictionAlgorithmRegistryService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/prediction-algorithm-registry.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
+import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
+import { AlertsService } from 'services/alerts.service';
+import { TextInputPredictionService } from 'interactions/TextInput/text-input-prediction.service';
 
 describe('Answer Classification Service', () => {
   const stateName = 'Test State';
 
+  let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let appService: AppService;
   let interactionSpecsService: InteractionSpecsService;
@@ -59,6 +54,7 @@ describe('Answer Classification Service', () => {
       providers: [CamelCaseToHyphensPipe],
     });
 
+    alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.get(AnswerClassificationService);
     appService = TestBed.get(AppService);
     interactionSpecsService = TestBed.get(InteractionSpecsService);
@@ -251,6 +247,24 @@ describe('Answer Classification Service', () => {
       );
     });
 
+    it('should fail if no answer group matches and' +
+    'default outcome of interaction is not defined', () => {
+      spyOn(alertsService, 'addWarning').and.callThrough();
+
+      stateDict.interaction.default_outcome = null;
+      const state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+
+      expect(
+        () => answerClassificationService.getMatchingClassificationResult(
+          state.name, state.interaction, 'abc', textInputRulesService)
+      ).toThrowError(
+        'No defaultOutcome was available to classify the answer.');
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Something went wrong with the exploration.');
+    });
+
     it(
       'should fail if no answer group matches and no default rule is ' +
         'provided',
@@ -335,7 +349,11 @@ describe('Answer Classification Service', () => {
       stateClassifierMappingService.testOnlySetClassifierData(
         stateName, testClassifier);
       predictionAlgorithmRegistryService.testOnlySetPredictionService(
-        'TestClassifier', 1, { predict: (classifierData, answer) => 1 });
+        'TestClassifier', 1,
+        {
+          predict: (classifierData, answer) => 1
+        } as TextInputPredictionService
+      );
 
       stateDict = {
         content: {
@@ -439,13 +457,31 @@ describe('Answer Classification Service', () => {
       };
     });
 
-    it(
-      'should query the prediction service if no answer group matches and ' +
-        'interaction is trainable',
+    it('should query the prediction service if no answer group matches and ' +
+        'interaction is trainable', () => {
+      spyOn(
+        interactionSpecsService, 'isInteractionTrainable'
+      ).and.returnValue(true);
+
+      const state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+
+      expect(
+        answerClassificationService.getMatchingClassificationResult(
+          state.name, state.interaction, '0', textInputRulesService)
+      ).toEqual(
+        new AnswerClassificationResult(
+          state.interaction.answerGroups[1].outcome, 1, null,
+          ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
+    });
+
+    it('should get default rule if the answer group can not be predicted',
       () => {
         spyOn(
-          interactionSpecsService, 'isInteractionTrainable'
-        ).and.returnValue(true);
+          predictionAlgorithmRegistryService, 'getPredictionService'
+        ).and.returnValue({
+          predict: (classifierData, answer) => -1
+        } as TextInputPredictionService);
 
         const state = (
           stateObjectFactory.createFromBackendDict(stateName, stateDict));
@@ -455,8 +491,9 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, '0', textInputRulesService)
         ).toEqual(
           new AnswerClassificationResult(
-            state.interaction.answerGroups[1].outcome, 1, null,
-            ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
+            outcomeObjectFactory.createNew(
+              'default', 'default_outcome', '', []), 2, 0,
+            ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
       });
 
     it(
@@ -630,5 +667,44 @@ describe('Answer Classification Service', () => {
             state.interaction.answerGroups[1].outcome, 1, 0,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
       });
+
+    it('should check whether answer is classified explicitly ' +
+        'or goes into new state', () => {
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.callThrough();
+
+      // Returns false when no answer group matches and
+      // default outcome has destination equal to state name.
+
+      stateDict.interaction.default_outcome.dest = stateName;
+      let state1 = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+
+      let res1 = (
+        answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+          state1.name, state1, '777', textInputRulesService));
+
+      expect(res1).toBeFalse();
+      expect(
+        answerClassificationService.getMatchingClassificationResult
+      ).toHaveBeenCalledWith(
+        state1.name, state1.interaction, '777', textInputRulesService);
+
+      // Returns true if any answer group matches.
+
+      stateDict.interaction.default_outcome.dest = 'default';
+      let state2 = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+
+      let res2 = (
+        answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+          state2.name, state2, 'equal', textInputRulesService));
+
+      expect(res2).toBeTrue();
+      expect(
+        answerClassificationService.getMatchingClassificationResult
+      ).toHaveBeenCalledWith(
+        state2.name, state2.interaction, 'equal', textInputRulesService);
+    });
   });
 });

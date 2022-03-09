@@ -27,9 +27,13 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import fs_domain
-from core.domain import fs_services
-from core.domain import html_cleaner
-from core.domain import html_validation_service
+
+from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -590,6 +594,9 @@ class StoryContents:
         Returns:
             StoryNode or None. The StoryNode object of the corresponding
             exploration id if exist else None.
+
+        Raises:
+            Exception. Unable to find the exploration in any node.
         """
         for node in self.nodes:
             if node.exploration_id == exp_id:
@@ -1123,6 +1130,9 @@ class Story:
         Args:
             new_thumbnail_filename: str|None. The new thumbnail filename of the
                 story.
+
+        Raises:
+            Exception. The subtopic with the given id doesn't exist.
         """
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
@@ -1311,6 +1321,7 @@ class Story:
 
         Raises:
             ValueError. The node is not part of the story.
+            Exception. The node with the given id doesn't exist.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:

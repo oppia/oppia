@@ -125,7 +125,6 @@ import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFac
 import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
 import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
-import { StoryContentsObjectFactory } from 'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryUpdateService } from 'domain/story/story-update.service';
@@ -390,8 +389,16 @@ import { HistoryTabBackendApiService } from 'pages/exploration-editor-page/servi
 import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights.service';
 import { ExplorationRightsBackendApiService } from 'pages/exploration-editor-page/services/exploration-rights-backend-api.service';
 import { ExplorationCategoryService } from 'pages/exploration-editor-page/services/exploration-category.service';
+import { ExplorationCorrectnessFeedbackService } from 'pages/exploration-editor-page/services/exploration-correctness-feedback.service';
+import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
+import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
 import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
 import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
+import { NumberConversionService } from './number-conversion.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
+import { ContributionAndReviewService } from 'pages/contributor-dashboard-page/services/contribution-and-review.service';
+import { ContributionAndReviewBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-and-review-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -455,6 +462,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['ContextService', ContextService],
   ['ContinueRulesService', ContinueRulesService],
   ['ContinueValidationService', ContinueValidationService],
+  ['ContributionAndReviewService', ContributionAndReviewService],
+  ['ContributionAndReviewBackendApiService',
+    ContributionAndReviewBackendApiService],
   ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ContributionOpportunitiesBackendApiService',
     ContributionOpportunitiesBackendApiService],
@@ -493,6 +503,8 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationCreationBackendApiService],
   ['ExplorationCreationService',
     ExplorationCreationService],
+  ['ExplorationCorrectnessFeedbackService',
+    ExplorationCorrectnessFeedbackService],
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
@@ -511,14 +523,18 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationImprovementsTaskRegistryService],
   ['ExplorationInitStateNameService', ExplorationInitStateNameService],
   ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
+  ['ExplorationObjectiveService', ExplorationObjectiveService],
   ['ExplorationObjectFactory', ExplorationObjectFactory],
   ['ExplorationObjectiveService', ExplorationObjectiveService],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
   ['ExplorationPlayerStateService', ExplorationPlayerStateService],
+  ['ExplorationParamSpecsService', ExplorationParamSpecsService],
+  ['ExplorationParamChangesService', ExplorationParamChangesService],
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
+  ['ExplorationStatesService', ExplorationStatesService],
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
@@ -545,6 +561,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['FractionInputRulesService', FractionInputRulesService],
   ['FractionInputValidationService', FractionInputValidationService],
   ['GenerateContentIdService', GenerateContentIdService],
+  ['GraphDataService', GraphDataService],
   ['GraphDetailService', GraphDetailService],
   ['GraphInputRulesService', GraphInputRulesService],
   ['GraphInputValidationService', GraphInputValidationService],
@@ -742,7 +759,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
   ['StatsReportingService', StatsReportingService],
-  ['StoryContentsObjectFactory', StoryContentsObjectFactory],
   ['StoryEditorNavigationService', StoryEditorNavigationService],
   ['StoryEditorStateService', StoryEditorStateService],
   ['StoryObjectFactory', StoryObjectFactory],
@@ -808,5 +824,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['UndoRedoService', UndoRedoService],
   ['QuestionValidationService', QuestionValidationService],
   ['CollectionEditorStateService', CollectionEditorStateService],
-  ['DeleteAccountBackendApiService', DeleteAccountBackendApiService]
+  ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
+  ['NumberConversionService', NumberConversionService]
 ];

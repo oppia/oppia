@@ -30,6 +30,7 @@ import { WindowDimensionsService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PageTitleService } from 'services/page-title.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockWindowRef {
   _window = {
@@ -58,6 +59,7 @@ describe('Topic viewer page', () => {
   let windowDimensionsService = null;
   let topicViewerPageComponent = null;
   let windowRef: MockWindowRef;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let topicName = 'Topic Name';
   let topicUrlFragment = 'topic-frag';
@@ -107,14 +109,23 @@ describe('Topic viewer page', () => {
     alertsService = TestBed.inject(AlertsService);
     pageTitleService = TestBed.inject(PageTitleService);
     urlService = TestBed.inject(UrlService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     let fixture = TestBed.createComponent(TopicViewerPageComponent);
     topicViewerPageComponent = fixture.componentInstance;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
+
+  it('should get RTL language status correctly', () => {
+    expect(topicViewerPageComponent.isLanguageRTL()).toEqual(true);
+  });
+
 
   it('should successfully get topic data', fakeAsync(() => {
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
@@ -229,6 +240,15 @@ describe('Topic viewer page', () => {
 
     widthSpy.and.returnValue(700);
     expect(topicViewerPageComponent.checkMobileView()).toBe(false);
+  });
+
+  it('should check if the view is tablet or not', () => {
+    var widthSpy = spyOn(windowDimensionsService, 'getWidth');
+    widthSpy.and.returnValue(700);
+    expect(topicViewerPageComponent.checkTabletView()).toBe(true);
+
+    widthSpy.and.returnValue(800);
+    expect(topicViewerPageComponent.checkTabletView()).toBe(false);
   });
 
   it('should set url accordingly when user changes active tab to' +

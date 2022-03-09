@@ -580,7 +580,8 @@ URLS = [
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),
     get_redirect_route(
-        r'/createhandler/imageupload/<entity_type>/<entity_id>',
+        r'%s/<entity_type>/<entity_id>' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX),
         editor.ImageUploadHandler),
     get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',
@@ -742,7 +743,7 @@ URLS = [
         topic_editor.TopicPublishSendMailHandler),
 
     get_redirect_route(
-        r'%s/<comma_separated_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+        r'%s/<selected_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
         concept_card_viewer.ConceptCardDataHandler),
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,

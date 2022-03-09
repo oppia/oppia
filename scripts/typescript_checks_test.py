@@ -20,7 +20,7 @@ import json
 import os
 import subprocess
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 from . import typescript_checks
@@ -49,14 +49,14 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             typescript_checks.compile_and_check_typescript(
                 typescript_checks.TSCONFIG_FILEPATH)
             out_dir = ''
-            with python_utils.open_file(
+            with utils.open_file(
                 typescript_checks.TSCONFIG_FILEPATH, 'r') as f:
                 config_data = json.load(f)
                 out_dir = os.path.join(
                     config_data['compilerOptions']['outDir'], '')
             compiled_js_dir_swap = self.swap(
                 typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR)
-            with compiled_js_dir_swap, self.assertRaisesRegexp(
+            with compiled_js_dir_swap, self.assertRaisesRegex(
                 Exception,
                 'COMPILED_JS_DIR: %s does not match the output directory '
                 'in %s: %s' % (
@@ -123,7 +123,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             return process
 
         with self.swap(subprocess, 'Popen', mock_popen_for_errors):
-            with self.assertRaisesRegexp(SystemExit, '1'):
+            with self.assertRaisesRegex(SystemExit, '1'):
                 typescript_checks.compile_and_check_typescript(
                     typescript_checks.TSCONFIG_FILEPATH)
 

@@ -26,11 +26,15 @@ import sys
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import action_registry
 from core.domain import customization_args_util
 from core.domain import exp_domain
-from core.domain import interaction_registry
-from core.domain import playthrough_issue_registry
+
+from core.domain import action_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import playthrough_issue_registry  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 # These are special sentinel values attributed to answers migrated from the old
 # answer storage model. Those answers could not have session IDs or time spent
@@ -354,6 +358,9 @@ class StateStats:
         Args:
             other: StateStats | SessionStateStats. The other collection of stats
                 to aggregate from.
+
+        Raises:
+            TypeError. Given SessionStateStats can not be aggregated from.
         """
         if other.__class__ is self.__class__:
             self.total_answers_count_v1 += other.total_answers_count_v1
@@ -833,9 +840,9 @@ class Playthrough:
         try:
             issue = playthrough_issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
-        except KeyError:
+        except KeyError as e:
             raise utils.ValidationError('Invalid issue type: %s' % (
-                self.issue_type))
+                self.issue_type)) from e
 
         customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
@@ -970,9 +977,9 @@ class ExplorationIssue:
         try:
             issue = playthrough_issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
-        except KeyError:
+        except KeyError as e:
             raise utils.ValidationError('Invalid issue type: %s' % (
-                self.issue_type))
+                self.issue_type)) from e
 
         customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
@@ -1077,9 +1084,9 @@ class LearnerAction:
         try:
             action = action_registry.Registry.get_action_by_type(
                 self.action_type)
-        except KeyError:
+        except KeyError as e:
             raise utils.ValidationError(
-                'Invalid action type: %s' % self.action_type)
+                'Invalid action type: %s' % self.action_type) from e
         customization_args_util.validate_customization_args_and_values(
             'action', self.action_type, self.action_customization_args,
             action.customization_arg_specs)
@@ -1746,8 +1753,8 @@ class LearnerAnswerDetails:
                     learner_answer_info.get_learner_answer_info_dict_size())
         if self.learner_answer_info_list == new_learner_answer_info_list:
             raise Exception('Learner answer info with the given id not found.')
-        else:
-            self.learner_answer_info_list = new_learner_answer_info_list
+
+        self.learner_answer_info_list = new_learner_answer_info_list
 
     def update_state_reference(self, new_state_reference):
         """Updates the state_reference of the LearnerAnswerDetails object.

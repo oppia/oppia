@@ -20,7 +20,6 @@ import collections
 import logging
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import config_domain
@@ -447,6 +446,9 @@ def replace_skill_id_in_all_topics(user_id, old_skill_id, new_skill_id):
         user_id: str. The unique user ID of the user.
         old_skill_id: str. The old skill id.
         new_skill_id: str. The new skill id.
+
+    Raises:
+        Exception. The new skill already present.
     """
     all_topics = topic_fetchers.get_all_topics()
     for topic in all_topics:
@@ -632,6 +634,11 @@ def apply_change_list(skill_id, change_list, committer_id):
 
     Returns:
         Skill. The resulting skill domain object.
+
+    Raises:
+        Exception. The user does not have enough rights to edit the
+            skill description.
+        Exception. Invalid change dict.
     """
     skill = skill_fetchers.get_skill_by_id(skill_id)
     user = user_services.get_user_actions_info(committer_id)
@@ -705,12 +712,11 @@ def apply_change_list(skill_id, change_list, committer_id):
                         change.misconception_id, change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
-            elif (change.cmd ==
-                  skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
-                  or change.cmd ==
-                  skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION # pylint: disable=line-too-long
-                  or change.cmd ==
-                  skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd in (
+                    skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
+                    skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
+                    skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION
+            )):
                 # Loading the skill model from the datastore into a
                 # skill domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
@@ -792,7 +798,8 @@ def _save_skill(committer_id, skill, commit_message, change_list):
             'Unexpected error: trying to update version %s of skill '
             'from version %s. Please reload the page and try again.'
             % (skill_model.version, skill.version))
-    elif skill.version < skill_model.version:
+
+    if skill.version < skill_model.version:
         raise Exception(
             'Trying to update version %s of skill from version %s, '
             'which is too old. Please reload the page and try again.'
@@ -1068,8 +1075,7 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)
 
-    for skill_id, skill_mastery_model in python_utils.ZIP(
-            skill_ids, skill_mastery_models):
+    for skill_id, skill_mastery_model in zip(skill_ids, skill_mastery_models):
         if skill_mastery_model is None:
             degrees_of_mastery[skill_id] = None
         else:
