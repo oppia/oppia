@@ -181,8 +181,10 @@ export class PlaythroughService {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private explorationId!: string;
   private explorationVersion!: number;
-  private learnerIsInSamplePopulation!: boolean;
+  private learnerIsInSamplePopulation: boolean = false;
 
+  // Below properties are initialized with null values, and are set to non-null
+  // values only when the record action of corresponding exploration is starts.
   private eqTracker: EarlyQuitTracker | null = null;
   private cstTracker: CyclicStateTransitionsTracker | null = null;
   private misTracker: MultipleIncorrectAnswersTracker | null = null;
@@ -339,13 +341,15 @@ export class PlaythroughService {
 
   // Return undefined if learner has not begun recording.
   private hasRecordingFinished(): boolean | undefined {
-    if (this.recordedLearnerActions !== null) {
-      return (
-        this.hasRecordingBegun() &&
-        this.recordedLearnerActions.length > 1 &&
-        this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
-          .actionType === AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
+    if (this.recordedLearnerActions === null) {
+      throw new Error('Cannot finish recording before beginning.');
     }
+
+    return (
+      this.hasRecordingBegun() &&
+      this.recordedLearnerActions.length > 1 &&
+      this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
+        .actionType === AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
   }
 
   private isRecordedPlaythroughHelpful(): boolean {

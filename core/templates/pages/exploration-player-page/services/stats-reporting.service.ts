@@ -63,8 +63,8 @@ export class StatsReportingService {
   previousStateName!: string;
   nextStateName!: string;
   topicName!: string;
-  private editorPreviewMode!: boolean;
-  private questionPlayerMode!: boolean;
+  private editorPreviewMode: boolean = false;
+  private questionPlayerMode: boolean = false;
   statesVisited: Set<string> = new Set();
   explorationStarted: boolean = false;
   explorationActuallyStarted: boolean = false;

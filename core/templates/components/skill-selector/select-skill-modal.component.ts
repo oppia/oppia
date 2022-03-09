@@ -36,8 +36,8 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   skillsInSameTopicCount!: number;
   skillSummaries!: SkillSummaryBackendDict[];
   untriagedSkillSummaries!: SkillSummary[];
-  allowSkillsFromOtherTopics!: boolean;
   selectedSkillId!: string;
+  allowSkillsFromOtherTopics: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal

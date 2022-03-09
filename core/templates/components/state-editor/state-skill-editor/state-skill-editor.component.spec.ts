@@ -35,6 +35,7 @@ import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summar
 import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 
 describe('State Skill Editor Component', () => {
@@ -132,81 +133,9 @@ describe('State Skill Editor Component', () => {
     ],
     totalSkillCount: 1,
     topicSummaries: [
-      {
-        version: 1,
-        urlFragment: 'empty-topic',
-        languageCode: 'en',
-        description: 'description',
-        uncategorizedSkillCount: 0,
-        totalPublishedNodeCount: 0,
-        canEditTopic: true,
-        isPublished: false,
-        id: 'HLEn0XQiV9XE',
-        topicModelCreatedOn: 1623851496406.576,
-        subtopicCount: 0,
-        thumbnailBgColor: '#FFFFFF',
-        canonicalStoryCount: 0,
-        name: 'Empty Topic',
-        classroom: 'math',
-        totalSkillCount: 0,
-        additionalStoryCount: 0,
-        topicModelLastUpdated: 1623851496406.582,
-        thumbnailFilename: 'thumbnail_filename',
-        getId(): string {
-          return this.id;
-        },
-        getName(): string {
-          return this.name;
-        },
-        getCanonicalStoryCount(): number {
-          return this.canonicalStoryCount;
-        },
-        getSubtopicCount(): number {
-          return this.subtopicCount;
-        },
-        getTotalSkillCount(): number {
-          return this.totalSkillCount;
-        },
-        getTotalPublishedNodeCount(): number {
-          return this.totalPublishedNodeCount;
-        },
-        getUncategorizedSkillCount(): number {
-          return this.uncategorizedSkillCount;
-        },
-        getLanguageCode(): string {
-          return this.languageCode;
-        },
-        getDescription(): string {
-          return this.description;
-        },
-        getVersion(): number {
-          return this.version;
-        },
-        getAdditionalStoryCount(): number {
-          return this.additionalStoryCount;
-        },
-        getTopicModelCreatedOn(): number {
-          return this.topicModelCreatedOn;
-        },
-        getTopicModelLastUpdated(): number {
-          return this.topicModelLastUpdated;
-        },
-        getClassroom(): string | undefined {
-          return this.classroom;
-        },
-        getUrlFragment(): string {
-          return this.urlFragment;
-        },
-        getThumbnailFilename(): string {
-          return this.thumbnailFilename;
-        },
-        getThumbnailBgColor(): string {
-          return this.thumbnailBgColor;
-        },
-        isTopicPublished(): boolean {
-          return this.isPublished;
-        }
-      }
+      new CreatorTopicSummary(
+        '', '', 2, 2, 2, 2, 2, '', '', 2, 2, 2, 2, true, true, '', '',
+        '', '')
     ],
     categorizedSkillsDict: {}
   };
@@ -273,7 +202,6 @@ describe('State Skill Editor Component', () => {
   it('should open add skill modal for adding skill', () => {
     mockNgbModal.modal = 'add_skill';
     const modalSpy = spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss as TimerHandler);
       return (
         { componentInstance: MockNgbModal,
           result: Promise.resolve('success')
@@ -295,7 +223,6 @@ describe('State Skill Editor Component', () => {
   it('should open delete skill modal for deleting skill', () => {
     mockNgbModal.modal = 'delete_skill';
     const modalSpy = spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss as TimerHandler);
       return (
         { componentInstance: MockNgbModal,
           result: Promise.resolve('success')
