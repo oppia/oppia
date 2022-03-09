@@ -29,15 +29,13 @@ CMD_CHANGE_PROPERTY_VALUE: Final = 'change_property_value'
 
 # Value of a particular property can be bool, str, List[Dict], Dict,
 # int and other types too. so, Any type has to be used for value parameter.
-def set_property(
-    committer_id: str, name: str, value: Any
-) -> None:
+def set_property(committer_id: str, name: str, value: Any) -> None:
     """Sets a property value. The property must already be registered.
 
     Args:
         committer_id: str. The user ID of the committer.
         name: str. The name of the property.
-        value: str. The value of the property.
+        value: Any. The value of the property.
 
     Raises:
         Exception. No config property with the specified name is found.
