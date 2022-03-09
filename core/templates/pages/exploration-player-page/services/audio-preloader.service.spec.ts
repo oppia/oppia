@@ -31,7 +31,7 @@ describe('Audio preloader service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
@@ -375,10 +375,11 @@ describe('Audio preloader service', () => {
       explorationObjectFactory.createFromBackendDict(explorationDict));
     audioPreloaderService.init(exploration);
     audioTranslationLanguageService.init(['en'], 'en', 'en', false);
-    const audioFiles = audioPreloaderService.kickOffAudioPreloader(
+    audioPreloaderService.kickOffAudioPreloader(
       exploration.getInitialState().name as string);
 
-    expect(audioFiles).toEqual([]);
+    expect(audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading())
+      .toEqual([]);
   });
 
   it('should properly restart pre-loading from a new state', () => {
