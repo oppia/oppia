@@ -1281,10 +1281,10 @@ def url_open(source_url: str) -> str:
     context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
     # The type ignore is needed, because typestubs define the return type
     # of 'urlopen' as 'Any' which is wrong.
-    return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return]
+    return urllib.request.urlopen(source_url, context=context) # type: ignore
 
 
-def filter_a(tag, name, value):
+def filter_a(tag: str, name: str, value: str) -> bool:
     """Returns whether the described attribute of a tag should be
     whitelisted.
 
@@ -1337,7 +1337,7 @@ ATTRS_WHITELIST = {
 }
 
 
-def clean(user_submitted_html):
+def clean(user_submitted_html: str) -> str:
     """Cleans a piece of user submitted HTML.
 
     This only allows HTML from a restricted set of tags, attrs and styles.
@@ -1361,7 +1361,7 @@ def clean(user_submitted_html):
         user_submitted_html, tags=tag_names, attributes=core_tags, strip=True)
 
 
-def strip_html_tags(html_string):
+def strip_html_tags(html_string: str) -> str:
     """Strips all HTML markup from an HTML string.
 
     Args:
@@ -1374,7 +1374,9 @@ def strip_html_tags(html_string):
     return bleach.clean(html_string, tags=[], attributes={}, strip=True)
 
 
-def get_image_filenames_from_html_strings(html_strings):
+def get_image_filenames_from_html_strings(
+        html_strings: List[str]
+) -> List[str]:
     """Extracts the image filename from the oppia-noninteractive-image and
     oppia-noninteractive-math RTE component from all the html strings
     passed in.
@@ -1403,7 +1405,7 @@ def get_image_filenames_from_html_strings(html_strings):
     return list(set(filenames))
 
 
-def get_rte_components(html_string):
+def get_rte_components(html_string: str) -> List[Dict[str, Any]]:
     """Extracts the RTE components from an HTML string.
 
     Args:
@@ -1421,7 +1423,7 @@ def get_rte_components(html_string):
     for tag_name, tag_attrs in oppia_custom_tag_attrs.items():
         component_tags = soup.find_all(name=tag_name)
         for component_tag in component_tags:
-            component = {'id': tag_name}
+            component = {'id': tag_name} # type: Dict[str, Any]
             customization_args = {}
             for attr in tag_attrs:
                 # Unescape special HTML characters such as '&quot;'.
