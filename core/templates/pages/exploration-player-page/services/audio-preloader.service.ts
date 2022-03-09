@@ -100,8 +100,8 @@ export class AudioPreloaderService {
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
     const languageCode = (
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
-    // If the language code is not selected then there is no audio
-    // file available so we will return empty string array.
+    // If the language code is not selected then there are no audio
+    // files available, so we directly return empty array.
     if (languageCode === null) {
       return [];
     }
