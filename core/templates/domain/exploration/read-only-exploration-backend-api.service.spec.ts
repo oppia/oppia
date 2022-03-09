@@ -30,6 +30,7 @@ describe('Read only exploration backend API service', () => {
     exploration_id: '0',
     is_logged_in: true,
     session_id: 'KERH',
+    draft_change_list_id: 0,
     exploration: {
       init_state_name: 'Introduction',
       param_changes: [],
@@ -208,6 +209,7 @@ describe('Read only exploration backend API service', () => {
       auto_tts_enabled: false,
       correctness_feedback_enabled: false,
       record_playthrough_probability: 1,
+      draft_change_list_id: 0,
       preferred_language_codes: []
     });
 
@@ -230,6 +232,7 @@ describe('Read only exploration backend API service', () => {
       auto_tts_enabled: false,
       correctness_feedback_enabled: false,
       record_playthrough_probability: 1,
+      draft_change_list_id: 0,
       preferred_language_codes: []
     });
     expect(failHandler).not.toHaveBeenCalled();
@@ -249,6 +252,7 @@ describe('Read only exploration backend API service', () => {
       auto_tts_enabled: false,
       correctness_feedback_enabled: false,
       record_playthrough_probability: 1,
+      draft_change_list_id: 0,
       preferred_language_codes: []
     });
     expect(roebas.isCached('0')).toBe(true);

@@ -64,7 +64,7 @@ describe('Post Publish Modal Controller', function() {
   }
   const mockWindow = {
     document: {
-      execCommand: (command) => {}
+      execCommand: (command: string) => {}
     }
   };
   beforeEach(waitForAsync(() => {
@@ -149,5 +149,21 @@ describe('Post Publish Modal Controller', function() {
     expect(addRange).toHaveBeenCalledWith(document.createRange());
     expect(mockWindow.document.execCommand).not.toHaveBeenCalled();
     expect(component.explorationLinkCopied).toBe(true);
+  });
+
+  it('should throw error if selection is null', () => {
+    spyOn(window, 'getSelection').and.returnValue(null);
+
+    let firstChild = document.createElement('div');
+    let lastChild = document.createElement('div');
+    let element = document.createElement('div');
+    element.appendChild(firstChild);
+    element.appendChild(lastChild);
+
+    element.onclick = (event) => {
+      expect(() => component.selectText(event))
+        .toThrowError('Selection cannot be null');
+    };
+    element.click();
   });
 });

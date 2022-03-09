@@ -59,7 +59,7 @@ export interface ExplorationBackendDict {
   'states': StateObjectsBackendDict;
   'title': string;
   'language_code': string;
-  'draft_change_list_id'?: number;
+  'draft_change_list_id': number;
   'version'?: number;
 }
 

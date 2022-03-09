@@ -173,6 +173,7 @@ describe('Exploration object factory', () => {
       draft_changes: [],
       is_version_of_draft_valid: true,
       version: 1,
+      draft_change_list_id: 0,
       correctness_feedback_enabled: false
     };
 
