@@ -100,7 +100,7 @@ class BlogPost:
         self.id = blog_post_id
         self.author_id = author_id
         self.title = title
-        self.content = utils.clean(content) # type: ignore[no-untyped-call]
+        self.content = utils.clean(content)
         self.url_fragment = url_fragment
         self.tags = tags
         self.thumbnail_filename = thumbnail_filename
@@ -357,7 +357,7 @@ class BlogPost:
         Args:
             content: str. The new content of the blog post.
         """
-        self.content = utils.clean(content) # type: ignore[no-untyped-call]
+        self.content = utils.clean(content)
 
     def update_tags(self, tags: List[str]) -> None:
         """Updates the tags list of the blog post.
