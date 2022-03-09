@@ -277,8 +277,8 @@ class CollectionDict(TypedDict):
     nodes: List[CollectionNodeDict]
 
 
-class SerializerCollectionDict(CollectionDict):
-    """Type for the serializer's collection_dict variable."""
+class SerializableCollectionDict(CollectionDict):
+    """Type representing the serializable Collection object."""
 
     version: int
     created_on: str
@@ -286,7 +286,7 @@ class SerializerCollectionDict(CollectionDict):
 
 
 class VersionedCollectionDict(TypedDict):
-    """Type for the argument versioned_collection_contents."""
+    """Dictionary representing versioned Collection object."""
 
     schema_version: int
     collection_contents: CollectionDict
@@ -475,7 +475,7 @@ class Collection:
         # current version of domain object but collection_dict expecting a
         # TypeDict which contain full version of domain object. Thus to avoid
         # MyPy error we added an ignore here.
-        collection_dict: SerializerCollectionDict = self.to_dict() # type: ignore[assignment]
+        collection_dict: SerializableCollectionDict = self.to_dict() # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
         # yaml encoding/decoding of this object does not handle the version
         # parameter.
@@ -743,9 +743,6 @@ class Collection:
             name: _SKILL_ID_PREFIX + str(index)
             for index, name in enumerate(sorted(skill_names))
         }
-        # Here, we're accessing acquired_skills and prerequisite_skills keys
-        # which are not defined in CollectionNodeDict. Thus to prevent MyPy
-        # error, we added an ignore here.
         collection_contents['nodes'] = [{ # type: ignore[typeddict-item]
             'exploration_id': node['exploration_id'],
             'prerequisite_skill_ids': [
@@ -792,10 +789,6 @@ class Collection:
         # errors as we work with the previous versions of the domain objects.
         collection_contents['next_skill_index'] = collection_contents[ # type: ignore[misc]
             'next_skill_id'] # type: ignore[misc]
-        # MyPy doesn't allow key deletion from TypedDict, also we are ignoring
-        # it because we are in the convert function. In _convert_* functions,
-        # we can ignore some MyPy errors as we work with the previous versions
-        # of the domain objects.
         del collection_contents['next_skill_id'] # type: ignore[misc]
 
         return collection_contents
