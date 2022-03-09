@@ -101,8 +101,6 @@ describe('Numeric expression input rules service', () => {
     expect(neirs.MatchesUpToTrivialManipulations(
       '3*10^(-5)', {x: inputString})).toBeTrue();
     expect(neirs.MatchesUpToTrivialManipulations(
-      '3/10^5', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesUpToTrivialManipulations(
       '(10^(-5))*3', {x: inputString})).toBeTrue();
 
     expect(neirs.MatchesUpToTrivialManipulations(
@@ -111,6 +109,8 @@ describe('Numeric expression input rules service', () => {
       '0.00003', {x: inputString})).toBeFalse();
     expect(neirs.MatchesUpToTrivialManipulations(
       '3*10^(-1)*10^(-4)', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '3/10^5', {x: inputString})).toBeFalse();
 
 
     inputString = '1000 + 200 + 30 + 4 + 0.5 + 0.06';

@@ -54,7 +54,7 @@ export class NumericExpressionInputRulesService {
     // loop.
     for (let i = answerTerms.length - 1; i >= 0; i--) {
       for (let j = 0; j < inputTerms.length; j++) {
-        if (mis.termsMatch(answerTerms[i], inputTerms[j])) {
+        if (mis.doTermsMatch(answerTerms[i], inputTerms[j])) {
           answerTerms.splice(i, 1);
           inputTerms.splice(j, 1);
           break;
@@ -88,7 +88,7 @@ export class NumericExpressionInputRulesService {
 
     for (let answerTerm of answerTerms) {
       for (let inputTerm of inputTerms) {
-        if (mis.termsMatch(answerTerm, inputTerm)) {
+        if (mis.doTermsMatch(answerTerm, inputTerm)) {
           return true;
         }
       }
@@ -110,7 +110,7 @@ export class NumericExpressionInputRulesService {
     for (let inputTerm of inputTerms) {
       let matched = false;
       for (let answerTerm of answerTerms) {
-        if (mis.termsMatch(answerTerm, inputTerm)) {
+        if (mis.doTermsMatch(answerTerm, inputTerm)) {
           matched = true;
           break;
         }

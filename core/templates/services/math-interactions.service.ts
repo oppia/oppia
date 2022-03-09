@@ -523,40 +523,27 @@ export class MathInteractionsService {
 
   // The input terms to this function should be the terms split by '+'/'-'
   // from an expression.
-  termsMatch(term1: string, term2: string): boolean {
-    let getConstants = function(expression: string): string[] {
-      let constants = expression.match(/(\d*\.\d+)|(\d+)/g);
-      if (constants !== null) {
-        return constants;
-      }
-      return [];
-    };
-
-    let partsMatch = function(part1: string, part2: string): boolean {
+  doTermsMatch(term1: string, term2: string): boolean {
+    let doPartsMatch = function(part1: string, part2: string): boolean {
+      // Splitting a term by '*' or '/' would give a list of parts.
       // Nerdamer simplifies constant terms automatically so to avoid that,
       // we'll replace all constants with a variable.
-      let usedVariables = nerdamer(part1).variables().concat(
-        nerdamer(part2).variables());
-      let usedVariablesSet = new Set(usedVariables);
+      // Multiple instances of the same constant will be replaced by the same
+      // variable.
 
-      let usedConstants = getConstants(part1).concat(getConstants(part2));
-      // Sorting in reverse by length so that longer strings get replaced before
-      // shorter ones so that overlapping substrings don't cause conflicts.
-      usedConstants.sort((a, b) => b.length - a.length);
+      // Replacing decimals with variables.
+      // Eg: 3.4 + x => const3point4 + x
+      // We need to do this differently since const3.4 would be
+      // an invalid variable.
+      part1 = part1.replace(/(\d+)\.(\d+)/g, 'const$1point$2');
+      part2 = part2.replace(/(\d+)\.(\d+)/g, 'const$1point$2');
 
-      let charCode = 'a'.charCodeAt(0);
-      for (let i = 0; i < usedConstants.length; i++) {
-        let constant = usedConstants[i];
-        if (i === 0 || constant !== usedConstants[i - 1]) {
-          let letter = String.fromCharCode(charCode);
-          while (usedVariablesSet.has(letter)) {
-            letter = String.fromCharCode(++charCode);
-          }
-          part1 = part1.replace(new RegExp(constant, 'g'), letter);
-          part2 = part2.replace(new RegExp(constant, 'g'), letter);
-        }
-        charCode++;
-      }
+      // Replacing integers with variables.
+      // Eg: 2 + x * 4 + 2 => const2 + x * const4 + const2
+      // const2, const4 are considered as variables by nerdamer, just like x.
+      part1 = part1.replace(/(\d+)/g, 'const$1');
+      part2 = part2.replace(/(\d+)/g, 'const$1');
+
       return nerdamer(part1).eq(nerdamer(part2).toString());
     };
 
@@ -571,7 +558,7 @@ export class MathInteractionsService {
     // loop.
     for (let i = partsList1.length - 1; i >= 0; i--) {
       for (let j = 0; j < partsList2.length; j++) {
-        if (partsMatch(partsList1[i], partsList2[j])) {
+        if (doPartsMatch(partsList1[i], partsList2[j])) {
           partsList1.splice(i, 1);
           partsList2.splice(j, 1);
           break;

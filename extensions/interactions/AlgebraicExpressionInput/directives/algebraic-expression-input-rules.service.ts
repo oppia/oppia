@@ -115,7 +115,7 @@ export class AlgebraicExpressionInputRulesService {
 
     for (let answerTerm of answerTerms) {
       for (let inputTerm of inputTerms) {
-        if (mis.termsMatch(answerTerm, inputTerm)) {
+        if (mis.doTermsMatch(answerTerm, inputTerm)) {
           return true;
         }
       }
@@ -140,7 +140,7 @@ export class AlgebraicExpressionInputRulesService {
     for (let inputTerm of inputTerms) {
       let matched = false;
       for (let answerTerm of answerTerms) {
-        if (mis.termsMatch(answerTerm, inputTerm)) {
+        if (mis.doTermsMatch(answerTerm, inputTerm)) {
           matched = true;
           break;
         }
