@@ -57,15 +57,19 @@ angular.module('oppia').component('contributionsAndReview', {
   controller: [
     '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
-    'NgbModal', 'QuestionObjectFactory', 'SkillBackendApiService',
-    'TranslationTopicService', 'UrlInterpolationService', 'UserService',
-    'CORRESPONDING_DELETED_OPPORTUNITY_TEXT', 'IMAGE_CONTEXT',
+    'LocalStorageService', 'NgbModal', 'QuestionObjectFactory',
+    'SkillBackendApiService', 'TranslationTopicService',
+    'UrlInterpolationService', 'UserService',
+    'CORRESPONDING_DELETED_OPPORTUNITY_TEXT',
+    'DEFAULT_OPPORTUNITY_TOPIC_NAME', 'IMAGE_CONTEXT',
     function(
         $filter, $rootScope, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
-        NgbModal, QuestionObjectFactory, SkillBackendApiService,
+        LocalStorageService, NgbModal, QuestionObjectFactory,
+        SkillBackendApiService, TranslationTopicService,
         UrlInterpolationService, UserService,
-        CORRESPONDING_DELETED_OPPORTUNITY_TEXT, IMAGE_CONTEXT) {
+        CORRESPONDING_DELETED_OPPORTUNITY_TEXT,
+        DEFAULT_OPPORTUNITY_TOPIC_NAME, IMAGE_CONTEXT) {
       var ctrl = this;
       ctrl.contributions = {};
 
@@ -355,6 +359,7 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       ctrl.loadContributions = function() {
+        ctrl.topicName = TranslationTopicService.getActiveTopicName();
         if (!ctrl.activeTabType || !ctrl.activeSuggestionType) {
           return new Promise((resolve, reject) => {
             resolve({opportunitiesDicts: [], more: false});
@@ -410,6 +415,21 @@ angular.module('oppia').component('contributionsAndReview', {
             enabled: true
           }
         ];
+
+        var prevSelectedTopicName = (
+          LocalStorageService.getLastSelectedTranslationTopicName());
+
+        ctrl.topicName = DEFAULT_OPPORTUNITY_TOPIC_NAME;
+        TranslationTopicService.setActiveTopicName(ctrl.topicName);
+
+        ContributionOpportunitiesService.getAllTopicNamesAsync()
+          .then(function(topicNames) {
+            if (topicNames.indexOf(prevSelectedTopicName) !== -1) {
+              ctrl.topicName = prevSelectedTopicName;
+              TranslationTopicService.setActiveTopicName(ctrl.topicName);
+            }
+            $rootScope.$applyAsync();
+          });
 
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
