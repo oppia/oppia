@@ -22,6 +22,7 @@ from core import feconf
 from core.domain import email_subscription_services
 from core.domain import subscription_services
 from core.platform import models
+from core.storage.email import gae_models
 from core.tests import test_utils
 
 from typing import Sequence
@@ -101,7 +102,7 @@ class InformSubscribersTest(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
             # Make sure correct email models are stored.
-            all_models: Sequence[email_models.SentEmailModel] = (
+            all_models: Sequence[gae_models.SentEmailModel] = (
                 email_models.SentEmailModel.get_all().fetch())
             self.assertEqual(True, any(
                 model.recipient_id == self.user_id for model in all_models))
