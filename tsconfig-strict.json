@@ -161,7 +161,7 @@
     "core/templates/domain/exploration/RuleObjectFactory.ts",
     "core/templates/domain/exploration/RuleObjectFactorySpec.ts",
     "core/templates/domain/exploration/solution.model.ts",
-    "core/templates/domain/exploration/SolutionObjectFactorySpec.ts",
+    "core/templates/domain/exploration/solution.model.spec.ts",
     "core/templates/domain/exploration/StatesObjectFactory.ts",
     "core/templates/domain/exploration/SubtitledUnicodeObjectFactory.ts",
     "core/templates/domain/exploration/SubtitledUnicodeObjectFactorySpec.ts",
