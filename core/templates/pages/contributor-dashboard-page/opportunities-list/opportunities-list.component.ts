@@ -52,7 +52,7 @@ export class OpportunitiesListComponent {
   activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
   more: boolean = false;
-  isOnLastPage: boolean = true;
+  userIsOnLastPage: boolean = true;
 
   constructor(
     private zone: NgZone,
@@ -87,7 +87,7 @@ export class OpportunitiesListComponent {
           });
           this.visibleOpportunities = this.opportunities.slice(
             0, this.OPPORTUNITIES_PAGE_SIZE);
-          this.isOnLastPage = this.calculateIsOnLastPage(
+          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
             this.opportunities,
             this.OPPORTUNITIES_PAGE_SIZE,
             this.activePageNumber,
@@ -110,7 +110,7 @@ export class OpportunitiesListComponent {
         this.more = more;
         this.visibleOpportunities = this.opportunities.slice(
           0, this.OPPORTUNITIES_PAGE_SIZE);
-        this.isOnLastPage = this.calculateIsOnLastPage(
+        this.userIsOnLastPage = this.calculateUserIsOnLastPage(
           this.opportunities,
           this.OPPORTUNITIES_PAGE_SIZE,
           this.activePageNumber,
@@ -134,7 +134,7 @@ export class OpportunitiesListComponent {
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
-          this.isOnLastPage = this.calculateIsOnLastPage(
+          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
             this.opportunities,
             this.OPPORTUNITIES_PAGE_SIZE,
             pageNumber,
@@ -148,7 +148,7 @@ export class OpportunitiesListComponent {
     this.activePageNumber = pageNumber;
   }
 
-  calculateIsOnLastPage(
+  calculateUserIsOnLastPage(
       opportunities: ExplorationOpportunity[],
       pageSize: number,
       activePageNumber: number,
