@@ -419,7 +419,8 @@ angular.module('oppia').component('contributionsAndReview', {
           }
         ];
 
-        TranslationTopicService.setActiveTopicName(DEFAULT_OPPORTUNITY_TOPIC_NAME);
+        TranslationTopicService.setActiveTopicName(
+          DEFAULT_OPPORTUNITY_TOPIC_NAME);
 
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
