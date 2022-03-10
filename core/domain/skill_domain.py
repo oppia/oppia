@@ -1780,15 +1780,18 @@ class UserSkillMastery:
 
 class CategorizedSkills:
     """Domain object for representing categorized skills' ids and
-    descriptions.
+    descriptions. Here, 'categorized skill' means that the skill is assigned
+    to some topic or subtopic. If a skill is assigned to a topic but not a
+    subtopic, then it is termed as 'uncategorized' which also comes under
+    CategorizedSkills because it is atleast assigned to a topic.
 
     Attributes:
         categorized_skills: dict[str, dict[str, list(ShortSkillSummary)].
             The parent dict contains keys as topic names. The children dicts
-            contain keys as subtopic names and values as list of short skill
+            contain keys as subtopic titles and values as list of short skill
             summaries. An extra key called 'uncategorized' is present in every
             child dict to represent the skills that are not assigned to any
-            subtopic.
+            subtopic but are assigned to the parent topic.
     """
 
     def __init__(self):
@@ -1796,8 +1799,8 @@ class CategorizedSkills:
         self.categorized_skills = {}
 
     def add_topic(self, topic_name, subtopic_titles):
-        """Adds a topic to the categorized skills and initializes its value
-        as an empty dict.
+        """Adds a topic to the categorized skills and initializes its
+        'uncategorized' and subtopic skills as empty lists.
 
         Args:
             topic_name: str. The name of the topic.
@@ -1856,15 +1859,15 @@ class CategorizedSkills:
                 'Topic name \'%s\' is not added.' % topic_name)
 
     def require_subtopic_title_to_be_added(self, topic_name, subtopic_title):
-        """Checks whether the given subtopic name is added to the
+        """Checks whether the given subtopic title is added to the
         categorized skills dict under the given topic name.
 
         Args:
             topic_name: str. The name of the topic.
-            subtopic_title: str. The name of the subtopic.
+            subtopic_title: str. The title of the subtopic.
 
         Raises:
-            ValidationError. Subtopic name is not added.
+            ValidationError. Subtopic title is not added.
         """
         if not subtopic_title in self.categorized_skills[topic_name]:
             raise utils.ValidationError(
@@ -1885,8 +1888,10 @@ class CategorizedSkills:
 
 
 class ShortSkillSummary:
-    """Domain object for a short skill summary. It is similar to SkillSummary
-    but has fewer fields.
+    """Domain object for a short skill summary. It contains the id and
+    description of the skill. It is different from the SkillSummary in the
+    sense that the later contains many other properties of the skill along with
+    the skill id and description.
     """
 
     def __init__(self, skill_id, skill_description):
