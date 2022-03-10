@@ -49,6 +49,7 @@ describe('Contributions and review component', function() {
   var skillBackendApiService = null;
   var skillObjectFactory = null;
   var userService = null;
+  var getUserCreatedTranslationSuggestionsAsyncSpy = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -93,102 +94,108 @@ describe('Contributions and review component', function() {
         contributionAndReviewService,
         'getUserCreatedTranslationSuggestionsAsync').and.returnValue(
         Promise.resolve({
-          suggestion_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_1',
-              target_id: '1',
-              suggestion_type: 'translate_content',
-              change: {
-                content_html: 'Translation',
-                translation_html: 'Tradução'
+          suggestionIdToDetails: {
+            suggestion_1: {
+              suggestion: {
+                suggestion_id: 'suggestion_1',
+                target_id: '1',
+                suggestion_type: 'translate_content',
+                change: {
+                  content_html: 'Translation',
+                  translation_html: 'Tradução'
+                },
+                status: 'review'
               },
-              status: 'review'
-            },
-            details: 'skill_1'
-          }
+              details: 'skill_1'
+            }
+          },
+          more: false
         }));
-      spyOn(
+      getUserCreatedTranslationSuggestionsAsyncSpy = spyOn(
         contributionAndReviewService, 'getReviewableQuestionSuggestionsAsync')
         .and.returnValue(Promise.resolve({
-          suggestion_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_1',
-              target_id: '1',
-              suggestion_type: 'translate_content',
-              change: {
-                skill_id: 'skill1',
-                question_dict: {
-                  id: '1',
-                  question_state_data: {
-                    content: {
-                      html: 'Question 1',
-                      content_id: 'content_1'
-                    },
-                    interaction: {
-                      answer_groups: [{
-                        outcome: {
-                          dest: 'outcome 1',
-                          feedback: {
-                            content_id: 'content_5',
-                            html: ''
+          suggestionIdToDetails: {
+            suggestion_1: {
+              suggestion: {
+                suggestion_id: 'suggestion_1',
+                target_id: '1',
+                suggestion_type: 'translate_content',
+                change: {
+                  skill_id: 'skill1',
+                  question_dict: {
+                    id: '1',
+                    question_state_data: {
+                      content: {
+                        html: 'Question 1',
+                        content_id: 'content_1'
+                      },
+                      interaction: {
+                        answer_groups: [{
+                          outcome: {
+                            dest: 'outcome 1',
+                            feedback: {
+                              content_id: 'content_5',
+                              html: ''
+                            },
+                            labelled_as_correct: true,
+                            param_changes: [],
+                            refresher_exploration_id: null
                           },
-                          labelled_as_correct: true,
-                          param_changes: [],
-                          refresher_exploration_id: null
+                          rule_specs: [],
+                        }],
+                        confirmed_unclassified_answers: [],
+                        customization_args: {
+                          placeholder: {
+                            value: {
+                              content_id: 'ca_placeholder_0',
+                              unicode_str: ''
+                            }
+                          },
+                          rows: { value: 1 }
                         },
-                        rule_specs: [],
-                      }],
-                      confirmed_unclassified_answers: [],
-                      customization_args: {
-                        placeholder: {
-                          value: {
-                            content_id: 'ca_placeholder_0',
-                            unicode_str: ''
+                        default_outcome: {
+                          dest: null,
+                          feedback: {
+                            html: 'Correct Answer',
+                            content_id: 'content_2'
+                          },
+                          param_changes: [],
+                          labelled_as_correct: true
+                        },
+                        hints: [{
+                          hint_content: {
+                            html: 'Hint 1',
+                            content_id: 'content_3'
+                          }
+                        }],
+                        solution: {
+                          correct_answer: 'This is the correct answer',
+                          answer_is_exclusive: false,
+                          explanation: {
+                            html: 'Solution explanation',
+                            content_id: 'content_4'
                           }
                         },
-                        rows: { value: 1 }
+                        id: 'TextInput'
                       },
-                      default_outcome: {
-                        dest: null,
-                        feedback: {
-                          html: 'Correct Answer',
-                          content_id: 'content_2'
-                        },
-                        param_changes: [],
-                        labelled_as_correct: true
+                      param_changes: [],
+                      recorded_voiceovers: {
+                        voiceovers_mapping: {}
                       },
-                      hints: [{
-                        hint_content: {
-                          html: 'Hint 1',
-                          content_id: 'content_3'
-                        }
-                      }],
-                      solution: {
-                        correct_answer: 'This is the correct answer',
-                        answer_is_exclusive: false,
-                        explanation: {
-                          html: 'Solution explanation',
-                          content_id: 'content_4'
-                        }
+                      written_translations: {
+                        translations_mapping: {}
                       },
-                      id: 'TextInput'
                     },
-                    param_changes: [],
-                    recorded_voiceovers: {
-                      voiceovers_mapping: {}
-                    },
-                    written_translations: {
-                      translations_mapping: {}
-                    },
-                  },
-                }
+                  }
+                },
+                status: 'review'
               },
-              status: 'review'
-            },
-            details: {
-              skill_description: 'Skill description'
+              details: {
+                skill_description: 'Skill description'
+              }
             }
-          }
+          },
+          more: false
         }));
 
       $scope = $rootScope.$new();
@@ -293,6 +300,9 @@ describe('Contributions and review component', function() {
           }]);
           expect(more).toEqual(false);
         });
+
+        getUserCreatedTranslationSuggestionsAsyncSpy
+          .and.returnValue(Promise.resolve({}));
 
         // Subsequent calls should return the next batch of results.
         ctrl.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
@@ -444,83 +454,86 @@ describe('Contributions and review component', function() {
       spyOn(
         contributionAndReviewService, 'getUserCreatedQuestionSuggestionsAsync')
         .and.returnValue($q.resolve({
-          suggestion_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_1',
-              target_id: '1',
-              suggestion_type: 'add_question',
-              change: {
-                skill_id: 'skill1',
-                question_dict: {
-                  id: '1',
-                  question_state_data: {
-                    content: {
-                      html: 'Question 1',
-                      content_id: 'content_1'
-                    },
-                    interaction: {
-                      answer_groups: [{
-                        outcome: {
-                          dest: 'outcome 1',
-                          feedback: {
-                            content_id: 'content_5',
-                            html: ''
+          suggestionIdToDetails: {
+            suggestion_1: {
+              suggestion: {
+                suggestion_id: 'suggestion_1',
+                target_id: '1',
+                suggestion_type: 'add_question',
+                change: {
+                  skill_id: 'skill1',
+                  question_dict: {
+                    id: '1',
+                    question_state_data: {
+                      content: {
+                        html: 'Question 1',
+                        content_id: 'content_1'
+                      },
+                      interaction: {
+                        answer_groups: [{
+                          outcome: {
+                            dest: 'outcome 1',
+                            feedback: {
+                              content_id: 'content_5',
+                              html: ''
+                            },
+                            labelled_as_correct: true,
+                            param_changes: [],
+                            refresher_exploration_id: null
                           },
-                          labelled_as_correct: true,
-                          param_changes: [],
-                          refresher_exploration_id: null
+                          rule_specs: [],
+                        }],
+                        confirmed_unclassified_answers: [],
+                        customization_args: {
+                          placeholder: {
+                            value: {
+                              content_id: 'ca_placeholder_0',
+                              unicode_str: ''
+                            }
+                          },
+                          rows: { value: 1 }
                         },
-                        rule_specs: [],
-                      }],
-                      confirmed_unclassified_answers: [],
-                      customization_args: {
-                        placeholder: {
-                          value: {
-                            content_id: 'ca_placeholder_0',
-                            unicode_str: ''
+                        default_outcome: {
+                          dest: null,
+                          feedback: {
+                            html: 'Correct Answer',
+                            content_id: 'content_2'
+                          },
+                          param_changes: [],
+                          labelled_as_correct: true
+                        },
+                        hints: [{
+                          hint_content: {
+                            html: 'Hint 1',
+                            content_id: 'content_3'
+                          }
+                        }],
+                        solution: {
+                          correct_answer: 'This is the correct answer',
+                          answer_is_exclusive: false,
+                          explanation: {
+                            html: 'Solution explanation',
+                            content_id: 'content_4'
                           }
                         },
-                        rows: { value: 1 }
+                        id: 'TextInput'
                       },
-                      default_outcome: {
-                        dest: null,
-                        feedback: {
-                          html: 'Correct Answer',
-                          content_id: 'content_2'
-                        },
-                        param_changes: [],
-                        labelled_as_correct: true
+                      param_changes: [],
+                      recorded_voiceovers: {
+                        voiceovers_mapping: {}
                       },
-                      hints: [{
-                        hint_content: {
-                          html: 'Hint 1',
-                          content_id: 'content_3'
-                        }
-                      }],
-                      solution: {
-                        correct_answer: 'This is the correct answer',
-                        answer_is_exclusive: false,
-                        explanation: {
-                          html: 'Solution explanation',
-                          content_id: 'content_4'
-                        }
+                      written_translations: {
+                        translations_mapping: {}
                       },
-                      id: 'TextInput'
                     },
-                    param_changes: [],
-                    recorded_voiceovers: {
-                      voiceovers_mapping: {}
-                    },
-                    written_translations: {
-                      translations_mapping: {}
-                    },
-                  },
-                }
+                  }
+                },
+                status: 'accepted'
               },
-              status: 'accepted'
-            },
-            details: null
-          }
+              details: null
+            }
+          },
+          more: false
         }));
       spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
         $q.resolve({
@@ -557,19 +570,22 @@ describe('Contributions and review component', function() {
         contributionAndReviewService,
         'getUserCreatedTranslationSuggestionsAsync')
         .and.returnValue($q.resolve({
-          suggestion_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_1',
-              target_id: '1',
-              suggestion_type: 'translate_content',
-              change: {
-                content_html: 'Translation',
-                translation_html: 'Tradução'
+          suggestionIdToDetails: {
+            suggestion_1: {
+              suggestion: {
+                suggestion_id: 'suggestion_1',
+                target_id: '1',
+                suggestion_type: 'translate_content',
+                change: {
+                  content_html: 'Translation',
+                  translation_html: 'Tradução'
+                },
+                status: 'review'
               },
-              status: 'review'
-            },
-            details: null
-          }
+              details: null
+            }
+          },
+          more: false
         }));
       spyOn(
         contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
@@ -1084,102 +1100,108 @@ describe('Contributions and review component', function() {
         contributionAndReviewService,
         'getUserCreatedTranslationSuggestionsAsync').and.returnValue(
         Promise.resolve({
-          suggestion_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_1',
-              target_id: '1',
-              suggestion_type: 'translate_content',
-              change: {
-                content_html: 'Translation',
-                translation_html: ['Tradução']
+          suggestionIdToDetails: {
+            suggestion_1: {
+              suggestion: {
+                suggestion_id: 'suggestion_1',
+                target_id: '1',
+                suggestion_type: 'translate_content',
+                change: {
+                  content_html: 'Translation',
+                  translation_html: ['Tradução']
+                },
+                status: 'review'
               },
-              status: 'review'
-            },
-            details: null
-          }
+              details: null
+            }
+          },
+          more: false
         }));
       spyOn(
         contributionAndReviewService, 'getReviewableQuestionSuggestionsAsync')
         .and.returnValue(Promise.resolve({
-          suggestion_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_1',
-              target_id: '1',
-              suggestion_type: 'translate_content',
-              change: {
-                skill_id: 'skill1',
-                question_dict: {
-                  id: '1',
-                  question_state_data: {
-                    content: {
-                      html: 'Question 1',
-                      content_id: 'content_1'
-                    },
-                    interaction: {
-                      answer_groups: [{
-                        outcome: {
-                          dest: 'outcome 1',
-                          feedback: {
-                            content_id: 'content_5',
-                            html: ''
+          suggestionIdToDetails: {
+            suggestion_1: {
+              suggestion: {
+                suggestion_id: 'suggestion_1',
+                target_id: '1',
+                suggestion_type: 'translate_content',
+                change: {
+                  skill_id: 'skill1',
+                  question_dict: {
+                    id: '1',
+                    question_state_data: {
+                      content: {
+                        html: 'Question 1',
+                        content_id: 'content_1'
+                      },
+                      interaction: {
+                        answer_groups: [{
+                          outcome: {
+                            dest: 'outcome 1',
+                            feedback: {
+                              content_id: 'content_5',
+                              html: ''
+                            },
+                            labelled_as_correct: true,
+                            param_changes: [],
+                            refresher_exploration_id: null
                           },
-                          labelled_as_correct: true,
-                          param_changes: [],
-                          refresher_exploration_id: null
+                          rule_specs: [],
+                        }],
+                        confirmed_unclassified_answers: [],
+                        customization_args: {
+                          placeholder: {
+                            value: {
+                              content_id: 'ca_placeholder_0',
+                              unicode_str: ''
+                            }
+                          },
+                          rows: { value: 1 }
                         },
-                        rule_specs: [],
-                      }],
-                      confirmed_unclassified_answers: [],
-                      customization_args: {
-                        placeholder: {
-                          value: {
-                            content_id: 'ca_placeholder_0',
-                            unicode_str: ''
+                        default_outcome: {
+                          dest: null,
+                          feedback: {
+                            html: 'Correct Answer',
+                            content_id: 'content_2'
+                          },
+                          param_changes: [],
+                          labelled_as_correct: true
+                        },
+                        hints: [{
+                          hint_content: {
+                            html: 'Hint 1',
+                            content_id: 'content_3'
+                          }
+                        }],
+                        solution: {
+                          correct_answer: 'This is the correct answer',
+                          answer_is_exclusive: false,
+                          explanation: {
+                            html: 'Solution explanation',
+                            content_id: 'content_4'
                           }
                         },
-                        rows: { value: 1 }
+                        id: 'TextInput'
                       },
-                      default_outcome: {
-                        dest: null,
-                        feedback: {
-                          html: 'Correct Answer',
-                          content_id: 'content_2'
-                        },
-                        param_changes: [],
-                        labelled_as_correct: true
+                      param_changes: [],
+                      recorded_voiceovers: {
+                        voiceovers_mapping: {}
                       },
-                      hints: [{
-                        hint_content: {
-                          html: 'Hint 1',
-                          content_id: 'content_3'
-                        }
-                      }],
-                      solution: {
-                        correct_answer: 'This is the correct answer',
-                        answer_is_exclusive: false,
-                        explanation: {
-                          html: 'Solution explanation',
-                          content_id: 'content_4'
-                        }
+                      written_translations: {
+                        translations_mapping: {}
                       },
-                      id: 'TextInput'
                     },
-                    param_changes: [],
-                    recorded_voiceovers: {
-                      voiceovers_mapping: {}
-                    },
-                    written_translations: {
-                      translations_mapping: {}
-                    },
-                  },
-                }
+                  }
+                },
+                status: 'review'
               },
-              status: 'review'
-            },
-            details: {
-              skill_description: 'Skill description'
+              details: {
+                skill_description: 'Skill description'
+              }
             }
-          }
+          },
+          more: false
         }));
 
       $scope = $rootScope.$new();
