@@ -215,6 +215,8 @@ NOT_FULLY_COVERED_FILES = [
     'core/python_utils.py',
     'core/python_utils_test.py',
     'extensions/',
+    'scripts/check_if_pr_is_low_risk.py',
+    'scripts/check_if_pr_is_low_risk_test.py',
     'scripts/clean.py',
     'scripts/clean_test.py',
     'scripts/common.py',
