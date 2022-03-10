@@ -27,9 +27,14 @@ from core.tests import test_utils
 
 from . import concurrent_task_utils
 
+import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+
+OBJECT = builtins.object
+
 
 def test_function(unused_arg):
-    return python_utils.OBJECT
+    return OBJECT
 
 
 class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
