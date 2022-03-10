@@ -140,7 +140,7 @@ var ListEditor = function(elem) {
         elem.all(
           by.css(
             '.protractor-test-schema-based-list-editor-table-data'))
-          .get(listLength - 1));
+          .get(listLength));
     }
   };
   var deleteItem = async function(index) {
