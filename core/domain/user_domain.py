@@ -47,9 +47,9 @@ class UserSettingsDict(TypedDict):
     default_dashboard: str
     creator_dashboard_display_pref: str
     user_bio: str
-    subject_interests: Optional[List[str]]
+    subject_interests: List[str]
     first_contribution_msec: Optional[float]
-    preferred_language_codes: Optional[List[str]]
+    preferred_language_codes: List[str]
     preferred_site_language_code: Optional[str]
     preferred_audio_language_code: Optional[str]
     pin: Optional[str]
