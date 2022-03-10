@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import ast
 import base64
 import binascii
 import collections
@@ -1279,3 +1280,28 @@ def url_open(source_url: str) -> str:
     # The type ignore is needed, because typestubs define the return type
     # of 'urlopen' as 'Any' which is wrong.
     return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return]
+
+
+def get_args_of_function_node(
+    function_node: ast.FunctionDef, args_to_ignore: List[str]) -> List[str]:
+    """Extracts the arguments from a function definition.
+
+    Args:
+        function_node: ast.FunctionDef. Represents a function.
+        args_to_ignore: list(str). Ignore these arguments in a function
+            definition.
+
+    Returns:
+        list(str). The args for a function as listed in the function
+        definition.
+    """
+    try:
+        return [
+            a.arg
+            for a in function_node.args.args
+            if a.arg not in args_to_ignore
+        ]
+    except AttributeError:
+        return [
+            a.id for a in function_node.args.args if a.id not in args_to_ignore
+        ]

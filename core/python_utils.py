@@ -31,30 +31,6 @@ _CERTIFI_PATH = os.path.join(
 sys.path.insert(0, _CERTIFI_PATH)
 
 
-def get_args_of_function_node(function_node, args_to_ignore):
-    """Extracts the arguments from a function definition.
-
-    Args:
-        function_node: ast.FunctionDef. Represents a function.
-        args_to_ignore: list(str). Ignore these arguments in a function
-            definition.
-
-    Returns:
-        list(str). The args for a function as listed in the function
-        definition.
-    """
-    try:
-        return [
-            a.arg
-            for a in function_node.args.args
-            if a.arg not in args_to_ignore
-        ]
-    except AttributeError:
-        return [
-            a.id for a in function_node.args.args if a.id not in args_to_ignore
-        ]
-
-
 def get_package_file_contents(package: str, filepath: str) -> str:
     """Open file and return its contents. This needs to be used for files that
     are loaded by the Python code directly, like constants.ts or

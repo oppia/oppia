@@ -22,7 +22,6 @@ import builtins
 import threading
 import time
 
-from core import python_utils
 from core.tests import test_utils
 
 from . import concurrent_task_utils

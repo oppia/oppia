@@ -23,7 +23,7 @@ import os
 import re
 import sys
 
-from core import python_utils
+from core import utils as util
 from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -236,7 +236,7 @@ class ASTDocStringChecker:
         """
         # Ignore self and cls args.
         args_to_ignore = ['self', 'cls']
-        return python_utils.get_args_of_function_node(
+        return util.get_args_of_function_node(
             function_node, args_to_ignore)
 
     @classmethod
