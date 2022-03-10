@@ -177,3 +177,120 @@ class MigrateTopicJob(base_jobs.JobBase):
         return updated_topic_summary_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the topic migration.
+
+        Returns:
+            PCollection. A PCollection of results from the topic migration.
+        """
+
+        unmigrated_topic_models = (
+            self.pipeline
+            | 'Get all non-deleted topic models' >> (
+                ndb_io.GetModels(topic_models.TopicModel.get_all()))
+            # Pylint disable is needed becasue pylint is not able to correclty
+            # detect that the value is passed through the pipe.
+            | 'Add topic keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda topic_model: topic_model.id)
+        )
+        topic_summary_models = (
+            self.pipeline
+            | 'Get all non-deleted topic summary models' >> (
+                ndb_io.GetModels(topic_models.TopicSummaryModel.get_all()))
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add topic summary keys' >> beam,.WithKeys(
+                lambda topic_summary_model: topic_summary_model.id)
+        )
+
+        migrated_topic_results = (
+            unmigrated_topic_models
+            | 'Transform and migrate model' >> beam.MapTuple(
+                self._migrate_topic)
+        )
+        migrated_topics = (
+            migrated_topic_results
+            | 'Filter oks' >> beam.Filter(
+                lambda result_item: result_item.is_ok())
+            | 'Unwrap ok' >> beam.Map(
+                lambda result_item: result_item.unwrap())
+        )
+        migrated_topic_job_run_results = (
+            migrated_topic_results
+            | 'Generates results for migration' >> (
+                job_result_transforms.ResultsToJobRunResults('TOPIC PROCESSED'))
+        )
+
+        topic_changes = (
+            unmigrated_topic_models
+            | 'Generates topic changes' >> beam.FlatMapTuple(
+                self._generate_topic_changes)
+        )
+
+        topic_objects_list = (
+            {
+                'topic_model': unmigrated_topic_models,
+                'topic_summary_model': topic_summary_models,
+                'topic': migrated_topics,
+                'topic_changes': topic_changes
+            }
+            | 'Merge objects' >> beam.CoGroupByKey()
+            | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Remove unmigrated topics' >> beam.Filter(
+                lambda x: len(x['topic_changes']) > 0 and len(x['topics']) > 0)
+            | 'Reorganize the topic objects' >> beam.Map(lambda objects: {
+                    'topic_model': objects['topic_model'][0],
+                    'topic_summary_model': objects['topic_summary_model'][0],
+                    'topic': objects['topic'][0],
+                    'topic_changes': objects['topic_changes']
+                })
+        )
+
+        topic_objects_list_job_run_results = (
+            topic_objects_list
+            | 'Transform topic objects into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOPIC_MIGRATED'))
+        )
+
+        cache_deletion_job_run_results = (
+            topic_objects_list
+            | 'Delete topic from cache' >> beam.Map(
+                lambda topic_object: self._delete_topic_from_cache(
+                    topic_object['topic']))
+            | 'Generate result for cache deletion' >> (
+                job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
+        )
+
+        topic_models_to_put = (
+            topic_objects_list
+            | 'Generate topic models to put' >> beam.FlatMap(
+                lambda topic_objects: self._update_topic(
+                    topic_objects['topic_model'],
+                    topic_objects['topic'],
+                    topic_objects['topic_changes'],
+                ))
+        )
+
+        topic_summary_model_to_put = (
+            topic_objects_list
+            | 'Generate topic summary to put' >> beam.Map(
+                lambda topic_objects: self._update_topic_summary(
+                    topic_objects['topic'],
+                    topic_obejcts['topic_summary_model']
+                ))
+        )
+
+        unused_put_results = (
+            (topic_models_to_put, topic_summary_model_to_put)
+            | 'Merge models' >> beam.Flatten()
+            | 'Put models into datastore' >> ndb_io.PutModels()
+        )
+
+        return (
+            (
+                cache_deletion_job_run_results,
+                migrated_topic_job_run_results,
+                topic_objects_list_job_run_results
+            )
+            | beam.Flatten()
+        )
