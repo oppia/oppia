@@ -88,7 +88,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
     # We have ignored [override] here because the signature of this method
     # doesn't match with user_domain.ModifiableUserData.from_dict().
     @classmethod
-    def from_dict( # type: ignore[override]
+    def from_dict(  # type: ignore[override]
         cls, modifiable_user_data_dict: MockModifiableUserDataDict
     ) -> MockModifiableUserData:
         return MockModifiableUserData(
@@ -116,7 +116,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
     # We have ignored [override] here because the signature of this method
     # doesn't match with user_domain.ModifiableUserData.from_raw_dict().
     @classmethod
-    def from_raw_dict( # type: ignore[override]
+    def from_raw_dict(  # type: ignore[override]
         cls, raw_user_data_dict: MockModifiableUserDataDict
     ) -> MockModifiableUserData:
         data_schema_version = raw_user_data_dict.get('schema_version')
@@ -134,10 +134,10 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(UserSettingsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
-        self.owner = user_services.get_user_actions_info(self.owner_id) # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner = user_services.get_user_actions_info(self.owner_id)  # type: ignore[no-untyped-call]
 
-        self.user_settings = user_services.get_user_settings(self.owner_id) # type: ignore[no-untyped-call]
+        self.user_settings = user_services.get_user_settings(self.owner_id)  # type: ignore[no-untyped-call]
         self.user_settings.validate()
         self.assertEqual(self.owner.roles, [feconf.ROLE_ID_FULL_USER])
         user_data_dict: user_domain.RawUserDataDict = {
@@ -167,19 +167,19 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.user_settings.user_id = 'uid_%sA' % ('a' * 31)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
 
         self.user_settings.user_id = 'uid_%s' % ('a' * 31)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
 
         self.user_settings.user_id = 'a' * 36
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
@@ -190,7 +190,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.roles = ['FULL_USER']
         self.user_settings.banned = True
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected roles for banned user to be empty'):
             self.user_settings.validate()
@@ -200,7 +200,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
     ) -> None:
         self.user_settings.roles = ['FULL_USER', 'FULL_USER', 'TOPIC_MANAGER']
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Roles contains duplicate values:'):
             self.user_settings.validate()
 
@@ -209,7 +209,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
     ) -> None:
         self.user_settings.roles = ['TOPIC_MANAGER']
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected roles to contains one default role.'):
             self.user_settings.validate()
@@ -221,7 +221,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             (feconf.FULL_USER_PIN_LENGTH, feconf.PROFILE_USER_PIN_LENGTH)
         )
         for pin in invalid_pin_values_list:
-            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 utils.ValidationError, error_msg
             ):
                 self.user_settings.pin = pin
@@ -241,7 +241,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         valid_pin_values_list = ['AbC', '123A}', '1!2', 'AB!', '[123]']
         error_msg = 'Only numeric characters are allowed in PIN'
         for pin in valid_pin_values_list:
-            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 utils.ValidationError, error_msg
             ):
                 self.user_settings.pin = pin
@@ -249,20 +249,20 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_validate_empty_user_id_raises_exception(self) -> None:
         self.user_settings.user_id = ''
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'No user id specified.'
         ):
             self.user_settings.validate()
 
     def test_validate_invalid_role_name_raises_exception(self) -> None:
         self.user_settings.roles = ['invalid_role']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Role invalid_role does not exist.'):
             self.user_settings.validate()
 
     def test_validation_none__email_raises_error(self) -> None:
         self.user_settings.email = None
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'No user email specified.'):
             self.user_settings.validate()
 
@@ -271,7 +271,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'testemail.com', '@testemail.com', 'testemail.com@']
         for email in invalid_emails_list:
             self.user_settings.email = email
-            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 utils.ValidationError, 'Invalid email address: %s' % email
             ):
                 self.user_settings.validate()
@@ -281,7 +281,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
     ) -> None:
         self.user_settings.creator_dashboard_display_pref = (
             'invalid_creator_dashboard_display_pref')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'invalid_creator_dashboard_display_pref is not a valid '
             'value for the dashboard display preferences.'
@@ -294,45 +294,45 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.modifiable_user_data.user_id = self.owner_id
         self.modifiable_user_data.pin = '12345'
         self.modifiable_user_data.display_alias = 'temp_name'
-        user_services.update_multiple_users_data([self.modifiable_user_data]) # type: ignore[no-untyped-call]
+        user_services.update_multiple_users_data([self.modifiable_user_data])  # type: ignore[no-untyped-call]
 
-        auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
+        auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         profile_pin = '123'
         error_msg = 'Expected display_alias to be a string, received'
-        with self.assertRaisesRegex(utils.ValidationError, error_msg): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, error_msg):  # type: ignore[no-untyped-call]
             self.modifiable_new_user_data.display_alias = ''
             self.modifiable_new_user_data.pin = profile_pin
-            user_services.create_new_profiles( # type: ignore[no-untyped-call]
+            user_services.create_new_profiles(  # type: ignore[no-untyped-call]
                 auth_id, self.OWNER_EMAIL, [self.modifiable_new_user_data]
             )
 
     def test_has_not_fully_registered_for_guest_user_is_false(
         self
     ) -> None:
-        self.assertFalse(user_services.has_fully_registered_account(None)) # type: ignore[no-untyped-call]
+        self.assertFalse(user_services.has_fully_registered_account(None))  # type: ignore[no-untyped-call]
 
     def test_create_new_user_with_existing_auth_id_raises_error(self) -> None:
         user_id = self.user_settings.user_id
-        user_auth_id = auth_services.get_auth_id_from_user_id(user_id) # type: ignore[no-untyped-call]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        user_auth_id = auth_services.get_auth_id_from_user_id(user_id)  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'User %s already exists for auth_id %s.'
             % (user_id, user_auth_id)
         ):
-            user_services.create_new_user(user_auth_id, self.OWNER_EMAIL) # type: ignore[no-untyped-call]
+            user_services.create_new_user(user_auth_id, self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
 
     def test_cannot_set_existing_username(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Sorry, the username \"%s\" is already taken! Please pick '
             'a different one.' % self.OWNER_USERNAME
         ):
-            user_services.set_username(self.owner_id, self.OWNER_USERNAME) # type: ignore[no-untyped-call]
+            user_services.set_username(self.owner_id, self.OWNER_USERNAME)  # type: ignore[no-untyped-call]
 
     def test_cannot_add_user_role_with_invalid_role(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Role invalid_role does not exist.'
         ):
-            user_services.add_user_role(self.owner_id, 'invalid_role') # type: ignore[no-untyped-call]
+            user_services.add_user_role(self.owner_id, 'invalid_role')  # type: ignore[no-untyped-call]
 
     def test_cannot_get_human_readable_user_ids_with_invalid_user_ids(
         self
@@ -345,11 +345,11 @@ class UserSettingsTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_user_not_found = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        assert_raises_user_not_found = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'User not found.')
 
         with logging_swap, assert_raises_user_not_found:
-            user_services.get_human_readable_user_ids(['invalid_user_id']) # type: ignore[no-untyped-call]
+            user_services.get_human_readable_user_ids(['invalid_user_id'])  # type: ignore[no-untyped-call]
 
         self.assertEqual(
             observed_log_messages,
@@ -366,7 +366,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             username=''
         ).put()
 
-        user_ids = user_services.get_human_readable_user_ids( # type: ignore[no-untyped-call]
+        user_ids = user_services.get_human_readable_user_ids(  # type: ignore[no-untyped-call]
             [self.owner_id, feconf.SYSTEM_COMMITTER_ID, 'unregistered_user_id'])
         expected_user_ids = [
             'owner', 'admin',
@@ -377,11 +377,11 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_get_human_readable_user_ids_with_nonexistent_id_non_strict_passes(
         self
     ) -> None:
-        user_id = user_services.create_new_user( # type: ignore[no-untyped-call]
+        user_id = user_services.create_new_user(  # type: ignore[no-untyped-call]
             'auth_id', 'user@example.com').user_id
-        user_services.set_username(user_id, 'username') # type: ignore[no-untyped-call]
-        user_services.mark_user_for_deletion(user_id) # type: ignore[no-untyped-call]
-        human_readable_user_ids = user_services.get_human_readable_user_ids( # type: ignore[no-untyped-call]
+        user_services.set_username(user_id, 'username')  # type: ignore[no-untyped-call]
+        user_services.mark_user_for_deletion(user_id)  # type: ignore[no-untyped-call]
+        human_readable_user_ids = user_services.get_human_readable_user_ids(  # type: ignore[no-untyped-call]
             [user_id], strict=False)
 
         self.assertEqual(
@@ -391,14 +391,14 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_created_on_gets_updated_correctly(self) -> None:
         # created_on should not be updated upon updating other attributes of
         # the user settings model.
-        user_settings = user_services.create_new_user( # type: ignore[no-untyped-call]
+        user_settings = user_services.create_new_user(  # type: ignore[no-untyped-call]
             'auth_id', 'user@example.com')
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
         time_of_creation = user_settings_model.created_on
 
-        user_services.update_user_bio(user_settings.user_id, 'New bio.') # type: ignore[no-untyped-call]
+        user_services.update_user_bio(user_settings.user_id, 'New bio.')  # type: ignore[no-untyped-call]
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
@@ -410,27 +410,27 @@ class UserContributionsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(UserContributionsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
-        self.user_contributions = user_services.get_user_contributions( # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_contributions = user_services.get_user_contributions(  # type: ignore[no-untyped-call]
             self.owner_id)
         self.user_contributions.validate()
 
     def test_validate_user_id(self) -> None:
         self.user_contributions.user_id = ''
-        with self.assertRaisesRegex(Exception, 'No user id specified.'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'No user id specified.'):  # type: ignore[no-untyped-call]
             self.user_contributions.validate()
 
     def test_cannot_create_user_contributions_with_migration_bot(
         self
     ) -> None:
         self.assertIsNone(
-            user_services.create_user_contributions( # type: ignore[no-untyped-call]
+            user_services.create_user_contributions(  # type: ignore[no-untyped-call]
                 feconf.MIGRATION_BOT_USER_ID, [], []))
 
     def test_update_user_contributions(self) -> None:
-        user_services.update_user_contributions(self.owner_id, ['e1'], ['e2']) # type: ignore[no-untyped-call]
+        user_services.update_user_contributions(self.owner_id, ['e1'], ['e2'])  # type: ignore[no-untyped-call]
 
-        contributions = user_services.get_user_contributions(self.owner_id) # type: ignore[no-untyped-call]
+        contributions = user_services.get_user_contributions(self.owner_id)  # type: ignore[no-untyped-call]
         self.assertEqual(contributions.user_id, self.owner_id)
         self.assertEqual(contributions.created_exploration_ids, ['e1'])
         self.assertEqual(contributions.edited_exploration_ids, ['e2'])
@@ -438,19 +438,19 @@ class UserContributionsTests(test_utils.GenericTestBase):
     def test_cannot_create_user_contributions_with_existing_user_id(
         self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'User contributions model for user %s already exists.'
             % self.owner_id):
-            user_services.create_user_contributions(self.owner_id, [], []) # type: ignore[no-untyped-call]
+            user_services.create_user_contributions(self.owner_id, [], [])  # type: ignore[no-untyped-call]
 
     def test_cannot_update_user_contributions_with_invalid_user_id(
         self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'User contributions model for user invalid_user_id does not exist'):
-            user_services.update_user_contributions('invalid_user_id', [], []) # type: ignore[no-untyped-call]
+            user_services.update_user_contributions('invalid_user_id', [], [])  # type: ignore[no-untyped-call]
 
     def test_cannot_update_dashboard_stats_log_with_invalid_schema_version(
         self
@@ -460,12 +460,12 @@ class UserContributionsTests(test_utils.GenericTestBase):
         model.update_timestamps()
         model.put()
 
-        self.assertIsNone(user_services.get_user_impact_score(self.owner_id)) # type: ignore[no-untyped-call]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        self.assertIsNone(user_services.get_user_impact_score(self.owner_id))  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'Sorry, we can only process v1-v%d dashboard stats schemas at '
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
-            user_services.update_dashboard_stats_log(self.owner_id) # type: ignore[no-untyped-call]
+            user_services.update_dashboard_stats_log(self.owner_id)  # type: ignore[no-untyped-call]
 
 
 class UserGlobalPrefsTests(test_utils.GenericTestBase):
@@ -1076,14 +1076,14 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
     def test_incorrect_language_code_for_voiceover_raise_error(self) -> None:
         self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
             self.user_contribution_rights.validate()
 
     def test_incorrect_language_code_for_translation_raise_error(self) -> None:
         self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
             self.user_contribution_rights.validate()
 
@@ -1096,7 +1096,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
 
         self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'hi', 'hi']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected can_review_voiceover_for_language_codes list not to have '
             'duplicate values'):
@@ -1111,7 +1111,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
 
         self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'hi', 'hi']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected can_review_translation_for_language_codes list not to '
             'have duplicate values'):
@@ -1205,7 +1205,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
         for version in invalid_schema_versions:
             user_data_dict['schema_version'] = version
             error_msg = 'Invalid version %s received.' % version
-            with self.assertRaisesRegex(Exception, error_msg): # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
                 user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     # This test should be modified to use the original class ModifiableUserData
