@@ -241,6 +241,23 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.target_id, self.target_version_at_submission,
                 self.author_id, add_translation_change_dict, 'test description')
 
+    def test_get_submitted_submissions(self):
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            self.author_id, self.change, None)
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            self.author_id, self.change, 'test_description')
+        suggestions = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(suggestions[0].author_id, self.author_id)
+        self.assertEqual(suggestions[1].author_id, self.author_id)
+
     def test_get_all_stale_suggestion_ids(self):
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -1110,6 +1127,31 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         queries = [('author_id', self.author_id_2)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
 
+    def test_get_translation_suggestions_in_review_by_exp_ids(self):
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_in_review_by_exp_ids(
+                [
+                    self.target_id_1,
+                    self.target_id_2,
+                    self.target_id_3
+                ],
+                'en'
+            )
+        )
+        self.assertEqual(len(suggestions), 0)
+        self._create_translation_suggestion_with_language_code('en')
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_in_review_by_exp_ids(
+                [self.target_id_1],
+                'en'
+            )
+        )
+        self.assertEqual(suggestions[0].author_id, self.author_id_1)
+        self.assertEqual(suggestions[0].language_code, 'en')
+        self.assertEqual(suggestions[0].target_id, self.target_id_1)
+
     def test_get_by_target_id(self):
         queries = [
             ('target_type', feconf.ENTITY_TYPE_EXPLORATION),
@@ -1760,6 +1802,32 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
+
+    def test_create_translation_contribution_stats_from_model(self):
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code='es',
+            contributor_user_id='user_id',
+            topic_id='topic_id',
+            submitted_translations_count=2,
+            submitted_translation_word_count=100,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=50,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            contribution_dates=[
+                datetime.date.fromtimestamp(1616173836),
+                datetime.date.fromtimestamp(1616173837)
+            ]
+        )
+        translation_suggestion = suggestion_services.get_all_translation_contribution_stats( # pylint: disable=line-too-long
+            'user_id')
+        self.assertEqual(len(translation_suggestion), 1)
+        self.assertEqual(translation_suggestion[0].language_code, 'es')
+        self.assertEqual(
+            translation_suggestion[0].contributor_user_id,
+            'user_id'
+        )
 
     def test_create_and_reject_suggestion(self):
         with self.swap(
