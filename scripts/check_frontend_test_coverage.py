@@ -43,8 +43,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'Base.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
-    # Remove contributions-and-review.component.ts once #15070 is merged.
-    'contributions-and-review.component.ts',
     'exploration-states.service.ts',
     'expression-interpolation.service.ts',
     'google-analytics.initializer.ts',

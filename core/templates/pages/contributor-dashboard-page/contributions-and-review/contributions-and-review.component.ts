@@ -328,8 +328,7 @@ angular.module('oppia').component('contributionsAndReview', {
       var getContributionSummaries = function(suggestionIdToSuggestions) {
         if (ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE) {
           return getTranslationContributionsSummary(suggestionIdToSuggestions);
-        } else if (
-          ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
+        } else if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {ß
           return getQuestionContributionsSummary(suggestionIdToSuggestions);
         }
       };
@@ -418,7 +417,6 @@ angular.module('oppia').component('contributionsAndReview', {
             enabled: true
           }
         ];
-
         TranslationTopicService.setActiveTopicName(
           DEFAULT_OPPORTUNITY_TOPIC_NAME);
 
@@ -448,8 +446,7 @@ angular.module('oppia').component('contributionsAndReview', {
                     suggestionType: SUGGESTION_TYPE_QUESTION,
                     text: 'Review Questions'
                   });
-                  userReviewableSuggestionTypes.push(
-                    SUGGESTION_TYPE_QUESTION);
+                  userReviewableSuggestionTypes.push(SUGGESTION_TYPE_QUESTION);
                 }
                 if (
                   userCanReviewTranslationSuggestionsInLanguages
@@ -466,12 +463,10 @@ angular.module('oppia').component('contributionsAndReview', {
                     ctrl.TAB_TYPE_REVIEWS, userReviewableSuggestionTypes[0]);
                 } else if (userCanSuggestQuestions) {
                   ctrl.switchToTab(
-                    ctrl.TAB_TYPE_CONTRIBUTIONS,
-                    SUGGESTION_TYPE_QUESTION);
+                    ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_QUESTION);
                 } else {
                   ctrl.switchToTab(
-                    ctrl.TAB_TYPE_CONTRIBUTIONS,
-                    SUGGESTION_TYPE_TRANSLATE);
+                    ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_TRANSLATE);
                 }
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
