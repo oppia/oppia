@@ -1,5 +1,5 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.rtl.css" as="style">
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.rtl.css">
 
 <div class="footer navbar-fixed-bottom oppia-exploration-footer" *ngIf="!iframed">
   <div class="row">
@@ -15,7 +15,7 @@
         <li>
           <h1 class="oppia-lesson-info-h1">
             <span class="oppia-lesson-info-header">
-                  Lesson Info
+                {{ 'I18N_LESSON_INFO_HEADER' | translate }}
             </span>
           </h1>
         </li>
@@ -32,107 +32,5 @@
   </div>
 </div>
 
-<style>
-  .oppia-exploration-footer {
-    background-color: #094142;
-    color: #fff;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 13px;
-    height: 42px;
-    line-height: 0;
-    margin-top: 30px;
-    width: 100%;
-  }
 
-  .oppia-exploration-footer .exploration-footer-img {
-    height: 60px;
-    margin: -25px 0 0 10px;
-    width: 60px;
-  }
 
-  .oppia-exploration-footer .oppia-share-exploration-footer {
-    line-height: 0.6;
-    padding-right: 20px;
-    text-transform: uppercase;
-  }
-
-  .oppia-exploration-footer .oppia-exploration-footer-container {
-    max-width: 800px;
-  }
-
-  .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
-    display: block;
-    float: right;
-    margin: -8px;
-    padding-right: 20px;
-  }
-
-  .oppia-footer-info-icon {
-    font-size: 20px;
-    margin-right: 5px;
-  }
-
-  .oppia-lesson-info {
-    cursor: pointer;
-    display: flex;
-    list-style-type: none;
-    padding-left: 2px;
-    padding-top: 10px;
-  }
-
-  .oppia-lesson-info-h1 {
-    color: #fff;
-    display: inline;
-    font-size: 17px;
-    font-weight: normal;
-  }
-
-  @media (max-width: 650px) {
-    .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
-      margin: 0 -8px;
-    }
-  }
-
-  .oppia-exploration-footer .oppia-exploration-footer-sharing-links li {
-    float: left;
-  }
-
-  .oppia-exploration-footer .oppia-navbar-footer-info-icon {
-    height: 56px;
-    padding: 12px;
-  }
-
-  .oppia-exploration-footer .oppia-navbar-footer-info-icon:hover {
-    background: #fff;
-    color: #009688;
-    height: 56px;
-    padding: 12px;
-  }
-
-  @media (max-width: 475px) {
-    .oppia-exploration-footer-sharing-links {
-      display: none;
-    }
-  }
-
-  @media (max-width: 658px) {
-    .oppia-exploration-footer .oppia-share-exploration-footer {
-      display: none;
-    }
-    .oppia-exploration-footer .oppia-navbar-footer-info-icon {
-      margin-top: -3px;
-    }
-    .oppia-exploration-footer .oppia-navbar-footer-info-icon:hover {
-      margin-top: -3px;
-    }
-  }
-
-  @media (min-width: 768px) {
-    .oppia-exploration-footer .oppia-exploration-footer-info-icon {
-      display: none;
-    }
-  }
-</style>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.rtl.css">

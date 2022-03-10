@@ -1,6 +1,9 @@
 <mat-card class="oppia-lesson-info-card">
   <div class="oppia-lesson-info-content">
-    <p class="oppia-story-title" *ngIf="hasStoryTitle">
+    <p class="oppia-story-title" *ngIf="hasStoryTitle && !isHackyStoryTitleTranslationDisplayed()">
+      {{ storyTitle }}
+    </p>
+    <p class="oppia-story-title" *ngIf="hasStoryTitle && isHackyStoryTitleTranslationDisplayed()">
       {{ storyTitleTranslationKey | translate}}
     </p>
     <hr>

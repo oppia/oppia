@@ -129,22 +129,24 @@ export class ExplorationFooterComponent {
       windowClass: 'oppia-modal-lesson-information-card'
     });
 
-    let index = this.playerPositionService.getDisplayedCardIndex();
+    let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
 
     modalRef.componentInstance.numberofCheckpoints = this.numberofCheckpoints;
     // Note to developers:
     // The checkpointArray is used to track the number of
-    // completedCheckpoints. 1 is pushed if a checkpoint is
-    // encountered else 0 is pushed.
+    // completedCheckpoints. For the first card, 1 is pushed
+    // since the first card is always a checkpoint. For
+    // displayedCardindex > 1, 1 is pushed if the card is a
+    // checkpoint, else 0 is pushed.
     let completedCheckpoints = 0;
-    for (let i = 0; i <= index; i++) {
+    for (let i = 0; i <= displayedCardIndex; i++) {
       completedCheckpoints = completedCheckpoints + this.checkpointArray[i];
     }
     this.completedWidth = (
       (100 / (this.numberofCheckpoints)) * completedCheckpoints
     );
 
-    if (index > 0) {
+    if (displayedCardIndex > 0) {
       let state = this.explorationEngineService.getState();
       if (state.cardIsCheckpoint) {
         this.checkpointArray.push(1);

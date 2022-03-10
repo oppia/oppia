@@ -18,17 +18,14 @@
 
 import { Component } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from
-// eslint-disable-next-line max-len
-  'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from
-// eslint-disable-next-line max-len
   'domain/summary/learner-exploration-summary.model';
 import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
-// eslint-disable-next-line max-len
   'services/i18n-language-code.service';
 
  @Component({
@@ -42,6 +39,10 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   storyTitleTranslationKey!: string;
   storyPlaythroughObject!: StoryPlaythrough;
   storyId!: string;
+  storyTitle: string = '';
+  topicUrlFragment: string;
+  classroomUrlFragment: string;
+  storyUrlFragment: string;
   expTitleTranslationKey!: string;
   expDescTranslationKey!: string;
   displayedCard!: StateCard;
@@ -66,6 +67,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private ngbActiveModal: NgbActiveModal,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private storyViewerBackendApiService: StoryViewerBackendApiService,
   ) {
     super(ngbActiveModal);
   }
@@ -93,6 +95,23 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
           this.explorationId, TranslationKeyType.DESCRIPTION)
     );
 
+    if (this.hasStoryTitle) {
+      this.topicUrlFragment = (
+        this.urlService.getTopicUrlFragmentFromLearnerUrl());
+      this.classroomUrlFragment = (
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+      this.storyUrlFragment = (
+        this.urlService.getStoryUrlFragmentFromLearnerUrl());
+
+      this.storyViewerBackendApiService.fetchStoryDataAsync(
+        this.topicUrlFragment,
+        this.classroomUrlFragment,
+        this.storyUrlFragment).then(
+        (storyDataDict) => {
+          this.storyTitle = storyDataDict.title;
+        });
+    }
+
 
     // The purpose of separatorArray is for the working of
     // for loop in lesson-information-card-modal.component.html.
@@ -100,6 +119,14 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     this.separatorWidth = 100 / (this.numberofCheckpoints);
 
     this.startedWidth = 100 - this.completedWidth;
+  }
+
+  isHackyStoryTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 
   isHackyExpTitleTranslationDisplayed(): boolean {

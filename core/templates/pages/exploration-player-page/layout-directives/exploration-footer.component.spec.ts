@@ -167,7 +167,7 @@ describe('ExplorationFooterComponent', () => {
     expect(component.hintsAndSolutionsAreSupported).toBeFalse();
   });
 
-  it('should push 1 in checkpointArray when index < 1', () => {
+  it('should push 1 in checkpointArray for the first card', () => {
     let ngbModal = TestBed.inject(NgbModal);
 
     expect(component.checkpointArray).toEqual([0]);
@@ -197,7 +197,7 @@ describe('ExplorationFooterComponent', () => {
   });
 
   it('should push 0 in checkpointArray when card_is_checkpoint' +
-    'is false and index > 1', () => {
+    'is false and displayedCardIndex > 1', () => {
     let ngbModal = TestBed.inject(NgbModal);
 
     expect(component.checkpointArray).toEqual([0]);
@@ -283,7 +283,7 @@ describe('ExplorationFooterComponent', () => {
   });
 
   it('should push 1 in checkpointArray when card_is_checkpoint' +
-    'is true and index > 1', () => {
+    'is true and displayedCardIndex > 1', () => {
     let ngbModal = TestBed.inject(NgbModal);
 
     expect(component.checkpointArray).toEqual([0]);
@@ -390,7 +390,8 @@ describe('ExplorationFooterComponent', () => {
       .toHaveBeenCalled();
   }));
 
-  it('should handle error if backend call fails', fakeAsync(() => {
+  it('should handle error if backend call' +
+   'to learnerViewInfoBackendApiService fails', fakeAsync(() => {
     let explorationId = 'expId';
     component.explorationId = explorationId;
     component.expInfo = null;

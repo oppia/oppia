@@ -20,6 +20,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -40,6 +42,7 @@ describe('Lesson Information card modal component', () => {
   let componentInstance: LessonInformationCardModalComponent;
   let urlService: UrlService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let storyViewerBackendApiService: StoryViewerBackendApiService;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -62,6 +65,7 @@ describe('Lesson Information card modal component', () => {
         NgbActiveModal,
         PlayerTranscriptService,
         ExplorationEngineService,
+        StoryViewerBackendApiService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -99,6 +103,7 @@ describe('Lesson Information card modal component', () => {
 
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     urlService = TestBed.inject(UrlService);
+    storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
 
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValue(true);
@@ -119,12 +124,15 @@ describe('Lesson Information card modal component', () => {
 
     // Translation is only displayed if the language is not English
     // and it's hacky translation is available.
-    let hackyStoryTitleTranslationIsDisplayed =
+    let hackyExpTitleTranslationIsDisplayed =
       componentInstance.isHackyExpTitleTranslationDisplayed();
-    expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
-    let hackyNodeTitleTranslationIsDisplayed =
+    expect(hackyExpTitleTranslationIsDisplayed).toBe(true);
+    let hackyExpDescTranslationIsDisplayed =
       componentInstance.isHackyExpDescTranslationDisplayed();
-    expect(hackyNodeTitleTranslationIsDisplayed).toBe(true);
+    expect(hackyExpDescTranslationIsDisplayed).toBe(true);
+    let hackyStoryTitleTranslationIsDisplayed =
+      componentInstance.isHackyStoryTitleTranslationDisplayed();
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
   }));
 
   it('should set hasStoryTitle true when' +
@@ -134,9 +142,20 @@ describe('Lesson Information card modal component', () => {
       story_id: storyId,
       node_id: nodeId
     });
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('');
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue('');
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(
+        new StoryPlaythrough(storyId, [], 'storyTitle', '', '', '')));
     componentInstance.ngOnInit();
     expect(componentInstance.storyId).toEqual(storyId);
-    expect(componentInstance.hasStoryTitle).toBe(true);
+    expect(componentInstance.hasStoryTitle).toEqual(true);
+    expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(urlService.getClassroomUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(urlService.getStoryUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(storyViewerBackendApiService.fetchStoryDataAsync).toHaveBeenCalled();
     expect(componentInstance.storyTitleTranslationKey).toEqual(
       'I18N_STORY_storyId_TITLE');
   }));
