@@ -278,7 +278,7 @@ class CollectionDict(TypedDict):
 
 
 class SerializableCollectionDict(CollectionDict):
-    """Type representing the serializable Collection object."""
+    """Dictionary representing the serializable Collection object."""
 
     version: int
     created_on: str
