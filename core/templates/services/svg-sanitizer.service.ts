@@ -183,7 +183,9 @@ export class SvgSanitizerService {
         // The outermost node of an SVG will always be the svg tag itself.
         // A filename with extension '.svg' and having outermost tag other than
         // <svg></svg> will not qualify as an image file and cannot be uploaded.
-        node.parentNode?.removeChild(node);
+        if (node.parentNode) {
+          node.parentNode.removeChild(node);
+        }
       } else {
         for (let i = 0; i < node.attributes.length; i++) {
           let nodeAttrName: string = node.attributes[i].name.toLowerCase();
