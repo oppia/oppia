@@ -328,7 +328,7 @@ angular.module('oppia').component('contributionsAndReview', {
       var getContributionSummaries = function(suggestionIdToSuggestions) {
         if (ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE) {
           return getTranslationContributionsSummary(suggestionIdToSuggestions);
-        } else if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {ß
+        } else if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
           return getQuestionContributionsSummary(suggestionIdToSuggestions);
         }
       };
