@@ -62,7 +62,7 @@ describe('SvgSanitizerService', () => {
     () => {
       const testCases = [
         {
-          // Test when SVG has an invalid tag('circel').
+          // Test when SVG has an invalid tag ('circel').
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
@@ -83,7 +83,7 @@ describe('SvgSanitizerService', () => {
             'Z"/></g></svg>')
         },
         {
-          // Test when SVG has an invalid attribute('data-name').
+          // Test when SVG has an invalid attribute ('data-name').
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
@@ -104,7 +104,7 @@ describe('SvgSanitizerService', () => {
             'Z"/></g></svg>')
         },
         {
-          // Test when SVG has an invalid self closing tag('paht').
+          // Test when SVG has an invalid self closing tag ('paht').
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
@@ -121,7 +121,7 @@ describe('SvgSanitizerService', () => {
             'idth="0" transform="matrix(1 0 0 -1 0 0)"/></svg>')
         },
         {
-          // Test when SVG has more than one invalid tags('pth', 'circel').
+          // Test when SVG has more than one invalid tags ('pth', 'circel').
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
@@ -139,7 +139,7 @@ describe('SvgSanitizerService', () => {
         },
         {
           // Test when SVG has more than one invalid
-          // attributes('styyle', 'strokke').
+          // attributes ('styyle', 'strokke').
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" styyle="vertical-align: -' +
