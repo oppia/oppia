@@ -365,17 +365,17 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 'invalid_id', 'invalid_thumbnail.svg')
 
     def test_story_description_validation(self):
-        self.story.description = []
+        self.story.description = 1
         self._assert_validation_error(
-            'Story description should be a string.')
+            'Expected description to be a string, received 1')
 
         self.story.description = ''
         self._assert_validation_error(
-            'Story description field should not be empty.')
+            'Expected description field not to be empty')
 
         self.story.description = 'a' * 1001
         self._assert_validation_error(
-            'Story description should be less than %d chars, received %s.' % (
+            'Expected description to be less than %d chars, received %s' % (
             1000, 1001))
 
     def test_to_human_readable_dict(self):

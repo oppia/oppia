@@ -709,16 +709,17 @@ class Story:
         """
         if not isinstance(description, str):
             raise utils.ValidationError(
-                'Story description should be a string.')
+                'Expected description to be a string, received %s'
+                % description)
         if description == '':
             raise utils.ValidationError(
-                'Story description field should not be empty.')
+                'Expected description field not to be empty')
 
         description_length_limit = (
             android_validation_constants.MAX_CHARS_IN_STORY_DESCRIPTION)
         if len(description) > description_length_limit:
             raise utils.ValidationError(
-                'Story description should be less than %d chars, received %s.'
+                'Expected description to be less than %d chars, received %s'
                 % (description_length_limit, len(description)))
 
     @classmethod
