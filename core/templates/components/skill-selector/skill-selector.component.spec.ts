@@ -53,7 +53,7 @@ describe('SkillSelectorComponent', () => {
 
   beforeEach(() => {
     spyOn(
-      userService, 'getCanUserAccessTopicsAndSkillsDashboard'
+      userService, 'canUserAccessTopicsAndSkillsDashboard'
     ).and.returnValue(Promise.resolve(true));
   });
 

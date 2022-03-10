@@ -109,7 +109,7 @@ export class UserService {
     });
   }
 
-  async getCanUserAccessTopicsAndSkillsDashboard(): Promise<boolean> {
+  async canUserAccessTopicsAndSkillsDashboard(): Promise<boolean> {
     return this.getUserInfoAsync().then((userInfo) => {
       return (
         userInfo.isLoggedIn() &&

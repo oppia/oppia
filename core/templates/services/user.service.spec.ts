@@ -414,7 +414,7 @@ describe('User Api Service', () => {
         userService, 'getUserInfoAsync'
       ).and.returnValue(Promise.resolve(userInfo));
 
-      userService.getCanUserAccessTopicsAndSkillsDashboard()
+      userService.canUserAccessTopicsAndSkillsDashboard()
         .then((canUserAccessTopicsAndSkillsDashboard) => {
           expect(canUserAccessTopicsAndSkillsDashboard).toBeTrue();
         });

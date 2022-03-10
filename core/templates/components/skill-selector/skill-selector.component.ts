@@ -82,7 +82,7 @@ export class SkillSelectorComponent implements OnInit {
     }
     this.initialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
 
-    this.userService.getCanUserAccessTopicsAndSkillsDashboard()
+    this.userService.canUserAccessTopicsAndSkillsDashboard()
       .then((canUserAccessTopicsAndSkillsDashboard) => {
         this.userCanEditSkills = canUserAccessTopicsAndSkillsDashboard;
       });

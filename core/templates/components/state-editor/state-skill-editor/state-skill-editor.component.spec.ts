@@ -169,7 +169,7 @@ describe('State Skill Editor Component', () => {
 
   beforeEach(() => {
     spyOn(
-      userService, 'getCanUserAccessTopicsAndSkillsDashboard'
+      userService, 'canUserAccessTopicsAndSkillsDashboard'
     ).and.returnValue(Promise.resolve(true));
   });
 

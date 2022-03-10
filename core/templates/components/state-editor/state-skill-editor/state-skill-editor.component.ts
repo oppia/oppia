@@ -73,7 +73,7 @@ export class StateSkillEditorComponent implements OnInit {
         this.categorizedSkills = response.categorizedSkillsDict;
         this.untriagedSkillSummaries = response.untriagedSkillSummaries;
       });
-    this.userService.getCanUserAccessTopicsAndSkillsDashboard()
+    this.userService.canUserAccessTopicsAndSkillsDashboard()
       .then((canUserAccessTopicsAndSkillsDashboard) => {
         this.userCanEditSkills = canUserAccessTopicsAndSkillsDashboard;
       });
