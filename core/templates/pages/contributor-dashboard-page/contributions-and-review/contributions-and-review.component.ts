@@ -90,23 +90,23 @@ angular.module('oppia').component('contributionsAndReview', {
 
       var tabNameToOpportunityFetchFunction = {
         [SUGGESTION_TYPE_QUESTION]: {
-          [ctrl.TAB_TYPE_CONTRIBUTIONS]: () => {
+          [ctrl.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
             return ContributionAndReviewService
-              .getUserCreatedQuestionSuggestionsAsync();
+              .getUserCreatedQuestionSuggestionsAsync(shouldResetOffset);
           },
-          [ctrl.TAB_TYPE_REVIEWS]: () => {
+          [ctrl.TAB_TYPE_REVIEWS]: shouldResetOffset => {
             return ContributionAndReviewService
-              .getReviewableQuestionSuggestionsAsync();
+              .getReviewableQuestionSuggestionsAsync(shouldResetOffset);
           }
         },
         [SUGGESTION_TYPE_TRANSLATE]: {
-          [ctrl.TAB_TYPE_CONTRIBUTIONS]: () => {
+          [ctrl.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
             return ContributionAndReviewService
-              .getUserCreatedTranslationSuggestionsAsync();
+              .getUserCreatedTranslationSuggestionsAsync(shouldResetOffset);
           },
-          [ctrl.TAB_TYPE_REVIEWS]: () => {
+          [ctrl.TAB_TYPE_REVIEWS]: shouldResetOffset => {
             return ContributionAndReviewService
-              .getReviewableTranslationSuggestionsAsync();
+              .getReviewableTranslationSuggestionsAsync(shouldResetOffset);
           }
         }
       };
@@ -351,20 +351,31 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.dropdownShown = !ctrl.dropdownShown;
       };
 
-      ctrl.loadContributions = function() {
+      ctrl.loadOpportunities = function() {
+        return ctrl.loadContributions(/* Param shouldResetOffset= */ true);
+      };
+
+      ctrl.loadMoreOpportunities = function() {
+        return ctrl.loadContributions(/* Param shouldResetOffset= */ false);
+      };
+
+      ctrl.loadContributions = function(shouldResetOffset) {
         if (!ctrl.activeTabType || !ctrl.activeSuggestionType) {
           return new Promise((resolve, reject) => {
             resolve({opportunitiesDicts: [], more: false});
           });
         }
-        var fetchFunction = tabNameToOpportunityFetchFunction[
+        const fetchFunction = tabNameToOpportunityFetchFunction[
           ctrl.activeSuggestionType][ctrl.activeTabType];
 
-        return fetchFunction().then(function(suggestionIdToSuggestions) {
-          ctrl.contributions = suggestionIdToSuggestions;
+        return fetchFunction(shouldResetOffset).then(function(response) {
+          Object.keys(response.suggestionIdToDetails).forEach(id => {
+            ctrl.contributions[id] = response.suggestionIdToDetails[id];
+          });
           return {
-            opportunitiesDicts: getContributionSummaries(ctrl.contributions),
-            more: false
+            opportunitiesDicts: getContributionSummaries(
+              response.suggestionIdToDetails),
+            more: response.more
           };
         });
       };
