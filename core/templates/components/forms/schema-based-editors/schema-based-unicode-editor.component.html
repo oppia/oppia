@@ -30,7 +30,7 @@
 
   <!-- Note that we do not yet support ng-blur for the code editor. -->
   <div *ngIf="getCodingMode()" class="oppia-coding-editor">
-    <oppia-codemirror [value]="localValue"
+    <oppia-codemirror [(value)]="localValue"
                       [options]="codemirrorOptions"
                       [refresh]="codemirrorStatus"
                       (valueChange)="updateLocalValue($event)">
