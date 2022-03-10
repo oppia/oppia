@@ -175,7 +175,7 @@ def update_app_yaml(release_app_yaml_path, feconf_config_path):
     """Updates app.yaml file with more strict CORS HTTP header.
 
     Args:
-        release_app_yaml_path: str. Absolute path of the app.yaml file.
+        release_app_yaml_path: str. Absolute path of the app_dev.yaml file.
         feconf_config_path: str. Absolute path of the feconf config file.
     """
     with utils.open_file(feconf_config_path, 'r') as feconf_config_file:
@@ -208,7 +208,7 @@ def verify_config_files(
     Args:
         release_feconf_path: str. The path to feconf file in release
             directory.
-        release_app_yaml_path: str. The path to app.yaml file in release
+        release_app_yaml_path: str. The path to app_dev.yaml file in release
             directory.
         verify_email_api_keys: bool. Whether to verify both mailgun and
             mailchimp api keys.
@@ -324,7 +324,7 @@ def main(args=None):
     release_constants_path = os.path.join(
         options.release_dir_path, common.CONSTANTS_FILE_PATH)
     release_app_yaml_path = os.path.join(
-        options.release_dir_path, common.APP_YAML_PATH)
+        options.release_dir_path, common.APP_DEV_YAML_PATH)
 
     if options.prompt_for_mailgun_and_terms_update:
         try:
