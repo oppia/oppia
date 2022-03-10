@@ -62,7 +62,7 @@ describe('SvgSanitizerService', () => {
     () => {
       const testCases = [
         {
-          // Test when SVG has an invalid tag.
+          // Test when SVG has an invalid tag('circel').
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
@@ -83,7 +83,7 @@ describe('SvgSanitizerService', () => {
             'Z"/></g></svg>')
         },
         {
-          // Test when SVG has an invalid attribute.
+          // Test when SVG has an invalid attribute('data-name').
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
@@ -104,7 +104,7 @@ describe('SvgSanitizerService', () => {
             'Z"/></g></svg>')
         },
         {
-          // Test when SVG has an invalid self closing tag.
+          // Test when SVG has an invalid self closing tag('paht').
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
@@ -121,7 +121,7 @@ describe('SvgSanitizerService', () => {
             'idth="0" transform="matrix(1 0 0 -1 0 0)"/></svg>')
         },
         {
-          // Test when SVG has more than one invalid tags.
+          // Test when SVG has more than one invalid tags('pth', 'circel').
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
@@ -138,7 +138,8 @@ describe('SvgSanitizerService', () => {
             'idth="0" transform="matrix(1 0 0 -1 0 0)"/></svg>')
         },
         {
-          // Test when SVG has more than one invalid attributes.
+          // Test when SVG has more than one invalid
+          // attributes('styyle', 'strokke').
           svgString: (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
             '.429ex" viewBox="0 -511.5 572.5 615.4" styyle="vertical-align: -' +
@@ -512,25 +513,25 @@ describe('SvgSanitizerService', () => {
         invalidTagsAndAttributes: {
           tags: [], attrs: ['svg:data-custom']
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were%3A%0AAttributes%3A%20svg%3Adata-custom'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7B%20IMAGE_HERE%20%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7B%20SCREENSHOTS_HERE%20%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20reported%3A%0AAttributes%3A%20svg%3Adata-custom'
       },
       {
         invalidTagsAndAttributes: {
           tags: ['paht'], attrs: []
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were%3A%0ATags%3A%20paht'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7B%20IMAGE_HERE%20%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7B%20SCREENSHOTS_HERE%20%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20reported%3A%0ATags%3A%20paht'
       },
       {
         invalidTagsAndAttributes: {
           tags: ['paht', 'circel'], attrs: []
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were%3A%0ATags%3A%20paht%2C%20circel'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7B%20IMAGE_HERE%20%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7B%20SCREENSHOTS_HERE%20%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20reported%3A%0ATags%3A%20paht%2C%20circel'
       },
       {
         invalidTagsAndAttributes: {
           tags: ['circel'], attrs: ['svg:data-name']
         },
-        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7BIMAGE_HERE%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7BSCREENSHOTS_HERE%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20were%3A%0ATags%3A%20circel%2C%20%0AAttributes%3A%20svg%3Adata-name'
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7B%20IMAGE_HERE%20%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7B%20SCREENSHOTS_HERE%20%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20reported%3A%0ATags%3A%20circel%2C%20%0AAttributes%3A%20svg%3Adata-name'
       }
     ];
     testCases.forEach(testCase => {
