@@ -482,10 +482,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
             language_codes: list(str). The list of language codes.
 
         Returns:
-            list(SuggestionModel). A list of suggestions which are in review,
-            but not created by the given user.
+            list(SuggestionModel). A list of translation suggestions which
+            are in review, for the specified language codes but
+            not created by the given user.
         """
-
         return cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -495,11 +495,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_translation_suggestions_with_exp_ids(
-            cls, user_id: str, language_codes: List[str],
-            exp_ids: List[str]
+        cls, user_id: str, language_codes: List[str],
+        exp_ids: List[str]
     ) -> Sequence[GeneralSuggestionModel]:
         """Gets all translation suggestions for the given language
-        codes which are in review and belong to the passed exp_ids.
+        codes which are in review and correspond to the
+        given exploration IDs.
 
         Args:
             user_id: str. The id of the user trying to make this query.

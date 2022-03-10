@@ -588,24 +588,24 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
     ])
 
 
-def get_reviewable_suggestions_for_translate_content(
+def get_reviewable_translation_suggestions(
         user_id, opportunity_summary_exp_ids):
-    """Returns a list of suggestions of type translate_content
-     matching the passed opportunity ids which the user can review.
+    """Returns a list of translation suggestions matching the
+     passed opportunity IDs which the user can review.
 
     Args:
         user_id: str. The ID of the user.
-        opportunity_summary_exp_ids: list(str) or None.
+        opportunity_summary_exp_ids: list(str) or NONE.
             The list of exploration IDs for which suggestions
             are fetched. If the list is empty, no suggestions are
             fetched. If the value is None, all reviewable
             suggestions are fetched. If the list consists of some
             valid number of ids, suggestions corresponding to the
-            ids are fetched.
+            IDs are fetched.
 
     Returns:
-        list(Suggestion). A list of suggestions which the given
-        user is allowed to review.
+        list(Suggestion). A list of translation suggestions
+        which the given user is allowed to review.
     """
     contribution_rights = user_services.get_user_contribution_rights(
         user_id)
@@ -625,44 +625,30 @@ def get_reviewable_suggestions_for_translate_content(
                     user_id, language_codes,
                     opportunity_summary_exp_ids))
 
-    all_suggestions = ([
+    translation_suggestions = ([
         get_suggestion_from_model(s)
         for s in in_review_translation_suggestions
     ])
-    return all_suggestions
+    return translation_suggestions
 
 
-def get_reviewable_suggestions(
-        user_id, suggestion_type, opportunity_summary_exp_ids=None):
-    """Returns a list of suggestions of given suggestion_type which
-       the user can review. If suggestion_type is translate_content,
-       then either we fetch all suggestions, return an empty list
-       or return suggestions corresponding to the opportunity ids
-       depending on the value of opportunity_summary_exp_ids.
+def get_reviewable_question_suggestions(user_id):
+    """Returns a list of question suggestions which the user
+       can review.
 
     Args:
         user_id: str. The ID of the user.
-        suggestion_type: str. The type of the suggestion.
-        opportunity_summary_exp_ids: list(str) or None.
-            The default value is None. If not none, it contains
-            the list of exploration IDs for which suggestions
-            are to be fetched.
 
     Returns:
-        list(Suggestion). A list of suggestions which the given
-        user is allowed to review.
+        list(Suggestion). A list of question suggestions which
+        the given user is allowed to review.
     """
-    all_suggestions = []
-    if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        all_suggestions = get_reviewable_suggestions_for_translate_content(
-            user_id, opportunity_summary_exp_ids)
-    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-        all_suggestions = ([
-            get_suggestion_from_model(s) for s in (
-                suggestion_models.GeneralSuggestionModel
-                .get_in_review_question_suggestions(user_id))
-        ])
-    return all_suggestions
+    question_suggestions = ([
+        get_suggestion_from_model(s) for s in (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_question_suggestions(user_id))
+    ])
+    return question_suggestions
 
 
 def get_question_suggestions_waiting_longest_for_review():
