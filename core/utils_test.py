@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import ast
 import base64
 import copy
 import datetime
@@ -794,3 +795,12 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(response.getcode(), 200) # type: ignore[attr-defined]
         self.assertEqual(
             response.url, 'http://www.google.com') # type: ignore[attr-defined]
+
+    def test_get_args_of_function_node(self) -> None:
+        function_txt = b"""def _mock_function(arg1, arg2):
+                      pass"""
+
+        ast_node = ast.walk(ast.parse(function_txt))
+        function_node = [n for n in ast_node if isinstance(n, ast.FunctionDef)]
+        args_list = utils.get_args_of_function_node(function_node[0], [])
+        self.assertEqual(args_list, ['arg1', 'arg2'])

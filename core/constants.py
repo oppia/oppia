@@ -18,10 +18,11 @@
 
 from __future__ import annotations
 
+import io
 import json
+import os
+import pkgutil
 import re
-
-from core import python_utils
 
 from typing import Any, Dict
 
@@ -59,6 +60,30 @@ def remove_comments(text: str) -> str:
     return re.sub(r'  //.*\n', r'', text)
 
 
+def get_package_file_contents(package: str, filepath: str) -> str:
+    """Open file and return its contents. This needs to be used for files that
+    are loaded by the Python code directly, like constants.ts or
+    rich_text_components.json. This function is needed to make loading these
+    files work even when Oppia is packaged.
+
+    Args:
+        package: str. The package where the file is located.
+            For Oppia the package is usually the folder in the root folder,
+            like 'core' or 'extensions'.
+        filepath: str. The path to the file in the package.
+
+    Returns:
+        str. The contents of the file.
+    """
+    try:
+        file = io.open(os.path.join(package, filepath), 'r', encoding='utf-8')
+        return file.read()
+    except FileNotFoundError:
+        data = pkgutil.get_data(package, filepath)
+        assert isinstance(data, bytes)
+        return data.decode('utf-8')
+
+
 class Constants(dict):  # type: ignore[type-arg]
     """Transforms dict to object, attributes can be accessed by dot notation."""
 
@@ -75,11 +100,11 @@ class Constants(dict):  # type: ignore[type-arg]
 
 
 constants = Constants(parse_json_from_ts(  # pylint:disable=invalid-name
-    python_utils.get_package_file_contents('assets', 'constants.ts')))
+    get_package_file_contents('assets', 'constants.ts')))
 
 release_constants = Constants( # pylint:disable=invalid-name
     json.loads(
-        python_utils.get_package_file_contents(
+        get_package_file_contents(
             'assets', 'release_constants.json')
     )
 )

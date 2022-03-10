@@ -23,7 +23,6 @@ import re
 
 from core import constants
 from core import feconf
-from core import python_utils
 from core import utils
 from extensions.objects.models import objects
 
@@ -39,7 +38,7 @@ class BaseRteComponent:
 
     package, filepath = os.path.split(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
     rich_text_component_specs = constants.parse_json_from_ts(
-        python_utils.get_package_file_contents(package, filepath))
+        constants.get_package_file_contents(package, filepath))
 
     obj_types_to_obj_classes = {
         'unicode': objects.UnicodeString,

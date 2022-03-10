@@ -47,6 +47,13 @@ from typing_extensions import Literal
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
 
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
+
+_CERTIFI_PATH = os.path.join(
+    os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
+sys.path.insert(0, _CERTIFI_PATH)
+
 import yaml  # isort:skip  # pylint: disable=wrong-import-position
 import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -1295,13 +1302,8 @@ def get_args_of_function_node(
         list(str). The args for a function as listed in the function
         definition.
     """
-    try:
-        return [
-            a.arg
-            for a in function_node.args.args
-            if a.arg not in args_to_ignore
-        ]
-    except AttributeError:
-        return [
-            a.id for a in function_node.args.args if a.id not in args_to_ignore
-        ]
+    return [
+        a.arg
+        for a in function_node.args.args
+        if a.arg not in args_to_ignore
+    ]
