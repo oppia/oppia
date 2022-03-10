@@ -31,6 +31,9 @@ from core import utils
 from scripts import common
 from scripts import servers
 
+from typing import IO, Deque, Dict, List, Optional, Sequence, Tuple
+from typing_extensions import TypedDict
+
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 
@@ -171,7 +174,15 @@ _PARSER.add_argument(
     help='Build webpack with source maps.')
 
 
-def generate_app_yaml(deploy_mode=False):
+class DependencyBundleDict(TypedDict):
+    """Dictionary that represents dependency_bundle."""
+
+    js: List[str]
+    css: List[str]
+    fontsPath: str
+
+
+def generate_app_yaml(deploy_mode: bool = False) -> None:
     """Generate app.yaml from app_dev.yaml.
 
     Args:
@@ -207,7 +218,10 @@ def generate_app_yaml(deploy_mode=False):
 
 
 def modify_constants(
-        prod_env=False, emulator_mode=True, maintenance_mode=False):
+    prod_env: bool = False,
+    emulator_mode: bool = True,
+    maintenance_mode: bool = False
+) -> None:
     """Modify constants.ts and feconf.py.
 
     Args:
@@ -218,7 +232,7 @@ def modify_constants(
     """
     dev_mode_variable = (
         '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
-    common.inplace_replace_file(
+    common.inplace_replace_file(  # type: ignore[no-untyped-call]
         common.CONSTANTS_FILE_PATH,
         r'"DEV_MODE": (true|false)',
         dev_mode_variable,
@@ -226,7 +240,7 @@ def modify_constants(
     )
     emulator_mode_variable = (
         '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
-    common.inplace_replace_file(
+    common.inplace_replace_file(  # type: ignore[no-untyped-call]
         common.CONSTANTS_FILE_PATH,
         r'"EMULATOR_MODE": (true|false)',
         emulator_mode_variable,
@@ -235,7 +249,7 @@ def modify_constants(
 
     enable_maintenance_mode_variable = (
         'ENABLE_MAINTENANCE_MODE = %s' % str(maintenance_mode))
-    common.inplace_replace_file(
+    common.inplace_replace_file(  # type: ignore[no-untyped-call]
         common.FECONF_PATH,
         r'ENABLE_MAINTENANCE_MODE = (True|False)',
         enable_maintenance_mode_variable,
@@ -243,12 +257,12 @@ def modify_constants(
     )
 
 
-def set_constants_to_default():
+def set_constants_to_default() -> None:
     """Set variables in constants.ts and feconf.py to default values."""
     modify_constants(prod_env=False, emulator_mode=True, maintenance_mode=False)
 
 
-def _minify(source_path, target_path):
+def _minify(source_path: str, target_path: str) -> None:
     """Runs the given file through a minifier and outputs it to target_path.
 
     Args:
@@ -264,17 +278,17 @@ def _minify(source_path, target_path):
     # Use relative path to avoid java command line parameter parse error on
     # Windows. Convert to posix style path because the java program requires
     # the filepath arguments to be in posix path style.
-    target_path = common.convert_to_posixpath(
+    target_path = common.convert_to_posixpath(  # type: ignore[no-untyped-call]
         os.path.relpath(target_path))
-    source_path = common.convert_to_posixpath(
+    source_path = common.convert_to_posixpath(  # type: ignore[no-untyped-call]
         os.path.relpath(source_path))
-    yuicompressor_dir = common.convert_to_posixpath(YUICOMPRESSOR_DIR)
+    yuicompressor_dir = common.convert_to_posixpath(YUICOMPRESSOR_DIR)  # type: ignore[no-untyped-call]
     cmd = 'java -Xmx24m -jar %s -o %s %s' % (
         yuicompressor_dir, target_path, source_path)
     subprocess.check_call(cmd, shell=True)
 
 
-def write_to_file_stream(file_stream, content):
+def write_to_file_stream(file_stream: IO[str], content: str) -> None:
     """Write to a file object using provided content.
 
     Args:
@@ -284,7 +298,7 @@ def write_to_file_stream(file_stream, content):
     file_stream.write(str(content))
 
 
-def _join_files(source_paths, target_file_stream):
+def _join_files(source_paths: List[str], target_file_stream: IO[str]) -> None:
     """Writes multiple files into one file.
 
     Args:
@@ -296,7 +310,10 @@ def _join_files(source_paths, target_file_stream):
             write_to_file_stream(target_file_stream, source_file.read())
 
 
-def _minify_and_create_sourcemap(source_path, target_file_path):
+def _minify_and_create_sourcemap(
+    source_path: str,
+    target_file_path: str
+) -> None:
     """Minifies and generates source map for a JS file. This function is only
     meant to be used with third_party.min.js.
 
@@ -312,7 +329,10 @@ def _minify_and_create_sourcemap(source_path, target_file_path):
     subprocess.check_call(cmd, shell=True)
 
 
-def _generate_copy_tasks_for_fonts(source_paths, target_path):
+def _generate_copy_tasks_for_fonts(
+    source_paths: List[str],
+    target_path: str
+) -> Deque[threading.Thread]:
     """Queue up a copy task for each font file.
 
     Args:
@@ -323,7 +343,7 @@ def _generate_copy_tasks_for_fonts(source_paths, target_path):
         deque(Thread). A deque that contains all copy tasks queued to be
         processed.
     """
-    copy_tasks = collections.deque()
+    copy_tasks: Deque[threading.Thread] = collections.deque()
     for font_path in source_paths:
         copy_task = threading.Thread(
             target=shutil.copy,
@@ -332,7 +352,7 @@ def _generate_copy_tasks_for_fonts(source_paths, target_path):
     return copy_tasks
 
 
-def _insert_hash(filepath, file_hash):
+def _insert_hash(filepath: str, file_hash: str) -> str:
     """Inserts hash into filepath before the file extension.
 
     Args:
@@ -346,7 +366,7 @@ def _insert_hash(filepath, file_hash):
     return '%s.%s%s' % (filepath, file_hash, file_extension)
 
 
-def ensure_directory_exists(filepath):
+def ensure_directory_exists(filepath: str) -> None:
     """Ensures if directory tree exists, if not creates the directories.
 
     Args:
@@ -358,7 +378,7 @@ def ensure_directory_exists(filepath):
         os.makedirs(directory)
 
 
-def safe_delete_directory_tree(directory_path):
+def safe_delete_directory_tree(directory_path: str) -> None:
     """Recursively delete a directory tree. If directory tree does not exist,
     create the directories first then delete the directory tree.
 
@@ -369,7 +389,7 @@ def safe_delete_directory_tree(directory_path):
     shutil.rmtree(directory_path)
 
 
-def _ensure_files_exist(filepaths):
+def _ensure_files_exist(filepaths: List[str]) -> None:
     """Ensures that files exist at the given filepaths.
 
     Args:
@@ -383,7 +403,7 @@ def _ensure_files_exist(filepaths):
             raise OSError('File %s does not exist.' % filepath)
 
 
-def safe_copy_file(source_filepath, target_filepath):
+def safe_copy_file(source_filepath: str, target_filepath: str) -> None:
     """Copy a file (no metadata) after ensuring the file exists at the given
     source filepath.
     NOTE: shutil.copyfile does not accept directory path as arguments.
@@ -396,7 +416,7 @@ def safe_copy_file(source_filepath, target_filepath):
     shutil.copyfile(source_filepath, target_filepath)
 
 
-def safe_delete_file(filepath):
+def safe_delete_file(filepath: str) -> None:
     """Delete a file after ensuring the provided file actually exists.
 
     Args:
@@ -406,7 +426,7 @@ def safe_delete_file(filepath):
     os.remove(filepath)
 
 
-def get_file_count(directory_path):
+def get_file_count(directory_path: str) -> int:
     """Count total number of file in the given directory, ignoring any files
     with extensions in FILE_EXTENSIONS_TO_IGNORE or files that should not be
     built.
@@ -429,7 +449,7 @@ def get_file_count(directory_path):
 
 
 def _compare_file_count(
-        first_dir_list, second_dir_list):
+        first_dir_list: List[str], second_dir_list: List[str]) -> None:
     """Ensure that the total count of files in all directories in the first
     list matches the count of files in all the directories in the second list.
 
@@ -454,7 +474,10 @@ def _compare_file_count(
                 file_counts[0], file_counts[1]))
 
 
-def process_html(source_file_stream, target_file_stream):
+def process_html(
+    source_file_stream: IO[str],
+    target_file_stream: IO[str]
+) -> None:
     """Remove whitespaces and add hashes to filepaths in the HTML file stream
     object.
 
@@ -468,7 +491,7 @@ def process_html(source_file_stream, target_file_stream):
         target_file_stream, REMOVE_WS(' ', source_file_stream.read()))
 
 
-def get_dependency_directory(dependency):
+def get_dependency_directory(dependency: Dict[str, str]) -> str:
     """Get dependency directory from dependency dictionary.
 
     Args:
@@ -485,7 +508,10 @@ def get_dependency_directory(dependency):
     return os.path.join(THIRD_PARTY_STATIC_DIR, dependency_dir)
 
 
-def get_css_filepaths(dependency_bundle, dependency_dir):
+def get_css_filepaths(
+    dependency_bundle: DependencyBundleDict,
+    dependency_dir: str
+) -> List[str]:
     """Gets dependency css filepaths.
 
     Args:
@@ -504,7 +530,10 @@ def get_css_filepaths(dependency_bundle, dependency_dir):
     return [os.path.join(dependency_dir, css_file) for css_file in css_files]
 
 
-def get_js_filepaths(dependency_bundle, dependency_dir):
+def get_js_filepaths(
+    dependency_bundle: DependencyBundleDict,
+    dependency_dir: str
+) -> List[str]:
     """Gets dependency js filepaths.
 
     Args:
@@ -523,7 +552,10 @@ def get_js_filepaths(dependency_bundle, dependency_dir):
     return [os.path.join(dependency_dir, js_file) for js_file in js_files]
 
 
-def get_font_filepaths(dependency_bundle, dependency_dir):
+def get_font_filepaths(
+    dependency_bundle: DependencyBundleDict,
+    dependency_dir: str
+) -> List[str]:
     """Gets dependency font filepaths.
 
     Args:
@@ -554,7 +586,7 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
     return font_filepaths
 
 
-def get_dependencies_filepaths():
+def get_dependencies_filepaths() -> Dict[str, List[str]]:
     """Extracts dependencies filepaths from dependencies.json file into
     a dictionary.
 
@@ -564,7 +596,7 @@ def get_dependencies_filepaths():
         corresponding values is a full list of dependency file paths of the
         given type.
     """
-    filepaths = {
+    filepaths: Dict[str, List[str]] = {
         'js': [],
         'css': [],
         'fonts': []
@@ -589,7 +621,7 @@ def get_dependencies_filepaths():
     return filepaths
 
 
-def minify_third_party_libs(third_party_directory_path):
+def minify_third_party_libs(third_party_directory_path: str) -> None:
     """Minify third_party.js and third_party.css and remove un-minified
     files.
     """
@@ -611,7 +643,7 @@ def minify_third_party_libs(third_party_directory_path):
     safe_delete_file(third_party_css_filepath)
 
 
-def build_third_party_libs(third_party_directory_path):
+def build_third_party_libs(third_party_directory_path: str) -> None:
     """Joins all third party css files into single css file and js files into
     single js file. Copies both files and all fonts into third party folder.
     """
@@ -642,7 +674,7 @@ def build_third_party_libs(third_party_directory_path):
             dependency_filepaths['fonts'], webfonts_dir))
 
 
-def build_using_webpack(config_path):
+def build_using_webpack(config_path: str) -> None:
     """Execute webpack build process. This takes all TypeScript files we have in
     /templates and generates JS bundles according the require() imports
     and also compiles HTML pages into the /backend_prod_files/webpack_bundles
@@ -659,7 +691,7 @@ def build_using_webpack(config_path):
         p.wait()
 
 
-def hash_should_be_inserted(filepath):
+def hash_should_be_inserted(filepath: str) -> bool:
     """Returns if the file should be renamed to include hash in
     the path.
 
@@ -674,7 +706,7 @@ def hash_should_be_inserted(filepath):
         in FILEPATHS_NOT_TO_RENAME)
 
 
-def should_file_be_built(filepath):
+def should_file_be_built(filepath: str) -> bool:
     """Determines if the file should be built.
         - JS files: Returns False if filepath matches with pattern in
         JS_FILENAME_SUFFIXES_TO_IGNORE or is in JS_FILEPATHS_NOT_TO_BUILD,
@@ -704,7 +736,10 @@ def should_file_be_built(filepath):
 
 
 def generate_copy_tasks_to_copy_from_source_to_target(
-        source, target, file_hashes):
+    source: str,
+    target: str,
+    file_hashes: Dict[str, str]
+) -> Deque[threading.Thread]:
     """Generate copy task for each file in source directory, excluding files
     with extensions in FILE_EXTENSIONS_TO_IGNORE. Insert hash from hash dict
     into the destination filename.
@@ -723,7 +758,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
     """
     print('Processing %s' % os.path.join(os.getcwd(), source))
     print('Copying into %s' % os.path.join(os.getcwd(), target))
-    copy_tasks = collections.deque()
+    copy_tasks: Deque[threading.Thread] = collections.deque()
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirnames:
             print('Copying %s' % os.path.join(root, directory))
@@ -735,7 +770,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
                 target_path = source_path
                 # The path in hashes.json file is in posix style,
                 # see the comment above HASHES_JSON_FILENAME for details.
-                relative_path = common.convert_to_posixpath(
+                relative_path = common.convert_to_posixpath(  # type: ignore[no-untyped-call]
                     os.path.relpath(source_path, start=source))
                 if (hash_should_be_inserted(source + relative_path) and
                         relative_path in file_hashes):
@@ -751,7 +786,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
     return copy_tasks
 
 
-def is_file_hash_provided_to_frontend(filepath):
+def is_file_hash_provided_to_frontend(filepath: str) -> bool:
     """Returns if the hash for the filepath should be provided to the frontend.
 
     Args:
@@ -765,7 +800,7 @@ def is_file_hash_provided_to_frontend(filepath):
         in FILEPATHS_PROVIDED_TO_FRONTEND)
 
 
-def generate_md5_hash(filepath):
+def generate_md5_hash(filepath: str) -> str:
     """Returns md5 hash of file.
 
     Args:
@@ -784,7 +819,10 @@ def generate_md5_hash(filepath):
     return m.hexdigest()
 
 
-def get_filepaths_by_extensions(source_dir, file_extensions):
+def get_filepaths_by_extensions(
+    source_dir: str,
+    file_extensions: Tuple[str, ...]
+) -> List[str]:
     """Return list of filepaths in a directory with certain extensions,
     excluding filepaths that should not be built.
 
@@ -806,7 +844,7 @@ def get_filepaths_by_extensions(source_dir, file_extensions):
     return filepaths
 
 
-def get_file_hashes(directory_path):
+def get_file_hashes(directory_path: str) -> Dict[str, str]:
     """Returns hashes of all files in directory tree, excluding files with
     extensions in FILE_EXTENSIONS_TO_IGNORE or files that should not be built.
 
@@ -831,9 +869,9 @@ def get_file_hashes(directory_path):
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 # The path in hashes.json file is in posix style,
                 # see the comment above HASHES_JSON_FILENAME for details.
-                complete_filepath = common.convert_to_posixpath(
+                complete_filepath = common.convert_to_posixpath(  # type: ignore[no-untyped-call]
                     os.path.join(root, filename))
-                relative_filepath = common.convert_to_posixpath(os.path.relpath(
+                relative_filepath = common.convert_to_posixpath(os.path.relpath(  # type: ignore[no-untyped-call]
                     complete_filepath, start=directory_path))
                 file_hashes[relative_filepath] = generate_md5_hash(
                     complete_filepath)
@@ -841,7 +879,7 @@ def get_file_hashes(directory_path):
     return file_hashes
 
 
-def filter_hashes(file_hashes):
+def filter_hashes(file_hashes: Dict[str, str]) -> Dict[str, str]:
     """Filters hashes that should be provided to the frontend
     and prefixes "/" in front of the keys.
 
@@ -860,7 +898,7 @@ def filter_hashes(file_hashes):
     return filtered_hashes
 
 
-def save_hashes_to_file(file_hashes):
+def save_hashes_to_file(file_hashes: Dict[str, str]) -> None:
     """Return JS code that loads hashes needed for frontend into variable.
 
     Args:
@@ -880,7 +918,7 @@ def save_hashes_to_file(file_hashes):
         hashes_json_file.write(u'\n')
 
 
-def minify_func(source_path, target_path, filename):
+def minify_func(source_path: str, target_path: str, filename: str) -> None:
     """Call the appropriate functions to handle different types of file
     formats:
         - HTML files: Remove whitespaces, interpolates paths in HTML to include
@@ -905,13 +943,16 @@ def minify_func(source_path, target_path, filename):
         safe_copy_file(source_path, target_path)
 
 
-def _execute_tasks(tasks, batch_size=24):
+def _execute_tasks(
+    tasks: Deque[threading.Thread],
+    batch_size: int = 24
+) -> None:
     """Starts all tasks and checks the results.
 
     Runs no more than 'batch_size' tasks at a time.
     """
     remaining_tasks = collections.deque(tasks)
-    currently_running_tasks = []
+    currently_running_tasks: List[threading.Thread] = []
 
     while remaining_tasks or currently_running_tasks:
         if currently_running_tasks:
@@ -928,7 +969,10 @@ def _execute_tasks(tasks, batch_size=24):
                     'threads can only be started once') from e
 
 
-def generate_build_tasks_to_build_all_files_in_directory(source, target):
+def generate_build_tasks_to_build_all_files_in_directory(
+    source: str,
+    target: str
+) -> Deque[threading.Thread]:
     """This function queues up tasks to build all files in a directory,
     excluding files that should not be built.
 
@@ -944,7 +988,7 @@ def generate_build_tasks_to_build_all_files_in_directory(source, target):
     """
     print('Processing %s' % os.path.join(os.getcwd(), source))
     print('Generating into %s' % os.path.join(os.getcwd(), target))
-    build_tasks = collections.deque()
+    build_tasks: Deque[threading.Thread] = collections.deque()
 
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirnames:
@@ -962,7 +1006,10 @@ def generate_build_tasks_to_build_all_files_in_directory(source, target):
 
 
 def generate_build_tasks_to_build_files_from_filepaths(
-        source_path, target_path, filepaths):
+    source_path: str,
+    target_path: str,
+    filepaths: List[str]
+) -> Deque[threading.Thread]:
     """This function queues up build tasks to build files from a list of
     filepaths, excluding files that should not be built.
 
@@ -977,7 +1024,7 @@ def generate_build_tasks_to_build_files_from_filepaths(
         deque(Thread). A deque that contains all build tasks queued
         to be processed.
     """
-    build_tasks = collections.deque()
+    build_tasks: collections.deque[threading.Thread] = collections.deque()
     for filepath in filepaths:
         source_file_path = os.path.join(source_path, filepath)
         target_file_path = os.path.join(target_path, filepath)
@@ -992,7 +1039,9 @@ def generate_build_tasks_to_build_files_from_filepaths(
 
 
 def generate_delete_tasks_to_remove_deleted_files(
-        source_dir_hashes, staging_directory):
+    source_dir_hashes: Dict[str, str],
+    staging_directory: str
+) -> Deque[threading.Thread]:
     """This function walks the staging directory and queues up deletion tasks to
     remove files that are not in the hash dict i.e. remaining files in staging
     directory that have since been deleted from source directory. Files with
@@ -1009,7 +1058,7 @@ def generate_delete_tasks_to_remove_deleted_files(
         queued to be processed.
     """
     print('Scanning directory %s to remove deleted file' % staging_directory)
-    delete_tasks = collections.deque()
+    delete_tasks: Deque[threading.Thread] = collections.deque()
     for root, _, filenames in os.walk(
             os.path.join(os.getcwd(), staging_directory)):
         for filename in filenames:
@@ -1020,7 +1069,7 @@ def generate_delete_tasks_to_remove_deleted_files(
                 # On Windows the path is on Windows-Style, while the path in
                 # hashes is in posix style, we need to convert it so the check
                 # can run correctly.
-                relative_path = common.convert_to_posixpath(
+                relative_path = common.convert_to_posixpath(  # type: ignore[no-untyped-call]
                     os.path.relpath(target_path, start=staging_directory))
                 # Remove file found in staging directory but not in source
                 # directory, i.e. file not listed in hash dict.
@@ -1034,7 +1083,10 @@ def generate_delete_tasks_to_remove_deleted_files(
     return delete_tasks
 
 
-def get_recently_changed_filenames(source_dir_hashes, out_dir):
+def get_recently_changed_filenames(
+    source_dir_hashes: Dict[str, str],
+    out_dir: str
+) -> List[str]:
     """Compare hashes of source files and built files. Return a list of
     filenames that were recently changed. Skips files that are not supposed to
     built or already built.
@@ -1071,7 +1123,9 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
     return recently_changed_filenames
 
 
-def generate_build_tasks_to_build_directory(dirnames_dict):
+def generate_build_tasks_to_build_directory(
+    dirnames_dict: Dict[str, str]
+) -> Deque[threading.Thread]:
     """This function queues up build tasks to build all files in source
     directory if there is no existing staging directory. Otherwise, selectively
     queue up build tasks to build recently changed files.
@@ -1092,7 +1146,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict):
     source_dir = dirnames_dict['dev_dir']
     staging_dir = dirnames_dict['staging_dir']
     out_dir = dirnames_dict['out_dir']
-    build_tasks = collections.deque()
+    build_tasks: Deque[threading.Thread] = collections.deque()
     if not os.path.isdir(staging_dir):
         # If there is no staging dir, perform build process on all files.
         print('Creating new %s folder' % staging_dir)
@@ -1137,7 +1191,10 @@ def generate_build_tasks_to_build_directory(dirnames_dict):
     return build_tasks
 
 
-def _verify_filepath_hash(relative_filepath, file_hashes):
+def _verify_filepath_hash(
+    relative_filepath: str,
+    file_hashes: Dict[str, str]
+) -> None:
     """Ensure that hashes in filepaths match with the hash entries in hash
     dict.
 
@@ -1175,7 +1232,10 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
             relative_filepath)
 
 
-def _verify_hashes(output_dirnames, file_hashes):
+def _verify_hashes(
+    output_dirnames: List[str],
+    file_hashes: Dict[str, str]
+) -> None:
     """Verify a few metrics after build process finishes:
         1) The hashes in filenames belongs to the hash dict.
         2) hashes.json, third_party.min.css and third_party.min.js are built and
@@ -1208,14 +1268,14 @@ def _verify_hashes(output_dirnames, file_hashes):
     # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_js_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
-        file_hashes[common.convert_to_posixpath(
+        file_hashes[common.convert_to_posixpath(  # type: ignore[no-untyped-call]
             MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)])
 
     # The path in hashes.json (generated via file_hashes) file is in posix
     # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_css_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
-        file_hashes[common.convert_to_posixpath(
+        file_hashes[common.convert_to_posixpath(  # type: ignore[no-untyped-call]
             MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH)])
 
     _ensure_files_exist([
@@ -1226,7 +1286,7 @@ def _verify_hashes(output_dirnames, file_hashes):
             THIRD_PARTY_GENERATED_OUT_DIR, third_party_css_final_filename)])
 
 
-def generate_hashes():
+def generate_hashes() -> Dict[str, str]:
     """Generates hashes for files."""
 
     # The keys for hashes are filepaths relative to the subfolders of the future
@@ -1254,15 +1314,15 @@ def generate_hashes():
     return hashes
 
 
-def generate_build_directory(hashes):
+def generate_build_directory(hashes: Dict[str, str]) -> None:
     """Generates hashes for files. Minifies files and interpolates paths
     in HTMLs to include hashes. Renames the files to include hashes and copies
     them into build directory.
     """
     print('Building Oppia in production mode...')
 
-    build_tasks = collections.deque()
-    copy_tasks = collections.deque()
+    build_tasks: Deque[threading.Thread] = collections.deque()
+    copy_tasks: Deque[threading.Thread] = collections.deque()
 
     # Build files in /extensions and copy them into staging directory.
     build_tasks += generate_build_tasks_to_build_directory(
@@ -1319,14 +1379,14 @@ def generate_build_directory(hashes):
     print('Build completed.')
 
 
-def generate_python_package():
+def generate_python_package() -> None:
     """Generates Python package using setup.py."""
     print('Building Oppia package...')
     subprocess.check_call('python setup.py sdist -d build', shell=True)
     print('Oppia package build completed.')
 
 
-def main(args=None):
+def main(args: Optional[Sequence[str]] = None) -> None:
     """The main method of this script."""
     options = _PARSER.parse_args(args=args)
 
