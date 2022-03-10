@@ -24,6 +24,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 
  @Component({
    selector: 'oppia-home-tab',
@@ -46,14 +47,18 @@ export class HomeTabComponent {
   continueWhereYouLeftOffList: LearnerTopicSummary[] = [];
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
+  classroomTopicIds: string[] = [];
+  untrackedTopicIds: string[] = [];
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
+    private adminDataService: AdminDataService,
   ) {}
 
   ngOnInit(): void {
+    this.sortUntrackedTopics();
     this.width = this.widthConst * (this.currentGoals.length);
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
@@ -78,6 +83,33 @@ export class HomeTabComponent {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  sortUntrackedTopics(): void {
+    this.adminDataService.getDataAsync().then((adminDataObject) => {
+      console.log("adminDataObject");
+      console.log(adminDataObject);
+      console.log("untrackedTopics");
+      console.log(this.untrackedTopics);
+      console.log("untrackedTopics.math[0].storyTitles");
+      console.log(this.untrackedTopics.math[0].storyTitles);
+      console.log("Type of untrackedTopics.math[0].storyTitles");
+      console.log(typeof this.untrackedTopics.math[0].storyTitles);
+      this.classroomTopicIds = adminDataObject.configProperties
+        .classroom_pages_data.value[0].topic_ids;
+      this.untrackedTopicIds = this.untrackedTopics.math
+        .map(a => a.id);
+
+      this.classroomTopicIds = this.classroomTopicIds.filter(el => {
+        return (this.classroomTopicIds.includes(
+          el) && this.untrackedTopicIds.includes(el));
+      });
+
+      this.untrackedTopics.math.sort((a, b) => {
+        return this.classroomTopicIds.indexOf(a.id) -
+          this.untrackedTopicIds.indexOf(b.id);
+      });
+    });
   }
 
   getTimeOfDay(): string {

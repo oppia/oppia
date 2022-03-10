@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for for HomeTabComponent.
  */
 
-import { async, ComponentFixture, TestBed } from
+import { async, ComponentFixture, TestBed, fakeAsync } from
   '@angular/core/testing';
 import constants from 'assets/constants';
 import { MaterialModule } from 'modules/material.module';
@@ -29,6 +29,7 @@ import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backend-api.service';
 
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
@@ -37,6 +38,36 @@ describe('Home tab Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let mockResizeEmitter: EventEmitter<void>;
+  let adminBackendApiService: AdminBackendApiService;
+
+  const adminPageData: AdminPageData = {
+    demoExplorationIds: [],
+    demoExplorations: [],
+    demoCollections: [],
+    updatableRoles: [],
+    roleToActions: {},
+    configProperties: {
+      classroom_pages_data: {
+        schema: null,
+        description: '',
+        value: [
+          {
+            course_details: '',
+            name: 'math',
+            topic_ids: ['topicA',
+              'topicB',
+              'topicC'],
+            topic_list_intro: '',
+            url_fragment: 'math'
+          }
+        ]
+      }
+    },
+    viewableRoles: [],
+    humanReadableRoles: {},
+    topicSummaries: [],
+    featureFlags: []
+  };
 
   beforeEach(async(() => {
     mockResizeEmitter = new EventEmitter();
@@ -51,6 +82,7 @@ describe('Home tab Component', () => {
         HomeTabComponent
       ],
       providers: [
+        AdminBackendApiService,
         UrlInterpolationService,
         {
           provide: WindowDimensionsService,
@@ -70,9 +102,11 @@ describe('Home tab Component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    adminBackendApiService = TestBed.inject(AdminBackendApiService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
+    spyOn(adminBackendApiService, 'getDataAsync').and.resolveTo(adminPageData);
     let subtopic = {
       skill_ids: ['skill_id_2'],
       id: 1,
@@ -130,12 +164,87 @@ describe('Home tab Component', () => {
         skill_id_2: 'Skill Description 2'
       }
     };
+    const learnerTopicSummaryBackendDict2 = {
+      id: 'topicA',
+      name: 'Topic A',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      total_published_node_count: 2,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    };
+    const learnerTopicSummaryBackendDict3 = {
+      id: 'topicB',
+      name: 'Topic B',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      total_published_node_count: 2,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    };
     component.currentGoals = [LearnerTopicSummary.createFromBackendDict(
       learnerTopicSummaryBackendDict1)];
     component.goalTopics = [LearnerTopicSummary.createFromBackendDict(
       learnerTopicSummaryBackendDict1)];
     component.partiallyLearntTopicsList = [];
-    component.untrackedTopics = {};
+    component.untrackedTopics = {
+      math: [LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict3),
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict2)]
+    };
     component.username = 'username';
     fixture.detectChanges();
   });
@@ -232,4 +341,15 @@ describe('Home tab Component', () => {
     component.goalTopicsLength = 0;
     expect(component.isGoalLimitReached()).toBeFalse();
   });
+
+  it('should call sort function', () => {
+    spyOn(component, 'sortUntrackedTopics');
+    component.ngOnInit();
+    expect(component.sortUntrackedTopics).toHaveBeenCalled();
+  });
+
+  it('should reload config properties when initialized', fakeAsync(() => {
+    component.sortUntrackedTopics();
+    expect(component.classroomTopicIds).toEqual(component.untrackedTopicIds);
+  }));
 });
