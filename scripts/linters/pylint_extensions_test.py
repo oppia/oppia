@@ -3213,7 +3213,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             .checker.config.disallowed_functions_and_replacements_str) = [
                 'datetime.datetime.now=>datetime.datetime.utcnow',
                 'self.assertEquals=>self.assertEqual',
-                'b.next=>python_utils.NEXT',
+                'b.next=>utils.NEXT',
             ]
         self.checker_test_object.checker.open()
 
@@ -3245,7 +3245,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         message_replace_disallowed_next = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call3,
-            args=('b.next', 'python_utils.NEXT'),
+            args=('b.next', 'utils.NEXT'),
             confidence=interfaces.UNDEFINED
         )
 

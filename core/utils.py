@@ -69,11 +69,6 @@ T = TypeVar('T')
 TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
 BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
-# TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
-# because python_utils is untyped and will be removed in python3.
-# These will be removed after python3 migration and adding stubs for new python3
-# libraries.
-
 
 class InvalidInputException(Exception):
     """Error class for invalid input."""

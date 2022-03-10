@@ -22,9 +22,8 @@ from core.tests import test_utils
 from scripts import check_if_pr_is_low_risk
 from scripts import common
 
-# We import StringIO directly instead of using python_utils.string_io
-# because we need to inherit from StringIO, so we need the StringIO
-# class. python_utils.string_io returns a StringIO object.
+# We import StringIO directly because we need to inherit from StringIO,
+# so we need the StringIO class.
 try:
     from StringIO import StringIO  # pylint: disable=import-only-modules
 except ImportError:

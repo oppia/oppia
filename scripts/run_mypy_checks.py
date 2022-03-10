@@ -212,8 +212,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/tests/test_utils.py',
     'core/tests/test_utils_test.py',
     'core/jobs',
-    'core/python_utils.py',
-    'core/python_utils_test.py',
     'extensions/',
     'scripts/build.py',
     'scripts/build_test.py',
