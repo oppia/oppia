@@ -1806,6 +1806,9 @@ class CategorizedSkills:
             topic_name: str. The name of the topic.
             subtopic_titles: list(str). The list of subtopic titles of the
                 topic.
+
+        Raises:
+            ValidationError. Topic name is already added.
         """
         if topic_name in self.categorized_skills:
             raise utils.ValidationError(
