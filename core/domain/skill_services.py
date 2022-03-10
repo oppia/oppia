@@ -1187,43 +1187,30 @@ def get_categorized_skill_ids_and_descriptions():
 
     categorized_skills = skill_domain.CategorizedSkills()
 
-    skill_ids_and_details = []
     skill_ids = []
 
     for topic in topics:
         subtopics = topic.subtopics
         subtopic_titles = [subtopic.title for subtopic in subtopics]
         categorized_skills.add_topic(topic.name, subtopic_titles)
-
         for skill_id in topic.uncategorized_skill_ids:
             skill_ids.append(skill_id)
-            skill_ids_and_details.append({
-                'skill_id': skill_id,
-                'topic_name': topic.name,
-                'subtopic_title': None
-            })
         for subtopic in subtopics:
             for skill_id in subtopic.skill_ids:
                 skill_ids.append(skill_id)
-                skill_ids_and_details.append({
-                    'skill_id': skill_id,
-                    'topic_name': topic.name,
-                    'subtopic_title': subtopic.title
-                })
 
     skill_descriptions = get_descriptions_of_skills(skill_ids)[0]
 
-    for skill_detail in skill_ids_and_details:
-        skill_id = skill_detail['skill_id']
-        skill_description = skill_descriptions[skill_id]
-        topic_name = skill_detail['topic_name']
-        subtopic_title = skill_detail['subtopic_title']
-
-        if subtopic_title is None:
+    for topic in topics:
+        subtopics = topic.subtopics
+        for skill_id in topic.uncategorized_skill_ids:
             categorized_skills.add_uncategorized_skill(
-                topic_name, skill_id, skill_description)
-        else:
-            categorized_skills.add_subtopic_skill(
-                topic_name, subtopic_title, skill_id, skill_description)
+                topic.name, skill_id,
+                skill_descriptions[skill_id])
+        for subtopic in subtopics:
+            for skill_id in subtopic.skill_ids:
+                categorized_skills.add_subtopic_skill(
+                    topic.name, subtopic.title,
+                    skill_id, skill_descriptions[skill_id])
 
     return categorized_skills
