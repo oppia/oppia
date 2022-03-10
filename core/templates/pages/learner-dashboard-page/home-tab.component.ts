@@ -87,14 +87,6 @@ export class HomeTabComponent {
 
   sortUntrackedTopics(): void {
     this.adminDataService.getDataAsync().then((adminDataObject) => {
-      console.log("adminDataObject");
-      console.log(adminDataObject);
-      console.log("untrackedTopics");
-      console.log(this.untrackedTopics);
-      console.log("untrackedTopics.math[0].storyTitles");
-      console.log(this.untrackedTopics.math[0].storyTitles);
-      console.log("Type of untrackedTopics.math[0].storyTitles");
-      console.log(typeof this.untrackedTopics.math[0].storyTitles);
       this.classroomTopicIds = adminDataObject.configProperties
         .classroom_pages_data.value[0].topic_ids;
       this.untrackedTopicIds = this.untrackedTopics.math
