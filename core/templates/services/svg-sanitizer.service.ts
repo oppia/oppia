@@ -180,12 +180,7 @@ export class SvgSanitizerService {
     svg.querySelectorAll('*').forEach((node) => {
       let nodeTagName: string = node.tagName.toLowerCase();
       if (tagsToBeRemoved.indexOf(nodeTagName) !== -1) {
-        // The outermost node of an SVG will always be the svg tag itself.
-        // A filename with extension '.svg' and having outermost tag other than
-        // <svg></svg> will not qualify as an image file and cannot be uploaded.
-        if (node.parentNode) {
-          node.parentNode.removeChild(node);
-        }
+        node.parentNode.removeChild(node);
       } else {
         for (let i = 0; i < node.attributes.length; i++) {
           let nodeAttrName: string = node.attributes[i].name.toLowerCase();
