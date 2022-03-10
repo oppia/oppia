@@ -29,6 +29,8 @@ from typing import List, Optional
 from typing_extensions import TypedDict
 
 
+# TODO(#15105): Refactor UserSettings to limit the number of Optional
+# fields used in UserSettingsDict.
 class UserSettingsDict(TypedDict):
     """Dictionary representing the UserSettings object."""
 
@@ -1088,6 +1090,8 @@ class UserContributionRights:
                     self.can_review_voiceover_for_language_codes))
 
 
+# TODO(#15106): Refactor ModifiableUserData to limit the number of Optional
+# fields used in ModifiableUserDataDict.
 class ModifiableUserDataDict(TypedDict):
     """Dictionary representing the ModifiableUserData object."""
 
