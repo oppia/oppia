@@ -124,18 +124,13 @@
                   </div>
                   <div class="nav-item-bottom d-flex flex-column" *ngIf="!userIsLoggedIn">
                     <div *ngIf="classroomData.length > 0">
-                      <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
+                      <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3)">
                         <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                            (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment())"
                            tabindex="0"
                            class="underline"
                            href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/{{topicSummary.getUrlFragment()}}">
-                          <span *ngIf="!isHackyTopicTitleTranslationDisplayed(idx)">
                             {{ topicSummary.getName() }}
-                          </span>
-                          <span *ngIf="isHackyTopicTitleTranslationDisplayed(idx)">
-                            {{ topicTitlesTranslationKeys[idx] | translate }}
-                          </span>
                         </a>
                       </div>
                     </div>

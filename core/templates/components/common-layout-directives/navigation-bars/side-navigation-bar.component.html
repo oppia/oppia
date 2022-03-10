@@ -209,15 +209,10 @@
           <p class="oppia-sidebar-learn-subtext">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</p>
         </a>
         <div *ngIf="!userIsLoggedIn && classroomData.length > 0">
-          <div *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
+          <div *ngFor="let topicSummary of classroomData.slice(0, 3)">
             <div class="submenu-notop-margin">
               <a (click)="navigateToClassroomPage('/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/' + topicSummary.getUrlFragment())">
-                <span *ngIf="!isHackyTopicTitleTranslationDisplayed(idx)">
-                  {{ topicSummary.getName() }}
-                </span>
-                <span *ngIf="isHackyTopicTitleTranslationDisplayed(idx)">
-                  {{ topicTitlesTranslationKeys[idx] | translate }}
-                </span>
+                <span>{{ topicSummary.getName() }}</span>
               </a>
             </div>
           </div>
