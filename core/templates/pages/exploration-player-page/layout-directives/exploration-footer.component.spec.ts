@@ -461,7 +461,8 @@ describe('ExplorationFooterComponent', () => {
       preferred_language_codes: [],
       auto_tts_enabled: true,
       correctness_feedback_enabled: true,
-      record_playthrough_probability: 1
+      record_playthrough_probability: 1,
+      draft_change_list_id: 0
     };
 
     spyOn(roebas, 'fetchExplorationAsync')
