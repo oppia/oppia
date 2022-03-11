@@ -2462,45 +2462,11 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.logout()
         self.login(self.REVIEWER_EMAIL)
 
-    def test_exploration_handler_returns_data_with_no_topic(self):
+    def test_exploration_handler_returns_data(self):
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0
-            })
-        self.assertEqual(len(response['suggestions']), 1)
-        suggestion = response['suggestions'][0]
-        self.assertDictEqual(
-            suggestion['change'], self.translate_suggestion_change)
-        self.assertEqual(
-            suggestion['suggestion_type'],
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-        )
-        self.assertEqual(
-            suggestion['target_type'], feconf.ENTITY_TYPE_EXPLORATION)
-        self.assertEqual(suggestion['language_code'], 'hi')
-        self.assertEqual(suggestion['author_name'], 'author')
-        self.assertEqual(suggestion['status'], 'review')
-        self.assertDictEqual(
-            response['target_id_to_opportunity_dict'],
-            {
-                'exp1': {
-                    'chapter_title': 'Node1',
-                    'content_count': 2,
-                    'id': 'exp1',
-                    'story_title': 'A story',
-                    'topic_name': 'topic',
-                    'translation_counts': {},
-                    'translation_in_review_counts': {}
-                }
-            }
-        )
-
-    def test_exploration_handler_returns_data_with_valid_topic_and_exp_ids( # pylint: disable=line-too-long
-            self):
-        response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content', params={
-                'topic_name': 'topic'
             })
         self.assertEqual(len(response['suggestions']), 1)
         suggestion = response['suggestions'][0]
@@ -2531,16 +2497,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             }
         )
         self.assertEqual(response['next_offset'], 1)
-
-    def test_exploration_handler_returns_data_with_invalid_topic_and_no_exp_id( # pylint: disable=line-too-long
-            self):
-        with self.assertRaisesRegex(
-              Exception,
-                'The supplied input topic: invalid_topic is not valid'):
-            self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content', params={
-                'topic_name': 'invalid_topic'
-            })
 
     def test_get_reviewable_suggestions_when_state_of_a_target_is_removed(
         self):

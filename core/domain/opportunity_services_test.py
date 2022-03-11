@@ -849,25 +849,6 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunity_domain.ExplorationOpportunitySummary)
         self.assertEqual(opportunities['0'].id, '0')
 
-    def test_get_exploration_opportunity_summaries_by_topic_id(self):
-        output = (
-            opportunity_services
-                .get_exploration_opportunity_summaries_by_topic_id(
-                'None'))
-
-        self.assertEqual(output, [])
-
-        opportunities = (
-            opportunity_services
-                .get_exploration_opportunity_summaries_by_topic_id(
-                'topic'))
-
-        self.assertEqual(len(opportunities), 1)
-        self.assertIsInstance(
-            opportunities[0],
-            opportunity_domain.ExplorationOpportunitySummary)
-        self.assertEqual(opportunities[0].topic_id, 'topic')
-
     def test_get_exploration_opportunity_summaries_by_ids_for_invalid_id(self):
         opportunities = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
