@@ -24,8 +24,8 @@ from core import feconf
 from core import utils
 from core.domain import value_generators_domain
 
-from typing_extensions import TypedDict
 from typing import Dict, Any
+from typing_extensions import TypedDict
 
 from core.domain import object_registry  # pylint: disable=invalid-import-from # isort:skip
 
