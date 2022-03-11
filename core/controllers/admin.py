@@ -675,12 +675,12 @@ class AdminHandler(base.BaseHandler):
         """
         if constants.DEV_MODE:
             if story_services.does_story_exist_with_url_fragment(
-                'help-jamie-win-arcade'):
+                'no-help-jamie'):
                 self._generate_sample_opportunities_with_existing_topic(
                     num_sample_ops,
                     num_sample_interactions,
                     should_submit_suggestions,
-                    'help-jamie-win-arcade')
+                    'no-help-jamie')
             else:
                 self._generate_sample_opportunities_without_existing_topic(
                     num_sample_ops,
@@ -715,8 +715,8 @@ class AdminHandler(base.BaseHandler):
             1, topic_id_1))
 
         story = story_domain.Story.create_default_story(
-            story_id, 'Help Jaime win the Arcade', 'Description',
-            topic_id_1, 'help-jamie-win-arcade')
+            story_id, 'Help Jaime win the Arcade1', 'Description',
+            topic_id_1, 'no-help-jamie')
 
         story_node_dicts = self._generate_sample_chapters(
             num_sample_ops,
