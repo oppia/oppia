@@ -39,14 +39,10 @@ EXCLUDED_DIRECTORIES = [
 # List of files who should be type-annotated but are not.
 NOT_FULLY_COVERED_FILES = [
     'core/controllers/',
-    'core/domain/action_registry.py',
-    'core/domain/action_registry_test.py',
     'core/domain/auth_services.py',
     'core/domain/auth_services_test.py',
     'core/domain/blog_services.py',
     'core/domain/blog_services_test.py',
-    'core/domain/calculation_registry.py',
-    'core/domain/calculation_registry_test.py',
     'core/domain/change_domain.py',
     'core/domain/classifier_services.py',
     'core/domain/classifier_services_test.py',
@@ -56,8 +52,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/collection_domain_test.py',
     'core/domain/collection_services.py',
     'core/domain/collection_services_test.py',
-    'core/domain/config_services.py',
-    'core/domain/config_services_test.py',
     'core/domain/cron_services.py',
     'core/domain/customization_args_util.py',
     'core/domain/customization_args_util_test.py',
