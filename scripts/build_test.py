@@ -215,15 +215,28 @@ class BuildTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(ValueError, 'Hash dict is empty'):  # type: ignore[no-untyped-call]
             build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
 
-        file_hashes = {base_filename: 'test.html'}
+        # Generate a random hash dict for base.html.
+        file_hashes = {base_filename: 'abcdfabcdfabcdf1ABCDFABCDFABCDF1'}
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            ValueError, '%s is expected to contain MD5 hash' % base_filename):
+            build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
+
         base_without_hash_filename = 'base_without_hash.html'
-        self.assertIsNone(build._verify_filepath_hash(   # type: ignore[func-returns-value]  # pylint: disable=protected-access
+        self.assertIsNone(build._verify_filepath_hash(  # pylint: disable=protected-access
             base_without_hash_filename, file_hashes))
 
         bad_filepath = 'README'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Filepath has less than 2 partitions after splitting'):
             build._verify_filepath_hash(bad_filepath, file_hashes)  # pylint: disable=protected-access
+
+        hashed_base_filename = build._insert_hash(  # pylint: disable=protected-access
+            base_filename, 'ABCDFABCDFABCDF1abcdfabcdfabcdf1')
+        with self.assertRaisesRegex(
+            KeyError,
+            'Hash from file named %s does not match hash dict values' %
+            hashed_base_filename):
+            build._verify_filepath_hash(hashed_base_filename, file_hashes)  # pylint: disable=protected-access
 
     def test_process_html(self) -> None:
         """Test process_html removes whitespaces."""
