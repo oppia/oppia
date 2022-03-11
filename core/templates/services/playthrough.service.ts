@@ -310,15 +310,21 @@ export class PlaythroughService {
           this.explorationId, this.explorationVersion,
           this.misTracker.generateIssueCustomizationArgs(),
           this.recordedLearnerActions);
-    } else if (this.cstTracker && this.cstTracker.foundAnIssue() && (
-      this.recordedLearnerActions !== null)) {
+    } else if (
+      this.cstTracker &&
+      this.cstTracker.foundAnIssue() &&
+      this.recordedLearnerActions !== null
+    ) {
       return this.playthroughObjectFactory
         .createNewCyclicStateTransitionsPlaythrough(
           this.explorationId, this.explorationVersion,
           this.cstTracker.generateIssueCustomizationArgs(),
           this.recordedLearnerActions);
-    } else if (this.eqTracker && this.eqTracker.foundAnIssue() && (
-      this.recordedLearnerActions !== null)) {
+    } else if (
+      this.eqTracker &&
+      this.eqTracker.foundAnIssue() &&
+      this.recordedLearnerActions !== null
+    ) {
       return this.playthroughObjectFactory
         .createNewEarlyQuitPlaythrough(
           this.explorationId, this.explorationVersion,

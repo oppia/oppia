@@ -63,17 +63,17 @@ describe('Stats reporting service ', () => {
     spyOn(messengerService, 'sendMessage').and.callThrough();
     spyOn(siteAnalyticsService, 'registerNewCard').and.callThrough();
     spyOn(siteAnalyticsService, 'registerStartExploration')
-      .and.returnValue();
+      .and.callThrough();
     spyOn(siteAnalyticsService, 'registerFinishExploration')
-      .and.returnValue();
+      .and.callThrough();
     spyOn(siteAnalyticsService, 'registerCuratedLessonCompleted')
-      .and.returnValue();
+      .and.callThrough();
     spyOn(playthroughService, 'recordExplorationStartAction')
-      .and.returnValue();
+      .and.callThrough();
     spyOn(playthroughService, 'recordExplorationQuitAction')
-      .and.returnValue();
+      .and.callThrough();
     spyOn(playthroughService, 'storePlaythrough')
-      .and.returnValue();
+      .and.callThrough();
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     spyOn(urlService, 'getUrlParams')
@@ -250,7 +250,7 @@ describe('Stats reporting service ', () => {
   it('should record stats when an answer submit button is clicked', () => {
     let recordAnswerSubmitActionSpy = spyOn(
       playthroughService, 'recordAnswerSubmitAction')
-      .and.returnValue();
+      .and.callThrough();
     statsReportingService.recordAnswerSubmitAction(
       'oldState', 'newState', 'expId', 'answer', 'feedback');
 

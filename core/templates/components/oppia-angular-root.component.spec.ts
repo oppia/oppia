@@ -89,7 +89,7 @@ describe('OppiaAngularRootComponent', function() {
       TestBed.inject(MetaTagCustomizationService));
     emitSpy = spyOn(component.initialized, 'emit');
     spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags')
-      .and.returnValue();
+      .and.callThrough();
     i18nService = TestBed.inject(I18nService);
   }));
 

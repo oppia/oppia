@@ -322,7 +322,7 @@ describe('Admin roles tab component ', function() {
       }));
 
     it('should open topic manager modal on adding topic manager role', () => {
-      spyOn(component, 'openTopicManagerRoleEditor').and.returnValue();
+      spyOn(component, 'openTopicManagerRoleEditor').and.callThrough();
 
       component.addNewRole('TOPIC_MANAGER');
 
