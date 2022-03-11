@@ -20,15 +20,22 @@ from __future__ import annotations
 
 import re
 
+from typing_extensions import TypedDict
+from typing import Dict
 from core import feconf
 from core import utils
 from core.domain import value_generators_domain
+from value_generators_domain import BaseValueGenerator
 
 from core.domain import object_registry  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
+class ParamChangeDict(TypedDict):
+    name: str
+    generator_id: str
+    customization_args: Dict[str,str]
 
 class ParamSpec:
     """Value object for an exploration parameter specification."""
@@ -37,7 +44,7 @@ class ParamSpec:
         'UnicodeString',
     }
 
-    def __init__(self, obj_type):
+    def __init__(self, obj_type: str) -> None:
         """Initializes a ParamSpec object with the specified object type.
 
         Args:
@@ -46,7 +53,7 @@ class ParamSpec:
         """
         self.obj_type = obj_type
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str,str]:
         """Returns a dict representation of this ParamSpec.
 
         Returns:
@@ -58,7 +65,7 @@ class ParamSpec:
         }
 
     @classmethod
-    def from_dict(cls, param_spec_dict):
+    def from_dict(cls, param_spec_dict: Dict[str,str]) -> ParamSpec:
         """Creates a ParamSpec object from its dict representation.
 
         Args:
@@ -72,11 +79,11 @@ class ParamSpec:
         """
         return cls(param_spec_dict['obj_type'])
 
-    def validate(self):
+    def validate(self) -> None:
         """Validate the existence of the object class."""
 
         # Ensure that this object class exists.
-        object_registry.Registry.get_object_class_by_type(self.obj_type)
+        object_registry.Registry.get_object_class_by_type(self.obj_type) # type: ignore[no-untyped-call]
 
         # Ensure the obj_type is among the supported ParamSpec types.
         if self.obj_type not in self.SUPPORTED_OBJ_TYPES:
@@ -89,7 +96,8 @@ class ParamSpec:
 class ParamChange:
     """Value object for a parameter change."""
 
-    def __init__(self, name, generator_id, customization_args):
+    def __init__(self, name: str, generator_id: str,
+        customization_args: Dict[str,str]) -> None:
         """Initialize a ParamChange object with the specified arguments.
 
         Args:
@@ -111,7 +119,7 @@ class ParamChange:
         self._customization_args = customization_args
 
     @property
-    def name(self):
+    def name(self) -> str:
         """The name of the changing parameter.
 
         Returns:
@@ -120,7 +128,7 @@ class ParamChange:
         return self._name
 
     @property
-    def generator(self):
+    def generator(self) -> BaseValueGenerator:
         """The value generator used to define the new value of the
         changing parameter.
 
@@ -132,7 +140,7 @@ class ParamChange:
             self._generator_id)()
 
     @property
-    def customization_args(self):
+    def customization_args(self) -> Dict[str,str]:
         """A dict containing several arguments that determine the changing value
         of the parameter.
 
@@ -146,7 +154,7 @@ class ParamChange:
          """
         return self._customization_args
 
-    def to_dict(self):
+    def to_dict(self) -> ParamChangeDict:
         """Returns a dict representing this ParamChange domain object.
 
         Returns:
@@ -159,7 +167,7 @@ class ParamChange:
         }
 
     @classmethod
-    def from_dict(cls, param_change_dict):
+    def from_dict(cls, param_change_dict: ParamChangeDict) -> ParamChange:
         """Create a ParamChange object with the specified arguments.
 
         Args:
@@ -185,18 +193,18 @@ class ParamChange:
             param_change_dict['customization_args']
         )
 
-    def _get_value(self, context_params):
+    def _get_value(self, context_params: str) -> BaseValueGenerator:
         """Generates a single value for a parameter change."""
         return self.generator.generate_value(
             context_params, **self.customization_args)
 
-    def get_normalized_value(self, obj_type, context_params):
+    def get_normalized_value(self, obj_type: str, context_params: str) -> BaseValueGenerator:
         """Generates a single normalized value for a parameter change."""
         raw_value = self._get_value(context_params)
-        return object_registry.Registry.get_object_class_by_type(
+        return object_registry.Registry.get_object_class_by_type( # type: ignore[no-untyped-call]
             obj_type).normalize(raw_value)
 
-    def validate(self):
+    def validate(self) -> None:
         """Checks that the properties of this ParamChange object are valid."""
         if not isinstance(self.name, str):
             raise utils.ValidationError(
