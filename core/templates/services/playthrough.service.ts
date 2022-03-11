@@ -330,10 +330,9 @@ export class PlaythroughService {
   }
 
   private isRecordedPlaythroughHelpful(): boolean {
-    const hasRecordedPlayFinished = this.hasRecordingFinished();
     return (
       // Playthroughs are only helpful in their entirety.
-      hasRecordedPlayFinished &&
+      this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.
       this.recordedLearnerActions.some(
         a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
