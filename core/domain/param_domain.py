@@ -96,8 +96,12 @@ class ParamSpec:
 class ParamChange:
     """Value object for a parameter change."""
 
-    def __init__(self, name: str, generator_id: str,
-        customization_args: Dict[str,str]) -> None:
+    def __init__(
+        self,
+        name: str,
+        generator_id: str,
+        customization_args: Dict[str,str]
+    ) -> None:
         """Initialize a ParamChange object with the specified arguments.
 
         Args:
@@ -198,7 +202,10 @@ class ParamChange:
         return self.generator.generate_value(
             context_params, **self.customization_args)
 
-    def get_normalized_value(self, obj_type: str, context_params: str) -> BaseValueGenerator:
+    def get_normalized_value(
+        self,
+        obj_type: str,
+        context_params: str) -> BaseValueGenerator:
         """Generates a single normalized value for a parameter change."""
         raw_value = self._get_value(context_params)
         return object_registry.Registry.get_object_class_by_type( # type: ignore[no-untyped-call]
