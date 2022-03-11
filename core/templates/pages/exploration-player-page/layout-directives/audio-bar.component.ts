@@ -144,13 +144,7 @@ export class AudioBarComponent {
   getCurrentAudioLanguageCode(): string {
     const currentAudioLanguageCode = (
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode()
-    );
-
-    if (currentAudioLanguageCode === null) {
-      throw new Error(
-        'AudioTranslationLanguageService returned null for current audio ' +
-        'language code.');
-    }
+    ) as string;
 
     return currentAudioLanguageCode;
   }
