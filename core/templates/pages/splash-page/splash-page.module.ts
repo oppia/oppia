@@ -18,7 +18,6 @@
 
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
-import { SharedComponentsModule } from 'components/shared-component.module';
 import { SplashPageComponent } from './splash-page.component';
 import { SplashPageRootComponent } from './splash-page-root.component';
 import { CommonModule } from '@angular/common';
@@ -28,7 +27,6 @@ import { SplashPageRoutingModule } from './splash-page-routing.module';
   imports: [
     CommonModule,
     HttpClientModule,
-    SharedComponentsModule,
     SplashPageRoutingModule
   ],
   declarations: [

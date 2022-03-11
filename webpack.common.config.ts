@@ -17,6 +17,7 @@
  */
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
@@ -372,98 +373,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
-    new HtmlWebpackPlugin({
-      chunks: ['practice_session'],
-      filename: 'practice-session-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/practice-session-page/' +
-        'practice-session-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['review_test'],
-      filename: 'review-test-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/review-test-page/review-test-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['skill_editor'],
-      filename: 'skill-editor-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/skill-editor-page/' +
-        'skill-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['story_editor'],
-      filename: 'story-editor-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/story-editor-page/' +
-        'story-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['subtopic_viewer'],
-      filename: 'subtopic-viewer-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/subtopic-viewer-page/' +
-        'subtopic-viewer-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['topic_editor'],
-      filename: 'topic-editor-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/topic-editor-page/' +
-        'topic-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['topics_and_skills_dashboard'],
-      filename: 'topics-and-skills-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template: (
-        commonPrefix +
-        '/pages/topics-and-skills-dashboard-page/' +
-        'topics-and-skills-dashboard-page.mainpage.html'
-      ),
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['topic_viewer'],
-      filename: 'topic-viewer-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/topic-viewer-page/' +
-        'topic-viewer-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new CleanWebpackPlugin({
-      cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
-    }),
     new webpack.LoaderOptionsPlugin({
       options: {
         macros: {
@@ -472,6 +381,7 @@ module.exports = {
         },
       },
     }),
+    //new BundleAnalyzerPlugin()
   ],
   module: {
     rules: [{
@@ -543,9 +453,13 @@ module.exports = {
     jquery: 'jQuery'
   },
   optimization: {
-    runtimeChunk: 'single',
+    sideEffects: true,
+    usedExports: true,
     splitChunks: {
-      chunks: 'all'
+      chunks: 'all',
+      minSize: 10000,
+      maxAsyncRequests: 50,
+      maxInitialRequests: 50
     },
   }
 };
