@@ -75,7 +75,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       }
       if (!QuestionUndoRedoService.hasChanges()) {
         AlertsService.addInfoMessage(
-          'No changes detected unable to update question.', 5000);
+          'No changes detected.', 5000);
         return;
       }
       SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(

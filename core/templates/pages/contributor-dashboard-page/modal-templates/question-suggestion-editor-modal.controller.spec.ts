@@ -256,7 +256,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
         .toHaveBeenCalled();
     });
 
-    it('should fail to update the question', function() {
+    it('should fail to update the question' +
+       'when no changes are made', function() {
       spyOn(ContributionAndReviewService, 'updateQuestionSuggestionAsync')
         .and.callFake((
             suggestionId, skillDifficulty, questionStateData, imagesData,
@@ -264,8 +265,10 @@ describe('Question Suggestion Editor Modal Controller', function() {
           successCallback();
         });
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
-
+      spyOn(AlertsService, 'addInfoMessage');
       $scope.done();
+      expect(AlertsService.addInfoMessage)
+        .toHaveBeenCalledWith('No changes detected.', 5000);
     });
 
     it('should show alert when suggestion is submitted', function() {
