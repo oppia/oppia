@@ -32,10 +32,12 @@ from core.domain import object_registry  # pylint: disable=invalid-import-from #
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
+
 class ParamChangeDict(TypedDict):
     name: str
     generator_id: str
-    customization_args: Dict[str,str]
+    customization_args: Dict[str, str]
+
 
 class ParamSpec:
     """Value object for an exploration parameter specification."""
@@ -53,7 +55,7 @@ class ParamSpec:
         """
         self.obj_type = obj_type
 
-    def to_dict(self) -> Dict[str,str]:
+    def to_dict(self) -> Dict[str, str]:
         """Returns a dict representation of this ParamSpec.
 
         Returns:
@@ -65,7 +67,7 @@ class ParamSpec:
         }
 
     @classmethod
-    def from_dict(cls, param_spec_dict: Dict[str,str]) -> ParamSpec:
+    def from_dict(cls, param_spec_dict: Dict[str, str]) -> ParamSpec:
         """Creates a ParamSpec object from its dict representation.
 
         Args:
@@ -100,7 +102,7 @@ class ParamChange:
         self,
         name: str,
         generator_id: str,
-        customization_args: Dict[str,str]
+        customization_args: Dict[str, str]
     ) -> None:
         """Initialize a ParamChange object with the specified arguments.
 
@@ -144,7 +146,7 @@ class ParamChange:
             self._generator_id)()
 
     @property
-    def customization_args(self) -> Dict[str,str]:
+    def customization_args(self) -> Dict[str, str]:
         """A dict containing several arguments that determine the changing value
         of the parameter.
 
