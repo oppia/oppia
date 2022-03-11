@@ -47,9 +47,6 @@ from typing_extensions import Literal
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
 
-_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _THIRD_PARTY_PATH)
-
 _CERTIFI_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
 sys.path.insert(0, _CERTIFI_PATH)
