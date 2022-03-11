@@ -38,7 +38,7 @@ import { FatigueDetectionService } from '../services/fatigue-detection.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { HintsAndSolutionManagerService } from '../services/hints-and-solution-manager.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { ImagePreloaderService } from '../services/image-preloader.service';
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { LearnerParamsService } from '../services/learner-params.service';
@@ -69,6 +69,7 @@ import { StoryViewerDomainConstants } from 'domain/story_viewer/story-viewer-dom
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/services/collection-player-backend-api.service';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -97,6 +98,7 @@ export class ConversationSkinComponent {
 
   CONTINUE_BUTTON_FOCUS_LABEL = (
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
+
   isLoggedIn: boolean;
   storyNodeIdToAdd: string;
   inStoryMode: boolean = false;
@@ -116,6 +118,7 @@ export class ConversationSkinComponent {
   upcomingInlineInteractionHtml;
   DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+
   // If the exploration is iframed, send data to its parent about
   // its height so that the parent can be resized as necessary.
   lastRequestedHeight: number = 0;
@@ -292,10 +295,6 @@ export class ConversationSkinComponent {
     this.windowRef.nativeWindow.onresize = () => {
       this.adjustPageHeight(false, null);
     };
-
-    this.windowRef.nativeWindow.addEventListener('scroll', () => {
-      this.fixSupplementOnScroll();
-    });
 
     this.currentInteractionService.setOnSubmitFn(this.submitAnswer.bind(this));
     this.startCardChangeAnimation = false;
@@ -710,7 +709,7 @@ export class ConversationSkinComponent {
           topicUrlFragment, classroomUrlFragment,
           storyUrlFragment).then(
           (res) => {
-            let nextStoryNode = [];
+            let nextStoryNode: LearnerExplorationSummary[] = [];
             for (let i = 0; i < res.nodes.length; i++) {
               if (res.nodes[i].id === nodeId &&
                   (i + 1) < res.nodes.length) {
@@ -1167,18 +1166,6 @@ export class ConversationSkinComponent {
     ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX;
   }
 
-  fixSupplementOnScroll(): void {
-    let supplementCard = $('div.conversation-skin-supplemental-card');
-    let topMargin = $('.navbar-container').height() - 20;
-    if ($(window).scrollTop() > topMargin) {
-      supplementCard.addClass(
-        'conversation-skin-supplemental-card-fixed');
-    } else {
-      supplementCard.removeClass(
-        'conversation-skin-supplemental-card-fixed');
-    }
-  }
-
   onNavigateFromIframe(): void {
     this.siteAnalyticsService.registerVisitOppiaFromIframeEvent(
       this.explorationId);
@@ -1186,6 +1173,26 @@ export class ConversationSkinComponent {
 
   submitAnswerFromProgressNav(): void {
     this.currentInteractionService.submitAnswer();
+  }
+
+  getRecommendedExpTitleTranslationKey(explorationId: string): string {
+    return (
+      this.i18nLanguageCodeService.getExplorationTranslationKey(
+        explorationId,
+        TranslationKeyType.TITLE
+      )
+    );
+  }
+
+  isHackyExpTitleTranslationDisplayed(explorationId: string): boolean {
+    let recommendedExpTitleTranslationKey = (
+      this.getRecommendedExpTitleTranslationKey(explorationId)
+    );
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        recommendedExpTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

@@ -101,7 +101,6 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
 import { AddOrUpdateSolutionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
 import { SavePendingChangesModalComponent } from './save-pending-changes/save-pending-changes-modal.component';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
-import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
 import { QuestionMisconceptionSelectorComponent } from './question-directives/question-misconception-selector/question-misconception-selector.component';
 import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
 import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
@@ -114,6 +113,7 @@ import { QuestionsListSelectSkillAndDifficultyModalComponent } from 'pages/topic
 import { QuestionEditorSaveModalComponent } from './question-directives/modal-templates/question-editor-save-modal.component';
 import { HintEditorComponent } from 'components/state-directives/hint-editor/hint-editor.component';
 import { ResponseHeaderComponent } from './state-directives/response-header/response-header.component';
+import { StateContentEditorComponent } from './state-editor/state-content-editor/state-content-editor.component';
 import { StateHintsEditorComponent } from 'components/state-editor/state-hints-editor/state-hints-editor.component';
 import { ReviewMaterialEditorComponent } from './review-material-editor/review-material-editor.component';
 import { ConfirmLeaveModalComponent } from 'pages/exploration-editor-page/modal-templates/confirm-leave-modal.component';
@@ -229,9 +229,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SelectSkillModalComponent,
     SearchBarComponent,
     SharingLinksComponent,
-    SmoothHeightAnimatorComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
+    StateContentEditorComponent,
     StateHintsEditorComponent,
     StateSkillEditorComponent,
     StorySummaryTileComponent,
@@ -331,6 +331,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     RatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
+    StateContentEditorComponent,
     StateHintsEditorComponent,
     ScoreRingComponent,
     SearchBarComponent,
@@ -338,7 +339,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
-    SmoothHeightAnimatorComponent,
     ThumbnailDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
@@ -432,6 +432,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
     SearchBarComponent,
+    StateContentEditorComponent,
     StateHintsEditorComponent,
     QuestionDifficultySelectorComponent,
     QuestionEditorSaveModalComponent,
@@ -444,7 +445,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
-    SmoothHeightAnimatorComponent,
     TakeBreakModalComponent,
     ThreadTableComponent,
     ThumbnailDisplayComponent,

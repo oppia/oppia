@@ -11,10 +11,17 @@
           <i class="fa fa-caret-right" aria-hidden="true" *ngIf="!currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
           <i class="fa fa-caret-down" aria-hidden="true" *ngIf="currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
         </div>
-        <div class="oppia-trash-button" (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
-          <i class="fa fa-trash"></i>
+        <div #dropdown class="oppia-three-dots-dropdown-container"
+             (click)="toggleThreeDotsDropdown()">
+          <i class="fa fa-ellipsis-v"></i>
+          <div *ngIf="showThreeDotsDropdown" class="oppia-three-dots-dropdown">
+            <div class="oppia-trash-button" (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
+              <i class="fa fa-trash"></i>
+              <span>{{'I18N_LEARNER_DASHBOARD_REMOVE_BUTTON' | translate}}</span>
+            </div>
+          </div>
         </div>
-        <label class="oppia-current-goals-topic-name protractor-test-topic-name-in-current-goals">
+        <label class="oppia-current-goals-topic-name protractor-test-topic-name-in-current-goals" (click)="toggleStory(i)">
           <span [innerHTML]="'I18N_LEARN_TOPIC' | translate: { topicName: topic.name }"></span>
         </label>
         <p class="oppia-goals-story-name">
@@ -86,6 +93,7 @@
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_GOALS_SECTION' | translate"></p>
   </div>
 </div>
+
 <!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
 <link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/goals-tab.component.css">
 <link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/goals-tab.component.rtl.css">
