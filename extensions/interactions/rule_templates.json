@@ -4,7 +4,7 @@
       "description": "matches exactly with {{x|AlgebraicExpression}}"
     },
     "MatchesUpToTrivialManipulations": {
-      "description": "matches {{x|AlgebraicExpression}}, taking into account commutativity and associativity."
+      "description": "matches {{x|AlgebraicExpression}}, taking into account commutativity and associativity"
     },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|AlgebraicExpression}}"
@@ -127,7 +127,7 @@
       "description": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}"
     },
     "MatchesUpToTrivialManipulations": {
-      "description": "matches {{x|MathEquation}} {{y|PositionOfTerms}}, taking into account commutativity and associativity."
+      "description": "matches {{x|MathEquation}} {{y|PositionOfTerms}}, taking into account commutativity and associativity"
     },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|MathEquation}}"
@@ -180,7 +180,7 @@
       "description": "matches exactly with {{x|NumericExpression}}"
     },
     "MatchesUpToTrivialManipulations": {
-      "description": "matches {{x|NumericExpression}}, taking into account commutativity and associativity."
+      "description": "matches {{x|NumericExpression}}, taking into account commutativity and associativity"
     },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|NumericExpression}}"

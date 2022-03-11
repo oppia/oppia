@@ -217,8 +217,6 @@ describe('Math equation input rules service', () => {
     expect(meirs.MatchesUpToTrivialManipulations(
       'y=c+m*x', {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesUpToTrivialManipulations(
-      'y-m*x-2*c=-c', {x: inputString, y: positionOfTerms})).toBeTrue();
-    expect(meirs.MatchesUpToTrivialManipulations(
       'y-m*x=c', {x: inputString, y: positionOfTerms})).toBeTrue();
     // Rejected cases.
     expect(meirs.MatchesUpToTrivialManipulations(
@@ -233,6 +231,8 @@ describe('Math equation input rules service', () => {
       'y/(m*x+c)=1', {x: inputString, y: positionOfTerms})).toBeFalse();
     expect(meirs.MatchesUpToTrivialManipulations(
       'y^2=m*x*y+c*y', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesUpToTrivialManipulations(
+      'y-m*x-2*c=-c', {x: inputString, y: positionOfTerms})).toBeFalse();
   });
 
   it('should have a correct IsEquivalentTo rule', () => {

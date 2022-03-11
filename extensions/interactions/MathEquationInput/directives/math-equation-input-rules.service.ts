@@ -30,6 +30,7 @@ import {
   MathEquationRuleInputsWithoutSide,
   MathEquationRuleInputsWithPlaceholder
 } from 'interactions/rule-input-defs';
+import { MathInteractionsService } from 'services/math-interactions.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,7 @@ export class MathEquationInputRulesService {
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide): boolean {
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();
+    let mathInteractionsService = new MathInteractionsService();
 
     let positionOfTerms = inputs.y;
 
@@ -59,6 +61,17 @@ export class MathEquationInputRulesService {
     } else {
       // Position of terms is irrelevant. So, we bring all terms on one side
       // and perform an exact match.
+
+      // Replacing constants to ensure that they don't get simplified.
+      rhsAnswer = mathInteractionsService.replaceConstantsWithVariables(
+        rhsAnswer);
+      lhsAnswer = mathInteractionsService.replaceConstantsWithVariables(
+        lhsAnswer);
+      rhsInput = mathInteractionsService.replaceConstantsWithVariables(
+        rhsInput);
+      lhsInput = mathInteractionsService.replaceConstantsWithVariables(
+        lhsInput);
+
       let rhsAnswerModified = nerdamer(rhsAnswer).multiply('-1').text();
       let expressionAnswer = nerdamer(rhsAnswerModified).add(lhsAnswer).text();
 
@@ -74,6 +87,7 @@ export class MathEquationInputRulesService {
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide): boolean {
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();
+    let mathInteractionsService = new MathInteractionsService();
 
     let positionOfTerms = inputs.y;
 
@@ -98,6 +112,17 @@ export class MathEquationInputRulesService {
     } else {
       // Position of terms is irrelevant. So, we bring all terms on one side
       // and perform an exact match.
+
+      // Replacing constants to ensure that they don't get simplified.
+      rhsAnswer = mathInteractionsService.replaceConstantsWithVariables(
+        rhsAnswer);
+      lhsAnswer = mathInteractionsService.replaceConstantsWithVariables(
+        lhsAnswer);
+      rhsInput = mathInteractionsService.replaceConstantsWithVariables(
+        rhsInput);
+      lhsInput = mathInteractionsService.replaceConstantsWithVariables(
+        lhsInput);
+
       let rhsAnswerModified = nerdamer(rhsAnswer).multiply('-1').text();
       let expressionAnswer = nerdamer(rhsAnswerModified).add(lhsAnswer).text();
 

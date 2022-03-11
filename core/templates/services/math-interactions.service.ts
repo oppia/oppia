@@ -521,32 +521,36 @@ export class MathInteractionsService {
     return listOfTerms;
   }
 
+  replaceConstantsWithVariables(expressionString: string): string {
+    // Multiple instances of the same constant will be replaced by the same
+    // variable.
+
+    // Replacing decimals with variables.
+    // Eg: 3.4 + x => const3point4 + x
+    // We need to do this differently since const3.4 would be
+    // an invalid variable.
+    expressionString = expressionString.replace(
+      /(\d+)\.(\d+)/g, 'const$1point$2');
+
+    // Replacing integers with variables.
+    // Eg: 2 + x * 4 + 2 => const2 + x * const4 + const2
+    // const2, const4 are considered as variables by nerdamer, just like x.
+    expressionString = expressionString.replace(/(\d+)/g, 'const$1');
+    return expressionString;
+  }
+
+  doPartsMatch(part1: string, part2: string): boolean {
+    // Splitting a term by '*' or '/' would give a list of parts.
+    // Nerdamer simplifies constant terms automatically so to avoid that,
+    // we'll replace all constants with a variable.
+    part1 = this.replaceConstantsWithVariables(part1);
+    part2 = this.replaceConstantsWithVariables(part2);
+    return nerdamer(part1).eq(nerdamer(part2).toString());
+  }
+
   // The input terms to this function should be the terms split by '+'/'-'
   // from an expression.
   doTermsMatch(term1: string, term2: string): boolean {
-    let doPartsMatch = function(part1: string, part2: string): boolean {
-      // Splitting a term by '*' or '/' would give a list of parts.
-      // Nerdamer simplifies constant terms automatically so to avoid that,
-      // we'll replace all constants with a variable.
-      // Multiple instances of the same constant will be replaced by the same
-      // variable.
-
-      // Replacing decimals with variables.
-      // Eg: 3.4 + x => const3point4 + x
-      // We need to do this differently since const3.4 would be
-      // an invalid variable.
-      part1 = part1.replace(/(\d+)\.(\d+)/g, 'const$1point$2');
-      part2 = part2.replace(/(\d+)\.(\d+)/g, 'const$1point$2');
-
-      // Replacing integers with variables.
-      // Eg: 2 + x * 4 + 2 => const2 + x * const4 + const2
-      // const2, const4 are considered as variables by nerdamer, just like x.
-      part1 = part1.replace(/(\d+)/g, 'const$1');
-      part2 = part2.replace(/(\d+)/g, 'const$1');
-
-      return nerdamer(part1).eq(nerdamer(part2).toString());
-    };
-
     // We split both terms by multiplication and division into separate parts
     // and try to match these parts from both inputs by checking equivalency.
     let partsList1 = this.getTerms(term1, false);
@@ -558,7 +562,7 @@ export class MathInteractionsService {
     // loop.
     for (let i = partsList1.length - 1; i >= 0; i--) {
       for (let j = 0; j < partsList2.length; j++) {
-        if (doPartsMatch(partsList1[i], partsList2[j])) {
+        if (this.doPartsMatch(partsList1[i], partsList2[j])) {
           partsList1.splice(i, 1);
           partsList2.splice(j, 1);
           break;
