@@ -17,6 +17,7 @@
  */
 
 import { NgModule } from '@angular/core';
+import { SharedComponentsModule } from 'components/shared-component.module';
 import { TopicLandingPageComponent } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.component';
 import { TopicLandingPageRootComponent } from './topic-landing-page-root.component';
@@ -26,6 +27,7 @@ import { TopicLandingPageRoutingModule } from './topic-landing-page-routing.modu
 @NgModule({
   imports: [
     CommonModule,
+    SharedComponentsModule,
     TopicLandingPageRoutingModule
   ],
   declarations: [
