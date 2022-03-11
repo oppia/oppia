@@ -110,8 +110,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
     # We have ignored [override] here because the signature of this method
     # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error( # type: ignore[override]
-        self,
-        expected_error_substring: str
+        self, expected_error_substring: str
     ) -> None:
         """Checks that the topic passes strict validation."""
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
@@ -372,8 +371,7 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'Value for property_name in cmd update_subtopic_page_property: '
                 'invalid is not allowed')):
-            subtopic_page_domain.SubtopicPageChange(
-            {
+            subtopic_page_domain.SubtopicPageChange({
                 'cmd': 'update_subtopic_page_property',
                 'subtopic_id': 'subtopic_id',
                 'property_name': 'invalid',
@@ -384,8 +382,7 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
     def test_subtopic_page_change_object_with_update_subtopic_page_property(
         self
     ) -> None:
-        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange(
-        {
+        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange({
             'cmd': 'update_subtopic_page_property',
             'subtopic_id': 'subtopic_id',
             'property_name': 'page_contents_html',
@@ -403,8 +400,7 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
 
     def test_subtopic_page_change_object_with_create_new(self) -> None:
         subtopic_page_change_object = (
-            subtopic_page_domain.SubtopicPageChange(
-            {
+            subtopic_page_domain.SubtopicPageChange({
                 'cmd': 'create_new',
                 'topic_id': 'topic_id',
                 'subtopic_id': 'subtopic_id'
@@ -423,5 +419,4 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
         subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange(
             subtopic_page_change_dict)
         self.assertEqual(
-            subtopic_page_change_object.to_dict(
-            ), subtopic_page_change_dict)
+            subtopic_page_change_object.to_dict(), subtopic_page_change_dict)
