@@ -16,10 +16,24 @@
  * @fileoverview Unit tests for hybrid router module provider.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
-import { HybridRouterModuleProvider, MockRouterModule } from 'hybrid-router-module-provider';
+import { HybridRouterModuleProvider, MockRouter, MockRouterModule } from 'hybrid-router-module-provider';
 
 describe('Hybrid router module provider', () => {
+  let mockRouter: MockRouter;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [MockRouter]
+    });
+    mockRouter = TestBed.inject(MockRouter);
+  });
+
+  beforeEach(() => {
+    mockRouter.ngOnInit();
+  });
+
   it('should provide router module for pages using angular router', () => {
     let bodyElement = window.document.createElement('body');
     // eslint-disable-next-line oppia/no-inner-html

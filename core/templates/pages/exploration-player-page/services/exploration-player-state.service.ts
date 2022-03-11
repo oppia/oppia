@@ -157,6 +157,7 @@ export class ExplorationPlayerStateService {
         param_specs: returnDict.exploration.param_specs,
         states: returnDict.exploration.states,
         title: returnDict.exploration.title,
+        draft_change_list_id: returnDict.draft_change_list_id,
         language_code: returnDict.exploration.language_code,
         version: returnDict.version
       },
