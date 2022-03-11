@@ -222,17 +222,17 @@ class BuildTests(test_utils.GenericTestBase):
             build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
 
         base_without_hash_filename = 'base_without_hash.html'
-        self.assertIsNone(build._verify_filepath_hash(  # pylint: disable=protected-access
+        self.assertIsNone(build._verify_filepath_hash(   # type: ignore[func-returns-value]  # pylint: disable=protected-access
             base_without_hash_filename, file_hashes))
 
         bad_filepath = 'README'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             ValueError, 'Filepath has less than 2 partitions after splitting'):
             build._verify_filepath_hash(bad_filepath, file_hashes)  # pylint: disable=protected-access
 
         hashed_base_filename = build._insert_hash(  # pylint: disable=protected-access
             base_filename, 'ABCDFABCDFABCDF1abcdfabcdfabcdf1')
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             KeyError,
             'Hash from file named %s does not match hash dict values' %
             hashed_base_filename):
