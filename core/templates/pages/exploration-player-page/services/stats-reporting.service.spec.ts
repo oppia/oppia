@@ -60,8 +60,8 @@ describe('Stats reporting service ', () => {
   });
 
   beforeEach(() => {
-    spyOn(messengerService, 'sendMessage').and.returnValue();
-    spyOn(siteAnalyticsService, 'registerNewCard').and.returnValue();
+    spyOn(messengerService, 'sendMessage').and.callThrough();
+    spyOn(siteAnalyticsService, 'registerNewCard').and.callThrough();
     spyOn(siteAnalyticsService, 'registerStartExploration')
       .and.returnValue();
     spyOn(siteAnalyticsService, 'registerFinishExploration')

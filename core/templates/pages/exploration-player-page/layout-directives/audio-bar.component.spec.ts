@@ -88,7 +88,7 @@ describe('Audio Bar Component', () => {
       .and.returnValue(mockOnAutoplayAudioEventEmitter);
     let secondaryTranslaionsSpy = spyOn(
       audioTranslationManagerService, 'setSecondaryAudioTranslations')
-      .and.returnValue();
+      .and.callThrough();
 
     component.ngOnInit();
     component.expandAudioBar();

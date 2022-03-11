@@ -183,8 +183,9 @@ export class PlaythroughService {
   private explorationVersion!: number;
   private learnerIsInSamplePopulation: boolean = false;
 
-  // Below properties are initialized with null values, and are set to non-null
-  // values only when the record action of corresponding exploration is starts.
+  // Below properties are initialized with null values and are set to non-null
+  // values only when the learner's transition of the corresponding
+  // exploration starts.
   private eqTracker: EarlyQuitTracker | null = null;
   private cstTracker: CyclicStateTransitionsTracker | null = null;
   private misTracker: MultipleIncorrectAnswersTracker | null = null;

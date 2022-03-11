@@ -62,8 +62,7 @@ export class AudioBarComponent {
     this.languagesInExploration = this.audioTranslationLanguageService
       .getLanguageOptionsForDropdown();
     this.selectedLanguage = {
-      value: this.audioTranslationLanguageService
-        .getCurrentAudioLanguageCode() as string
+      value: this.getCurrentAudioLanguageCode()
     };
   }
 
@@ -145,7 +144,13 @@ export class AudioBarComponent {
   getCurrentAudioLanguageCode(): string {
     const currentAudioLanguageCode = (
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode()
-    ) as string;
+    );
+
+    if (currentAudioLanguageCode === null) {
+      throw new Error(
+        'AudioTranslationLanguageService returned null for current audio ' +
+        'language code.');
+    }
 
     return currentAudioLanguageCode;
   }
@@ -160,7 +165,7 @@ export class AudioBarComponent {
 
   getVoiceoverInCurrentLanguage(): Voiceover {
     return this.audioTranslationManagerService.getCurrentAudioTranslations()[
-      this.getCurrentAudioLanguageCode() as string];
+      this.getCurrentAudioLanguageCode()];
   }
 
   isAudioPlaying(): boolean {

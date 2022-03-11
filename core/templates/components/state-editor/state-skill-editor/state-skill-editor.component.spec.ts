@@ -134,8 +134,9 @@ describe('State Skill Editor Component', () => {
     totalSkillCount: 1,
     topicSummaries: [
       new CreatorTopicSummary(
-        '', '', 2, 2, 2, 2, 2, '', '', 2, 2, 2, 2, true, true, '', '',
-        '', '')
+        'dummy2', 'division', 2, 2, 3, 3, 0,
+        'es', 'dummy2', 1, 1, 1, 1, true,
+        true, 'math', 'public/img1.png', 'green', 'div')
     ],
     categorizedSkillsDict: {}
   };
