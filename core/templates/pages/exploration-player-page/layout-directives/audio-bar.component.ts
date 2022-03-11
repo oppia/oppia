@@ -44,6 +44,7 @@ export class AudioBarComponent {
   progressBarIsShown: boolean = false;
   audioLoadingIndicatorIsShown: boolean = false;
   explorationPlayerModeIsActive: boolean;
+  // Value may be null if the language is not available.
   selectedLanguage: { value: string | null };
 
   constructor(
