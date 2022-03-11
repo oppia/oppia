@@ -20,11 +20,12 @@ from __future__ import annotations
 
 import re
 
-from typing_extensions import TypedDict
-from typing import Dict, Any
 from core import feconf
 from core import utils
 from core.domain import value_generators_domain
+
+from typing_extensions import TypedDict
+from typing import Dict, Any
 
 from core.domain import object_registry  # pylint: disable=invalid-import-from # isort:skip
 
