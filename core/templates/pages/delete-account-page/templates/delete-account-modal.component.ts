@@ -38,7 +38,12 @@ export class DeleteAccountModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.userService.getUserInfoAsync().then((userInfo) => {
-      this.expectedUsername = userInfo.getUsername() as string;
+      const expectedUsername = userInfo.getUsername();
+
+      if (expectedUsername === null) {
+        throw new Error('Username is not exist');
+      }
+      this.expectedUsername = expectedUsername;
     });
   }
 

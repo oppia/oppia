@@ -65,7 +65,6 @@ describe('Admin Navbar component', () => {
     expect(component.profilePictureDataUrl).toBe(userProfileImage);
     expect(component.getStaticImageUrl(imagePath)).toBe(
       '/assets/images/path/to/image.png');
-    expect(component.username).toBe('username1');
     expect(component.isModerator).toBe(true);
     expect(component.isSuperAdmin).toBe(true);
     expect(component.profileUrl).toEqual(profileUrl);

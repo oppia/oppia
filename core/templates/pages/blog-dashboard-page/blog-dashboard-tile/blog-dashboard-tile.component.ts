@@ -46,8 +46,10 @@ export class BlogDashboardTileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.lastUpdatedDateString = this.getDateStringInWords(
-      this.blogPostSummary.lastUpdated as string);
+    const lastUpdated = this.blogPostSummary.lastUpdated;
+    if (lastUpdated) {
+      this.lastUpdatedDateString = this.getDateStringInWords(lastUpdated);
+    }
   }
 
   getDateStringInWords(naiveDate: string): string {

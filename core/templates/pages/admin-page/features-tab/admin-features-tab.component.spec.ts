@@ -462,10 +462,10 @@ describe('Admin page feature tab', function() {
   });
 
   describe('server mode option filter', () => {
-    type optionFilterType = (
+    type OptionFilterType = (
       (feature: PlatformParameter, option: string) => boolean);
     let options: readonly string[];
-    let optionFilter: optionFilterType;
+    let optionFilter: OptionFilterType;
 
     beforeEach(() => {
       options = component
@@ -473,7 +473,7 @@ describe('Admin page feature tab', function() {
         .options as readonly string[];
       optionFilter = component
         .filterTypeToContext[PlatformParameterFilterType.ServerMode]
-        .optionFilter as optionFilterType;
+        .optionFilter as OptionFilterType;
     });
 
     it('should return [\'dev\'] for feature in dev stage', () => {

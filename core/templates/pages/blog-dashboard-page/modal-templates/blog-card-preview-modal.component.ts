@@ -47,8 +47,7 @@ export class BlogCardPreviewModalComponent
   }
 
   ngOnInit(): void {
-    this.blogPostData = (
-      this.blogDashboardPageService.blogPostData as BlogPostData);
+    this.blogPostData = this.blogDashboardPageService.blogPostData;
     this.summaryContent = this.truncatePipe.transform(
       this.blogPostData.content, 300);
     this.profilePicUrl = this.blogDashboardPageService.authorPictureUrl;
@@ -58,8 +57,13 @@ export class BlogCardPreviewModalComponent
     } else {
       dateString = this.blogPostData.lastUpdated;
     }
+
+    const blogPostId = this.blogPostData.id;
+    if (blogPostId === null) {
+      throw new Error('Blog post is not exist');
+    }
     this.blogPostSummary = new BlogPostSummary (
-      this.blogPostData.id as string,
+      blogPostId,
       this.blogPostData.authorUsername,
       this.blogPostData.title,
       this.summaryContent,

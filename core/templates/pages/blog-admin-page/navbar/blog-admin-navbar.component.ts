@@ -34,7 +34,6 @@ export class BlogAdminNavbarComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   profilePictureDataUrl!: string;
-  username!: string;
   profileUrl!: string;
   logoWebpImageSrc!: string;
   logoPngImageSrc!: string;
@@ -63,12 +62,15 @@ export class BlogAdminNavbarComponent implements OnInit {
 
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
+    const username = userInfo.getUsername();
 
-    this.username = userInfo.getUsername() as string;
+    if (username === null) {
+      throw new Error('Username is not exist');
+    }
     this.profileUrl = (
       this.urlInterpolationService.interpolateUrl(
         '/profile/<username>', {
-          username: this.username
+          username: username
         }));
   }
 

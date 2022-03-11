@@ -189,7 +189,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.languageCode = this.activeSuggestion.change.
       language_code;
     this.userService.getUserInfoAsync().then(userInfo => {
-      this.username = userInfo.getUsername() as string,
+      const username = userInfo.getUsername();
+
+      if (username === null) {
+        throw new Error('Username is not exist');
+      }
+      this.username = username,
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
     });
     this.userService.getUserContributionRightsDataAsync().then(

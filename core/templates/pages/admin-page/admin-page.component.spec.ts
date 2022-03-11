@@ -90,7 +90,7 @@ describe('Admin Page component ', () => {
   beforeEach(() => {
     adminRouterService = TestBed.inject(AdminRouterService);
 
-    spyOn(adminRouterService, 'showTab').and.returnValue();
+    spyOn(adminRouterService, 'showTab').and.callThrough();
   });
 
   it('should check whether the admin activities tab is open', () => {

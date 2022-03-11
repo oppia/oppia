@@ -35,7 +35,6 @@ export class AdminNavbarComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   imagePath!: string;
   profilePictureDataUrl: string = '';
-  username: string = '';
   isModerator: boolean = false;
   isSuperAdmin: boolean = false;
   profileUrl: string = '';
@@ -99,15 +98,18 @@ export class AdminNavbarComponent implements OnInit {
 
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
+    const username = userInfo.getUsername();
 
-    this.username = userInfo.getUsername() as string;
+    if (username === null) {
+      throw new Error('Username is not exist');
+    }
     this.isModerator = userInfo.isModerator();
     this.isSuperAdmin = userInfo.isSuperAdmin();
 
     this.profileUrl = (
       this.urlInterpolationService.interpolateUrl(
         AdminPageConstants.PROFILE_URL_TEMPLATE, {
-          username: this.username
+          username: username
         })
     );
   }

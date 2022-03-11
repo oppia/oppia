@@ -222,6 +222,8 @@ export class AdminFeaturesTabComponent implements OnInit {
 
       this.setStatusMessage.emit('Saved successfully.');
     } catch (e: unknown) {
+      // A response that represents an error or failure, from a
+      // non-successful HTTP status during the parsing of the response.
       let httpError = e as HttpErrorResponse;
       if (httpError.error && httpError.error.error) {
         this.setStatusMessage.emit(`Update failed: ${httpError.error.error}`);

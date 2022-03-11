@@ -107,7 +107,8 @@ export class AdminMiscTabComponent {
     // 'getElementById' can return null if the element provided as
     // an argument is invalid.
     let element = document.getElementById(
-      'topicSimilaritiesFile') as HTMLInputElement;
+      'topicSimilaritiesFile'
+    ) as HTMLInputElement;
     if (element === null) {
       throw new Error('No element with id topicSimilaritiesFile found.');
     }

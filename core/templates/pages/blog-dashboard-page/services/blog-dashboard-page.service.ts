@@ -33,7 +33,7 @@ import { BlogPostData } from 'domain/blog/blog-post.model';
 export class BlogDashboardPageService {
   private _blogPostId: string = '';
   private _authorPictureUrl: string = '';
-  private _blogPostData: null | BlogPostData = null;
+  private _blogPostData!: BlogPostData;
   private _BLOG_POST_EDITOR_URL_TEMPLATE = (
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
 
@@ -106,11 +106,11 @@ export class BlogDashboardPageService {
     this._blogPostId = id;
   }
 
-  set blogPostData(data: BlogPostData | null) {
+  set blogPostData(data: BlogPostData) {
     this._blogPostData = data;
   }
 
-  get blogPostData(): BlogPostData | null {
+  get blogPostData(): BlogPostData {
     return this._blogPostData;
   }
 

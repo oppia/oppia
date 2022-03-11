@@ -76,9 +76,9 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     this.invalidImageWarningIsShown = false;
     let reader = new FileReader();
     reader.onload = (e) => {
-      this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        (e.target as FileReader).result as string) as SafeResourceUrl;
-      if (!this.uploadedImage) {
+      const uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
+        (e.target as FileReader).result as string);
+      if (!uploadedImage) {
         this.uploadedImage = decodeURIComponent(
           (e.target as FileReader).result as string);
       }

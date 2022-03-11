@@ -34,10 +34,10 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   @Input() managedTopicIds!: string[];
   @Input() topicIdToName!: {[topicId: string]: string};
   @Input() username!: string;
+  newTopicId!: string;
+  topicIdInUpdate!: string;
 
-  newTopicId: string | null = null;
   topicIdsForSelection: string[] = [];
-  topicIdInUpdate: string | null = null;
 
   constructor(
     private activeModal: NgbActiveModal,
@@ -52,16 +52,20 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   }
 
   addTopic(): void {
-    this.managedTopicIds.push(this.newTopicId as string);
+    this.managedTopicIds.push(this.newTopicId);
     this.topicIdInUpdate = this.newTopicId;
-    this.newTopicId = null;
+    // Empty the newTopicId to prevent the user from adding the same topic
+    // twice.
+    this.newTopicId = '';
     this.adminBackendApiService.assignManagerToTopicAsync(
-      this.username, this.topicIdInUpdate as string).then(()=> {
-      this.topicIdInUpdate = null;
+      this.username, this.topicIdInUpdate).then(()=> {
+      // Empty the topicIdInUpdate to prevent the user from removing the
+      // same topic twice.
+      this.topicIdInUpdate = '';
       this.updateTopicIdsForSelection();
     }, errorMessage => {
       let topicIdIndex = this.managedTopicIds.indexOf(
-        this.newTopicId as string);
+        this.newTopicId);
       this.managedTopicIds.splice(topicIdIndex, 1);
       this.alertsService.addWarning(
         errorMessage || 'Error communicating with server.');
@@ -74,7 +78,9 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
     this.adminBackendApiService.deassignManagerFromTopicAsync(
       this.username, topicIdToRemove).then(() => {
       this.managedTopicIds.splice(topicIdIndex, 1);
-      this.topicIdInUpdate = null;
+      // Empty the topicIdInUpdate to prevent the user from removing the
+      // same topic twice.
+      this.topicIdInUpdate = '';
       this.updateTopicIdsForSelection();
     }, errorMessage => {
       this.alertsService.addWarning(

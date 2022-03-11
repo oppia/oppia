@@ -98,9 +98,9 @@ describe('Admin misc tab component ', () => {
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
 
     statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
-      .and.returnValue();
-    spyOn(adminTaskManagerService, 'startTask').and.returnValue();
-    spyOn(adminTaskManagerService, 'finishTask').and.returnValue();
+      .and.callThrough();
+    spyOn(adminTaskManagerService, 'startTask').and.callThrough();
+    spyOn(adminTaskManagerService, 'finishTask').and.callThrough();
     confirmSpy = spyOn(mockWindowRef.nativeWindow, 'confirm');
     // This throws "Argument of type 'mockReaderObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". We need to suppress this

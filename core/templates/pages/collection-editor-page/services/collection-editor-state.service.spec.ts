@@ -98,7 +98,7 @@ describe('Collection editor state service', () => {
       collectionEditorStateService.onCollectionInitialized.subscribe(
         collectionInitializedSpy));
 
-    alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+    alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
   });
 
   afterEach(() => {

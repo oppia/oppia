@@ -31,7 +31,10 @@ import { LoggerService } from 'services/contextual/logger.service';
   providedIn: 'root'
 })
 export class TranslationTopicService {
-  private activeTopicName: string | null = null;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private activeTopicName!: string;
   private _activeTopicChangedEventEmitter = new EventEmitter<void>();
 
   constructor(
@@ -39,7 +42,7 @@ export class TranslationTopicService {
     private loggerService: LoggerService) {}
 
   getActiveTopicName(): string {
-    return this.activeTopicName as string;
+    return this.activeTopicName;
   }
 
   setActiveTopicName(newActiveTopicName: string): void {
