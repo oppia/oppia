@@ -366,7 +366,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
                 opportunity_summary_exp_ids_specific_to_topic = [
                     opportunity.id for opportunity
                     in exploration_opportunity_summaries]
-            elif topic_name != 'All':
+            else:
                 raise self.InvalidInputException(
                     'The supplied input topic: %s is not valid' % topic_name)
 
