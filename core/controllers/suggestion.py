@@ -33,6 +33,7 @@ from core.domain import opportunity_services
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
+from core.domain import topic_fetchers
 
 
 class SuggestionHandler(base.BaseHandler):
@@ -353,6 +354,12 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
                         'min_value': 0
                     }]
                 }
+            },
+            'topic_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
             }
         }
     }
@@ -369,9 +376,39 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
             target_type, suggestion_type)
         limit = self.normalized_request.get('limit')
         offset = self.normalized_request.get('offset')
-        suggestions, next_offset = (
-            suggestion_services.get_reviewable_suggestions(
-                self.user_id, suggestion_type, limit, offset))
+        topic_name = self.request.get('topic_name', None)
+
+        opportunity_summary_exp_ids_specific_to_topic = None
+        if (topic_name is not None) and (
+                topic_name != feconf.ALL_LITERAL_CONSTANT):
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            if topic is None:
+                raise self.InvalidInputException(
+                    'The supplied input topic: %s is not valid' % topic_name)
+
+            exploration_opportunity_summaries = (
+                opportunity_services.
+                get_exploration_opportunity_summaries_by_topic_id(
+                    topic.id))
+
+            opportunity_summary_exp_ids_specific_to_topic = [
+                opportunity.id for opportunity
+                in exploration_opportunity_summaries]
+
+        suggestions = []
+        next_offset = 0
+        if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+            suggestions, next_offset = (
+                suggestion_services.
+                get_reviewable_translation_suggestions_by_offset(
+                    self.user_id,
+                    opportunity_summary_exp_ids_specific_to_topic,
+                    limit, offset))
+        elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+            suggestions, next_offset = (
+                suggestion_services.
+                get_reviewable_question_suggestions_by_offset(
+                    self.user_id, limit, offset))
         self._render_suggestions(target_type, suggestions, next_offset)
 
 

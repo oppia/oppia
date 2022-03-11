@@ -1086,6 +1086,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)
         self.signup(self.REVIEWER_EMAIL_2, 'reviewer2')
         self.reviewer_id_2 = self.get_user_id_from_email(self.REVIEWER_EMAIL_2)
+        self.opportunity_summary_ids = [
+            self.explorations[0].id, self.explorations[1].id,
+            self.explorations[2].id]
+        self.topic_name = 'topic'
 
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',
@@ -1373,8 +1377,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(suggestions), 1)
 
-    def test_get_reviewable_translation_suggestions(self):
-        # Add few translation suggestions in different languages.
+    def test_get_reviewable_translation_suggestions_with_valid_exp_ids(
+            self):
+        # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('pt')
@@ -1390,30 +1395,85 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id_1, 'pt')
 
-        suggestions, offset = suggestion_services.get_reviewable_suggestions(
-            user_id=self.reviewer_id_1,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            limit=constants.OPPORTUNITIES_PAGE_SIZE,
-            offset=0)
+        # Get all reviewable translation suggestions.
+        suggestions, offset = (
+            suggestion_services.
+            get_reviewable_translation_suggestions_by_offset(
+                self.reviewer_id_1, self.opportunity_summary_ids,
+                constants.OPPORTUNITIES_PAGE_SIZE, 0))
 
         # Expect that the results correspond to translation suggestions that the
         # user has rights to review.
         self.assertEqual(len(suggestions), 3)
         self.assertEqual(offset, 3)
-        actual_language_code_list = sorted([
+        actual_language_code_list = [
             suggestion.change.language_code
             for suggestion in suggestions
-        ])
+        ]
         expected_language_code_list = ['hi', 'hi', 'pt']
         self.assertEqual(actual_language_code_list, expected_language_code_list)
 
-    def test_get_reviewable_question_suggestions(self):
-        # Add few translation suggestions in different languages.
+    def test_get_reviewable_translation_suggestions_with_empty_exp_ids( # pylint: disable=line-too-long
+            self):
+        # Add a few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('pt')
         self._create_translation_suggestion_with_language_code('bn')
         self._create_translation_suggestion_with_language_code('bn')
-        # Add few question suggestions.
+        # Provide the user permission to review suggestions in particular
+        # languages.
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'pt')
+
+        # Get all reviewable translation suggestions.
+        suggestions, offset = suggestion_services.get_reviewable_translation_suggestions_by_offset(
+            self.reviewer_id_1, [],
+            constants.OPPORTUNITIES_PAGE_SIZE, 0)
+
+        self.assertEqual(offset, 0)
+        self.assertEqual(len(suggestions), 0)
+
+    def test_get_reviewable_translation_suggestions_with_none_exp_ids(
+            self):
+        # Add a few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('pt')
+        self._create_translation_suggestion_with_language_code('bn')
+        self._create_translation_suggestion_with_language_code('bn')
+        # Provide the user permission to review suggestions in particular
+        # languages.
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'pt')
+
+        # Get all reviewable translation suggestions.
+        suggestions, offset = (
+            suggestion_services.
+            get_reviewable_translation_suggestions_by_offset(
+                self.reviewer_id_1, None,
+                constants.OPPORTUNITIES_PAGE_SIZE, 0))
+
+        self.assertEqual(len(suggestions), 3)
+        self.assertEqual(offset, 3)
+        actual_language_code_list = [
+            suggestion.change.language_code
+            for suggestion in suggestions
+        ]
+        expected_language_code_list = ['hi', 'hi', 'pt']
+        self.assertEqual(actual_language_code_list, expected_language_code_list)
+
+    def test_get_reviewable_question_suggestions(self):
+        # Add a few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('pt')
+        self._create_translation_suggestion_with_language_code('bn')
+        self._create_translation_suggestion_with_language_code('bn')
+        # Add a few question suggestions.
         self._create_question_suggestion_with_skill_id('skill1')
         self._create_question_suggestion_with_skill_id('skill2')
         # Provide the user permission to review suggestions in particular
@@ -1425,11 +1485,12 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Provide the user permission to review question suggestions.
         user_services.allow_user_to_review_question(self.reviewer_id_1)
 
-        suggestions, offset = suggestion_services.get_reviewable_suggestions(
-            user_id=self.reviewer_id_1,
-            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            limit=constants.OPPORTUNITIES_PAGE_SIZE,
-            offset=0)
+        # Get all reviewable question suggestions.
+        suggestions, offset = (
+            suggestion_services.get_reviewable_question_suggestions_by_offset(
+                self.reviewer_id_1,
+                limit=constants.OPPORTUNITIES_PAGE_SIZE,
+                offset=0))
 
         # Expect that the results correspond to question suggestions.
         self.assertEqual(len(suggestions), 2)
