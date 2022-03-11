@@ -33,9 +33,12 @@ interface CollectionCache {
   [collectionId: string]: Collection;
 }
 
+// When creating a new collection, title will be
+// initialized with null value. This will be null until populated
+// from the backend and provided themselves by the user.
 interface CollectionDetails {
   canEdit: boolean;
-  title: string;
+  title: string | null;
 }
 
 interface CollectionDetailsCache {
@@ -92,10 +95,12 @@ export class ReadOnlyCollectionBackendApiService {
 
   private _cacheCollectionDetails(
       details: ReadOnlyCollectionBackendResponse): void {
-    this._collectionDetailsCache[details.collection.id as string] = {
-      canEdit: details.can_edit,
-      title: details.collection.title as string,
-    };
+    if (details.collection.id !== null) {
+      this._collectionDetailsCache[details.collection.id] = {
+        canEdit: details.can_edit,
+        title: details.collection.title,
+      };
+    }
   }
 
   private _isCached(collectionId: string): boolean {

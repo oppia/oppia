@@ -27,6 +27,7 @@ interface FetchSuggestionsResponse {
     [targetId: string]: OpportunityDict;
   };
   suggestions: SuggestionBackendDict[];
+  next_offset: number;
 }
 
 interface ReviewExplorationSuggestionRequestBody {
@@ -86,27 +87,33 @@ export class ContributionAndReviewBackendApiService {
 
   // Return undefined if the suggestion is not found.
   async fetchSuggestionsAsync(
-      fetchType: string
-  ): Promise<FetchSuggestionsResponse | undefined> {
+      fetchType: string,
+      limit: number,
+      offset: number
+  ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
-      return this.fetchSubmittedSuggestionsAsync('skill', 'add_question');
+      return this.fetchSubmittedSuggestionsAsync(
+        'skill', 'add_question', limit, offset);
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
-        'exploration', 'translate_content');
+        'exploration', 'translate_content', limit, offset);
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
-      return this.fetchReviewableSuggestionsAsync('skill', 'add_question');
+      return this.fetchReviewableSuggestionsAsync(
+        'skill', 'add_question', limit, offset);
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'exploration', 'translate_content');
+        'exploration', 'translate_content', limit, offset);
     }
   }
 
   async fetchSubmittedSuggestionsAsync(
       targetType: string,
-      suggestionType: string
+      suggestionType: string,
+      limit: number,
+      offset: number
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
@@ -114,12 +121,18 @@ export class ContributionAndReviewBackendApiService {
         suggestion_type: suggestionType
       }
     );
-    return this.http.get<FetchSuggestionsResponse>(url).toPromise();
+    const params = {
+      limit: limit.toString(),
+      offset: offset.toString()
+    };
+    return this.http.get<FetchSuggestionsResponse>(url, { params }).toPromise();
   }
 
   async fetchReviewableSuggestionsAsync(
       targetType: string,
-      suggestionType: string
+      suggestionType: string,
+      limit: number,
+      offset: number
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
@@ -127,7 +140,11 @@ export class ContributionAndReviewBackendApiService {
         suggestion_type: suggestionType
       }
     );
-    return this.http.get<FetchSuggestionsResponse>(url).toPromise();
+    const params = {
+      limit: limit.toString(),
+      offset: offset.toString()
+    };
+    return this.http.get<FetchSuggestionsResponse>(url, { params }).toPromise();
   }
 
   async reviewExplorationSuggestionAsync(
