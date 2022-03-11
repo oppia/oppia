@@ -31,7 +31,7 @@ describe('Audio preloader service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
@@ -366,6 +366,21 @@ describe('Audio preloader service', () => {
       expect(audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading())
         .toEqual([]);
     }));
+
+  it('should return empty audioFiles list if language code is null', () => {
+    spyOn(audioTranslationLanguageService, 'getCurrentAudioLanguageCode')
+      .and.returnValue(null);
+
+    const exploration = (
+      explorationObjectFactory.createFromBackendDict(explorationDict));
+    audioPreloaderService.init(exploration);
+    audioTranslationLanguageService.init(['en'], 'en', 'en', false);
+    audioPreloaderService.kickOffAudioPreloader(
+      exploration.getInitialState().name as string);
+
+    expect(audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading())
+      .toEqual([]);
+  });
 
   it('should properly restart pre-loading from a new state', () => {
     const exploration = (

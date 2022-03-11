@@ -100,10 +100,12 @@ export class AudioPreloaderService {
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
     const languageCode = (
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
-    let allVoiceovers = null;
-    if (languageCode !== null) {
-      allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
+    // If the language code is not selected then there are no audio
+    // files available, so we directly return empty array.
+    if (languageCode === null) {
+      return [];
     }
+    let allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
     const initialStateName = this.exploration.getInitialState().name;
     let bfsTraversalOfStates: string[] = [];
     if (initialStateName !== null) {
