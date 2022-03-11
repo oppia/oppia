@@ -29,7 +29,7 @@ import { StateCustomizationArgsService } from 'components/state-editor/state-edi
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -38,9 +38,14 @@ interface HtmlFormSchema {
 
 interface SolutionInterface {
   answerIsExclusive: boolean;
-  correctAnswer: InteractionAnswer;
+  // This property will be undefined when the component is initialised
+  // and correct answer is not yet choosen.
+  correctAnswer: InteractionAnswer | undefined;
   explanationHtml: string;
-  explanationContentId: string;
+  // A null 'explanationContentId' indicates that the 'Solution' has been
+  // created but not saved. Before the 'SubtitledHtml' object is saved into a
+  // State, the 'content_id' should be set to a string.
+  explanationContentId: string | null;
   explanation?: string;
 }
 
@@ -50,17 +55,19 @@ interface SolutionInterface {
 })
 export class AddOrUpdateSolutionModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  ansOptions: string[];
-  answerIsValid: boolean;
-  correctAnswerEditorHtml: string;
-  data: SolutionInterface;
-  savedMemento: InteractionAnswer;
-  solutionType: Solution;
-  tempAnsOption: string;
-  COMPONENT_NAME_SOLUTION: string = (
-    AppConstants.COMPONENT_NAME_SOLUTION);
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  ansOptions!: string[];
+  answerIsValid!: boolean;
+  correctAnswerEditorHtml!: string;
+  data!: SolutionInterface;
+  savedMemento!: InteractionAnswer;
+  solutionType!: Solution;
+  tempAnsOption!: string;
+  EMPTY_SOLUTION_DATA!: SolutionInterface;
+  COMPONENT_NAME_SOLUTION: string = AppConstants.COMPONENT_NAME_SOLUTION;
 
-  EMPTY_SOLUTION_DATA: SolutionInterface;
   SOLUTION_EDITOR_FOCUS_LABEL: string = (
     'currentCorrectAnswerEditorHtmlForSolutionEditor');
 
@@ -91,9 +98,11 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   shouldAdditionalSubmitButtonBeShown(): boolean {
-    let interactionSpecs = INTERACTION_SPECS[
-      this.stateInteractionIdService.savedMemento];
-    return interactionSpecs.show_generic_submit_button;
+    let interactionId = (
+      this.stateInteractionIdService.savedMemento as InteractionSpecsKey);
+    const interactionSpec = (
+      InteractionSpecsConstants.INTERACTION_SPECS[interactionId]);
+    return interactionSpec.show_generic_submit_button;
   }
 
   isSolutionExplanationLengthExceeded(
@@ -124,9 +133,12 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   saveSolution(): void {
-    if (typeof this.data.answerIsExclusive === 'boolean' &&
-       this.data.correctAnswer !== null &&
-        this.data.explanation !== '') {
+    if (
+      typeof this.data.answerIsExclusive === 'boolean' &&
+      this.data.correctAnswer !== undefined &&
+      this.data.explanation !== '' &&
+      this.data.explanationContentId !== null
+    ) {
       this.ngbActiveModal.close({
         solution: this.solutionObjectFactory.createNew(
           this.data.answerIsExclusive,
@@ -154,23 +166,23 @@ export class AddOrUpdateSolutionModalComponent
     this.answerIsValid = false;
     this.EMPTY_SOLUTION_DATA = {
       answerIsExclusive: false,
-      correctAnswer: null,
+      correctAnswer: undefined,
       explanationHtml: '',
       explanationContentId: this.COMPONENT_NAME_SOLUTION
     };
     this.data = this.solutionType ? {
       answerIsExclusive: (
         this.stateSolutionService.savedMemento.answerIsExclusive),
-      correctAnswer: null,
+      correctAnswer: undefined,
       explanationHtml: (
         this.stateSolutionService.savedMemento.explanation.html),
       explanationContentId: (
-        this.stateSolutionService.savedMemento.explanation
-          .contentId)
+        this.stateSolutionService.savedMemento.explanation.contentId)
     } : cloneDeep(this.EMPTY_SOLUTION_DATA);
-    this.currentInteractionService.setOnSubmitFn((answer) => {
-      this.data.correctAnswer = answer;
-    });
+    this.currentInteractionService.setOnSubmitFn(
+      (answer: InteractionAnswer) => {
+        this.data.correctAnswer = answer;
+      });
     this.ansOptions = ['The only', 'One'];
     this.tempAnsOption = this.ansOptions[1];
   }
