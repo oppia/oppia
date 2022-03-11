@@ -258,8 +258,7 @@ export class PlaythroughService {
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
 
-    this.playthroughDurationInSecs = (
-      this.playthroughStopwatch.getTimeInSecs());
+    this.playthroughDurationInSecs = this.playthroughStopwatch.getTimeInSecs();
 
     this.eqTracker.recordExplorationQuit(
       stateName, this.playthroughDurationInSecs);
@@ -337,8 +336,8 @@ export class PlaythroughService {
       this.recordedLearnerActions.some(
         a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
       // Playthroughs are only helpful if learners have invested enough time.
-      this.playthroughDurationInSecs >= (
-        ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS));
+      this.playthroughDurationInSecs >=
+        ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
   }
 }
 
