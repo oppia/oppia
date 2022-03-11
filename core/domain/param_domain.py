@@ -33,7 +33,8 @@ from core.domain import object_registry  # pylint: disable=invalid-import-from #
 
 
 class ParamChangeDict(TypedDict):
-    """"""
+
+    """TypedDict used for MyPy Type annotations"""
     name: str
     generator_id: str
     customization_args: Dict[str, str]
