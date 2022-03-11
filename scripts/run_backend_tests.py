@@ -61,7 +61,10 @@ import sys
 import threading
 import time
 
-from . import install_third_party_libs
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
+
+from . import install_third_party_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, utils).
 install_third_party_libs.main()

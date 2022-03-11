@@ -27,9 +27,7 @@ following Python types: bool, dict, float, int, list, unicode.
 from __future__ import annotations
 
 import numbers
-import os
 import re
-import sys
 import urllib
 
 from core import feconf
@@ -40,9 +38,6 @@ from core.domain import html_cleaner
 from core.domain import user_domain
 
 from typing import Any, Callable, Dict, List, Optional, cast
-
-_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _THIRD_PARTY_PATH)
 
 
 SCHEMA_KEY_ITEMS = 'items'
