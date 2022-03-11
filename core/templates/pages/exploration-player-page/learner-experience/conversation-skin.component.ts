@@ -296,10 +296,6 @@ export class ConversationSkinComponent {
       this.adjustPageHeight(false, null);
     };
 
-    this.windowRef.nativeWindow.addEventListener('scroll', () => {
-      this.fixSupplementOnScroll();
-    });
-
     this.currentInteractionService.setOnSubmitFn(this.submitAnswer.bind(this));
     this.startCardChangeAnimation = false;
     this.initializePage();
@@ -1168,18 +1164,6 @@ export class ConversationSkinComponent {
   canWindowShowTwoCards(): boolean {
     return this.windowDimensionsService.getWidth() >
     ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX;
-  }
-
-  fixSupplementOnScroll(): void {
-    let supplementCard = $('div.conversation-skin-supplemental-card');
-    let topMargin = $('.navbar-container').height() - 20;
-    if ($(window).scrollTop() > topMargin) {
-      supplementCard.addClass(
-        'conversation-skin-supplemental-card-fixed');
-    } else {
-      supplementCard.removeClass(
-        'conversation-skin-supplemental-card-fixed');
-    }
   }
 
   onNavigateFromIframe(): void {
