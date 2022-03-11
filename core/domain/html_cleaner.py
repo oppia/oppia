@@ -27,9 +27,10 @@ from core.domain import rte_component_registry
 
 import bleach
 import bs4
+from typing import Any, Dict, List
 
 
-def filter_a(tag, name, value):
+def filter_a(tag: str, name: str, value: str) -> bool:
     """Returns whether the described attribute of a tag should be
     whitelisted.
 
@@ -82,7 +83,7 @@ ATTRS_WHITELIST = {
 }
 
 
-def clean(user_submitted_html):
+def clean(user_submitted_html: str) -> str:
     """Cleans a piece of user submitted HTML.
 
     This only allows HTML from a restricted set of tags, attrs and styles.
@@ -95,7 +96,7 @@ def clean(user_submitted_html):
         and attributes.
     """
     oppia_custom_tags = (
-        rte_component_registry.Registry.get_tag_list_with_attrs())
+        rte_component_registry.Registry.get_tag_list_with_attrs())  # type: ignore[no-untyped-call]
 
     core_tags = ATTRS_WHITELIST.copy()
     core_tags.update(oppia_custom_tags)
@@ -107,7 +108,7 @@ def clean(user_submitted_html):
         user_submitted_html, tags=tag_names, attributes=core_tags, strip=True)
 
 
-def strip_html_tags(html_string):
+def strip_html_tags(html_string: str) -> str:
     """Strips all HTML markup from an HTML string.
 
     Args:
@@ -120,7 +121,7 @@ def strip_html_tags(html_string):
     return bleach.clean(html_string, tags=[], attributes={}, strip=True)
 
 
-def get_image_filenames_from_html_strings(html_strings):
+def get_image_filenames_from_html_strings(html_strings: List[str]) -> List[str]:
     """Extracts the image filename from the oppia-noninteractive-image and
     oppia-noninteractive-math RTE component from all the html strings
     passed in.
@@ -149,7 +150,7 @@ def get_image_filenames_from_html_strings(html_strings):
     return list(set(filenames))
 
 
-def get_rte_components(html_string):
+def get_rte_components(html_string: str) -> List[Dict[str, Any]]:
     """Extracts the RTE components from an HTML string.
 
     Args:
@@ -164,7 +165,7 @@ def get_rte_components(html_string):
     components = []
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     oppia_custom_tag_attrs = (
-        rte_component_registry.Registry.get_tag_list_with_attrs())
+        rte_component_registry.Registry.get_tag_list_with_attrs())  # type: ignore[no-untyped-call]
     for tag_name, tag_attrs in oppia_custom_tag_attrs.items():
         component_tags = soup.find_all(name=tag_name)
         for component_tag in component_tags:

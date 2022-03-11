@@ -22,8 +22,10 @@ from core.constants import constants
 from core.domain import classroom_domain
 from core.domain import config_domain
 
+from typing import Optional
 
-def get_classroom_url_fragment_for_topic_id(topic_id):
+
+def get_classroom_url_fragment_for_topic_id(topic_id: str) -> str:
     """Returns the classroom url fragment for the provided topic id.
 
     Args:
@@ -34,11 +36,13 @@ def get_classroom_url_fragment_for_topic_id(topic_id):
     """
     for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
         if topic_id in classroom_dict['topic_ids']:
-            return classroom_dict['url_fragment']
-    return constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS
+            return str(classroom_dict['url_fragment'])
+    return str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
 
 
-def get_classroom_by_url_fragment(classroom_url_fragment):
+def get_classroom_by_url_fragment(
+    classroom_url_fragment: str
+) -> Optional[classroom_domain.Classroom]:
     """Returns the classroom domain object for the provided classroom url
     fragment.
 

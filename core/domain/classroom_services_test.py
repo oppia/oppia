@@ -26,16 +26,16 @@ from core.tests import test_utils
 class ClassroomServicesTests(test_utils.GenericTestBase):
     """Tests for classroom services."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(ClassroomServicesTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
 
-    def test_can_get_classroom_by_url_fragment(self):
-        topic_id = topic_fetchers.get_new_topic_id()
-        config_services.set_property(
+    def test_can_get_classroom_by_url_fragment(self) -> None:
+        topic_id = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        config_services.set_property(  # type: ignore[no-untyped-call]
             self.user_id_admin, 'classroom_pages_data', [{
                 'name': 'math',
                 'url_fragment': 'math',
@@ -44,17 +44,18 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
                 'topic_list_intro': ''
             }])
         classroom = classroom_services.get_classroom_by_url_fragment('math')
+        assert classroom is not None
         self.assertEqual(classroom.name, 'math')
         self.assertEqual(classroom.url_fragment, 'math')
         self.assertEqual(classroom.topic_ids, [topic_id])
 
-    def test_return_none_when_classroom_cannot_be_found(self):
+    def test_return_none_when_classroom_cannot_be_found(self) -> None:
         classroom = classroom_services.get_classroom_by_url_fragment('bio')
         self.assertIsNone(classroom)
 
-    def test_get_classroom_url_fragment_for_topic_id(self):
-        topic_id = topic_fetchers.get_new_topic_id()
-        config_services.set_property(
+    def test_get_classroom_url_fragment_for_topic_id(self) -> None:
+        topic_id = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        config_services.set_property(  # type: ignore[no-untyped-call]
             self.user_id_admin, 'classroom_pages_data', [{
                 'name': 'math',
                 'url_fragment': 'math-one',
@@ -67,9 +68,9 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
                 topic_id))
         self.assertEqual(classroom_url_fragment, 'math-one')
 
-    def test_return_default_if_associated_classroom_is_not_found(self):
-        topic_id = topic_fetchers.get_new_topic_id()
-        config_services.set_property(
+    def test_return_default_if_associated_classroom_is_not_found(self) -> None:
+        topic_id = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        config_services.set_property(  # type: ignore[no-untyped-call]
             self.user_id_admin, 'classroom_pages_data', [{
                 'name': 'math',
                 'url_fragment': 'math-two',

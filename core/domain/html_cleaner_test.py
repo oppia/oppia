@@ -25,11 +25,11 @@ from core.tests import test_utils
 class HtmlCleanerUnitTests(test_utils.GenericTestBase):
     """Test the HTML sanitizer."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(HtmlCleanerUnitTests, self).setUp()
         self.longMessage = True
 
-    def test_whitelisted_tags(self):
+    def test_whitelisted_tags(self) -> None:
 
         self.assertTrue(
             html_cleaner.filter_a('a', 'href', 'http://www.oppia.com'))
@@ -40,11 +40,11 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         self.assertTrue(
             html_cleaner.filter_a('a', 'title', 'http://www.oppia.com'))
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'The filter_a method should only be used for a tags.'):
             html_cleaner.filter_a('link', 'href', 'http://www.oppia.com')
 
-    def test_good_tags_allowed(self):
+    def test_good_tags_allowed(self) -> None:
         test_data = [(
             '<a href="http://www.google.com">Hello</a>',
             '<a href="http://www.google.com">Hello</a>'
@@ -73,7 +73,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
                 html_cleaner.clean(datum[0]), datum[1],
                 msg='\n\nOriginal text: %s' % datum[0])
 
-    def test_bad_tags_suppressed(self):
+    def test_bad_tags_suppressed(self) -> None:
         test_data = [(
             '<incomplete-bad-tag>',
             ''
@@ -102,7 +102,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
                 html_cleaner.clean(datum[0]), datum[1],
                 msg='\n\nOriginal text: %s' % datum[0])
 
-    def test_oppia_custom_tags(self):
+    def test_oppia_custom_tags(self) -> None:
         test_data = [(
             '<oppia-noninteractive-image filepath-with-value="1"/>',
             '<oppia-noninteractive-image filepath-with-value="1">'
@@ -126,7 +126,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
 class HtmlStripperUnitTests(test_utils.GenericTestBase):
     """Test the HTML stripper."""
 
-    def test_strip_html_tags(self):
+    def test_strip_html_tags(self) -> None:
         test_data = [(
             '<a href="http://www.google.com">Hello</a>',
             'Hello',
@@ -154,7 +154,7 @@ class HtmlStripperUnitTests(test_utils.GenericTestBase):
 class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
     """Test the RTE component extractor."""
 
-    def test_get_rte_components(self):
+    def test_get_rte_components(self) -> None:
         test_data = (
             '<p>Test text&nbsp;'
             '<oppia-noninteractive-math '
@@ -211,7 +211,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         for component in components:
             self.assertIn(component, expected_components)
 
-    def test_get_image_filenames_from_html_strings(self):
+    def test_get_image_filenames_from_html_strings(self) -> None:
         html_strings = [
             '<oppia-noninteractive-image '
             'filepath-with-value="&quot;img.svg&quot;" caption-with-value='
@@ -244,7 +244,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             ';svg_filename&amp;quot;:&amp;quot;math3.svg&amp;quot;}"></oppia-n'
             'oninteractive-math>'
         ]
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             [
                 'img.svg', 'img2.svg', 'img3.svg', 'img4.svg',
                 'img5.svg', 'math1.svg', 'math2.svg', 'math3.svg'],
