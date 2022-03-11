@@ -118,7 +118,10 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     this.separatorArray = new Array(this.numberofCheckpoints);
     this.separatorWidth = 100 / (this.numberofCheckpoints);
 
-    this.startedWidth = 100 - this.completedWidth;
+    this.startedWidth = 100 / (this.numberofCheckpoints);
+    if (this.completedWidth === 100) {
+      this.startedWidth = 0;
+    }
   }
 
   isHackyStoryTitleTranslationDisplayed(): boolean {

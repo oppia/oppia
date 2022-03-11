@@ -171,4 +171,12 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.storyId).toEqual(undefined);
     expect(componentInstance.hasStoryTitle).toBe(false);
   }));
+
+  it('should set value of startedWidth' +
+      ' to 0 when completedWidht is 100',
+  fakeAsync(() => {
+    componentInstance.completedWidth = 100;
+    componentInstance.ngOnInit();
+    expect(componentInstance.startedWidth).toEqual(0);
+  }));
 });

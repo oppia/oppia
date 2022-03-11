@@ -1,7 +1,7 @@
 <mat-card class="oppia-lesson-info-card">
   <div class="oppia-lesson-info-content">
-    <p class="oppia-story-title" *ngIf="hasStoryTitle && !isHackyStoryTitleTranslationDisplayed()">
-      {{ storyTitle }}
+    <p class="oppia-story-title" *ngIf="!hasStoryTitle && !isHackyStoryTitleTranslationDisplayed()">
+      Help Jaime count the number of balls
     </p>
     <p class="oppia-story-title" *ngIf="hasStoryTitle && isHackyStoryTitleTranslationDisplayed()">
       {{ storyTitleTranslationKey | translate}}
