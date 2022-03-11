@@ -70,7 +70,12 @@ class TopicEditorStoryHandler(base.BaseHandler):
             },
             'description': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': (
+                            constants.MAX_CHARS_IN_STORY_DESCRIPTION)
+                    }]
                 }
             },
             'filename': {
