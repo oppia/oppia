@@ -1278,6 +1278,64 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 suggestion_services
                 .get_translation_suggestion_ids_with_exp_ids([])), 0)
 
+    def test_get_submitted_suggestions_by_offset(self):
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('pt')
+        question_1_skill_id = 'skill1'
+        question_2_skill_id = 'skill2'
+        self._create_question_suggestion_with_skill_id(question_1_skill_id)
+        self._create_question_suggestion_with_skill_id(question_2_skill_id)
+
+        # Fetch submitted translation suggestions.
+        suggestions, offset = (
+            suggestion_services.get_submitted_suggestions_by_offset(
+                user_id=self.author_id_1,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                limit=constants.OPPORTUNITIES_PAGE_SIZE,
+                offset=0))
+
+        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(offset, 2)
+        self.assertEqual(suggestions[0].target_id, self.target_id_1)
+        self.assertEqual(
+            suggestions[0].suggestion_type,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[0].status,
+            suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(suggestions[1].target_id, self.target_id_1)
+        self.assertEqual(
+            suggestions[1].suggestion_type,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[1].status,
+            suggestion_models.STATUS_IN_REVIEW)
+
+        # Fetch submitted question suggestions.
+        suggestions, offset = (
+            suggestion_services.get_submitted_suggestions_by_offset(
+                user_id=self.author_id_1,
+                suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                limit=constants.OPPORTUNITIES_PAGE_SIZE,
+                offset=0))
+
+        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(offset, 2)
+        self.assertEqual(suggestions[0].target_id, question_2_skill_id)
+        self.assertEqual(
+            suggestions[0].suggestion_type,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        self.assertEqual(
+            suggestions[0].status,
+            suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(suggestions[1].target_id, question_1_skill_id)
+        self.assertEqual(
+            suggestions[1].suggestion_type,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        self.assertEqual(
+            suggestions[1].status,
+            suggestion_models.STATUS_IN_REVIEW)
+
     def test_get_translation_suggestions_in_review_by_exploration(self):
         self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('hi')
@@ -1331,13 +1389,17 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.reviewer_id_1, 'hi')
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id_1, 'pt')
-        # Get all reviewable translation suggestions.
-        suggestions = suggestion_services.get_reviewable_suggestions(
-            self.reviewer_id_1, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+
+        suggestions, offset = suggestion_services.get_reviewable_suggestions(
+            user_id=self.reviewer_id_1,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            limit=constants.OPPORTUNITIES_PAGE_SIZE,
+            offset=0)
 
         # Expect that the results correspond to translation suggestions that the
         # user has rights to review.
         self.assertEqual(len(suggestions), 3)
+        self.assertEqual(offset, 3)
         actual_language_code_list = sorted([
             suggestion.change.language_code
             for suggestion in suggestions
@@ -1362,12 +1424,16 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.reviewer_id_1, 'pt')
         # Provide the user permission to review question suggestions.
         user_services.allow_user_to_review_question(self.reviewer_id_1)
-        # Get all reviewable question suggestions.
-        suggestions = suggestion_services.get_reviewable_suggestions(
-            self.reviewer_id_1, feconf.SUGGESTION_TYPE_ADD_QUESTION)
+
+        suggestions, offset = suggestion_services.get_reviewable_suggestions(
+            user_id=self.reviewer_id_1,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            limit=constants.OPPORTUNITIES_PAGE_SIZE,
+            offset=0)
 
         # Expect that the results correspond to question suggestions.
         self.assertEqual(len(suggestions), 2)
+        self.assertEqual(offset, 2)
         expected_suggestion_type_list = ['skill1', 'skill2']
         actual_suggestion_type_list = [
             suggestion.change.skill_id
