@@ -181,17 +181,13 @@ export class PlaythroughService {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private explorationId!: string;
   private explorationVersion!: number;
-  private learnerIsInSamplePopulation: boolean = false;
-
-  // The properties below are initialized with null values and are set to
-  // non-null values only when recording and scrutinizing playthroughs is
-  // enabled.
   private eqTracker!: EarlyQuitTracker;
   private cstTracker!: CyclicStateTransitionsTracker;
   private misTracker!: MultipleIncorrectAnswersTracker;
   private recordedLearnerActions!: LearnerAction[];
   private playthroughStopwatch!: Stopwatch;
   private playthroughDurationInSecs!: number;
+  private learnerIsInSamplePopulation: boolean = false;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
