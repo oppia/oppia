@@ -21,11 +21,10 @@ from __future__ import annotations
 import re
 
 from typing_extensions import TypedDict
-from typing import Dict
+from typing import Dict, Any
 from core import feconf
 from core import utils
 from core.domain import value_generators_domain
-from value_generators_domain import BaseValueGenerator
 
 from core.domain import object_registry  # pylint: disable=invalid-import-from # isort:skip
 
@@ -34,6 +33,7 @@ from core.domain import object_registry  # pylint: disable=invalid-import-from #
 
 
 class ParamChangeDict(TypedDict):
+    """"""
     name: str
     generator_id: str
     customization_args: Dict[str, str]
@@ -134,7 +134,7 @@ class ParamChange:
         return self._name
 
     @property
-    def generator(self) -> BaseValueGenerator:
+    def generator(self) -> value_generators_domain.BaseValueGenerator:
         """The value generator used to define the new value of the
         changing parameter.
 
@@ -199,15 +199,17 @@ class ParamChange:
             param_change_dict['customization_args']
         )
 
-    def _get_value(self, context_params: str) -> BaseValueGenerator:
+    def _get_value(
+        self,
+        context_params: str) -> Any:
         """Generates a single value for a parameter change."""
         return self.generator.generate_value(
-            context_params, **self.customization_args)
+            context_params, **self.customization_args) # type: ignore[arg-type]
 
     def get_normalized_value(
         self,
         obj_type: str,
-        context_params: str) -> BaseValueGenerator:
+        context_params: str) -> Any:
         """Generates a single normalized value for a parameter change."""
         raw_value = self._get_value(context_params)
         return object_registry.Registry.get_object_class_by_type( # type: ignore[no-untyped-call]
