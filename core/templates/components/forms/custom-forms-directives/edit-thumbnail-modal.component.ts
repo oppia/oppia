@@ -62,10 +62,10 @@ export class EditThumbnailModalComponent {
   @Input() dimensions!: Dimensions;
   @Input() uploadedImageMimeType!: string;
   @Input() openInUploadMode: boolean = false;
-  tags!: string[];
-  attrs!: string[];
   imgSrc!: string;
-  invalidTagsAndAttributes!: InvalidTagsAndAttributes;
+  invalidTagsAndAttributes: InvalidTagsAndAttributes = {
+    tags: [], attrs: []
+  };
 
   invalidImageWarningIsShown = false;
   invalidFilenameWarningIsShown = false;
@@ -119,13 +119,9 @@ export class EditThumbnailModalComponent {
       this.invalidTagsAndAttributes = (
         this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
           this.imgSrc));
-      this.tags = this.invalidTagsAndAttributes.tags;
-      this.attrs = this.invalidTagsAndAttributes.attrs;
-      if (this.tags.length > 0 || this.attrs.length > 0) {
-        this.reset();
-      } else {
-        this.thumbnailHasChanged = true;
-      }
+      this.uploadedImage = this.svgSanitizerService
+        .removeAllInvalidTagsAndAttributes(this.uploadedImage);
+      this.thumbnailHasChanged = true;
     };
     reader.readAsDataURL(file);
   }

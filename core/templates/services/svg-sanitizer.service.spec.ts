@@ -31,39 +31,6 @@ describe('SvgSanitizerService', () => {
     }
   }
 
-  /**
-   * Safe SVG Decoded
-   * <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
-   *  <polygon id="triangle"
-   *           points="0,0 0,50 50,0" fill="#009900" stroke="#004400" />
-   * </svg>
-   */
-  const safeSvg = (
-    'data:image/svg+xml;base64,PHN2ZyBpZD0ic291cmNlIiB2ZXJzaW9uPSIxLjEiIGJhc2' +
-    'VQcm9maWxlPSJmdWxsIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogID' +
-    'xwb2x5Z29uIGlkPSJ0cmlhbmdsZSIgcG9pbnRzPSIwLDAgMCw1MCA1MCwwIiBmaWxsPSIjMD' +
-    'A5OTAwIiBzdHJva2U9IiMwMDQ0MDAiPjwvcG9seWdvbj4KPC9zdmc+'
-  );
-
-  /**
-   * Malicious SVG Decoded
-   * <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
-   * <polygon id="triangle"
-   *           points="0,0 0,50 50,0" fill="#009900" stroke="#004400" />
-   * <script type="text/javascript">
-   *   alert('This app is probably vulnerable to XSS attacks!');
-   * </script>
-   * </svg>
-   */
-  const maliciousSvg = (
-    'data:image/svg+xml;base64,PHN2ZyBpZD0ic291cmNlIiB2ZXJzaW9uPSIxLjEiIGJhc2' +
-    'VQcm9maWxlPSJmdWxsIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogID' +
-    'xwb2x5Z29uIGlkPSJ0cmlhbmdsZSIgcG9pbnRzPSIwLDAgMCw1MCA1MCwwIiBmaWxsPSIjMD' +
-    'A5OTAwIiBzdHJva2U9IiMwMDQ0MDAiPjwvcG9seWdvbj4KICA8c2NyaXB0IHR5cGU9InRleH' +
-    'QvamF2YXNjcmlwdCI+CiAgICBhbGVydCgnVGhpcyBhcHAgaXMgcHJvYmFibHkgdnVsbmVyYW' +
-    'JsZSB0byBYU1MgYXR0YWNrcyEnKTsKICA8L3NjcmlwdD4KPC9zdmc+'
-  );
-
   const invalidBase64data = 'data:image/svg+xml;base64,This is invalid %3D';
 
   beforeEach(() => {
@@ -80,22 +47,142 @@ describe('SvgSanitizerService', () => {
   });
 
   it('should check for invalid base64 images', () => {
-    expect(svgSanitizerService.isValidBase64Svg(invalidBase64data)).toBe(false);
+    expect(svgSanitizerService.isBase64Svg(invalidBase64data)).toBe(false);
+  });
+
+  it('should return null when a invalid base64 SVG is requested as' +
+  'SafeResourceUrl',
+  () => {
+    expect(svgSanitizerService.getTrustedSvgResourceUrl(
+      invalidBase64data)).toBeNull();
   });
 
   it(
-    'should return null when malicious SVG is requested as SafeResourceUrl',
+    'should return safeResourceUrl after removing invalid tags and attributes',
     () => {
-      expect(svgSanitizerService.getTrustedSvgResourceUrl(maliciousSvg)).toBe(
-        null);
-    });
-
-  it(
-    'should return SafeResourceUrl when a safe SVG is requested as' +
-    'SafeResourceUrl',
-    () => {
-      expect(svgSanitizerService.getTrustedSvgResourceUrl(safeSvg)).toBe(
-        safeSvg);
+      const testCases = [
+        {
+          // Test when SVG has an invalid tag ('circel').
+          svgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z"/></g><circel></circel></svg>'),
+          expectedSvgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z"/></g></svg>')
+        },
+        {
+          // Test when SVG has an invalid attribute ('data-name').
+          svgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z" data-name="dataName"/></g></svg>'),
+          expectedSvgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z"/></g></svg>')
+        },
+        {
+          // Test when SVG has an invalid self closing tag ('paht').
+          svgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><paht stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z"/></g></svg>'),
+          expectedSvgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"/></svg>')
+        },
+        {
+          // Test when SVG has more than one invalid tags ('pth', 'circel').
+          svgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><pth stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z" data-custom="dataCustom"/></g><circel></circel></svg>'),
+          expectedSvgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" style="vertical-align: ' +
+            '-0.241ex;"><g stroke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"/></svg>')
+        },
+        {
+          // Test when SVG has more than one invalid
+          // attributes ('styyle', 'strokke').
+          svgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4" styyle="vertical-align: -' +
+            '0.241ex;"><g strokke="currentColor" fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z"/></g></svg>'),
+          expectedSvgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1' +
+            '.429ex" viewBox="0 -511.5 572.5 615.4"' +
+            '><g fill="currentColor" stroke-w' +
+            'idth="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+            ' d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402 Q' +
+            '368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 5' +
+            '9T 463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289' +
+            'Z"/></g></svg>')
+        },
+        {
+          // Test when SVG has a hidden script.
+          svgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfi' +
+            'le="full"><polygon id="triangle" points="0,0 0,50 50,0" fill="#' +
+            '009900" stroke="#004400"/><script type="text/javascript">' +
+            'alert(\'This app is probably vulnerable to XSS attacks!\');' +
+            '</script></svg>'),
+          expectedSvgString: (
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfi' +
+            'le="full"><polygon id="triangle" points="0,0 0,50 50,0" fill="#' +
+            '009900" stroke="#004400"/></svg>')
+        }
+      ];
+      testCases.forEach(testCase => {
+        let dataURI = (
+          'data:image/svg+xml;base64,' +
+          btoa(unescape(encodeURIComponent(testCase.svgString))));
+        let safeResourceUrl = svgSanitizerService.getTrustedSvgResourceUrl(
+          dataURI);
+        expect(safeResourceUrl).toEqual(
+          'data:image/svg+xml;base64,' +
+          btoa(unescape(encodeURIComponent(testCase.expectedSvgString))));
+      });
     });
 
   it('should remove the role attribute from the Math SVG string', () => {
@@ -269,6 +356,24 @@ describe('SvgSanitizerService', () => {
     expect(dimensions).toEqual(expectedDimension);
   });
 
+  it('should correctly get SVG from DataUri', () => {
+    const svgString = (
+      '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.429e' +
+      'x" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vertical-a' +
+      'lign: -0.241ex;"><g stroke="currentColor" fill="currentColor" stro' +
+      'ke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+      ' d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402Q368 ' +
+      '386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 14' +
+      '0Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z"/></g></svg>'
+    );
+    const dataURI = (
+      'data:image/svg+xml;base64,' +
+      btoa(unescape(encodeURIComponent(svgString))));
+    const parsedSvg = svgSanitizerService.getSvgFromDataUri(dataURI);
+    expect(parsedSvg).toEqual(
+      domParser.parseFromString(svgString, 'image/svg+xml'));
+  });
+
   it('should get invalid svg tags and attributes', () => {
     var dataURI = (
       'data:image/svg+xml;base64,' +
@@ -398,6 +503,41 @@ describe('SvgSanitizerService', () => {
         testCase.expected[0], 'Attributes - Case:' + testCase.title);
       expect(testCaseResult.tags.length).toEqual(
         testCase.expected[1], 'Tags - Case:' + testCase.title);
+    });
+  });
+
+  it('should return correct GitHub issue URL when invalid Tags and attributes' +
+    'in the SVG are removed', () => {
+    const testCases = [
+      {
+        invalidTagsAndAttributes: {
+          tags: [], attrs: ['svg:data-custom']
+        },
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7B%20IMAGE_HERE%20%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7B%20SCREENSHOTS_HERE%20%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20reported%3A%0AAttributes%3A%20svg%3Adata-custom'
+      },
+      {
+        invalidTagsAndAttributes: {
+          tags: ['paht'], attrs: []
+        },
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7B%20IMAGE_HERE%20%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7B%20SCREENSHOTS_HERE%20%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20reported%3A%0ATags%3A%20paht'
+      },
+      {
+        invalidTagsAndAttributes: {
+          tags: ['paht', 'circel'], attrs: []
+        },
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7B%20IMAGE_HERE%20%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7B%20SCREENSHOTS_HERE%20%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20reported%3A%0ATags%3A%20paht%2C%20circel'
+      },
+      {
+        invalidTagsAndAttributes: {
+          tags: ['circel'], attrs: ['svg:data-name']
+        },
+        correctURL: 'https://github.com/oppia/oppia/issues/new?title=Uploaded%20SVG%20image%20looks%20distorted%20in%20the%20preview&body=The%20image%20file%20is%20attached%20below%3A%0A%0A%7B%7B%20IMAGE_HERE%20%7D%7D%0A%0AScreenshots%20of%20the%20problem%3A%0A%0A%7B%7B%20SCREENSHOTS_HERE%20%7D%7D%0A%0AThe%20invalid%20tags%20and%20attributes%20reported%3A%0ATags%3A%20circel%2C%20%0AAttributes%3A%20svg%3Adata-name'
+      }
+    ];
+    testCases.forEach(testCase => {
+      let testCaseResult = svgSanitizerService.getIssueURL(
+        testCase.invalidTagsAndAttributes);
+      expect(testCaseResult).toEqual(testCase.correctURL);
     });
   });
 });
