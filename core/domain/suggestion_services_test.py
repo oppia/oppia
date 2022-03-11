@@ -1377,7 +1377,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(suggestions), 1)
 
-    def test_get_reviewable_suggestions_with_valid_exp_ids(
+    def test_get_reviewable_translation_suggestions_with_valid_exp_ids(
             self):
         # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')
@@ -1397,7 +1397,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         # Get all reviewable translation suggestions.
         suggestions, offset = (
-            suggestion_services.get_reviewable_translation_suggestions(
+            suggestion_services.
+            get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1, self.opportunity_summary_ids,
                 constants.OPPORTUNITIES_PAGE_SIZE, 0))
 
@@ -1428,10 +1429,11 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.reviewer_id_1, 'pt')
 
         # Get all reviewable translation suggestions.
-        suggestions, offset = suggestion_services.get_reviewable_translation_suggestions(
+        suggestions, offset = suggestion_services.get_reviewable_translation_suggestions_by_offset(
             self.reviewer_id_1, [],
             constants.OPPORTUNITIES_PAGE_SIZE, 0)
 
+        self.assertEqual(offset, 0)
         self.assertEqual(len(suggestions), 0)
 
     def test_get_reviewable_translation_suggestions_with_none_exp_ids(
@@ -1451,7 +1453,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         # Get all reviewable translation suggestions.
         suggestions, offset = (
-            suggestion_services.get_reviewable_translation_suggestions(
+            suggestion_services.
+            get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1, None,
                 constants.OPPORTUNITIES_PAGE_SIZE, 0))
 
@@ -1483,10 +1486,11 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.reviewer_id_1)
 
         # Get all reviewable question suggestions.
-        suggestions, offset = suggestion_services.get_reviewable_question_suggestions(
-            self.reviewer_id_1,
-            limit=constants.OPPORTUNITIES_PAGE_SIZE,
-            offset=0)
+        suggestions, offset = (
+            suggestion_services.get_reviewable_question_suggestions_by_offset(
+                self.reviewer_id_1,
+                limit=constants.OPPORTUNITIES_PAGE_SIZE,
+                offset=0))
 
         # Expect that the results correspond to question suggestions.
         self.assertEqual(len(suggestions), 2)

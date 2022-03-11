@@ -2471,6 +2471,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'offset': 0
             })
         self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(response['next_offset'], 1)
         suggestion = response['suggestions'][0]
         self.assertDictEqual(
             suggestion['change'], self.translate_suggestion_change)
@@ -2503,9 +2504,12 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         # translation suggestions.
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content', params={
-                'topic_name': feconf.ALL_LITERAL_CONSTANT
+                'topic_name': feconf.ALL_LITERAL_CONSTANT,
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
             })
         self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(response['next_offset'], 1)
         suggestion = response['suggestions'][0]
         self.assertDictEqual(
             suggestion['change'], self.translate_suggestion_change)
@@ -2537,9 +2541,12 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             self):
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content', params={
-                'topic_name': 'topic'
+                'topic_name': 'topic',
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
             })
         self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(response['next_offset'], 1)
         suggestion = response['suggestions'][0]
         self.assertDictEqual(
             suggestion['change'], self.translate_suggestion_change)
@@ -2576,7 +2583,9 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'The supplied input topic: invalid_topic is not valid'):
             self.get_json(
             '/getreviewablesuggestions/exploration/translate_content', params={
-                'topic_name': 'invalid_topic'
+                'topic_name': 'invalid_topic',
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
             })
 
     def test_get_reviewable_suggestions_when_state_of_a_target_is_removed(

@@ -588,7 +588,7 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
     ])
 
 
-def get_reviewable_translation_suggestions(
+def get_reviewable_translation_suggestions_by_offset(
         user_id, opportunity_summary_exp_ids, limit, offset):
     """Returns a list of translation suggestions matching the
      passed opportunity IDs which the user can review.
@@ -619,21 +619,20 @@ def get_reviewable_translation_suggestions(
         contribution_rights.can_review_translation_for_language_codes)
 
     in_review_translation_suggestions = []
+    next_offset = 0
     if opportunity_summary_exp_ids is None:
         in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel
-                .get_in_review_translation_suggestions_by_offset(
-                limit,
-                offset,
-                user_id,
-                language_codes))
+            .get_in_review_translation_suggestions_by_offset(
+                limit, offset,
+                user_id, language_codes))
     elif len(opportunity_summary_exp_ids) > 0:
         in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel
-                .get_in_review_translation_suggestions_with_exp_ids(
-                    limit, offset,
-                    user_id, language_codes,
-                    opportunity_summary_exp_ids))
+            .get_in_review_translation_suggestions_with_exp_ids_by_offset(
+                limit, offset,
+                user_id, language_codes,
+                opportunity_summary_exp_ids))
 
     translation_suggestions = ([
         get_suggestion_from_model(s)
@@ -642,7 +641,7 @@ def get_reviewable_translation_suggestions(
     return translation_suggestions, next_offset
 
 
-def get_reviewable_question_suggestions(
+def get_reviewable_question_suggestions_by_offset(
         user_id, limit, offset):
     """Returns a list of question suggestions which the user
        can review.
@@ -659,10 +658,10 @@ def get_reviewable_question_suggestions(
             the given user is allowed to review.
             next_offset: int. The input offset + the number of results returned
                 by the current query.
-
     """
-    suggestions, next_offset = (suggestion_models.GeneralSuggestionModel
-    .get_in_review_question_suggestions_by_offset(user_id, limit, offset))
+    suggestions, next_offset = (
+        suggestion_models.GeneralSuggestionModel
+        .get_in_review_question_suggestions_by_offset(limit, offset, user_id))
 
     question_suggestions = ([
         get_suggestion_from_model(s) for s in suggestions
