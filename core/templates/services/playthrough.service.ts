@@ -304,8 +304,7 @@ export class PlaythroughService {
           this.recordedLearnerActions);
     } else if (
       this.eqTracker &&
-      this.eqTracker.foundAnIssue() &&
-      this.recordedLearnerActions !== null
+      this.eqTracker.foundAnIssue()
     ) {
       return this.playthroughObjectFactory
         .createNewEarlyQuitPlaythrough(
