@@ -355,7 +355,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
         topic_name = self.request.get('topic_name', None)
 
         opportunity_summary_exp_ids_specific_to_topic = None
-        if (topic_name is not None) and (topic_name != 'All'):
+        if (topic_name is not None) and (topic_name != feconf.ALL_LITERAL_CONSTANT):
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if topic is None:
                 raise self.InvalidInputException(

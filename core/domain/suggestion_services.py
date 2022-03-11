@@ -595,7 +595,7 @@ def get_reviewable_translation_suggestions(
 
     Args:
         user_id: str. The ID of the user.
-        opportunity_summary_exp_ids: list(str) or NONE.
+        opportunity_summary_exp_ids: list(str) or None.
             The list of exploration IDs for which suggestions
             are fetched. If the list is empty, no suggestions are
             fetched. If the value is None, all reviewable

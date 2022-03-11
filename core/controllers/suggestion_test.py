@@ -2465,7 +2465,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         # translation suggestions.
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content', params={
-                'topic_name': 'All'
+                'topic_name': feconf.ALL_LITERAL_CONSTANT
             })
         self.assertEqual(len(response['suggestions']), 1)
         suggestion = response['suggestions'][0]

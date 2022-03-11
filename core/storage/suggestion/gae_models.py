@@ -483,7 +483,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of translation suggestions which
-            are in review, for the specified language codes but
+            are in review, for the specified language codes, but
             not created by the given user.
         """
         return cls.get_all().filter(datastore_services.all_of(
