@@ -27,7 +27,6 @@ import tarfile
 import urllib
 import zipfile
 
-from core import python_utils
 from core import utils
 
 from . import common
@@ -198,7 +197,7 @@ def download_and_untar_files(
 
 def get_file_contents(filepath, mode='r'):
     """Gets the contents of a file, given a relative filepath from oppia/."""
-    with python_utils.open_file(filepath, mode) as f:
+    with utils.open_file(filepath, mode) as f:
         return f.read()
 
 
@@ -353,7 +352,10 @@ def install_elasticsearch_dev_server():
             ['%s/bin/elasticsearch' % common.ES_PATH, '--version'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+            stderr=subprocess.PIPE,
+            # Set the minimum heap size to 100 MB and maximum to 500 MB.
+            env={'ES_JAVA_OPTS': '-Xms100m -Xmx500m'}
+        )
         print('ElasticSearch is already installed.')
         return
     except OSError:
