@@ -298,9 +298,9 @@ describe('State Skill Editor Component', () => {
         language_code: 'en',
         version: 3,
         prerequisite_skill_ids: [],
-        all_questions_merged: null,
-        next_misconception_id: null,
-        superseding_skill_id: null
+        all_questions_merged: false,
+        next_misconception_id: 0,
+        superseding_skill_id: '',
       };
       const fetchSkillResponse = {
         skill: skillObjectFactory.createFromBackendDict(skillBackendDict),

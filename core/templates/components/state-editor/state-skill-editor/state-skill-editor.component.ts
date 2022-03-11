@@ -46,15 +46,16 @@ export class StateSkillEditorComponent implements OnInit {
   @Output() onSaveStateContent: EventEmitter<string> = (
     new EventEmitter<string>());
 
-  categorizedSkills: SkillsCategorizedByTopics = null;
-  untriagedSkillSummaries: ShortSkillSummary[] = null;
+  categorizedSkills!: SkillsCategorizedByTopics;
+  untriagedSkillSummaries!: ShortSkillSummary[];
   skillEditorIsShown: boolean = true;
-  skillName: string = null;
+  isSkillSelected = false;
+  skillName!: string;
   userCanEditSkills: boolean = false;
 
   constructor(
-    private topicsAndSkillsDashboardBackendApiService: (
-      TopicsAndSkillsDashboardBackendApiService),
+    private topicsAndSkillsDashboardBackendApiService:
+      TopicsAndSkillsDashboardBackendApiService,
     private storyEditorStateService: StoryEditorStateService,
     private alertsService: AlertsService,
     private windowDimensionsService: WindowDimensionsService,
