@@ -1781,9 +1781,9 @@ class UserSkillMastery:
 class CategorizedSkills:
     """Domain object for representing categorized skills' ids and
     descriptions. Here, 'categorized skill' means that the skill is assigned
-    to some topic or subtopic. If a skill is assigned to a topic but not a
+    to some topic. If a skill is assigned to a topic but not a
     subtopic, then it is termed as 'uncategorized' which also comes under
-    CategorizedSkills because it is atleast assigned to a topic.
+    CategorizedSkills because it is at least assigned to a topic.
 
     Attributes:
         categorized_skills: dict[str, dict[str, list(ShortSkillSummary)].
@@ -1893,7 +1893,7 @@ class CategorizedSkills:
 class ShortSkillSummary:
     """Domain object for a short skill summary. It contains the id and
     description of the skill. It is different from the SkillSummary in the
-    sense that the later contains many other properties of the skill along with
+    sense that the latter contains many other properties of the skill along with
     the skill id and description.
     """
 
