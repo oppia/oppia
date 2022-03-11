@@ -24,29 +24,28 @@ from core.tests import test_utils
 class ConfigServicesTests(test_utils.GenericTestBase):
     """Tests for config services."""
 
-    def test_can_set_config_property(self) -> None:
+    def test_can_set_config_property(self):
         self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
         config_services.set_property('admin', 'promo_bar_enabled', True)
         self.assertTrue(config_domain.PROMO_BAR_ENABLED.value)
 
-    def test_can_not_set_config_property_containing_email(self) -> None:
+    def test_can_not_set_config_property_containing_email(self):
         self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError, 'Validation failed: does_not_contain_email .*'
         ):
             config_services.set_property(
                 'admin', 'promo_bar_message', 'Test some@email.cz test')
 
     def test_can_not_set_config_property_with_invalid_config_property_name(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            self):
+        with self.assertRaisesRegex(
             Exception,
             'No config property with name new_config_property_name found.'):
             config_services.set_property(
                 'admin', 'new_config_property_name', True)
 
-    def test_can_revert_config_property(self) -> None:
+    def test_can_revert_config_property(self):
         self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
         config_services.set_property('admin', 'promo_bar_enabled', True)
         self.assertTrue(config_domain.PROMO_BAR_ENABLED.value)
@@ -54,9 +53,8 @@ class ConfigServicesTests(test_utils.GenericTestBase):
         self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
 
     def test_can_not_revert_config_property_with_invalid_config_property_name(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            self):
+        with self.assertRaisesRegex(
             Exception,
             'No config property with name new_config_property_name found.'):
             config_services.revert_property('admin', 'new_config_property_name')

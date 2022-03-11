@@ -26,17 +26,12 @@ from extensions.answer_summarizers import models
 class CalculationRegistryTests(test_utils.GenericTestBase):
     """Provides testing of the calculation registry."""
 
-    def test_get_calculation_by_id(self) -> None:
+    def test_get_calculation_by_id(self):
         self.assertTrue(
             isinstance(
                 calculation_registry.Registry.get_calculation_by_id(
                     'AnswerFrequencies'),
                 models.AnswerFrequencies))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             TypeError, '\'a\' is not a valid calculation id.'):
-            # get_calculation_by_id has calculation_id argument, which
-            # can accept only keys of CalculationDict and 'a' is not
-            # one of them. So, we don't have any overload function
-            # for 'a' key. That's why we added call-overload ignore
-            # statement here.
-            calculation_registry.Registry.get_calculation_by_id('a')  # type: ignore[call-overload]
+            calculation_registry.Registry.get_calculation_by_id('a')
