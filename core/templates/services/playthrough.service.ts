@@ -284,17 +284,13 @@ export class PlaythroughService {
    * If none of the issue types have been discovered, returns null instead.
    */
   private createNewPlaythrough(): Playthrough | null {
-    if (
-      this.misTracker &&
-      this.misTracker.foundAnIssue()
-    ) {
+    if (this.misTracker.foundAnIssue()) {
       return this.playthroughObjectFactory
         .createNewMultipleIncorrectSubmissionsPlaythrough(
           this.explorationId, this.explorationVersion,
           this.misTracker.generateIssueCustomizationArgs(),
           this.recordedLearnerActions);
     } else if (
-      this.cstTracker &&
       this.cstTracker.foundAnIssue()
     ) {
       return this.playthroughObjectFactory
@@ -303,7 +299,6 @@ export class PlaythroughService {
           this.cstTracker.generateIssueCustomizationArgs(),
           this.recordedLearnerActions);
     } else if (
-      this.eqTracker &&
       this.eqTracker.foundAnIssue()
     ) {
       return this.playthroughObjectFactory
@@ -323,8 +318,7 @@ export class PlaythroughService {
 
   private hasRecordingBegun(): boolean {
     return (
-      this.isPlaythroughRecordingEnabled() &&
-      this.recordedLearnerActions !== null);
+      this.isPlaythroughRecordingEnabled());
   }
 
   private hasRecordingFinished(): boolean {
