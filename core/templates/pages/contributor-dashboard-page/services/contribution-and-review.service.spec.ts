@@ -16,8 +16,9 @@
  * @fileoverview Unit tests for contribution and review service
  */
 
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { AppConstants } from 'app.constants';
 import { ContributionAndReviewService } from './contribution-and-review.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContributionAndReviewBackendApiService }
@@ -27,30 +28,71 @@ import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
   let carbas: ContributionAndReviewBackendApiService;
+  let fetchSuggestionsAsyncSpy: jasmine.Spy;
 
   const suggestion1 = {
     suggestion_id: 'suggestion_id_1',
     target_id: 'skill_id_1',
+  } as SuggestionBackendDict;
+  const suggestion2 = {
+    suggestion_id: 'suggestion_id_2',
+    target_id: 'skill_id_2',
+  } as SuggestionBackendDict;
+  const suggestion3 = {
+    suggestion_id: 'suggestion_id_3',
+    target_id: 'skill_id_3',
   } as SuggestionBackendDict;
 
   const opportunityDict1 = {
     skill_id: 'skill_id_1',
     skill_description: 'skill_description_1',
   };
+  const opportunityDict2 = {
+    skill_id: 'skill_id_2',
+    skill_description: 'skill_description_2',
+  };
+  const opportunityDict3 = {
+    skill_id: 'skill_id_3',
+    skill_description: 'skill_description_3',
+  };
 
-  const suggestionsBackendObject = {
+  const backendFetchResponse = {
     suggestions: [
       suggestion1
     ],
     target_id_to_opportunity_dict: {
       skill_id_1: opportunityDict1,
     },
+    next_offset: 1
+  };
+
+  const multiplePageBackendFetchResponse = {
+    suggestions: [
+      suggestion1,
+      suggestion2,
+      suggestion3
+    ],
+    target_id_to_opportunity_dict: {
+      skill_id_1: opportunityDict1,
+      skill_id_2: opportunityDict2,
+      skill_id_3: opportunityDict3
+    },
+    next_offset: 3
   };
 
   const expectedSuggestionDict = {
     suggestion: suggestion1,
-    details: suggestionsBackendObject
-      .target_id_to_opportunity_dict.skill_id_1
+    details: backendFetchResponse.target_id_to_opportunity_dict.skill_id_1
+  };
+  const expectedSuggestion2Dict = {
+    suggestion: suggestion2,
+    details: multiplePageBackendFetchResponse
+      .target_id_to_opportunity_dict.skill_id_2
+  };
+  const expectedSuggestion3Dict = {
+    suggestion: suggestion3,
+    details: multiplePageBackendFetchResponse
+      .target_id_to_opportunity_dict.skill_id_3
   };
 
   beforeEach(() => {
@@ -63,69 +105,219 @@ describe('Contribution and review service', () => {
     });
     cars = TestBed.inject(ContributionAndReviewService);
     carbas = TestBed.inject(ContributionAndReviewBackendApiService);
+    fetchSuggestionsAsyncSpy = spyOn(carbas, 'fetchSuggestionsAsync');
   });
 
   describe('getUserCreatedQuestionSuggestionsAsync', () => {
+    const defaultOpportunitiesPageSize = AppConstants.OPPORTUNITIES_PAGE_SIZE;
+    afterAll(() => {
+      // This throws "Cannot assign to 'OPPORTUNITIES_PAGE_SIZE' because it
+      // is a read-only property.". We need to suppress this error because
+      // we need to change the value of 'OPPORTUNITIES_PAGE_SIZE' for testing
+      // purposes.
+      // @ts-expect-error
+      AppConstants.OPPORTUNITIES_PAGE_SIZE = defaultOpportunitiesPageSize;
+    });
+
     it('should return available question suggestions and opportunity details',
       () => {
-        spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
-          Promise.resolve(suggestionsBackendObject));
+        fetchSuggestionsAsyncSpy.and.returnValue(
+          Promise.resolve(backendFetchResponse));
 
+<<<<<<< HEAD
         cars.getUserCreatedQuestionSuggestionsAsync('all')
           .then((suggestionIdToSuggestions) => {
             expect(suggestionIdToSuggestions.suggestion_id_1)
+=======
+        cars.getUserCreatedQuestionSuggestionsAsync()
+          .then((response) => {
+            expect(response.suggestionIdToDetails.suggestion_id_1)
+>>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
               .toEqual(expectedSuggestionDict);
           });
 
-        expect(carbas.fetchSuggestionsAsync).toHaveBeenCalled();
+        expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
       });
+
+    it('should fetch one page ahead and cache extra results', fakeAsync(() => {
+      // This throws "Cannot assign to 'OPPORTUNITIES_PAGE_SIZE' because it
+      // is a read-only property.". We need to suppress this error because
+      // we need to change the value of 'OPPORTUNITIES_PAGE_SIZE' for testing
+      // purposes.
+      // @ts-expect-error
+      AppConstants.OPPORTUNITIES_PAGE_SIZE = 2;
+
+      // Return more than a page's worth of results (3 results for a page size
+      // of 2).
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(multiplePageBackendFetchResponse));
+
+      // Only the first 2 results should be returned and the extra result
+      // should be cached.
+      cars.getUserCreatedQuestionSuggestionsAsync()
+        .then((response) => {
+          expect(response.suggestionIdToDetails.suggestion_id_1)
+            .toEqual(expectedSuggestionDict);
+          expect(response.suggestionIdToDetails.suggestion_id_2)
+            .toEqual(expectedSuggestion2Dict);
+          expect(Object.keys(response.suggestionIdToDetails).length)
+            .toEqual(2);
+          expect(response.more).toBeTrue();
+        });
+
+      flushMicrotasks();
+
+      const suggestion4 = {
+        suggestion_id: 'suggestion_id_4',
+        target_id: 'skill_id_4',
+      } as SuggestionBackendDict;
+      const opportunityDict4 = {
+        skill_id: 'skill_id_4',
+        skill_description: 'skill_description_4',
+      };
+      const suggestion4BackendFetchResponse = {
+        suggestions: [
+          suggestion4
+        ],
+        target_id_to_opportunity_dict: {
+          skill_id_4: opportunityDict4,
+        },
+        next_offset: 4
+      };
+      const expectedSuggestion4Dict = {
+        suggestion: suggestion4,
+        details: suggestion4BackendFetchResponse
+          .target_id_to_opportunity_dict.skill_id_4
+      };
+
+      // Return a 4th suggestion from the backend that was not available in the
+      // first fetch.
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(suggestion4BackendFetchResponse));
+
+      // Return both the cached 3rd suggestion and the new 4th suggestion to the
+      // caller.
+      cars.getUserCreatedQuestionSuggestionsAsync(false)
+        .then((response) => {
+          expect(response.suggestionIdToDetails.suggestion_id_3)
+            .toEqual(expectedSuggestion3Dict);
+          expect(response.suggestionIdToDetails.suggestion_id_4)
+            .toEqual(expectedSuggestion4Dict);
+          expect(Object.keys(response.suggestionIdToDetails).length)
+            .toEqual(2);
+          expect(response.more).toBeFalse();
+        });
+    }));
+
+    it('should reset offset', fakeAsync(() => {
+      // This throws "Cannot assign to 'OPPORTUNITIES_PAGE_SIZE' because it
+      // is a read-only property.". We need to suppress this error because
+      // we need to change the value of 'OPPORTUNITIES_PAGE_SIZE' for testing
+      // purposes.
+      // @ts-expect-error
+      AppConstants.OPPORTUNITIES_PAGE_SIZE = 2;
+
+      // Return more than a page's worth of results (3 results for a page size
+      // of 2).
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(multiplePageBackendFetchResponse));
+
+      // Only the first 2 results should be returned and the extra result
+      // should be cached.
+      cars.getUserCreatedQuestionSuggestionsAsync()
+        .then((response) => {
+          expect(response.suggestionIdToDetails.suggestion_id_1)
+            .toEqual(expectedSuggestionDict);
+          expect(response.suggestionIdToDetails.suggestion_id_2)
+            .toEqual(expectedSuggestion2Dict);
+          expect(Object.keys(response.suggestionIdToDetails).length)
+            .toEqual(2);
+          expect(response.more).toBeTrue();
+        });
+
+      flushMicrotasks();
+
+      // Fetch again from offset 0.
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(multiplePageBackendFetchResponse));
+
+      // Return the first 2 results from offset 0 again.
+      cars.getUserCreatedQuestionSuggestionsAsync()
+        .then((response) => {
+          expect(response.suggestionIdToDetails.suggestion_id_1)
+            .toEqual(expectedSuggestionDict);
+          expect(response.suggestionIdToDetails.suggestion_id_2)
+            .toEqual(expectedSuggestion2Dict);
+          expect(Object.keys(response.suggestionIdToDetails).length)
+            .toEqual(2);
+          expect(response.more).toBeTrue();
+        });
+    }));
   });
 
   describe('getReviewableQuestionSuggestionsAsync', () => {
     it('should return available question suggestions and opportunity details',
       () => {
-        spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
-          Promise.resolve(suggestionsBackendObject));
+        fetchSuggestionsAsyncSpy.and.returnValue(
+          Promise.resolve(backendFetchResponse));
 
+<<<<<<< HEAD
         cars.getReviewableQuestionSuggestionsAsync('all')
           .then((suggestionIdToSuggestions) => {
             expect(suggestionIdToSuggestions.suggestion_id_1)
+=======
+        cars.getReviewableQuestionSuggestionsAsync()
+          .then((response) => {
+            expect(response.suggestionIdToDetails.suggestion_id_1)
+>>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
               .toEqual(expectedSuggestionDict);
           });
 
-        expect(carbas.fetchSuggestionsAsync).toHaveBeenCalled();
+        expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
       });
   });
 
   describe('getUserCreatedTranslationSuggestionsAsync', () => {
     it('should return translation suggestions and opportunity details',
       () => {
-        spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
-          Promise.resolve(suggestionsBackendObject));
+        fetchSuggestionsAsyncSpy.and.returnValue(
+          Promise.resolve(backendFetchResponse));
 
+<<<<<<< HEAD
         cars.getUserCreatedTranslationSuggestionsAsync('all')
           .then((suggestionIdToSuggestions) => {
             expect(suggestionIdToSuggestions.suggestion_id_1)
+=======
+        cars.getUserCreatedTranslationSuggestionsAsync()
+          .then((response) => {
+            expect(response.suggestionIdToDetails.suggestion_id_1)
+>>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
               .toEqual(expectedSuggestionDict);
           });
 
-        expect(carbas.fetchSuggestionsAsync).toHaveBeenCalled();
+        expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
       });
   });
 
   describe('getReviewableTranslationSuggestionsAsync', () => {
     it('should return translation suggestions and opportunity details',
       () => {
-        spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
-          Promise.resolve(suggestionsBackendObject));
+        fetchSuggestionsAsyncSpy.and.returnValue(
+          Promise.resolve(backendFetchResponse));
 
+<<<<<<< HEAD
         cars.getReviewableTranslationSuggestionsAsync('all')
           .then((suggestionIdToSuggestions) => {
             expect(suggestionIdToSuggestions.suggestion_id_1)
+=======
+        cars.getReviewableTranslationSuggestionsAsync()
+          .then((response) => {
+            expect(response.suggestionIdToDetails.suggestion_id_1)
+>>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
               .toEqual(expectedSuggestionDict);
           });
 
-        expect(carbas.fetchSuggestionsAsync).toHaveBeenCalled();
+        expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
       });
   });
 

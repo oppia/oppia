@@ -2221,22 +2221,38 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.login(self.AUTHOR_EMAIL)
 
         response = self.get_json(
-            '/getsubmittedsuggestions/exploration/translate_content')
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(response['next_offset'], 1)
+
         response = self.get_json(
-            '/getsubmittedsuggestions/topic/translate_content')
+            '/getsubmittedsuggestions/topic/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(response, {})
 
     def test_skill_handler_returns_data(self):
         self.login(self.AUTHOR_EMAIL)
 
         response = self.get_json(
-            '/getsubmittedsuggestions/skill/add_question')
+            '/getsubmittedsuggestions/skill/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(response['next_offset'], 1)
+
         response = self.get_json(
-            '/getsubmittedsuggestions/topic/add_question')
+            '/getsubmittedsuggestions/topic/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(response, {})
 
     def test_question_suggestions_data_for_deleted_opportunities(self):
@@ -2244,9 +2260,13 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         opportunity_services.delete_skill_opportunity(self.SKILL_ID)
         response = self.get_json(
-            '/getsubmittedsuggestions/skill/add_question')
+            '/getsubmittedsuggestions/skill/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(response['next_offset'], 1)
         self.assertEqual(
             response['target_id_to_opportunity_dict'][self.SKILL_ID], None)
 
@@ -2255,9 +2275,13 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         opportunity_services.delete_exploration_opportunities([self.EXP_ID])
         response = self.get_json(
-            '/getsubmittedsuggestions/exploration/translate_content')
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(response['next_offset'], 1)
         self.assertEqual(
             response['target_id_to_opportunity_dict'][self.EXP_ID], None)
 
@@ -2265,23 +2289,34 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.login(self.AUTHOR_EMAIL)
 
         response = self.get_json(
-            '/getsubmittedsuggestions/exploration/translate_content')
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
 
         self.get_json(
-            '/getsubmittedsuggestions/exploration/invalid_suggestion_type',
+            '/getsubmittedsuggestions/exploration/invalid_suggestion_type', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            },
             expected_status_int=400)
 
     def test_handler_with_invalid_target_type_raise_error(self):
         self.login(self.AUTHOR_EMAIL)
 
         response = self.get_json(
-            '/getsubmittedsuggestions/exploration/translate_content')
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
 
         self.get_json(
-            '/getsubmittedsuggestions/invalid_target_type'
-            '/translate_content', expected_status_int=400)
+            '/getsubmittedsuggestions/invalid_target_type/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            }, expected_status_int=400)
 
 
 class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
@@ -2429,7 +2464,10 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     def test_exploration_handler_returns_data_with_no_topic(self):
         response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
+            '/getreviewablesuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
         suggestion = response['suggestions'][0]
         self.assertDictEqual(
@@ -2492,6 +2530,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 }
             }
         )
+        self.assertEqual(response['next_offset'], 1)
 
     def test_exploration_handler_returns_data_with_invalid_topic_and_no_exp_id( # pylint: disable=line-too-long
             self):
@@ -2585,12 +2624,16 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.REVIEWER_EMAIL)
         response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
+            '/getreviewablesuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
 
         # Since there is a properly created translation in the setup and another
         # one in this test case, there should be 2 suggestions when it is
         # requested for available translations.
         self.assertEqual(len(response['suggestions']), 2)
+        self.assertEqual(response['next_offset'], 2)
 
         self.logout()
 
@@ -2602,11 +2645,18 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.REVIEWER_EMAIL)
         response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
+            '/getreviewablesuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
 
         # Now the state of the exploration created in this case is deleted.
         # Therefore only one translation should be retrieved.
         self.assertEqual(len(response['suggestions']), 1)
+        # The suggestion with the deleted exploration state was filtered out
+        # after the storage query, so the next offset skips the filtered
+        # suggestion.
+        self.assertEqual(response['next_offset'], 2)
 
         self.logout()
 
@@ -2695,7 +2745,10 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         # requested for available translations.
         self.login(self.REVIEWER_EMAIL)
         response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
+            '/getreviewablesuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
 
         self.assertEqual(len(response['suggestions']), 2)
 
@@ -2723,7 +2776,10 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         # Therefore only one translation should be retrieved.
         self.login(self.REVIEWER_EMAIL)
         response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
+            '/getreviewablesuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
 
         self.assertEqual(len(response['suggestions']), 1)
 
@@ -2731,12 +2787,18 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     def test_topic_translate_handler_returns_no_data(self):
         response = self.get_json(
-            '/getreviewablesuggestions/topic/translate_content')
+            '/getreviewablesuggestions/topic/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(response, {})
 
     def test_skill_handler_returns_data(self):
         response = self.get_json(
-            '/getreviewablesuggestions/skill/add_question')
+            '/getreviewablesuggestions/skill/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
         suggestion = response['suggestions'][0]
         self.assertDictEqual(
@@ -2774,17 +2836,26 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     def test_topic_question_handler_returns_no_data(self):
         response = self.get_json(
-            '/getreviewablesuggestions/topic/add_question')
+            '/getreviewablesuggestions/topic/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(response, {})
 
     def test_handler_with_invalid_suggestion_type_raise_error(self):
         self.get_json(
-            '/getreviewablesuggestions/exploration/invalid_suggestion_type',
+            '/getreviewablesuggestions/exploration/invalid_suggestion_type', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            },
             expected_status_int=404
         )
 
     def test_handler_with_invalid_target_type_raise_error(self):
         self.get_json(
-            '/getreviewablesuggestions/invalid_target_type/translate_content',
+            '/getreviewablesuggestions/invalid_target_type/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            },
             expected_status_int=400
         )

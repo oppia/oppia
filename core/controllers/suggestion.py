@@ -285,12 +285,14 @@ class SuggestionsProviderHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid suggestion_type: %s' % suggestion_type)
 
-    def _render_suggestions(self, target_type, suggestions):
+    def _render_suggestions(self, target_type, suggestions, next_offset):
         """Renders retrieved suggestions.
 
         Args:
             target_type: str. The suggestion type.
             suggestions: list(BaseSuggestion). A list of suggestions to render.
+            next_offset: int. The number of results to skip from the beginning
+                of all results matching the original query.
         """
         if target_type == feconf.ENTITY_TYPE_EXPLORATION:
             target_id_to_opportunity_dict = (
@@ -298,7 +300,8 @@ class SuggestionsProviderHandler(base.BaseHandler):
             self.render_json({
                 'suggestions': _construct_exploration_suggestions(suggestions),
                 'target_id_to_opportunity_dict':
-                    target_id_to_opportunity_dict
+                    target_id_to_opportunity_dict,
+                'next_offset': next_offset
             })
         elif target_type == feconf.ENTITY_TYPE_SKILL:
             target_id_to_opportunity_dict = (
@@ -306,7 +309,8 @@ class SuggestionsProviderHandler(base.BaseHandler):
             self.render_json({
                 'suggestions': [s.to_dict() for s in suggestions],
                 'target_id_to_opportunity_dict':
-                    target_id_to_opportunity_dict
+                    target_id_to_opportunity_dict,
+                'next_offset': next_offset
             })
         else:
             self.render_json({})
@@ -333,11 +337,31 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
+<<<<<<< HEAD
             'topic_name': {
                 'schema': {
                     'type': 'basestring'
                 },
                 'default_value': None
+=======
+            'limit': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'offset': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+>>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
             }
         }
     }
@@ -352,6 +376,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
         """
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
+<<<<<<< HEAD
         topic_name = self.request.get('topic_name', None)
 
         opportunity_summary_exp_ids_specific_to_topic = None
@@ -374,12 +399,58 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
             self.user_id, suggestion_type,
             opportunity_summary_exp_ids_specific_to_topic)
         self._render_suggestions(target_type, suggestions)
+=======
+        limit = self.normalized_request.get('limit')
+        offset = self.normalized_request.get('offset')
+        suggestions, next_offset = (
+            suggestion_services.get_reviewable_suggestions(
+                self.user_id, suggestion_type, limit, offset))
+        self._render_suggestions(target_type, suggestions, next_offset)
+>>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
 
 
 class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
     """Provides all suggestions which are submitted by the user for a given
     suggestion type.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'target_type': {
+            'schema': {
+                'type': 'basestring',
+            },
+            'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+        },
+        'suggestion_type': {
+            'schema': {
+                'type': 'basestring',
+            },
+            'choices': feconf.SUGGESTION_TYPE_CHOICES
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'limit': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'offset': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_suggest_changes
     def get(self, target_type, suggestion_type):
@@ -391,9 +462,12 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
         """
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
-        suggestions = suggestion_services.get_submitted_suggestions(
-            self.user_id, suggestion_type)
-        self._render_suggestions(target_type, suggestions)
+        limit = self.normalized_request.get('limit')
+        offset = self.normalized_request.get('offset')
+        suggestions, next_offset = (
+            suggestion_services.get_submitted_suggestions_by_offset(
+            self.user_id, suggestion_type, limit, offset))
+        self._render_suggestions(target_type, suggestions, next_offset)
 
 
 class SuggestionListHandler(base.BaseHandler):

@@ -588,6 +588,7 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
     ])
 
 
+<<<<<<< HEAD
 def get_reviewable_suggestions_for_translate_content(
         user_id, opportunity_summary_exp_ids):
     """Returns a list of suggestions of type translate_content
@@ -639,10 +640,16 @@ def get_reviewable_suggestions(
        then either we fetch all suggestions, return an empty list
        or return suggestions corresponding to the opportunity ids
        depending on the value of opportunity_summary_exp_ids.
+=======
+def get_reviewable_suggestions(user_id, suggestion_type, limit, offset):
+    """Returns a list of suggestions of given suggestion_type which the user
+    can review.
+>>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
 
     Args:
         user_id: str. The ID of the user.
         suggestion_type: str. The type of the suggestion.
+<<<<<<< HEAD
         opportunity_summary_exp_ids: list(str) or None.
             The default value is None. If not none, it contains
             the list of exploration IDs for which suggestions
@@ -656,13 +663,49 @@ def get_reviewable_suggestions(
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         all_suggestions = get_reviewable_suggestions_for_translate_content(
             user_id, opportunity_summary_exp_ids)
-    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-        all_suggestions = ([
-            get_suggestion_from_model(s) for s in (
+=======
+        limit: int. The maximum number of results to return.
+        offset: int. The number of results to skip from the beginning of all
+            results matching the query.
+
+    Returns:
+        Tuple of (results, next_offset). Where:
+            results: list(Suggestion). A list of suggestions that are of the
+                supplied type which the supplied user is permitted to review.
+            next_offset: int. The input offset + the number of results returned
+                by the current query.
+    """
+    all_suggestions = []
+    if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        contribution_rights = user_services.get_user_contribution_rights(
+            user_id)
+        language_codes = (
+            contribution_rights.can_review_translation_for_language_codes)
+        suggestions, next_offset = (
                 suggestion_models.GeneralSuggestionModel
+                .get_in_review_translation_suggestions_by_offset(
+                    limit,
+                    offset,
+                    user_id,
+                    language_codes))
+        all_suggestions = [get_suggestion_from_model(s) for s in suggestions]
+>>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
+    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+        suggestions, next_offset = (
+                suggestion_models.GeneralSuggestionModel
+<<<<<<< HEAD
                 .get_in_review_question_suggestions(user_id))
         ])
     return all_suggestions
+=======
+                .get_in_review_question_suggestions_by_offset(
+                    limit,
+                    offset,
+                    user_id))
+        all_suggestions = [get_suggestion_from_model(s) for s in suggestions]
+
+    return all_suggestions, next_offset
+>>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
 
 
 def get_question_suggestions_waiting_longest_for_review():
@@ -978,6 +1021,38 @@ def get_submitted_suggestions(user_id, suggestion_type):
             .get_user_created_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
     ])
+
+
+def get_submitted_suggestions_by_offset(
+        user_id, suggestion_type, limit, offset):
+    """Returns a list of suggestions of given suggestion_type which the user
+    has submitted.
+
+    Args:
+        user_id: str. The ID of the user.
+        suggestion_type: str. The type of suggestion.
+        limit: int. The maximum number of results to return.
+        offset: int. The number of results to skip from the beginning
+            of all results matching the query.
+
+    Returns:
+        Tuple of (results, next_offset). Where:
+            results: list(Suggestion). A list of suggestions of the supplied
+                type which the supplied user has submitted.
+            next_offset: int. The input offset + the number of results returned
+                by the current query.
+    """
+    submitted_suggestion_models, next_offset = (
+        suggestion_models.GeneralSuggestionModel
+            .get_user_created_suggestions_by_offset(
+                limit,
+                offset,
+                suggestion_type,
+                user_id))
+    suggestions = ([
+        get_suggestion_from_model(s) for s in submitted_suggestion_models
+    ])
+    return suggestions, next_offset
 
 
 def get_info_about_suggestions_waiting_too_long_for_review():
