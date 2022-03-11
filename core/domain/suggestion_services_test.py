@@ -1394,19 +1394,12 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.reviewer_id_1, 'hi')
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id_1, 'pt')
-<<<<<<< HEAD
-        # Get all reviewable translation suggestions.
-        suggestions = suggestion_services.get_reviewable_suggestions(
-                self.reviewer_id_1, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                self.opportunity_summary_ids)
-=======
 
         suggestions, offset = suggestion_services.get_reviewable_suggestions(
             user_id=self.reviewer_id_1,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             limit=constants.OPPORTUNITIES_PAGE_SIZE,
             offset=0)
->>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
 
         # Expect that the results correspond to translation suggestions that the
         # user has rights to review.
@@ -1513,19 +1506,12 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.reviewer_id_1, 'pt')
         # Provide the user permission to review question suggestions.
         user_services.allow_user_to_review_question(self.reviewer_id_1)
-<<<<<<< HEAD
-        # Get all reviewable question suggestions.
-        suggestions = suggestion_services.get_reviewable_suggestions(
-            self.reviewer_id_1, feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            self.opportunity_summary_ids)
-=======
 
         suggestions, offset = suggestion_services.get_reviewable_suggestions(
             user_id=self.reviewer_id_1,
             suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
             limit=constants.OPPORTUNITIES_PAGE_SIZE,
             offset=0)
->>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
 
         # Expect that the results correspond to question suggestions.
         self.assertEqual(len(suggestions), 2)

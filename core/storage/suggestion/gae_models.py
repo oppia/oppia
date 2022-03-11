@@ -469,13 +469,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
-<<<<<<< HEAD
-    def get_in_review_translation_suggestions(
-        cls, user_id: str, language_codes: List[str]
-    ) -> Sequence[GeneralSuggestionModel]:
-        """Gets all translation suggestions for the given
-        language codes which are in review.
-=======
     def get_in_review_translation_suggestions_by_offset(
             cls,
             limit: int,
@@ -486,7 +479,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """Fetches translation suggestions that are in-review where the
         author_id != user_id and language_code matches one of the supplied
         language_codes.
->>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
 
         Args:
             limit: int. Maximum number of entities to be returned.
@@ -499,13 +491,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 suggestions should match.
 
         Returns:
-<<<<<<< HEAD
-            list(SuggestionModel). A list of suggestions which are in review,
-            but not created by the given user.
-        """
-
-        return cls.get_all().filter(datastore_services.all_of(
-=======
             Tuple of (results, next_offset). Where:
                 results: list(SuggestionModel). A list of suggestions that are
                     in-review, not authored by the supplied user, and that match
@@ -514,7 +499,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     returned by the current query.
         """
         suggestion_query = cls.get_all().filter(datastore_services.all_of(
->>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.author_id != user_id,

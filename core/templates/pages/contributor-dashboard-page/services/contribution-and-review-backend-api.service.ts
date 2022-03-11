@@ -101,19 +101,11 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-<<<<<<< HEAD
-        'skill', 'add_question', topicName);
-    }
-    if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
-      return this.fetchReviewableSuggestionsAsync(
-        'exploration', 'translate_content', topicName);
-=======
         'skill', 'add_question', limit, offset, topicName);
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
         'exploration', 'translate_content', limit, offset, topicName);
->>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
     }
   }
 
@@ -139,12 +131,9 @@ export class ContributionAndReviewBackendApiService {
   async fetchReviewableSuggestionsAsync(
       targetType: string,
       suggestionType: string,
-<<<<<<< HEAD
-      topicName: string
-=======
       limit: number,
-      offset: number
->>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
+      offset: number,
+      topicName: string
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
@@ -153,12 +142,9 @@ export class ContributionAndReviewBackendApiService {
       }
     );
     const params = {
-<<<<<<< HEAD
-      topic_name: topicName,
-=======
       limit: limit.toString(),
-      offset: offset.toString()
->>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
+      offset: offset.toString(),
+      topic_name: topicName
     };
     return this.http.get<FetchSuggestionsResponse>(url, { params }).toPromise();
   }

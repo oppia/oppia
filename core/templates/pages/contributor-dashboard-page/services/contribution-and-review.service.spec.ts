@@ -124,15 +124,9 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse));
 
-<<<<<<< HEAD
-        cars.getUserCreatedQuestionSuggestionsAsync('all')
-          .then((suggestionIdToSuggestions) => {
-            expect(suggestionIdToSuggestions.suggestion_id_1)
-=======
         cars.getUserCreatedQuestionSuggestionsAsync()
           .then((response) => {
             expect(response.suggestionIdToDetails.suggestion_id_1)
->>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
               .toEqual(expectedSuggestionDict);
           });
 
@@ -261,15 +255,9 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse));
 
-<<<<<<< HEAD
-        cars.getReviewableQuestionSuggestionsAsync('all')
-          .then((suggestionIdToSuggestions) => {
-            expect(suggestionIdToSuggestions.suggestion_id_1)
-=======
         cars.getReviewableQuestionSuggestionsAsync()
           .then((response) => {
             expect(response.suggestionIdToDetails.suggestion_id_1)
->>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
               .toEqual(expectedSuggestionDict);
           });
 
@@ -283,15 +271,9 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse));
 
-<<<<<<< HEAD
-        cars.getUserCreatedTranslationSuggestionsAsync('all')
-          .then((suggestionIdToSuggestions) => {
-            expect(suggestionIdToSuggestions.suggestion_id_1)
-=======
         cars.getUserCreatedTranslationSuggestionsAsync()
           .then((response) => {
             expect(response.suggestionIdToDetails.suggestion_id_1)
->>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
               .toEqual(expectedSuggestionDict);
           });
 
@@ -305,15 +287,9 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse));
 
-<<<<<<< HEAD
-        cars.getReviewableTranslationSuggestionsAsync('all')
-          .then((suggestionIdToSuggestions) => {
-            expect(suggestionIdToSuggestions.suggestion_id_1)
-=======
         cars.getReviewableTranslationSuggestionsAsync()
           .then((response) => {
             expect(response.suggestionIdToDetails.suggestion_id_1)
->>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
               .toEqual(expectedSuggestionDict);
           });
 

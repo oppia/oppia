@@ -116,14 +116,9 @@ angular.module('oppia').component('contributionsAndReview', {
           },
           [ctrl.TAB_TYPE_REVIEWS]: shouldResetOffset => {
             return ContributionAndReviewService
-<<<<<<< HEAD
-              .getReviewableTranslationSuggestionsAsync(
-                TranslationTopicService.getActiveTopicName());
-=======
               .getReviewableTranslationSuggestionsAsync(
                 shouldResetOffset,
                 TranslationTopicService.getActiveTopicName());
->>>>>>> bfc32c07a020ac949e4b3a09b39fa2becbbcfff4
           }
         }
       };
