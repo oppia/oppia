@@ -428,6 +428,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   toggleSidebar(event: Event): void {
     this.sidebarStatusService.toggleSidebar();
     this.sidebarStatusService.toggleHamburgerIconStatus(event);
+    if (this.isSidebarShown()) {
+      this.windowRef.nativeWindow.document.body.style.overflowY = 'hidden';
+    } else {
+      this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
+    }
   }
 
   navigateToClassroomPage(classroomUrl: string): void {
