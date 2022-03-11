@@ -19,22 +19,18 @@ from __future__ import annotations
 from core.domain import config_domain
 from core.platform import models
 
-from typing import Any
-
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
 
-# Value of a particular property can be bool, str, List[Dict], Dict,
-# int and other types too. so, Any type has to be used for value parameter.
-def set_property(committer_id: str, name: str, value: Any) -> None:
+def set_property(committer_id, name, value):
     """Sets a property value. The property must already be registered.
 
     Args:
         committer_id: str. The user ID of the committer.
         name: str. The name of the property.
-        value: Any. The value of the property.
+        value: str. The value of the property.
 
     Raises:
         Exception. No config property with the specified name is found.
@@ -47,7 +43,7 @@ def set_property(committer_id: str, name: str, value: Any) -> None:
     config_property.set_value(committer_id, value)
 
 
-def revert_property(committer_id: str, name: str) -> None:
+def revert_property(committer_id, name):
     """Reverts a property value to the default value.
 
     Args:

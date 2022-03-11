@@ -23,13 +23,6 @@ import os
 
 from core import feconf
 from core.platform import models
-from extensions.actions import base
-
-from typing import Dict, List
-
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import stats_models
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -38,10 +31,10 @@ class Registry:
     """Registry of all actions."""
 
     # Dict mapping action IDs to instances of the actions.
-    _actions: Dict[str, base.BaseLearnerActionSpec] = {}
+    _actions = {}
 
     @classmethod
-    def get_all_action_types(cls) -> List[str]:
+    def get_all_action_types(cls):
         """Get a list of all action types.
 
         Returns:
@@ -50,7 +43,7 @@ class Registry:
         return stats_models.ALLOWED_ACTION_TYPES
 
     @classmethod
-    def _refresh(cls) -> None:
+    def _refresh(cls):
         """Initializes the mapping between action types to instances of the
         action classes.
         """
@@ -68,7 +61,7 @@ class Registry:
                 cls._actions[clazz.__name__] = clazz()
 
     @classmethod
-    def get_all_actions(cls) -> List[base.BaseLearnerActionSpec]:
+    def get_all_actions(cls):
         """Get a list of instances of all actions.
 
         Returns:
@@ -80,7 +73,7 @@ class Registry:
         return list(cls._actions.values())
 
     @classmethod
-    def get_action_by_type(cls, action_type: str) -> base.BaseLearnerActionSpec:
+    def get_action_by_type(cls, action_type):
         """Gets an action by its type.
 
         Refreshes once if the action is not found; subsequently, throws a
