@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for Merge Skill Modal.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -36,7 +37,8 @@ describe('Merge Skill Modal', () => {
         MatCardModule,
         MatRadioModule,
         MatCheckboxModule,
-        FormsModule
+        FormsModule,
+        HttpClientTestingModule
       ],
       declarations: [
         MergeSkillModalComponent,

@@ -27,7 +27,7 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 // eslint-disable-next-line max-len
-import { AssignedSkillDataBackendDict, SkillsDashboardData, SkillsDashboardDataBackendDict, TopicsAndSkillDashboardData, TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillsDashboardDataBackendDict } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { AssignedSkillDataBackendDict, CategorizedAndUntriagedSkillsData, CategorizedAndUntriagedSkillsDataBackendDict, SkillsDashboardData, SkillsDashboardDataBackendDict, TopicsAndSkillDashboardData, TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillsDashboardDataBackendDict } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicsAndSkillsDashboardFilter } from './topics-and-skills-dashboard-filter.model';
 
 describe('Topics and Skills Dashboard backend API service', () => {
@@ -41,6 +41,10 @@ describe('Topics and Skills Dashboard backend API service', () => {
   let assignedSkillDataBackendResponse: AssignedSkill;
   let skillsDashboardDataBackendDict: SkillsDashboardDataBackendDict;
   let skillsDashboardDataBackendResponse: SkillsDashboardData;
+  let categorizedAndUntriagedSkillsDataBackendDict:
+    CategorizedAndUntriagedSkillsDataBackendDict;
+  let categorizedAndUntriagedSkillsDataBackendResponse:
+    CategorizedAndUntriagedSkillsData;
 
 
   const TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = (
@@ -256,6 +260,61 @@ describe('Topics and Skills Dashboard backend API service', () => {
       nextCursor: skillsDashboardDataBackendDict.next_cursor,
       more: skillsDashboardDataBackendDict.more
     };
+
+    categorizedAndUntriagedSkillsDataBackendDict = {
+      untriaged_skill_summary_dicts: [
+        {
+          skill_description: 'Dummy Skill 3',
+          skill_id: '4P77sLaU14DE',
+        }
+      ],
+      categorized_skills_dict: {
+        'Empty Topic': {
+          uncategorized: []
+        },
+        'Dummy Topic 1': {
+          uncategorized: [
+            {
+              skill_id: 'BBB6dzfb5pPt',
+              skill_description: 'Dummy Skill 1'
+            }
+          ],
+          'Dummy Subtopic Title': [
+            {
+              skill_id: 'D1FdmljJNXdt',
+              skill_description: 'Dummy Skill 2'
+            }
+          ]
+        }
+      }
+    };
+
+    categorizedAndUntriagedSkillsDataBackendResponse = {
+      untriagedSkillSummaries: [
+        ShortSkillSummary.createFromBackendDict(
+          categorizedAndUntriagedSkillsDataBackendDict
+            .untriaged_skill_summary_dicts[0]),
+      ],
+      categorizedSkillsDict: {
+        'Empty Topic': {
+          uncategorized: []
+        },
+        'Dummy Topic 1': {
+          uncategorized: [
+            ShortSkillSummary.createFromBackendDict({
+              skill_id: 'BBB6dzfb5pPt',
+              skill_description: 'Dummy Skill 1'
+            })
+          ],
+          'Dummy Subtopic Title': [
+            ShortSkillSummary.createFromBackendDict({
+              skill_id: 'D1FdmljJNXdt',
+              skill_description: 'Dummy Skill 2'
+            })
+          ]
+        }
+      }
+    };
   });
 
   afterEach(() => {
@@ -442,4 +501,46 @@ describe('Topics and Skills Dashboard backend API service', () => {
         .onTopicsAndSkillsDashboardReinitialized)
       .toEqual(mockEventEmitter);
   });
+
+  it('should successfully fetch categorized and untriaged skills ' +
+  'data from the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    topicsAndSkillsDashboardBackendApiService
+      .fetchCategorizedAndUntriagedSkillsDataAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/topics_and_skills_dashboard/categorized_and_untriaged_skills_data');
+
+    expect(req.request.method).toEqual('GET');
+    req.flush(categorizedAndUntriagedSkillsDataBackendDict);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      categorizedAndUntriagedSkillsDataBackendResponse);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to fetch categorized and untriaged skills data ' +
+  'from the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    topicsAndSkillsDashboardBackendApiService
+      .fetchCategorizedAndUntriagedSkillsDataAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/topics_and_skills_dashboard/categorized_and_untriaged_skills_data');
+
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Failed to categorized and untriaged skills data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error.'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Failed to categorized and untriaged skills data.'));
+  }));
 });
