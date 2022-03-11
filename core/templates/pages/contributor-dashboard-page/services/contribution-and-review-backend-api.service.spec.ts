@@ -115,7 +115,8 @@ describe('Contribution and review backend API service', () => {
     it('should fetch reviewable question suggestions', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
       const url = (
-        '/getreviewablesuggestions/skill/add_question?limit=10&offset=0&topic_name=All');
+        '/getreviewablesuggestions/skill/add_question' +
+        '?limit=10&offset=0&topic_name=All');
 
       carbas.fetchSuggestionsAsync(
         'REVIEWABLE_QUESTION_SUGGESTIONS',
@@ -129,7 +130,9 @@ describe('Contribution and review backend API service', () => {
 
       expect(carbas.fetchReviewableSuggestionsAsync)
         .toHaveBeenCalledWith(
-          'skill', 'add_question', AppConstants.OPPORTUNITIES_PAGE_SIZE, 0, 'All');
+          'skill',
+          'add_question',
+          AppConstants.OPPORTUNITIES_PAGE_SIZE, 0, 'All');
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));

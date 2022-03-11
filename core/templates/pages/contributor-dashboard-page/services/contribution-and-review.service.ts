@@ -170,24 +170,24 @@ export class ContributionAndReviewService {
   }
 
   async getReviewableQuestionSuggestionsAsync(
-    shouldResetOffset: boolean = true,
-    topicName: string = 'All'):
+      shouldResetOffset: boolean = true,
+      topicName: string = 'All'):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.reviewableQuestionFetcher, shouldResetOffset, topicName);
   }
 
   async getUserCreatedTranslationSuggestionsAsync(
-    shouldResetOffset: boolean = true,
-    topicName: string = 'All'):
+      shouldResetOffset: boolean = true,
+      topicName: string = 'All'):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.userCreatedTranslationFetcher, shouldResetOffset, topicName);
   }
 
   async getReviewableTranslationSuggestionsAsync(
-    shouldResetOffset: boolean = true,
-    topicName: string = 'All'):
+      shouldResetOffset: boolean = true,
+      topicName: string = 'All'):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher, shouldResetOffset, topicName);
