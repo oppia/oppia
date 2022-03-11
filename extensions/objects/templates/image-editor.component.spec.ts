@@ -29,6 +29,7 @@ import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { SimpleChanges } from '@angular/core';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 let gifshot = require('gifshot');
 
 declare global {
@@ -356,7 +357,10 @@ describe('ImageEditor', () => {
     TestBed.configureTestingModule(
       {
         imports: [HttpClientTestingModule],
-        declarations: [ImageEditorComponent],
+        declarations: [
+          ImageEditorComponent,
+          MockTranslatePipe
+        ],
         providers: [
           {
             provide: ImageUploadHelperService,
@@ -1648,6 +1652,10 @@ describe('ImageEditor', () => {
     component.data = { mode: component.MODE_EMPTY, metadata: {}, crop: true };
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
       dataSvg.uploadedImageData);
+    spyOn(svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri')
+      .and.returnValue({ tags: [], attrs: [] });
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes')
+      .and.returnValue(dataSvg.uploadedImageData.toString());
 
     component.onFileChanged(dataSvg.uploadedFile);
 

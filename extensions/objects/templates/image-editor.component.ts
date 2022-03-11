@@ -873,8 +873,12 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         this.imgData = reader.result as string;
         let imageData: string | SafeResourceUrl = reader.result as string;
         if (file.name.endsWith('.svg')) {
+          this.invalidTagsAndAttributes = this.svgSanitizerService
+            .getInvalidSvgTagsAndAttrsFromDataUri(this.imgData);
+          this.imgData = this.svgSanitizerService
+            .removeAllInvalidTagsAndAttributes(this.imgData);
           imageData = this.svgSanitizerService.getTrustedSvgResourceUrl(
-            imageData as string);
+            this.imgData);
         }
         this.data = {
           mode: this.MODE_UPLOADED,
@@ -953,7 +957,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
 
     // Check mime type from imageDataURI.
     // Check point 2 in the note before imports and after fileoverview.
-    const imageDataURI = this.imgData || (
+    let imageDataURI = this.imgData || (
       this.data.metadata.uploadedImageData as string);
     const mimeType = imageDataURI.split(';')[0];
     let resampledFile;
@@ -982,18 +986,11 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       let gifHeight = dimensions.height;
       this.processGIFImage(imageDataURI, gifWidth, gifHeight, null, successCb);
     } else if (mimeType === 'data:image/svg+xml') {
-      this.invalidTagsAndAttributes = (
-        this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
+      resampledFile = (
+        this.imageUploadHelperService.convertImageDataToImageFile(
           imageDataURI));
-      const tags = this.invalidTagsAndAttributes.tags;
-      const attrs = this.invalidTagsAndAttributes.attrs;
-      if (tags.length === 0 && attrs.length === 0) {
-        resampledFile = (
-          this.imageUploadHelperService.convertImageDataToImageFile(
-            imageDataURI));
-        this.saveImage(dimensions, resampledFile, 'svg');
-        this.data.crop = false;
-      }
+      this.saveImage(dimensions, resampledFile, 'svg');
+      this.data.crop = false;
     } else {
       const resampledImageData = this.getResampledImageData(
         imageDataURI, dimensions.width, dimensions.height);

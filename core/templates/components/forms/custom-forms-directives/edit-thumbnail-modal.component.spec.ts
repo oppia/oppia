@@ -75,12 +75,6 @@ describe('Edit Thumbnail Modal Component', () => {
     }
   }
 
-  let mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrsFromDataUri: (dataUri: string) => {
-      return { tags: ['script'], attrs: [] };
-    },
-  };
-
   const fileContent = (
     'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
     'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
@@ -95,13 +89,10 @@ describe('Edit Thumbnail Modal Component', () => {
         MockTranslatePipe
       ],
       providers: [
+        SvgSanitizerService,
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal
-        },
-        {
-          provide: SvgSanitizerService,
-          useValue: mockSvgSanitizerService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -132,7 +123,10 @@ describe('Edit Thumbnail Modal Component', () => {
     ' svg file', () => {
     spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
     spyOn(component, 'isValidFilename').and.returnValue(true);
-    const resetSpy = spyOn(component, 'reset').and.callThrough();
+    spyOn(svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri')
+      .and.returnValue({ tags: [], attrs: [] });
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes')
+      .and.returnValue(fileContent);
     let file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
     component.invalidImageWarningIsShown = false;
     component.invalidFilenameWarningIsShown = false;
@@ -142,9 +136,6 @@ describe('Edit Thumbnail Modal Component', () => {
     component.onFileChanged(file);
     expect(component.invalidImageWarningIsShown).toBe(false);
     expect(component.invalidFilenameWarningIsShown).toBe(false);
-    expect(component.tags).toEqual(['script']);
-    expect(component.attrs).toEqual([]);
-    expect(resetSpy).toHaveBeenCalled();
   });
 
   it('should not load file if it is not a svg type', () => {
@@ -272,11 +263,10 @@ describe('Edit Thumbnail Modal Component', () => {
     ' uploaded', () => {
     spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
     spyOn(component, 'isValidFilename').and.returnValue(true);
-    spyOn(
-      svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri'
-    ).and.callFake(() => {
-      return { tags: [], attrs: [] };
-    });
+    spyOn(svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri')
+      .and.returnValue({ tags: [], attrs: [] });
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes')
+      .and.returnValue(fileContent);
     let file = new File([fileContent], 'triangle.svg', {type: 'image/svg'});
     component.uploadedImageMimeType = 'image/svg+xml';
     expect(component.thumbnailHasChanged).toBeFalse();

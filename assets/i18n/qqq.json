@@ -452,6 +452,8 @@
 	"I18N_INTERACTIONS_SET_INPUT_EMPTY_SET": "Text displayed in a set interaction. - The user is asked to introduce items of a set described in the problem. This text indicates that each one of those items has to be written is a separate line. It's shown when the user has not entered any item yet.",
 	"I18N_INTERACTIONS_SET_INPUT_NO_ANSWER": "Text displayed in a set interaction. - The interaction is a dialog between Oppia and the user. This text is shown on the user side of the dialog if the set introduced by the user has no elements.",
 	"I18N_INTERACTIONS_SUBMIT": "Text displayed in an interaction or navigation bar. - The text is shown inside a button. When the user clicks the button, the system checks if the answer is correct and continues to the following action.\n{{Identical|Submit}}",
+	"I18N_INTERACTIONS_TERMS_LIMIT": "Error message shown below the input field for the ratio input interaction.",
+	"I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT": "Alert message shown when invalid tags and attributes have been stripped from the uploaded SVG",
 	"I18N_LANGUAGE_FOOTER_VIEW_IN": "Text for the site language selector. - When the user selects a different language, the site (not the explorations) is translated into that language.",
 	"I18N_LEARNER_DASHBOARD_AFTERNOON_GREETING": "Good afternoon greeting on the learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_ALL_GOALS_SECTION": "Text for the edit goals section in the learner dashboard.",
