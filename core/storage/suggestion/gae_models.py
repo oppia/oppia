@@ -469,29 +469,52 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
-    def get_in_review_translation_suggestions(
-        cls, user_id: str, language_codes: List[str]
-    ) -> Sequence[GeneralSuggestionModel]:
-        """Gets all translation suggestions for the given
-        language codes which are in review.
+    def get_in_review_translation_suggestions_by_offset(
+        cls,
+        limit: int,
+        offset: int,
+        user_id: str,
+        language_codes: List[str]
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
+        """Fetches translation suggestions that are in-review where the
+        author_id != user_id and language_code matches one of the supplied
+        language_codes.
 
         Args:
-            user_id: str. The id of the user trying to make this query.
-                As a user cannot review their own suggestions, suggestions
-                authored by the user will be excluded.
-            language_codes: list(str). The list of language codes.
+            limit: int. Maximum number of entities to be returned.
+            offset: int. Number of results to skip from the beginning of all
+                results matching the query.
+            user_id: str. The id of the user trying to make this query. As a
+                user cannot review their own suggestions, suggestions authored
+                by the user will be excluded.
+            language_codes: list(str). List of language codes that the
+                suggestions should match.
 
         Returns:
-            list(SuggestionModel). A list of translation suggestions which
-            are in review, for the specified language codes, but
-            not created by the given user.
+            Tuple of (results, next_offset). Where:
+                results: list(SuggestionModel). A list of suggestions that are
+                    in-review, not authored by the supplied user, and that match
+                    one of the supplied language codes.
+                next_offset: int. The input offset + the number of results
+                    returned by the current query.
         """
-        return cls.get_all().filter(datastore_services.all_of(
+        suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.author_id != user_id,
             cls.language_code.IN(language_codes)
-        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+        ))
+
+        results: Sequence[GeneralSuggestionModel] = (
+            suggestion_query.fetch(limit, offset=offset)
+        )
+        next_offset = offset + len(results)
+
+        return (
+            results,
+            next_offset
+        )
+
 
     @classmethod
     def get_in_review_translation_suggestions_with_exp_ids(
@@ -548,25 +571,43 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
-    def get_in_review_question_suggestions(
-        cls, user_id: str
-    ) -> Sequence[GeneralSuggestionModel]:
-        """Gets all question suggestions which are in review.
+    def get_in_review_question_suggestions_by_offset(
+        cls, limit: int, offset: int, user_id: str
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
+        """Fetches question suggestions that are in-review and not authored by
+        the supplied user.
 
         Args:
-            user_id: str. The id of the user trying to make this query.
-                As a user cannot review their own suggestions, suggestions
-                authored by the user will be excluded.
+            limit: int. Maximum number of entities to be returned.
+            offset: int. Number of of results to skip from the beginning of all
+                results matching the query.
+            user_id: str. The id of the user trying to make this query. As a
+                user cannot review their own suggestions, suggestions authored
+                by the user will be excluded.
 
         Returns:
-            list(SuggestionModel). A list of suggestions that are of the given
-            type, which are in review, but not created by the given user.
+            Tuple of (results, next_offset). Where:
+                results: list(SuggestionModel). A list of suggestions that are
+                    in-review, not authored by the supplied user, and that match
+                    one of the supplied language codes.
+                next_offset: int. The input offset + the number of results
+                    returned by the current query.
         """
-        return cls.get_all().filter(datastore_services.all_of(
+        suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
             cls.author_id != user_id
-        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+        ))
+
+        results: Sequence[GeneralSuggestionModel] = (
+            suggestion_query.fetch(limit, offset=offset)
+        )
+        next_offset = offset + len(results)
+
+        return (
+            results,
+            next_offset
+        )
 
     @classmethod
     def get_question_suggestions_waiting_longest_for_review(
@@ -631,6 +672,42 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.suggestion_type == suggestion_type,
             cls.author_id == user_id
         )).order(-cls.created_on).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
+    def get_user_created_suggestions_by_offset(
+        cls, limit: int, offset: int, suggestion_type: str, user_id: str
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
+        """Fetches suggestions of suggestion_type which the supplied user has
+        created.
+
+        Args:
+            limit: int. Maximum number of entities to be returned.
+            offset: int. The number of results to skip from the beginning of all
+                results matching the query.
+            suggestion_type: str. The type of suggestion to query for.
+            user_id: str. The id of the user trying to make this query.
+
+        Returns:
+            Tuple of (results, next_offset). Where:
+                results: list(SuggestionModel). A list of suggestions that are
+                    of the supplied type which the supplied user has created.
+                next_offset: int. The input offset + the number of results
+                    returned by the current query.
+        """
+        suggestion_query = cls.get_all().filter(datastore_services.all_of(
+            cls.suggestion_type == suggestion_type,
+            cls.author_id == user_id
+        )).order(-cls.created_on)
+
+        results: Sequence[GeneralSuggestionModel] = (
+            suggestion_query.fetch(limit, offset=offset)
+        )
+        next_offset = offset + len(results)
+
+        return (
+            results,
+            next_offset
+        )
 
     @classmethod
     def get_all_score_categories(cls) -> List[str]:

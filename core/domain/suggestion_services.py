@@ -589,7 +589,7 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
 
 
 def get_reviewable_translation_suggestions(
-        user_id, opportunity_summary_exp_ids):
+        user_id, opportunity_summary_exp_ids, limit, offset):
     """Returns a list of translation suggestions matching the
      passed opportunity IDs which the user can review.
 
@@ -602,10 +602,16 @@ def get_reviewable_translation_suggestions(
             suggestions are fetched. If the list consists of some
             valid number of ids, suggestions corresponding to the
             IDs are fetched.
+        limit: int. The maximum number of results to return.
+        offset: int. The number of results to skip from the beginning of all
+            results matching the query.
 
     Returns:
-        list(Suggestion). A list of translation suggestions
-        which the given user is allowed to review.
+        Tuple of (results, next_offset). Where:
+            results: list(Suggestion). A list of translation suggestions
+            which the supplied user is permitted to review.
+            next_offset: int. The input offset + the number of results returned
+                by the current query.
     """
     contribution_rights = user_services.get_user_contribution_rights(
         user_id)
@@ -614,14 +620,18 @@ def get_reviewable_translation_suggestions(
 
     in_review_translation_suggestions = []
     if opportunity_summary_exp_ids is None:
-        in_review_translation_suggestions = (
+        in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel
-                .get_in_review_translation_suggestions(
-                    user_id, language_codes))
+                .get_in_review_translation_suggestions_by_offset(
+                limit,
+                offset,
+                user_id,
+                language_codes))
     elif len(opportunity_summary_exp_ids) > 0:
-        in_review_translation_suggestions = (
+        in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel
                 .get_in_review_translation_suggestions_with_exp_ids(
+                    limit, offset,
                     user_id, language_codes,
                     opportunity_summary_exp_ids))
 
@@ -629,26 +639,35 @@ def get_reviewable_translation_suggestions(
         get_suggestion_from_model(s)
         for s in in_review_translation_suggestions
     ])
-    return translation_suggestions
+    return translation_suggestions, next_offset
 
 
-def get_reviewable_question_suggestions(user_id):
+def get_reviewable_question_suggestions(
+        user_id, limit, offset):
     """Returns a list of question suggestions which the user
        can review.
 
     Args:
         user_id: str. The ID of the user.
+        limit: int. The maximum number of results to return.
+        offset: int. The number of results to skip from the beginning of all
+            results matching the query.
 
     Returns:
-        list(Suggestion). A list of question suggestions which
-        the given user is allowed to review.
+        Tuple of (results, next_offset). Where:
+            results: list(Suggestion). A list of question suggestions which
+            the given user is allowed to review.
+            next_offset: int. The input offset + the number of results returned
+                by the current query.
+
     """
+    suggestions, next_offset = (suggestion_models.GeneralSuggestionModel
+    .get_in_review_question_suggestions_by_offset(user_id, limit, offset))
+
     question_suggestions = ([
-        get_suggestion_from_model(s) for s in (
-            suggestion_models.GeneralSuggestionModel
-            .get_in_review_question_suggestions(user_id))
+        get_suggestion_from_model(s) for s in suggestions
     ])
-    return question_suggestions
+    return question_suggestions, next_offset
 
 
 def get_question_suggestions_waiting_longest_for_review():
@@ -964,6 +983,38 @@ def get_submitted_suggestions(user_id, suggestion_type):
             .get_user_created_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
     ])
+
+
+def get_submitted_suggestions_by_offset(
+        user_id, suggestion_type, limit, offset):
+    """Returns a list of suggestions of given suggestion_type which the user
+    has submitted.
+
+    Args:
+        user_id: str. The ID of the user.
+        suggestion_type: str. The type of suggestion.
+        limit: int. The maximum number of results to return.
+        offset: int. The number of results to skip from the beginning
+            of all results matching the query.
+
+    Returns:
+        Tuple of (results, next_offset). Where:
+            results: list(Suggestion). A list of suggestions of the supplied
+                type which the supplied user has submitted.
+            next_offset: int. The input offset + the number of results returned
+                by the current query.
+    """
+    submitted_suggestion_models, next_offset = (
+        suggestion_models.GeneralSuggestionModel
+            .get_user_created_suggestions_by_offset(
+                limit,
+                offset,
+                suggestion_type,
+                user_id))
+    suggestions = ([
+        get_suggestion_from_model(s) for s in submitted_suggestion_models
+    ])
+    return suggestions, next_offset
 
 
 def get_info_about_suggestions_waiting_too_long_for_review():
