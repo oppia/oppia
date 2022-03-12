@@ -138,14 +138,13 @@ describe('LocalStorageService', () => {
       const entityEditorBrowserTabsInfoObject:
         EntityEditorBrowserTabsInfoObject = {
           entityType: 'topic',
-          id: 'topic_1',
           latestVersion: 1,
           numberOfOpenedTabs: 1,
           someTabHasUnsavedChanges: false
         };
       localStorageService.updateEntityEditorBrowserTabsInfo(
-        EntityEditorBrowserTabsInfo.createFromDict(
-          entityEditorBrowserTabsInfoObject),
+        EntityEditorBrowserTabsInfo.createFromObjectAndId(
+          entityEditorBrowserTabsInfoObject, 'topic_1'),
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_TOPIC_EDITOR_BROWSER_TABS
       );
@@ -154,21 +153,20 @@ describe('LocalStorageService', () => {
       expect(localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_TOPIC_EDITOR_BROWSER_TABS,
-        'topic_1')!.toDict()).toEqual(entityEditorBrowserTabsInfoObject);
+        'topic_1')!.toObject()).toEqual(entityEditorBrowserTabsInfoObject);
     });
 
     it('should update entity editor browser tabs info', () => {
       const entityEditorBrowserTabsInfoObject:
         EntityEditorBrowserTabsInfoObject = {
           entityType: 'skill',
-          id: 'skill_1',
           latestVersion: 1,
           numberOfOpenedTabs: 1,
           someTabHasUnsavedChanges: false
         };
       const entityEditorBrowserTabsInfo = (
-        EntityEditorBrowserTabsInfo.createFromDict(
-          entityEditorBrowserTabsInfoObject));
+        EntityEditorBrowserTabsInfo.createFromObjectAndId(
+          entityEditorBrowserTabsInfoObject, 'skill_1'));
       localStorageService.updateEntityEditorBrowserTabsInfo(
         entityEditorBrowserTabsInfo,
         EntityEditorBrowserTabsInfoDomainConstants

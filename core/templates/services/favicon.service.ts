@@ -18,21 +18,26 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { WindowRef } from './contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FaviconService {
-  constructor() {}
+  constructor(
+    private windowRef: WindowRef
+  ) {}
 
   setFavicon(faviconUrl: string): void {
     const link: HTMLLinkElement = (
-      document.querySelector('link[rel*="icon"]') ||
-      document.createElement('link'));
+      this.windowRef.nativeWindow.document.querySelector('link[rel*="icon"]') ||
+      this.windowRef.nativeWindow.document.createElement('link'));
     link.href = faviconUrl;
     link.type = 'image/x-icon';
     link.rel = 'icon';
-    document.getElementsByTagName('head')[0].appendChild(link);
+    link.remove();
+    this.windowRef.nativeWindow.document
+      .getElementsByTagName('head')[0].appendChild(link);
   }
 }
 

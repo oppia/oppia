@@ -25,9 +25,12 @@
  * and avoid failure in the future while saving their work.
  */
 
+export interface EntityEditorBrowserTabsInfoLocalStorageObject {
+  [entityId: string]: EntityEditorBrowserTabsInfoObject;
+}
+
 export interface EntityEditorBrowserTabsInfoObject {
   entityType: string;
-  id: string;
   latestVersion: number;
   numberOfOpenedTabs: number;
   someTabHasUnsavedChanges: boolean;
@@ -91,22 +94,22 @@ export class EntityEditorBrowserTabsInfo {
     );
   }
 
-  static createFromDict(
-      entityEditorBrowserTabsInfoObject: EntityEditorBrowserTabsInfoObject
+  static createFromObjectAndId(
+      entityEditorBrowserTabsInfoObject: EntityEditorBrowserTabsInfoObject,
+      entityId: string
   ): EntityEditorBrowserTabsInfo {
     return new EntityEditorBrowserTabsInfo(
       entityEditorBrowserTabsInfoObject.entityType,
-      entityEditorBrowserTabsInfoObject.id,
+      entityId,
       entityEditorBrowserTabsInfoObject.latestVersion,
       entityEditorBrowserTabsInfoObject.numberOfOpenedTabs,
       entityEditorBrowserTabsInfoObject.someTabHasUnsavedChanges
     );
   }
 
-  toDict(): EntityEditorBrowserTabsInfoObject {
+  toObject(): EntityEditorBrowserTabsInfoObject {
     return {
       entityType: this.getEntityType(),
-      id: this.getId(),
       latestVersion: this.getLatestVersion(),
       numberOfOpenedTabs: this.getNumberOfOpenedTabs(),
       someTabHasUnsavedChanges: (

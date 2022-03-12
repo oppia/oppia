@@ -23,15 +23,15 @@ describe('Entity Editor Browser Tabs Info', () => {
   let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo;
   const skillEditorBrowserTabsInfoObject = {
     entityType: 'skill',
-    id: 'skill_1',
     latestVersion: 1,
     numberOfOpenedTabs: 1,
     someTabHasUnsavedChanges: false
   };
 
   beforeEach(() => {
-    skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.createFromDict(
-      skillEditorBrowserTabsInfoObject);
+    skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo
+      .createFromObjectAndId(
+        skillEditorBrowserTabsInfoObject, 'skill_1');
     topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
       'topic', 'topic_1', 1, 1, false);
   });
@@ -55,7 +55,7 @@ describe('Entity Editor Browser Tabs Info', () => {
 
   it('should correctly convert into object that can be stored in local storage',
     () => {
-      expect(skillEditorBrowserTabsInfo.toDict()).toEqual(
+      expect(skillEditorBrowserTabsInfo.toObject()).toEqual(
         skillEditorBrowserTabsInfoObject);
     });
 

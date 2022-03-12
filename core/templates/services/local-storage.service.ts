@@ -28,7 +28,7 @@ import {
   ExplorationChange,
   ExplorationDraft
 } from 'domain/exploration/exploration-draft.model';
-import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoObject } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoLocalStorageObject } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { WindowRef } from './contextual/window-ref.service';
 
 @Injectable({
@@ -216,7 +216,7 @@ export class LocalStorageService {
   ): EntityEditorBrowserTabsInfo | null {
     if (this.isStorageAvailable()) {
       let allEntityEditorBrowserTabsInfoObjects:
-        EntityEditorBrowserTabsInfoObject[] = [];
+        EntityEditorBrowserTabsInfoLocalStorageObject = {};
 
       const stringifiedEntityEditorBrowserTabsInfo = (this.storage as Storage)
         .getItem(entityEditorBrowserTabsInfoConstant);
@@ -226,15 +226,11 @@ export class LocalStorageService {
       }
 
       const requiredEntityEditorBrowserTabsInfoObject = (
-        allEntityEditorBrowserTabsInfoObjects.find(
-          (entityEditorBrowserTabsInfoObject) => {
-            return entityEditorBrowserTabsInfoObject.id === entityId;
-          })
-      );
+        allEntityEditorBrowserTabsInfoObjects[entityId]);
 
       if (requiredEntityEditorBrowserTabsInfoObject) {
-        return EntityEditorBrowserTabsInfo.createFromDict(
-          requiredEntityEditorBrowserTabsInfoObject);
+        return EntityEditorBrowserTabsInfo.createFromObjectAndId(
+          requiredEntityEditorBrowserTabsInfoObject, entityId);
       }
     }
     return null;
@@ -252,12 +248,13 @@ export class LocalStorageService {
       entityEditorBrowserTabsInfoConstant: string
   ): void {
     if (this.isStorageAvailable()) {
-      const entityEditorBrowserTabsInfoObject = (
-        entityEditorBrowserTabsInfo.toDict()
+      const updatedEntityEditorBrowserTabsInfoObject = (
+        entityEditorBrowserTabsInfo.toObject()
       );
+      const entityId = entityEditorBrowserTabsInfo.getId();
 
       let allEntityEditorBrowserTabsInfoObjects:
-        EntityEditorBrowserTabsInfoObject[] = [];
+        EntityEditorBrowserTabsInfoLocalStorageObject = {};
 
       const stringifiedEntityEditorBrowserTabsInfo = (this.storage as Storage)
         .getItem(entityEditorBrowserTabsInfoConstant);
@@ -266,36 +263,27 @@ export class LocalStorageService {
           stringifiedEntityEditorBrowserTabsInfo);
       }
 
-      const index = allEntityEditorBrowserTabsInfoObjects.findIndex(
-        (entityEditorBrowserTabsInfoObject) => {
-          return (
-            entityEditorBrowserTabsInfoObject.id ===
-              entityEditorBrowserTabsInfo.getId());
-        });
-
-      if (index === -1) {
-        // If index is -1, then the entity editor browser tabs info object
-        // was not present on the local storage earlier.
-        allEntityEditorBrowserTabsInfoObjects.push(
-          entityEditorBrowserTabsInfoObject);
-      } else {
+      if (allEntityEditorBrowserTabsInfoObjects[entityId]) {
         if (entityEditorBrowserTabsInfo.getNumberOfOpenedTabs() === 0) {
           // If number of opened tabs for a particular entity editor becomes
           // 0, then we should free the local storage by removing its info.
-          allEntityEditorBrowserTabsInfoObjects.splice(index, 1);
+          delete allEntityEditorBrowserTabsInfoObjects[entityId];
           // If all the editor tabs of a particular entity are closed, then
           // remove the whole list from the local storage since its length
           // has become zero.
-          if (allEntityEditorBrowserTabsInfoObjects.length === 0) {
+          if (Object.keys(allEntityEditorBrowserTabsInfoObjects).length === 0) {
             this.removeOpenedEntityEditorBrowserTabsInfo(
               entityEditorBrowserTabsInfoConstant);
           }
         } else {
           // If none of the above mentioned edge cases are present, then just
           // update the local storage with the updated info.
-          allEntityEditorBrowserTabsInfoObjects[index] = (
-            entityEditorBrowserTabsInfoObject);
+          allEntityEditorBrowserTabsInfoObjects[entityId] = (
+            updatedEntityEditorBrowserTabsInfoObject);
         }
+      } else {
+        allEntityEditorBrowserTabsInfoObjects[entityId] = (
+          updatedEntityEditorBrowserTabsInfoObject);
       }
 
       (this.storage as Storage).setItem(

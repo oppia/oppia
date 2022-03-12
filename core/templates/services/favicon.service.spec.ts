@@ -17,22 +17,29 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { WindowRef } from './contextual/window-ref.service';
 import { FaviconService } from './favicon.service';
 
 describe('Favicon service', () => {
   let faviconService: FaviconService;
+  let windowRef: WindowRef;
 
   beforeEach(() => {
     faviconService = TestBed.inject(FaviconService);
+    windowRef = TestBed.inject(WindowRef);
   });
 
   it('should set the favicon to the given url', () => {
     const faviconUrl = '/assets/images/logo/favicon.png';
     const linkElement: HTMLLinkElement = document.createElement('link');
-    spyOn(document, 'querySelector').and.returnValue(linkElement);
+    spyOn(
+      windowRef.nativeWindow.document, 'querySelector'
+    ).and.returnValue(linkElement);
 
     faviconService.setFavicon(faviconUrl);
 
-    expect(linkElement.href).toContain(faviconUrl);
+    expect(linkElement.href).toEqual('http://localhost:9876' + faviconUrl);
+    expect(linkElement.type).toEqual('image/x-icon');
+    expect(linkElement.rel).toEqual('icon');
   });
 });
