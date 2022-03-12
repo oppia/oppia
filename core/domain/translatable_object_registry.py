@@ -19,16 +19,17 @@ from __future__ import annotations
 import inspect
 
 from extensions.objects.models import objects
+from typing import Any, Dict, List
 
 
 class Registry:
     """Registry of all translatable objects."""
 
     # Dict mapping object class names to their classes.
-    _translatable_objects_dict = {}
+    _translatable_objects_dict: Dict[str, Any] = {}
 
     @classmethod
-    def _refresh_registry(cls):
+    def _refresh_registry(cls) -> None:
         """Refreshes the registry by adding new translatable object classes
         to the registry.
         """
@@ -50,7 +51,7 @@ class Registry:
                 cls._translatable_objects_dict[clazz.__name__] = clazz
 
     @classmethod
-    def get_all_class_names(cls):
+    def get_all_class_names(cls) -> List[str]:
         """Gets a list of all translatable object class names.
 
         Returns:
@@ -60,7 +61,7 @@ class Registry:
         return sorted(cls._translatable_objects_dict.keys())
 
     @classmethod
-    def get_object_class(cls, obj_type):
+    def get_object_class(cls, obj_type: str) -> Any:
         """Gets a translatable object class by its type.
 
         Refreshes once if the class is not found; subsequently, throws an
