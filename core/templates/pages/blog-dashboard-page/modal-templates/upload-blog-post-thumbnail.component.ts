@@ -40,6 +40,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   @ViewChild('croppableImage') croppableImageRef!: ElementRef;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
+  invalidTagsAndAttributes: { tags: string[]; attrs: string[] };
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
   @Output() imageLocallySaved: EventEmitter<string> = new EventEmitter();
   @Output() cancelThumbnailUpload: EventEmitter<void> = new EventEmitter();
@@ -76,9 +77,16 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     this.invalidImageWarningIsShown = false;
     let reader = new FileReader();
     reader.onload = (e) => {
-      const uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        (e.target as FileReader).result as string);
-      if (!uploadedImage) {
+      this.invalidTagsAndAttributes = {
+        tags: [],
+        attrs: []
+      };
+      let imageData = (e.target as FileReader).result as string;
+      this.invalidTagsAndAttributes = this.svgSanitizerService
+        .getInvalidSvgTagsAndAttrsFromDataUri(imageData);
+      this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
+        imageData);
+      if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
           (e.target as FileReader).result as string);
       }
@@ -91,6 +99,10 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   reset(): void {
     this.uploadedImage = false;
     this.cropppedImageDataUrl = '';
+    this.invalidTagsAndAttributes = {
+      tags: [],
+      attrs: []
+    };
   }
 
   onInvalidImageLoaded(): void {
@@ -113,10 +125,18 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
 
   cancel(): void {
     this.uploadedImage = false;
+    this.invalidTagsAndAttributes = {
+      tags: [],
+      attrs: []
+    };
     this.cancelThumbnailUpload.emit();
   }
 
   ngOnInit(): void {
+    this.invalidTagsAndAttributes = {
+      tags: [],
+      attrs: []
+    };
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
 
     this.windowDimensionService.getResizeEvent().subscribe(() => {
