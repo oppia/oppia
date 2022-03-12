@@ -138,6 +138,12 @@ class QuestionCountDataHandler(base.BaseHandler):
         skill_ids = comma_separated_skill_ids.split(',')
         skill_ids = list(set(skill_ids))
 
+        try:
+            _require_valid_skill_ids(skill_ids)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(
+                'Invalid skill id') from e
+
         total_question_count = (
             question_services.get_total_question_count_for_skill_ids(skill_ids))
 
