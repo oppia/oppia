@@ -49,7 +49,6 @@
 
 @media(max-width: 768px) {
   .oppia-stories-list-container .oppia-page-card {
-    padding: 8em 24px 64px 24px;
     width: 100%;
   }
 
