@@ -16,23 +16,24 @@
  * @fileoverview Module for the splash page.
  */
 
-import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { NgModule } from '@angular/core';
+
+import { BaseModule } from 'base-components/base.module';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { SplashPageComponent } from './splash-page.component';
 import { SplashPageRootComponent } from './splash-page-root.component';
-import { CommonModule } from '@angular/common';
 import { SplashPageRoutingModule } from './splash-page-routing.module';
-import { BaseModule } from '../../base-components/base.module';
-import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 
 @NgModule({
   imports: [
     BaseModule,
     CommonModule,
     HttpClientModule,
+    RichTextComponentsModule,
     SplashPageRoutingModule,
-    RichTextComponentsModule
   ],
   declarations: [
     OppiaAngularRootComponent,
