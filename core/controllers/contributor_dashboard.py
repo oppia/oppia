@@ -99,7 +99,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
-            topic_name = self.normalized_payload.get('topic_name', None)
+            topic_name = self.normalized_payload.get('topic_name')
             if language_code is None:
                 raise self.InvalidInputException
             opportunities, next_cursor, more = (

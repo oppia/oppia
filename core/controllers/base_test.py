@@ -2171,3 +2171,65 @@ class UrlPathNormalizationTest(test_utils.GenericTestBase):
             self.get_json(
                 '/mock_normalization/%s/%s' % (int_string, list_string),
                 expected_status_int=200)
+
+
+class RaiseErrorOnGetTest(test_utils.GenericTestBase):
+    """This test class is to ensure handlers with schema raises error
+    when they use self.request or self.payload."""
+
+    class MockHandlerWithSchema(base.BaseHandler):
+        """Mock handler with schema."""
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'mock_int': {
+                    'schema': {
+                        'type': 'int'
+                    }
+                }
+            }
+        }
+
+        def post(self):
+            self.payload.get('mock_int')
+            return self.render_json({})
+
+    class MockHandlerWithoutSchema(base.BaseHandler):
+        """Mock handler without schema."""
+
+        def post(self):
+            self.payload.get('mock_int')
+            return self.render_json({})
+
+    def setUp(self):
+        super().setUp()
+        user_id = user_services.get_user_id_from_username('learneruser')
+        self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
+        self.payload = {'mock_int': 1}
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route('/mock_with_schema', self.MockHandlerWithSchema),
+            webapp2.Route(
+                '/mock_without_schema', self.MockHandlerWithoutSchema),
+        ], debug=feconf.DEBUG))
+
+    def test_raise_error_on_get(self):
+        err_message = 'err_message'
+        error = base.RaiseErrorOnGet(err_message)
+        with self.assertRaisesRegex(ValueError, err_message):
+            error.get('key')
+
+    def test_raise_error_on_get_for_payload_request_with_schema(self):
+        with self.swap(self, 'testapp', self.testapp):
+            self.post_json(
+                '/mock_with_schema', self.payload, csrf_token=self.csrf_token,
+                expected_status_int=500)
+
+    def test_raise_no_error_on_get_for_payload_request_without_schema(self):
+        test_app_ctx = self.swap(self, 'testapp', self.testapp)
+        handler_class_still_needs_schema_list_ctx = self.swap(
+            handler_schema_constants, 'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
+            ['MockHandlerWithoutSchema'])
+        with test_app_ctx, handler_class_still_needs_schema_list_ctx:
+            self.post_json(
+                '/mock_without_schema', self.payload, csrf_token=self.csrf_token,
+                expected_status_int=200)

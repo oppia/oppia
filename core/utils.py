@@ -94,17 +94,6 @@ class ExplorationConversionError(Exception):
     pass
 
 
-class ThrowGetError:
-    """Error class to throw error while invoking the get function."""
-
-    def __init__(self, message: str):
-        self.err_message = message
-
-    def get(self, *args: Any, **kwargs: Any) -> None:
-        """Get function throws error when invoked."""
-        raise ValueError(self.err_message)
-
-
 @overload
 def open_file(
     filename: str,
