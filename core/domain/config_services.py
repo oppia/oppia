@@ -20,11 +20,9 @@ from core.domain import config_domain
 from core.platform import models
 
 from typing import Any
-from typing_extensions import Final
-
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 
-CMD_CHANGE_PROPERTY_VALUE: Final = 'change_property_value'
+CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
 
 # Value of a particular property can be bool, str, List[Dict], Dict,

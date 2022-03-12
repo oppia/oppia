@@ -26,6 +26,7 @@ from core.storage.email import gae_models
 from core.tests import test_utils
 
 from typing import Sequence
+from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -41,11 +42,11 @@ class InformSubscribersTest(test_utils.EmailTestBase):
     creator.
     """
 
-    USER_NAME = 'user'
-    USER_EMAIL = 'user@test.com'
+    USER_NAME: Final = 'user'
+    USER_EMAIL: Final = 'user@test.com'
 
-    USER_NAME_2 = 'user2'
-    USER_EMAIL_2 = 'user2@test.com'
+    USER_NAME_2: Final = 'user2'
+    USER_EMAIL_2: Final = 'user2@test.com'
 
     def setUp(self) -> None:
         super(InformSubscribersTest, self).setUp()  # type: ignore[no-untyped-call]
