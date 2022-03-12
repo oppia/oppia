@@ -170,9 +170,14 @@ export class CollectionEditorStateService {
    * shares behavior with setCollection(), when it succeeds.
    */
   saveCollection(commitMessage: string, successCallback?: () => void): boolean {
-    if (!this._collectionIsInitialized) {
+    const collectionId = this._collection.getId();
+    const collectionVersion = this._collection.getVersion();
+    if (!collectionId ||
+        !this._collectionIsInitialized ||
+        !collectionVersion) {
       this.alertsService.fatalWarning(
         'Cannot save a collection before one is loaded.');
+      return false;
     }
 
     // Don't attempt to save the collection if there are no changes pending.
@@ -181,8 +186,7 @@ export class CollectionEditorStateService {
     }
     this._collectionIsBeingSaved = true;
     this.editableCollectionBackendApiService.updateCollectionAsync(
-      this._collection.getId(),
-      this._collection.getVersion(), commitMessage,
+      collectionId, collectionVersion, commitMessage,
       this.undoRedoService.getCommittableChangeList()).then(
       (collectionObject) => {
         this._updateCollection(collectionObject);

@@ -26,6 +26,9 @@ import { ExplorationOpportunity } from '../opportunities-list-item/opportunities
 import constants from 'assets/constants';
 import { Subscription } from 'rxjs';
 
+type LoadOpportunities = Promise<{
+  opportunitiesDicts: ExplorationOpportunity[]; more: boolean; }>;
+
 @Component({
   selector: 'oppia-opportunities-list',
   templateUrl: './opportunities-list.component.html',
@@ -35,13 +38,11 @@ export class OpportunitiesListComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() loadOpportunities!: () => Promise<{
-    opportunitiesDicts: ExplorationOpportunity[]; more: boolean; }>;
+  @Input() loadOpportunities!: () => LoadOpportunities;
 
   @Input() labelRequired!: boolean;
   @Input() progressBarRequired!: boolean;
-  @Input() loadMoreOpportunities!: () => Promise<{
-    opportunitiesDicts: ExplorationOpportunity[]; more: boolean; }>;
+  @Input() loadMoreOpportunities!: () => LoadOpportunities;
 
   @Input() opportunityHeadingTruncationLength!: number;
   @Input() opportunityType!: string;

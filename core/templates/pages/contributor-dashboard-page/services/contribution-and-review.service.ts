@@ -67,8 +67,8 @@ interface FetchSuggestionsResponse {
   providedIn: 'root',
 })
 export class ContributionAndReviewService {
-  private activeTabType: string = null;
-  private activeSuggestionType: string = null;
+  private activeTabType!: string;
+  private activeSuggestionType!: string;
 
   constructor(
     private contributionAndReviewBackendApiService:
@@ -204,14 +204,13 @@ export class ContributionAndReviewService {
       review_message: reviewMessage,
       commit_message: (
         action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
-        commitMessage : null
+        commitMessage : ''
       )
     };
 
     return this.contributionAndReviewBackendApiService
       .reviewExplorationSuggestionAsync(
-        targetId, suggestionId,
-        requestBody as ReviewExplorationSuggestionRequestBody
+        targetId, suggestionId, requestBody
       ).then(() => {
         onSuccess(suggestionId);
       }, (error) => {

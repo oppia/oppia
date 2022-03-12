@@ -38,9 +38,9 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   windowIsNarrow!: boolean;
   cropper!: Cropper;
   @ViewChild('croppableImage') croppableImageRef!: ElementRef;
+  invalidTagsAndAttributes!: { tags: string[]; attrs: string[] };
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
-  invalidTagsAndAttributes: { tags: string[]; attrs: string[] };
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
   @Output() imageLocallySaved: EventEmitter<string> = new EventEmitter();
   @Output() cancelThumbnailUpload: EventEmitter<void> = new EventEmitter();
@@ -84,9 +84,9 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
       let imageData = (e.target as FileReader).result as string;
       this.invalidTagsAndAttributes = this.svgSanitizerService
         .getInvalidSvgTagsAndAttrsFromDataUri(imageData);
-      this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
+      const uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
         imageData);
-      if (!this.uploadedImage) {
+      if (!uploadedImage) {
         this.uploadedImage = decodeURIComponent(
           (e.target as FileReader).result as string);
       }

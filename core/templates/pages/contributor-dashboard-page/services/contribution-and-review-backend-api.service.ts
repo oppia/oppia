@@ -85,7 +85,6 @@ export class ContributionAndReviewBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  // Return undefined if the suggestion is not found.
   async fetchSuggestionsAsync(
       fetchType: string,
       limit: number,
@@ -108,6 +107,7 @@ export class ContributionAndReviewBackendApiService {
       return this.fetchReviewableSuggestionsAsync(
         'exploration', 'translate_content', limit, offset, topicName);
     }
+    throw new Error('Invalid fetch type');
   }
 
   async fetchSubmittedSuggestionsAsync(
