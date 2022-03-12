@@ -215,10 +215,15 @@ export class LocalStorageService {
       entityEditorBrowserTabsInfoConstant: string, entityId: string
   ): EntityEditorBrowserTabsInfo | null {
     if (this.isStorageAvailable()) {
-      const allEntityEditorBrowserTabsInfoObjects:
-        EntityEditorBrowserTabsInfoObject[] = JSON.parse((
-        this.storage as Storage).getItem(
-          entityEditorBrowserTabsInfoConstant) || '[]');
+      let allEntityEditorBrowserTabsInfoObjects:
+        EntityEditorBrowserTabsInfoObject[] = [];
+
+      const stringifiedEntityEditorBrowserTabsInfo = (this.storage as Storage)
+        .getItem(entityEditorBrowserTabsInfoConstant);
+      if (stringifiedEntityEditorBrowserTabsInfo) {
+        allEntityEditorBrowserTabsInfoObjects = JSON.parse(
+          stringifiedEntityEditorBrowserTabsInfo);
+      }
 
       const requiredEntityEditorBrowserTabsInfoObject = (
         allEntityEditorBrowserTabsInfoObjects.find(
@@ -251,10 +256,15 @@ export class LocalStorageService {
         entityEditorBrowserTabsInfo.toDict()
       );
 
-      const allEntityEditorBrowserTabsInfoObjects:
-        EntityEditorBrowserTabsInfoObject[] = JSON.parse((
-        this.storage as Storage).getItem(
-          entityEditorBrowserTabsInfoConstant) || '[]');
+      let allEntityEditorBrowserTabsInfoObjects:
+        EntityEditorBrowserTabsInfoObject[] = [];
+
+      const stringifiedEntityEditorBrowserTabsInfo = (this.storage as Storage)
+        .getItem(entityEditorBrowserTabsInfoConstant);
+      if (stringifiedEntityEditorBrowserTabsInfo) {
+        allEntityEditorBrowserTabsInfoObjects = JSON.parse(
+          stringifiedEntityEditorBrowserTabsInfo);
+      }
 
       const index = allEntityEditorBrowserTabsInfoObjects.findIndex(
         (entityEditorBrowserTabsInfoObject) => {

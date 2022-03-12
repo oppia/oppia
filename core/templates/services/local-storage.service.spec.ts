@@ -147,13 +147,14 @@ describe('LocalStorageService', () => {
         EntityEditorBrowserTabsInfo.createFromDict(
           entityEditorBrowserTabsInfoObject),
         EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_TOPIC_EDITOR_BROWSER_TABS,
+          .OPENED_TOPIC_EDITOR_BROWSER_TABS
       );
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_TOPIC_EDITOR_BROWSER_TABS,
-        'topic_1')?.toDict()).toEqual(entityEditorBrowserTabsInfoObject);
+        'topic_1')!.toDict()).toEqual(entityEditorBrowserTabsInfoObject);
     });
 
     it('should update entity editor browser tabs info', () => {
@@ -171,21 +172,21 @@ describe('LocalStorageService', () => {
       localStorageService.updateEntityEditorBrowserTabsInfo(
         entityEditorBrowserTabsInfo,
         EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS,
+          .OPENED_SKILL_EDITOR_BROWSER_TABS
       );
 
       entityEditorBrowserTabsInfo.setLatestVersion(2);
       localStorageService.updateEntityEditorBrowserTabsInfo(
         entityEditorBrowserTabsInfo,
         EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS,
+          .OPENED_SKILL_EDITOR_BROWSER_TABS
       );
 
       entityEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
       localStorageService.updateEntityEditorBrowserTabsInfo(
         entityEditorBrowserTabsInfo,
         EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS,
+          .OPENED_SKILL_EDITOR_BROWSER_TABS
       );
     });
 
