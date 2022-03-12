@@ -79,6 +79,10 @@ export class ListOfTabsEditorComponent implements OnInit {
   }
 
   updateValue(value: unknown): void {
+    if (this.value === value) {
+      return;
+    }
+
     this.value = value;
     this.valueChanged.emit(this.value);
   }
