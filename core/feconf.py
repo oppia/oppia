@@ -512,11 +512,11 @@ MAILGUN_API_KEY = None
 MAILGUN_DOMAIN_NAME = None
 
 # Audience ID of the mailing list for Oppia in Mailchimp.
-MAILCHIMP_AUDIENCE_ID = None
+MAILCHIMP_AUDIENCE_ID = 'be3edb3e4b'
 # Mailchimp API Key.
-MAILCHIMP_API_KEY = None
+MAILCHIMP_API_KEY = 'f699619271b34ac13e167fca63816441-us1'
 # Mailchimp username.
-MAILCHIMP_USERNAME = None
+MAILCHIMP_USERNAME = 'Akshay'
 # Mailchimp secret, used to authenticate webhook requests.
 MAILCHIMP_WEBHOOK_SECRET = None
 
