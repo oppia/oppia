@@ -777,6 +777,7 @@ class RaiseErrorOnGet:
         """Raises an error when invoked."""
         raise ValueError(self.error_message)
 
+
 class CsrfTokenManager:
     """Manages page/user tokens in memcache to protect against CSRF."""
 
