@@ -17,8 +17,8 @@
  * in components which registered both on hybrid and angular pages.
  */
 
-import { Directive, Input, ModuleWithProviders, NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Directive, EventEmitter, Injectable, Input, ModuleWithProviders, NgModule } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 
 // TODO(#13443): Remove hybrid router module provider once all pages are
 // migrated to angular router.
@@ -33,12 +33,27 @@ export class MockRouterLink {
   @Input() routerLink!: string;
 }
 
+@Injectable()
+export class MockRouter {
+  events = new EventEmitter<void>();
+
+  ngOnInit(): void {
+    this.events.emit();
+  }
+}
+
 @NgModule({
   declarations: [
     MockRouterLink
   ],
   exports: [
-    MockRouterLink
+    MockRouterLink,
+  ],
+  providers: [
+    {
+      provide: Router,
+      useClass: MockRouter
+    }
   ]
 })
 export class MockRouterModule {}
