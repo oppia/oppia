@@ -18,19 +18,19 @@
 
 from __future__ import annotations
 
+import ast
+
 from core import feconf
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Dict, Iterable, List, Tuple
-
-import ast
 import apache_beam as beam
-import result
 import mailchimp3
 from mailchimp3 import mailchimpclient
+import result
+from typing import Dict, Iterable, List, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -53,24 +53,28 @@ class SendBatchMailchimpRequest(beam.DoFn): # type: ignore[misc]
         batch_index_dict: Dict[str, int]
     ) -> result.Result[str]:
         """Add 500 users at a time, who have subscribed for newsletters,
-        to the mailchimp db.
+            to the mailchimp db.
 
         Args:
-            tuples: list(Tuple). List of tuples consisting of user emails and
-                'true' status. The second value is always true as the step
+            email_tuples: list(Tuple). List of tuples consisting of user emails
+                and 'true' status. The second value is always true as the step
                 before this function in the beam job filtered for the same.
-            index: Dict. Single element dictionary of current batch index.
+            batch_index_dict: Dict. Single element dictionary of current batch
+                index.
+
+        Raises:
+            Exception. Exception thrown by the api is raised.
 
         Yields:
             JobRunResult. Job run result which is either 'Ok' or an error with
-                corresponding error message.
+            corresponding error message.
         """
         client = mailchimp3.MailChimp(    # pragma: no cover
             mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
 
         email_tuples = email_tuples[0][
-            batch_index_dict['batch_index_for_mailchimp']*500:
-            (batch_index_dict['batch_index_for_mailchimp']+1)*500]
+            batch_index_dict['batch_index_for_mailchimp'] * 500:
+            (batch_index_dict['batch_index_for_mailchimp'] + 1) * 500]
         mailchimp_data = []
 
         for email, _ in email_tuples:
@@ -82,20 +86,20 @@ class SendBatchMailchimpRequest(beam.DoFn): # type: ignore[misc]
         try:
             response = client.lists.update_members(
                 feconf.MAILCHIMP_AUDIENCE_ID,
-                {"members": mailchimp_data, "update_existing": True})
+                {'members': mailchimp_data, 'update_existing': True})
         except mailchimpclient.MailChimpError as error:
             error_message = ast.literal_eval(str(error))
             raise Exception(error_message['detail']) from error
 
         if (
-                len(response["new_members"]) + len(response["updated_members"])
+                len(response['new_members']) + len(response['updated_members'])
                 == len(email_tuples)):
             yield result.Ok()
         else:
             failed_emails = []
-            for user in response["errors"]:
-                failed_emails.append(user["email_address"])
-            yield result.Err("User update failed for: %s" % failed_emails)
+            for user in response['errors']:
+                failed_emails.append(user['email_address'])
+            yield result.Err('User update failed for: %s' % failed_emails)
 
 
 class CombineTuples(beam.CombineFn):  # type: ignore[misc]
@@ -147,7 +151,7 @@ class MailchimpPopulateJob(base_jobs.JobBase):
                 user_models.UserEmailPreferencesModel.get_all().order(
                     'created_on'))
             | 'Filter for site_updates == true' >> beam.Filter(
-                lambda model: model.site_updates == True)
+                lambda model: model.site_updates is True)
             | 'Extract user id as tuple' >> beam.Map(
                 lambda preferences_model: (preferences_model.id, True))
         )
@@ -170,7 +174,7 @@ class MailchimpPopulateJob(base_jobs.JobBase):
             | 'Drop user id' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Filter for valid user emails' >> beam.Filter(
                 lambda email_status: (
-                    len(email_status[1]) == 1 and email_status[1][0] == True)
+                    len(email_status[1]) == 1 and email_status[1][0] is True)
             )
             | 'Combine all valid tuples into a single list' >>
                 beam.CombineGlobally(CombineTuples())
