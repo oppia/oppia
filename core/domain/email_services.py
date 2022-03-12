@@ -21,7 +21,7 @@ import re
 from core import feconf
 from core.platform import models
 
-from typing import List, Optional
+from typing import List
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
@@ -81,7 +81,7 @@ def send_mail(
     subject: str,
     plaintext_body: str,
     html_body: str,
-    bcc_admin: Optional[bool] = False
+    bcc_admin: bool = False
 ) -> None:
     """Sends an email.
 
