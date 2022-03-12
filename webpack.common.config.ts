@@ -471,7 +471,7 @@ module.exports = {
           loadExtensions: macros.loadExtensions
         },
       },
-    })
+    }),
   ],
   module: {
     rules: [{
@@ -547,7 +547,7 @@ module.exports = {
     sideEffects: true,
     usedExports: true,
     splitChunks: {
-      chunks: 'all',
+      chunks: 'all'
     },
   }
 };
