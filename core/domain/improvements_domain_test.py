@@ -72,9 +72,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
             constants.TASK_STATUS_RESOLVED, self.owner_id,
             self.MOCK_DATE)
-        self.assertEqual(
-            task_entry.to_dict(),
-            {
+        self.assertEqual(task_entry.to_dict(), {
             'entity_type': 'exploration',
             'entity_id': self.exp_id,
             'entity_version': 1,
