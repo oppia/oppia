@@ -311,8 +311,7 @@ def _join_files(source_paths: List[str], target_file_stream: IO[str]) -> None:
 
 
 def _minify_and_create_sourcemap(
-    source_path: str,
-    target_file_path: str
+    source_path: str, target_file_path: str
 ) -> None:
     """Minifies and generates source map for a JS file. This function is only
     meant to be used with third_party.min.js.
@@ -330,8 +329,7 @@ def _minify_and_create_sourcemap(
 
 
 def _generate_copy_tasks_for_fonts(
-    source_paths: List[str],
-    target_path: str
+    source_paths: List[str], target_path: str
 ) -> Deque[threading.Thread]:
     """Queue up a copy task for each font file.
 
@@ -449,7 +447,8 @@ def get_file_count(directory_path: str) -> int:
 
 
 def _compare_file_count(
-        first_dir_list: List[str], second_dir_list: List[str]) -> None:
+    first_dir_list: List[str], second_dir_list: List[str]
+) -> None:
     """Ensure that the total count of files in all directories in the first
     list matches the count of files in all the directories in the second list.
 
@@ -475,8 +474,7 @@ def _compare_file_count(
 
 
 def process_html(
-    source_file_stream: IO[str],
-    target_file_stream: IO[str]
+    source_file_stream: IO[str], target_file_stream: IO[str]
 ) -> None:
     """Remove whitespaces and add hashes to filepaths in the HTML file stream
     object.
@@ -509,8 +507,7 @@ def get_dependency_directory(dependency: Dict[str, str]) -> str:
 
 
 def get_css_filepaths(
-    dependency_bundle: DependencyBundleDict,
-    dependency_dir: str
+    dependency_bundle: DependencyBundleDict, dependency_dir: str
 ) -> List[str]:
     """Gets dependency css filepaths.
 
@@ -531,8 +528,7 @@ def get_css_filepaths(
 
 
 def get_js_filepaths(
-    dependency_bundle: DependencyBundleDict,
-    dependency_dir: str
+    dependency_bundle: DependencyBundleDict, dependency_dir: str
 ) -> List[str]:
     """Gets dependency js filepaths.
 
@@ -553,8 +549,7 @@ def get_js_filepaths(
 
 
 def get_font_filepaths(
-    dependency_bundle: DependencyBundleDict,
-    dependency_dir: str
+    dependency_bundle: DependencyBundleDict, dependency_dir: str
 ) -> List[str]:
     """Gets dependency font filepaths.
 
@@ -736,9 +731,7 @@ def should_file_be_built(filepath: str) -> bool:
 
 
 def generate_copy_tasks_to_copy_from_source_to_target(
-    source: str,
-    target: str,
-    file_hashes: Dict[str, str]
+    source: str, target: str, file_hashes: Dict[str, str]
 ) -> Deque[threading.Thread]:
     """Generate copy task for each file in source directory, excluding files
     with extensions in FILE_EXTENSIONS_TO_IGNORE. Insert hash from hash dict
@@ -820,8 +813,7 @@ def generate_md5_hash(filepath: str) -> str:
 
 
 def get_filepaths_by_extensions(
-    source_dir: str,
-    file_extensions: Tuple[str, ...]
+    source_dir: str, file_extensions: Tuple[str, ...]
 ) -> List[str]:
     """Return list of filepaths in a directory with certain extensions,
     excluding filepaths that should not be built.
@@ -944,8 +936,7 @@ def minify_func(source_path: str, target_path: str, filename: str) -> None:
 
 
 def _execute_tasks(
-    tasks: Deque[threading.Thread],
-    batch_size: int = 24
+    tasks: Deque[threading.Thread], batch_size: int = 24
 ) -> None:
     """Starts all tasks and checks the results.
 
@@ -970,8 +961,7 @@ def _execute_tasks(
 
 
 def generate_build_tasks_to_build_all_files_in_directory(
-    source: str,
-    target: str
+    source: str, target: str
 ) -> Deque[threading.Thread]:
     """This function queues up tasks to build all files in a directory,
     excluding files that should not be built.
@@ -1006,9 +996,7 @@ def generate_build_tasks_to_build_all_files_in_directory(
 
 
 def generate_build_tasks_to_build_files_from_filepaths(
-    source_path: str,
-    target_path: str,
-    filepaths: List[str]
+    source_path: str, target_path: str, filepaths: List[str]
 ) -> Deque[threading.Thread]:
     """This function queues up build tasks to build files from a list of
     filepaths, excluding files that should not be built.
@@ -1039,8 +1027,7 @@ def generate_build_tasks_to_build_files_from_filepaths(
 
 
 def generate_delete_tasks_to_remove_deleted_files(
-    source_dir_hashes: Dict[str, str],
-    staging_directory: str
+    source_dir_hashes: Dict[str, str], staging_directory: str
 ) -> Deque[threading.Thread]:
     """This function walks the staging directory and queues up deletion tasks to
     remove files that are not in the hash dict i.e. remaining files in staging
@@ -1084,8 +1071,7 @@ def generate_delete_tasks_to_remove_deleted_files(
 
 
 def get_recently_changed_filenames(
-    source_dir_hashes: Dict[str, str],
-    out_dir: str
+    source_dir_hashes: Dict[str, str], out_dir: str
 ) -> List[str]:
     """Compare hashes of source files and built files. Return a list of
     filenames that were recently changed. Skips files that are not supposed to
@@ -1192,8 +1178,7 @@ def generate_build_tasks_to_build_directory(
 
 
 def _verify_filepath_hash(
-    relative_filepath: str,
-    file_hashes: Dict[str, str]
+    relative_filepath: str, file_hashes: Dict[str, str]
 ) -> None:
     """Ensure that hashes in filepaths match with the hash entries in hash
     dict.
@@ -1233,8 +1218,7 @@ def _verify_filepath_hash(
 
 
 def _verify_hashes(
-    output_dirnames: List[str],
-    file_hashes: Dict[str, str]
+    output_dirnames: List[str], file_hashes: Dict[str, str]
 ) -> None:
     """Verify a few metrics after build process finishes:
         1) The hashes in filenames belongs to the hash dict.

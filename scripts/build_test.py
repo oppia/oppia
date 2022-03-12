@@ -717,7 +717,8 @@ class BuildTests(test_utils.GenericTestBase):
         app_dev_yaml_temp_file.close()
 
     def test_generate_app_yaml_with_deploy_mode_with_nonexistent_var_raises(
-            self) -> None:
+            self
+        ) -> None:
         mock_dev_yaml_filepath = 'mock_app_dev.yaml'
         mock_yaml_filepath = 'mock_app.yaml'
         app_dev_yaml_filepath_swap = self.swap(
