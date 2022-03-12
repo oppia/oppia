@@ -1428,6 +1428,9 @@ class Skill:
         Args:
             difficulty: str. The difficulty of the rubric.
             explanations: list(str). The explanations for the rubric.
+
+        Raises:
+            ValueError. No rubric for given difficulty.
         """
         for rubric in self.rubrics:
             if rubric.difficulty == difficulty:
@@ -1773,3 +1776,159 @@ class UserSkillMastery:
             skill_mastery_dict['skill_id'],
             skill_mastery_dict['degree_of_mastery']
         )
+
+
+class CategorizedSkills:
+    """Domain object for representing categorized skills' ids and
+    descriptions. Here, 'categorized skill' means that the skill is assigned
+    to some topic. If a skill is assigned to a topic but not a
+    subtopic, then it is termed as 'uncategorized' which also comes under
+    CategorizedSkills because it is at least assigned to a topic.
+
+    Attributes:
+        categorized_skills: dict[str, dict[str, list(ShortSkillSummary)].
+            The parent dict contains keys as topic names. The children dicts
+            contain keys as subtopic titles and values as list of short skill
+            summaries. An extra key called 'uncategorized' is present in every
+            child dict to represent the skills that are not assigned to any
+            subtopic but are assigned to the parent topic.
+    """
+
+    def __init__(self):
+        """Constructs a CategorizedSkills domain object."""
+        self.categorized_skills = {}
+
+    def add_topic(self, topic_name, subtopic_titles):
+        """Adds a topic to the categorized skills and initializes its
+        'uncategorized' and subtopic skills as empty lists.
+
+        Args:
+            topic_name: str. The name of the topic.
+            subtopic_titles: list(str). The list of subtopic titles of the
+                topic.
+
+        Raises:
+            ValidationError. Topic name is already added.
+        """
+        if topic_name in self.categorized_skills:
+            raise utils.ValidationError(
+                'Topic name \'%s\' is already added.' % topic_name)
+
+        self.categorized_skills[topic_name] = {}
+        self.categorized_skills[topic_name]['uncategorized'] = []
+        for subtopic_title in subtopic_titles:
+            self.categorized_skills[topic_name][subtopic_title] = []
+
+    def add_uncategorized_skill(
+        self, topic_name, skill_id, skill_description):
+        """Adds an uncategorized skill id and description for the given topic.
+
+        Args:
+            topic_name: str. The name of the topic.
+            skill_id: str. The id of the skill.
+            skill_description: str. The description of the skill.
+        """
+        self.require_topic_name_to_be_added(topic_name)
+        self.categorized_skills[topic_name]['uncategorized'].append(
+            ShortSkillSummary(skill_id, skill_description))
+
+    def add_subtopic_skill(
+        self, topic_name, subtopic_title, skill_id, skill_description):
+        """Adds a subtopic skill id and description for the given topic.
+
+        Args:
+            topic_name: str. The name of the topic.
+            subtopic_title: str. The title of the subtopic.
+            skill_id: str. The id of the skill.
+            skill_description: str. The description of the skill.
+        """
+        self.require_topic_name_to_be_added(topic_name)
+        self.require_subtopic_title_to_be_added(topic_name, subtopic_title)
+        self.categorized_skills[topic_name][subtopic_title].append(
+            ShortSkillSummary(skill_id, skill_description))
+
+    def require_topic_name_to_be_added(self, topic_name):
+        """Checks whether the given topic name is valid i.e. added to the
+        categorized skills dict.
+
+        Args:
+            topic_name: str. The name of the topic.
+
+        Raises:
+            ValidationError. Topic name is not added.
+        """
+        if not topic_name in self.categorized_skills:
+            raise utils.ValidationError(
+                'Topic name \'%s\' is not added.' % topic_name)
+
+    def require_subtopic_title_to_be_added(self, topic_name, subtopic_title):
+        """Checks whether the given subtopic title is added to the
+        categorized skills dict under the given topic name.
+
+        Args:
+            topic_name: str. The name of the topic.
+            subtopic_title: str. The title of the subtopic.
+
+        Raises:
+            ValidationError. Subtopic title is not added.
+        """
+        if not subtopic_title in self.categorized_skills[topic_name]:
+            raise utils.ValidationError(
+                'Subtopic title \'%s\' is not added.' % subtopic_title)
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object."""
+        categorized_skills_dict = copy.deepcopy(self.categorized_skills)
+
+        for topic_name in categorized_skills_dict:
+            # The key 'uncategorized' will also be covered by this loop.
+            for subtopic_title in categorized_skills_dict[topic_name]:
+                categorized_skills_dict[topic_name][subtopic_title] = [
+                    short_skill_summary.to_dict() for short_skill_summary in
+                    categorized_skills_dict[topic_name][subtopic_title]
+                ]
+        return categorized_skills_dict
+
+
+class ShortSkillSummary:
+    """Domain object for a short skill summary. It contains the id and
+    description of the skill. It is different from the SkillSummary in the
+    sense that the latter contains many other properties of the skill along with
+    the skill id and description.
+    """
+
+    def __init__(self, skill_id, skill_description):
+        """Constructs a ShortSkillSummary domain object.
+
+        Args:
+            skill_id: str. The id of the skill.
+            skill_description: str. The description of the skill.
+        """
+        self.skill_id = skill_id
+        self.skill_description = skill_description
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this ShortSkillSummary object.
+        """
+        return {
+            'skill_id': self.skill_id,
+            'skill_description': self.skill_description
+        }
+
+    @classmethod
+    def from_skill_summary(cls, skill_summary):
+        """Returns a ShortSkillSummary domain object from the given skill
+        summary.
+
+        Args:
+            skill_summary: SkillSummary. The skill summary domain object.
+
+        Returns:
+            ShortSkillSummary. The ShortSkillSummary domain object.
+        """
+        return cls(
+            skill_summary.id,
+            skill_summary.description)

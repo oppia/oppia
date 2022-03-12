@@ -572,6 +572,31 @@ def get_exploration_opportunity_summaries_by_ids(ids):
     return opportunities
 
 
+def get_exploration_opportunity_summaries_by_topic_id(topic_id):
+    """Returns a list of all exploration opportunity summaries
+    with the given topic ID.
+
+    Args:
+        topic_id: str. The topic for which opportunity summaries
+            are fetched.
+
+    Returns:
+        list(ExplorationOpportunitySummary). A list of all
+        exploration opportunity summaries with the given topic ID.
+    """
+    opportunity_summaries = []
+    exp_opportunity_summary_models = (
+        opportunity_models.
+            ExplorationOpportunitySummaryModel.get_by_topic(topic_id)
+    )
+    for exp_opportunity_summary_model in exp_opportunity_summary_models:
+        opportunity_summary = (
+            get_exploration_opportunity_summary_from_model(
+                exp_opportunity_summary_model))
+        opportunity_summaries.append(opportunity_summary)
+    return opportunity_summaries
+
+
 def update_opportunities_with_new_topic_name(topic_id, topic_name):
     """Updates the exploration opportunity summary models with new topic name.
 
@@ -841,6 +866,9 @@ def regenerate_opportunities_related_to_topic(
 
     Returns:
         int. The number of opportunity models created.
+
+    Raises:
+        Exception. Failure to regenerate opportunities for given topic.
     """
     if delete_existing_opportunities:
         exp_opportunity_models = (

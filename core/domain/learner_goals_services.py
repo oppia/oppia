@@ -76,6 +76,9 @@ def mark_topic_to_learn(user_id, topic_id):
     Returns:
         bool. The boolean indicates whether the learner goals limit
         of the user has been exceeded.
+
+    Raises:
+        Exception. Given topic is already present.
     """
     learner_goals_model = user_models.LearnerGoalsModel.get(
         user_id, strict=False)
@@ -105,6 +108,9 @@ def remove_topics_from_learn_goal(user_id, topic_ids_to_remove):
     Args:
         user_id: str. The id of the user.
         topic_ids_to_remove: list(str). The ids of the topics to be removed.
+
+    Raises:
+        Exception. Given topic does not exist.
     """
     learner_goals_model = user_models.LearnerGoalsModel.get(
         user_id, strict=False)
