@@ -17,7 +17,6 @@
  */
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
@@ -472,8 +471,7 @@ module.exports = {
           loadExtensions: macros.loadExtensions
         },
       },
-    }),
-    new BundleAnalyzerPlugin()
+    })
   ],
   module: {
     rules: [{
@@ -545,13 +543,11 @@ module.exports = {
     jquery: 'jQuery'
   },
   optimization: {
+    runtimeChunk: 'single',
     sideEffects: true,
     usedExports: true,
     splitChunks: {
       chunks: 'all',
-      minSize: 10000,
-      maxAsyncRequests: 50,
-      maxInitialRequests: 50
     },
   }
 };

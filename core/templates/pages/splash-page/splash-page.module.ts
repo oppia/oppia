@@ -22,14 +22,20 @@ import { SplashPageComponent } from './splash-page.component';
 import { SplashPageRootComponent } from './splash-page-root.component';
 import { CommonModule } from '@angular/common';
 import { SplashPageRoutingModule } from './splash-page-routing.module';
+import { BaseModule } from '../../base-components/base.module';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 
 @NgModule({
   imports: [
+    BaseModule,
     CommonModule,
     HttpClientModule,
-    SplashPageRoutingModule
+    SplashPageRoutingModule,
+    RichTextComponentsModule
   ],
   declarations: [
+    OppiaAngularRootComponent,
     SplashPageComponent,
     SplashPageRootComponent,
   ],
