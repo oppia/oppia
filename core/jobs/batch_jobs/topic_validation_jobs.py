@@ -83,3 +83,63 @@ class GetNumberOfTopicsExceedsMaxAbbNameJob(base_jobs.JobBase):
             )
             | 'Combine results' >> beam.Flatten()
         )
+
+
+class GetTopicsWithInvalidPageTitleFragmentJob(base_jobs.JobBase):
+    """Job that returns topics having page title fragment with
+    len > 50 or less than 5"""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns PCollection of invalid topics with their id and
+        len of page title fragment.
+
+        Returns:
+            PCollection. Returns PCollection of invalid topic with
+            their id and len of page title fragment.
+        """
+        total_topics = (
+            self.pipeline
+            | 'Get all TopicModels' >> ndb_io.GetModels(
+                topic_models.TopicModel.get_all(include_deleted=False))
+            | 'Combine topic ids and page title fragment' >> beam.Map(
+                lambda topic: (topic.id, topic.page_title_fragment_for_web))
+        )
+
+        topic_ids_with_exceeding_page_title_fragment = (
+            total_topics
+            | 'Filter topics with title frag greater than 50 or less than 5' >>
+                beam.Filter(lambda topic: (
+                    len(topic[1]) > 50 or
+                    len(topic[1]) < 5
+                    ))
+        )
+
+        report_number_of_topics_queried = (
+            total_topics
+            | 'Report count of topic models' >> (
+                job_result_transforms.CountObjectsToJobRunResult('TOPICS'))
+        )
+
+        report_number_of_invalid_topics = (
+            topic_ids_with_exceeding_page_title_fragment
+            | 'Report count of invalid topic models' >> (
+                job_result_transforms.CountObjectsToJobRunResult('INVALID'))
+        )
+
+        report_invalid_ids_and_their_actual_len = (
+            topic_ids_with_exceeding_page_title_fragment
+            | 'Save info on invalid topics' >> beam.Map(
+                lambda objects: job_run_result.JobRunResult.as_stderr(
+                    'The id of topic is %s and its page title frag. len is %s'
+                    % (objects[0], len(objects[1]))
+                ))
+        )
+
+        return (
+            (
+                report_number_of_topics_queried,
+                report_number_of_invalid_topics,
+                report_invalid_ids_and_their_actual_len
+            )
+            | 'Combine results' >> beam.Flatten()
+        )

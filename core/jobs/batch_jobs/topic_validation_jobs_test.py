@@ -115,3 +115,98 @@ class GetNumberOfTopicsExceedsMaxAbbNameJobTests(
                 f'The id of topic is {self.TOPIC_ID_3} and its abb. '
                 + f'name len is {len(self.topic_3.abbreviated_name)}'),
         ])
+
+
+class GetTopicsWithInvalidPageTitleFragmentTests(
+    job_test_utils.JobTestBase):
+
+    JOB_CLASS = topic_validation_jobs.GetTopicsWithInvalidPageTitleFragmentJob
+
+    TOPIC_ID_1 = '1'
+    TOPIC_ID_2 = '2'
+    TOPIC_ID_3 = '3'
+
+    def setUp(self):
+        super().setUp()
+
+        long_fragment = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy'
+
+        # This is an invalid model with page frag. len greater than 50.
+        self.topic_1 = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_ID_1,
+            name='Topic 1',
+            canonical_name='topic 1',
+            story_reference_schema_version=12,
+            subtopic_schema_version=11,
+            next_subtopic_id=1,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='topic_one',
+            practice_tab_is_displayed=True,
+            page_title_fragment_for_web=long_fragment
+        )
+
+        # This is an valid model with valid page frag len.
+        self.topic_2 = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_ID_2,
+            name='Topic 2',
+            canonical_name='topic 2',
+            story_reference_schema_version=12,
+            subtopic_schema_version=11,
+            next_subtopic_id=1,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='topic_two',
+            practice_tab_is_displayed=True,
+            page_title_fragment_for_web='test_title'
+        )
+
+        # This is an invalid model with page frag. len less than 5.
+        self.topic_3 = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_ID_3,
+            name='Topic 3',
+            canonical_name='topic 3',
+            story_reference_schema_version=12,
+            subtopic_schema_version=11,
+            next_subtopic_id=1,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='topic_three',
+            practice_tab_is_displayed=True,
+            page_title_fragment_for_web='test'
+        )
+
+    def test_run_with_no_models(self) -> None:
+        self.assert_job_output_is([])
+
+    def test_run_with_single_valid_model(self) -> None:
+        self.put_multi([self.topic_2])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('TOPICS SUCCESS: 1')
+        ])
+
+    def test_run_with_single_invalid_model(self) -> None:
+        self.put_multi([self.topic_1])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('TOPICS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stderr(
+                f'The id of topic is {self.TOPIC_ID_1} and its page title '
+                + 'frag. len is '
+                + f'{len(self.topic_1.page_title_fragment_for_web)}'),
+        ])
+
+    def test_run_with_mixed_models(self) -> None:
+        self.put_multi([self.topic_1, self.topic_2, self.topic_3])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('TOPICS SUCCESS: 3'),
+            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
+            job_run_result.JobRunResult.as_stderr(
+                f'The id of topic is {self.TOPIC_ID_1} and its page title '
+                + 'frag. len is '
+                + f'{len(self.topic_1.page_title_fragment_for_web)}'),
+            job_run_result.JobRunResult.as_stderr(
+                f'The id of topic is {self.TOPIC_ID_3} and its page title '
+                + 'frag. len is '
+                + f'{len(self.topic_3.page_title_fragment_for_web)}'),
+        ])
