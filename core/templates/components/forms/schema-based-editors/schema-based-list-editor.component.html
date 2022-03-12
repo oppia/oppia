@@ -33,14 +33,14 @@
                                (inputFocus)="(idx === localValue.length - 1 ? hideAddItemButton() : showAddItemButton())">
           </schema-based-editor>
         </td>
-        <td *ngIf="!len && (!minListLength || localValue.length > minListLength) && localValue.length > 0" class="align-top">
+        <div *ngIf="!len && (!minListLength || localValue.length > minListLength) && localValue.length > 0" class="align-top">
           <button class="oppia-delete-list-entry-button oppia-transition-200 protractor-test-delete-list-entry" type="button"
                   (click)="deleteElement(idx)"
                   [disabled]="disabled">
             <i class="material-icons md-18">&#xE5CD;</i>
             <span class="oppia-icon-accessibility-label">Delete this list entry</span>
           </button>
-        </td>
+        </div>
       </tr>
     </table>
 

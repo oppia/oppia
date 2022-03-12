@@ -123,7 +123,7 @@ var ListEditor = function(elem) {
     var items = (
       await elem.all(by.id(
         'protractor-test-schema-based-list-editor-table-row')).all(
-        by.tagName('tr')));
+        by.tagName('td')));
     return items.length;
   };
   // If objectType is specified this returns an editor for objects of that type
@@ -167,7 +167,7 @@ var ListEditor = function(elem) {
     setLength: async function(desiredLength) {
       var startingLength = await elem.all(by.id(
         'protractor-test-schema-based-list-editor-table-row')).all(
-        by.tagName('tr')).count();
+        by.tagName('td')).count();
       for (var i = startingLength + 1; i < desiredLength; i++) {
         await addItem();
       }

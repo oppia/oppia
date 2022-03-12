@@ -157,7 +157,8 @@ implements OnInit, ControlValueAccessor, Validator {
       this.schemaUndefinedLastElementService.getUndefinedValue(
         this.itemSchema));
     if (this.localValue[lastValueIndex] ===
-              valueToConsiderUndefined) {
+              valueToConsiderUndefined &&
+              this.localValue[lastValueIndex] !== '') {
       this.deleteElement(lastValueIndex);
     }
   }
