@@ -23,7 +23,6 @@ from core.domain import translation_fetchers
 from core.platform import models
 from core.tests import test_utils
 
-from typing import cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -37,14 +36,12 @@ if MYPY: # pragma: no cover
 class TranslationFetchersTests(test_utils.GenericTestBase):
 
     def test_get_translation_from_model(self) -> None:
-        # Here, create() method returns Optional[str] but for test purposes
-        # we are casting it to str. Because get() method of model only accept
-        # str type argument.
-        model_id = cast(
-            str,
+        model_id = (
             translation_models.MachineTranslationModel.create(
                 'en', 'es', 'hello world', 'hola mundo')
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert model_id is not None
         model_instance = translation_models.MachineTranslationModel.get(
             model_id)
         # Ruling out the possibility of None for mypy type checking.
