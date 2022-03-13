@@ -690,7 +690,9 @@ class BuildTests(test_utils.GenericTestBase):
         )
 
         app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
-        setattr(app_dev_yaml_temp_file, app_dev_yaml_temp_file.name, mock_dev_yaml_filepath)
+        setattr(
+            app_dev_yaml_temp_file, app_dev_yaml_temp_file.name,
+            mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
             tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
@@ -732,7 +734,9 @@ class BuildTests(test_utils.GenericTestBase):
         )
 
         app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
-        setattr(app_dev_yaml_temp_file, app_dev_yaml_temp_file.name, mock_dev_yaml_filepath)
+        setattr(
+            app_dev_yaml_temp_file, app_dev_yaml_temp_file.name,
+            mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
             tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
@@ -768,7 +772,8 @@ class BuildTests(test_utils.GenericTestBase):
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
         constants_temp_file = tempfile.NamedTemporaryFile()
-        setattr(constants_temp_file, constants_temp_file.name, mock_constants_path)
+        setattr(
+            constants_temp_file, constants_temp_file.name, mock_constants_path)
         with utils.open_file(mock_constants_path, 'w') as tmp:
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": true,\n')
@@ -818,7 +823,8 @@ class BuildTests(test_utils.GenericTestBase):
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
         constants_temp_file = tempfile.NamedTemporaryFile()
-        setattr(constants_temp_file, constants_temp_file.name, mock_constants_path)
+        setattr(
+            constants_temp_file, constants_temp_file.name, mock_constants_path)
         with utils.open_file(mock_constants_path, 'w') as tmp:
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": false,\n')
