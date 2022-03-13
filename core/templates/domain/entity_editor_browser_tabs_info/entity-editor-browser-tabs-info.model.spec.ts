@@ -21,7 +21,7 @@ import { EntityEditorBrowserTabsInfo } from './entity-editor-browser-tabs-info.m
 describe('Entity Editor Browser Tabs Info', () => {
   let topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo;
   let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo;
-  const skillEditorBrowserTabsInfoObject = {
+  const skillEditorBrowserTabsInfoLocalStorageObject = {
     entityType: 'skill',
     latestVersion: 1,
     numberOfOpenedTabs: 1,
@@ -30,8 +30,8 @@ describe('Entity Editor Browser Tabs Info', () => {
 
   beforeEach(() => {
     skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo
-      .createFromObjectAndId(
-        skillEditorBrowserTabsInfoObject, 'skill_1');
+      .fromLocalStorageDict(
+        skillEditorBrowserTabsInfoLocalStorageObject, 'skill_1');
     topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
       'topic', 'topic_1', 1, 1, false);
   });
@@ -55,8 +55,8 @@ describe('Entity Editor Browser Tabs Info', () => {
 
   it('should correctly convert into object that can be stored in local storage',
     () => {
-      expect(skillEditorBrowserTabsInfo.toObject()).toEqual(
-        skillEditorBrowserTabsInfoObject);
+      expect(skillEditorBrowserTabsInfo.toLocalStorageDict()).toEqual(
+        skillEditorBrowserTabsInfoLocalStorageObject);
     });
 
   it('should correctly set latest version to the given value', () => {

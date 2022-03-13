@@ -28,7 +28,7 @@ import {
   ExplorationChange,
   ExplorationDraft
 } from 'domain/exploration/exploration-draft.model';
-import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoLocalStorageObject } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoObject } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { WindowRef } from './contextual/window-ref.service';
 
 @Injectable({
@@ -216,7 +216,7 @@ export class LocalStorageService {
   ): EntityEditorBrowserTabsInfo | null {
     if (this.isStorageAvailable()) {
       let allEntityEditorBrowserTabsInfoObjects:
-        EntityEditorBrowserTabsInfoLocalStorageObject = {};
+        EntityEditorBrowserTabsInfoObject = {};
 
       const stringifiedEntityEditorBrowserTabsInfo = (this.storage as Storage)
         .getItem(entityEditorBrowserTabsInfoConstant);
@@ -229,7 +229,7 @@ export class LocalStorageService {
         allEntityEditorBrowserTabsInfoObjects[entityId]);
 
       if (requiredEntityEditorBrowserTabsInfoObject) {
-        return EntityEditorBrowserTabsInfo.createFromObjectAndId(
+        return EntityEditorBrowserTabsInfo.fromLocalStorageDict(
           requiredEntityEditorBrowserTabsInfoObject, entityId);
       }
     }
@@ -249,12 +249,12 @@ export class LocalStorageService {
   ): void {
     if (this.isStorageAvailable()) {
       const updatedEntityEditorBrowserTabsInfoObject = (
-        entityEditorBrowserTabsInfo.toObject()
+        entityEditorBrowserTabsInfo.toLocalStorageDict()
       );
       const entityId = entityEditorBrowserTabsInfo.getId();
 
       let allEntityEditorBrowserTabsInfoObjects:
-        EntityEditorBrowserTabsInfoLocalStorageObject = {};
+        EntityEditorBrowserTabsInfoObject = {};
 
       const stringifiedEntityEditorBrowserTabsInfo = (this.storage as Storage)
         .getItem(entityEditorBrowserTabsInfoConstant);

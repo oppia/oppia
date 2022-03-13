@@ -17,7 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoObject } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoLocalStorageObject } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 import { ExplorationChange, ExplorationDraft, ExplorationDraftDict } from 'domain/exploration/exploration-draft.model';
 import { LocalStorageService } from 'services/local-storage.service';
@@ -135,38 +135,47 @@ describe('LocalStorageService', () => {
     });
 
     it('should add entity editor browser tabs info', () => {
-      const entityEditorBrowserTabsInfoObject:
-        EntityEditorBrowserTabsInfoObject = {
+      const entityEditorBrowserTabsInfoLocalStorageObject:
+        EntityEditorBrowserTabsInfoLocalStorageObject = {
           entityType: 'topic',
           latestVersion: 1,
           numberOfOpenedTabs: 1,
           someTabHasUnsavedChanges: false
         };
       localStorageService.updateEntityEditorBrowserTabsInfo(
-        EntityEditorBrowserTabsInfo.createFromObjectAndId(
-          entityEditorBrowserTabsInfoObject, 'topic_1'),
+        EntityEditorBrowserTabsInfo.fromLocalStorageDict(
+          entityEditorBrowserTabsInfoLocalStorageObject, 'topic_1'),
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_TOPIC_EDITOR_BROWSER_TABS
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(localStorageService.getEntityEditorBrowserTabsInfo(
-        EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_TOPIC_EDITOR_BROWSER_TABS,
-        'topic_1')!.toObject()).toEqual(entityEditorBrowserTabsInfoObject);
+      const topicEditorBrowserTabsInfo = (
+        localStorageService.getEntityEditorBrowserTabsInfo(
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_TOPIC_EDITOR_BROWSER_TABS,
+          'topic_1')
+      );
+
+      expect(topicEditorBrowserTabsInfo).not.toBeNull();
+      // The "?" in the below assertion is to avoid typescript errors because
+      // localStorageService.getEntityEditorBrowserTabsInfo can either return
+      // null or an instance of EntityEditorBrowserTabsInfo.
+      expect(
+        topicEditorBrowserTabsInfo?.toLocalStorageDict()
+      ).toEqual(entityEditorBrowserTabsInfoLocalStorageObject);
     });
 
     it('should update entity editor browser tabs info', () => {
-      const entityEditorBrowserTabsInfoObject:
-        EntityEditorBrowserTabsInfoObject = {
+      const entityEditorBrowserTabsInfoLocalStorageObject:
+        EntityEditorBrowserTabsInfoLocalStorageObject = {
           entityType: 'skill',
           latestVersion: 1,
           numberOfOpenedTabs: 1,
           someTabHasUnsavedChanges: false
         };
       const entityEditorBrowserTabsInfo = (
-        EntityEditorBrowserTabsInfo.createFromObjectAndId(
-          entityEditorBrowserTabsInfoObject, 'skill_1'));
+        EntityEditorBrowserTabsInfo.fromLocalStorageDict(
+          entityEditorBrowserTabsInfoLocalStorageObject, 'skill_1'));
       localStorageService.updateEntityEditorBrowserTabsInfo(
         entityEditorBrowserTabsInfo,
         EntityEditorBrowserTabsInfoDomainConstants
