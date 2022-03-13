@@ -586,7 +586,7 @@ class BuildTests(test_utils.GenericTestBase):
     def test_re_build_recently_changed_files_at_dev_dir(self) -> None:
         temp_file = tempfile.NamedTemporaryFile()
         temp_file_name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
-        temp_file.name = temp_file_name # type: ignore[misc]
+        setattr(temp_file, temp_file.name, temp_file_name)
         with utils.open_file(
             '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
             tmp.write(u'Some content.')
@@ -690,14 +690,14 @@ class BuildTests(test_utils.GenericTestBase):
         )
 
         app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
-        app_dev_yaml_temp_file.name = mock_dev_yaml_filepath # type: ignore[misc]
+        setattr(app_dev_yaml_temp_file, app_dev_yaml_temp_file.name, mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
             tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
-        app_yaml_temp_file.name = mock_yaml_filepath # type: ignore[misc]
+        setattr(app_yaml_temp_file, app_yaml_temp_file.name, mock_yaml_filepath)
         with utils.open_file(mock_yaml_filepath, 'w') as tmp:
             tmp.write(u'Initial content in mock_app.yaml')
 
@@ -732,14 +732,14 @@ class BuildTests(test_utils.GenericTestBase):
         )
 
         app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
-        app_dev_yaml_temp_file.name = mock_dev_yaml_filepath # type: ignore[misc]
+        setattr(app_dev_yaml_temp_file, app_dev_yaml_temp_file.name, mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
             tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
-        app_yaml_temp_file.name = mock_yaml_filepath # type: ignore[misc]
+        setattr(app_yaml_temp_file, app_yaml_temp_file.name, mock_yaml_filepath)
         with utils.open_file(mock_yaml_filepath, 'w') as tmp:
             tmp.write('Initial content in mock_app.yaml')
 
@@ -768,7 +768,7 @@ class BuildTests(test_utils.GenericTestBase):
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
         constants_temp_file = tempfile.NamedTemporaryFile()
-        constants_temp_file.name = mock_constants_path # type: ignore[misc]
+        setattr(constants_temp_file, constants_temp_file.name, mock_constants_path)
         with utils.open_file(mock_constants_path, 'w') as tmp:
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": true,\n')
@@ -776,7 +776,7 @@ class BuildTests(test_utils.GenericTestBase):
             tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
-        feconf_temp_file.name = mock_feconf_path # type: ignore[misc]
+        setattr(feconf_temp_file, feconf_temp_file.name, mock_feconf_path)
         with utils.open_file(mock_feconf_path, 'w') as tmp:
             tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
 
@@ -818,7 +818,7 @@ class BuildTests(test_utils.GenericTestBase):
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
         constants_temp_file = tempfile.NamedTemporaryFile()
-        constants_temp_file.name = mock_constants_path # type: ignore[misc]
+        setattr(constants_temp_file, constants_temp_file.name, mock_constants_path)
         with utils.open_file(mock_constants_path, 'w') as tmp:
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": false,\n')
@@ -826,7 +826,7 @@ class BuildTests(test_utils.GenericTestBase):
             tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
-        feconf_temp_file.name = mock_feconf_path # type: ignore[misc]
+        setattr(feconf_temp_file, feconf_temp_file.name, mock_feconf_path)
         with utils.open_file(mock_feconf_path, 'w') as tmp:
             tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
 
@@ -849,7 +849,7 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_safe_delete_file(self) -> None:
         temp_file = tempfile.NamedTemporaryFile()
-        temp_file.name = 'some_file.txt' # type: ignore[misc]
+        setattr(temp_file, temp_file.name, 'some_file.txt')
         with utils.open_file('some_file.txt', 'w') as tmp:
             tmp.write(u'Some content.')
         self.assertTrue(os.path.isfile('some_file.txt'))
