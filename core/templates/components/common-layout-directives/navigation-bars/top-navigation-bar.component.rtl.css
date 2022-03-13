@@ -115,6 +115,10 @@
   padding-top: 27px;
 }
 
+.oppia-top-navigation-bar.navbar-header {
+  float: right !important;
+}
+
 .navbar-header {
   display: flex;
   margin-left: -30px;
@@ -456,6 +460,13 @@
 @media screen and (max-width: 840px) {
   .desktop-view-language-code {
     display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .oppia-top-navigation-bar.navbar-header {
+    float: right !important;
+    margin-right: -15px;
   }
 }
 

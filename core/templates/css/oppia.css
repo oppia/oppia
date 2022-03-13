@@ -1582,10 +1582,6 @@ pre.oppia-pre-wrapped-text {
   padding: 6px 12px 6px 12px;
   text-transform: uppercase;
 }
-.rtl-navbar-header .btn.oppia-navbar-button {
-  margin-left: 0;
-  margin-right: 5px;
-}
 .btn.oppia-navbar-button:hover,
 .btn.oppia-navbar-button:focus {
   background-color: #fff;
