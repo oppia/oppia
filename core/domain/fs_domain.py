@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core import utils
 
-from typing import List,Sized
+from typing import List, Sized
 
 from core.platform import models # pylint: disable=invalid-import-from # isort:skip
 # TODO(#14537): Refactor this file and remove imports marked
@@ -421,7 +421,7 @@ class AbstractFileSystem:
         if not normalized_path.startswith(base_dir):
             raise IOError('Invalid filepath: %s' % filepath)
 
-    def isfile(self, filepath: str) -> bool :
+    def isfile(self, filepath: str) -> bool:
         """Checks if a file exists. Similar to os.path.isfile(...).
 
         Args:
