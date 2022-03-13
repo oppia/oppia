@@ -889,18 +889,29 @@ def get_translatable_text(
 
 
 class ContentIdGenerator:
-    """TODO
+    """Class to generate the content-id for a translatable content based on the
+    next_content_id_index variable.
     """
     def __init__(self, start_index):
+        """Constructs an ContentIdGenerator object."""
         self.next_content_id_index = start_index
 
     def generate(content_type):
+        """Generates the new content-id from the next content id."""
         content_id = content_type + '_' + str(self.next_content_id_index)
         self.next_content_id_index += 1
 
 
 def traverse_state(state_dict):
-    """TODO
+    """This method iterates throughout the state dict and yields the value for
+    each field. The yielded value is used for generating and updating the
+    content-ids for the fields in the state in their respective methods.
+
+    Args:
+        state_dict: State object represented in the dict format.
+
+    Yields:
+        (str|list(str), str). A tuple containing content and content-id.
     """
     yield state_dict['content'], ContentType.CONTENT
 
@@ -945,7 +956,16 @@ def traverse_state(state_dict):
 
 
 def update_old_content_id_to_new_content_id_in_states(states_dict):
-    """TODO
+    """Updates the old content-ids from the state fields like hints, solution,
+    etc with the newly generated content id.
+
+    Args:
+        states_dict: list(dict(State)). List of dictionaries, where each dict
+            represents a state object.
+
+    Returns:
+        states_dict: list(dict(State)). List of state dicts, with updated
+        content-ids.
     """
     content_id_generator = ContentIdGenerator()
 
@@ -964,7 +984,18 @@ def update_old_content_id_to_new_content_id_in_states(states_dict):
 
 
 def generate_old_content_id_to_new_content_id_in_states(states_dict):
-    """TODO
+    """Generates the new content-id for each state field based on
+    next_content_id_index variable.
+
+    Args:
+        states_dict: list(dict(State)). List of dictionaries, where each dict
+            represents a state object.
+
+    Returns:
+        (dict(str, dict(str, str)), str). A tuple with the first field as a dict
+        and the second field is the value of the next_content_id_index. The
+        first field is a dict with state name as a key and old-content-id to
+        new-content-id dict as a value.
     """
     content_id_generator = ContentIdGenerator()
     states_to_content_id = {}

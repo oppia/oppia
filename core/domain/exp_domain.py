@@ -1972,8 +1972,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _convert_states_v49_dict_to_v50_dict(cls, states_dict):
         """Converts from v49 to v50. Version 50 removes next_content_id_index
-        and WrittenTranslation from State. This version also maps old content id
-        with new content id.
+        and WrittenTranslation from State. This version also updates the
+        content-ids for each translatable field in the state with its new
+        content-id.
         """
         del state_dict['next_content_id_index']
         del state_dict['written_translations']
