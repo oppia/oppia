@@ -125,10 +125,10 @@ describe('Story editor state service', () => {
       language_code: 'en',
       version: 1,
       corresponding_topic_id: 'topic_id',
-      thumbnail_filename: '',
+      thumbnail_filename: 'img.svg',
       thumbnail_bg_color: null,
-      url_fragment: '',
-      meta_tag_content: ''
+      url_fragment: 'url_fragment1',
+      meta_tag_content: 'meta_content1'
     };
 
     secondBackendStoryObject = {
@@ -144,10 +144,10 @@ describe('Story editor state service', () => {
       language_code: 'en',
       version: 1,
       corresponding_topic_id: 'topic_id',
-      thumbnail_filename: '',
+      thumbnail_filename: 'img.svg',
       thumbnail_bg_color: null,
-      url_fragment: '',
-      meta_tag_content: ''
+      url_fragment: 'url_fragment2',
+      meta_tag_content: 'meta_content2'
     };
 
     TestBed.configureTestingModule({
