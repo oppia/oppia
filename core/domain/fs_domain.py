@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core import utils
 
-from typing import Any, Sized, List
+from typing import List,Sized
 
 from core.platform import models # pylint: disable=invalid-import-from # isort:skip
 # TODO(#14537): Refactor this file and remove imports marked
