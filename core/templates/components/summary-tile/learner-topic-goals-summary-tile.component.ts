@@ -105,7 +105,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
       this.storyNodeToDisplay = this.incompleteStoryNodes[0];
     }
 
-    if(this.storyNodeToDisplay){
+    if (this.storyNodeToDisplay) {
       if (this.storyNodeToDisplay.getThumbnailFilename()) {
         this.thumbnailUrl = (
           this.assetsBackendApiService.getThumbnailUrlForPreview(
