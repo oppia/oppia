@@ -105,22 +105,31 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
       this.storyNodeToDisplay = this.incompleteStoryNodes[0];
     }
 
-    if (this.storyNodeToDisplay.getThumbnailFilename()) {
-      this.thumbnailUrl = (
-        this.assetsBackendApiService.getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.STORY, this.storySummaryToDisplay.getId(),
-          this.storyNodeToDisplay.getThumbnailFilename()));
+    if(this.storyNodeToDisplay){
+      if (this.storyNodeToDisplay.getThumbnailFilename()) {
+        this.thumbnailUrl = (
+          this.assetsBackendApiService.getThumbnailUrlForPreview(
+            AppConstants.ENTITY_TYPE.STORY, this.storySummaryToDisplay.getId(),
+            this.storyNodeToDisplay.getThumbnailFilename()));
+      }
+
+      this.storyNodeTitle = this.storyNodeToDisplay.getTitle();
+      this.thumbnailBgColor = this.storyNodeToDisplay.getThumbnailBgColor();
+      this.storyName = this.storySummaryToDisplay.getTitle();
     }
+
     this.storyNodeLink = this.getStoryNodeLink();
-    this.storyNodeTitle = this.storyNodeToDisplay.getTitle();
-    this.thumbnailBgColor = this.storyNodeToDisplay.getThumbnailBgColor();
-    this.storyName = this.storySummaryToDisplay.getTitle();
-    let totalStoryNodesCount = this.storySummaryToDisplay.getAllNodes().length;
-    let completedNodesCount = (
-      this.storySummaryToDisplay.getCompletedNodeTitles().length
-    );
-    this.storyProgress = Math.floor(
-      (completedNodesCount / totalStoryNodesCount) * 100);
+
+    if (this.storySummaryToDisplay) {
+      let totalStoryNodesCount = (
+        this.storySummaryToDisplay.getAllNodes().length
+      );
+      let completedNodesCount = (
+        this.storySummaryToDisplay.getCompletedNodeTitles().length
+      );
+      this.storyProgress = Math.floor(
+        (completedNodesCount / totalStoryNodesCount) * 100);
+    }
   }
 
   isCardHovered(): string {
