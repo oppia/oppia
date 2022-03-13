@@ -3935,7 +3935,7 @@ div.oppia-issues-learner-action {
   .oppia-profile-picture-container {
     float: left;
     height: auto;
-    width: 130px;
+    width: 100%;
   }
 }
 
