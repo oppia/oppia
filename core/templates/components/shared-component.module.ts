@@ -26,14 +26,14 @@ import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/f
 import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MaterialModule } from '../modules/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
-import { BaseModule } from '../base-components/base.module';
+import { BaseModule } from 'base-components/base.module';
 import { NgBootstrapModule } from 'modules/ng-boostrap.module';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
@@ -101,7 +101,6 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
 import { AddOrUpdateSolutionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
 import { SavePendingChangesModalComponent } from './save-pending-changes/save-pending-changes-modal.component';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
-import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
 import { QuestionMisconceptionSelectorComponent } from './question-directives/question-misconception-selector/question-misconception-selector.component';
 import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
 import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
@@ -230,7 +229,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SelectSkillModalComponent,
     SearchBarComponent,
     SharingLinksComponent,
-    SmoothHeightAnimatorComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     StateContentEditorComponent,
@@ -341,7 +339,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
-    SmoothHeightAnimatorComponent,
     ThumbnailDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
@@ -448,7 +445,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
-    SmoothHeightAnimatorComponent,
     TakeBreakModalComponent,
     ThreadTableComponent,
     ThumbnailDisplayComponent,
