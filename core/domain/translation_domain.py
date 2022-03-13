@@ -27,6 +27,17 @@ from typing import Dict, List
 from typing_extensions import TypedDict
 
 
+class ContentType(enum.Enum):
+    """Represents all possible content types in the State."""
+
+    CONTENT = 'content'
+    INTERACTION = 'interaction'
+    RULE = 'rule'
+    FEEDBACK = 'feedback'
+    HINT = 'hint'
+    SOLUTION = 'solution'
+
+
 class TranslatableContentFormat(enum.Enum):
     """Represents all possible data types for any translatable content."""
 
@@ -370,6 +381,17 @@ class EntityTranslation:
                     raise utils.ValidationError(
                         'content_value must be a string, but got %r' %
                         content_value)
+
+    @classmethod
+    def create_empty_translation_object(cls):
+        return cls(
+            entity_id='',
+            entity_type='',
+            entity_version=0,
+            language_code='',
+            translations={}
+        )
+
 
 
 class MachineTranslation:
@@ -857,3 +879,110 @@ class WrittenTranslations:
                             conversion_fn(translation_dict['html']))
 
         return written_translations_dict
+
+
+def get_translatable_text(
+    entity,
+    language_code
+):
+    pass
+
+
+class ContentIdGenerator:
+    """TODO
+    """
+    def __init__(self, start_index):
+        self.next_content_id_index = start_index
+
+    def generate(content_type):
+        content_id = content_type + '_' + str(self.next_content_id_index)
+        self.next_content_id_index += 1
+
+
+def traverse_state(state_dict):
+    """TODO
+    """
+    yield state_dict['content'], ContentType.CONTENT
+
+    interaction = state_dict['interaction']
+
+    default_outcome = interaction['default_outcome']
+    if default_outcome is not None:
+        yield default_outcome['feedback'], ContentType.FEEDBACK
+
+    answer_groups = interaction['answer_groups']
+    for answer_group in answer_groups:
+        outcome = answer_group['outcome']
+        yield outcome['feedback'], ContentType.FEEDBACK
+
+        if interaction['id'] not in ['TextInput', 'SetInput']:
+            continue
+
+        for rule_spec in answer_group['rule_specs']:
+            for input_value in sorted(rule_spec['inputs'].values()):
+                if 'normalizedStrSet' in input_value::
+                    yield input_value, ContentType.RULE
+                if 'unicodeStrSet' in input_value:
+                    yield input_value, ContentType.RULE
+
+    for hint in interaction['hints']:
+        yield hint['hint_content'], ContentType.HINT
+
+    solution = interaction['solution']
+    if solution is not None:
+        yield solution, ContentType.SOLUTION
+
+    for cust_args in sorted(interaction['customisation_args'].values()):
+        subtitled_htmls = cust_args.get_subtitled_html()
+        for subtitled_html in subtitled_htmls:
+            html_string = subtitled_html.html
+            if not html_string.isnumeric():
+                yield subtitled_html, ContentType.INTERACTION
+
+        subtitled_unicodes = cust_args.get_subtitled_unicode()
+        for subtitled_unicode in subtitled_unicodes:
+            yield subtitled_unicode, ContentType.INTERACTION
+
+
+def update_old_content_id_to_new_content_id_in_states(states_dict):
+    """TODO
+    """
+    content_id_generator = ContentIdGenerator()
+
+    for state_name in sorted(states_dict.keys()):
+        old_id_to_new_id = {}
+        for content, content_type in traverse_state(states_dict[state_name]):
+            if content_type == ContentType.INTERACTION:
+                content.content_id = content_id_generator.generate(content_type)
+            elif content_type == ContentType.RULE:
+                content['contentId']] = content_id_generator.generate(
+                    content_type)
+            else:
+                content['content_id'] = content_id_generator.generate(
+                    content_type)
+    return state_dict
+
+
+def generate_old_content_id_to_new_content_id_in_states(states_dict):
+    """TODO
+    """
+    content_id_generator = ContentIdGenerator()
+    states_to_content_id = {}
+
+    for state_name in sorted(states_dict.keys()):
+        old_id_to_new_id = {}
+
+        for content, content_type in traverse_state(states_dict[state_name]):
+            if content_type == ContentType.INTERACTION:
+                old_id_to_new_id[content.content_id] = (
+                    content_id_generator.generate(content_type))
+            elif content_type == ContentType.RULE:
+                old_id_to_new_id[content['contentId']] = (
+                    content_id_generator.generate(content_type))
+            else:
+                old_id_to_new_id[content['content_id']] = (
+                    content_id_generator.generate(content_type))
+
+        states_to_content_id[state_name] = old_id_to_new_id
+
+    return (states_to_content_id, content_id_generator.next_content_id_index)

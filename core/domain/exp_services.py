@@ -59,6 +59,7 @@ from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.domain import translation_domain
+from core.domain import translation_services
 from core.domain import user_services
 from core.platform import models
 
@@ -1180,7 +1181,7 @@ def update_exploration(
         taskqueue_services.FUNCTION_ID_UPDATE_TRANSLATION_RELATED_CHANGE,
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_id,
         updated_exploration.version, changes_related_to_translation,
-        updated_exploration.get_content_count()
+        translation_services.get_content_count(updated_exploration)
         )
 
     # Update summary of changed exploration in a deferred task.

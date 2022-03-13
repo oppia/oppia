@@ -21,6 +21,7 @@ from __future__ import annotations
 import logging
 
 from core.domain import translation_fetchers
+from core.domain import translation_domain
 from core.platform import models
 
 translate_services = models.Registry.import_translate_services()
@@ -142,7 +143,7 @@ def get_languages_with_complete_translation():
     return language_code_list
 
 
-def get_translation_counts(self):
+def get_translation_counts(entity_type, entity_id, entity_version):
     """Returns a dict representing the number of translations available in a
     language for which there exists at least one translation in the
     exploration.
@@ -152,10 +153,11 @@ def get_translation_counts(self):
         translation available in that language as the value.
     """
     exploration_translation_counts = collections.defaultdict(int)
-    entity_translations = get_all_entity_translation_objects_for_entity(
-        entity_type,
-        entity_id,
-        entity_version
+    entity_translations = (
+        translation_fetchers.get_all_entity_translation_objects_for_entity(
+            entity_type,
+            entity_id,
+            entity_version)
     )
     for entity_translation in entity_translations:
         lang_code = entity_translation.language_code
@@ -168,7 +170,7 @@ def get_translation_counts(self):
     return dict(exploration_translation_counts)
 
 
-def get_content_count(self):
+def get_content_count(base_translatable_object):
     """Returns the total number of distinct content fields available in the
     exploration which are user facing and can be translated into
     different languages.
@@ -180,7 +182,10 @@ def get_content_count(self):
         the exploration.
     """
     content_count = (
-        len(self.get_all_contents_which_need_translations(
-        translation_domain.create_empty_translation_object()))
+        len(
+            base_translatable_object.get_all_contents_which_need_translations(
+                translation_domain.EntityTranslation
+                .create_empty_translation_object())
+        )
     )
     return content_count

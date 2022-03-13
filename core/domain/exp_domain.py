@@ -589,6 +589,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 enabled.
             correctness_feedback_enabled: bool. True if correctness feedback is
                 enabled.
+            next_content_id_index: int. The next content_id index to use for
+                generation of new content_ids.
             created_on: datetime.datetime. Date and time when the exploration
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
@@ -1559,26 +1561,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         del self.states[state_name]
 
-    def get_translatable_text(self, language_code):
-        """Returns all the contents which needs translation in the given
-        language.
-
-        Args:
-            language_code: str. The language code in which translation is
-                required.
-
-        Returns:
-            dict(str, dict(str, str)). A dict where state_name is the key and a
-            dict with content_id as the key and html content as value.
-        """
-        state_names_to_content_id_mapping = {}
-        for state_name, state in self.states.items():
-            state_names_to_content_id_mapping[state_name] = (
-                state.get_content_id_mapping_needing_translations(
-                    language_code))
-
-        return state_names_to_content_id_mapping
-
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.
@@ -1988,6 +1970,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v49_dict_to_v50_dict(cls, states_dict):
+        """Converts from v49 to v50. Version 50 removes next_content_id_index
+        and WrittenTranslation from State. This version also maps old content id
+        with new content id.
+        """
+        del state_dict['next_content_id_index']
+        del state_dict['written_translations']
+
+        translation_domain.update_old_content_id_to_new_content_id_in_states(
+            states_dict)
+
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
@@ -2024,7 +2019,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 54
+    CURRENT_EXP_SCHEMA_VERSION = 55
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2208,6 +2203,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
+        pass
+
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -2282,6 +2282,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v53_dict_to_v54_dict(
                 exploration_dict)
             exploration_schema_version = 54
+
+        if exploration_schema_version == 54:
+            exploration_dict = cls._convert_v54_dict_to_v55_dict(
+                exploration_dict)
+            exploration_schema_version = 55
 
         return exploration_dict
 
