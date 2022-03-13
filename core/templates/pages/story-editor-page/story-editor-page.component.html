@@ -21,7 +21,7 @@
             <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box story-editor-warning-box" ng-if="$ctrl.warningsAreShown">
               <span class="oppia-editor-warnings-header">Warnings</span>
               <li class="oppia-editor-warnings-text protractor-test-warnings-text"
-                  ng-repeat="issue in $ctrl.validationIssues.concat($ctrl.explorationValidationIssues) track by $index">
+                  ng-if="$ctrl.story" ng-repeat="issue in $ctrl.validationIssues.concat($ctrl.explorationValidationIssues) track by $index">
                 <hr class="oppia-editor-warnings-separator">
                 <[issue]>
               </li>

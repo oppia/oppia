@@ -236,36 +236,6 @@ export class StoryObjectFactory {
       storyBackendDict.url_fragment, storyBackendDict.meta_tag_content
     );
   }
-
-  // Create an interstitial story that would be displayed in the editor until
-  // the actual story is fetched from the backend.
-  createInterstitialStory(): Story {
-    let sampleStoryContentsBackendDict = {
-      initial_node_id: '',
-      nodes: [
-        {
-          id: '',
-          title: '',
-          description: '',
-          prerequisite_skill_ids: [''],
-          acquired_skill_ids: [''],
-          destination_node_ids: [''],
-          outline: '',
-          exploration_id: '',
-          outline_is_finalized: false,
-          thumbnail_bg_color: null,
-          thumbnail_filename: null
-        }],
-      next_node_id: ''
-    };
-    let mockStoryContent = StoryContents.createFromBackendDict(
-      sampleStoryContentsBackendDict);
-
-    return new Story(
-      'Id loading', 'Story title loading', 'Story description loading',
-      'Story notes loading', mockStoryContent, 'en', 1, 'Topic id loading',
-      null, null, '', '');
-  }
 }
 
 angular.module('oppia').factory(
