@@ -23,7 +23,7 @@ in mypy checks not during runtime.
 
 from __future__ import annotations
 from core.platform.app_identity import (
-     gae_app_identity_services as app_identity_services)
+    gae_app_identity_services as app_identity_services)
 from core.platform.cache import redis_cache_services as memory_cache_services
 from core.platform.datastore import (
     cloud_datastore_services as datastore_services)

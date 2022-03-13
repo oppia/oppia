@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core import utils
 
-from typing import Any, Sized
+from typing import Any, Sized, List
 
 from core.platform import models # pylint: disable=invalid-import-from # isort:skip
 # TODO(#14537): Refactor this file and remove imports marked
@@ -93,7 +93,8 @@ class GeneralFileSystem:
         self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
 
     def _validate_entity_parameters(
-        self, entity_name: str, entity_id: str) -> None:
+        self, entity_name: str, entity_id: str
+        ) -> None:
         """Checks whether the entity_id and entity_name passed in are valid.
 
         Args:
@@ -123,7 +124,7 @@ class GeneralFileSystem:
         """
         return self._assets_path
 
-    def _get_gcs_file_url(self, filepath: str) -> str: # type: ignore[no-untyped-call]
+    def _get_gcs_file_url(self, filepath: str) -> str:
         """Returns the constructed GCS file URL.
 
         Args:
@@ -138,7 +139,7 @@ class GeneralFileSystem:
         gcs_file_url = '%s/%s' % (self._assets_path, filepath)
         return gcs_file_url
 
-    def isfile(self, filepath: str) -> bool:# type: ignore[no-untyped-call]
+    def isfile(self, filepath: str) -> bool:
         """Checks if the file with the given filepath exists in the GCS.
 
         Args:
@@ -151,7 +152,7 @@ class GeneralFileSystem:
         return storage_services.isfile(
             self._bucket_name, self._get_gcs_file_url(filepath))
 
-    def get(self, filepath: str) -> FileStream | None: # type: ignore[no-untyped-call]
+    def get(self, filepath: str) -> FileStream | None:
         """Gets a file as an unencoded stream of raw bytes.
 
         Args:
@@ -168,7 +169,7 @@ class GeneralFileSystem:
         else:
             return None
 
-    def commit(self, filepath: str, raw_bytes: bytes, mimetype: str) -> None: # type: ignore[no-untyped-call]
+    def commit(self, filepath: str, raw_bytes: bytes, mimetype: str) -> None:
         """Commit raw_bytes to the relevant file in the entity's assets folder.
 
         Args:
@@ -184,7 +185,7 @@ class GeneralFileSystem:
             mimetype
         )
 
-    def delete(self, filepath: str) -> None: # type: ignore[no-untyped-call]
+    def delete(self, filepath: str) -> None:
 
         """Deletes a file and the metadata associated with it.
 
@@ -217,7 +218,7 @@ class GeneralFileSystem:
             self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
         )
 
-    def listdir(self, dir_name: str) -> list[str]: # type: ignore[no-untyped-call]
+    def listdir(self, dir_name: str) -> list[str]:
 
         """Lists all files in a directory.
 
@@ -353,7 +354,7 @@ class GcsFileSystem(GeneralFileSystem):
             self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
         )
 
-    def listdir(self, dir_name: str) -> list[str]:
+    def listdir(self, dir_name: str) -> List[str]:
         """Lists all files in a directory.
 
         Args:
@@ -420,7 +421,7 @@ class AbstractFileSystem:
         if not normalized_path.startswith(base_dir):
             raise IOError('Invalid filepath: %s' % filepath)
 
-    def isfile(self, filepath: str) -> bool | Any:
+    def isfile(self, filepath: str) -> bool :
         """Checks if a file exists. Similar to os.path.isfile(...).
 
         Args:
@@ -496,7 +497,7 @@ class AbstractFileSystem:
         self._check_filepath(filepath)
         self._impl.delete(filepath)
 
-    def listdir(self, dir_name: str) -> Any:
+    def listdir(self, dir_name: str) -> List[str]:
         """Lists all the files in a directory. Similar to os.listdir(...).
 
         Args:
