@@ -1140,7 +1140,8 @@ export class SvgEditorComponent implements OnInit {
     } else {
       this.drawMode = this.DRAW_MODE_NONE;
       if (this.uploadedSvgDataUrl !== null) {
-        var svgString = atob(this.uploadedSvgDataUrl.unsafeUrl.split(',')[1]);
+        const svgString = this._base64DecodeUnicode(
+          this.uploadedSvgDataUrl.unsafeUrl.split(',')[1]);
         fabric.loadSVGFromString(svgString, (args) => this.loadSvgFile(args));
       }
       this.canvas.renderAll();
