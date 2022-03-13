@@ -21,7 +21,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SocialButtonsComponent } from './social-buttons.component';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-fdescribe('SocialButtonsComponent', () => {
+describe('SocialButtonsComponent', () => {
   let component: SocialButtonsComponent;
   let fixture: ComponentFixture<SocialButtonsComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -45,5 +45,4 @@ fdescribe('SocialButtonsComponent', () => {
   it('should get RTL language status correctly', () => {
     expect(component.isLanguageRTL()).toEqual(true);
   });
-
 });
