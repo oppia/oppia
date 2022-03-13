@@ -26,7 +26,6 @@ import { StoryEditorStateService } from 'pages/story-editor-page/services/story-
 import { importAllAngularServices, TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
 import { AlertsService } from 'services/alerts.service';
 import { StoryUpdateService } from 'domain/story/story-update.service';
-import { StoryContents } from 'domain/story/story-contents-object.model';
 
 require('domain/story/story-update.service.ts');
 
@@ -251,36 +250,6 @@ describe('Story editor state service', () => {
       secondBackendStoryObject);
     storyEditorStateService.setStory(newStory);
     expect(storyEditorStateService.hasLoadedStory()).toBe(true);
-  });
-
-  it('should initially return an interstitial story', () => {
-    let sampleStoryContentsBackendDict = {
-      initial_node_id: '',
-      nodes: [
-        {
-          id: '',
-          title: '',
-          description: '',
-          prerequisite_skill_ids: [''],
-          acquired_skill_ids: [''],
-          destination_node_ids: [''],
-          outline: '',
-          exploration_id: '',
-          outline_is_finalized: false,
-          thumbnail_bg_color: null,
-          thumbnail_filename: null
-        }],
-      next_node_id: ''
-    };
-    let mockStoryContent = StoryContents.createFromBackendDict(
-      sampleStoryContentsBackendDict);
-    var story = storyEditorStateService.getStory();
-
-    expect(story.getId()).toEqual('Id loading');
-    expect(story.getTitle()).toEqual('Story title loading');
-    expect(story.getDescription()).toEqual('Story description loading');
-    expect(story.getNotes()).toEqual('Story notes loading');
-    expect(story.getStoryContents()).toEqual(mockStoryContent);
   });
 
   it('should be able to set a new story with an in-place copy', () => {

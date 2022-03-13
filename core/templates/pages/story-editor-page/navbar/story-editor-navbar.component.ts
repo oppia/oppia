@@ -96,7 +96,9 @@ export class StoryEditorNavbarComponent implements OnInit {
 
   discardChanges(): void {
     this.undoRedoService.clearChanges();
-    this.storyEditorStateService.loadStory(this.story.getId());
+    if (this.story) {
+      this.storyEditorStateService.loadStory(this.story.getId());
+    }
     this._validateStory();
     this.forceValidateExplorations = true;
   }
