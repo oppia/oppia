@@ -17,7 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoLocalStorageObject } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoLocalStorageDict } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 import { ExplorationChange, ExplorationDraft, ExplorationDraftDict } from 'domain/exploration/exploration-draft.model';
 import { LocalStorageService } from 'services/local-storage.service';
@@ -135,8 +135,8 @@ describe('LocalStorageService', () => {
     });
 
     it('should add entity editor browser tabs info', () => {
-      const entityEditorBrowserTabsInfoLocalStorageObject:
-        EntityEditorBrowserTabsInfoLocalStorageObject = {
+      const entityEditorBrowserTabsInfoLocalStorageDict:
+        EntityEditorBrowserTabsInfoLocalStorageDict = {
           entityType: 'topic',
           latestVersion: 1,
           numberOfOpenedTabs: 1,
@@ -144,7 +144,7 @@ describe('LocalStorageService', () => {
         };
       localStorageService.updateEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfo.fromLocalStorageDict(
-          entityEditorBrowserTabsInfoLocalStorageObject, 'topic_1'),
+          entityEditorBrowserTabsInfoLocalStorageDict, 'topic_1'),
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_TOPIC_EDITOR_BROWSER_TABS
       );
@@ -162,12 +162,12 @@ describe('LocalStorageService', () => {
       // null or an instance of EntityEditorBrowserTabsInfo.
       expect(
         topicEditorBrowserTabsInfo?.toLocalStorageDict()
-      ).toEqual(entityEditorBrowserTabsInfoLocalStorageObject);
+      ).toEqual(entityEditorBrowserTabsInfoLocalStorageDict);
     });
 
     it('should update entity editor browser tabs info', () => {
-      const entityEditorBrowserTabsInfoLocalStorageObject:
-        EntityEditorBrowserTabsInfoLocalStorageObject = {
+      const entityEditorBrowserTabsInfoLocalStorageDict:
+        EntityEditorBrowserTabsInfoLocalStorageDict = {
           entityType: 'skill',
           latestVersion: 1,
           numberOfOpenedTabs: 1,
@@ -175,7 +175,7 @@ describe('LocalStorageService', () => {
         };
       const entityEditorBrowserTabsInfo = (
         EntityEditorBrowserTabsInfo.fromLocalStorageDict(
-          entityEditorBrowserTabsInfoLocalStorageObject, 'skill_1'));
+          entityEditorBrowserTabsInfoLocalStorageDict, 'skill_1'));
       localStorageService.updateEntityEditorBrowserTabsInfo(
         entityEditorBrowserTabsInfo,
         EntityEditorBrowserTabsInfoDomainConstants
