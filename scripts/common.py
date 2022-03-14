@@ -58,7 +58,7 @@ NODE_VERSION = '16.13.0'
 YARN_VERSION = '1.22.15'
 
 # Versions of libraries used in backend.
-PILLOW_VERSION = '8.4.0'
+PILLOW_VERSION = '9.0.1'
 
 # Buf version.
 BUF_VERSION = '0.29.0'

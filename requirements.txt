@@ -240,7 +240,7 @@ packaging==20.4
     #   google-api-core
     #   google-cloud-appengine-logging
     #   pytest
-pillow==9.0.0
+pillow==9.0.1
     # via -r requirements.in
 pluggy==0.13.1
     # via pytest
