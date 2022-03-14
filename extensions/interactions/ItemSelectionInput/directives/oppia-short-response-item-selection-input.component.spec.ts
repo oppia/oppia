@@ -48,21 +48,12 @@ describe('ShortResponseItemSelectionInput', () => {
     fixture = TestBed.createComponent(ShortResponseItemSelectionInputComponent);
     component = fixture.componentInstance;
     component.answer = '["ca_choices_1"]';
-    component.choices = '[{' +
-      '"_html": "choice 1",' +
-      '"_contentId": "ca_choices_1"' +
-    '}, {' +
-      '"_html": "choice 2",' +
-      '"_contentId": "ca_choices_2"' +
-    '}, {' +
-      '"_html": "choice 3",' +
-      '"_contentId": "ca_choices_3"' +
-    '}]';
+    component.choices = '["choice 1","choice 2","choice 3"]';
   });
 
   it('should initialise component when user submits answer', () => {
     component.ngOnInit();
 
-    expect(component.responses).toEqual(['choice 1']);
+    expect(component.responses).toEqual(['choice 2']);
   });
 });

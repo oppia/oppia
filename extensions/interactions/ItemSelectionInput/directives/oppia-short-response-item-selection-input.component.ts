@@ -45,11 +45,10 @@ export class ShortResponseItemSelectionInputComponent implements OnInit {
     ) as string[];
     const choices = this.htmlEscaperService.escapedJsonToObj(
       this.choices
-    ) as { _html: string; _contentId: string }[];
+    ) as string[];
 
-    const choicesContentIds = choices.map(choice => choice._contentId);
     this.responses = answer.map(
-      contentId => choices[choicesContentIds.indexOf(contentId)]._html);
+      contentId => choices[parseInt(contentId.split('_')[2])]);
   }
 }
 

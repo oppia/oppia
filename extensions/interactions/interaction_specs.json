@@ -200,8 +200,8 @@
     }
   },
   "ItemSelectionInput": {
-    "can_have_solution": false,
-    "show_generic_submit_button": false,
+    "can_have_solution": true,
+    "show_generic_submit_button": true,
     "instructions": null,
     "is_trainable": false,
     "narrow_instructions": null,

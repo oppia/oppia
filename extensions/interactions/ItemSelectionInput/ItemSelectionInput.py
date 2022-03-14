@@ -30,9 +30,7 @@ class ItemSelectionInput(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
     answer_type = 'SetOfTranslatableHtmlContentIds'
-    # Radio buttons get unselected when specifying a solution. This needs to be
-    # fixed before solution feature can support this interaction.
-    can_have_solution = False
+    can_have_solution = True
     # ItemSelectionInput's submit button is dynamic and is handled
     # separately.
     show_generic_submit_button = False
