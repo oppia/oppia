@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import ast
 import builtins
-import urllib
+import urllib.parse
 
 from core import python_utils
 from core.tests import test_utils
@@ -44,70 +44,3 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         response = urllib.parse.parse_qs(
             'http://www.google.com?search=oppia')
         self.assertEqual(response, {'http://www.google.com?search': ['oppia']})
-
-    def test_recursively_convert_to_str_with_dict(self):
-        test_var_1_in_unicode = str('test_var_1')
-        test_var_2_in_unicode = str('test_var_2')
-        test_var_3_in_bytes = test_var_1_in_unicode.encode(encoding='utf-8')
-        test_var_4_in_bytes = test_var_2_in_unicode.encode(encoding='utf-8')
-        test_dict = {
-            test_var_1_in_unicode: test_var_3_in_bytes,
-            test_var_2_in_unicode: test_var_4_in_bytes
-        }
-        self.assertEqual(
-            test_dict,
-            {'test_var_1': b'test_var_1', 'test_var_2': b'test_var_2'})
-
-        for key, val in test_dict.items():
-            self.assertEqual(type(key), str)
-            self.assertEqual(type(val), builtins.bytes)
-
-        dict_in_str = python_utils._recursively_convert_to_str(test_dict)  # pylint: disable=protected-access
-        self.assertEqual(
-            dict_in_str,
-            {'test_var_1': 'test_var_1', 'test_var_2': 'test_var_2'})
-
-        for key, val in dict_in_str.items():
-            self.assertEqual(type(key), str)
-            self.assertEqual(type(val), str)
-
-    def test_recursively_convert_to_str_with_nested_structure(self):
-        test_var_1_in_unicode = str('test_var_1')
-        test_list_1 = [
-            test_var_1_in_unicode,
-            test_var_1_in_unicode.encode(encoding='utf-8'),
-            'test_var_2',
-            b'test_var_3',
-            {'test_var_4': b'test_var_5'}
-        ]
-        test_dict = {test_var_1_in_unicode: test_list_1}
-        self.assertEqual(
-            test_dict,
-            {
-                'test_var_1': [
-                    'test_var_1', b'test_var_1', 'test_var_2', b'test_var_3',
-                    {'test_var_4': b'test_var_5'}]
-            }
-        )
-
-        dict_in_str = python_utils._recursively_convert_to_str(test_dict)  # pylint: disable=protected-access
-        self.assertEqual(
-            dict_in_str,
-            {
-                'test_var_1': [
-                    'test_var_1', 'test_var_1', 'test_var_2', 'test_var_3',
-                    {'test_var_4': 'test_var_5'}]
-            }
-        )
-
-        for key, value in dict_in_str.items():
-            self.assertNotEqual(type(key), builtins.bytes)
-            self.assertTrue(isinstance(key, str))
-
-            for item in value:
-                self.assertNotEqual(type(item), builtins.bytes)
-                self.assertTrue(isinstance(item, (str, bytes, dict)))
-
-            for k, v in value[-1].items():
-                self.assertEqual(type(k), str)
-                self.assertEqual(type(v), str)
