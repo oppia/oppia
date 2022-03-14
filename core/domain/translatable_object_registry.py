@@ -19,14 +19,30 @@ from __future__ import annotations
 import inspect
 
 from extensions.objects.models import objects
-from typing import Any, Dict, List
+from typing import Dict, List, Type, Union
+from typing_extensions import Literal
+
+TranslatableObjectNames = Literal[
+        'TranslatableHtml',
+        'TranslatableUnicodeString',
+        'TranslatableSetOfUnicodeString',
+        'TranslatableSetOfNormalizedString',
+        ]
+
+TranslatableObjectClasses = Union[
+        Type[objects.TranslatableHtml],
+        Type[objects.TranslatableUnicodeString],
+        Type[objects.TranslatableSetOfUnicodeString],
+        Type[objects.TranslatableSetOfNormalizedString],
+        ]
 
 
 class Registry:
     """Registry of all translatable objects."""
 
     # Dict mapping object class names to their classes.
-    _translatable_objects_dict: Dict[str, Any] = {}
+    _translatable_objects_dict: Dict[TranslatableObjectNames,
+            TranslatableObjectClasses] = {}
 
     @classmethod
     def _refresh_registry(cls) -> None:
@@ -61,7 +77,10 @@ class Registry:
         return sorted(cls._translatable_objects_dict.keys())
 
     @classmethod
-    def get_object_class(cls, obj_type: str) -> Any:
+    def get_object_class(
+            cls,
+            obj_type: TranslatableObjectNames
+            ) -> TranslatableObjectClasses:
         """Gets a translatable object class by its type.
 
         Refreshes once if the class is not found; subsequently, throws an
