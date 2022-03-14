@@ -67,6 +67,8 @@ describe('ResponseItemSelectionInput', () => {
   });
   it('should set the answers and responses arrays to empty when no answer ' +
     'is selected', () => {
+    expect(component.responses).toBe(undefined);
+
     component.answer = '""';
     component.ngOnInit();
 

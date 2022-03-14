@@ -51,9 +51,8 @@ export class ResponseItemSelectionInputComponent implements OnInit {
     ) as { _html: string; _contentId: string }[];
 
     const choicesContentIds = choices.map(choice => choice._contentId);
-    this.responses = [];
-    answer.forEach(contentId => this.responses.push(
-      choices[choicesContentIds.indexOf(contentId)]._html));
+    this.responses = answer.map(
+      contentId => choices[choicesContentIds.indexOf(contentId)]._html);
   }
 }
 
