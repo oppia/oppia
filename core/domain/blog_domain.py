@@ -105,7 +105,7 @@ class BlogPost:
         self.id = blog_post_id
         self.author_id = author_id
         self.title = title
-        self.content = html_cleaner.clean(content) # type: ignore[no-untyped-call]
+        self.content = html_cleaner.clean(content)
         self.url_fragment = url_fragment
         self.tags = tags
         self.thumbnail_filename = thumbnail_filename
@@ -362,7 +362,7 @@ class BlogPost:
         Args:
             content: str. The new content of the blog post.
         """
-        self.content = html_cleaner.clean(content) # type: ignore[no-untyped-call]
+        self.content = html_cleaner.clean(content)
 
     def update_tags(self, tags: List[str]) -> None:
         """Updates the tags list of the blog post.
