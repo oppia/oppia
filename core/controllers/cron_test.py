@@ -123,7 +123,7 @@ class CronJobTests(test_utils.GenericTestBase):
         with self.testapp_swap:
             self.get_json('/cron/models/cleanup')
 
-        self.assertIsNone(exp_models.ExplorationModel.get_by_id('exp_id'))
+        self.assertIsNotNone(exp_models.ExplorationModel.get_by_id('exp_id'))
 
     def test_run_cron_to_mark_old_models_as_deleted(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
