@@ -33,6 +33,13 @@ export class PlaythroughIssuesService {
       PlaythroughIssuesBackendApiService
   ) { }
 
+  /** Prepares the PlaythroughIssuesService for subsequent calls to other
+  *
+  * @param {string} newExplorationId - the exploration id the service will
+  *    be targeting.
+  * @param {number} newExplorationVersion - the version of the exploration
+  *    the service will be targeting.
+  */
   initSession(
       newExplorationId: string, newExplorationVersion: number): void {
     this.explorationId = newExplorationId;
