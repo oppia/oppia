@@ -169,17 +169,17 @@ def check_updates_to_terms_of_service(
                 f.write(line)
 
 
-def update_app_yaml(release_app_yaml_path, feconf_config_path):
+def update_app_yaml(release_app_dev_yaml_path, feconf_config_path):
     """Updates app.yaml file with more strict CORS HTTP header.
 
     Args:
-        release_app_yaml_path: str. Absolute path of the app.yaml file.
+        release_app_dev_yaml_path: str. Absolute path of the app_dev.yaml file.
         feconf_config_path: str. Absolute path of the feconf config file.
     """
     with utils.open_file(feconf_config_path, 'r') as feconf_config_file:
         feconf_config_contents = feconf_config_file.read()
 
-    with utils.open_file(release_app_yaml_path, 'r') as app_yaml_file:
+    with utils.open_file(release_app_dev_yaml_path, 'r') as app_yaml_file:
         app_yaml_contents = app_yaml_file.read()
 
     project_origin = re.search(
@@ -193,12 +193,12 @@ def update_app_yaml(release_app_yaml_path, feconf_config_path):
         app_yaml_contents
     )
 
-    with utils.open_file(release_app_yaml_path, 'w') as app_yaml_file:
+    with utils.open_file(release_app_dev_yaml_path, 'w') as app_yaml_file:
         app_yaml_file.write(edited_app_yaml_contents)
 
 
 def verify_config_files(
-    release_feconf_path, release_app_yaml_path, verify_email_api_keys
+    release_feconf_path, release_app_dev_yaml_path, verify_email_api_keys
 ):
     """Verifies that feconf is updated correctly to include
     mailgun api key, mailchimp api key and redishost.
@@ -206,7 +206,7 @@ def verify_config_files(
     Args:
         release_feconf_path: str. The path to feconf file in release
             directory.
-        release_app_yaml_path: str. The path to app.yaml file in release
+        release_app_dev_yaml_path: str. The path to app_dev.yaml file in release
             directory.
         verify_email_api_keys: bool. Whether to verify both mailgun and
             mailchimp api keys.
@@ -228,7 +228,7 @@ def verify_config_files(
             'REDISHOST = \'localhost\'' in feconf_contents):
         raise Exception('REDISHOST must be updated before deployment.')
 
-    with utils.open_file(release_app_yaml_path, 'r') as app_yaml_file:
+    with utils.open_file(release_app_dev_yaml_path, 'r') as app_yaml_file:
         app_yaml_contents = app_yaml_file.read()
 
     if 'Access-Control-Allow-Origin: \"*\"' in app_yaml_contents:
@@ -316,8 +316,8 @@ def main(args=None):
         options.release_dir_path, common.FECONF_PATH)
     release_constants_path = os.path.join(
         options.release_dir_path, common.CONSTANTS_FILE_PATH)
-    release_app_yaml_path = os.path.join(
-        options.release_dir_path, common.APP_YAML_PATH)
+    release_app_dev_yaml_path = os.path.join(
+        options.release_dir_path, common.APP_DEV_YAML_PATH)
 
     if options.prompt_for_mailgun_and_terms_update:
         try:
@@ -333,10 +333,10 @@ def main(args=None):
         release_feconf_path, feconf_config_path, FECONF_REGEX)
     apply_changes_based_on_config(
         release_constants_path, constants_config_path, CONSTANTS_REGEX)
-    update_app_yaml(release_app_yaml_path, feconf_config_path)
+    update_app_yaml(release_app_dev_yaml_path, feconf_config_path)
     verify_config_files(
         release_feconf_path,
-        release_app_yaml_path,
+        release_app_dev_yaml_path,
         options.prompt_for_mailgun_and_terms_update
     )
 
