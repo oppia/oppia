@@ -31,9 +31,7 @@ class ItemSelectionInput(base.BaseInteraction):
     _dependency_ids = []
     answer_type = 'SetOfTranslatableHtmlContentIds'
     can_have_solution = True
-    # ItemSelectionInput's submit button is dynamic and is handled
-    # separately.
-    show_generic_submit_button = False
+    show_generic_submit_button = True
 
     _customization_arg_specs = [{
         'name': 'minAllowableSelectionCount',
