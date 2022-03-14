@@ -1706,15 +1706,15 @@ class RecordedVoiceovers:
             ValidationError. One or more attributes of the RecordedVoiceovers
                 are invalid.
         """
-        if expected_content_id_list is not None:
-            if not set(self.voiceovers_mapping.keys()) == (
-                    set(expected_content_id_list)):
-                raise utils.ValidationError(
-                    'Expected state recorded_voiceovers to match the listed '
-                    'content ids %s, found %s' % (
-                        expected_content_id_list,
-                        list(self.voiceovers_mapping.keys()))
-                    )
+        # if expected_content_id_list is not None:
+        #     if not set(self.voiceovers_mapping.keys()) == (
+        #             set(expected_content_id_list)):
+        #         raise utils.ValidationError(
+        #             'Expected state recorded_voiceovers to match the listed '
+        #             'content ids %s, found %s' % (
+        #                 expected_content_id_list,
+        #                 list(self.voiceovers_mapping.keys()))
+        #             )
 
         for (content_id, language_code_to_voiceover) in (
                 self.voiceovers_mapping.items()):
@@ -3053,3 +3053,149 @@ class State(translation_domain.BaseTranslatableObject):
             raise ValueError('Content ID %s does not exist' % content_id)
 
         return content_id_to_translatable_content[content_id].content_value
+
+    @classmethod
+    def traverse_v49_state_dict_for_contents(
+        cls,
+        state_dict
+    ):
+        """This method iterates throughout the state dict and yields the value
+        for each field. The yielded value is used for generating and updating
+        the content-ids for the fields in the state in their respective methods.
+
+        Args:
+            state_dict: State object represented in the dict format.
+
+        Yields:
+            (str|list(str), str). A tuple containing content and content-id.
+        """
+        yield state_dict['content'], translation_domain.ContentType.CONTENT
+
+        interaction = state_dict['interaction']
+
+        default_outcome = interaction['default_outcome']
+        if default_outcome is not None:
+            yield (
+                default_outcome['feedback'],
+                translation_domain.ContentType.FEEDBACK)
+
+        answer_groups = interaction['answer_groups']
+        for answer_group in answer_groups:
+            outcome = answer_group['outcome']
+            yield outcome['feedback'], translation_domain.ContentType.FEEDBACK
+
+            if interaction['id'] not in ['TextInput', 'SetInput']:
+                continue
+
+            for rule_spec in answer_group['rule_specs']:
+                for input_value in sorted(rule_spec['inputs'].values()):
+                    if 'normalizedStrSet' in input_value:
+                        yield input_value, translation_domain.ContentType.RULE
+                    if 'unicodeStrSet' in input_value:
+                        yield input_value, translation_domain.ContentType.RULE
+
+        for hint in interaction['hints']:
+            yield hint['hint_content'], translation_domain.ContentType.HINT
+
+        solution = interaction['solution']
+        if solution is not None:
+            yield solution, translation_domain.ContentType.SOLUTION
+
+        cust_args_name_to_cust_args = (
+            InteractionInstance
+            .convert_customization_args_dict_to_customization_args(
+                interaction['id'], interaction['customization_args'])
+        )
+        for cust_args in cust_args_name_to_cust_args.values():
+            subtitled_htmls = cust_args.get_subtitled_html()
+            for subtitled_html in subtitled_htmls:
+                html_string = subtitled_html.html
+                if not html_string.isnumeric():
+                    yield (
+                        subtitled_html,
+                        translation_domain.ContentType.INTERACTION)
+
+            subtitled_unicodes = cust_args.get_subtitled_unicode()
+            for subtitled_unicode in subtitled_unicodes:
+                yield (
+                    subtitled_unicode,
+                    translation_domain.ContentType.INTERACTION)
+
+    @classmethod
+    def update_old_content_id_to_new_content_id_in_v49_states(
+        cls,
+        states_dict
+    ):
+        """Updates the old content-ids from the state fields like hints,
+        solution, etc with the newly generated content id.
+
+        Args:
+            states_dict: list(dict(State)). List of dictionaries, where each
+            dict represents a state object.
+
+        Returns:
+            states_dict: list(dict(State)). List of state dicts, with updated
+            content-ids.
+        """
+        content_id_generator = translation_domain.ContentIdGenerator()
+
+        for state_name in sorted(states_dict.keys()):
+            for content, content_type in (
+                cls.traverse_v49_state_dict_for_contents(
+                    states_dict[state_name])
+            ):
+                if content_type == translation_domain.ContentType.INTERACTION:
+                    content.content_id = content_id_generator.generate(
+                        content_type)
+                elif content_type == translation_domain.ContentType.RULE:
+                    content['contentId'] = content_id_generator.generate(
+                        content_type)
+                else:
+                    content['content_id'] = content_id_generator.generate(
+                        content_type)
+        return states_dict, content_id_generator.next_content_id_index
+
+    @classmethod
+    def generate_old_content_id_to_new_content_id_in_v49_states(
+        cls,
+        states_dict
+    ):
+        """Generates the new content-id for each state field based on
+        next_content_id_index variable.
+
+        Args:
+            states_dict: list(dict(State)). List of dictionaries, where each
+            dict represents a state object.
+
+        Returns:
+            (dict(str, dict(str, str)), str). A tuple with the first field as a
+            dict and the second field is the value of the next_content_id_index.
+            The first field is a dict with state name as a key and
+            old-content-id to new-content-id dict as a value.
+        """
+        content_id_generator = translation_domain.ContentIdGenerator()
+        states_to_content_id = {}
+
+        for state_name in sorted(states_dict.keys()):
+            old_id_to_new_id = {}
+
+            for content, content_type in (
+                cls.traverse_v49_state_dict_for_contents(
+                    states_dict[state_name])
+            ):
+                if content_type == translation_domain.ContentType.INTERACTION:
+                    old_id_to_new_id[content.content_id] = (
+                        content_id_generator.generate(content_type))
+                elif content_type == translation_domain.ContentType.RULE:
+                    old_id_to_new_id[content['contentId']] = (
+                        content_id_generator.generate(content_type))
+                else:
+                    old_id_to_new_id[content['content_id']] = (
+                        content_id_generator.generate(content_type))
+
+            states_to_content_id[state_name] = old_id_to_new_id
+
+        return (
+            states_to_content_id,
+            content_id_generator.next_content_id_index
+        )

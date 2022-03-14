@@ -1976,11 +1976,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
         content-ids for each translatable field in the state with its new
         content-id.
         """
-        del state_dict['next_content_id_index']
-        del state_dict['written_translations']
+        for _, state_dict in states_dict.items():
+            del state_dict['next_content_id_index']
+            del state_dict['written_translations']
+        states_dict, next_content_id_index = (
+            state_domain.State
+            .update_old_content_id_to_new_content_id_in_v49_states(states_dict)
+        )
 
-        translation_domain.update_old_content_id_to_new_content_id_in_states(
-            states_dict)
+        return states_dict, next_content_id_index
 
 
     @classmethod
@@ -2012,6 +2016,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if current_states_schema_version == 43:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], init_state_name)
+        elif current_states_schema_version == 49:
+            versioned_exploration_states['states'], next_content_id_index = (
+                conversion_fn(
+                    versioned_exploration_states['states'],
+                    init_state_name
+                )
+            )
+            return next_content_id_index
         else:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'])
@@ -2205,8 +2217,29 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
-        pass
+        """Converts a v54 exploration dict into a v54 exploration dict.
+        Removes written_translation, next_content_id_index from state properties
+        and also introduces next_content_id_index variable into
+        exploration level.
 
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v54.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v55.
+        """
+        exploration_dict['schema_version'] = 55
+
+        exploration_dict['states'], next_content_id_index = (
+            cls._convert_states_v49_dict_to_v50_dict(
+                exploration_dict['states'])
+        )
+        exploration_dict['states_schema_version'] = 50
+        exploration_dict['next_content_id_index'] = next_content_id_index
+
+        return exploration_dict
 
     @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):

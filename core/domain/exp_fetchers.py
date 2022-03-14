@@ -71,12 +71,25 @@ def _migrate_states_schema(versioned_exploration_states, init_state_name):
                 feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION,
                 feconf.CURRENT_STATE_SCHEMA_VERSION))
 
+    next_content_id_index = None
     while (states_schema_version <
            feconf.CURRENT_STATE_SCHEMA_VERSION):
+        if state_schema_version == 49:
+            # State conversion function from 49 to 50 removes
+            # next_content_id_index from the state level, hence this if case
+            # populates the next_content_id_index from the old state, which will
+            # be used for introducing next_content_id_index into
+            # exploration level.
+            next_content_id_index = (
+                exp_domain.Exploration.update_states_from_model(
+                    versioned_exploration_states,
+                    states_schema_version, init_state_name)
+            )
         exp_domain.Exploration.update_states_from_model(
-            versioned_exploration_states,
-            states_schema_version, init_state_name)
+                    versioned_exploration_states,
+                    states_schema_version, init_state_name)
         states_schema_version += 1
+    return next_content_id_index
 
 
 def get_new_exploration_id():
@@ -160,12 +173,19 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         'states': copy.deepcopy(exploration_model.states)
     }
     init_state_name = exploration_model.init_state_name
+    next_content_id_index = None
 
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
-        _migrate_states_schema(versioned_exploration_states, init_state_name)
+        next_content_id_index = (
+            _migrate_states_schema(
+                versioned_exploration_states, init_state_name)
+        )
+    if next_content_id_index is not None:
+        exploration_model.next_content_id_index = next_content_id_index
+
 
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
