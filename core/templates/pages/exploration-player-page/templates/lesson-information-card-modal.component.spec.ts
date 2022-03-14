@@ -157,7 +157,8 @@ describe('Lesson Information card modal component', () => {
       not.toHaveBeenCalled();
     expect(urlService.getStoryUrlFragmentFromLearnerUrl).
       not.toHaveBeenCalled();
-    expect(storyViewerBackendApiService.fetchStoryDataAsync).not.toHaveBeenCalled();
+    expect(storyViewerBackendApiService.fetchStoryDataAsync).
+      not.toHaveBeenCalled();
     expect(componentInstance.storyTitleTranslationKey).toEqual(undefined);
 
     componentInstance.ngOnInit();
