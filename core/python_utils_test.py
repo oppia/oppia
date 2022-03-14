@@ -19,8 +19,6 @@
 from __future__ import annotations
 
 import ast
-import builtins
-import urllib.parse
 
 from core import python_utils
 from core.tests import test_utils
@@ -39,8 +37,3 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         function_node = [n for n in ast_node if isinstance(n, ast.FunctionDef)]
         args_list = python_utils.get_args_of_function_node(function_node[0], [])
         self.assertEqual(args_list, ['arg1', 'arg2'])
-
-    def test_parse_query_string(self):
-        response = urllib.parse.parse_qs(
-            'http://www.google.com?search=oppia')
-        self.assertEqual(response, {'http://www.google.com?search': ['oppia']})

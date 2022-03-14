@@ -30,11 +30,6 @@ _CERTIFI_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
 sys.path.insert(0, _CERTIFI_PATH)
 
-import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
-
-OBJECT = builtins.object
-
 
 def get_args_of_function_node(function_node, args_to_ignore):
     """Extracts the arguments from a function definition.
