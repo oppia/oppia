@@ -235,7 +235,7 @@ const getStoryEditorUrl = async function(browser, page) {
 
     await page.waitForSelector(storyNameField, {visible: true});
     await page.type(storyNameField, 'Story TASD');
-    await page.type(storyUrlFragmentField, 'story-url-one');
+    await page.type(storyUrlFragmentField, 'storyurlone');
     await page.type(storyDescriptionField, 'Story 1 description');
     await page.click(storyThumbnailButton);
     await page.waitForSelector(storyUploadButton, {visible: true});
