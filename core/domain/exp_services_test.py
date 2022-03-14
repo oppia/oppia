@@ -1213,8 +1213,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             language_code='bn', correctness_feedback_enabled=True)
         error_string = (
             'Invalid language %s found for exploration '
-            'with ID %s.' % (exploration.language_code, exploration.id)
-        )
+            'with ID %s. This language is not supported for explorations '
+            'in a story on the mobile app.' %
+            (exploration.language_code, exploration.id))
         errors = exp_services.validate_exploration_for_story(exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
@@ -1225,9 +1226,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
         error_string = (
-            'Expected all explorations to have correctness feedback '
-            'enabled. Invalid exploration: %s' % (exploration.id)
-        )
+            'Expected all explorations in a story to '
+            'have correctness feedback '
+            'enabled. Invalid exploration: %s' % exploration.id)
         errors = exp_services.validate_exploration_for_story(exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
@@ -1240,9 +1241,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
         error_string = (
-            'Expected no exploration to have parameter '
-            'values in it. Invalid exploration: %s' % (exploration.id)
-        )
+            'Expected no exploration in a story to have parameter '
+            'values in it. Invalid exploration: %s' % exploration.id)
         errors = exp_services.validate_exploration_for_story(exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
@@ -1254,8 +1254,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True)
         error_string = (
             'Invalid interaction %s in exploration '
-            'with ID: %s.' % ('CodeRepl', exploration.id)
-        )
+            'with ID: %s. This interaction is not supported for '
+            'explorations in a story on the '
+            'mobile app.' % ('CodeRepl', exploration.id))
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1300,10 +1301,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True)
         error_string = (
-            'Exploration with ID: %s contains exploration '
-            'recommendations in its EndExploration interaction.'
-            % (exploration.id)
-        )
+            'Explorations in a story are not expected to contain '
+            'exploration recommendations. Exploration with ID: '
+            '%s contains exploration recommendations in its '
+            'EndExploration interaction.' % (exploration.id))
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1350,9 +1351,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True)
         error_string = (
             'RTE content in state %s of exploration '
-            'with ID %s is not supported on mobile.'
-            % (exploration.init_state_name, exploration.id)
-        )
+            'with ID %s is not supported on mobile for explorations '
+            'in a story.' % (exploration.init_state_name, exploration.id))
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
         solution_dict = {
