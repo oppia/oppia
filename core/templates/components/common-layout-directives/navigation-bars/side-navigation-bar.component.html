@@ -208,7 +208,7 @@
           <span>{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS' | translate }}</span>
           <p class="oppia-sidebar-learn-subtext">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</p>
         </a>
-        <div *ngIf="!userIsLoggedIn && classroomData.length > 0">
+        <div *ngIf="classroomData.length > 0">
           <div *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
             <div class="submenu-notop-margin">
               <a (click)="navigateToClassroomPage('/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/' + topicSummary.getUrlFragment())">
@@ -224,8 +224,7 @@
         </div>
         <div class="submenu-notop-margin">
           <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" routerLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link">
-            <span class="learn-submenu-links" *ngIf="!userIsLoggedIn">{{ 'I18N_SIDEBAR_SUBMENU_SEE_ALL_LESSONS' | translate }}</span>
-            <span class="learn-submenu-links" *ngIf="userIsLoggedIn">Continue learning</span>
+            <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_SEE_ALL_LESSONS' | translate }}</span>
             <i class="material-icons oppia-sidebar-menu-icon float-none learn-submenu-links">arrow_forward</i>
           </a>
         </div>

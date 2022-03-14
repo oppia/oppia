@@ -122,7 +122,7 @@
                            alt="Learn">
                     </picture>
                   </div>
-                  <div class="nav-item-bottom d-flex flex-column" *ngIf="!userIsLoggedIn">
+                  <div class="nav-item-bottom d-flex flex-column">
                     <div *ngIf="classroomData.length > 0">
                       <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
                         <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
@@ -146,15 +146,9 @@
                       <span class="material-icons arrow-forward">arrow_forward</span>
                     </a>
                   </div>
-                  <a *ngIf="userIsLoggedIn"
-                     (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                     class="nav-item-bottom-link-logged"
-                     href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
-                    <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_2' | translate }}</span>
-                    <span class="material-icons arrow-forward">arrow_forward</span>
-                  </a>
-                </div>
-                <div class="nav-content nav-item-right d-flex flex-column">
+                </a>
+                <a class="nav-content nav-item-right d-flex flex-column" tabindex="0"
+                   href="/community-library" (click)="navigateToClassroomPage('/community-library')">
                   <div class="nav-item-right-head">{{ 'I18N_TOPNAV_LEARN_HEADING' | translate }}</div>
                   <div class="des">{{ 'I18N_TOPNAV_LIBRARY_DESCRIPTION' | translate }}</div>
                   <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
