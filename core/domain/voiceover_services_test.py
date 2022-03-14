@@ -32,6 +32,11 @@ from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY:   # pragma: no cover
+    from mypy_imports import suggestion_models
+
+
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
@@ -41,27 +46,27 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
     APPLICANT_USERNAME = 'applicant'
     APPLICANT_EMAIL = 'applicant@example.com'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(VoiceoverApplicationServicesUnitTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)  # type: ignore[no-untyped-call]
 
-        self.applicant = user_services.get_user_actions_info(self.applicant_id)
+        self.applicant = user_services.get_user_actions_info(self.applicant_id)  # type: ignore[no-untyped-call]
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.admin = user_services.get_user_actions_info(self.admin_id)  # type: ignore[no-untyped-call]
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
         self.USER_ID = 'user'
         self.SKILL_ID = 'skill'
-        self.QUESTION_ID = question_services.get_new_question_id()
-        explorations = [self.save_new_valid_exploration(
+        self.QUESTION_ID = question_services.get_new_question_id()  # type: ignore[no-untyped-call]
+        explorations = [self.save_new_valid_exploration(  # type: ignore[no-untyped-call]
             '%s' % i,
             self.owner_id,
             title='title %d' % i,
@@ -71,7 +76,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         ) for i in range(2)]
 
         for exp in explorations:
-            self.publish_exploration(self.owner_id, exp.id)
+            self.publish_exploration(self.owner_id, exp.id)  # type: ignore[no-untyped-call]
 
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description')
@@ -83,18 +88,18 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
-        topic_services.save_new_topic(self.owner_id, topic)
-        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
+        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)  # type: ignore[no-untyped-call]
 
-        story = story_domain.Story.create_default_story(
+        story = story_domain.Story.create_default_story(  # type: ignore[no-untyped-call]
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
             'a-story')
-        story_services.save_new_story(self.owner_id, story)
-        topic_services.add_canonical_story(
+        story_services.save_new_story(self.owner_id, story)  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
-        topic_services.publish_story(
+        topic_services.publish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
-        story_services.update_story(
+        story_services.update_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
                 'node_id': 'node_1',
@@ -103,14 +108,14 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': 'update_story_node_property',
                 'property_name': 'exploration_id',
                 'node_id': 'node_1',
-                'old_value': None,
+                'old_value': None,   # type: ignore[dict-item]
                 'new_value': '0'
             })], 'Changes.')
 
         self.add_user_role(
             self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
-    def test_voiceover_application_creation(self):
+    def test_voiceover_application_creation(self) -> None:
 
         user_voiceover_applications = (
             voiceover_services.get_user_submitted_voiceover_applications(
@@ -128,7 +133,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_voiceover_applications[0].target_id, '0')
 
     def test_get_voiceover_application_from_model_with_invalid_type_raise_error(
-            self):
+        self
+    ) -> None:
         suggestion_models.GeneralVoiceoverApplicationModel(
             id='application_id',
             target_type='exploration',
@@ -146,12 +152,14 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         voiceover_application_model.target_type = 'invalid_type'
         voiceover_application_model.update_timestamps()
         voiceover_application_model.put()
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'Invalid target type for voiceover application: invalid_type'):
             voiceover_services.get_voiceover_application_by_id('application_id')
 
-    def test_newly_created_voiceover_application_have_in_review_status(self):
+    def test_newly_created_voiceover_application_have_in_review_status(
+        self
+    ) -> None:
         user_voiceover_applications = (
             voiceover_services.get_user_submitted_voiceover_applications(
                 self.applicant_id))
@@ -169,7 +177,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             user_voiceover_applications[0].status,
             suggestion_models.STATUS_IN_REVIEW)
 
-    def test_get_reviewable_voiceover_applications(self):
+    def test_get_reviewable_voiceover_applications(self) -> None:
         voiceover_applications = (
             voiceover_services.get_reviewable_voiceover_applications(
                 self.admin_id))
@@ -187,7 +195,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             voiceover_applications[0].status,
             suggestion_models.STATUS_IN_REVIEW)
 
-    def test_accept_application_assigns_role_to_entity(self):
+    def test_accept_application_assigns_role_to_entity(self) -> None:
         voiceover_services.create_new_voiceover_application(
             feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
@@ -212,13 +220,15 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             user_voiceover_applications[0].status,
             suggestion_models.STATUS_ACCEPTED)
 
-        exploration_rights = rights_manager.get_exploration_rights('0')
-        can_voiceover = rights_manager.check_can_voiceover_activity(
+        exploration_rights = rights_manager.get_exploration_rights('0')  # type: ignore[no-untyped-call]
+        can_voiceover = rights_manager.check_can_voiceover_activity(  # type: ignore[no-untyped-call]
             self.applicant, exploration_rights)
 
         self.assertTrue(can_voiceover)
 
-    def test_accept_application_removes_exploration_voiceover_opportunity(self):
+    def test_accept_application_removes_exploration_voiceover_opportunity(
+        self
+    ) -> None:
         voiceover_services.create_new_voiceover_application(
             feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
@@ -232,7 +242,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW)
 
         opportunities, _, more = (
-            opportunity_services.get_voiceover_opportunities('en', None))
+            opportunity_services.get_voiceover_opportunities('en', None))  # type: ignore[no-untyped-call]
         self.assertEqual(len(opportunities), 1)
 
         voiceover_services.accept_voiceover_application(
@@ -248,12 +258,13 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_ACCEPTED)
 
         opportunities, _, more = (
-            opportunity_services.get_voiceover_opportunities('en', None))
+            opportunity_services.get_voiceover_opportunities('en', None))  # type: ignore[no-untyped-call]
         self.assertEqual(len(opportunities), 0)
         self.assertFalse(more)
 
     def test_accept_application_removes_rejectes_other_similar_applications(
-            self):
+        self
+    ) -> None:
         voiceover_services.create_new_voiceover_application(
             feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
@@ -305,7 +316,9 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             'We have to reject your application as another application for the '
             'same opportunity got accepted.')
 
-    def test_author_accepts_own_voiceover_application_raise_exception(self):
+    def test_author_accepts_own_voiceover_application_raise_exception(
+        self
+    ) -> None:
         voiceover_services.create_new_voiceover_application(
             feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
@@ -313,14 +326,14 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             voiceover_services.get_user_submitted_voiceover_applications(
                 self.applicant_id))
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Applicants are not allowed to review their own '
             'voiceover application.'):
             voiceover_services.accept_voiceover_application(
                 user_voiceover_applications[0].voiceover_application_id,
                 self.applicant_id)
 
-    def test_reject_voiceover_application(self):
+    def test_reject_voiceover_application(self) -> None:
         voiceover_services.create_new_voiceover_application(
             feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
@@ -334,7 +347,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW)
 
         opportunities, _, _ = (
-            opportunity_services.get_voiceover_opportunities('en', None))
+            opportunity_services.get_voiceover_opportunities('en', None))  # type: ignore[no-untyped-call]
         self.assertEqual(len(opportunities), 1)
 
         voiceover_services.reject_voiceover_application(
@@ -350,10 +363,12 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_REJECTED)
 
         opportunities, _, _ = (
-            opportunity_services.get_voiceover_opportunities('en', None))
+            opportunity_services.get_voiceover_opportunities('en', None))  # type: ignore[no-untyped-call]
         self.assertEqual(len(opportunities), 1)
 
-    def test_author_rejects_own_voiceover_application_raise_exception(self):
+    def test_author_rejects_own_voiceover_application_raise_exception(
+        self
+    ) -> None:
         voiceover_services.create_new_voiceover_application(
             feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
@@ -361,40 +376,43 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             voiceover_services.get_user_submitted_voiceover_applications(
                 self.applicant_id))
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Applicants are not allowed to review their own '
             'voiceover application.'):
             voiceover_services.reject_voiceover_application(
                 user_voiceover_applications[0].voiceover_application_id,
                 self.applicant_id, 'Testing rejection')
 
-    def test_get_text_to_create_voiceover_application(self):
-        exp_services.update_exploration(
+    def test_get_text_to_create_voiceover_application(self) -> None:
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.owner_id, '0', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_CONTENT),
                     'state_name': 'Introduction',
-                    'new_value': {
+                    'new_value': {   # type: ignore[dict-item]
                         'content_id': 'content',
                         'html': '<p>The new content to voiceover</p>'
                     }
                 })], 'Adds new content to init state')
 
-        content = voiceover_services.get_text_to_create_voiceover_application(
-            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en')
+        content: str = (
+            voiceover_services.get_text_to_create_voiceover_application(
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en'))
         self.assertEqual(content, '<p>The new content to voiceover</p>')
 
-    def test_get_text_to_create_voiceover_application_in_diff_language(self):
-        exp_services.update_exploration(
+    def test_get_text_to_create_voiceover_application_in_diff_language(
+        self
+    ) -> None:
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.owner_id, '0', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_CONTENT),
                     'state_name': 'Introduction',
-                    'new_value': {
+                    'new_value': {   # type: ignore[dict-item]
                         'content_id': 'content',
                         'html': '<p>The new content to voiceover</p>'
                     }
@@ -412,8 +430,10 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION, '0', 'hi')
         self.assertEqual(content, '<p>Translation in Hindi</p>')
 
-    def test_get_text_to_create_voiceover_application_for_invalid_type(self):
-        with self.assertRaisesRegex(
+    def test_get_text_to_create_voiceover_application_for_invalid_type(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Invalid target type: invalid_type'):
             voiceover_services.get_text_to_create_voiceover_application(
                 'invalid_type', '0', 'hi')
