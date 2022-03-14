@@ -255,7 +255,7 @@ class Misconception:
 
         if misconception_id < 0:
             raise utils.ValidationError(
-                'Expected misconception ID to be greater than 0, received %s' %
+                'Expected misconception ID to be >= 0, received %s' %
                 misconception_id)
 
     def validate(self):
