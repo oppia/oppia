@@ -67,7 +67,7 @@ class Registry:
                 cls._translatable_objects_dict[clazz.__name__] = clazz
 
     @classmethod
-    def get_all_class_names(cls) -> List[str]:
+    def get_all_class_names(cls) -> List[TranslatableObjectNames]:
         """Gets a list of all translatable object class names.
 
         Returns:
