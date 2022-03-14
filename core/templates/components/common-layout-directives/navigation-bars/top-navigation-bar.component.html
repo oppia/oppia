@@ -195,6 +195,7 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
                  href="/about-foundation"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">{{'I18N_TOPNAV_OPPIA_FOUNDATION' | translate}}</span>
@@ -236,7 +237,7 @@
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/partnerships')" href="/partnerships"
+                   href="/partnerships"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
                    rel="noopener"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
@@ -249,7 +250,6 @@
                   </div>
                 </a>
                 <a class="item d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/volunteer')"
                    href="/volunteer"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -265,7 +265,6 @@
               </div>
               <div class="bottom-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/contact')"
                    href="/contact"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -279,7 +278,6 @@
                   </div>
                 </a>
                 <a class="item d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/donate')"
                    href="/donate"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
