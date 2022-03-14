@@ -27,7 +27,6 @@ from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
-from core.storage.suggestion import gae_models
 
 from typing import Dict, List, Optional, Type
 
@@ -64,7 +63,7 @@ def _get_voiceover_application_class(
 
 def _get_voiceover_application_model(
     voiceover_application: suggestion_registry.ExplorationVoiceoverApplication
-) -> gae_models.GeneralVoiceoverApplicationModel:
+) -> suggestion_models.GeneralVoiceoverApplicationModel:
     """Returns the GeneralVoiceoverApplicationModel object for the give
     voiceover application object.
 
@@ -90,7 +89,9 @@ def _get_voiceover_application_model(
 
 
 def _get_voiceover_application_from_model(
-    voiceover_application_model: gae_models.GeneralVoiceoverApplicationModel
+    voiceover_application_model: (
+        suggestion_models.GeneralVoiceoverApplicationModel
+    )
 ) -> suggestion_registry.ExplorationVoiceoverApplication:
     """Returns the BaseVoiceoverApplication object for the give
     voiceover application model object.
@@ -128,7 +129,8 @@ def _save_voiceover_applications(
             voiceover application objects.
     """
     voiceover_application_models: List[
-        gae_models.GeneralVoiceoverApplicationModel] = []
+        suggestion_models.GeneralVoiceoverApplicationModel
+    ] = []
     for voiceover_application in voiceover_applications:
         voiceover_application.validate()  # type: ignore[no-untyped-call]
         voiceover_application_model = _get_voiceover_application_model(
@@ -153,7 +155,9 @@ def get_voiceover_application_by_id(
         BaseVoiceoverApplication. The voiceover application object for the given
         application id.
     """
-    voiceover_application_model: gae_models.GeneralVoiceoverApplicationModel = (
+    voiceover_application_model: (
+        suggestion_models.GeneralVoiceoverApplicationModel
+    ) = (
         suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
             voiceover_application_id))
     return _get_voiceover_application_from_model(voiceover_application_model)

@@ -399,7 +399,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
 
         content: str = (
             voiceover_services.get_text_to_create_voiceover_application(
-            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en'))
+                feconf.ENTITY_TYPE_EXPLORATION, '0', 'en'))
         self.assertEqual(content, '<p>The new content to voiceover</p>')
 
     def test_get_text_to_create_voiceover_application_in_diff_language(
