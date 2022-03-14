@@ -22,12 +22,9 @@ import builtins
 import threading
 import time
 
-from core import python_utils
 from core.tests import test_utils
 
 from . import concurrent_task_utils
-
-import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 OBJECT = builtins.object
