@@ -41,12 +41,6 @@ implements OnInit, ControlValueAccessor, Validator {
   onTouch: () => void = () => {};
   onValidatorChange: () => void = () => {};
 
-  temp = 0;
-
-  getComponentValidationState(): Record<string, boolean> {
-    return {random: true};
-  }
-
   constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   registerOnTouched(fn: () => void): void {

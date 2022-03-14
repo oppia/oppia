@@ -79,7 +79,7 @@ describe('Schema based editor component', function() {
     let form = jasmine.createSpyObj(
       'form', ['$setValidity']);
 
-    spyOnProperty(component.frm, 'statusChanges')
+    spyOnProperty(component.form, 'statusChanges')
       .and.returnValue(mockEmitter);
     spyOn(angular, 'element').and.returnValue(
       // This throws "Type '{ top: number; }' is not assignable to type

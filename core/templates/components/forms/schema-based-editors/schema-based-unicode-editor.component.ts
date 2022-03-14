@@ -46,8 +46,8 @@ interface OppiaValidator {
     },
     {
       provide: NG_VALIDATORS,
-      multi: true,
       useExisting: forwardRef(() => SchemaBasedUnicodeEditor),
+      multi: true
     },
   ]
 })

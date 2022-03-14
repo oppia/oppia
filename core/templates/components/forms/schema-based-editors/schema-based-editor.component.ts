@@ -21,6 +21,7 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, Abst
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Schema } from 'services/schema-default-value.service';
 const INVALID = 'INVALID';
+
 @Component({
   selector: 'schema-based-editor',
   templateUrl: './schema-based-editor.component.html',
@@ -32,14 +33,14 @@ const INVALID = 'INVALID';
     },
     {
       provide: NG_VALIDATORS,
-      multi: true,
       useExisting: forwardRef(() => SchemaBasedEditorComponent),
+      multi: true
     },
   ]
 })
 export class SchemaBasedEditorComponent
 implements AfterViewInit, ControlValueAccessor, Validator {
-  @ViewChild('hybridForm') frm: NgForm;
+  @ViewChild('hybridForm') form: NgForm;
   _localValue;
   @Input() schema: Schema;
   @Input() disabled: boolean;
@@ -87,7 +88,7 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   ngAfterViewInit(): void {
     let form: angular.IFormController = angular.element(
       this.elementRef.nativeElement).controller('form');
-    this.frm.statusChanges.subscribe((x) => {
+    this.form.statusChanges.subscribe((x) => {
       if (form === null || form === undefined) {
         return;
       }

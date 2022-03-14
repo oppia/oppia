@@ -16,26 +16,26 @@
              (blur)="onBlur()" (focus)="onFocus()"
              inputmode="numeric">
       <span *ngIf="errorStringI18nKey" class="oppia-form-error oppia-numeric-input-error">
-        {{errorStringI18nKey | translate}}
+        {{ errorStringI18nKey | translate }}
       </span>
-      <span *ngIf="hasLoaded && !isUserCurrentlyTyping && hasFocusedAtLeastOnce"
+      <span *ngIf="hasLoaded && !serCurrentlyTyping && userHasFocusedAtLeastOnce"
             class="oppia-form-container"
             tabindex="-1"
             [oppiaFocusOn]="labelForErrorFocusTarget">
         <span *ngIf="floatForm.form.controls.floatValue.errors?.isFloat"
               class="oppia-form-error"
-              aria-live="assertive"
-              [innerHTML]="'I18N_FORMS_TYPE_NUMBER_INVALID_DECIMAL' | translate">
+              aria-live="assertive">
+          {{ 'I18N_FORMS_TYPE_NUMBER_INVALID_DECIMAL' | translate }}
         </span>
         <span *ngIf="errorStringI18nKey && !floatForm.form.controls.floatValue.errors?.isFloat && floatForm.form.controls.floatValue.errors?.isAtLeast"
               class="oppia-form-error"
-              aria-live="assertive"
-              [innerHTML]="'I18N_FORMS_TYPE_NUMBER_AT_LEAST' | translate:{minValue: getMinValue()}">
+              aria-live="assertive">
+          {{ 'I18N_FORMS_TYPE_NUMBER_AT_LEAST' | translate:{minValue: getMinValue()} }}
         </span>
         <span *ngIf="errorStringI18nKey && !floatForm.form.controls.floatValue.errors?.isFloat && floatForm.form.controls.floatValue.errors?.isAtMost"
               class="oppia-form-error"
-              aria-live="assertive"
-              [innerHTML]="'I18N_FORMS_TYPE_NUMBER_AT_MOST' | translate:{maxValue: getMaxValue()}">
+              aria-live="assertive">
+          {{ 'I18N_FORMS_TYPE_NUMBER_AT_MOST' | translate:{maxValue: getMaxValue()} }}
         </span>
       </span>
     </span>

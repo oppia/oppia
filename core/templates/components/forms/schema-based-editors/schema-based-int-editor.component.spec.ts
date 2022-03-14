@@ -52,7 +52,7 @@ describe('Schema Based Int Editor Component', () => {
     component.labelForFocusTarget = {};
     component.registerOnTouched();
     component.registerOnChange(null);
-    component.onChange = (val: boolean) => {
+    component.onChange = (val: number) => {
       return;
     };
   });
@@ -76,21 +76,21 @@ describe('Schema Based Int Editor Component', () => {
   it('should overwrite local value', () => {
     expect(component.localValue).toBe(undefined);
 
-    component.writeValue(true);
+    component.writeValue(1);
 
-    expect(component.localValue).toBeTrue();
+    expect(component.localValue).toBe(1);
   });
 
   it('should update local value', () => {
     component.localValue = false;
 
-    component.updateValue(false);
+    component.updateValue(2);
 
-    expect(component.localValue).toBeFalse();
+    expect(component.localValue).toBe(2);
 
-    component.updateValue(true);
+    component.updateValue(1);
 
-    expect(component.localValue).toBeTrue();
+    expect(component.localValue).toBe(1);
   });
 
   it('should submit form on key press', () => {

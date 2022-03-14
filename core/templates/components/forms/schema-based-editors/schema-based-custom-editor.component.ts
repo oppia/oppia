@@ -16,8 +16,8 @@
  * @fileoverview Component for a schema-based editor for custom values.
  */
 
-import { AfterViewInit, Component, EventEmitter, forwardRef, Input, Output, ViewChild } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, NgForm, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
+import { ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -31,19 +31,17 @@ import { downgradeComponent } from '@angular/upgrade/static';
     },
     {
       provide: NG_VALIDATORS,
-      multi: true,
       useExisting: forwardRef(() => SchemaBasedCustomEditorComponent),
+      multi: true
     },
   ]
 })
-export class SchemaBasedCustomEditorComponent
-implements ControlValueAccessor, Validator, AfterViewInit {
-  @ViewChild('hybridForm') frm: NgForm;
-  @Input() localValue;
+export class SchemaBasedCustomEditorComponent implements ControlValueAccessor {
+  @Input() localValue: string;
   @Output() localValueChange = new EventEmitter();
   @Input() schema;
   @Input() form;
-  onChange: (_: unknown) => void = () => {};
+  onChange: (_: string) => void = () => {};
   onTouch: () => void;
   onValidatorChange: () => void = () => {};
 
@@ -55,37 +53,22 @@ implements ControlValueAccessor, Validator, AfterViewInit {
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnChange(fn: (_: unknown) => void): void {
+  registerOnChange(fn: (_: string) => void): void {
     this.onChange = fn;
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  writeValue(obj: unknown): void {
+  writeValue(obj: string): void {
     if (this.localValue === obj) {
       return;
     }
     this.localValue = obj;
   }
 
-  // Implemented as a part of Validator interface.
-  validate(control: AbstractControl): ValidationErrors {
-    return {};
-  }
-
-  updateValue(e: unknown): void {
-    this.localValueChange.emit(e);
-    this.localValue = e;
-    this.onChange(e);
-  }
-
-  ngAfterViewInit(): void {
-    this.frm.statusChanges.subscribe((x) => {
-      if (x === 'INVALID') {
-        // TBD console.log(this.frm.errors);
-      } else {
-        // TBD console.log(x);
-      }
-    });
+  updateValue(value: string): void {
+    this.localValueChange.emit(value);
+    this.localValue = value;
+    this.onChange(value);
   }
 }
 

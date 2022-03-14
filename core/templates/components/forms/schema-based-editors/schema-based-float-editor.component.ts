@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Compoent for a schema-based editor for floats.
+ * @fileoverview Component for a schema-based editor for floats.
  */
 
 import { Component, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
@@ -42,8 +42,8 @@ interface OppiaValidator {
     },
     {
       provide: NG_VALIDATORS,
-      multi: true,
       useExisting: forwardRef(() => SchemaBasedFloatEditorComponent),
+      multi: true
     },
   ]
 })
@@ -56,8 +56,8 @@ implements ControlValueAccessor, OnInit, Validator {
   @Output() inputBlur = new EventEmitter<void>();
   @Output() inputFocus = new EventEmitter<void>();
   @ViewChild('floatform', {'static': true}) floatForm: NgForm;
-  hasFocusedAtLeastOnce: boolean;
-  isUserCurrentlyTyping: boolean;
+  userHasFocusedAtLeastOnce: boolean;
+  userIsCurrentlyTyping: boolean;
   errorStringI18nKey: string = '';
   labelForErrorFocusTarget: string;
   hasLoaded: boolean;
@@ -66,6 +66,7 @@ implements ControlValueAccessor, OnInit, Validator {
   checkRequireNonnegativeInputValue: boolean = false;
   minValue: number;
   localStringValue: string;
+
   constructor(
     private focusManagerService: FocusManagerService,
     private numberConversionService: NumberConversionService,
@@ -92,7 +93,7 @@ implements ControlValueAccessor, OnInit, Validator {
     if (this._validate(control.value, this.uiConfig)) {
       return {};
     }
-    return {error: 'invalid'};
+    return { error: 'invalid' };
   }
 
   private _validate(
@@ -121,8 +122,8 @@ implements ControlValueAccessor, OnInit, Validator {
 
   ngOnInit(): void {
     this.hasLoaded = false;
-    this.isUserCurrentlyTyping = false;
-    this.hasFocusedAtLeastOnce = false;
+    this.userIsCurrentlyTyping = false;
+    this.userHasFocusedAtLeastOnce = false;
     this.errorStringI18nKey = '';
     this.labelForErrorFocusTarget = (
       this.focusManagerService.generateFocusLabel()
@@ -155,16 +156,15 @@ implements ControlValueAccessor, OnInit, Validator {
   }
 
   onFocus(): void {
-    this.hasFocusedAtLeastOnce = true;
+    this.userHasFocusedAtLeastOnce = true;
     this.inputFocus.emit();
   }
 
   onBlur(): void {
-    this.isUserCurrentlyTyping = false;
+    this.userIsCurrentlyTyping = false;
     this.inputBlur.emit();
   }
 
-  // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
   getMinValue(): number {
     for (var i = 0; i < this.validators.length; i++) {
       if (this.validators[i].id === 'is_at_least') {
@@ -196,13 +196,13 @@ implements ControlValueAccessor, OnInit, Validator {
           this.floatForm.form.controls.floatValue.errors
         ).length !== 0
       ) {
-        this.isUserCurrentlyTyping = false;
+        this.userIsCurrentlyTyping = false;
         this.focusManagerService.setFocus(this.labelForErrorFocusTarget);
       } else {
         this.schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
       }
     } else {
-      this.isUserCurrentlyTyping = true;
+      this.userIsCurrentlyTyping = true;
     }
   }
 

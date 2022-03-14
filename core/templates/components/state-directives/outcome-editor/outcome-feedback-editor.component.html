@@ -12,7 +12,6 @@
     <em>No feedback specified.</em>
   </span>
 
-  <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
   <schema-based-editor [schema]="OUTCOME_FEEDBACK_SCHEMA" [ngModel]="outcome.feedback.html" (ngModelChange)="updateHtml($event)">
   </schema-based-editor>
 </div>

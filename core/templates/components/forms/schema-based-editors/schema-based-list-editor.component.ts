@@ -43,8 +43,8 @@ interface OppiaValidator {
     },
     {
       provide: NG_VALIDATORS,
-      multi: true,
       useExisting: forwardRef(() => SchemaBasedListEditorComponent),
+      multi: true
     },
   ]
 })
@@ -113,7 +113,7 @@ implements OnInit, ControlValueAccessor, Validator {
   }
 
   private _deleteEmptyElements(): void {
-    for (var i = 0; i < this.localValue.length - 1; i++) {
+    for (let i = 0; i < this.localValue.length - 1; i++) {
       const val = this.localValue[i] as SchemaDefaultValue[];
       if (val.length === 0) {
         this.deleteElement(i);
@@ -152,8 +152,8 @@ implements OnInit, ControlValueAccessor, Validator {
   }
 
   private _deleteLastElementIfUndefined(): void {
-    var lastValueIndex = this.localValue.length - 1;
-    var valueToConsiderUndefined = (
+    const lastValueIndex = this.localValue.length - 1;
+    const valueToConsiderUndefined = (
       this.schemaUndefinedLastElementService.getUndefinedValue(
         this.itemSchema));
     if (this.localValue[lastValueIndex] ===
@@ -175,10 +175,10 @@ implements OnInit, ControlValueAccessor, Validator {
   _onChildFormSubmit(): void {
     if (!this.isAddItemButtonPresent) {
       /**
-             * If form submission happens on last element of the set (i.e
-             * the add item button is absent) then automatically add the
-             * element to the list.
-             */
+       * If form submission happens on last element of the set (i.e
+       * the add item button is absent) then automatically add the
+       * element to the list.
+       */
       if ((this.maxListLength === null ||
                  this.localValue.length < this.maxListLength) &&
                 !!this.localValue[this.localValue.length - 1]) {
@@ -186,9 +186,9 @@ implements OnInit, ControlValueAccessor, Validator {
       }
     } else {
       /**
-             * If form submission happens on existing element remove focus
-             * from it
-             */
+       * If form submission happens on existing element remove focus
+       * from it
+       */
       (document.activeElement as HTMLElement).blur();
     }
   }
@@ -220,8 +220,10 @@ implements OnInit, ControlValueAccessor, Validator {
     // Only hide the 'add item' button in the case of single-line unicode
     // input.
     this.isOneLineInput = true;
-    if (this.itemSchema.type !== 'unicode' ||
-              this.itemSchema.hasOwnProperty('choices')) {
+    if (
+      this.itemSchema.type !== 'unicode' ||
+      this.itemSchema.hasOwnProperty('choices')
+    ) {
       this.isOneLineInput = false;
     } else if (this.itemSchema.ui_config) {
       if (this.itemSchema.ui_config.coding_mode) {
@@ -273,7 +275,7 @@ implements OnInit, ControlValueAccessor, Validator {
       if (this.len !== this.localValue.length) {
         throw new Error(
           'List editor length does not match length of input value: ' +
-                this.len + ' ' + this.localValue);
+          this.len + ' ' + this.localValue);
       }
     }
   }

@@ -31,29 +31,29 @@ import { downgradeComponent } from '@angular/upgrade/static';
     },
     {
       provide: NG_VALIDATORS,
-      multi: true,
       useExisting: forwardRef(() => SchemaBasedHtmlEditorComponent),
+      multi: true
     },
   ]
 })
 
 export class SchemaBasedHtmlEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
-  localValue;
-  @Input() disabled;
-  @Input() labelForFocusTarget;
-  @Input() uiConfig;
-  @Input() headersEnabled;
-  onChange: (val: unknown) => void = () => {};
+  localValue: string;
+  @Input() disabled: boolean;
+  @Input() labelForFocusTarget: string;
+  @Input() uiConfig: unknown;
+  @Input() headersEnabled: boolean;
+  onChange: (val: string) => void = () => {};
   constructor() { }
 
   // Implemented as a part of ControlValueAccessor interface.
-  writeValue(value: unknown): void {
+  writeValue(value: string): void {
     this.localValue = value;
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnChange(fn: (val: unknown) => void): void {
+  registerOnChange(fn: (val: string) => void): void {
     this.onChange = fn;
   }
 

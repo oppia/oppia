@@ -92,8 +92,8 @@ describe('Schema based float editor component', function() {
     tick(50);
 
     expect(component.hasLoaded).toBe(true);
-    expect(component.isUserCurrentlyTyping).toBe(false);
-    expect(component.hasFocusedAtLeastOnce).toBe(false);
+    expect(component.userIsCurrentlyTyping).toBe(false);
+    expect(component.userHasFocusedAtLeastOnce).toBe(false);
     expect(component.errorStringI18nKey).toBe('');
     expect(component.localValue).toBe(0.0);
     expect(component.localStringValue).toBe('');
@@ -137,11 +137,11 @@ describe('Schema based float editor component', function() {
       keyCode: 14
     });
 
-    component.isUserCurrentlyTyping = false;
+    component.userIsCurrentlyTyping = false;
 
     component.onKeypress(evt);
 
-    expect(component.isUserCurrentlyTyping).toBe(true);
+    expect(component.userIsCurrentlyTyping).toBe(true);
   }));
 
   it('should register keyboard event when user is not typing if there' +
@@ -153,11 +153,11 @@ describe('Schema based float editor component', function() {
     let formvalue = new FormControl(null);
     formvalue.setErrors({invalidNumber: true});
     component.floatForm.form.controls.floatValue = formvalue;
-    component.isUserCurrentlyTyping = true;
+    component.userIsCurrentlyTyping = true;
 
     component.onKeypress(evt);
 
-    expect(component.isUserCurrentlyTyping).toBe(false);
+    expect(component.userIsCurrentlyTyping).toBe(false);
   }));
 
   it('should register keyboard event when user is not typing if there' +
@@ -171,11 +171,11 @@ describe('Schema based float editor component', function() {
     let formvalue = new FormControl(null);
     formvalue.setErrors({});
     component.floatForm.form.controls.floatValue = formvalue;
-    component.isUserCurrentlyTyping = true;
+    component.userIsCurrentlyTyping = true;
 
     component.onKeypress(evt);
 
-    expect(component.isUserCurrentlyTyping).toBe(true);
+    expect(component.userIsCurrentlyTyping).toBe(true);
     expect(schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit)
       .toHaveBeenCalled();
   }));

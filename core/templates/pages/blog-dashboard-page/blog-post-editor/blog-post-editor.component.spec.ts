@@ -204,10 +204,6 @@ describe('Blog Post Editor Component', () => {
       .toEqual(component.HTML_SCHEMA);
   });
 
-  it('should return true for header enabled callback', () => {
-    expect(component.headersAreEnabledCallBack()).toBe(true);
-  });
-
   it('should successfully fetch blog post editor data', fakeAsync(() => {
     let blogPostEditorData = {
       username: 'test_user',

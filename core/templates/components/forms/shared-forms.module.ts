@@ -99,7 +99,6 @@ import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
     ObjectEditorComponent,
     MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
     MarkAudioAsNeedingUpdateModalComponent,
-    // SchemaBasedEditorDirective,
   ],
   exports: [
     AudioSliderComponent,

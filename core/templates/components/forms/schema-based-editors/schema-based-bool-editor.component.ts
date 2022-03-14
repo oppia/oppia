@@ -16,7 +16,7 @@
  * @fileoverview Component for a schema-based editor for booleans.
  */
 
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 
@@ -31,18 +31,17 @@ import { downgradeComponent } from '@angular/upgrade/static';
     },
     {
       provide: NG_VALIDATORS,
-      multi: true,
       useExisting: forwardRef(() => SchemaBasedBoolEditorComponent),
+      multi: true
     },
   ]
 })
 export class SchemaBasedBoolEditorComponent
-implements ControlValueAccessor, OnInit, Validator {
+implements ControlValueAccessor, Validator {
   localValue;
   @Input() disabled: boolean;
   @Input() labelForFocusTarget: string;
-  onChange: (val: unknown) => void = () => {};
-  constructor() { }
+  onChange: (val: boolean) => void = () => {};
 
   // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: unknown): void {
@@ -62,8 +61,6 @@ implements ControlValueAccessor, OnInit, Validator {
   validate(control: AbstractControl): ValidationErrors {
     return {};
   }
-
-  ngOnInit(): void { }
 
   updateValue(val: boolean): void {
     if (this.localValue === val) {

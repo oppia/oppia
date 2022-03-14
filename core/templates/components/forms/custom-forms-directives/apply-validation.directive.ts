@@ -19,22 +19,9 @@
 import { Directive, Input } from '@angular/core';
 import { NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { UnderscoresToCamelCasePipe } from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
+import { Validators } from 'interactions/TextInput/directives/text-input-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { SchemaValidators } from '../validators/schema-validators';
-
-require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
-
-interface InteractionValidator {
-  'id': string;
-  'min_value': number;
-  'max_value': number;
-}
-
-interface ApplyValidationCustomScope extends ng.IScope {
-  $ctrl: {
-    validators: () => InteractionValidator[];
-  };
-}
 
 @Directive({
   selector: '[applyValidation]',
@@ -45,86 +32,41 @@ interface ApplyValidationCustomScope extends ng.IScope {
   }]
 })
 export class ApplyValidationDirective implements Validator {
-  @Input() validators;
+  @Input() validators: Validators[];
   underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
   validate(control: AbstractControl): ValidationErrors | null {
     if (!this.validators || this.validators.length === 0) {
       return null;
     }
     let errorsPresent = false;
-    let errors: ValidationErrors = {};
+    let allValidationErrors: ValidationErrors = {};
     for (const validatorSpec of this.validators) {
-      const frontendName = this.underscoresToCamelCasePipe.transform(
+      const validatorName = this.underscoresToCamelCasePipe.transform(
         validatorSpec.id
       );
-      var filterArgs = {};
-      for (var key in validatorSpec) {
+      const filterArgs = {};
+      for (let key in validatorSpec) {
         if (key !== 'id') {
-          filterArgs[this.underscoresToCamelCasePipe.transform(key)] =
-          cloneDeep(validatorSpec[key]);
+          filterArgs[this.underscoresToCamelCasePipe.transform(key)] = (
+            cloneDeep(validatorSpec[key]));
         }
       }
-      if (SchemaValidators[frontendName]) {
-        const error = SchemaValidators[frontendName](filterArgs)(control);
+      if (SchemaValidators[validatorName]) {
+        const error = SchemaValidators[validatorName](filterArgs)(control);
         if (error !== null) {
           errorsPresent = true;
-          errors = {...errors, ...error};
+          allValidationErrors = {...allValidationErrors, ...error};
         }
+      } else {
+        throw new Error(
+          'Not a valid validator. Validator should be one of the following: ' +
+          Object.keys(SchemaValidators.toString())
+        );
       }
     }
     if (!errorsPresent) {
       return null;
     }
-    return errors;
+    return allValidationErrors;
   }
 }
-
-
-/* eslint-disable-next-line angular/directive-restrict */
-angular.module('oppia').directive('applyValidation', [
-  '$filter', function($filter) {
-    return {
-      require: 'ngModel',
-      restrict: 'A',
-      scope: {},
-      bindToController: {
-        validators: '&'
-      },
-      controllerAs: '$ctrl',
-      controller: [function() {}],
-      link: function(scope: ApplyValidationCustomScope, elm, attrs, ctrl) {
-        // Add validators in reverse order.
-        if (scope.$ctrl.validators()) {
-          scope.$ctrl.validators().forEach(function(validatorSpec) {
-            var frontendName = $filter('underscoresToCamelCase')(
-              validatorSpec.id);
-
-            // Note that there may not be a corresponding frontend filter for
-            // each backend validator.
-            try {
-              $filter(frontendName);
-            } catch (err) {
-              return;
-            }
-
-            var filterArgs = {};
-            for (var key in validatorSpec) {
-              if (key !== 'id') {
-                filterArgs[$filter('underscoresToCamelCase')(key)] =
-                  angular.copy(validatorSpec[key]);
-              }
-            }
-
-            var customValidator = function(viewValue) {
-              ctrl.$setValidity(
-                frontendName, $filter(frontendName)(viewValue, filterArgs));
-              return viewValue;
-            };
-
-            ctrl.$parsers.unshift(customValidator);
-            ctrl.$formatters.unshift(customValidator);
-          });
-        }
-      }
-    };
-  }]);

@@ -203,9 +203,14 @@ export class ImageWithRegionsEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.alwaysEditable = true;
-    // The initializeEditor function is written separately since it
-    // is also called in resetEditor function.
+    // The following is check is to prevent cases when value not defined.
+    // This is a dynamically created component and in some cases we get
+    // undefined. This happens when ngOnInit runs before we can assign
+    // this.value the value that is supposed to be passed from object editor
+    // component.
     if (this.value) {
+      // The initializeEditor function is written separately since it
+      // is also called in resetEditor function.
       this.initializeEditor();
       this.imageValueChanged(this.value.imagePath);
     }

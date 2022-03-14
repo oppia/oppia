@@ -70,12 +70,6 @@ describe('RealEditorComponent', () => {
     });
   });
 
-  it('should get component validation state', () => {
-    expect(component.getComponentValidationState()).toEqual({
-      random: true
-    });
-  });
-
   it('should update value when user enters a new value', () => {
     const changeDetectorRef =
       fixture.debugElement.injector.get(ChangeDetectorRef);

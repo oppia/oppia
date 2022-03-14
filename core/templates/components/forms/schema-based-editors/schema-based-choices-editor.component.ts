@@ -30,8 +30,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
     },
     {
       provide: NG_VALIDATORS,
-      multi: true,
       useExisting: forwardRef(() => SchemaBasedChoicesEditorComponent),
+      multi: true
     },
   ]
 })

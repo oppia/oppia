@@ -34,8 +34,8 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
     },
     {
       provide: NG_VALIDATORS,
-      multi: true,
       useExisting: forwardRef(() => SchemaBasedIntEditorComponent),
+      multi: true
     },
   ]
 })
@@ -48,19 +48,19 @@ implements ControlValueAccessor, OnInit, Validator {
   @Input() labelForFocusTarget;
   @Output() inputBlur = new EventEmitter<void>();
   @Output() inputFocus = new EventEmitter<void>();
-  onChange: (val: unknown) => void = () => {};
+  onChange: (val: number) => void = () => {};
   constructor(
     private focusManagerService: FocusManagerService,
     private schemaFormSubmittedService: SchemaFormSubmittedService
   ) { }
 
   // Implemented as a part of ControlValueAccessor interface.
-  writeValue(value: unknown): void {
+  writeValue(value: number): void {
     this.localValue = value;
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnChange(fn: (val: unknown) => void): void {
+  registerOnChange(fn: (val: number) => void): void {
     this.onChange = fn;
   }
 
@@ -90,7 +90,7 @@ implements ControlValueAccessor, OnInit, Validator {
     }, 50);
   }
 
-  updateValue(val: boolean): void {
+  updateValue(val: number): void {
     this.localValue = val;
     this.onChange(val);
   }

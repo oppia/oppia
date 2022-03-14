@@ -17,7 +17,7 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { SchemaBasedCustomEditorComponent } from './schema-based-custom-editor.component';
 
@@ -38,55 +38,40 @@ describe('Schema Based Custom Editor Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SchemaBasedCustomEditorComponent);
     component = fixture.componentInstance;
-
-    component.frm = {
-      statusChanges: {
-        subscribe: (callb: (value: string) => void) => {
-          callb('VALID');
-        }
-      }
-    } as NgForm;
-
-    component.ngAfterViewInit();
-
     component.registerOnTouched(() => {});
     component.registerOnChange(null);
     component.onValidatorChange();
     component.onTouch();
-    component.onChange = (val: boolean) => {
+    component.onChange = (val: string) => {
       return;
     };
-  });
-
-  it('should get empty object on validating', () => {
-    expect(component.validate(null)).toEqual({});
   });
 
   it('should overwrite local value', () => {
     expect(component.localValue).toBe(undefined);
 
-    component.writeValue(true);
+    component.writeValue('true');
 
-    expect(component.localValue).toBeTrue();
+    expect(component.localValue).toBe('true');
   });
 
   it('should not overwrite when local value not change', () => {
-    component.localValue = true;
+    component.localValue = 'true';
 
-    component.writeValue(true);
+    component.writeValue('true');
 
     expect(component.localValue).toBeTrue();
   });
 
   it('should update local value', () => {
-    component.localValue = false;
+    component.localValue = 'false';
 
-    component.updateValue(false);
+    component.updateValue('false');
 
-    expect(component.localValue).toBeFalse();
+    expect(component.localValue).toBe('false');
 
-    component.updateValue(true);
+    component.updateValue('true');
 
-    expect(component.localValue).toBeTrue();
+    expect(component.localValue).toBe('true');
   });
 });

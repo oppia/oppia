@@ -118,7 +118,7 @@ export class SchemaValidators {
       ) {
         return null;
       }
-      return {isUrlFragment: {isUrlFragment: 'error'}};
+      return {isUrlFragment: 'Not a url fragment'};
     };
   }
 }

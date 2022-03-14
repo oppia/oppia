@@ -17,6 +17,14 @@
  */
 
 // Individual object editor directives are in extensions/objects/templates.
+/**
+ * NOTE: This component creates an Object Editor Component. Since it is a
+ * created by us dynamically, we have to manage the entire life cycle of the
+ * component. From creation to deletion. This also includes updating of @Input
+ * properties and listening to @Output events. In future, if some of the @Input
+ * properties change, you can pass them to the ObjectEditor using ngOnChanges
+ * function.
+ */
 
 import { AfterViewInit, Component, ComponentFactoryResolver, EventEmitter, forwardRef, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
@@ -133,17 +141,17 @@ interface ObjectEditor {
     },
     {
       provide: NG_VALIDATORS,
-      multi: true,
-      useExisting: forwardRef(() => ObjectEditorComponent)
+      useExisting: forwardRef(() => ObjectEditorComponent),
+      multi: true
     }
   ]
 })
 export class ObjectEditorComponent
 implements AfterViewInit, OnChanges, OnDestroy,
 ControlValueAccessor, Validator {
-  private _value;
+  private _value: unknown;
   @Input() alwaysEditable: string;
-  @Input() initArgs;
+  @Input() initArgs: unknown;
   @Input() isEditable: string;
   @Input() modalId: symbol;
   @Input() objType: string;
@@ -156,24 +164,28 @@ ControlValueAccessor, Validator {
 
   @Input() set value(val: unknown) {
     this._value = val;
-    if (this.ref) {
-      this.ref.instance.value = this._value;
+    // Ng-model can call write-obj before we create the component. Hence a
+    // check to see if component has been created.
+    if (this.componentRef) {
+      this.componentRef.instance.value = this._value;
       this.onChange(this._value);
       this.valueChange.emit(this._value);
     }
   }
 
   @Output() valueChange = new EventEmitter();
-  ref: ComponentRef<ObjectEditor>;
+  componentRef: ComponentRef<ObjectEditor>;
   componentSubscriptions = new Subscription();
   onChange: (_: unknown) => void = () => {};
   onTouch: () => void;
   onValidatorChange: () => void = () => {};
 
-  componentValidationState: Record<string, boolean> = {};
+
+  // A hashmap is used instead of an array for faster lookup.
+  componentErrors: Record<string, false> = {};
 
   getComponentValidationState(): Record<string, boolean> {
-    return this.componentValidationState;
+    return this.componentErrors;
   }
 
 
@@ -185,7 +197,7 @@ ControlValueAccessor, Validator {
     this.onValidatorChange = fn;
   }
 
-  writeValue(obj: string | number): void {
+  writeValue(obj: unknown): void {
     if (obj === null || obj === undefined) {
       return;
     }
@@ -211,7 +223,7 @@ ControlValueAccessor, Validator {
     ) {
       throw new Error('\nProvided initArgs: ' + this.initArgs);
     }
-    if (EDITORS[editorName]) {
+    if (EDITORS.hasOwnProperty(editorName)) {
       if (editorName === (
         'list-of-sets-of-translatable-html-content-ids'
       ) && !this.initArgs) {
@@ -222,44 +234,56 @@ ControlValueAccessor, Validator {
           EDITORS[editorName])
       );
       this.viewContainerRef.clear();
-      const ref = this.viewContainerRef.createComponent<unknown>(
+      const componentRef = this.viewContainerRef.createComponent<unknown>(
         componentFactory) as ComponentRef<ObjectEditor>;
-      ref.instance.alwaysEditable = this.alwaysEditable;
-      ref.instance.initArgs = this.initArgs;
-      ref.instance.isEditable = this.isEditable;
-      ref.instance.modalId = this.modalId;
-      ref.instance.objType = this.objType;
-      if (this.schema && !ref.instance.schema) {
-        ref.instance.schema = this.schema;
+
+      componentRef.instance.alwaysEditable = this.alwaysEditable;
+      componentRef.instance.initArgs = this.initArgs;
+      componentRef.instance.isEditable = this.isEditable;
+      componentRef.instance.modalId = this.modalId;
+      componentRef.instance.objType = this.objType;
+
+      // Some Object editors have a schema predefined. In order to not
+      // replace it with an undefined value, we check if "this.schema" is
+      // defined and component doesn't have its own schema property.
+      if (this.schema && !componentRef.instance.schema) {
+        componentRef.instance.schema = this.schema;
       }
-      ref.instance.value = this.value;
-      if (ref.instance.valueChanged) {
+      componentRef.instance.value = this.value;
+
+      // Listening to @Output events (valueChanged and validityChange).
+      if (componentRef.instance.valueChanged) {
         this.componentSubscriptions.add(
-          ref.instance.valueChanged.subscribe((e) => {
-            if (Array.isArray(e)) {
-              this.value = [...e];
+          componentRef.instance.valueChanged.subscribe((newValue) => {
+            // Changes to array are not caught if the array reference doesn't
+            // change. This is a hack for change detection.
+            if (Array.isArray(newValue)) {
+              this.value = [...newValue];
               return;
             }
-            // SetTimeout(() => this.value = e, 0);
-            this.value = e;
+            this.value = newValue;
           })
         );
       }
-      if (ref.instance.validityChange) {
+      if (componentRef.instance.validityChange) {
         this.componentSubscriptions.add(
-          ref.instance.validityChange.subscribe((e) => {
-            for (const key of Object.keys(e)) {
-              if (e[key] !== true) {
-                if (this.componentValidationState[key] === undefined) {
-                  this.componentValidationState[key] = e[key];
+          componentRef.instance.validityChange.subscribe((errorsMap) => {
+            for (const errorKey of Object.keys(errorsMap)) {
+              // Errors map contains true for a key if valid state and false
+              // for an error state. We remove the key from componentErrors
+              // when it is valid and add it when it is reported as error.
+              const errorState = errorsMap[errorKey];
+              if (errorState !== true) {
+                if (this.componentErrors[errorKey] === undefined) {
+                  this.componentErrors[errorKey] = errorState;
                 }
               } else {
-                if (this.componentValidationState[key] !== undefined) {
-                  delete this.componentValidationState[key];
+                if (this.componentErrors[errorKey] !== undefined) {
+                  delete this.componentErrors[errorKey];
                 }
               }
               if (this.form) {
-                this.form.$setValidity(key, e[key]);
+                this.form.$setValidity(errorKey, errorsMap[errorKey]);
                 this.validityChange.emit();
               }
             }
@@ -267,8 +291,8 @@ ControlValueAccessor, Validator {
           })
         );
       }
-      this.ref = ref;
-      this.ref.changeDetectorRef.detectChanges();
+      this.componentRef = componentRef;
+      this.componentRef.changeDetectorRef.detectChanges();
     } else {
       this.loggerService.error('Editor: ' + editorName + ' not supported');
     }
@@ -276,8 +300,8 @@ ControlValueAccessor, Validator {
 
   validate(control: AbstractControl): ValidationErrors | null {
     return Object.keys(
-      this.componentValidationState
-    ).length > 0 ? this.componentValidationState : null;
+      this.componentErrors
+    ).length > 0 ? this.componentErrors : null;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -286,7 +310,7 @@ ControlValueAccessor, Validator {
   ngOnDestroy(): void {
     this.componentSubscriptions.unsubscribe();
     this.viewContainerRef.clear();
-    this.ref.changeDetectorRef.detach();
+    this.componentRef.changeDetectorRef.detach();
   }
 }
 

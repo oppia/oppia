@@ -211,10 +211,6 @@ export class BlogPostEditorComponent implements OnInit {
     }
   }
 
-  headersAreEnabledCallBack(): boolean {
-    return true;
-  }
-
   publishBlogPost(): void {
     let issues = this.blogPostData.prepublishValidate(this.maxAllowedTags);
     if (issues.length === 0) {

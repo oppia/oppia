@@ -4,7 +4,6 @@
       <input type="number"
              matNativeControl
              [(ngModel)]="localValue"
-             #phoneNgModel="ngModel"
              (ngModelChange)="updateValue($event)"
              [disabled]="disabled"
              required="!notRequired"

@@ -32,8 +32,8 @@ import { IdGenerationService } from 'services/id-generation.service';
     },
     {
       provide: NG_VALIDATORS,
-      multi: true,
       useExisting: forwardRef(() => SchemaBasedDictEditorComponent),
+      multi: true
     },
   ]
 })
@@ -44,6 +44,10 @@ implements ControlValueAccessor, OnInit, Validator {
   @Input() disabled;
   @Input() propertySchemas;
   @Input() labelForFocusTarget;
+  /**
+   * Mapping of propertySchemaName to corresponding fieldIds.
+   * Populated in ngOnInit.
+   */
   fieldIds: Record<string, string> = {};
   JSON = JSON;
   onChange: (val: unknown) => void = () => {};
@@ -89,10 +93,6 @@ implements ControlValueAccessor, OnInit, Validator {
 
   getLabelForFocusTarget(): string {
     return this.labelForFocusTarget;
-  }
-
-  getEmptyString(): '' {
-    return '';
   }
 
   getHumanReadablePropertyDescription(
