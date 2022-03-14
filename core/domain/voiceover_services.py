@@ -51,8 +51,9 @@ def _get_voiceover_application_class(
     Raises:
         Exception. The voiceover application target type is invalid.
     """
-    target_type_to_classes: Dict[str, Type[
-        suggestion_registry.ExplorationVoiceoverApplication]] = (
+    target_type_to_classes: Dict[
+        str, Type[suggestion_registry.ExplorationVoiceoverApplication]
+    ] = (
         suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
     if target_type in target_type_to_classes:
         return target_type_to_classes[target_type]
@@ -120,7 +121,8 @@ def _get_voiceover_application_from_model(
 
 def _save_voiceover_applications(
     voiceover_applications: List[
-        suggestion_registry.ExplorationVoiceoverApplication]
+        suggestion_registry.ExplorationVoiceoverApplication
+    ]
 ) -> None:
     """Saves a list of given voiceover application object in datastore.
 
