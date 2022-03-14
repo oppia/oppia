@@ -34,6 +34,7 @@ export class PlaythroughIssuesService {
   ) { }
 
   /** Prepares the PlaythroughIssuesService for subsequent calls to other
+  * functions.
   *
   * @param {string} newExplorationId - the exploration id the service will
   *    be targeting.
