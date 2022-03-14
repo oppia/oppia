@@ -18,9 +18,6 @@
 
 from __future__ import annotations
 
-import ast
-
-from core import python_utils
 from core.tests import test_utils
 
 
