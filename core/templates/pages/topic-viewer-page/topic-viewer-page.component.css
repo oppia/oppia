@@ -110,8 +110,7 @@
 }
 
 .topic-viewer-page-content .tab-title {
-  color: #01645c;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  color: #017a70;
   font-size: 2em;
   word-break: break-word;
 }
@@ -190,8 +189,9 @@
   }
 
   .topic-viewer-page-content .oppia-page-card {
-    padding: 15px 24px 64px 24px;
-    width: 90vw;
+    margin-top: 7em;
+    padding: 70px 24px 64px 24px;
+    width: 100%;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {

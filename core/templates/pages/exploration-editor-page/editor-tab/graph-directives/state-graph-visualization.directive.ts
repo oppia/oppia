@@ -177,9 +177,17 @@ angular.module('oppia').directive('stateGraphVisualization', [
                 var dimensions = getElementDimensions();
 
                 // Center the graph at the node representing the current state.
-                origTranslations[0] = (
-                  dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
-                  nodeData[$scope.currentStateId()].width / 2);
+                try {
+                  origTranslations[0] = (
+                    dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
+                    nodeData[$scope.currentStateId()].width / 2);
+                } catch (error) {
+                  error.message += (
+                    `\ncurrentStateId(): ${ $scope.currentStateId() }` +
+                  `\nnodeData: ${ nodeData }`);
+                  throw error;
+                }
+
                 origTranslations[1] = (
                   dimensions.h / 2 - nodeData[$scope.currentStateId()].y0 -
                   nodeData[$scope.currentStateId()].height / 2);
@@ -292,6 +300,10 @@ angular.module('oppia').directive('stateGraphVisualization', [
 
             var getNodeFillOpacity = function(nodeId) {
               return $scope.opacityMap ? $scope.opacityMap[nodeId] : 0.5;
+            };
+
+            $scope.getCenterGraph = function() {
+              centerGraph();
             };
 
             $scope.getNodeTitle = function(node) {
