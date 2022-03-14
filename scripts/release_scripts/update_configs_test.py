@@ -630,7 +630,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 'apply_changes_based_on_config_gets_called'] = True
         def mock_verify_config_files(
             unused_release_feconf_path,
-            unused_release_app_yaml_path,
+            unused_release_app_dev_yaml_path,
             verify_email_api_keys
         ):
             check_function_calls['verify_config_files_gets_called'] = True
@@ -640,7 +640,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 verify_email_api_keys)
 
         def mock_update_app_yaml(
-            unused_release_app_yaml_path,
+            unused_release_app_dev_yaml_path,
             unused_feconf_config_path
         ):
             check_function_calls['update_app_yaml_gets_called'] = True
@@ -696,7 +696,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
 
         def mock_verify_config_files(
             unused_release_feconf_path,
-            unused_release_app_yaml_path,
+            unused_release_app_dev_yaml_path,
             verify_email_api_keys
         ):
             check_function_calls['verify_config_files_gets_called'] = True
@@ -706,7 +706,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 verify_email_api_keys)
 
         def mock_update_app_yaml(
-            unused_release_app_yaml_path,
+            unused_release_app_dev_yaml_path,
             unused_feconf_config_path
         ):
             check_function_calls['update_app_yaml_gets_called'] = True
