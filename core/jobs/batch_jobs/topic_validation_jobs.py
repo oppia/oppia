@@ -29,62 +29,6 @@ import apache_beam as beam
 (topic_models, ) = models.Registry.import_models([models.NAMES.topic])
 
 
-class GetNumberOfTopicsExceedsMaxAbbNameJob(base_jobs.JobBase):
-    """Job that returns topics having abb. name longer than 39."""
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns PCollection of invalid topics with their id and
-        abb. name.
-
-        Returns:
-            PCollection. Returns PCollection of invalid topic with
-            their id and abb. name.
-        """
-        total_topics = (
-            self.pipeline
-            | 'Get all TopicModels' >> ndb_io.GetModels(
-                topic_models.TopicModel.get_all(include_deleted=False))
-            | 'Combine topic ids and abb. name' >> beam.Map(
-                lambda topic: (topic.id, topic.abbreviated_name))
-        )
-
-        topic_ids_with_exceeding_abb_name = (
-            total_topics
-            | 'Filter topics with abb. name greater than 39' >>
-                beam.Filter(lambda topic: len(topic[1]) > 39)
-        )
-
-        report_number_of_topics_queried = (
-            total_topics
-            | 'Report count of topic models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('TOPICS'))
-        )
-
-        report_number_of_invalid_topics = (
-            topic_ids_with_exceeding_abb_name
-            | 'Report count of invalid topic models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('INVALID'))
-        )
-
-        report_invalid_ids_and_their_actual_len = (
-            topic_ids_with_exceeding_abb_name
-            | 'Save info on invalid topics' >> beam.Map(
-                lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The id of topic is %s and its abb. name len is %s'
-                    % (objects[0], len(objects[1]))
-                ))
-        )
-
-        return (
-            (
-                report_number_of_topics_queried,
-                report_number_of_invalid_topics,
-                report_invalid_ids_and_their_actual_len
-            )
-            | 'Combine results' >> beam.Flatten()
-        )
-
-
 class GetTopicsWithInvalidPageTitleFragmentJob(base_jobs.JobBase):
     """Job that returns topics having page title fragment with
     len > 50 or less than 5"""
