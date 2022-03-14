@@ -50,15 +50,13 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   expTitle!: string;
   expDesc!: string;
   contributorNames!: string[];
-  hasStoryTitle!: boolean;
+  storyTitleIsPresent!: boolean;
   chapterTitle!: string;
   chapterDesc!: string;
   chapterNumber!: string;
-  numberofCheckpoints!: number;
+  checkpointCount!: number;
   expInfo: LearnerExplorationSummaryBackendDict;
-  startedWidth: number = 0;
   completedWidth!: number;
-  separatorWidth: number = 0;
   separatorArray: number[] = [];
 
 
@@ -77,7 +75,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     this.expTitle = this.expInfo.title;
     this.expDesc = this.expInfo.objective;
     this.storyId = this.urlService.getUrlParams().story_id;
-    this.hasStoryTitle = (this.storyId !== undefined) ? true : false;
+    this.storyTitleIsPresent = !!this.storyId;
 
     this.storyTitleTranslationKey = (
       this.i18nLanguageCodeService
@@ -95,7 +93,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
           this.explorationId, TranslationKeyType.DESCRIPTION)
     );
 
-    if (this.hasStoryTitle) {
+    if (this.storyTitleIsPresent) {
       this.topicUrlFragment = (
         this.urlService.getTopicUrlFragmentFromLearnerUrl());
       this.classroomUrlFragment = (
@@ -112,16 +110,10 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
         });
     }
 
-
-    // The purpose of separatorArray is for the working of
-    // for loop in lesson-information-card-modal.component.html.
-    this.separatorArray = new Array(this.numberofCheckpoints);
-    this.separatorWidth = 100 / (this.numberofCheckpoints);
-
-    this.startedWidth = 100 / (this.numberofCheckpoints);
-    if (this.completedWidth === 100) {
-      this.startedWidth = 0;
-    }
+    // Rendering the separators in the progress bar requires
+    // the number of separators.The purpose of separatorArray
+    // is to provide the number of checkpoints in the template file.
+    this.separatorArray = new Array(this.checkpointCount);
   }
 
   isHackyStoryTitleTranslationDisplayed(): boolean {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for lesson information card component.
+ * @fileoverview Unit tests for lesson information card modal component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -106,12 +106,12 @@ describe('Lesson Information card modal component', () => {
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
 
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-      .and.returnValue(true);
+      .and.returnValues(true, true, false);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValue(false);
+      .and.returnValues(false, false, true);
   });
 
-  it('should intialize the component and set values', fakeAsync(() => {
+  it('should initialize the component and set values', fakeAsync(() => {
     componentInstance.ngOnInit();
     expect(componentInstance.explorationId).toEqual(expId);
     expect(componentInstance.expTitle).toEqual(expTitle);
@@ -124,19 +124,19 @@ describe('Lesson Information card modal component', () => {
 
     // Translation is only displayed if the language is not English
     // and it's hacky translation is available.
-    let hackyExpTitleTranslationIsDisplayed =
-      componentInstance.isHackyExpTitleTranslationDisplayed();
+    let hackyExpTitleTranslationIsDisplayed = (
+      componentInstance.isHackyExpTitleTranslationDisplayed());
     expect(hackyExpTitleTranslationIsDisplayed).toBe(true);
-    let hackyExpDescTranslationIsDisplayed =
-      componentInstance.isHackyExpDescTranslationDisplayed();
-    expect(hackyExpDescTranslationIsDisplayed).toBe(true);
-    let hackyStoryTitleTranslationIsDisplayed =
-      componentInstance.isHackyStoryTitleTranslationDisplayed();
+    let hackyStoryTitleTranslationIsDisplayed = (
+      componentInstance.isHackyStoryTitleTranslationDisplayed());
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+    let hackyExpDescTranslationIsDisplayed = (
+      componentInstance.isHackyExpDescTranslationDisplayed());
+    expect(hackyExpDescTranslationIsDisplayed).toBe(false);
   }));
 
-  it('should set hasStoryTitle true when' +
-      'storyId is not undefined',
+  it('should set data correctly when' +
+      ' storyId is not undefined',
   fakeAsync(() => {
     spyOn(urlService, 'getUrlParams').and.returnValue({
       story_id: storyId,
@@ -149,9 +149,21 @@ describe('Lesson Information card modal component', () => {
     spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
       Promise.resolve(
         new StoryPlaythrough(storyId, [], 'storyTitle', '', '', '')));
+
+    expect(componentInstance.storyId).toEqual(undefined);
+    expect(componentInstance.storyTitleIsPresent).toEqual(undefined);
+    expect(urlService.getTopicUrlFragmentFromLearnerUrl).not.toHaveBeenCalled();
+    expect(urlService.getClassroomUrlFragmentFromLearnerUrl).
+      not.toHaveBeenCalled();
+    expect(urlService.getStoryUrlFragmentFromLearnerUrl).
+      not.toHaveBeenCalled();
+    expect(storyViewerBackendApiService.fetchStoryDataAsync).not.toHaveBeenCalled();
+    expect(componentInstance.storyTitleTranslationKey).toEqual(undefined);
+
     componentInstance.ngOnInit();
+
     expect(componentInstance.storyId).toEqual(storyId);
-    expect(componentInstance.hasStoryTitle).toEqual(true);
+    expect(componentInstance.storyTitleIsPresent).toEqual(true);
     expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
     expect(urlService.getClassroomUrlFragmentFromLearnerUrl).toHaveBeenCalled();
     expect(urlService.getStoryUrlFragmentFromLearnerUrl).toHaveBeenCalled();
@@ -160,23 +172,19 @@ describe('Lesson Information card modal component', () => {
       'I18N_STORY_storyId_TITLE');
   }));
 
-  it('should set hasStoryTitle false when' +
-      'storyId is undefined',
+  it('should set data correctly when' +
+      ' storyId is undefined',
   fakeAsync(() => {
     spyOn(urlService, 'getUrlParams').and.returnValue({
       story_id: undefined,
       node_id: undefined
     });
-    componentInstance.ngOnInit();
     expect(componentInstance.storyId).toEqual(undefined);
-    expect(componentInstance.hasStoryTitle).toBe(false);
-  }));
+    expect(componentInstance.storyTitleIsPresent).toEqual(undefined);
 
-  it('should set value of startedWidth' +
-      ' to 0 when completedWidht is 100',
-  fakeAsync(() => {
-    componentInstance.completedWidth = 100;
     componentInstance.ngOnInit();
-    expect(componentInstance.startedWidth).toEqual(0);
+
+    expect(componentInstance.storyId).toEqual(undefined);
+    expect(componentInstance.storyTitleIsPresent).toBe(false);
   }));
 });

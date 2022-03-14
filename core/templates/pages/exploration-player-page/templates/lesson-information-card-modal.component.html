@@ -20,20 +20,26 @@
       {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
     </h4>
     <p class="progress-text">Progress</p>
-    <div class="progress under_part">
-      <div class="border_container">
-        <div class="separator"
+    <div class="progress">
+      <div class="progress-bar-separator-container">
+        <div class="progress-bar-separator"
              *ngFor="let i of separatorArray;"
-             [style.width.%]="separatorWidth">
+             [style.width.%]="100 / checkpointCount">
         </div>
       </div>
-      <div class="progress-bar progress-bar-completed"
+      <div class="lesson-progress-bar completed-checkpoints-progress-bar"
            role="progressbar"
            [style.width.%]="completedWidth">
       </div>
-      <div class="progress-bar progress-bar-started"
+      <div *ngIf="completedWidth != 100"
+           class="lesson-progress-bar started-checkpoint-progress-bar"
            role="progressbar"
-           [style.width.%]="startedWidth">
+           [style.width.%]="100 / checkpointCount">
+      </div>
+      <div *ngIf="completedWidth == 100"
+           class="lesson-progress-bar started-checkpoint-progress-bar"
+           role="progressbar"
+           [style.width.%]="0">
       </div>
     </div>
   </div>
@@ -119,10 +125,6 @@
       margin-left: 5px;
   }
 
-  .button {
-    outline: none;
-  }
-
   .oppia-close-popover-button {
     outline: none;
     padding: 0;
@@ -130,28 +132,28 @@
     top: 0;
   }
 
-  .progress-bar {
+  .lesson-progress-bar {
       left: 0;
       width: 0;
   }
 
-  .progress-bar-completed {
+  .completed-checkpoints-progress-bar {
       background-color: #2d4a9d;
       transition: none;
   }
 
-  .progress-bar-started {
+  .started-checkpoint-progress-bar {
       background-color: #2d4a9d99;
       transition: none;
   }
 
-  .separator {
+  .progress-bar-separator {
       border: 1px solid #707070;
       height: 10px;
       z-index: 1;
   }
 
-  .border_container {
+  .progress-bar-separator-container {
       display: flex;
       height: 10px;
       position: absolute;

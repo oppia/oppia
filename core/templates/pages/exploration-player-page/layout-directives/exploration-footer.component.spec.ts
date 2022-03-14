@@ -154,7 +154,7 @@ describe('ExplorationFooterComponent', () => {
   }));
 
   it('should not show hints after user finishes practice session' +
-  ' and results are loadeed.', () => {
+  ' and results are loaded.', () => {
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     expect(component.hintsAndSolutionsAreSupported).toBeTrue();
 
@@ -167,7 +167,7 @@ describe('ExplorationFooterComponent', () => {
     expect(component.hintsAndSolutionsAreSupported).toBeFalse();
   });
 
-  it('should push 1 in checkpointArray for the first card', () => {
+  it('should update the progress bar for the first card', () => {
     let ngbModal = TestBed.inject(NgbModal);
 
     expect(component.checkpointArray).toEqual([0]);
@@ -196,8 +196,8 @@ describe('ExplorationFooterComponent', () => {
     expect(component.checkpointArray).toEqual([0, 1]);
   });
 
-  it('should push 0 in checkpointArray when card_is_checkpoint' +
-    'is false and displayedCardIndex > 1', () => {
+  it('should not change the width of the completed' +
+    'part in the progress bar when a checkpoint is not encountered', () => {
     let ngbModal = TestBed.inject(NgbModal);
 
     expect(component.checkpointArray).toEqual([0]);
@@ -282,8 +282,8 @@ describe('ExplorationFooterComponent', () => {
     expect(component.checkpointArray).toEqual([0, 0]);
   });
 
-  it('should push 1 in checkpointArray when card_is_checkpoint' +
-    'is true and displayedCardIndex > 1', () => {
+  it('should increase the width of the completed' +
+    'part in the progress bar when a checkpoint is encountered', () => {
     let ngbModal = TestBed.inject(NgbModal);
 
     expect(component.checkpointArray).toEqual([0]);
@@ -467,13 +467,13 @@ describe('ExplorationFooterComponent', () => {
 
     spyOn(roebas, 'fetchExplorationAsync')
       .and.returnValue(Promise.resolve(sampleDataResults));
-    expect(component.numberofCheckpoints).toEqual(0);
+    expect(component.checkpointCount).toEqual(0);
 
     component.getCheckpointCount('expId');
     tick();
 
     expect(component.expStates).toEqual(sampleDataResults.exploration.states);
-    expect(component.numberofCheckpoints).toEqual(1);
+    expect(component.checkpointCount).toEqual(1);
   }));
 
   it('should show hints when initialized in question player when user is' +

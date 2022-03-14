@@ -50,7 +50,12 @@ export class ExplorationFooterComponent {
   resizeSubscription!: Subscription;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
-  numberofCheckpoints: number = 0;
+
+  // Stores the number of checkpoints in an exploration.
+  checkpointCount: number = 0;
+
+  // Used to update the number of checkpoints completed
+  // and decide the completed width of the progress bar.
   checkpointArray: number[] = [0];
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth: number = 0;
@@ -131,7 +136,7 @@ export class ExplorationFooterComponent {
 
     let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
 
-    modalRef.componentInstance.numberofCheckpoints = this.numberofCheckpoints;
+    modalRef.componentInstance.checkpointCount = this.checkpointCount;
     // Note to developers:
     // The checkpointArray is used to track the number of
     // completedCheckpoints. For the first card, 1 is pushed
@@ -143,7 +148,7 @@ export class ExplorationFooterComponent {
       completedCheckpoints = completedCheckpoints + this.checkpointArray[i];
     }
     this.completedWidth = (
-      (100 / (this.numberofCheckpoints)) * completedCheckpoints
+      (100 / (this.checkpointCount)) * completedCheckpoints
     );
 
     if (displayedCardIndex > 0) {
@@ -205,7 +210,7 @@ export class ExplorationFooterComponent {
               count++;
             }
           }
-          this.numberofCheckpoints = count;
+          this.checkpointCount = count;
         });
   }
 
