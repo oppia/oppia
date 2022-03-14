@@ -65,4 +65,11 @@ describe('ResponseItemSelectionInput', () => {
 
     expect(component.responses).toEqual(['choice 1']);
   });
+  it('should set the answers and responses arrays to empty when no answer ' +
+    'is selected', () => {
+    component.answer = '""';
+    component.ngOnInit();
+
+    expect(component.responses).toEqual([]);
+  });
 });
