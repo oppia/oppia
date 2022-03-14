@@ -118,9 +118,8 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
       this.storyName = this.storySummaryToDisplay.getTitle();
     }
 
-    this.storyNodeLink = this.getStoryNodeLink();
-
     if (this.storySummaryToDisplay) {
+      this.storyNodeLink = this.getStoryNodeLink();
       let totalStoryNodesCount = (
         this.storySummaryToDisplay.getAllNodes().length
       );
