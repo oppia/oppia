@@ -39,7 +39,7 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
             TypeError, 'not a valid translatable object class'
         ):
             translatable_object_registry.Registry.get_object_class(
-                    'Int') # type: ignore[arg-type]
+                'Int') # type: ignore[arg-type]
 
     def test_fake_class_is_not_gettable(self) -> None:
         """Tests that trying to retrieve a fake class raises an error."""
