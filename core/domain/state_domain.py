@@ -1553,7 +1553,6 @@ class Outcome(translation_domain.BaseTranslatableObject):
     parameter changes.
     """
 
-<<<<<<< HEAD
     def to_dict(self):
         """Returns a dict representing this Outcome domain object.
 
@@ -1606,8 +1605,6 @@ class Outcome(translation_domain.BaseTranslatableObject):
             labelled_as_correct=self.labelled_as_correct
         )
 
-=======
->>>>>>> d415824662425e84f4a01766d23b2cf5e9fefbce
     def __init__(
             self, dest, feedback, labelled_as_correct, param_changes,
             refresher_exploration_id, missing_prerequisite_skill_id):
