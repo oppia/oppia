@@ -1960,7 +1960,9 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Missing key in handler args: version.'
         )
 
-    def test_submit_answer_for_exploration_raises_error_with_no_answer_matching_data_type(self): # pylint: disable=line-too-long
+    def test_submit_answer_for_exp_raises_error_with_no_answer_matching_type(
+        self
+    ):
         # Load demo exploration.
         exp_id = '6'
         exp_services.delete_demo(exp_id)
