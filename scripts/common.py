@@ -362,6 +362,12 @@ def get_current_branch_name():
     return git_status_first_line[len(branch_message_prefix):]
 
 
+def update_branch_with_upstream():
+    """Updates the current branch with upstream."""
+    current_branch_name = get_current_branch_name()
+    run_cmd(['git', 'pull', 'upstream', current_branch_name])
+
+
 def get_current_release_version_number(release_branch_name):
     """Gets the release version given a release branch name.
 
