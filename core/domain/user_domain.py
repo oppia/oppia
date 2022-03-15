@@ -202,6 +202,8 @@ class UserSettings:
         self.deleted = deleted
         self.created_on = created_on
 
+    # TODO(#15136): Limit the use of type validation. Once all the python files
+    # are annotated.
     def validate(self) -> None:
         """Checks that the user_id, email, roles, banned, pin and display_alias
         fields of this UserSettings domain object are valid.
@@ -560,6 +562,8 @@ class UserContributions:
         self.created_exploration_ids = created_exploration_ids
         self.edited_exploration_ids = edited_exploration_ids
 
+    # TODO(#15136): Limit the use of type validation. Once all the python files
+    # are annotated.
     def validate(self) -> None:
         """Checks that user_id, created_exploration_ids and
         edited_exploration_ids fields of this UserContributions
@@ -1138,6 +1142,8 @@ class UserContributionRights:
             self.can_review_voiceover_for_language_codes or
             self.can_review_questions)
 
+    # TODO(#15136): Limit the use of type validation. Once all the python files
+    # are annotated.
     def validate(self) -> None:
         """Validates different attributes of the class."""
         if not isinstance(self.can_review_translation_for_language_codes, list):
