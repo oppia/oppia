@@ -27,8 +27,8 @@ import zipfile
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
-_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _THIRD_PARTY_PATH)
+# _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+# sys.path.insert(0, _THIRD_PARTY_PATH)
 
 # These libraries need to be installed before running or importing any script.
 

@@ -23,6 +23,11 @@ import json
 import os
 import pkgutil
 import re
+import sys
+
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
+
 
 from typing import Any, Dict
 
