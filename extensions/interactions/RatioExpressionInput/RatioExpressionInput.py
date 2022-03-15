@@ -224,7 +224,7 @@ class RatioExpressionInput(base.BaseInteraction):
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
         return ratio_rule_spec.HasNumberOfTermsEqualToSpecDto(
-            input_term_count=input_dict['y']
+            input_term_count=int(input_dict['y'])
         )
 
     @classmethod
@@ -242,8 +242,8 @@ class RatioExpressionInput(base.BaseInteraction):
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
         return ratio_rule_spec.HasSpecificTermEqualToSpecDto(
-            input_term_index=input_dict['x'],
-            input_expected_term_value=input_dict['y']
+            input_term_index=int(input_dict['x']),
+            input_expected_term_value=int(input_dict['y'])
         )
 
     @classmethod
@@ -303,5 +303,5 @@ class RatioExpressionInput(base.BaseInteraction):
 
         return state_pb2.RatioExpressionInputInstanceDto.CustomizationArgsDto(
             placeholder=placeholder_proto,
-            number_of_terms=customization_args['numberOfTerms'].value
+            number_of_terms=int(customization_args['numberOfTerms'].value)
         )

@@ -321,5 +321,5 @@ class TextInput(base.BaseInteraction):
 
         return state_pb2.TextInputInstanceDto.CustomizationArgsDto(
             placeholder=placeholder_proto,
-            rows=customization_args['rows'].value
+            rows=int(customization_args['rows'].value)
         )

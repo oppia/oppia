@@ -205,9 +205,9 @@ class FractionInput(base.BaseInteraction):
         """
         return objects_pb2.FractionDto(
             is_negative=fraction['isNegative'],
-            whole_number=fraction['wholeNumber'],
-            numerator=fraction['numerator'],
-            denominator=fraction['denominator'])
+            whole_number=int(fraction['wholeNumber']),
+            numerator=int(fraction['numerator']),
+            denominator=int(fraction['denominator']))
 
     @classmethod
     def _convert_rule_specs_to_proto(cls, rule_specs_list):
@@ -370,7 +370,7 @@ class FractionInput(base.BaseInteraction):
             HasNumeratorEqualToSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.HasNumeratorEqualToSpecDto(
-            input=input_dict['x']
+            input=int(input_dict['x'])
         )
 
     @classmethod
@@ -384,7 +384,7 @@ class FractionInput(base.BaseInteraction):
             HasDenominatorEqualToSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.HasDenominatorEqualToSpecDto(
-            input=input_dict['x']
+            input=int(input_dict['x'])
         )
 
     @classmethod
@@ -398,7 +398,7 @@ class FractionInput(base.BaseInteraction):
             HasIntegerPartEqualToSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.HasIntegerPartEqualToSpecDto(
-            input=input_dict['x']
+            input=int(input_dict['x'])
         )
 
     @classmethod

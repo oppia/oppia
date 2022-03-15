@@ -1755,8 +1755,8 @@ class Voiceover:
         """
         return languages_pb2.VoiceoverFileDto(
             filename=self.filename,
-            file_size_bytes=self.file_size_bytes,
-            duration_secs=self.duration_secs
+            file_size_bytes=int(self.file_size_bytes),
+            duration_secs=float(self.duration_secs)
         )
 
     def __init__(self, filename, file_size_bytes, needs_update, duration_secs):

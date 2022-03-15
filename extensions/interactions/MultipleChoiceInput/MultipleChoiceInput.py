@@ -209,5 +209,5 @@ class MultipleChoiceInput(base.BaseInteraction):
         multiple_choice_dto = state_pb2.MultipleChoiceInputInstanceDto
 
         return multiple_choice_dto.RuleSpecDto.EqualsSpecDto(
-            input=equal
+            input=int(equal)
         )
