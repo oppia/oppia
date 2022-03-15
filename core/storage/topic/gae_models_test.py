@@ -263,6 +263,18 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             self.assertFalse(
                 topic_models.TopicRightsModel.has_reference_to_user_id('x_id'))
 
+            topic_rights.manager_ids = []
+            topic_rights.commit(
+                'committer_id',
+                'Remove Manager role',
+                [{
+                    'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+                    'removed_user_id': 'manager_id'
+                }])
+            self.assertFalse(
+                topic_models.TopicRightsModel
+                .has_reference_to_user_id('manager_id'))
+
     def test_export_data_nontrivial(self) -> None:
         """Tests nontrivial export data on user with some managed topics."""
         user_data = topic_models.TopicRightsModel.export_data(self.USER_ID_2)
@@ -278,3 +290,12 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             'managed_topic_ids': []
         }
         self.assertEqual(user_data, expected_data)
+
+    def test_get_rights_by_user_id(self) -> None:
+        all_rights_assigned_to_user = (
+            topic_models.TopicRightsModel.get_by_user(self.USER_ID_2))
+        self.assertEqual(len(all_rights_assigned_to_user), 2)
+        self.assertEqual(
+            all_rights_assigned_to_user[0].manager_ids, [self.USER_ID_2])
+        self.assertEqual(
+            all_rights_assigned_to_user[1].manager_ids, [self.USER_ID_2])
