@@ -79,9 +79,9 @@ class Registry:
 
     @classmethod
     def get_object_class(
-            cls,
-            obj_type: TranslatableObjectNames
-            ) -> TranslatableObjectClasses:
+        cls,
+        obj_type: TranslatableObjectNames
+    ) -> TranslatableObjectClasses:
         """Gets a translatable object class by its type.
 
         Refreshes once if the class is not found; subsequently, throws an
