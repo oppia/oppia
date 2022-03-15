@@ -88,6 +88,9 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         def mock_check_call(cmd_tokens):
             self.all_cmd_tokens.extend(cmd_tokens)
             self.check_function_calls['check_call_is_called'] = True
+        def mock_run_cmd(cmd_tokens):
+            self.all_cmd_tokens.extend(cmd_tokens)
+            self.check_function_calls['run_cmd_is_called'] = True
         def mock_verify_target_branch(
                 unused_remote_alias, unused_new_branch_name):
             self.check_function_calls[
@@ -121,6 +124,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             common, 'get_remote_alias', mock_get_remote_alias)
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call)
+        self.run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         self.verify_target_branch_swap = self.swap(
             cut_release_or_hotfix_branch,
             'verify_target_branch_does_not_already_exist',
@@ -415,41 +419,55 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
     def test_function_calls_for_hotfix_branch_with_hotfix_number_more_than_one(
             self):
+        def mock_get_current_branch_name():
+            return 'release-1.2.3-hotfix-2'
+        get_branch_name_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_current_branch_name)
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.get_remote_alias_swap, self.check_call_swap:
-                with self.verify_target_branch_swap:
+                with self.verify_target_branch_swap, self.run_cmd_swap:
                     with self.verify_target_version_swap, self.open_tab_swap:
                         with self.verify_hotfix_number_swap, self.input_swap:
-                            with self.ask_user_swap:
+                            with self.ask_user_swap, get_branch_name_swap:
                                 cut_release_or_hotfix_branch.execute_branch_cut(
                                     '1.2.3', 3)
         self.expected_check_function_calls[
             'verify_target_version_compatible_with_'
             'latest_released_version_is_called'] = False
+        self.expected_check_function_calls['run_cmd_is_called'] = True
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
         expected_cmd_tokens = [
             'git', 'pull', 'upstream', 'develop',
+            'git', 'checkout', 'release-1.2.3-hotfix-2',
+            'git', 'pull', 'upstream', 'release-1.2.3-hotfix-2',
             'git', 'checkout', '-b', 'release-1.2.3-hotfix-3',
             'release-1.2.3-hotfix-2']
         self.assertEqual(self.all_cmd_tokens, expected_cmd_tokens)
 
     def test_function_calls_for_hotfix_branch_with_hotfix_number_equal_to_one(
             self):
+        def mock_get_current_branch_name():
+            return 'release-1.2.3'
+        get_branch_name_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_current_branch_name)
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.get_remote_alias_swap, self.check_call_swap:
-                with self.verify_target_branch_swap:
+                with self.verify_target_branch_swap, self.run_cmd_swap:
                     with self.verify_target_version_swap, self.open_tab_swap:
                         with self.verify_hotfix_number_swap, self.input_swap:
-                            with self.ask_user_swap:
+                            with self.ask_user_swap, get_branch_name_swap:
                                 cut_release_or_hotfix_branch.execute_branch_cut(
                                     '1.2.3', 1)
         self.expected_check_function_calls[
             'verify_target_version_compatible_with_'
             'latest_released_version_is_called'] = False
+        self.expected_check_function_calls['run_cmd_is_called'] = True
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
         expected_cmd_tokens = [
             'git', 'pull', 'upstream', 'develop',
+            'git', 'checkout', 'release-1.2.3',
+            'git', 'pull', 'upstream', 'release-1.2.3',
             'git', 'checkout', '-b', 'release-1.2.3-hotfix-1', 'release-1.2.3']
         self.assertEqual(self.all_cmd_tokens, expected_cmd_tokens)
