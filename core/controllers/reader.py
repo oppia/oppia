@@ -457,91 +457,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
     """Tracks a learner submitting an answer."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'POST': {
-            'params': {
-                'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params_dict),
-                },
-                'default_value': {}
-            },
-            'session_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'old_state_name': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
-                }
-            },
-            'answer': {
-                'schema': {
-                    'type': 'multiple',
-                    'options': ['int', 'basestring', 'dict']
-                }
-            },
-            'client_time_spent_in_secs': {
-                'schema': {
-                    'type': 'float',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
-                }
-            },
-            'answer_group_index': {
-                'schema': {
-                    'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
-                }
-            },
-            'rule_spec_index': {
-                'schema': {
-                    'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
-                }
-            },
-            'version': {
-                'schema': editor.SCHEMA_FOR_VERSION
-            },
-            'classification_categorization': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': [
-                        exp_domain.EXPLICIT_CLASSIFICATION,
-                        exp_domain.TRAINING_DATA_CLASSIFICATION,
-                        exp_domain.STATISTICAL_CLASSIFICATION,
-                        exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
-                    ]
-                }
-            }
-        }
-    }
-
+    
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests.
@@ -549,21 +465,21 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        old_state_name = self.normalized_payload.get('old_state_name')
+        old_state_name = self.payload.get('old_state_name')
         # The reader's answer.
-        answer = self.normalized_payload.get('answer')
+        answer = self.payload.get('answer')
         # Parameters associated with the learner.
-        params = self.normalized_payload.get('params', {})
+        params = self.payload.get('params', {})
         # The version of the exploration.
-        version = self.normalized_payload.get('version')
-        session_id = self.normalized_payload.get('session_id')
-        client_time_spent_in_secs = self.normalized_payload.get(
+        version = self.payload.get('version')
+        session_id = self.payload.get('session_id')
+        client_time_spent_in_secs = self.payload.get(
             'client_time_spent_in_secs')
         # The answer group and rule spec indexes, which will be used to get
         # the rule spec string.
-        answer_group_index = self.normalized_payload.get('answer_group_index')
-        rule_spec_index = self.normalized_payload.get('rule_spec_index')
-        classification_categorization = self.normalized_payload.get(
+        answer_group_index = self.payload.get('answer_group_index')
+        rule_spec_index = self.payload.get('rule_spec_index')
+        classification_categorization = self.payload.get(
             'classification_categorization')
 
         exploration = exp_fetchers.get_exploration_by_id(
