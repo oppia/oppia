@@ -73,8 +73,7 @@ _PARSER.add_argument(
 
 
 def apply_changes_based_on_config(
-    local_filepath, config_filepath, expected_config_line_regex
-):
+        local_filepath, config_filepath, expected_config_line_regex):
     """Updates the local file based on the deployment configuration specified
     in the config file.
 
@@ -122,8 +121,7 @@ def apply_changes_based_on_config(
 
 
 def check_updates_to_terms_of_service(
-    release_feconf_path, personal_access_token
-):
+        release_feconf_path, personal_access_token):
     """Checks if updates are made to terms of service and updates
     REGISTRATION_PAGE_LAST_UPDATED_UTC in feconf.py if there are updates.
 
@@ -169,44 +167,12 @@ def check_updates_to_terms_of_service(
                 f.write(line)
 
 
-def update_app_yaml(release_app_yaml_path, feconf_config_path):
-    """Updates app.yaml file with more strict CORS HTTP header.
-
-    Args:
-        release_app_yaml_path: str. Absolute path of the app.yaml file.
-        feconf_config_path: str. Absolute path of the feconf config file.
-    """
-    with utils.open_file(feconf_config_path, 'r') as feconf_config_file:
-        feconf_config_contents = feconf_config_file.read()
-
-    with utils.open_file(release_app_yaml_path, 'r') as app_yaml_file:
-        app_yaml_contents = app_yaml_file.read()
-
-    project_origin = re.search(
-        r'OPPIA_SITE_URL = \'(.*)\'', feconf_config_contents).group(1)
-    access_control_allow_origin_header = (
-        'Access-Control-Allow-Origin: %s' % project_origin)
-
-    edited_app_yaml_contents, _ = re.subn(
-        r'Access-Control-Allow-Origin: \"\*\"',
-        access_control_allow_origin_header,
-        app_yaml_contents
-    )
-
-    with utils.open_file(release_app_yaml_path, 'w') as app_yaml_file:
-        app_yaml_file.write(edited_app_yaml_contents)
-
-
-def verify_config_files(
-    release_feconf_path, release_app_yaml_path, verify_email_api_keys
-):
+def verify_feconf(release_feconf_path, verify_email_api_keys):
     """Verifies that feconf is updated correctly to include
     mailgun api key, mailchimp api key and redishost.
 
     Args:
         release_feconf_path: str. The path to feconf file in release
-            directory.
-        release_app_yaml_path: str. The path to app.yaml file in release
             directory.
         verify_email_api_keys: bool. Whether to verify both mailgun and
             mailchimp api keys.
@@ -228,15 +194,6 @@ def verify_config_files(
             'REDISHOST = \'localhost\'' in feconf_contents):
         raise Exception('REDISHOST must be updated before deployment.')
 
-    with utils.open_file(release_app_yaml_path, 'r') as app_yaml_file:
-        app_yaml_contents = app_yaml_file.read()
-
-    if 'Access-Control-Allow-Origin: \"*\"' in app_yaml_contents:
-        raise Exception(
-            '\'Access-Control-Allow-Origin: "*"\' must be updated to '
-            'a specific origin before deployment.'
-        )
-
 
 def add_mailgun_api_key(release_feconf_path):
     """Adds mailgun api key to feconf config file.
@@ -256,7 +213,8 @@ def add_mailgun_api_key(release_feconf_path):
                 'key: %s, please retry.' % mailgun_api_key))
         mailgun_api_key = mailgun_api_key.strip()
 
-    with utils.open_file(release_feconf_path, 'r') as f:
+    feconf_lines = []
+    with python_utils.open_file(release_feconf_path, 'r') as f:
         feconf_lines = f.readlines()
 
     assert 'MAILGUN_API_KEY = None\n' in feconf_lines, 'Missing mailgun API key'
@@ -316,8 +274,6 @@ def main(args=None):
         options.release_dir_path, common.FECONF_PATH)
     release_constants_path = os.path.join(
         options.release_dir_path, common.CONSTANTS_FILE_PATH)
-    release_app_yaml_path = os.path.join(
-        options.release_dir_path, common.APP_YAML_PATH)
 
     if options.prompt_for_mailgun_and_terms_update:
         try:
@@ -333,12 +289,8 @@ def main(args=None):
         release_feconf_path, feconf_config_path, FECONF_REGEX)
     apply_changes_based_on_config(
         release_constants_path, constants_config_path, CONSTANTS_REGEX)
-    update_app_yaml(release_app_yaml_path, feconf_config_path)
-    verify_config_files(
-        release_feconf_path,
-        release_app_yaml_path,
-        options.prompt_for_mailgun_and_terms_update
-    )
+    verify_feconf(
+        release_feconf_path, options.prompt_for_mailgun_and_terms_update)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
