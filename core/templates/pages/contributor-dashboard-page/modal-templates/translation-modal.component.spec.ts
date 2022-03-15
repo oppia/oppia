@@ -19,7 +19,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
@@ -31,7 +31,6 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { TranslateTextService } from '../services/translate-text.service';
-import {TranslateTextBackendApiService} from '../services/translate-text-backend-api.service';
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
@@ -44,7 +43,6 @@ describe('Translation Modal Component', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let siteAnalyticsService: SiteAnalyticsService;
   let imageLocalStorageService: ImageLocalStorageService;
-  let translateTextBackendApiService: TranslateTextBackendApiService;
   let userService: UserService;
   let activeModal: NgbActiveModal;
   let httpTestingController: HttpTestingController;
@@ -102,8 +100,6 @@ describe('Translation Modal Component', () => {
     translateTextService = TestBed.inject(TranslateTextService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
-    translateTextBackendApiService = TestBed.
-      inject(TranslateTextBackendApiService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationLanguageService.setActiveLanguageCode('es');
     userService = TestBed.inject(UserService);
@@ -357,7 +353,8 @@ describe('Translation Modal Component', () => {
           content_html: 'text1',
           translation_html: 'texto1',
           data_format: 'html'
-        }
+        },
+        files: {}
       };
       component.ngOnInit();
 
@@ -424,9 +421,14 @@ describe('Translation Modal Component', () => {
     describe('when already uploading a translation', () => {
       it('should not submit the translation', fakeAsync(() => {
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
+        spyOn(
+          imageLocalStorageService,
+          'getFilenameToBase64MappingAsync').and.returnValue(
+          Promise.resolve({}));
 
         component.suggestTranslatedText();
         component.suggestTranslatedText();
+        tick();
 
         const req = httpTestingController.expectOne(
           '/suggestionhandler/');
@@ -532,7 +534,8 @@ describe('Translation Modal Component', () => {
             content_html: ['answer1', 'answer2', 'answer3'],
             translation_html: ['answero1', 'answero2', 'answero3'],
             data_format: 'set_of_normalized_string'
-          }
+          },
+          files: {}
         };
         component.skipActiveTranslation();
         component.skipActiveTranslation();
@@ -542,7 +545,12 @@ describe('Translation Modal Component', () => {
 
       it('should close the modal', fakeAsync(() => {
         spyOn(component, 'close');
+        spyOn(
+          imageLocalStorageService,
+          'getFilenameToBase64MappingAsync').and.returnValue(
+          Promise.resolve({}));
         component.suggestTranslatedText();
+        tick();
 
         const req = httpTestingController.expectOne(
           '/suggestionhandler/');
@@ -571,48 +579,54 @@ describe('Translation Modal Component', () => {
           filename: 'imageFilename1',
           imageBlob: 'imageBlob1'
         }, {
-          filename: 'imageFilename1',
-          imageBlob: 'imageBlob2'
-        }, {
-          filename: 'imageFilename2',
-          imageBlob: 'imageBlob1'
-        }, {
           filename: 'imageFilename2',
           imageBlob: 'imageBlob2'
         }];
+        let imageToBase64Mapping = {
+          imageFilename1: 'img1Base64',
+          imageFilename2: 'img2Base64'
+        };
         spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue(
           imagesData
         );
-        spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
-          Promise.resolve(['imageBlob1', 'imageBlob2'])
-        );
+        spyOn(
+          imageLocalStorageService,
+          'getFilenameToBase64MappingAsync').and.returnValue(
+          Promise.resolve(imageToBase64Mapping));
         component.suggestTranslatedText();
+        tick();
         flushMicrotasks();
         const req = httpTestingController.expectOne(
           '/suggestionhandler/');
         const files = JSON.parse(req.request.body.getAll('payload')[0]).files;
         expect(req.request.method).toEqual('POST');
-        const filename1Blobs = files.imageFilename1;
-        const filename2Blobs = files.imageFilename2;
-        expect(filename1Blobs).toContain('imageBlob1');
-        expect(filename1Blobs).toContain('imageBlob2');
-        expect(filename2Blobs).toContain('imageBlob1');
-        expect(filename2Blobs).toContain('imageBlob2');
+        expect(files.imageFilename1).toContain('img1Base64');
+        expect(files.imageFilename2).toContain('img2Base64');
         req.flush({});
         flushMicrotasks();
       }));
 
-    it('should not reset the image save destination', () => {
+    it('should not reset the image save destination', fakeAsync(() => {
       spyOn(translateTextService, 'suggestTranslatedText').and.stub();
+      spyOn(
+        imageLocalStorageService,
+        'getFilenameToBase64MappingAsync').and.returnValue(
+        Promise.resolve({}));
       expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
       component.suggestTranslatedText();
+      tick();
       expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
-    });
+    }));
 
     it('should reset the image save destination', fakeAsync(() => {
+      spyOn(
+        imageLocalStorageService,
+        'getFilenameToBase64MappingAsync').and.returnValue(
+        Promise.resolve({}));
       component.suggestTranslatedText();
+      tick();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
