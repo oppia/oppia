@@ -727,6 +727,11 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
                         'min_value': 0
                     }]
                 }
+            },
+            'refresher_exp_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
     }
