@@ -37,7 +37,8 @@ type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
 type StoryUpdateReverse = (storyChange: StoryChange, story: Story) => void;
 type changeBackendDict = (
   backendChangeObject: BackendChangeObject,
-  domainObject: DomainObject) => void;
+  domainObject: DomainObject
+) => void;
 
 interface Params {
   'node_id'?: string;
@@ -74,9 +75,9 @@ export class StoryUpdateService {
       changeDict, apply as changeBackendDict, reverse as changeBackendDict);
     try {
       this._undoRedoService.applyChange(changeObj, story);
-      // The catch parameter type can only be any or unknown. The type 'unknown'
-      // is safer than type 'any' because it reminds us that we need to perform
-      // some sorts of type-checks before operating on our values.
+    // The catch parameter type can only be any or unknown. The type 'unknown'
+    // is safer than type 'any' because it reminds us that we need to perform
+    // some sorts of type-checks before operating on our values.
     } catch (err: unknown) {
       if (err instanceof Error) {
         this._alertsService.addWarning(err.message);

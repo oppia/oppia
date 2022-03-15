@@ -33,20 +33,6 @@ import { LoaderService } from 'services/loader.service';
   providedIn: 'root'
 })
 export class StoryEditorStateService {
-  constructor(
-    private alertsService: AlertsService,
-    private editableStoryBackendApiService: EditableStoryBackendApiService,
-    private loaderService: LoaderService,
-    private storyObjectFactory: StoryObjectFactory,
-    private undoRedoService: UndoRedoService) {}
-
-  _storyIsInitialized: boolean = false;
-  _storyIsLoading: boolean = false;
-  _storyIsBeingSaved: boolean = false;
-  _storyIsPublished: boolean = false;
-  _skillSummaries: SkillSummaryBackendDict[] = [];
-  _expIdsChanged: boolean = false;
-  _storyWithUrlFragmentExists: boolean = false;
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -54,11 +40,25 @@ export class StoryEditorStateService {
   _topicName!: string;
   _classroomUrlFragment!: string;
   _topicUrlFragment!: string;
+  _storyIsInitialized: boolean = false;
+  _storyIsLoading: boolean = false;
+  _storyIsBeingSaved: boolean = false;
+  _storyIsPublished: boolean = false;
+  _skillSummaries: SkillSummaryBackendDict[] = [];
+  _expIdsChanged: boolean = false;
+  _storyWithUrlFragmentExists: boolean = false;
 
   _storyInitializedEventEmitter = new EventEmitter();
   _storyReinitializedEventEmitter = new EventEmitter();
   _viewStoryNodeEditorEventEmitter = new EventEmitter();
   _recalculateAvailableNodesEventEmitter = new EventEmitter();
+
+  constructor(
+    private alertsService: AlertsService,
+    private editableStoryBackendApiService: EditableStoryBackendApiService,
+    private loaderService: LoaderService,
+    private storyObjectFactory: StoryObjectFactory,
+    private undoRedoService: UndoRedoService) {}
 
   private _setStory(story: Story): void {
     if (!this._story) {

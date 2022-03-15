@@ -155,13 +155,15 @@ describe('Story editor state service', () => {
         {
           provide: EditableStoryBackendApiService,
           useValue: fakeEditableStoryBackendApiService
-        }
+        },
+        StoryUpdateService
       ]
     }).compileComponents();
 
     alertsService = TestBed.inject(AlertsService);
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
     storyObjectFactory = TestBed.inject(StoryObjectFactory);
+    storyUpdateService = TestBed.inject(StoryUpdateService);
   });
 
   beforeEach(() => {
@@ -172,10 +174,6 @@ describe('Story editor state service', () => {
       storyEditorStateService.onStoryReinitialized.subscribe(
         storyReinitializedSpy));
   });
-
-  beforeEach(angular.mock.inject(function($injector) {
-    storyUpdateService = $injector.get('StoryUpdateService');
-  }));
 
   afterEach(() => {
     testSubscriptions.unsubscribe();
@@ -252,20 +250,24 @@ describe('Story editor state service', () => {
     expect(storyEditorStateService.hasLoadedStory()).toBe(true);
   });
 
-  it('should be able to set a new story with an in-place copy', () => {
-    var previousStory = storyEditorStateService.getStory();
-    var expectedStory = storyObjectFactory.createFromBackendDict(
-      secondBackendStoryObject);
-    expect(previousStory).not.toEqual(expectedStory);
+  it('should be able to set a new story with an in-place copy',
+    fakeAsync(() => {
+      storyEditorStateService.loadStory('storyId_0');
+      tick(1000);
 
-    storyEditorStateService.setStory(expectedStory);
+      var previousStory = storyEditorStateService.getStory();
+      var expectedStory = storyObjectFactory.createFromBackendDict(
+        secondBackendStoryObject);
+      expect(previousStory).not.toEqual(expectedStory);
 
-    var actualStory = storyEditorStateService.getStory();
-    expect(actualStory).toEqual(expectedStory);
+      storyEditorStateService.setStory(expectedStory);
 
-    expect(actualStory).toBe(previousStory);
-    expect(actualStory).not.toBe(expectedStory);
-  });
+      var actualStory = storyEditorStateService.getStory();
+      expect(actualStory).toEqual(expectedStory);
+
+      expect(actualStory).toBe(previousStory);
+      expect(actualStory).not.toBe(expectedStory);
+    }));
 
   it('should fail to save the story without first loading one', () => {
     expect(() => {
@@ -297,6 +299,7 @@ describe('Story editor state service', () => {
     var errorCallback = jasmine.createSpy('errorCallback');
 
     storyEditorStateService.loadStory('storyId_0');
+    tick(1000);
     storyUpdateService.setStoryTitle(
       storyEditorStateService.getStory(), 'New title');
     tick(1000);
@@ -311,7 +314,7 @@ describe('Story editor state service', () => {
     var expectedObject = {
       property_name: 'title',
       new_value: 'New title',
-      old_value: 'Story title loading',
+      old_value: 'Story title',
       cmd: 'update_story_property'
     };
     var updateStorySpy = (
@@ -376,6 +379,9 @@ describe('Story editor state service', () => {
 
   it('should warn user when user attepts to publish story before it loads',
     fakeAsync(() => {
+      storyEditorStateService.loadStory('storyId_0');
+      tick(1000);
+
       const successCallback = jasmine.createSpy('successCallback');
       spyOn(alertsService, 'fatalWarning');
       storyEditorStateService._storyIsInitialized = false;
@@ -391,6 +397,7 @@ describe('Story editor state service', () => {
     const successCallback = jasmine.createSpy('successCallback');
     const errorCallback = jasmine.createSpy('errorCallback');
     storyEditorStateService.loadStory('storyId_0');
+    tick(1000);
     storyUpdateService.setStoryTitle(
       storyEditorStateService.getStory(), 'New title');
     tick(1000);
@@ -405,6 +412,7 @@ describe('Story editor state service', () => {
     const successCallback = jasmine.createSpy('successCallback');
     const errorCallback = jasmine.createSpy('errorCallback');
     storyEditorStateService.loadStory('storyId_0');
+    tick(1000);
     storyUpdateService.setStoryTitle(
       storyEditorStateService.getStory(), 'New title');
     tick(1000);
@@ -423,6 +431,7 @@ describe('Story editor state service', () => {
     var successCallback = jasmine.createSpy('successCallback');
     var errorCallback = jasmine.createSpy('errorCallback');
     storyEditorStateService.loadStory('storyId_0');
+    tick(1000);
     storyUpdateService.setStoryTitle(
       storyEditorStateService.getStory(), 'New title');
     tick(1000);
@@ -443,6 +452,7 @@ describe('Story editor state service', () => {
       const successCallback = jasmine.createSpy('successCallback');
       const errorCallback = jasmine.createSpy('errorCallback');
       storyEditorStateService.loadStory('storyId_0');
+      tick(1000);
       storyUpdateService.setStoryTitle(
         storyEditorStateService.getStory(), 'New title');
       tick(1000);
