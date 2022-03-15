@@ -163,9 +163,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data = (
             user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
-    def test_validate_non_str_user_id_raises_exception(self):
+    def test_validate_non_str_user_id_raises_exception(self) -> None:
         self.user_settings.user_id = 0
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected user_id to be a string'
         ):
             self.user_settings.validate()
@@ -191,25 +191,25 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_invalid_banned_value_type_raises_exception(self):
+    def test_validate_invalid_banned_value_type_raises_exception(self) -> None:
         self.user_settings.banned = 123
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected banned to be a bool'):
             self.user_settings.validate()
 
         self.user_settings.banned = '123'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected banned to be a bool'):
             self.user_settings.validate()
 
-    def test_validate_invalid_roles_value_type_raises_exception(self):
+    def test_validate_invalid_roles_value_type_raises_exception(self) -> None:
         self.user_settings.roles = 123
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected roles to be a list'):
             self.user_settings.validate()
 
         self.user_settings.roles = True
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected roles to be a list'):
             self.user_settings.validate()
 
@@ -243,9 +243,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'Expected roles to contains one default role.'):
             self.user_settings.validate()
 
-    def test_validate_non_str_pin_id(self):
+    def test_validate_non_str_pin_id(self) -> None:
         self.user_settings.pin = 0
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected PIN to be a string'
         ):
             self.user_settings.validate()
@@ -290,9 +290,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_non_str_role_raises_exception(self):
+    def test_validate_non_str_role_raises_exception(self) -> None:
         self.user_settings.roles = [0]
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected roles to be a string'
         ):
             self.user_settings.validate()
@@ -303,16 +303,18 @@ class UserSettingsTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Role invalid_role does not exist.'):
             self.user_settings.validate()
 
-    def test_validate_non_str_display_alias_raises_error(self):
+    def test_validate_non_str_display_alias_raises_error(self) -> None:
         self.user_settings.display_alias = 0
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected display_alias to be a string,'
             ' received %s' % self.user_settings.display_alias):
             self.user_settings.validate()
 
-    def test_validate_non_str_creator_dashboard_display_pref_raises_error(self):
+    def test_validate_non_str_creator_dashboard_display_pref_raises_error(
+        self
+    ) -> None:
         self.user_settings.creator_dashboard_display_pref = 0
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected dashboard display preference to be a string'
         ):
@@ -474,39 +476,39 @@ class UserContributionsTests(test_utils.GenericTestBase):
             self.owner_id)
         self.user_contributions.validate()
 
-    def test_validate_non_str_user_id(self):
+    def test_validate_non_str_user_id(self) -> None:
         self.user_contributions.user_id = 0
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected user_id to be a string'):
             self.user_contributions.validate()
 
-    def test_validate_user_id(self):
+    def test_validate_user_id(self) -> None:
         self.user_contributions.user_id = ''
-        with self.assertRaisesRegex(Exception, 'No user id specified.'):
+        with self.assertRaisesRegex(Exception, 'No user id specified.'):  # type: ignore[no-untyped-call]
             self.user_contributions.validate()
 
-    def test_validate_non_list_created_exploration_ids(self):
+    def test_validate_non_list_created_exploration_ids(self) -> None:
         self.user_contributions.created_exploration_ids = 0
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected created_exploration_ids to be a list'):
             self.user_contributions.validate()
 
-    def test_validate_created_exploration_ids(self):
+    def test_validate_created_exploration_ids(self) -> None:
         self.user_contributions.created_exploration_ids = [0]
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected exploration_id in created_exploration_ids '
             'to be a string'):
             self.user_contributions.validate()
 
-    def test_validate_non_list_edited_exploration_ids(self):
+    def test_validate_non_list_edited_exploration_ids(self) -> None:
         self.user_contributions.edited_exploration_ids = 0
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected edited_exploration_ids to be a list'):
             self.user_contributions.validate()
 
-    def test_validate_edited_exploration_ids(self):
+    def test_validate_edited_exploration_ids(self) -> None:
         self.user_contributions.edited_exploration_ids = [0]
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected exploration_id in edited_exploration_ids '
             'to be a string'):
             self.user_contributions.validate()
@@ -1164,16 +1166,28 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.user_contribution_rights.can_review_questions, True)
 
-    def test_can_review_translation_for_language_codes_incorrect_type(self):
-        self.user_contribution_rights.can_review_translation_for_language_codes = 5 # pylint: disable=line-too-long
-        with self.assertRaisesRegex(
+    def test_can_review_translation_for_language_codes_incorrect_type(
+        self
+    ) -> None:
+        # To avoid pylint's line-too-long error, new variable is created here.
+        user_contribution_rights = self.user_contribution_rights
+        # Here, List type is expected but for test purpose we're assigning it
+        # an int type. Thus to avoid MyPy error, we added an ignore here.
+        user_contribution_rights.can_review_translation_for_language_codes = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected can_review_translation_for_language_codes to be a list'):
             self.user_contribution_rights.validate()
 
-    def test_can_review_voiceover_for_language_codes_incorrect_type(self):
-        self.user_contribution_rights.can_review_voiceover_for_language_codes = 5 # pylint: disable=line-too-long
-        with self.assertRaisesRegex(
+    def test_can_review_voiceover_for_language_codes_incorrect_type(
+        self
+    ) -> None:
+        # To avoid pylint's line-too-long error, new variable is created here.
+        user_contribution_rights = self.user_contribution_rights
+        # Here, List type is expected but for test purpose we're assigning it
+        # an int type. Thus to avoid MyPy error, we added an ignore here.
+        user_contribution_rights.can_review_voiceover_for_language_codes = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected can_review_voiceover_for_language_codes to be a list'):
             self.user_contribution_rights.validate()
@@ -1222,16 +1236,20 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
             'have duplicate values'):
             self.user_contribution_rights.validate()
 
-    def test_incorrect_type_for_can_review_questions_raise_error(self):
-        self.user_contribution_rights.can_review_questions = 5
-        with self.assertRaisesRegex(
+    def test_incorrect_type_for_can_review_questions_raise_error(self) -> None:
+        # Here, bool value is expected but for test purpose we're assigning it
+        # an int type. Thus to avoid MyPy error, we added an ignore here.
+        self.user_contribution_rights.can_review_questions = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected can_review_questions to be a boolean value'):
             self.user_contribution_rights.validate()
 
-    def test_incorrect_type_for_can_submit_questions_raise_error(self):
-        self.user_contribution_rights.can_submit_questions = 5
-        with self.assertRaisesRegex(
+    def test_incorrect_type_for_can_submit_questions_raise_error(self) -> None:
+        # Here, bool value is expected but for test purpose we're assigning it
+        # an int type. Thus to avoid MyPy error, we added an ignore here.
+        self.user_contribution_rights.can_submit_questions = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected can_submit_questions to be a boolean value'):
             self.user_contribution_rights.validate()
@@ -1304,18 +1322,23 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
         )
         self.assertEqual(modifiable_user_data.user_id, 'user_id')
 
-    def test_from_raw_dict_with_none_schema_version_raises_error(self):
-        user_data_dict = {
-            'schema_version': None,
+    def test_from_raw_dict_with_none_schema_version_raises_error(
+        self
+    ) -> None:
+        # Here, schema_version is expecting an int type but for test
+        # purposes we're assigning it with None. Thus to avoid MyPy error,
+        # ignore statement is added here.
+        user_data_dict: user_domain.RawUserDataDict = {
+            'schema_version': None,  # type: ignore[typeddict-item]
             'display_alias': 'display_alias',
             'pin': '123',
-            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_language_codes': ['preferred_language_codes'],
             'preferred_site_language_code': 'preferred_site_language_code',
             'preferred_audio_language_code': 'preferred_audio_language_code',
             'user_id': 'user_id',
         }
         error_msg = 'Invalid modifiable user data: no schema version specified.'
-        with self.assertRaisesRegex(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
             user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     def test_from_raw_dict_with_invalid_schema_version_raises_error(
@@ -1341,26 +1364,28 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
                 user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
-    def test_from_raw_dict_with_invalid_schema_version_type_raises_error(self):
-        user_data_dict = {
+    def test_from_raw_dict_with_invalid_schema_version_type_raises_error(
+        self
+    ) -> None:
+        user_data_dict: user_domain.RawUserDataDict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
             'pin': '123',
-            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_language_codes': ['preferred_language_codes'],
             'preferred_site_language_code': 'preferred_site_language_code',
             'preferred_audio_language_code': 'preferred_audio_language_code',
             'user_id': 'user_id',
         }
-        invalid_schema_versions = (
+        invalid_schema_versions: List[Any] = [
             '', 'abc', '-1', '1', {}, [1], 1.0
-        )
+        ]
         for version in invalid_schema_versions:
             user_data_dict['schema_version'] = version
             error_msg = (
                 'Version has invalid type, expected int, '
                 'received %s' % type(version)
             )
-            with self.assertRaisesRegex(Exception, error_msg):
+            with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
                 user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     # This test should be modified to use the original class ModifiableUserData
