@@ -50,7 +50,7 @@ Reference:
 
 <!--
 In some cases this is not needed (e.g. for pages that we do not expect to 
-support mobile phone).
+support mobile phone or when working on a backend feature).
 
 Feel free to use the Developer Tools emulator for this.
 -->
