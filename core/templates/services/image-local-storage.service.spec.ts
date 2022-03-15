@@ -85,4 +85,21 @@ describe('ImageLocalStorageService', () => {
     imageLocalStorageService.setThumbnailBgColor(bgColor);
     expect(imageLocalStorageService.getThumbnailBgColor()).toEqual(bgColor);
   });
+
+  it('should map image filenames to base64 string', async() => {
+    const sampleImageData = [{
+      filename: 'image1.png',
+      imageBlob: new Blob(['image1'], {type: 'image/png'})
+    }, {
+      filename: 'image2.png',
+      imageBlob: new Blob(['image2'], {type: 'image/png'})
+    }];
+    const imageFilenameTob64Mapping = (
+      await imageLocalStorageService.getFilenameToBase64MappingAsync(
+        sampleImageData));
+    expect(Object.keys(imageFilenameTob64Mapping).sort()).toEqual(
+      ['image1.png', 'image2.png']);
+    expect(imageFilenameTob64Mapping['image1.png']).toEqual('aW1hZ2Ux');
+    expect(imageFilenameTob64Mapping['image2.png']).toEqual('aW1hZ2Uy');
+  });
 });

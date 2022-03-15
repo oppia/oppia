@@ -582,7 +582,7 @@ describe('Translation Modal Component', () => {
           filename: 'imageFilename2',
           imageBlob: 'imageBlob2'
         }];
-        let imageToBase64Mapping = {
+        const imageToBase64Mapping = {
           imageFilename1: 'img1Base64',
           imageFilename2: 'img2Base64'
         };
