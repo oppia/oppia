@@ -40,6 +40,7 @@ class GetNumberOfStoriesWithInvalidThumbnailBgColorJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid stories with their id and
         thumbnail bg color.
+
         Returns:
             PCollection. Returns PCollection of invalid stories with
             their id and thumbnail bg color.
