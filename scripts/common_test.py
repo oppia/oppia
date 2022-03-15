@@ -278,7 +278,6 @@ class CommonTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
 
-
     def test_update_branch_with_upstream(self):
         def mock_check_output(unused_cmd_tokens):
             return b'On branch test'
