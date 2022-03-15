@@ -1608,20 +1608,6 @@ class JsonEncodedInString(BaseObject):
     """Converts stringified value to its actual data type."""
 
     @classmethod
-    def get_schema(cls):
-        """Returns the object schema.
-
-        Returns:
-            dict. The object schema.
-        """
-        return {
-            'type': 'basestring',
-            'validators': [{
-                'id': 'is_nonempty'
-            }]
-        }
-
-    @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object.
 
@@ -1634,14 +1620,10 @@ class JsonEncodedInString(BaseObject):
 
         Raises:
             Exception. Given arg is not of type str.
-            Exception. Given arg is not in valid JSON format.
         """
         if not isinstance(raw, str):
             raise Exception('Expected string received %s of type %s' % (
                 raw, type(raw))
             )
 
-        try:
-            return json.loads(raw)
-        except json.decoder.JSONDecodeError as e:
-            raise Exception('Expect %s to be a valid JSON' % (raw)) from e
+        return json.loads(raw)

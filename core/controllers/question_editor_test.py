@@ -552,7 +552,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.get_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, 'invalid_question_id'),
-            expected_status_int=404)
+            expected_status_int=400)
         self.logout()
 
     def test_delete_with_guest_does_not_allow_question_deletion(self):
@@ -672,9 +672,11 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
             payload,
             csrf_token=csrf_token, expected_status_int=400)
-        self.assertEqual(
-            response_json['error'],
-            'Commit messages must be at most 375 characters long.')
+        error_msg = (
+            'Schema validation for \'commit_message\' failed: Validation '
+            'failed: has_length_at_most ({\'max_value\': %d}) for object %s'
+            % (constants.MAX_COMMIT_MESSAGE_LENGTH, payload['commit_message']))
+        self.assertEqual(response_json['error'], error_msg)
 
     def test_put_with_admin_email_allows_question_editing(self):
         payload = {}
@@ -707,14 +709,14 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
                 self.question_id), payload,
-            csrf_token=csrf_token, expected_status_int=404)
+            csrf_token=csrf_token, expected_status_int=400)
         del payload['commit_message']
         payload['change_list'] = change_list
         self.put_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
                 self.question_id), payload,
-            csrf_token=csrf_token, expected_status_int=404)
+            csrf_token=csrf_token, expected_status_int=400)
         payload['commit_message'] = 'update question data'
         self.put_json(
             feconf.QUESTION_EDITOR_DATA_URL_PREFIX, payload,
