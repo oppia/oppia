@@ -61,6 +61,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   placeholderImageUrl = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
+
   editableThumbnailDataUrl: string;
   transformedData: string;
   parsedResponse;
@@ -75,9 +76,11 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
+
   placeholderImageDataUrl = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
+
   thumbnailIsLoading = true;
 
   ngOnInit(): void {

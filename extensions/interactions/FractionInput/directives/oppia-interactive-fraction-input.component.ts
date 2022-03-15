@@ -24,7 +24,6 @@ import { Fraction } from 'domain/objects/fraction.model';
 import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
 import { FractionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 
 import { FractionInputRulesService } from './fraction-input-rules.service';
@@ -58,6 +57,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     type: 'unicode',
     ui_config: {}
   };
+
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private fractionInputRulesService: FractionInputRulesService,
@@ -182,8 +182,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
         this.isValid = false;
       } else {
         this.currentInteractionService.onSubmit(
-          fraction as unknown as string,
-          this.fractionInputRulesService as unknown as InteractionRulesService);
+          fraction, this.fractionInputRulesService);
       }
     } catch (parsingError) {
       this.errorMessageI18nKey = parsingError.message;

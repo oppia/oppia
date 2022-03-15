@@ -32,6 +32,7 @@ from core.domain import exp_services_test
 from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -994,6 +995,16 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
+
+    def setUp(self):
+        super(ExplorationDomainUnitTests, self).setUp()
+        translation_dict = {
+            'content_id_3': translation_domain.TranslatedContent(
+                'My name is Nikhil.', True)
+        }
+        self.dummy_entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
 
     # TODO(bhenning): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
@@ -2331,6 +2342,97 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.deserialize(
                 exploration.serialize()).to_dict())
 
+    def test_get_all_translatable_content_for_exp(self):
+        """Get all translatable fields from exploration."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_content_dict = {
+            'content_id': 'content',
+            'html': '<p>state content html</p>'
+        }
+        state_answer_group = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                            }})
+            ],
+            [],
+            None
+        )]
+        state_default_outcome = state_domain.Outcome(
+            'State1', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for State1</p>'),
+            False, [], None, None
+        )
+        state_hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state1</p>'
+                )
+            ),
+        ]
+        state_solution_dict = {
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
+        state_interaction_cust_args = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'rows': {'value': 1}
+        }
+        state.update_next_content_id_index(3)
+        state.update_content(
+            state_domain.SubtitledHtml.from_dict(state_content_dict))
+        state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args(state_interaction_cust_args)
+        state.update_interaction_answer_groups(
+            state_answer_group)
+        state.update_interaction_default_outcome(state_default_outcome)
+        state.update_interaction_hints(state_hint_list)
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, state_solution_dict)
+        state.update_interaction_solution(solution)
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            exploration.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents,
+            [
+                '<p>state outcome html</p>',
+                '<p>Default outcome for State1</p>',
+                '<p>Hello, this is html1 for state1</p>',
+                ['Test'],
+                '<p>Hello, this is html2 for state1</p>',
+                '<p>This is solution for state1</p>',
+                '<p>state content html</p>'
+            ])
+
     def test_android_proto_size_calculation_is_correct(self):
         """Test proto size calculation function."""
         exploration = self.save_new_valid_exploration(
@@ -2579,6 +2681,18 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in viewer_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_duplicate_user_role(self):
+        self.exp_summary.owner_ids = ['1']
+        self.exp_summary.editor_ids = ['2', '3']
+        self.exp_summary.voice_artist_ids = ['4']
+        self.exp_summary.viewer_ids = ['2']
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'Users should not be assigned to multiple roles at once, '
+                'received users: 1, 2, 3, 4, 2')
+        ):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_contributor_ids_type(self):
@@ -4207,7 +4321,7 @@ title: Title
         """Tests the migration of ItemSelectionInput rule inputs."""
         sample_yaml_content = (
             """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
@@ -4323,7 +4437,7 @@ title: Title
 
         latest_sample_yaml_content = (
             """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
@@ -4966,7 +5080,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'param_specs': {},
             'language_code': 'en',
-            'correctness_feedback_enabled': False,
+            'correctness_feedback_enabled': True,
         })
 
 

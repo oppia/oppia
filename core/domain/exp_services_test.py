@@ -25,10 +25,8 @@ import re
 import zipfile
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import classifier_services
-from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -1832,7 +1830,7 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     )
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
@@ -1940,7 +1938,7 @@ title: A title
 
     UPDATED_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
@@ -2108,7 +2106,7 @@ title: A title
                         '</oppia-noninteractive-image>').to_dict()
                 })], 'Add state name')
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
@@ -2199,7 +2197,7 @@ title: A title
                         '</oppia-noninteractive-image>').to_dict()
                 })], 'Add state name')
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -2208,7 +2206,7 @@ title: A title
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID))
         fs.commit('image/abc.png', raw_image)
         # Audio files should not be included in asset downloads.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'), 'rb', encoding=None
         ) as f:
             raw_audio = f.read()
@@ -2282,7 +2280,7 @@ title: A title
                 'alt-with-value="&quot;Image&quot;">'
                 '</oppia-noninteractive-image>').to_dict()
         })]
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None
         ) as f:
@@ -2571,7 +2569,7 @@ written_translations:
             'new_value': 1
         })]
         exploration.objective = 'The objective'
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
@@ -2759,19 +2757,25 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_param_changes(self):
         """Test updating of param_changes."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        exploration.param_specs = {
-            'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.owner_id, exploration, '', [])  # pylint: disable=protected-access
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'param_specs',
+            'new_value': {
+                'myParam': {'obj_type': 'UnicodeString'}
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, '')
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'param_changes', self.param_changes), '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        param_changes = exploration.init_state.param_changes[0]
-        self.assertEqual(param_changes._name, 'myParam')  # pylint: disable=protected-access
-        self.assertEqual(param_changes._generator_id, 'RandomSelector')  # pylint: disable=protected-access
+        param_changes = exploration.init_state.param_changes[0].to_dict()
+        self.assertEqual(param_changes['name'], 'myParam')
+        self.assertEqual(param_changes['generator_id'], 'RandomSelector')
         self.assertEqual(
-            param_changes._customization_args,  # pylint: disable=protected-access
+            param_changes['customization_args'],
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
 
     def test_update_invalid_param_changes(self):
@@ -2811,10 +2815,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_invalid_generator(self):
         """Test for check that the generator_id in param_changes exists."""
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        exploration.param_specs = {
-            'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.owner_id, exploration, '', [])  # pylint: disable=protected-access
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'param_specs',
+            'new_value': {
+                'myParam': {'obj_type': 'UnicodeString'}
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, '')
 
         self.param_changes[0]['generator_id'] = 'fake'
         with self.assertRaisesRegex(
@@ -4217,9 +4226,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             snapshots_metadata[1]['created_on_ms'])
 
         # Using the old version of the exploration should raise an error.
-        with self.assertRaisesRegex(Exception, 'version 1, which is too old'):
-            exp_services._save_exploration(  # pylint: disable=protected-access
-                second_committer_id, v1_exploration, '', [])
+        change_list_swap = self.swap_to_always_return(
+            exp_services, 'apply_change_list', value=v1_exploration)
+        with change_list_swap, self.assertRaisesRegex(
+            Exception, 'version 1, which is too old'):
+            exp_services.update_exploration(
+                second_committer_id, self.EXP_0_ID, [], 'commit_message')
 
         # Another person modifies the exploration.
         new_change_list = [exp_domain.ExplorationChange({
@@ -4270,10 +4282,13 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
-
-        exploration.title = 'First title'
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            self.owner_id, exploration, 'Changed title.', [])
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'First title'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, 'Changed title.')
         commit_dict_2 = {
             'committer_id': self.owner_id,
             'commit_message': 'Changed title.',
@@ -4367,9 +4382,13 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # In version 1, the title was 'A title'.
         # In version 2, the title becomes 'V2 title'.
-        exploration.title = 'V2 title'
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            self.owner_id, exploration, 'Changed title.', [])
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'V2 title'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, 'Changed title.')
 
         # In version 3, a new state is added.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -4647,24 +4666,37 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
         def populate_datastore():
             """Populates the database according to the sequence."""
-            exploration_1 = self.save_new_valid_exploration(
+            self.save_new_valid_exploration(
                 self.EXP_ID_1, self.albert_id)
 
-            exploration_1.title = 'Exploration 1 title'
-            exp_services._save_exploration(  # pylint: disable=protected-access
-                self.bob_id, exploration_1, 'Changed title.', [])
+            change_list = [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Exploration 1 title'
+            })]
+            exp_services.update_exploration(
+                self.bob_id, self.EXP_ID_1, change_list, 'Changed title.')
 
-            exploration_2 = self.save_new_valid_exploration(
+            self.save_new_valid_exploration(
                 self.EXP_ID_2, self.albert_id)
 
-            exploration_1.title = 'Exploration 1 Albert title'
-            exp_services._save_exploration(  # pylint: disable=protected-access
-                self.albert_id, exploration_1,
-                'Changed title to Albert1 title.', [])
+            change_list = [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Exploration 1 Albert title'
+            })]
+            exp_services.update_exploration(
+                self.albert_id, self.EXP_ID_1,
+                change_list, 'Changed title to Albert1 title.')
 
-            exploration_2.title = 'Exploration 2 Albert title'
-            exp_services._save_exploration(  # pylint: disable=protected-access
-                self.albert_id, exploration_2, 'Changed title to Albert2.', [])
+            change_list = [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Exploration 2 Albert title'
+            })]
+            exp_services.update_exploration(
+                self.albert_id, self.EXP_ID_2,
+                change_list, 'Changed title to Albert2.')
 
             exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
 
@@ -5608,9 +5640,15 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.param_changes, [])
 
-        exploration.param_specs = {
-            'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.albert_id, exploration, '', [])  # pylint: disable=protected-access
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'param_specs',
+            'new_value': {
+                'myParam': {'obj_type': 'UnicodeString'}
+            }
+        })]
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, change_list, '')
 
         param_changes = [{
             'customization_args': {
@@ -5709,7 +5747,7 @@ title: Old Title
 
     def test_update_exploration_auto_tts_enabled(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.auto_tts_enabled, True)
+        self.assertEqual(exploration.auto_tts_enabled, False)
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -6228,9 +6266,15 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         # Create explorations.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID1, self.USER_ID)
-        exploration.param_specs = {
-            'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.USER_ID, exploration, '', [])  # pylint: disable=protected-access
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'param_specs',
+            'new_value': {
+                'myParam': {'obj_type': 'UnicodeString'}
+            }
+        })]
+        exp_services.update_exploration(
+            self.USER_ID, self.EXP_ID1, change_list, '')
         self.save_new_valid_exploration(self.EXP_ID2, self.USER_ID)
         self.save_new_valid_exploration(self.EXP_ID3, self.USER_ID)
         self.init_state_name = exploration.init_state_name
@@ -6340,11 +6384,11 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         updated_exp = exp_services.get_exp_with_draft_applied(
             self.EXP_ID1, self.USER_ID)
         self.assertIsNotNone(updated_exp)
-        param_changes = updated_exp.init_state.param_changes[0]
-        self.assertEqual(param_changes._name, 'myParam')  # pylint: disable=protected-access
-        self.assertEqual(param_changes._generator_id, 'RandomSelector')  # pylint: disable=protected-access
+        param_changes = updated_exp.init_state.param_changes[0].to_dict()
+        self.assertEqual(param_changes['name'], 'myParam')
+        self.assertEqual(param_changes['generator_id'], 'RandomSelector')
         self.assertEqual(
-            param_changes._customization_args,  # pylint: disable=protected-access
+            param_changes['customization_args'],
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
 
     def test_get_exp_with_draft_applied_when_draft_does_not_exist(self):
@@ -6488,9 +6532,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
     """Test apply draft functions in exp_services."""
 
     EXP_ID1 = 'exp_id1'
-    USERNAME = 'user123'
     USER_ID = 'user_id'
-    COMMIT_MESSAGE = 'commit message'
     DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
 
     def setUp(self):
@@ -6498,8 +6540,26 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         # Create explorations.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID1, self.USER_ID)
-        exploration.param_specs = {
-            'myParam': param_domain.ParamSpec('UnicodeString')}
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'param_specs',
+            'new_value': {
+                'myParam': {'obj_type': 'UnicodeString'}
+            }
+        })]
+        exp_services.update_exploration(
+            self.USER_ID, self.EXP_ID1, change_list, '')
+
+        migration_change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+            'from_version': 48,
+            'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
+        })]
+        exp_services.update_exploration(
+            self.USER_ID, self.EXP_ID1,
+            migration_change_list, 'Migrate state schema.')
+
         self.init_state_name = exploration.init_state_name
         self.param_changes = [{
             'customization_args': {
@@ -6514,34 +6574,24 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         self.draft_change_list_dict = [
             change.to_dict() for change in self.draft_change_list]
         # Explorations with draft set.
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.USER_ID, self.EXP_ID1), user_id=self.USER_ID,
-            exploration_id=self.EXP_ID1,
-            draft_change_list=self.draft_change_list_dict,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=1,
-            draft_change_list_id=2).put()
-
-        migration_change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': '0',
-            'to_version': '1'
-        })]
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            self.USER_ID, exploration, 'Migrate state schema.',
-            migration_change_list)
+        exp_user_data = user_models.ExplorationUserDataModel.create(
+            self.USER_ID, self.EXP_ID1)
+        exp_user_data.draft_change_list = self.draft_change_list_dict
+        exp_user_data.draft_change_list_last_updated = self.DATETIME
+        exp_user_data.draft_change_list_exp_version = 2
+        exp_user_data.draft_change_list_id = 2
+        exp_user_data.update_timestamps()
+        exp_user_data.put()
 
     def test_get_exp_with_draft_applied_after_draft_upgrade(self):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID1)
         self.assertEqual(exploration.init_state.param_changes, [])
-        draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=line-too-long, protected-access
-            classmethod(lambda cls, changelist: changelist))
         updated_exp = exp_services.get_exp_with_draft_applied(
             self.EXP_ID1, self.USER_ID)
         self.assertIsNotNone(updated_exp)
-        param_changes = updated_exp.init_state.param_changes[0]
-        self.assertEqual(param_changes._name, 'myParam')  # pylint: disable=protected-access
-        self.assertEqual(param_changes._generator_id, 'RandomSelector')  # pylint: disable=protected-access
+        param_changes = updated_exp.init_state.param_changes[0].to_dict()
+        self.assertEqual(param_changes['name'], 'myParam')
+        self.assertEqual(param_changes['generator_id'], 'RandomSelector')
         self.assertEqual(
-            param_changes._customization_args,  # pylint: disable=protected-access
+            param_changes['customization_args'],
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})

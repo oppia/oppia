@@ -31,6 +31,7 @@ from core import utils
 from core.constants import constants
 from core.domain import customization_args_util
 from core.domain import param_domain
+from core.domain import translation_domain
 from extensions.objects.models import objects
 from proto_files import languages_pb2
 from proto_files import state_pb2
@@ -44,7 +45,7 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 # with 'invalid-import-from'.
 
 
-class AnswerGroup:
+class AnswerGroup(translation_domain.BaseTranslatableObject):
     """Value object for an answer group. Answer groups represent a set of rules
     dictating whether a shared feedback should be shared with the user. These
     rules are ORed together. Answer groups may also support a classifier
@@ -75,6 +76,30 @@ class AnswerGroup:
         self.outcome = outcome
         self.training_data = training_data
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
+
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields in the answer group.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        if self.outcome is not None:
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(self.outcome)
+            )
+        for rule_spec in self.rule_specs:
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(rule_spec)
+            )
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this AnswerGroup domain object.
@@ -186,6 +211,11 @@ class AnswerGroup:
 
         Returns:
             list(str). The list of all html content strings in the interaction.
+
+        Raises:
+            Exception. The Rule spec has an invalid format.
+            Exception. The Rule spec has no valid input variable
+                with HTML in it.
         """
         html_list = []
 
@@ -282,7 +312,7 @@ class AnswerGroup:
         return answer_group_dict
 
 
-class Hint:
+class Hint(translation_domain.BaseTranslatableObject):
     """Value object representing a hint."""
 
     def __init__(self, hint_content):
@@ -293,6 +323,24 @@ class Hint:
                 other assets for this content.
         """
         self.hint_content = hint_content
+
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the hint.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.HTML,
+            self.hint_content.content_id,
+            self.hint_content.html)
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this Hint domain object.
@@ -349,7 +397,7 @@ class Hint:
         return hint_dict
 
 
-class Solution:
+class Solution(translation_domain.BaseTranslatableObject):
     """Value object representing a solution.
 
     A solution consists of answer_is_exclusive, correct_answer and an
@@ -382,6 +430,24 @@ class Solution:
             interaction_registry.Registry.get_interaction_by_id(
                 interaction_id).normalize_answer(correct_answer))
         self.explanation = explanation
+
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the solution.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.HTML,
+            self.explanation.content_id,
+            self.explanation.html)
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this Solution domain object.
@@ -465,6 +531,9 @@ class Solution:
 
         Returns:
             dict. The converted Solution dict.
+
+        Raises:
+            Exception. The Solution dict has an invalid answer type.
         """
         if interaction_id is None:
             return solution_dict
@@ -502,11 +571,84 @@ class Solution:
         return solution_dict
 
 
-class InteractionInstance:
+class InteractionInstance(translation_domain.BaseTranslatableObject):
     """Value object for an instance of an interaction."""
 
     # The default interaction used for a new state.
     _DEFAULT_INTERACTION_ID = None
+
+    def __init__(
+            self, interaction_id, customization_args, answer_groups,
+            default_outcome, confirmed_unclassified_answers, hints, solution):
+        """Initializes a InteractionInstance domain object.
+
+        Args:
+            interaction_id: str. The interaction id.
+            customization_args: dict. The customization dict. The keys are
+                names of customization_args and the values are dicts with a
+                single key, 'value', whose corresponding value is the value of
+                the customization arg.
+            answer_groups: list(AnswerGroup). List of answer groups of the
+                interaction instance.
+            default_outcome: Outcome. The default outcome of the interaction
+                instance.
+            confirmed_unclassified_answers: list(*). List of answers which have
+                been confirmed to be associated with the default outcome.
+            hints: list(Hint). List of hints for this interaction.
+            solution: Solution. A possible solution for the question asked in
+                this interaction.
+        """
+        self.id = interaction_id
+        # Customization args for the interaction's view. Parts of these
+        # args may be Jinja templates that refer to state parameters.
+        # This is a dict: the keys are names of customization_args and the
+        # values are dicts with a single key, 'value', whose corresponding
+        # value is the value of the customization arg.
+        self.customization_args = customization_args
+        self.answer_groups = answer_groups
+        self.default_outcome = default_outcome
+        self.confirmed_unclassified_answers = confirmed_unclassified_answers
+        self.hints = hints
+        self.solution = solution
+
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the interaction instance.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        if self.default_outcome is not None:
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(self.default_outcome)
+            )
+        for answer_group in self.answer_groups:
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(answer_group)
+            )
+        for customization_arg in self.customization_args.values():
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(customization_arg)
+            )
+        for hint in self.hints:
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(hint)
+            )
+        if self.solution is not None:
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(self.solution)
+            )
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this InteractionInstance domain object.
@@ -917,6 +1059,9 @@ class InteractionInstance:
 
         Returns:
             list(str). The list of all html content strings in the interaction.
+
+        Raises:
+            Exception. The solution has invalid type.
         """
         html_list = []
 
@@ -1064,7 +1209,7 @@ class InteractionInstance:
                 customization_args_dict, ca_specs_dict))
 
 
-class InteractionCustomizationArg:
+class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     """Object representing an interaction's customization argument.
     Any SubtitledHtml or SubtitledUnicode values in the customization argument
     value are represented as their respective domain objects here, rather than a
@@ -1080,6 +1225,38 @@ class InteractionCustomizationArg:
         """
         self.value = value
         self.schema = schema
+
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the interaction customization
+        args.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        subtitled_htmls = self.get_subtitled_html()
+        for subtitled_html in subtitled_htmls:
+            html_string = subtitled_html.html
+            # Make sure we don't include content that only consists of
+            # numbers. See issue #13055.
+            if not html_string.isnumeric():
+                translatable_contents_collection.add_translatable_field(
+                    translation_domain.TranslatableContentFormat.HTML,
+                    subtitled_html.content_id,
+                    html_string)
+
+        subtitled_unicodes = self.get_subtitled_unicode()
+        for subtitled_unicode in subtitled_unicodes:
+            translatable_contents_collection.add_translatable_field(
+                translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                subtitled_unicode.content_id,
+                subtitled_unicode.unicode_str)
+        return translatable_contents_collection
 
     def to_customization_arg_dict(self):
         """Converts a InteractionCustomizationArgument domain object to a
@@ -1370,12 +1547,13 @@ class InteractionCustomizationArg:
         }
 
 
-class Outcome:
+class Outcome(translation_domain.BaseTranslatableObject):
     """Value object representing an outcome of an interaction. An outcome
     consists of a destination state, feedback to show the user, and any
     parameter changes.
     """
 
+<<<<<<< HEAD
     def to_dict(self):
         """Returns a dict representing this Outcome domain object.
 
@@ -1428,6 +1606,8 @@ class Outcome:
             labelled_as_correct=self.labelled_as_correct
         )
 
+=======
+>>>>>>> d415824662425e84f4a01766d23b2cf5e9fefbce
     def __init__(
             self, dest, feedback, labelled_as_correct, param_changes,
             refresher_exploration_id, missing_prerequisite_skill_id):
@@ -1468,6 +1648,64 @@ class Outcome:
         # An optional skill id whose concept card would be shown to the learner
         # when the learner receives this outcome.
         self.missing_prerequisite_skill_id = missing_prerequisite_skill_id
+
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the outcome.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.HTML,
+            self.feedback.content_id,
+            self.feedback.html)
+        return translatable_contents_collection
+
+    def to_dict(self):
+        """Returns a dict representing this Outcome domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of Outcome instance.
+        """
+        return {
+            'dest': self.dest,
+            'feedback': self.feedback.to_dict(),
+            'labelled_as_correct': self.labelled_as_correct,
+            'param_changes': [
+                param_change.to_dict() for param_change in self.param_changes],
+            'refresher_exploration_id': self.refresher_exploration_id,
+            'missing_prerequisite_skill_id': self.missing_prerequisite_skill_id
+        }
+
+    @classmethod
+    def from_dict(cls, outcome_dict):
+        """Return a Outcome domain object from a dict.
+
+        Args:
+            outcome_dict: dict. The dict representation of Outcome object.
+
+        Returns:
+            Outcome. The corresponding Outcome domain object.
+        """
+        feedback = SubtitledHtml.from_dict(outcome_dict['feedback'])
+        feedback.validate()
+        return cls(
+            outcome_dict['dest'],
+            feedback,
+            outcome_dict['labelled_as_correct'],
+            [param_domain.ParamChange(
+                param_change['name'], param_change['generator_id'],
+                param_change['customization_args'])
+             for param_change in outcome_dict['param_changes']],
+            outcome_dict['refresher_exploration_id'],
+            outcome_dict['missing_prerequisite_skill_id']
+        )
 
     def validate(self):
         """Validates various properties of the Outcome.
@@ -2317,7 +2555,7 @@ class RecordedVoiceovers:
         self.voiceovers_mapping.pop(content_id, None)
 
 
-class RuleSpec:
+class RuleSpec(translation_domain.BaseTranslatableObject):
     """Value object representing a rule specification."""
 
     def __init__(self, rule_type, inputs):
@@ -2335,6 +2573,33 @@ class RuleSpec:
         """
         self.rule_type = rule_type
         self.inputs = inputs
+
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the rule spec.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        for input_value in self.inputs.values():
+            if 'normalizedStrSet' in input_value:
+                translatable_contents_collection.add_translatable_field(
+                    translation_domain.TranslatableContentFormat
+                    .SET_OF_NORMALIZED_STRING,
+                    input_value['contentId'],
+                    input_value['normalizedStrSet'])
+            if 'unicodeStrSet' in input_value:
+                translatable_contents_collection.add_translatable_field(
+                    translation_domain.TranslatableContentFormat
+                    .SET_OF_UNICODE_STRING,
+                    input_value['contentId'],
+                    input_value['unicodeStrSet'])
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this RuleSpec domain object.
@@ -2449,6 +2714,11 @@ class RuleSpec:
 
         Returns:
             dict. The converted Rule Spec dict.
+
+        Raises:
+            Exception. The Rule spec has an invalid format.
+            Exception. The Rule spec has no valid input variable
+                with HTML in it.
         """
         # TODO(#9413): Find a way to include a reference to the interaction
         # type in the Draft change lists.
@@ -2764,7 +3034,7 @@ class TranslatableItem:
         )
 
 
-class State:
+class State(translation_domain.BaseTranslatableObject):
     """Domain object for a state."""
 
     def __init__(
@@ -2817,6 +3087,26 @@ class State:
         self.solicit_answer_details = solicit_answer_details
         self.card_is_checkpoint = card_is_checkpoint
         self.next_content_id_index = next_content_id_index
+
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the state.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        translatable_contents_collection.add_translatable_field(
+            translation_domain.TranslatableContentFormat.HTML,
+            self.content.content_id,
+            self.content.html)
+        translatable_contents_collection.add_fields_from_translatable_object(
+            self.interaction)
+        return translatable_contents_collection
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
         """Validates various properties of the State.
@@ -3046,7 +3336,7 @@ class State:
             str. The YAML version of the state_dict.
 
         Raises:
-            Exception. The state_dict does not represent a valid state.
+            Exception. The state dict does not represent a valid state.
         """
         try:
             # Check if the state_dict can be converted to a State.
@@ -3100,6 +3390,10 @@ class State:
             new_ids_list: list(str). A list of content ids currently present
                 within the substructure (like answer groups, hints etc.) of
                 state.
+
+        Raises:
+            Exception. The content to be deleted doesn't exist.
+            Exception. The content to be added already exists.
         """
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
@@ -3253,6 +3547,9 @@ class State:
 
         Args:
             customization_args_dict: dict. The new customization_args to set.
+
+        Raises:
+            Exception. The customization arguments are not unique.
         """
         customization_args = (
             InteractionInstance.
@@ -3286,6 +3583,9 @@ class State:
         Args:
             answer_groups_list: list(AnswerGroup). List of AnswerGroup domain
                 objects.
+
+        Raises:
+            Exception. Type of AnswerGroup domain objects is not as expected.
         """
         if not isinstance(answer_groups_list, list):
             raise Exception(
@@ -3399,7 +3699,7 @@ class State:
                 default outcome.
 
         Raises:
-            Exception. The 'confirmed_unclassified_answers' is not a list.
+            Exception. Given answers is not of type list.
         """
         if not isinstance(confirmed_unclassified_answers, list):
             raise Exception(
@@ -3483,6 +3783,9 @@ class State:
         Args:
             solicit_answer_details: bool. The new value of
                 solicit_answer_details for the state.
+
+        Raises:
+            Exception. The argument is not of type bool.
         """
         if not isinstance(solicit_answer_details, bool):
             raise Exception(
@@ -3496,6 +3799,9 @@ class State:
         Args:
             card_is_checkpoint: bool. The new value of
                 card_is_checkpoint for the state.
+
+        Raises:
+            Exception. The argument is not of type bool.
         """
         if not isinstance(card_is_checkpoint, bool):
             raise Exception(

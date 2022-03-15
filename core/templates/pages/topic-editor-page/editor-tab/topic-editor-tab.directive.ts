@@ -286,6 +286,9 @@ angular.module('oppia').directive('topicEditorTab', [
                   TopicUpdateService.setTopicUrlFragment(
                     $scope.topic, newTopicUrlFragment);
                   $rootScope.$applyAsync();
+                }, function() {
+                  TopicUpdateService.setTopicUrlFragment(
+                    $scope.topic, newTopicUrlFragment);
                 });
             } else {
               TopicUpdateService.setTopicUrlFragment(
@@ -334,14 +337,29 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
+          // Only update the topic if 1) the creator is turning off the
+          // practice tab or 2) the creator is turning on the practice tab
+          // and it has enough practice questions.
           $scope.updatePracticeTabIsDisplayed = function(
               newPracticeTabIsDisplayed) {
-            if (
-              newPracticeTabIsDisplayed !==
-              $scope.topic.getPracticeTabIsDisplayed()) {
+            if (!newPracticeTabIsDisplayed ||
+              $scope.doesTopicHaveMinimumPracticeQuestions()
+            ) {
               TopicUpdateService.setPracticeTabIsDisplayed(
                 $scope.topic, newPracticeTabIsDisplayed);
+              $scope.editablePracticeIsDisplayed = newPracticeTabIsDisplayed;
             }
+          };
+
+          $scope.doesTopicHaveMinimumPracticeQuestions = function() {
+            const skillQuestionCounts = (
+              Object.values($scope.skillQuestionCountDict));
+            const numberOfPracticeQuestions = (
+              skillQuestionCounts.reduce((a: number, b: number) => a + b, 0));
+            return (
+              numberOfPracticeQuestions >=
+              topicConstants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE
+            );
           };
 
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {

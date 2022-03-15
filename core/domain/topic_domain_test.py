@@ -22,7 +22,6 @@ import datetime
 import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import fs_domain
@@ -692,17 +691,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_get_subtopic_index(self) -> None:
         self.assertEqual(self.topic.get_subtopic_index(1), 0)
 
-    def test_to_dict(self) -> None:
-        user_ids = [self.user_id_a, self.user_id_b]
-        topic_rights = topic_domain.TopicRights(self.topic_id, user_ids, False)
-        expected_dict = {
-            'topic_id': self.topic_id,
-            'manager_names': ['A', 'B'],
-            'topic_is_published': False
-        }
-
-        self.assertEqual(expected_dict, topic_rights.to_dict())
-
     def test_is_manager(self) -> None:
         user_ids = [self.user_id_a, self.user_id_b]
         assert user_ids[0] is not None
@@ -755,7 +743,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.update_thumbnail_filename('img.svg')
 
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with python_utils.open_file(  # type: ignore[no-untyped-call]
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
@@ -809,7 +797,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
         # Test successful update of thumbnail_filename when the thumbnail
         # is found in the filesystem.
-        with python_utils.open_file(  # type: ignore[no-untyped-call]
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
@@ -1353,18 +1341,9 @@ class TopicRightsTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'B')
         self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
         self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
-        self.topic_summary_dict = {
-            'topic_id': 'topic_id',
-            'manager_names': ['A'],
-            'topic_is_published': False,
-        }
 
         self.topic_summary = topic_domain.TopicRights(
             'topic_id', [self.user_id_a], False)
-
-    def test_topic_summary_gets_created(self) -> None:
-        self.assertEqual(
-            self.topic_summary.to_dict(), self.topic_summary_dict)
 
     def test_is_manager(self) -> None:
         self.assertTrue(self.topic_summary.is_manager(self.user_id_a))

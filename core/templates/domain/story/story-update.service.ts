@@ -30,7 +30,7 @@ import { StoryChange } from 'domain/editor/undo_redo/change.model';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { Story } from 'domain/story/StoryObjectFactory';
-import { StoryContents } from 'domain/story/StoryContentsObjectFactory';
+import { StoryContents } from 'domain/story/story-contents-object.model';
 import { StoryNode } from './story-node.model';
 
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
@@ -56,6 +56,7 @@ export class StoryUpdateService {
     private _alertsService: AlertsService,
     private _storyEditorStateService: StoryEditorStateService
   ) {}
+
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // story.
@@ -81,6 +82,7 @@ export class StoryUpdateService {
   _getNodeIdFromChangeDict(changeDict: BackendChangeObject): string {
     return this._getParameterFromChangeDict(changeDict, 'node_id');
   }
+
   _getStoryNode(storyContents: StoryContents, nodeId: string): StoryNode {
     let storyNodeIndex = storyContents.getNodeIndex(nodeId);
     if (storyNodeIndex === -1) {
@@ -577,6 +579,7 @@ export class StoryUpdateService {
         this._storyEditorStateService.setExpIdsChanged();
       });
   }
+
   /**
    * Removes a node of a story and records the change in the
    * undo/redo service.

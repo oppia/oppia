@@ -34,6 +34,7 @@ export interface Testimonial {
   imageUrl: string;
   imageUrlWebp: string;
   borderPresent: boolean;
+  altText: string;
 }
 
 @Component({
@@ -82,6 +83,7 @@ export class TeachPageComponent implements OnInit {
         this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
       }));
   }
+
   // TODO(#11657): Extract the testimonials code into a separate component.
   // The 2 functions below are to cycle between values:
   // 0 to (testimonialCount - 1) for displayedTestimonialId.
@@ -101,25 +103,29 @@ export class TeachPageComponent implements OnInit {
       this.displayedTestimonialId + this.testimonialCount - 1) %
       this.testimonialCount;
   }
+
   getTestimonials(): [Testimonial, Testimonial, Testimonial] {
     return [{
       quote: 'I18N_TEACH_TESTIMONIAL_1',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
       imageUrl: '/teach/riya.jpg',
       imageUrlWebp: '/teach/riya.webp',
-      borderPresent: true
+      borderPresent: true,
+      altText: 'Photo of Riya'
     }, {
       quote: 'I18N_TEACH_TESTIMONIAL_2',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
       imageUrl: '/teach/awad.jpg',
       imageUrlWebp: '/teach/awad.webp',
-      borderPresent: true
+      borderPresent: true,
+      altText: 'Photo of Awad'
     }, {
       quote: 'I18N_TEACH_TESTIMONIAL_3',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
       imageUrl: '/teach/himanshu.jpg',
       imageUrlWebp: '/teach/himanshu.webp',
-      borderPresent: true
+      borderPresent: true,
+      altText: 'Photo of Himanshu'
     }];
   }
 

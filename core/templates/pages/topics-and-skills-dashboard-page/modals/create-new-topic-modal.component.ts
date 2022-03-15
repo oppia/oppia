@@ -38,8 +38,10 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   MAX_CHARS_IN_TOPIC_NAME: number = AppConstants.MAX_CHARS_IN_TOPIC_NAME;
   MAX_CHARS_IN_TOPIC_DESCRIPTION: number = (
     AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION);
+
   MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
     AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT);
+
   topicUrlFragmentExists: boolean = false;
   topicNameExists: boolean = false;
 
@@ -81,6 +83,8 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
       this.newlyCreatedTopic.urlFragment, () => {
         this.topicUrlFragmentExists = (
           this.topicEditorStateService.getTopicWithUrlFragmentExists());
+      }, () => {
+        return;
       });
   }
 
@@ -89,6 +93,8 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
       return;
     }
 
+    this.newlyCreatedTopic.name = this.newlyCreatedTopic.name
+      .replace(/\s+/g, ' ').trim();
     this.topicEditorStateService.updateExistenceOfTopicName(
       this.newlyCreatedTopic.name, () => {
         this.topicNameExists = (

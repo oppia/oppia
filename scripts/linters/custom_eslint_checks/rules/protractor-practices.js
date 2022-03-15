@@ -33,6 +33,9 @@ module.exports = {
     messages: {
       constInAllCaps: (
         'Please make sure that constant name “{{constName}}” are in all-caps'),
+      disallowedActiveElementMethod: (
+        'Please do not use browser.switchTo().activeElement()' +
+        ' in protractor files'),
       disallowedBrowserMethods: (
         'Please do not use browser.{{methodName}}() in protractor files'),
       disallowThen: 'Please do not use .then(), consider async/await instead',
@@ -51,6 +54,10 @@ module.exports = {
       'CallExpression[callee.object.name=element][callee.property.name=all]');
     var invalidAwaitSelector = (
       'AwaitExpression[argument.callee.property.name=/^(first|last|get)$/]');
+    var disallowedActiveElementMethodSelector = (
+      'MemberExpression[property.name=activeElement]' +
+      '[object.callee.property.name=switchTo]' +
+      '[object.callee.object.name=browser]');
     var disallowedBrowserMethods = [
       'sleep', 'explore', 'pause', 'waitForAngular'];
     var disallowedBrowserMethodsRegex = (
@@ -90,6 +97,13 @@ module.exports = {
           }
         }
       }
+    };
+
+    var reportDisallowedActiveElementMethod = function(node) {
+      context.report({
+        node: node,
+        messageId: 'disallowedActiveElementMethod'
+      });
     };
 
     var reportDisallowedBrowserMethod = function(node) {
@@ -151,6 +165,9 @@ module.exports = {
       },
       'VariableDeclaration[kind=const]': function(node) {
         checkConstName(node);
+      },
+      [disallowedActiveElementMethodSelector]: function(node) {
+        reportDisallowedActiveElementMethod(node);
       },
       [disallowedBrowserMethodsSelector]: function(node) {
         reportDisallowedBrowserMethod(node);

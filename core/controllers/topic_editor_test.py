@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import skill_services
@@ -175,7 +175,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         self.logout()
 
-    def test_story_creation(self):
+    def test_story_creation_with_valid_description(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -186,7 +186,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'story_url_fragment': 'story-frag-one'
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None
         ) as f:
@@ -203,6 +203,39 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             story_fetchers.get_story_by_id(story_id, strict=False))
         self.logout()
 
+    def test_story_creation_with_invalid_description(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'title': 'Story title',
+            'description': 'Story Description' * 60,
+            'filename': 'test_svg.svg',
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'story-frag-one'
+        }
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        json_response = self.post_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id), payload,
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400)
+
+        invalid_description = 'Story Description' * 60
+        self.assertEqual(
+            json_response['error'],
+            'Schema validation for \'description\' failed: '
+            'Validation failed: has_length_at_most '
+            f'({{\'max_value\': {constants.MAX_CHARS_IN_STORY_DESCRIPTION}}}) '
+            f'for object {invalid_description}')
+
+        self.logout()
+
     def test_story_creation_fails_with_invalid_image(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -214,7 +247,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'story_url_fragment': 'story-frag-two'
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'), 'rb',
             encoding=None
         ) as f:
@@ -249,7 +282,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             url_fragment='original'
         )
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None
         ) as f:

@@ -30,7 +30,7 @@ import sys
 import time
 
 from core import constants
-from core import python_utils
+from core import utils
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -58,7 +58,7 @@ NODE_VERSION = '16.13.0'
 YARN_VERSION = '1.22.15'
 
 # Versions of libraries used in backend.
-PILLOW_VERSION = '8.4.0'
+PILLOW_VERSION = '9.0.1'
 
 # Buf version.
 BUF_VERSION = '0.29.0'
@@ -82,7 +82,7 @@ PROTOC_VERSION = PROTOBUF_VERSION
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.2.4'
-ELASTICSEARCH_VERSION = '7.10.1'
+ELASTICSEARCH_VERSION = '7.17.0'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -145,6 +145,7 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
+APP_DEV_YAML_PATH = os.path.join('app_dev.yaml')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 5 * 60
 MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
 REDIS_CONF_PATH = os.path.join('redis.conf')
@@ -282,7 +283,21 @@ def open_new_tab_in_browser_if_possible(url):
         print('Please open the following link in browser: %s' % url)
         return
     browser_cmds = ['brave', 'chromium-browser', 'google-chrome', 'firefox']
-    for cmd in browser_cmds:
+    print(
+        'Please choose your default browser from the list using a number. '
+        'It will be given a preference over other available options.'
+    )
+    for index, browser in enumerate(browser_cmds):
+        print('%s). %s' % (index + 1, browser))
+
+    default_index = int(input().strip()) - 1
+    # Re-order the browsers by moving the user selected browser to the
+    # first position and copying over the browsers before and after
+    # the selected browser in the same order as they were present.
+    ordered_browser_cmds = (
+        [browser_cmds[default_index]] + browser_cmds[:default_index] +
+        browser_cmds[default_index + 1:])
+    for cmd in ordered_browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
             subprocess.check_call([cmd, url])
             return
@@ -299,18 +314,22 @@ def open_new_tab_in_browser_if_possible(url):
     input()
 
 
-def get_remote_alias(remote_url):
-    """Finds the correct alias for the given remote repository URL."""
+def get_remote_alias(remote_urls):
+    """Finds the correct alias for the given remote repository URLs."""
     git_remote_output = subprocess.check_output(
         ['git', 'remote', '-v']).decode('utf-8').split('\n')
     remote_alias = None
-    for line in git_remote_output:
-        if remote_url in line:
-            remote_alias = line.split()[0]
+    remote_url = None
+    for remote_url in remote_urls:
+        for line in git_remote_output:
+            if remote_url in line:
+                remote_alias = line.split()[0]
+        if remote_alias:
+            break
     if remote_alias is None:
         raise Exception(
             'ERROR: There is no existing remote alias for the %s repo.'
-            % remote_url)
+            % ', '.join(remote_urls))
 
     return remote_alias
 
@@ -345,6 +364,12 @@ def get_current_branch_name():
     return git_status_first_line[len(branch_message_prefix):]
 
 
+def update_branch_with_upstream():
+    """Updates the current branch with upstream."""
+    current_branch_name = get_current_branch_name()
+    run_cmd(['git', 'pull', 'upstream', current_branch_name])
+
+
 def get_current_release_version_number(release_branch_name):
     """Gets the release version given a release branch name.
 
@@ -353,6 +378,9 @@ def get_current_release_version_number(release_branch_name):
 
     Returns:
         str. The version of release.
+
+    Raises:
+        Exception. Invalid name of the release branch.
     """
     release_match = re.match(RELEASE_BRANCH_REGEX, release_branch_name)
     release_maintenance_match = re.match(
@@ -574,7 +602,7 @@ def create_readme(dir_path, readme_content):
             be created.
         readme_content: str. The content to be written in the README.
     """
-    with python_utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+    with utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
         f.write(readme_content)
 
 
@@ -597,6 +625,10 @@ def inplace_replace_file(
         replacement_string: str. The content to be replaced.
         expected_number_of_replacements: optional(int). The number of
             replacements that should be made. When None no check is done.
+
+    Raises:
+        ValueError. Wrong number of replacements.
+        Exception. The content failed to get replaced.
     """
     backup_filename = '%s.bak' % filename
     shutil.copyfile(filename, backup_filename)
@@ -604,14 +636,14 @@ def inplace_replace_file(
     total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
-        with python_utils.open_file(backup_filename, 'r') as f:
+        with utils.open_file(backup_filename, 'r') as f:
             for line in f:
                 new_line, number_of_replacements = regex.subn(
                     replacement_string, line)
                 new_contents.append(new_line)
                 total_number_of_replacements += number_of_replacements
 
-        with python_utils.open_file(filename, 'w') as f:
+        with utils.open_file(filename, 'w') as f:
             for line in new_contents:
                 f.write(line)
 
@@ -655,9 +687,9 @@ def inplace_replace_file_context(filename, regex_pattern, replacement_string):
     shutil.copyfile(filename, backup_filename)
 
     try:
-        with python_utils.open_file(backup_filename, 'r') as f:
+        with utils.open_file(backup_filename, 'r') as f:
             new_contents = [regex.sub(replacement_string, line) for line in f]
-        with python_utils.open_file(filename, 'w') as f:
+        with utils.open_file(filename, 'w') as f:
             f.write(''.join(new_contents))
         yield
     finally:
@@ -786,6 +818,9 @@ def write_stdout_safe(string):
 
     Args:
         string: str|bytes. The string to write to stdout.
+
+    Raises:
+        OSError. Failed to write the input string.
     """
     string_bytes = string.encode('utf-8') if isinstance(string, str) else string
 
