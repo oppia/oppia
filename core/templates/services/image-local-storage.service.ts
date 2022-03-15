@@ -114,7 +114,7 @@ export class ImageLocalStorageService {
   async getFilenameToBase64MappingAsync(
       imagesData: ImagesData[]
   ): Promise<Record<string, unknown>> {
-    let filesToBase64Mapping = {};
+    let filesToBase64Mapping: { [key: string]: unknown } = {};
     if (imagesData.length > 0) {
       for await (const obj of imagesData) {
         if (obj.imageBlob === null) {
