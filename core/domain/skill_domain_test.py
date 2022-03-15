@@ -95,7 +95,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_valid_misconception_id_greater_than_zero(self):
         self.skill.next_misconception_id = -12
         self._assert_validation_error(
-            'Expected misconception ID to be greater than 0')
+            'Expected misconception ID to be >= 0')
 
     def test_get_all_html_content_strings(self):
         html_strings = self.skill.get_all_html_content_strings()
