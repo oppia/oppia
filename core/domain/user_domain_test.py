@@ -163,6 +163,13 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data = (
             user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
+    def test_validate_non_str_user_id_raises_exception(self):
+        self.user_settings.user_id = 0
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected user_id to be a string'
+        ):
+            self.user_settings.validate()
+
     def test_validate_wrong_format_user_id_raises_exception(
         self
     ) -> None:
@@ -182,6 +189,28 @@ class UserSettingsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
+            self.user_settings.validate()
+
+    def test_validate_invalid_banned_value_type_raises_exception(self):
+        self.user_settings.banned = 123
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected banned to be a bool'):
+            self.user_settings.validate()
+
+        self.user_settings.banned = '123'
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected banned to be a bool'):
+            self.user_settings.validate()
+
+    def test_validate_invalid_roles_value_type_raises_exception(self):
+        self.user_settings.roles = 123
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected roles to be a list'):
+            self.user_settings.validate()
+
+        self.user_settings.roles = True
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected roles to be a list'):
             self.user_settings.validate()
 
     def test_validate_banned_user_with_roles_raises_exception(
@@ -212,6 +241,13 @@ class UserSettingsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected roles to contains one default role.'):
+            self.user_settings.validate()
+
+    def test_validate_non_str_pin_id(self):
+        self.user_settings.pin = 0
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected PIN to be a string'
+        ):
             self.user_settings.validate()
 
     def test_validate_invalid_length_pin_raises_error(self) -> None:
@@ -254,16 +290,39 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
+    def test_validate_non_str_role_raises_exception(self):
+        self.user_settings.roles = [0]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected roles to be a string'
+        ):
+            self.user_settings.validate()
+
     def test_validate_invalid_role_name_raises_exception(self) -> None:
         self.user_settings.roles = ['invalid_role']
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Role invalid_role does not exist.'):
             self.user_settings.validate()
 
+    def test_validate_non_str_display_alias_raises_error(self):
+        self.user_settings.display_alias = 0
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected display_alias to be a string,'
+            ' received %s' % self.user_settings.display_alias):
+            self.user_settings.validate()
+
+    def test_validate_non_str_creator_dashboard_display_pref_raises_error(self):
+        self.user_settings.creator_dashboard_display_pref = 0
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected dashboard display preference to be a string'
+        ):
+            self.user_settings.validate()
+
     def test_validation_none__email_raises_error(self) -> None:
         self.user_settings.email = None
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            utils.ValidationError, 'No user email specified.'):
+            utils.ValidationError, 'Expected email to be a string,'
+            ' received %s' % self.user_settings.email):
             self.user_settings.validate()
 
     def test_validation_wrong_email_raises_error(self) -> None:
@@ -415,9 +474,41 @@ class UserContributionsTests(test_utils.GenericTestBase):
             self.owner_id)
         self.user_contributions.validate()
 
-    def test_validate_user_id(self) -> None:
+    def test_validate_non_str_user_id(self):
+        self.user_contributions.user_id = 0
+        with self.assertRaisesRegex(
+            Exception, 'Expected user_id to be a string'):
+            self.user_contributions.validate()
+
+    def test_validate_user_id(self):
         self.user_contributions.user_id = ''
-        with self.assertRaisesRegex(Exception, 'No user id specified.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'No user id specified.'):
+            self.user_contributions.validate()
+
+    def test_validate_non_list_created_exploration_ids(self):
+        self.user_contributions.created_exploration_ids = 0
+        with self.assertRaisesRegex(
+            Exception, 'Expected created_exploration_ids to be a list'):
+            self.user_contributions.validate()
+
+    def test_validate_created_exploration_ids(self):
+        self.user_contributions.created_exploration_ids = [0]
+        with self.assertRaisesRegex(
+            Exception, 'Expected exploration_id in created_exploration_ids '
+            'to be a string'):
+            self.user_contributions.validate()
+
+    def test_validate_non_list_edited_exploration_ids(self):
+        self.user_contributions.edited_exploration_ids = 0
+        with self.assertRaisesRegex(
+            Exception, 'Expected edited_exploration_ids to be a list'):
+            self.user_contributions.validate()
+
+    def test_validate_edited_exploration_ids(self):
+        self.user_contributions.edited_exploration_ids = [0]
+        with self.assertRaisesRegex(
+            Exception, 'Expected exploration_id in edited_exploration_ids '
+            'to be a string'):
             self.user_contributions.validate()
 
     def test_cannot_create_user_contributions_with_migration_bot(
@@ -1073,6 +1164,20 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.user_contribution_rights.can_review_questions, True)
 
+    def test_can_review_translation_for_language_codes_incorrect_type(self):
+        self.user_contribution_rights.can_review_translation_for_language_codes = 5 # pylint: disable=line-too-long
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected can_review_translation_for_language_codes to be a list'):
+            self.user_contribution_rights.validate()
+
+    def test_can_review_voiceover_for_language_codes_incorrect_type(self):
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = 5 # pylint: disable=line-too-long
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected can_review_voiceover_for_language_codes to be a list'):
+            self.user_contribution_rights.validate()
+
     def test_incorrect_language_code_for_voiceover_raise_error(self) -> None:
         self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
@@ -1115,6 +1220,20 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected can_review_translation_for_language_codes list not to '
             'have duplicate values'):
+            self.user_contribution_rights.validate()
+
+    def test_incorrect_type_for_can_review_questions_raise_error(self):
+        self.user_contribution_rights.can_review_questions = 5
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected can_review_questions to be a boolean value'):
+            self.user_contribution_rights.validate()
+
+    def test_incorrect_type_for_can_submit_questions_raise_error(self):
+        self.user_contribution_rights.can_submit_questions = 5
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected can_submit_questions to be a boolean value'):
             self.user_contribution_rights.validate()
 
 
@@ -1185,6 +1304,20 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
         )
         self.assertEqual(modifiable_user_data.user_id, 'user_id')
 
+    def test_from_raw_dict_with_none_schema_version_raises_error(self):
+        user_data_dict = {
+            'schema_version': None,
+            'display_alias': 'display_alias',
+            'pin': '123',
+            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_site_language_code': 'preferred_site_language_code',
+            'preferred_audio_language_code': 'preferred_audio_language_code',
+            'user_id': 'user_id',
+        }
+        error_msg = 'Invalid modifiable user data: no schema version specified.'
+        with self.assertRaisesRegex(Exception, error_msg):
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
+
     def test_from_raw_dict_with_invalid_schema_version_raises_error(
         self
     ) -> None:
@@ -1206,6 +1339,28 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             user_data_dict['schema_version'] = version
             error_msg = 'Invalid version %s received.' % version
             with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+                user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
+
+    def test_from_raw_dict_with_invalid_schema_version_type_raises_error(self):
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '123',
+            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_site_language_code': 'preferred_site_language_code',
+            'preferred_audio_language_code': 'preferred_audio_language_code',
+            'user_id': 'user_id',
+        }
+        invalid_schema_versions = (
+            '', 'abc', '-1', '1', {}, [1], 1.0
+        )
+        for version in invalid_schema_versions:
+            user_data_dict['schema_version'] = version
+            error_msg = (
+                'Version has invalid type, expected int, '
+                'received %s' % type(version)
+            )
+            with self.assertRaisesRegex(Exception, error_msg):
                 user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     # This test should be modified to use the original class ModifiableUserData

@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import logging
 import os
+import re
 
 from core import feconf
 from core import utils
@@ -240,7 +241,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             ('@@', 'Invalid email address: @@'),
             ('abc', 'Invalid email address: abc'),
             ('', 'No user email specified.'),
-            (None, 'No user email specified.'),
+            (None, 'Expected email to be a string, received None'),
+            (
+                ['a', '@', 'b.com'],
+                re.escape(
+                    'Expected email to be a string, received '
+                    '[\'a\', \'@\', \'b.com\']'
+                )
+            )
         ]
         for email, error_msg in bad_email_addresses_with_expected_error_message:
             with self.assertRaisesRegex(utils.ValidationError, error_msg):
