@@ -25,7 +25,7 @@ import fnmatch
 import os
 import sys
 
-from core import python_utils
+from core import utils
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 15000
@@ -43,7 +43,7 @@ def _get_skip_files_list():
         IOError. If failed to open .gcloudignore in read mode.
     """
     try:
-        with python_utils.open_file('.gcloudignore', 'r') as gcloudignore:
+        with utils.open_file('.gcloudignore', 'r') as gcloudignore:
             gcloudignore_lines = gcloudignore.read().split('\n')
 
             skip_files_list = [
