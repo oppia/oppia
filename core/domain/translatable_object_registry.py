@@ -41,8 +41,9 @@ class Registry:
     """Registry of all translatable objects."""
 
     # Dict mapping object class names to their classes.
-    _translatable_objects_dict: Dict[TranslatableObjectNames,
-            TranslatableObjectClasses] = {}
+    _translatable_objects_dict: Dict[
+        TranslatableObjectNames, TranslatableObjectClasses
+    ] = {}
 
     @classmethod
     def _refresh_registry(cls) -> None:
