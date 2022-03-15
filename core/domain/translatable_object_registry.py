@@ -23,11 +23,11 @@ from typing import Dict, List, Type, Union
 from typing_extensions import Literal
 
 TranslatableObjectNames = Literal[
-        'TranslatableHtml',
-        'TranslatableUnicodeString',
-        'TranslatableSetOfUnicodeString',
-        'TranslatableSetOfNormalizedString',
-        ]
+    'TranslatableHtml',
+    'TranslatableUnicodeString',
+    'TranslatableSetOfUnicodeString',
+    'TranslatableSetOfNormalizedString',
+]
 
 TranslatableObjectClasses = Union[
         Type[objects.TranslatableHtml],
