@@ -30,11 +30,11 @@ TranslatableObjectNames = Literal[
 ]
 
 TranslatableObjectClasses = Union[
-        Type[objects.TranslatableHtml],
-        Type[objects.TranslatableUnicodeString],
-        Type[objects.TranslatableSetOfUnicodeString],
-        Type[objects.TranslatableSetOfNormalizedString],
-        ]
+    Type[objects.TranslatableHtml],
+    Type[objects.TranslatableUnicodeString],
+    Type[objects.TranslatableSetOfUnicodeString],
+    Type[objects.TranslatableSetOfNormalizedString],
+]
 
 
 class Registry:
