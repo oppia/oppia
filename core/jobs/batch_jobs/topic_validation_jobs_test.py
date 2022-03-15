@@ -35,11 +35,10 @@ class GetTopicsWithInvalidPageTitleFragmentTests(
     TOPIC_ID_1 = '1'
     TOPIC_ID_2 = '2'
     TOPIC_ID_3 = '3'
+    TOPIC_ID_4 = '4'
 
     def setUp(self):
         super().setUp()
-
-        long_fragment = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy'
 
         # This is an invalid model with page frag. len greater than 50.
         self.topic_1 = self.create_model(
@@ -53,7 +52,7 @@ class GetTopicsWithInvalidPageTitleFragmentTests(
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='topic_one',
             practice_tab_is_displayed=True,
-            page_title_fragment_for_web=long_fragment
+            page_title_fragment_for_web='a' * 60
         )
 
         # This is an valid model with valid page frag len.
@@ -86,6 +85,21 @@ class GetTopicsWithInvalidPageTitleFragmentTests(
             page_title_fragment_for_web='test'
         )
 
+        # This is an invalid model with page frag == None.
+        self.topic_4 = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_ID_4,
+            name='Topic 1',
+            canonical_name='topic 1',
+            story_reference_schema_version=12,
+            subtopic_schema_version=11,
+            next_subtopic_id=1,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='topic_one',
+            practice_tab_is_displayed=True,
+            page_title_fragment_for_web=None
+        )
+
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is([])
 
@@ -107,10 +121,10 @@ class GetTopicsWithInvalidPageTitleFragmentTests(
         ])
 
     def test_run_with_mixed_models(self) -> None:
-        self.put_multi([self.topic_1, self.topic_2, self.topic_3])
+        self.put_multi([self.topic_1, self.topic_2, self.topic_3, self.topic_4])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('TOPICS SUCCESS: 3'),
-            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
+            job_run_result.JobRunResult.as_stdout('TOPICS SUCCESS: 4'),
+            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 3'),
             job_run_result.JobRunResult.as_stderr(
                 f'The id of topic is {self.TOPIC_ID_1} and its page title '
                 + 'frag. len is '
@@ -119,4 +133,7 @@ class GetTopicsWithInvalidPageTitleFragmentTests(
                 f'The id of topic is {self.TOPIC_ID_3} and its page title '
                 + 'frag. len is '
                 + f'{len(self.topic_3.page_title_fragment_for_web)}'),
+            job_run_result.JobRunResult.as_stderr(
+                f'The id of topic is {self.TOPIC_ID_4} and its page title '
+                + 'frag. len is None'),
         ])

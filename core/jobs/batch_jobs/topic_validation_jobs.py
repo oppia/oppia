@@ -53,8 +53,8 @@ class GetTopicsWithInvalidPageTitleFragmentJob(base_jobs.JobBase):
             total_topics
             | 'Filter topics with title frag greater than 50 or less than 5' >>
                 beam.Filter(lambda topic: (
-                    len(topic[1]) > 50 or
-                    len(topic[1]) < 5
+                    topic[1] is None or
+                    (len(topic[1]) > 50 or len(topic[1]) < 5)
                     ))
         )
 
@@ -75,7 +75,10 @@ class GetTopicsWithInvalidPageTitleFragmentJob(base_jobs.JobBase):
             | 'Save info on invalid topics' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
                     'The id of topic is %s and its page title frag. len is %s'
-                    % (objects[0], len(objects[1]))
+                    % (
+                        objects[0],
+                        len(objects[1]) if objects[1] is not None else 'None'
+                    )
                 ))
         )
 
