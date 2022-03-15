@@ -35,7 +35,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   categorizedSkills!: SkillsCategorizedByTopics;
   skillsInSameTopicCount!: number;
   skillSummaries!: SkillSummaryBackendDict[];
-  untriagedSkillSummaries!: SkillSummary[];
+  untriagedSkillSummaries!: ShortSkillSummary[];
   selectedSkillId!: string;
   allowSkillsFromOtherTopics: boolean = false;
 

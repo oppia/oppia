@@ -176,18 +176,19 @@ class MultipleIncorrectAnswersTracker {
   providedIn: 'root'
 })
 export class PlaythroughService {
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  // The properties below are initialized with null values and are set to
+  // non-null values only when recording and scrutinizing playthroughs is
+  // enabled.
   private explorationId!: string;
   private explorationVersion!: number;
-  private eqTracker!: EarlyQuitTracker;
-  private cstTracker!: CyclicStateTransitionsTracker;
-  private misTracker!: MultipleIncorrectAnswersTracker;
-  private recordedLearnerActions!: LearnerAction[];
-  private playthroughStopwatch!: Stopwatch;
-  private playthroughDurationInSecs!: number;
   private learnerIsInSamplePopulation: boolean = false;
+
+  private eqTracker: EarlyQuitTracker | null = null;
+  private cstTracker: CyclicStateTransitionsTracker | null = null;
+  private misTracker: MultipleIncorrectAnswersTracker | null = null;
+  private recordedLearnerActions: LearnerAction[] | null = null;
+  private playthroughStopwatch: Stopwatch | null = null;
+  private playthroughDurationInSecs: number | null = null;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
@@ -231,19 +232,25 @@ export class PlaythroughService {
       return;
     }
 
-    this.recordedLearnerActions.push(
-      this.learnerActionObjectFactory.createNewAnswerSubmitAction({
-        state_name: {value: stateName},
-        dest_state_name: {value: destStateName},
-        interaction_id: {value: interactionId},
-        submitted_answer: {value: answer},
-        feedback: {value: feedback},
-        time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
-      }));
+    if (this.recordedLearnerActions !== null) {
+      this.recordedLearnerActions.push(
+        this.learnerActionObjectFactory.createNewAnswerSubmitAction({
+          state_name: {value: stateName},
+          dest_state_name: {value: destStateName},
+          interaction_id: {value: interactionId},
+          submitted_answer: {value: answer},
+          feedback: {value: feedback},
+          time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
+        }));
+    }
 
-    this.misTracker.recordStateTransition(destStateName);
+    if (this.misTracker !== null) {
+      this.misTracker.recordStateTransition(destStateName);
+    }
 
-    this.cstTracker.recordStateTransition(destStateName);
+    if (this.cstTracker !== null) {
+      this.cstTracker.recordStateTransition(destStateName);
+    }
   }
 
   recordExplorationQuitAction(
@@ -252,16 +259,23 @@ export class PlaythroughService {
       return;
     }
 
-    this.recordedLearnerActions.push(
-      this.learnerActionObjectFactory.createNewExplorationQuitAction({
-        state_name: {value: stateName},
-        time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
-      }));
+    if (this.recordedLearnerActions !== null) {
+      this.recordedLearnerActions.push(
+        this.learnerActionObjectFactory.createNewExplorationQuitAction({
+          state_name: {value: stateName},
+          time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
+        }));
+    }
 
-    this.playthroughDurationInSecs = this.playthroughStopwatch.getTimeInSecs();
+    if (this.playthroughStopwatch !== null) {
+      this.playthroughDurationInSecs = (
+        this.playthroughStopwatch.getTimeInSecs());
+    }
 
-    this.eqTracker.recordExplorationQuit(
-      stateName, this.playthroughDurationInSecs);
+    if (this.eqTracker !== null && this.playthroughDurationInSecs !== null) {
+      this.eqTracker.recordExplorationQuit(
+        stateName, this.playthroughDurationInSecs);
+    }
   }
 
   storePlaythrough(): void {
@@ -283,14 +297,20 @@ export class PlaythroughService {
    * If none of the issue types have been discovered, returns null instead.
    */
   private createNewPlaythrough(): Playthrough | null {
-    if (this.misTracker.foundAnIssue()) {
+    if (
+      this.misTracker &&
+      this.misTracker.foundAnIssue() &&
+      this.recordedLearnerActions !== null
+    ) {
       return this.playthroughObjectFactory
         .createNewMultipleIncorrectSubmissionsPlaythrough(
           this.explorationId, this.explorationVersion,
           this.misTracker.generateIssueCustomizationArgs(),
           this.recordedLearnerActions);
     } else if (
-      this.cstTracker.foundAnIssue()
+      this.cstTracker &&
+      this.cstTracker.foundAnIssue() &&
+      this.recordedLearnerActions !== null
     ) {
       return this.playthroughObjectFactory
         .createNewCyclicStateTransitionsPlaythrough(
@@ -298,7 +318,9 @@ export class PlaythroughService {
           this.cstTracker.generateIssueCustomizationArgs(),
           this.recordedLearnerActions);
     } else if (
-      this.eqTracker.foundAnIssue()
+      this.eqTracker &&
+      this.eqTracker.foundAnIssue() &&
+      this.recordedLearnerActions !== null
     ) {
       return this.playthroughObjectFactory
         .createNewEarlyQuitPlaythrough(
@@ -322,6 +344,7 @@ export class PlaythroughService {
 
   private hasRecordingFinished(): boolean {
     return (
+      this.recordedLearnerActions !== null &&
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
       this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
@@ -329,15 +352,23 @@ export class PlaythroughService {
   }
 
   private isRecordedPlaythroughHelpful(): boolean {
-    return (
-      // Playthroughs are only helpful in their entirety.
-      this.hasRecordingFinished() &&
-      // Playthroughs are only helpful if learners have attempted an answer.
-      this.recordedLearnerActions.some(
-        a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
-      // Playthroughs are only helpful if learners have invested enough time.
-      this.playthroughDurationInSecs >=
-        ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
+    const hasRecordedPlayFinished = this.hasRecordingFinished();
+    if (
+      this.recordedLearnerActions !== null &&
+      this.playthroughDurationInSecs !== null &&
+      hasRecordedPlayFinished !== undefined
+    ) {
+      return (
+        // Playthroughs are only helpful in their entirety.
+        this.hasRecordingFinished() &&
+        // Playthroughs are only helpful if learners have attempted an answer.
+        this.recordedLearnerActions.some(
+          a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
+        // Playthroughs are only helpful if learners have invested enough time.
+        this.playthroughDurationInSecs >=
+          ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
+    }
+    return false;
   }
 }
 
