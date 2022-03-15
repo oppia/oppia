@@ -16,62 +16,41 @@
  * @fileoverview Unit tests for PlaythroughIssuesService.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+import { TestBed } from '@angular/core/testing';
+import { PlaythroughIssuesService } from './playthrough-issues.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-backend-api.service';
 
-describe('Playthrough Issues Service', function() {
-  var PlaythroughIssuesService = null;
-  var PlaythroughIssueObjectFactory = null;
-  var PlaythroughIssuesBackendApiService = null;
-  var $q = null;
-  var explorationId = 'abc1';
-  var explorationVersion = 1;
-  var backendIssues = [{
-    issue_type: 'MultipleIncorrectSubmissions',
-    issue_customization_args: {
-      state_name: {
-        value: 'state_name1'
-      },
-      state_names: {
-        value: ['state_name1', 'state_name2', 'state_name3']
-      },
-      num_times_answered_incorrectly: {
-        value: 7
-      }
-    },
-    playthrough_ids: ['playthrough_id2'],
-    schema_version: 1,
-    is_valid: true
-  }];
+describe('Playthrough Issues Service', () => {
+  let playthroughIssuesService: PlaythroughIssuesService;
+  let playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
 
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector) {
-    PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
-    PlaythroughIssueObjectFactory = $injector.get(
-      'PlaythroughIssueObjectFactory');
-    PlaythroughIssuesBackendApiService = $injector.get(
-      'PlaythroughIssuesBackendApiService');
-    $q = $injector.get('$q');
-
-    PlaythroughIssuesService.initSession(explorationId, explorationVersion);
-  }));
-
-  it('should get issues from backend', function() {
-    var backendCallSpy = spyOn(
-      PlaythroughIssuesBackendApiService, 'fetchIssuesAsync').and.returnValue(
-      $q.resolve(backendIssues.map(
-        PlaythroughIssueObjectFactory.createFromBackendDict)));
-
-    PlaythroughIssuesService.getIssues().then(function(issues) {
-      expect(backendCallSpy).toHaveBeenCalled();
-      expect(issues).toEqual(
-        backendIssues.map(
-          PlaythroughIssueObjectFactory.createFromBackendDict));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        PlaythroughIssuesService,
+        PlaythroughIssuesBackendApiService
+      ]
     });
+
+    playthroughIssuesService = TestBed.inject(PlaythroughIssuesService);
+    playthroughIssuesBackendApiService = (
+      TestBed.inject(PlaythroughIssuesBackendApiService));
+
+    spyOn(playthroughIssuesBackendApiService, 'fetchIssuesAsync')
+      .and.stub();
+  });
+
+  it('should be defined', () => {
+    playthroughIssuesService.initSession('explorationId', 1);
+
+    expect(playthroughIssuesService.explorationId).toBe('explorationId');
+    expect(playthroughIssuesService.explorationVersion).toEqual(1);
+
+    playthroughIssuesService.getIssues();
+
+    expect(playthroughIssuesBackendApiService.fetchIssuesAsync)
+      .toHaveBeenCalled();
   });
 });

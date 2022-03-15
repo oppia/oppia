@@ -758,15 +758,18 @@ export class ExplorationStatesService {
     this._refreshGraphEventEmitter.emit();
   }
 
-  registerOnStateAddedCallback(callback: () => {}): void {
+  registerOnStateAddedCallback(
+      callback: (addedStateName: string) => void): void {
     this.stateAddedCallbacks.push(callback);
   }
 
-  registerOnStateDeletedCallback(callback: () => {}): void {
+  registerOnStateDeletedCallback(
+      callback: (deletedStateName: string) => void): void {
     this.stateDeletedCallbacks.push(callback);
   }
 
-  registerOnStateRenamedCallback(callback: () => {}): void {
+  registerOnStateRenamedCallback(
+      callback: (oldStateName: string, newStateName: string) => void): void {
     this.stateRenamedCallbacks.push(callback);
   }
 
@@ -776,7 +779,8 @@ export class ExplorationStatesService {
     this.stateAddedCallbacks.push(callback);
   }
 
-  registerOnStateInteractionSavedCallback(callback: () => {}): void {
+  registerOnStateInteractionSavedCallback(
+      callback: (state: State) => void): void {
     this.stateInteractionSavedCallbacks.push(callback);
   }
 
