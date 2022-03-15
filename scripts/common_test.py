@@ -180,7 +180,7 @@ class CommonTests(test_utils.GenericTestBase):
                 'check_call_gets_called': False
             }
             expected_check_function_calls = {
-                'input_gets_called': 1,
+                'input_gets_called': 2,
                 'check_call_gets_called': True
             }
             def mock_call(unused_cmd_tokens):
@@ -189,6 +189,8 @@ class CommonTests(test_utils.GenericTestBase):
                 check_function_calls['check_call_gets_called'] = True
             def mock_input():
                 check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 2:
+                    return '1'
                 return 'y'
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
@@ -209,7 +211,7 @@ class CommonTests(test_utils.GenericTestBase):
                 'check_call_gets_called': False
             }
             expected_check_function_calls = {
-                'input_gets_called': 2,
+                'input_gets_called': 3,
                 'check_call_gets_called': False
             }
             def mock_call(unused_cmd_tokens):
@@ -218,6 +220,8 @@ class CommonTests(test_utils.GenericTestBase):
                 check_function_calls['check_call_gets_called'] = True
             def mock_input():
                 check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 2:
+                    return '1'
                 return 'y'
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
@@ -273,6 +277,17 @@ class CommonTests(test_utils.GenericTestBase):
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
+
+    def test_update_branch_with_upstream(self):
+        def mock_check_output(unused_cmd_tokens):
+            return b'On branch test'
+
+        def mock_run_cmd(cmd):
+            return cmd
+
+        with self.swap(subprocess, 'check_output', mock_check_output):
+            with self.swap(common, 'run_cmd', mock_run_cmd):
+                common.update_branch_with_upstream()
 
     def test_get_current_release_version_number_with_non_hotfix_branch(self):
         self.assertEqual(
