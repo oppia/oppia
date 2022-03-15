@@ -58,7 +58,7 @@ NODE_VERSION = '16.13.0'
 YARN_VERSION = '1.22.15'
 
 # Versions of libraries used in backend.
-PILLOW_VERSION = '8.4.0'
+PILLOW_VERSION = '9.0.1'
 
 # Buf version.
 BUF_VERSION = '0.29.0'
@@ -143,6 +143,7 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
+APP_DEV_YAML_PATH = os.path.join('app_dev.yaml')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 5 * 60
 MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
 REDIS_CONF_PATH = os.path.join('redis.conf')
@@ -280,7 +281,21 @@ def open_new_tab_in_browser_if_possible(url):
         print('Please open the following link in browser: %s' % url)
         return
     browser_cmds = ['brave', 'chromium-browser', 'google-chrome', 'firefox']
-    for cmd in browser_cmds:
+    print(
+        'Please choose your default browser from the list using a number. '
+        'It will be given a preference over other available options.'
+    )
+    for index, browser in enumerate(browser_cmds):
+        print('%s). %s' % (index + 1, browser))
+
+    default_index = int(input().strip()) - 1
+    # Re-order the browsers by moving the user selected browser to the
+    # first position and copying over the browsers before and after
+    # the selected browser in the same order as they were present.
+    ordered_browser_cmds = (
+        [browser_cmds[default_index]] + browser_cmds[:default_index] +
+        browser_cmds[default_index + 1:])
+    for cmd in ordered_browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
             subprocess.check_call([cmd, url])
             return
