@@ -1537,6 +1537,10 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
+# This represents a literal constant for All and is used whereever
+# we need to compare a value with value All (for example, all topics)
+ALL_LITERAL_CONSTANT = 'All'
+
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is
 # '/access_validation_handler/<handler_name>'

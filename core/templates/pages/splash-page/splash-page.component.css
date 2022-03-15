@@ -558,4 +558,10 @@
     font-size: 1.05em;
     font-weight: 600;
   }
+  @media screen and (max-width: 768px) {
+    .splash-page .oppia-splash-icon-3-container {
+      display: block;
+      margin-left: 12vw;
+    }
+  }
 }
