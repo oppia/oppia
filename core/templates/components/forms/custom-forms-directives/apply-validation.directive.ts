@@ -19,7 +19,7 @@
 import { Directive, Input } from '@angular/core';
 import { NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { UnderscoresToCamelCasePipe } from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
-import { Validators } from 'interactions/TextInput/directives/text-input-validation.service';
+import { Validator as OppiaValidator } from 'interactions/TextInput/directives/text-input-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { SchemaValidators } from '../validators/schema-validators';
 
@@ -32,7 +32,7 @@ import { SchemaValidators } from '../validators/schema-validators';
   }]
 })
 export class ApplyValidationDirective implements Validator {
-  @Input() validators: Validators[];
+  @Input() validators: OppiaValidator[];
   underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
   validate(control: AbstractControl): ValidationErrors | null {
     if (!this.validators || this.validators.length === 0) {

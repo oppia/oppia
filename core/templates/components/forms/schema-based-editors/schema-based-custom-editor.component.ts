@@ -17,7 +17,7 @@
  */
 
 import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
-import { ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -31,12 +31,13 @@ import { downgradeComponent } from '@angular/upgrade/static';
     },
     {
       provide: NG_VALIDATORS,
+      multi: true,
       useExisting: forwardRef(() => SchemaBasedCustomEditorComponent),
-      multi: true
     },
   ]
 })
-export class SchemaBasedCustomEditorComponent implements ControlValueAccessor {
+export class SchemaBasedCustomEditorComponent
+implements ControlValueAccessor, Validator {
   @Input() localValue: string;
   @Output() localValueChange = new EventEmitter();
   @Input() schema;
@@ -63,6 +64,11 @@ export class SchemaBasedCustomEditorComponent implements ControlValueAccessor {
       return;
     }
     this.localValue = obj;
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
   }
 
   updateValue(value: string): void {
