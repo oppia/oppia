@@ -125,8 +125,7 @@ describe('ImageLocalStorageService', () => {
       imageBlob: new Blob(['data:random/xyz;base64,Blob1'], {type: 'image'})
     }];
     await expectAsync((
-      imageLocalStorageService.getFilenameToBase64MappingAsync(
-        sampleImageData))).toBeRejectedWithError(
-          'No valid prefix found in data url');
+      imageLocalStorageService.getFilenameToBase64MappingAsync(sampleImageData)
+    )).toBeRejectedWithError('No valid prefix found in data url');
   });
 });
