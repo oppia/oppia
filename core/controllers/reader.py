@@ -590,9 +590,6 @@ class StateCompleteEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if self.payload.get('exp_version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: State Complete')
         event_services.StateCompleteEventHandler.record(
             exploration_id, self.payload.get('exp_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
@@ -1210,8 +1207,8 @@ class RecommendationsHandler(base.BaseHandler):
         try:
             author_recommended_exp_ids = json.loads(self.request.get(
                 'stringified_author_recommended_ids'))
-        except Exception:
-            raise self.PageNotFoundException
+        except Exception as e:
+             raise self.PageNotFoundException from e
 
         system_recommended_exp_ids = []
         next_exp_id = None

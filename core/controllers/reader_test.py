@@ -2127,7 +2127,8 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
                 'session_id': 'session_id'
             }, expected_status_int=400
         )
-        self.assertEqual(response['error'],
+        self.assertEqual(
+            response['error'],
             'Missing key in handler args: exp_version.')
 
         self.logout()
