@@ -54,7 +54,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-root.directive.ts',
     'parameterize-rule-description.filter.ts',
     'python-program.tokenizer.ts',
-    'question-update.service.ts',
     'rule-type-selector.directive.ts',
     'select2-dropdown.directive.ts',
     'translation-file-hash-loader-backend-api.service.ts',

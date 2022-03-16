@@ -330,6 +330,7 @@ import { PlaythroughService } from 'services/playthrough.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 import { QuestionsListService } from 'services/questions-list.service';
+import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { SchemaDefaultValueService } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { SchemaUndefinedLastElementService } from 'services/schema-undefined-last-element.service';
@@ -680,6 +681,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['QuestionObjectFactory', QuestionObjectFactory],
   ['QuestionBackendApiService', QuestionBackendApiService],
   ['QuestionPlayerStateService', QuestionPlayerStateService],
+  ['QuestionUpdateService', QuestionUpdateService],
   ['QuestionSuggestionBackendApiService', QuestionSuggestionBackendApiService],
   ['QuestionsListService', QuestionsListService],
   ['QuestionPlayerEngineService', QuestionPlayerEngineService],

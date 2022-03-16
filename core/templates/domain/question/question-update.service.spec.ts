@@ -16,17 +16,6 @@
  * @fileoverview Unit tests for question update service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// question-update.service.ts is upgraded to Angular 8.
-
-
-
-
-
-
-// ^^^ This block is to be removed.
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { TestBed } from '@angular/core/testing';
@@ -34,15 +23,6 @@ import {QuestionUpdateService} from 'domain/question/question-update.service';
 import { QuestionObjectFactory } from './QuestionObjectFactory';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-
-// require('App.ts');
-// require('domain/editor/undo_redo/question-undo-redo.service.ts');
-// require('domain/question/QuestionObjectFactory.ts');
-// require('domain/question/question-update.service.ts');
-// require('domain/state/StateObjectFactory.ts');
-// require(
-//   'components/question-directives/question-editor/' +
-//   'question-editor.component.ts');
 
 describe('Question update service', function() {
   var questionUpdateService = null;
@@ -55,40 +35,7 @@ describe('Question update service', function() {
   var expectedOutputState = null;
   var sampleQuestionBackendObject = null;
   importAllAngularServices();
-
   beforeEach(angular.mock.module('oppia'));
-  /* BeforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(),
-        new RuleObjectFactory()));
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory());
-    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-  }));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  })); */
-
-
   beforeEach(() =>{
     questionUpdateService = TestBed.inject(QuestionUpdateService);
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
@@ -121,6 +68,14 @@ describe('Question update service', function() {
             labelled_as_correct: true
           }
         }],
+        solution: {
+          answer_is_exclusive: false,
+          correct_answer: 'test_answer',
+          explanation: {
+            content_id: 'content_2',
+            html: 'test_explanation1'
+          }
+        },
         customization_args: {
           placeholder: {
             value: {
@@ -138,14 +93,19 @@ describe('Question update service', function() {
           },
           labelled_as_correct: false
         },
-        hints: [],
+        hints: [{
+          hint_content: {
+            html: 'Hint 1',
+            content_id: 'hints_1'
+          }}],
         id: 'TextInput',
       },
       linked_skill_id: null,
       recorded_voiceovers: {
         voiceovers_mapping: {
           content: {},
-          default_outcome: {}
+          default_outcome: {},
+          hints_1: {}
         }
       },
       solicit_answer_details: false,
@@ -162,7 +122,7 @@ describe('Question update service', function() {
       classifier_model_id: 0,
       content: {
         html: 'test content',
-        content_id: 'content'
+        content_id: 'content_1'
       },
       param_changes: [],
       interaction: {
@@ -183,6 +143,14 @@ describe('Question update service', function() {
             labelled_as_correct: true
           }
         }],
+        solution: {
+          answer_is_exclusive: false,
+          correct_answer: 'test_answer',
+          explanation: {
+            content_id: 'content_2',
+            html: 'test_explanation1'
+          }
+        },
         customization_args: {
           placeholder: {
             value: {
@@ -200,20 +168,25 @@ describe('Question update service', function() {
           },
           labelled_as_correct: false
         },
-        hints: [],
+        hints: [{
+          hint_content: {
+            html: 'Hint 1',
+            content_id: 'hints_1'
+          }}],
         id: 'TextInput',
       },
       linked_skill_id: null,
       recorded_voiceovers: {
         voiceovers_mapping: {
-          content: {},
-          default_outcome: {}
+          default_outcome: {},
+          hints_1: {},
+          content_1: {}
         }
       },
       solicit_answer_details: false,
       written_translations: {
         translations_mapping: {
-          content: {},
+          content_1: {},
           default_outcome: {}
         }
       }
@@ -232,149 +205,6 @@ describe('Question update service', function() {
       sampleQuestionBackendObject);
   });
 
-  /* BeforeEach(angular.mock.inject(function($injector) {
-    QuestionUpdateService = $injector.get('QuestionUpdateService');
-    QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
-    StateObjectFactory = $injector.get('StateObjectFactory');
-
-    sampleStateDict = {
-      name: 'question',
-      classifier_model_id: 0,
-      content: {
-        html: 'old content',
-        content_id: 'content'
-      },
-      param_changes: [],
-      interaction: {
-        answer_groups: [{
-          rule_specs: [{
-            rule_type: 'Contains',
-            inputs: {x: {
-              contentId: 'rule_input',
-              normalizedStrSet: ['hola']
-            }}
-          }],
-          outcome: {
-            dest: 'Me Llamo',
-            feedback: {
-              content_id: 'feedback_1',
-              html: 'buen trabajo!'
-            },
-            labelled_as_correct: true
-          }
-        }],
-        customization_args: {
-          placeholder: {
-            value: {
-              content_id: 'ca_placeholder_0',
-              unicode_str: ''
-            }
-          },
-          rows: { value: 1 }
-        },
-        default_outcome: {
-          dest: 'Hola',
-          feedback: {
-            content_id: 'default_outcome',
-            html: 'try again!'
-          },
-          labelled_as_correct: false
-        },
-        hints: [],
-        id: 'TextInput',
-      },
-      linked_skill_id: null,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
-    };
-
-    expectedOutputStateDict = {
-      name: 'question',
-      classifier_model_id: 0,
-      content: {
-        html: 'test content',
-        content_id: 'content'
-      },
-      param_changes: [],
-      interaction: {
-        answer_groups: [{
-          rule_specs: [{
-            rule_type: 'Contains',
-            inputs: {x: {
-              contentId: 'rule_input',
-              normalizedStrSet: ['hola']
-            }}
-          }],
-          outcome: {
-            dest: 'Me Llamo',
-            feedback: {
-              content_id: 'feedback_1',
-              html: 'buen trabajo!'
-            },
-            labelled_as_correct: true
-          }
-        }],
-        customization_args: {
-          placeholder: {
-            value: {
-              content_id: 'ca_placeholder_0',
-              unicode_str: ''
-            }
-          },
-          rows: { value: 1 }
-        },
-        default_outcome: {
-          dest: 'Hola',
-          feedback: {
-            content_id: 'default_outcome',
-            html: 'try again!'
-          },
-          labelled_as_correct: false
-        },
-        hints: [],
-        id: 'TextInput',
-      },
-      linked_skill_id: null,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
-    };
-
-    expectedOutputState = StateObjectFactory.createFromBackendDict(
-      'question', expectedOutputStateDict);
-
-    sampleQuestionBackendObject = {
-      id: '0',
-      question_state_data: sampleStateDict,
-      language_code: 'en',
-      version: 1
-    };
-    sampleQuestion = QuestionObjectFactory.createFromBackendDict(
-      sampleQuestionBackendObject);
-  })); */
-
   it('should update the language code of the question', () => {
     expect(sampleQuestion.getLanguageCode()).toEqual('en');
     questionUpdateService.setQuestionLanguageCode(sampleQuestion, 'zh');
@@ -388,7 +218,7 @@ describe('Question update service', function() {
     var updateFunction = function() {
       var stateData = sampleQuestion.getStateData();
       stateData.content = SubtitledHtml.createDefault(
-        'test content', 'content');
+        'test content', 'content_1');
     };
     questionUpdateService.setQuestionStateData(
       sampleQuestion, updateFunction);

@@ -331,6 +331,8 @@ import { ProfilePageBackendApiService } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
+import { QuestionUpdateService } from
+  'domain/question/question-update.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
@@ -759,6 +761,10 @@ export class UpgradedServices {
     upgradedServices['QuestionValidationService'] =
     new QuestionValidationService(
       upgradedServices['StateEditorService']
+    );
+    upgradedServices['QuestionUpdateService'] =
+    new QuestionUpdateService(
+      upgradedServices['UndoRedoService']
     );
     upgradedServices['RatioExpressionInputValidationService'] =
           new RatioExpressionInputValidationService(
