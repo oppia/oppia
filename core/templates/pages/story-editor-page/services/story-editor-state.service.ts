@@ -60,7 +60,6 @@ export class StoryEditorStateService {
     private storyObjectFactory: StoryObjectFactory,
     private undoRedoService: UndoRedoService) {}
 
-
   private _setStory(story: Story): void {
     if (!this._story) {
       // The Story is set directly for the first load.
