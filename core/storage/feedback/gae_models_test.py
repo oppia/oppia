@@ -250,10 +250,10 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             )
 
     def test_get_messages_by_thread_id(self) -> None:
-        thread_id = feedback_services.create_thread(
+        thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
             'exploration', '0', None, 'subject1', 'text1')
 
-        feedback_services.create_message(
+        feedback_services.create_message( # type: ignore[no-untyped-call]
             thread_id, None, 'open', 'subject2', 'text2')
 
         recieved_messages = (
@@ -305,7 +305,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         self.assertEqual(all_messages[0][1].updated_subject, 'subject 1')
 
     def test_get_correct_message_count(self) -> None:
-        thread_id = feedback_services.create_thread(
+        thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
             'exploration', '0', None, 'subject1', 'text1')
         self.assertEqual(
             feedback_models.GeneralFeedbackMessageModel
@@ -313,7 +313,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             1
         )
 
-        feedback_services.create_message(
+        feedback_services.create_message( # type: ignore[no-untyped-call]
             thread_id, None, 'open', 'subject2', 'text2')
         self.assertEqual(
             feedback_models.GeneralFeedbackMessageModel
