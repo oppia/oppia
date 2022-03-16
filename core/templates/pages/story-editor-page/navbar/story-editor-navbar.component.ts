@@ -106,7 +106,7 @@ export class StoryEditorNavbarComponent implements OnInit {
 
   private _validateStory(): void {
     if (this.story === undefined) {
-      throw new Error('Story cannot be undefined');
+      return;
     }
     this.validationIssues = this.story.validate();
     let nodes = this.story.getStoryContents().getNodes();
