@@ -102,4 +102,31 @@ describe('ImageLocalStorageService', () => {
     expect(imageFilenameTob64Mapping['image1.png']).toEqual('aW1hZ2Ux');
     expect(imageFilenameTob64Mapping['image2.png']).toEqual('aW1hZ2Uy');
   });
+
+  it('should handle mapping scenario when image data is empty', async() => {
+    const imageFilenameTob64Mapping = (
+      await imageLocalStorageService.getFilenameToBase64MappingAsync([]));
+    expect(imageFilenameTob64Mapping).toEqual({});
+  });
+
+  it('should throw error if image blob is null', async() => {
+    const sampleImageData = [{
+      filename: 'imageFilename1',
+      imageBlob: null
+    }];
+    await expectAsync((
+      imageLocalStorageService.getFilenameToBase64MappingAsync(
+        sampleImageData))).toBeRejectedWithError('No image data found');
+  });
+
+  it('should throw error if prefix is invalid', async() => {
+    const sampleImageData = [{
+      filename: 'imageFilename1',
+      imageBlob: new Blob(['data:random/xyz;base64,Blob1'], {type: 'image'})
+    }];
+    await expectAsync((
+      imageLocalStorageService.getFilenameToBase64MappingAsync(
+        sampleImageData))).toBeRejectedWithError(
+          'No valid prefix found in data url');
+  });
 });
