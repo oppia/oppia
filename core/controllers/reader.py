@@ -30,7 +30,6 @@ from core.controllers import editor
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import event_services
-from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -457,7 +456,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
     """Tracks a learner submitting an answer."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
-    
+
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests.
@@ -472,6 +471,9 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         params = self.payload.get('params', {})
         # The version of the exploration.
         version = self.payload.get('version')
+        if version is None:
+             raise self.InvalidInputException(
+                 'NONE EXP VERSION: Answer Submit')
         session_id = self.payload.get('session_id')
         client_time_spent_in_secs = self.payload.get(
             'client_time_spent_in_secs')
