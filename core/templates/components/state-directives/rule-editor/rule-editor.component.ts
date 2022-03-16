@@ -44,6 +44,10 @@ require(
 var DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 // This directive controls an editor for selecting the type and input parameters
 // to a rule. It also includes 'Cancel' and 'Save Answer' buttons which call
+// This directive controls an editor for selecting the type and input parameters
+// to a rule. It also includes 'Cancel' and 'Save Answer' buttons which call
+// respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
+// buttons only show up if 'isEditingRuleInline' is true.
 // respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
 // buttons only show up if 'isEditingRuleInline' is true.
 angular.module('oppia').component('ruleEditor', {
@@ -99,6 +103,10 @@ angular.module('oppia').component('ruleEditor', {
             // This rule is for a multiple-choice, image-click, or item
             // selection interaction.
             // TODO(sll): Remove the need for this special case.
+            // This directive controls an editor for selecting the type and input parameters
+            // to a rule. It also includes 'Cancel' and 'Save Answer' buttons which call
+            // respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
+            // buttons only show up if 'isEditingRuleInline' is true.
             if (answerChoices.length > 0) {
               if (
                 finalInputArray[2] === 'SetOfTranslatableHtmlContentIds'
