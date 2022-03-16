@@ -472,8 +472,8 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         # The version of the exploration.
         version = self.payload.get('version')
         if version is None:
-             raise self.InvalidInputException(
-                 'NONE EXP VERSION: Answer Submit')
+            raise self.InvalidInputException(
+                'NONE EXP VERSION: Answer Submit')
         session_id = self.payload.get('session_id')
         client_time_spent_in_secs = self.payload.get(
             'client_time_spent_in_secs')
