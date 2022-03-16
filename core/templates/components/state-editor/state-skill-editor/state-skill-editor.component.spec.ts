@@ -312,7 +312,7 @@ describe('State Skill Editor Component', () => {
       ).and.returnValue(Promise.resolve(fetchSkillResponse));
       stateLinkedSkillIdService.displayed = 'skill_1';
 
-      expect(componentInstance.skillName).toBeNull();
+      expect(componentInstance.skillName).toBeUndefined();
 
       componentInstance.ngOnInit();
       tick();
