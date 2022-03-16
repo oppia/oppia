@@ -1208,7 +1208,7 @@ class RecommendationsHandler(base.BaseHandler):
             author_recommended_exp_ids = json.loads(self.request.get(
                 'stringified_author_recommended_ids'))
         except Exception as e:
-             raise self.PageNotFoundException from e
+            raise self.PageNotFoundException from e
 
         system_recommended_exp_ids = []
         next_exp_id = None
