@@ -56,7 +56,7 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/topics-and-skills-dashboard$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', {'minScore': 0.9}]
           }
         },
         {
@@ -78,7 +78,7 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/create/.*$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', {'minScore': 0.91}]
           }
         },
         {
@@ -90,19 +90,19 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/topic_editor/.*$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.86}]
+            'categories:accessibility': ['error', {'minScore': 0.84}]
           }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/skill_editor/.*$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', {'minScore': 0.91}]
           }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/story_editor/.*$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.86}]
+            'categories:accessibility': ['error', {'minScore': 0.84}]
           }
         },
       ]
