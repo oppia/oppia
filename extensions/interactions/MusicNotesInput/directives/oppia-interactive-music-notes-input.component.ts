@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer, MusicNotesAnswer } from 'interactions/answer-defs';
 import { MusicNotesInputCustomizationArgs, ReadableMusicNote } from 'interactions/customization-args-defs';
@@ -97,6 +97,7 @@ export class MusicNotesInputComponent implements
     private musicNotesInputRulesService: MusicNotesInputRulesService,
     private musicPhrasePlayerService: MusicPhrasePlayerService,
     private alertsService: AlertsService,
+    private elementRef: ElementRef
   ) {}
 
   private _getAttributes() {
@@ -191,27 +192,29 @@ export class MusicNotesInputComponent implements
   // displayed. The staffContainerElt and all subsequent measurements
   // must be recalculated in order for the grid to work properly.
   reinitStaff(): void {
-    $('.oppia-music-input-valid-note-area').css('visibility', 'hidden');
+    $(this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-valid-note-area')).css('visibility', 'hidden');
     setTimeout(() => {
-      $('.oppia-music-input-valid-note-area').css(
+      $(this.elementRef.nativeElement.querySelectorAll(
+        '.oppia-music-input-valid-note-area')).css(
         'visibility', 'visible');
       this.init();
     }, 20);
   }
 
-  // Creates draggable notes and droppable staff.
   init(): void {
-    let staffContainerElt = $('.oppia-music-input-staff');
+    let staffContainerElt = $(this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-staff'));
     this.CONTAINER_WIDTH = staffContainerElt.width();
     this.CONTAINER_HEIGHT = 0.2 * this.CONTAINER_WIDTH;
 
     // The grid rectangle dimensions defining the grid which the notes
     // fall on.
-    this.HORIZONTAL_GRID_SPACING = this.CONTAINER_WIDTH /
-      (this.MAXIMUM_NOTES_POSSIBLE + 1);
+    this.HORIZONTAL_GRID_SPACING = (
+      this.CONTAINER_WIDTH / (this.MAXIMUM_NOTES_POSSIBLE + 1));
 
-    this.VERTICAL_GRID_SPACING = this.CONTAINER_HEIGHT /
-      this.verticalGridKeys.length;
+    this.VERTICAL_GRID_SPACING = (
+      this.CONTAINER_HEIGHT / this.verticalGridKeys.length);
 
     this.clearNotesFromStaff();
     this.initPalette();
@@ -243,12 +246,14 @@ export class MusicNotesInputComponent implements
 
   // Removes all notes from staff.
   clearNotesFromStaff(): void {
-    $('.oppia-music-input-note-choices div').remove();
+    $(this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-note-choices div')).remove();
   }
 
   // Removes all droppable staff lines.
   clearDroppableStaff(): void {
-    $('.oppia-music-input-staff div').remove();
+    $(this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-staff div')).remove();
   }
 
   // Returns an Object containing the baseNoteMidiValues (81, 79, 77...)
@@ -256,8 +261,8 @@ export class MusicNotesInputComponent implements
   getStaffLinePositions(): Object {
     let staffLinePositionsArray = [];
     let staffLinePositions = {};
-    let elements = $(
-      '.oppia-music-input-staff div.oppia-music-staff-position');
+    let elements = $(this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-staff div.oppia-music-staff-position'));
     elements.each(
       (el, val) => {
         staffLinePositionsArray.push($(val).position().top);
@@ -271,8 +276,10 @@ export class MusicNotesInputComponent implements
 
   // Creates the notes and helper-clone notes for the noteChoices div.
   initPalette(): void {
-    let noteChoicesDiv = $('.oppia-music-input-note-choices');
-    let validNoteArea = $('.oppia-music-input-valid-note-area');
+    let noteChoicesDiv = $(this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-note-choices'));
+    let validNoteArea = $(this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-valid-note-area'));
     for (let i = 0; i < this.NOTE_TYPES.length; i++) {
       let innerDiv = $('<div></div>')
         .data('noteType', this.NOTE_TYPES[i])
@@ -333,7 +340,8 @@ export class MusicNotesInputComponent implements
   }
 
   repaintNotes(): void {
-    let noteChoicesDiv = $('.oppia-music-input-note-choices');
+    let noteChoicesDiv = $(this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-note-choices'));
     for (let i = 0; i < this.noteSequence.length; i++) {
       let innerDiv = $('<div></div>')
         .data('noteType', this.NOTE_TYPE_NATURAL)
@@ -503,7 +511,8 @@ export class MusicNotesInputComponent implements
             this.repaintLedgerLines();
           }
         });
-      $('.oppia-music-input-staff').append(staffLineDiv);
+      $(this.elementRef.nativeElement.querySelectorAll(
+        '.oppia-music-input-staff')).append(staffLineDiv);
 
       if (i === 0) {
         this.topPositionForCenterOfTopStaffLine =
@@ -610,7 +619,8 @@ export class MusicNotesInputComponent implements
    */
   getHorizontalPosition(noteStartAsFloat: number): number {
     let lastHorizontalPositionOffset = $(
-      '.oppia-music-input-note-choices div:first-child').position().left;
+      this.elementRef.nativeElement.querySelectorAll(
+        '.oppia-music-input-note-choices div:first-child')).position().left;
     let leftOffset =
       lastHorizontalPositionOffset - (
         (this.MAXIMUM_NOTES_POSSIBLE - 1) * this.HORIZONTAL_GRID_SPACING);
@@ -656,7 +666,8 @@ export class MusicNotesInputComponent implements
   repaintLedgerLines(): void {
     for (let i = 0; i < this.noteSequence.length; i++) {
       let note = this.noteSequence[i].note;
-      let lineValue = this._getCorrespondingNoteName(note.baseNoteMidiNumber);
+      let lineValue = (
+        this._getCorrespondingNoteName(note.baseNoteMidiNumber));
       if (this.isLedgerLineNote(lineValue)) {
         this.drawLedgerLine(
           this.getVerticalPosition(note.baseNoteMidiNumber),
