@@ -77,8 +77,8 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             self.exploration_stats_dict)
 
     def _get_exploration_stats_from_dict(
-        self, exploration_stats_dict:
-        stats_domain.ExplorationStatsDict) -> stats_domain.ExplorationStats:
+        self, exploration_stats_dict: stats_domain.ExplorationStatsDict) -> (
+            stats_domain.ExplorationStats):
         """Converts and returns the ExplorationStats
         object from the given exploration stats dict.
         """

@@ -30,7 +30,7 @@ from core.domain import customization_args_util
 from core.domain import exp_domain
 
 from typing import Any, Dict, List, Optional, Union
-from typing_extensions import TypedDict
+from typing_extensions import Literal, TypedDict
 
 from core.domain import action_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
@@ -69,12 +69,13 @@ MAX_ANSWER_DETAILS_BYTE_SIZE = 10000
 class SubmittedAnswerDict(TypedDict, total=False):
     """Dictionary representing the SubmittedAnswer object."""
 
-    answer: str
+    answer: Any
     interaction_id: str
     answer_group_index: int
     rule_spec_index: int
-    classification_categorization: str
-    params: Dict[Any, Any]
+    classification_categorization: Literal[Union['explicit',
+    'training_data_match', 'statistical_classifier', 'default_outcome']]
+    params: Dict[str, Any]
     session_id: str
     time_spent_in_sec: float
     rule_spec_str: Optional[str]
@@ -327,7 +328,8 @@ class ExplorationStats:
                     self.exp_version))
 
         exploration_stats_dict = self.to_dict()
-
+        # Ignore[misc] is used here because mypy does not recognize that key is
+        # a string.
         for stat_property in exploration_stats_properties:
             if not isinstance(exploration_stats_dict[stat_property], int): # type: ignore[misc]
                 raise utils.ValidationError(
@@ -337,7 +339,7 @@ class ExplorationStats:
                 raise utils.ValidationError(
                     '%s cannot have negative values' % (stat_property))
 
-        if not isinstance(self.state_stats_mapping, Dict):
+        if not isinstance(self.state_stats_mapping, dict):
             raise utils.ValidationError(
                 'Expected state_stats_mapping to be a dict, received %s' % (
                     self.state_stats_mapping))
@@ -367,7 +369,7 @@ class StateStats:
             total_hit_count_v1: int, total_hit_count_v2: int,
             first_hit_count_v1: int, first_hit_count_v2: int,
             num_times_solution_viewed_v2: int, num_completions_v1: int,
-             num_completions_v2: int) -> None:
+            num_completions_v2: int) -> None:
         """Constructs a StateStats domain object.
 
         Args:
@@ -568,7 +570,7 @@ class StateStats:
             self.__class__.__name__,
             ', '.join('%s=%r' % (prop, getattr(self, prop)) for prop in props))
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: StateStats) -> bool:
         """Implements == comparison between two StateStats instances, returning
         whether they both hold the same values.
 
@@ -578,8 +580,6 @@ class StateStats:
         Returns:
             bool. Whether the two instances have the same values.
         """
-        if not isinstance(other, StateStats):
-            return NotImplemented
         if other.__class__ is self.__class__:
             return (
                 self.total_answers_count_v1,
@@ -723,7 +723,7 @@ class SessionStateStats:
         }
         return session_state_stats_dict
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: SessionStateStats) -> bool:
         """Implements == comparison between two SessionStateStats instances,
         returning whether they hold the same values.
 
@@ -733,8 +733,6 @@ class SessionStateStats:
         Returns:
             bool. Whether the two instances have the same values.
         """
-        if not isinstance(other, SessionStateStats):
-            return NotImplemented
         if other.__class__ is self.__class__:
             return (
                 self.total_answers_count,
@@ -764,8 +762,8 @@ class SessionStateStats:
 
     @classmethod
     def from_dict(
-        cls, session_state_stats_dict:
-        Dict[str, int]) -> SessionStateStats:
+        cls,
+        session_state_stats_dict: Dict[str, int]) -> SessionStateStats:
         """Creates a SessionStateStats domain object from the given dict."""
         return cls(
             session_state_stats_dict['total_answers_count'],
@@ -1007,9 +1005,7 @@ class ExplorationIssue:
         self.schema_version = schema_version
         self.is_valid = is_valid
 
-    def __eq__(self, other: object) -> Any:
-        if not isinstance(other, ExplorationIssue):
-            return NotImplemented
+    def __eq__(self, other: ExplorationIssue) -> bool:
         return (
             self.issue_type == other.issue_type and
             self.issue_customization_args == other.issue_customization_args and
@@ -1236,17 +1232,17 @@ class StateAnswers:
     """Domain object containing answers submitted to an exploration state."""
 
     def __init__(
-            self, exploration_id: str, exploration_version: str,
+            self, exploration_id: str, exploration_version: int,
             state_name: str, interaction_id: str,
             submitted_answer_list: List[SubmittedAnswer],
-            schema_version: str=
-            str(feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION)) -> None:
+            schema_version: int=
+            feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION) -> None:
         """Constructs a StateAnswers domain object.
 
         Args:
             exploration_id: str. The ID of the exploration corresponding to
                 submitted answers.
-            exploration_version: str. The version of the exploration
+            exploration_version: int. The version of the exploration
                 corresponding to submitted answers.
             state_name: str. The state to which the answers were submitted.
             interaction_id: str. The ID of the interaction which created the
@@ -1254,7 +1250,7 @@ class StateAnswers:
             submitted_answer_list: list. The list of SubmittedAnswer domain
                 objects that were submitted to the exploration and version
                 specified in this object.
-            schema_version: str. The schema version of this answers object.
+            schema_version: int. The schema version of this answers object.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
@@ -1328,9 +1324,9 @@ class SubmittedAnswer:
     # without warning or migration.
 
     def __init__(
-            self, answer: str, interaction_id: str, answer_group_index: int,
+            self, answer: Any, interaction_id: str, answer_group_index: int,
             rule_spec_index: int, classification_categorization: str,
-            params: Dict[Any, Any], session_id: str, time_spent_in_sec: float,
+            params: Dict[str, Any], session_id: str, time_spent_in_sec: float,
             rule_spec_str: Optional[str]=None,
             answer_str: Optional[str]=None) -> None:
         self.answer = answer
@@ -1496,8 +1492,8 @@ class AnswerOccurrence:
 
     @classmethod
     def from_raw_type(
-        cls, answer_occurrence_dict:
-        AnswerOccurrenceDict) -> AnswerOccurrence:
+        cls,
+        answer_occurrence_dict: AnswerOccurrenceDict) -> AnswerOccurrence:
         """Returns domain object that represents a
         specific answer that occurred some number of times.
 
@@ -1522,7 +1518,7 @@ class AnswerCalculationOutput:
     calculation.
     """
 
-    def __init__(self, calculation_output_type: object):
+    def __init__(self, calculation_output_type: AnswerCalculationOutput):
         self.calculation_output_type = calculation_output_type
 
 
@@ -1648,7 +1644,7 @@ class StateAnswersCalcOutput:
     """
 
     def __init__(
-            self, exploration_id: str, exploration_version: str,
+            self, exploration_id: str, exploration_version: int,
             state_name: str, interaction_id: str,
             calculation_id: str, calculation_output: object) -> None:
         """Initialize domain object for state answers calculation output.
@@ -1656,7 +1652,7 @@ class StateAnswersCalcOutput:
         Args:
             exploration_id: str. The ID of the exploration corresponding to the
                 answer calculation output.
-            exploration_version: str. The version of the exploration
+            exploration_version: int. The version of the exploration
                 corresponding to the answer calculation output.
             state_name: str. The name of the exploration state to which the
                 aggregated answers were submitted.
