@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for the State Skill Editor Component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from
+import { TopicsAndSkillsDashboardBackendApiService, CategorizedAndUntriagedSkillsData } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
@@ -34,6 +34,9 @@ import { FormsModule } from '@angular/forms';
 import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { UserService } from 'services/user.service';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 
 
 describe('State Skill Editor Component', () => {
@@ -42,6 +45,9 @@ describe('State Skill Editor Component', () => {
   let mockNgbModal: MockNgbModal;
   let stateLinkedSkillIdService: StateLinkedSkillIdService;
   let urlInterpolationService: UrlInterpolationService;
+  let userService: UserService;
+  let skillBackendApiService: SkillBackendApiService;
+  let skillObjectFactory: SkillObjectFactory;
 
   class MockNgbModal {
     modal: string;
@@ -94,25 +100,17 @@ describe('State Skill Editor Component', () => {
     }
   }
 
-  const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
-    allClassroomNames: null,
-    canDeleteTopic: null,
-    canCreateTopic: null,
-    canDeleteSkill: null,
-    canCreateSkill: null,
+  const categorizedAndUntriagedSkillsData: CategorizedAndUntriagedSkillsData = {
     untriagedSkillSummaries: null,
-    mergeableSkillSummaries: null,
-    totalSkillCount: null,
-    topicSummaries: null,
     categorizedSkillsDict: null
   };
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     success: boolean = true;
-    fetchDashboardDataAsync() {
+    fetchCategorizedAndUntriagedSkillsDataAsync() {
       return {
         then: (callback: (resp) => void) => {
-          callback(topicsAndSkillsDashboardData);
+          callback(categorizedAndUntriagedSkillsData);
         }
       };
     }
@@ -137,6 +135,8 @@ describe('State Skill Editor Component', () => {
         TopicsAndSkillsDashboardBackendApiService,
         StateLinkedSkillIdService,
         UrlInterpolationService,
+        UserService,
+        SkillBackendApiService,
         {
           provide: NgbModal,
           useClass: MockNgbModal
@@ -162,6 +162,15 @@ describe('State Skill Editor Component', () => {
     stateLinkedSkillIdService = (
       stateLinkedSkillIdService as unknown) as
       jasmine.SpyObj<StateLinkedSkillIdService>;
+    userService = TestBed.inject(UserService);
+    skillBackendApiService = TestBed.inject(SkillBackendApiService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+  });
+
+  beforeEach(() => {
+    spyOn(
+      userService, 'canUserAccessTopicsAndSkillsDashboard'
+    ).and.returnValue(Promise.resolve(true));
   });
 
   it('should create', () => {
@@ -229,4 +238,46 @@ describe('State Skill Editor Component', () => {
     fixture.detectChanges();
     expect(componentInstance.skillEditorIsShown).toEqual(false);
   });
+
+  it('should fetch the linked skill name to be displayed from linked skill id',
+    fakeAsync(() => {
+      const skillBackendDict = {
+        id: 'skill_1',
+        description: 'skill 1',
+        misconceptions: [],
+        rubrics: [],
+        skill_contents: {
+          explanation: {
+            html: 'test explanation',
+            content_id: 'explanation',
+          },
+          worked_examples: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {}
+          }
+        },
+        language_code: 'en',
+        version: 3,
+        prerequisite_skill_ids: [],
+        all_questions_merged: null,
+        next_misconception_id: null,
+        superseding_skill_id: null
+      };
+      const fetchSkillResponse = {
+        skill: skillObjectFactory.createFromBackendDict(skillBackendDict),
+        assignedSkillTopicData: {},
+        groupedSkillSummaries: {}
+      };
+      spyOn(
+        skillBackendApiService, 'fetchSkillAsync'
+      ).and.returnValue(Promise.resolve(fetchSkillResponse));
+      stateLinkedSkillIdService.displayed = 'skill_1';
+
+      expect(componentInstance.skillName).toBeNull();
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.skillName).toEqual('skill 1');
+    }));
 });
