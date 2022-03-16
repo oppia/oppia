@@ -437,8 +437,6 @@ import { StateWrittenTranslationsService } from
 import { StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { StoryContentsObjectFactory } from
-  'domain/story/StoryContentsObjectFactory';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
@@ -619,10 +617,7 @@ export class UpgradedServices {
       new StateEditorRefreshService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateNameService'] = new StateNameService();
-    upgradedServices['StoryContentsObjectFactory'] =
-      new StoryContentsObjectFactory();
-    upgradedServices['StoryObjectFactory'] = new StoryObjectFactory(
-      upgradedServices['StoryContentsObjectFactory']);
+    upgradedServices['StoryObjectFactory'] = new StoryObjectFactory();
     upgradedServices['StoryReferenceObjectFactory'] =
       new StoryReferenceObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
@@ -788,8 +783,6 @@ export class UpgradedServices {
       upgradedServices['WindowRef']);
     upgradedServices['StateEditorService'] = new StateEditorService(
       upgradedServices['SolutionValidityService']);
-    upgradedServices['StoryContentsObjectFactory'] =
-      new StoryContentsObjectFactory();
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -890,7 +883,7 @@ export class UpgradedServices {
     upgradedServices['StoryEditorNavigationService'] =
         new StoryEditorNavigationService(upgradedServices['WindowRef']);
     upgradedServices['StoryObjectFactory'] =
-      new StoryObjectFactory(upgradedServices['StoryContentsObjectFactory']);
+      new StoryObjectFactory();
     upgradedServices['SuggestionThreadObjectFactory'] =
       new SuggestionThreadObjectFactory();
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
