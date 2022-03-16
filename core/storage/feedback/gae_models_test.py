@@ -167,14 +167,15 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                 .get_field_names_for_takeout(),
             {'last_updated': 'last_updated_msec'}
         )
-    
+
     def test_get_threads_by_entity_type_and_id(self) -> None:
-        recievedThreads = feedback_models.GeneralFeedbackThreadModel.get_threads(
-            self.ENTITY_TYPE, self.ENTITY_ID, 5)
-        self.assertEqual(len(recievedThreads), 1)
-        self.assertEqual(recievedThreads[0].entity_id, self.ENTITY_ID)
-        self.assertEqual(recievedThreads[0].entity_type, self.ENTITY_TYPE)
-        self.assertEqual(recievedThreads[0].original_author_id, self.USER_ID)
+        recieved_threads = (
+            feedback_models.GeneralFeedbackThreadModel.get_threads(
+                self.ENTITY_TYPE, self.ENTITY_ID, 5))
+        self.assertEqual(len(recieved_threads), 1)
+        self.assertEqual(recieved_threads[0].entity_id, self.ENTITY_ID)
+        self.assertEqual(recieved_threads[0].entity_type, self.ENTITY_TYPE)
+        self.assertEqual(recieved_threads[0].original_author_id, self.USER_ID)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -186,7 +187,6 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_type': base_models.EXPORT_POLICY.EXPORTED,
             'entity_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -256,22 +256,22 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         feedback_services.create_message(
             thread_id, None, 'open', 'subject2', 'text2')
 
-        recievedMessages = (feedback_models.GeneralFeedbackMessageModel
-            .get_messages(thread_id))
-        
-        self.assertEqual(len(recievedMessages), 2)
-        self.assertEqual(recievedMessages[0].thread_id, thread_id)
-        self.assertEqual(recievedMessages[0].entity_id, '0')
-        self.assertEqual(recievedMessages[0].entity_type, 'exploration')
-        self.assertEqual(recievedMessages[0].text, 'text1')
-        self.assertEqual(recievedMessages[0].updated_subject, 'subject1')
+        recieved_messages = (
+            feedback_models.GeneralFeedbackMessageModel.get_messages(
+                thread_id))
 
-        self.assertEqual(recievedMessages[1].thread_id, thread_id)
-        self.assertEqual(recievedMessages[1].entity_id, '0')
-        self.assertEqual(recievedMessages[1].entity_type, 'exploration')
-        self.assertEqual(recievedMessages[1].text, 'text2')
-        self.assertEqual(recievedMessages[1].updated_subject, 'subject2')
+        self.assertEqual(len(recieved_messages), 2)
+        self.assertEqual(recieved_messages[0].thread_id, thread_id)
+        self.assertEqual(recieved_messages[0].entity_id, '0')
+        self.assertEqual(recieved_messages[0].entity_type, 'exploration')
+        self.assertEqual(recieved_messages[0].text, 'text1')
+        self.assertEqual(recieved_messages[0].updated_subject, 'subject1')
 
+        self.assertEqual(recieved_messages[1].thread_id, thread_id)
+        self.assertEqual(recieved_messages[1].entity_id, '0')
+        self.assertEqual(recieved_messages[1].entity_type, 'exploration')
+        self.assertEqual(recieved_messages[1].text, 'text2')
+        self.assertEqual(recieved_messages[1].updated_subject, 'subject2')
 
     def test_get_all_messages(self) -> None:
         thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
@@ -618,7 +618,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         self.assertIsNone(
             feedback_models.GeneralFeedbackThreadUserModel.get(
                 self.USER_ID_A, self.THREAD_ID_A))
-    
+
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             feedback_models.GeneralFeedbackThreadUserModel
@@ -651,7 +651,7 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_models.FeedbackAnalyticsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
-    
+
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             feedback_models.FeedbackAnalyticsModel

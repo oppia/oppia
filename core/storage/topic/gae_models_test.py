@@ -131,7 +131,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             topic_models.TopicModel.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -212,7 +212,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -242,13 +242,13 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_models.TopicSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
-    
+
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             topic_models.TopicSummaryModel.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -414,7 +414,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
                     .ONE_INSTANCE_SHARED_ACROSS_USERS
             )
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -428,10 +428,10 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             topic_models.TopicRightsModel.get_export_policy(),
             expected_export_policy_dict
         )
-    
+
     def test_get_field_name_mapping_to_takeout_keys(self) -> None:
         self.assertEqual(
             topic_models.TopicRightsModel
                 .get_field_name_mapping_to_takeout_keys(),
-            { 'manager_ids': 'managed_topic_ids' }
+            {'manager_ids': 'managed_topic_ids'}
         )
