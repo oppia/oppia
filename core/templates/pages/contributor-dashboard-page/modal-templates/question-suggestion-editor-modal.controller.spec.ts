@@ -245,6 +245,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
             successCallback, errorCallback) => {
           successCallback();
         });
+      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       $scope.question = question;
       $scope.skillDifficulty = skillDifficulty;
       $scope.isEditing = true;
@@ -255,7 +256,23 @@ describe('Question Suggestion Editor Modal Controller', function() {
         .toHaveBeenCalled();
     });
 
+    it('should fail to update the question when no changes are made',
+      function() {
+        spyOn(ContributionAndReviewService, 'updateQuestionSuggestionAsync')
+          .and.callFake((
+              suggestionId, skillDifficulty, questionStateData, imagesData,
+              successCallback, errorCallback) => {
+            successCallback();
+          });
+        spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
+        spyOn(AlertsService, 'addInfoMessage');
+        $scope.done();
+        expect(AlertsService.addInfoMessage)
+          .toHaveBeenCalledWith('No changes detected.', 5000);
+      });
+
     it('should show alert when suggestion is submitted', function() {
+      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn(AlertsService, 'addSuccessMessage');
       $scope.isEditing = false;
       $scope.done();
@@ -269,6 +286,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
         SiteAnalyticsService,
         'registerContributorDashboardSubmitSuggestionEvent');
       $scope.isEditing = false;
+      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       $scope.done();
       expect(
         SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)

@@ -73,6 +73,11 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       if (!$scope.isQuestionValid()) {
         return;
       }
+      if (!QuestionUndoRedoService.hasChanges()) {
+        AlertsService.addInfoMessage(
+          'No changes detected.', 5000);
+        return;
+      }
       SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
         'Question');
       var imagesData = ImageLocalStorageService.getStoredImagesData();
