@@ -95,45 +95,47 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   discardChanges(): void {
-    this.undoRedoService.clearChanges();
-    if (this.story !== undefined) {
-      this.storyEditorStateService.loadStory(this.story.getId());
+    if (this.story === undefined) {
+      throw new Error('Story cannot be undefined');
     }
+    this.undoRedoService.clearChanges();
+    this.storyEditorStateService.loadStory(this.story.getId());
     this._validateStory();
     this.forceValidateExplorations = true;
   }
 
   private _validateStory(): void {
-    if (this.story !== undefined) {
-      this.validationIssues = this.story.validate();
-      let nodes = this.story.getStoryContents().getNodes();
-      let skillIdsInTopic = (
-        this.storyEditorStateService.getSkillSummaries().map(
-          skill => skill.id));
-      if (this.validationIssues.length === 0 && nodes.length > 0) {
-        let prerequisiteSkillValidationIssues = (
-          this.storyValidationService
-            .validatePrerequisiteSkillsInStoryContents(
-              skillIdsInTopic, this.story.getStoryContents()));
-        this.validationIssues = (
-          this.validationIssues.concat(
-            prerequisiteSkillValidationIssues));
-      }
-      if (this.storyEditorStateService.getStoryWithUrlFragmentExists()) {
-        this.validationIssues.push(
-          'Story URL fragment already exists.');
-      }
-      this.forceValidateExplorations = true;
-      this._validateExplorations();
-      let storyPrepublishValidationIssues = (
-        this.story.prepublishValidate());
-      let nodePrepublishValidationIssues = (
-        [].concat.apply([], nodes.map(
-          (node) => node.prepublishValidate())));
-      this.prepublishValidationIssues = (
-        storyPrepublishValidationIssues.concat(
-          nodePrepublishValidationIssues));
+    if (this.story === undefined) {
+      throw new Error('Story cannot be undefined');
     }
+    this.validationIssues = this.story.validate();
+    let nodes = this.story.getStoryContents().getNodes();
+    let skillIdsInTopic = (
+      this.storyEditorStateService.getSkillSummaries().map(
+        skill => skill.id));
+    if (this.validationIssues.length === 0 && nodes.length > 0) {
+      let prerequisiteSkillValidationIssues = (
+        this.storyValidationService
+          .validatePrerequisiteSkillsInStoryContents(
+            skillIdsInTopic, this.story.getStoryContents()));
+      this.validationIssues = (
+        this.validationIssues.concat(
+          prerequisiteSkillValidationIssues));
+    }
+    if (this.storyEditorStateService.getStoryWithUrlFragmentExists()) {
+      this.validationIssues.push(
+        'Story URL fragment already exists.');
+    }
+    this.forceValidateExplorations = true;
+    this._validateExplorations();
+    let storyPrepublishValidationIssues = (
+      this.story.prepublishValidate());
+    let nodePrepublishValidationIssues = (
+      [].concat.apply([], nodes.map(
+        (node) => node.prepublishValidate())));
+    this.prepublishValidationIssues = (
+      storyPrepublishValidationIssues.concat(
+        nodePrepublishValidationIssues));
   }
 
   private _validateExplorations(): void {

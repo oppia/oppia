@@ -35,7 +35,7 @@ import { StoryNode } from './story-node.model';
 
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
 type StoryUpdateReverse = (storyChange: StoryChange, story: Story) => void;
-type changeBackendDict = (
+type ChangeBackendDict = (
   backendChangeObject: BackendChangeObject,
   domainObject: DomainObject
 ) => void;
@@ -72,7 +72,7 @@ export class StoryUpdateService {
     let changeDict = cloneDeep(params) as BackendChangeObject;
     changeDict.cmd = command;
     let changeObj = new Change(
-      changeDict, apply as changeBackendDict, reverse as changeBackendDict);
+      changeDict, apply as ChangeBackendDict, reverse as ChangeBackendDict);
     try {
       this._undoRedoService.applyChange(changeObj, story);
     // The catch parameter type can only be any or unknown. The type 'unknown'
