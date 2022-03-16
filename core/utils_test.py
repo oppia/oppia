@@ -865,7 +865,9 @@ class UtilsTests(test_utils.GenericTestBase):
         img1_file_content = b'<svg width="100" height="100"><circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" /></svg>'  # pylint: disable=line-too-long
         img2_file_content = b'<svg width="400" height="110"><rect width="300" height="100" style="fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)" /></svg>'  # pylint: disable=line-too-long
         yaml_content = 'name: John Smith\ncontact:\n    home:   1012355532\n    office:  5002586256\naddress:\n  street: |\n            123 Tornado Alley\n            Suite 16            \n    city:   East Centerville\n    state:  KS'   # pylint: disable=line-too-long
-        self.assertEqual(utils.get_exploration_components_from_dir('core/tests/data/dummy_assets_yaml'), (yaml_content, [(img2_path, img2_file_content), (img1_path, img1_file_content)]))  # pylint: disable=line-too-long
+        result = utils.get_exploration_components_from_dir('core/tests/data/dummy_assets_yaml')
+        result = (result[0], set(result[1]))
+        self.assertEqual(result, (yaml_content,set([(img2_path, img2_file_content), (img1_path, img1_file_content)])))  # pylint: disable=line-too-long
 
     def test_get_current_time_in_millisecs_with_current_time(self) -> None:
         time_instance1 = utils.get_current_time_in_millisecs()
