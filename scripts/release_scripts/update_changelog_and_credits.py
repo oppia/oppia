@@ -45,10 +45,12 @@ CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
 CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
 PACKAGE_JSON_FILEPATH = os.path.join('', 'package.json')
 SETUP_PY_FILEPATH = os.path.join('', 'setup.py')
+FECONF_PY_FILEPATH = os.path.join('core', 'feconf.py')
 LIST_OF_FILEPATHS_TO_MODIFY = (
     CHANGELOG_FILEPATH,
     AUTHORS_FILEPATH,
     CONTRIBUTORS_FILEPATH,
+    FECONF_PY_FILEPATH,
     ABOUT_PAGE_CONSTANTS_FILEPATH,
     PACKAGE_JSON_FILEPATH
 )
@@ -400,7 +402,7 @@ def create_branch(
     """
     print(
         'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
-        'CHANGELOG, about-page, and package.json...')
+        'CHANGELOG, feconf.py, about-page, and package.json...')
     sb = repo.get_branch('develop')
     repo_fork.create_git_ref(
         ref='refs/heads/%s' % target_branch, sha=sb.commit.sha)
@@ -575,6 +577,10 @@ def main():
 
     release_summary_lines = get_release_summary_lines()
 
+    # Note to developers: If you edit any files apart from
+    # LIST_OF_FILEPATHS_TO_MODIFY in this script, please add it to this list
+    # so that it gets commited as part of the PR that is automatically
+    # generated.
     update_changelog(
         branch_name, release_summary_lines, current_release_version_number)
     update_authors(release_summary_lines)

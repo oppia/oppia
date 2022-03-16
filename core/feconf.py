@@ -1535,6 +1535,10 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
+# This represents a literal constant for All and is used whereever
+# we need to compare a value with value All (for example, all topics)
+ALL_LITERAL_CONSTANT = 'All'
+
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is
 # '/access_validation_handler/<handler_name>'
@@ -1550,3 +1554,23 @@ COMMIT_TYPE_DELETE = 'delete'
 # Interaction IDs of math related interactions.
 MATH_INTERACTION_IDS = [
     'NumericExpressionInput', 'AlgebraicExpressionInput', 'MathEquationInput']
+
+# The data type for the translated or translatable content in any
+# BaseTranslatableObject.
+ContentValueType = Union[str, List[str]]
+
+
+class TranslatableEntityType(enum.Enum):
+    """Represents all possible entity types which support new translations
+    architecture.
+    """
+
+    EXPLORATION = 'exploration'
+    QUESTION = 'question'
+
+
+class TranslatedContentDict(TypedDict):
+    """Dictionary representing TranslatedContent object."""
+
+    content_value: ContentValueType
+    needs_update: bool
