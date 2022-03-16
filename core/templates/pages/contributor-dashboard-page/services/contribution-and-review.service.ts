@@ -67,10 +67,29 @@ interface FetchSuggestionsResponse {
   providedIn: 'root',
 })
 export class ContributionAndReviewService {
+  private activeTabType: string = null;
+  private activeSuggestionType: string = null;
+
   constructor(
     private contributionAndReviewBackendApiService:
       ContributionAndReviewBackendApiService
   ) {}
+
+  getActiveTabType(): string {
+    return this.activeTabType;
+  }
+
+  setActiveTabType(activeTabType: string): void {
+    this.activeTabType = activeTabType;
+  }
+
+  getActiveSuggestionType(): string {
+    return this.activeSuggestionType;
+  }
+
+  setActiveSuggestionType(activeSuggestionType: string): void {
+    this.activeSuggestionType = activeSuggestionType;
+  }
 
   private userCreatedQuestionFetcher: SuggestionFetcher = (
     new SuggestionFetcher('SUBMITTED_QUESTION_SUGGESTIONS'));
@@ -95,7 +114,7 @@ export class ContributionAndReviewService {
    * @returns {Promise<FetchSuggestionsResponse>}
    */
   private async fetchSuggestionsAsync(
-      fetcher: SuggestionFetcher, shouldResetOffset: boolean
+      fetcher: SuggestionFetcher, shouldResetOffset: boolean, topicName: string
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
       // Handle the case where we need to fetch starting from the beginning.
@@ -111,7 +130,7 @@ export class ContributionAndReviewService {
         // The first page of results is returned to the caller and the second
         // page is cached.
         (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
-        fetcher.offset
+        fetcher.offset, topicName
       ).then((responseBody) => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
         fetcher.suggestionIdToDetails = {};
@@ -143,31 +162,35 @@ export class ContributionAndReviewService {
   }
 
   async getUserCreatedQuestionSuggestionsAsync(
-      shouldResetOffset: boolean = true):
+      shouldResetOffset: boolean = true,
+      topicName: string = 'All'):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this.userCreatedQuestionFetcher, shouldResetOffset);
+      this.userCreatedQuestionFetcher, shouldResetOffset, topicName);
   }
 
   async getReviewableQuestionSuggestionsAsync(
-      shouldResetOffset: boolean = true):
+      shouldResetOffset: boolean = true,
+      topicName: string = 'All'):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this.reviewableQuestionFetcher, shouldResetOffset);
+      this.reviewableQuestionFetcher, shouldResetOffset, topicName);
   }
 
   async getUserCreatedTranslationSuggestionsAsync(
-      shouldResetOffset: boolean = true):
+      shouldResetOffset: boolean = true,
+      topicName: string = 'All'):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this.userCreatedTranslationFetcher, shouldResetOffset);
+      this.userCreatedTranslationFetcher, shouldResetOffset, topicName);
   }
 
   async getReviewableTranslationSuggestionsAsync(
-      shouldResetOffset: boolean = true):
+      shouldResetOffset: boolean = true,
+      topicName: string = 'All'):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this.reviewableTranslationFetcher, shouldResetOffset);
+      this.reviewableTranslationFetcher, shouldResetOffset, topicName);
   }
 
   reviewExplorationSuggestion(
