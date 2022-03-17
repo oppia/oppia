@@ -151,7 +151,7 @@ describe('Question backend Api service', () => {
       let failHandler = jasmine.createSpy('fail');
 
       let questionCountHandlerUrl = (
-        '/question_count_handler/' + encodeURIComponent('1'));
+        '/question_count_handler/' + encodeURIComponent('"1"'));
 
       questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
         ['1']).then(successHandler, failHandler);
@@ -174,7 +174,7 @@ describe('Question backend Api service', () => {
       let failHandler = jasmine.createSpy('fail');
 
       let questionCountHandlerUrl = (
-        '/question_count_handler/' + encodeURIComponent('1'));
+        '/question_count_handler/' + encodeURIComponent('"1"'));
 
       questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
         ['1']).then(successHandler, failHandler);
