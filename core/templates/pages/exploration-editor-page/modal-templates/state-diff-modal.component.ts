@@ -16,7 +16,7 @@
  * @fileoverview Component for state diff modal.
  */
 
-import { OnInit } from '@angular/core';
+import { Input, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -25,7 +25,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { ContextService } from 'services/context.service';
 import { StateDiffModalBackendApiService } from '../services/state-diff-modal-backend-api.service';
 
-interface headersAndYamlStrs {
+export interface headersAndYamlStrs {
   leftPane: string;
   rightPane: string;
 }
@@ -42,16 +42,23 @@ interface mergeviewOptions {
   templateUrl: './state-diff-modal.component.html',
 })
 export class StateDiffModalComponent
-    extends ConfirmOrCancelModal implements OnInit {
-  newState: State | null;
-  oldState: State | null;
-  newStateName: string;
-  oldStateName: string;
-  headers: headersAndYamlStrs;
+  extends ConfirmOrCancelModal implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+
+  // The following properties will be null when there is no change introduced
+  // in either of the state. It remains same as original State.
+  @Input() newState!: State | null;
+  @Input() oldState!: State | null;
+  @Input() newStateName!: string;
+  @Input() oldStateName!: string;
+  @Input() headers!: headersAndYamlStrs;
   yamlStrs: headersAndYamlStrs = {
     leftPane: '',
     rightPane: '',
   };
+
   CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
     lineNumbers: true,
     readOnly: true,

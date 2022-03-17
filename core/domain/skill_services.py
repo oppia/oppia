@@ -446,6 +446,9 @@ def replace_skill_id_in_all_topics(user_id, old_skill_id, new_skill_id):
         user_id: str. The unique user ID of the user.
         old_skill_id: str. The old skill id.
         new_skill_id: str. The new skill id.
+
+    Raises:
+        Exception. The new skill already present.
     """
     all_topics = topic_fetchers.get_all_topics()
     for topic in all_topics:
@@ -631,6 +634,11 @@ def apply_change_list(skill_id, change_list, committer_id):
 
     Returns:
         Skill. The resulting skill domain object.
+
+    Raises:
+        Exception. The user does not have enough rights to edit the
+            skill description.
+        Exception. Invalid change dict.
     """
     skill = skill_fetchers.get_skill_by_id(skill_id)
     user = user_services.get_user_actions_info(committer_id)
@@ -1139,3 +1147,70 @@ def filter_skills_by_mastery(user_id, skill_ids):
         if skill_id in filtered_skill_ids:
             arranged_filtered_skill_ids.append(skill_id)
     return arranged_filtered_skill_ids
+
+
+def get_untriaged_skill_summaries(
+    skill_summaries, skill_ids_assigned_to_some_topic, merged_skill_ids):
+    """Returns a list of skill summaries for all skills that are untriaged.
+
+    Args:
+        skill_summaries: list(SkillSummary). The list of all skill summary
+            domain objects.
+        skill_ids_assigned_to_some_topic: set(str). The set of skill ids which
+            are assigned to some topic.
+        merged_skill_ids: list(str). List of skill IDs of merged skills.
+
+    Returns:
+        list(SkillSummary). A list of skill summaries for all skills that
+        are untriaged.
+    """
+    untriaged_skill_summaries = []
+
+    for skill_summary in skill_summaries:
+        skill_id = skill_summary.id
+        if (skill_id not in skill_ids_assigned_to_some_topic) and (
+                skill_id not in merged_skill_ids):
+            untriaged_skill_summaries.append(skill_summary)
+
+    return untriaged_skill_summaries
+
+
+def get_categorized_skill_ids_and_descriptions():
+    """Returns a CategorizedSkills domain object for all the skills that are
+    categorized.
+
+    Returns:
+        CategorizedSkills. An instance of the CategorizedSkills domain object
+        for all the skills that are categorized.
+    """
+    topics = topic_fetchers.get_all_topics()
+
+    categorized_skills = skill_domain.CategorizedSkills()
+
+    skill_ids = []
+
+    for topic in topics:
+        subtopics = topic.subtopics
+        subtopic_titles = [subtopic.title for subtopic in subtopics]
+        categorized_skills.add_topic(topic.name, subtopic_titles)
+        for skill_id in topic.uncategorized_skill_ids:
+            skill_ids.append(skill_id)
+        for subtopic in subtopics:
+            for skill_id in subtopic.skill_ids:
+                skill_ids.append(skill_id)
+
+    skill_descriptions = get_descriptions_of_skills(skill_ids)[0]
+
+    for topic in topics:
+        subtopics = topic.subtopics
+        for skill_id in topic.uncategorized_skill_ids:
+            categorized_skills.add_uncategorized_skill(
+                topic.name, skill_id,
+                skill_descriptions[skill_id])
+        for subtopic in subtopics:
+            for skill_id in subtopic.skill_ids:
+                categorized_skills.add_subtopic_skill(
+                    topic.name, subtopic.title,
+                    skill_id, skill_descriptions[skill_id])
+
+    return categorized_skills

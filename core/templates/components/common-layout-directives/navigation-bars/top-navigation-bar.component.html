@@ -1,4 +1,6 @@
-<div [ngClass]="{'rtl-navbar-header': isLanguageRTL(), 'float-right': isLanguageRTL(), 'float-left': !isLanguageRTL()}"
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.rtl.css" as="style">
+<div [ngClass]="{'float-right': isLanguageRTL(), 'float-left': !isLanguageRTL()}"
      class="navbar-header protractor-test-navbar-header">
   <a *ngIf="windowIsNarrow"
      (click)="toggleSidebar($event)"
@@ -41,7 +43,7 @@
     {{ subheaderText }}
   </span>
 </div>
-<div [ngClass]="{'rtl-navbar-header': isLanguageRTL(), 'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}"
+<div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}"
      class="navbar-header"
      *ngIf="userMenuIsShown">
   <ul class="nav oppia-navbar-nav"
@@ -122,11 +124,11 @@
                            alt="Learn">
                     </picture>
                   </div>
-                  <div class="nav-item-bottom d-flex flex-column" *ngIf="!userIsLoggedIn">
+                  <div class="nav-item-bottom d-flex flex-column">
                     <div *ngIf="classroomData.length > 0">
                       <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
                         <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                           (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment())"
+                           (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment()); $event.stopPropagation()"
                            tabindex="0"
                            class="underline"
                            href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/{{topicSummary.getUrlFragment()}}">
@@ -144,12 +146,6 @@
                       <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
                       <span class="material-icons arrow-forward">arrow_forward</span>
                     </div>
-                  </div>
-                  <div *ngIf="userIsLoggedIn"
-                       (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                       class="nav-item-bottom-link-logged">
-                    <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_2' | translate }}</span>
-                    <span class="material-icons arrow-forward">arrow_forward</span>
                   </div>
                 </a>
                 <a class="nav-content nav-item-right d-flex flex-column" tabindex="0"
@@ -199,6 +195,7 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
                  href="/about-foundation"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">{{'I18N_TOPNAV_OPPIA_FOUNDATION' | translate}}</span>
@@ -207,9 +204,11 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
                  href="https://medium.com/oppia-org"
+                 target="_blank"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">{{'I18N_TOPNAV_BLOG' | translate}}</span>
+                <span class="material-icons launch">launch</span>
               </a>
             </li>
           </ul>
@@ -238,7 +237,7 @@
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/partnerships')" href="/partnerships"
+                   href="/partnerships"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
                    rel="noopener"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
@@ -251,7 +250,6 @@
                   </div>
                 </a>
                 <a class="item d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/volunteer')"
                    href="/volunteer"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -267,7 +265,6 @@
               </div>
               <div class="bottom-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/contact')"
                    href="/contact"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -281,7 +278,6 @@
                   </div>
                 </a>
                 <a class="item d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/donate')"
                    href="/donate"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -527,444 +523,5 @@
     </li>
   </ul>
 </div>
-<style>
-  .arrow-forward {
-    color: #00645c;
-    font-size: 14px;
-    margin-left: 4px;
-  }
-  .underline:hover,
-  .underline:focus {
-    border-bottom: 2px solid #333;
-    transition: 50ms;
-  }
-  .get-involved-dropdown a {
-    text-decoration: none;
-  }
-  .heading a {
-    color: #212121;
-  }
-  .nav-item-links a {
-    color: #212121;
-    text-decoration: none;
-  }
-  .learn-dropdown-menu a,
-  .about-dropdown-menu a,
-  .get-involved-dropdown a {
-    text-decoration: none;
-  }
-  .learn-dropdown-menu .nav-item-top-link a {
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 18.75px;
-  }
-  .dropdown-menu .innvolved-item:hover a {
-    border-bottom: #333 solid 2px;
-    transition: 50ms;
-  }
-  .nav-link:focus {
-    background-color: #fff;
-    color: #00645c;
-  }
-  .get-involved-dropdown {
-    min-width: 574px;
-    padding: 0;
-  }
-  .get-involved-dropdown .nav-item {
-    width: 100%;
-  }
-  .get-involved-dropdown .heading {
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 18.75px;
-    padding: 0;
-  }
-  .get-involved-dropdown .language {
-    color: #f2994a;
-  }
-  .get-involved-dropdown .volunteer {
-    color: #2d9cdb;
-  }
-  .get-involved-dropdown .contact {
-    color: #b4bbc3;
-  }
-  .get-involved-dropdown .fav {
-    color: #eb5757;
-  }
-  .get-involved-dropdown .des {
-    color: #767676;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 20px;
-    padding: 0;
-    padding-left: 28px;
-    text-overflow: clip;
-  }
-  .top-section {
-    border-bottom: 1px solid rgba(33, 33, 33, 0.102);
-  }
-  .item-border {
-    border-right: 1px solid rgba(33, 33, 33, 0.102);
-  }
-  .item {
-    padding: 32px;
-    width: 287px;
-  }
-  .item:hover,
-  .item:focus {
-    background-color: rgba(33, 33, 33, 0.027);
-  }
-  .dropdown-menu .signin-dropdown {
-    border-radius: 1px;
-    height: 41px;
-    width: 200px;
-  }
-  .top-section .item {
-    padding-bottom: 27px;
-  }
-  .bottom-section .item {
-    padding-top: 27px;
-  }
-  .rtl-navbar-header {
-    display: flex;
-    margin-left: -30px;
-  }
-  .dropdown-toggle::after {
-    margin-right: 0.255em;
-  }
-  .learn-dropdown-menu {
-    border-radius: 3px;
-    padding: 0;
-  }
-  .classroom-enabled {
-    min-width: 688px;
-  }
-  .classroom-disabled {
-    min-width: 300px;
-  }
-
-  .language-dropdown {
-    max-height: 60vh;
-    overflow-y: auto;
-  }
-
-  .learn {
-    height: 66.5px;
-  }
-  .learn-dropdown-menu .nav-item-top-link {
-    padding: 0;
-    padding-bottom: 8px;
-  }
-  .learn-dropdown-menu .nav-item-right-head {
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.2px;
-    line-height: 14.06px;
-    padding: 0;
-    padding-bottom: 8px;
-    text-transform: uppercase;
-  }
-  .learn-dropdown-menu .nav-item-links {
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 16.41px;
-    padding: 0;
-    padding-top: 16px;
-    text-transform: capitalize;
-  }
-  .learn-dropdown-menu .nav-item-left {
-    border-right: 1px solid rgba(0, 0, 0, 0.051);
-    padding: 32px;
-    width: 388px;
-  }
-  .learn-dropdown-menu .nav-item-left:hover,
-  .learn-dropdown-menu .nav-item-right:hover,
-  .learn-dropdown-menu .nav-item-left:focus,
-  .learn-dropdown-menu .nav-item-right:focus {
-    background-color: rgba(33, 33, 33, 0.027);
-  }
-  .about-dropdown-menu .nav-item a:hover,
-  .about-dropdown-menu .nav-item a:focus {
-    background-color: rgba(33, 33, 33, 0.027);
-  }
-  .about-dropdown-menu .about-link:hover,
-  .about-dropdown-menu .about-link:focus {
-    color: #009688 !important;
-  }
-  .nav-item-left-head {
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 18.75px;
-  }
-  .learn-dropdown-menu .nav-item-right {
-    min-width: 300px;
-    padding: 32px;
-  }
-  .learn-dropdown-menu .nav-content {
-    color: #767676;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 20px;
-    width: 224px;
-  }
-  .learn-dropdown-menu .nav-item-bottom-link {
-    color: #00645c;
-    font-family: 'Inter', 'Roboto', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 16.41px;
-    padding: 0;
-    padding-top: 16px;
-  }
-  .learn-dropdown-menu .nav-item-bottom-link-logged {
-    color: #00645c;
-    font-family: 'Inter', 'Roboto', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 16.41px;
-    padding: 0;
-  }
-  .dropdown-menu {
-    border-radius: 3px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-  .rtl-navbar-header .dropdown-menu {
-    left: 0 !important;
-    right: auto !important;
-    text-align: right;
-  }
-  .language-icon {
-    margin-top: -3px;
-  }
-  .language-padding-left {
-    padding-left: 26px;
-  }
-  .oppia-navbar-brand-name:focus {
-    outline: 1px dotted #fff;
-    outline: auto 5px -webkit-focus-ring-color;
-  }
-  .oppia-nav-right-dropdown {
-    background-color: #fff;
-    border-radius: 5px;
-    border-width: 0;
-    box-shadow: 1px 1px 0 1px rgba(0,0,0,0.05);
-    color: #737373;
-    font-family: Roboto, arial, sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    height: 40px;
-    padding-left: 8px;
-    padding-right: 8px;
-    vertical-align: middle;
-    white-space: nowrap;
-  }
-  .language-element {
-    border-radius: 0;
-    box-shadow: 0 0;
-    color: #34665c;
-  }
-  .language-element:hover {
-    background-color: rgb(52, 102, 92, 0.1);
-  }
-  .language-element-selected {
-    background-color: rgb(52, 102, 92, 0.1);
-  }
-  .oppia-nav-right-dropdown:focus,
-  .oppia-nav-right-dropdown:hover {
-    box-shadow: 1px 4px 5px 1px rgba(0,0,0,0.1);
-  }
-  .oppia-nav-right-dropdown:active {
-    background-color: #e5e5e5;
-    box-shadow: none;
-    transition-duration: 10ms;
-  }
-  .oppia-signin-g-icon {
-    float: left;
-    padding: 10px 15px 10px 0;
-  }
-  .oppia-navbar-menu-icon {
-    color: #fff;
-    margin-top: -5px;
-  }
-  .oppia-navbar-dashboard-indicator-text {
-    bottom: 0;
-    color: white;
-    font-size: 1.12rem;
-    font-weight: bold;
-    position: absolute;
-    right: 4px;
-  }
-  .nav-mobile-header-text-container {
-    display: none;
-  }
-  .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
-    display: block;
-  }
-  .oppia-navbar-role-text {
-    bottom: 0;
-    color: white;
-    font-size: 11px;
-    font-weight: bold;
-    position: absolute;
-    right: 3px;
-  }
-  .oppia-navbar-dashboard-indicator {
-    background-color: #f7a541;
-    border-radius: 20px;
-    height: 15px;
-    position: absolute;
-    right: 25px;
-    top: 8px;
-    width: 15px;
-  }
-  .oppia-navbar-menu {
-    margin-left: 10px;
-    opacity: 0.9;
-    outline-color: transparent;
-    padding-top: 20px;
-  }
-  .oppia-navbar-menu:hover {
-    opacity: 1;
-  }
-  .oppia-navbar-menu:focus {
-    outline: 1px dotted #212121;
-    outline: 5px -webkit-focus-ring-color;
-  }
-  .oppia-navbar-profile {
-    float: right;
-  }
-  .oppia-navbar-role-indicator {
-    background-color: #f7a541;
-    border-radius: 20px;
-    bottom: 10px;
-    height: 15px;
-    position: absolute;
-    right: 25px;
-    width: 15px;
-  }
-  .oppia-navbar-close-icon {
-    color: #fff;
-    margin-right: 4px;
-    margin-top: -10px;
-  }
-  .oppia-signin-text {
-    font-family: Roboto, arial, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: .21px;
-    line-height: 41px;
-  }
-  .oppia-user-avatar-icon {
-    margin-top: -1px;
-  }
-  .oppia-admin-text {
-    right: 4px;
-  }
-  .oppia-navbar-button-container-extra-info {
-    margin-right: 10px;
-  }
-  .oppia-navbar-dropdown-menu {
-    margin-right: 15px;
-    padding: 0;
-  }
-  .oppia-nav-link {
-    padding: 0;
-    width: 190px;
-  }
-  .oppia-navbar-dropdown-item {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: 30px;
-  }
-  .oppia-navbar-tab-content-heading {
-    color: #212121;
-    font-size: 16px;
-    font-weight: 500;
-    padding: 0;
-  }
-  .oppia-navbar-tab-content-heading:after {
-    border-style: solid;
-    border-width: 0 0 1.59px;
-    bottom: 1px;
-    content: '';
-    left: 28px;
-    position: absolute;
-    width: 50.5px;
-  }
-  .rtl-navbar-header .oppia-navbar-tab-content-heading:after {
-    right: 28px;
-  }
-  .oppia-navbar-dropdown-heart-icon {
-    color: #eb5757;
-    font-size: 22px;
-    padding-right: 6px;
-  }
-  .oppia-navbar-tab-content-desc {
-    color: #767676;
-    line-height: 20px;
-    margin-left: 28px;
-    opacity: 0.9;
-  }
-  .oppia-navbar-dropdown-right {
-    left: 0;
-    min-width: 285px;
-    padding: 0;
-    right: auto;
-  }
-  .oppia-navbar-profile .profile-dropdown:hover {
-    background-color: #fff;
-  }
-
-  @media screen and (max-width: 880px) {
-    .oppia-logo-wide {
-      margin-left: 0;
-    }
-  }
-
-  @media screen and (max-width: 840px) {
-    .desktop-view-language-code {
-      display: none;
-    }
-  }
-
-  @media screen and (max-width: 768px) {
-    .nav-mobile-header-text-container {
-      display: inline-block;
-      font-size: 1px;
-      margin-top: 2px;
-      max-height: 56px;
-      text-overflow: ellipsis;
-      width: 50%;
-    }
-    .nav-mobile-header-editor {
-      color: #fff;
-      display: block;
-      font-family: Roboto, arial, sans-serif;
-      font-size: 19px;
-    }
-    .nav-mobile-header-text {
-      color: #fff;
-      display: inline-block;
-      font-size: 15px;
-      max-width: 205px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      width: 100%;
-    }
-  }
-</style>
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.rtl.css">

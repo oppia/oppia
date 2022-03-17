@@ -505,23 +505,70 @@ describe('Topic editor state service', () => {
 
   it('should update existence of topic url fragment', fakeAsync(() => {
     topicEditorStateService.updateExistenceOfTopicUrlFragment(
-      'test_topic', () => {});
+      'test_topic', () => {}, () => {});
     tick();
     expect(topicEditorStateService.getTopicWithUrlFragmentExists()).toBeTrue();
   }));
 
-  it('should show error when updation of topic url fragment', fakeAsync(() => {
+  it('should not show error when updation of topic url fragment failed' +
+     'with 400 status code', fakeAsync(() => {
+    let errorResponse = {
+      headers: {
+        normalizedNames: {},
+        lazyUpdate: null
+      },
+      status: 400,
+      statusText: 'Bad Request',
+      url: '',
+      ok: false,
+      name: 'HttpErrorResponse',
+      message: 'Http failure response for test url: 400 Bad Request',
+      error: {
+        error: 'Error: Bad request to server',
+        status_code: 400
+      }
+    };
+
     spyOn(alertsService, 'addWarning');
     spyOn(
       mockEditableTopicBackendApiService, 'doesTopicWithUrlFragmentExistAsync')
-      .and.returnValue(Promise.reject());
+      .and.returnValue(Promise.reject(errorResponse));
 
     topicEditorStateService.updateExistenceOfTopicUrlFragment(
-      'test_topic', () => {});
+      'test_topic', () => {}, () => {});
+    tick();
+    expect(alertsService.addWarning).not.toHaveBeenCalled();
+  }));
+
+  it('should not show error when updation of topic url fragment failed' +
+     'with 400 status code', fakeAsync(() => {
+    let errorResponse = {
+      headers: {
+        normalizedNames: {},
+        lazyUpdate: null
+      },
+      status: 500,
+      statusText: 'Error: Failed to check topic url fragment.',
+      url: '',
+      ok: false,
+      name: 'HttpErrorResponse',
+      message: 'Http failure response for test url: 500' +
+               'Error: Failed to check topic url fragment.',
+      error: {
+        error: 'Error: Failed to check topic url fragment.',
+        status_code: 500
+      }
+    };
+
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      mockEditableTopicBackendApiService, 'doesTopicWithUrlFragmentExistAsync')
+      .and.returnValue(Promise.reject(errorResponse));
+
+    topicEditorStateService.updateExistenceOfTopicUrlFragment(
+      'test_topic', () => {}, () => {});
     tick();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'There was an error when checking if the topic url fragment ' +
-        'exists for another topic.'
-    );
+      errorResponse.message);
   }));
 });

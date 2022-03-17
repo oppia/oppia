@@ -23,27 +23,50 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { ContextService } from 'services/context.service';
-import { PlayerPositionService } from
-  'pages/exploration-player-page/services/player-position.service';
-import { PlayerTranscriptService } from
-  'pages/exploration-player-page/services/player-transcript.service';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { Observable, Subject } from 'rxjs';
-
-export interface InteractionRulesService {
-  [ruleName: string]: (
-    answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean;
-}
+import { AlgebraicExpressionInputRulesService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
+import { CodeReplRulesService } from 'interactions/CodeRepl/directives/code-repl-rules.service';
+import { ContinueRulesService } from 'interactions/Continue/directives/continue-rules.service';
+import { FractionInputRulesService } from 'interactions/FractionInput/directives/fraction-input-rules.service';
+import { ImageClickInputRulesService } from 'interactions/ImageClickInput/directives/image-click-input-rules.service';
+import { InteractiveMapRulesService } from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
+import { MathEquationInputRulesService } from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
+import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import { NumericInputRulesService } from 'interactions/NumericInput/directives/numeric-input-rules.service';
+import { PencilCodeEditorRulesService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
+import { GraphInputRulesService } from 'interactions/GraphInput/directives/graph-input-rules.service';
+import { SetInputRulesService } from 'interactions/SetInput/directives/set-input-rules.service';
+import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 type SubmitAnswerFn = () => void;
 
-type OnSubmitFn = (
-  answer: string, interactionRulesService: InteractionRulesService) => void;
+type InteractionRulesService = (
+  AlgebraicExpressionInputRulesService |
+  CodeReplRulesService |
+  ContinueRulesService |
+  FractionInputRulesService |
+  ImageClickInputRulesService |
+  InteractiveMapRulesService |
+  MathEquationInputRulesService |
+  NumericExpressionInputRulesService |
+  NumericInputRulesService |
+  PencilCodeEditorRulesService |
+  GraphInputRulesService |
+  SetInputRulesService |
+  TextInputRulesService
+);
 
-type ValidityCheckFn = () => boolean;
+export type OnSubmitFn = (
+  answer: InteractionAnswer,
+  interactionRulesService: InteractionRulesService
+) => void;
 
-type PresubmitHookFn = () => void;
+export type ValidityCheckFn = () => boolean;
+
+export type PresubmitHookFn = () => void;
 
 @Injectable({
   providedIn: 'root'
@@ -53,9 +76,18 @@ export class CurrentInteractionService {
     private contextService: ContextService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService) {}
-  private static submitAnswerFn: SubmitAnswerFn = null;
-  private static onSubmitFn: OnSubmitFn = null;
-  private static validityCheckFn: ValidityCheckFn = null;
+
+  // The 'submitAnswerFn' function should grab the learner's answer and pass
+  // it to onSubmit. The interaction can pass in 'null' for this property if
+  // it does not use the progress nav's submit button
+  // (for example 'MultipleChoiceInput').
+  private static submitAnswerFn: SubmitAnswerFn | null = null;
+  // The 'validityCheckFn' function is used by the progress nav to decide
+  // whether or not to disable the submit button. If the interaction passes
+  // in 'null', the submit button will remain enabled (for the entire duration
+  // of the current interaction).
+  private static validityCheckFn: ValidityCheckFn | null = null;
+  private static onSubmitFn: OnSubmitFn;
   private static presubmitHooks: PresubmitHookFn[] = [];
   private static answerChangedSubject: Subject<void> = new Subject<void>();
 
@@ -70,7 +102,9 @@ export class CurrentInteractionService {
   }
 
   registerCurrentInteraction(
-      submitAnswerFn: SubmitAnswerFn, validityCheckFn: ValidityCheckFn): void {
+      submitAnswerFn: SubmitAnswerFn | null,
+      validityCheckFn: ValidityCheckFn | null
+  ): void {
     /**
      * Each interaction directive should call registerCurrentInteraction
      * when the interaction directive is first created.
@@ -79,7 +113,7 @@ export class CurrentInteractionService {
      *   answer and pass it to onSubmit. The interaction can pass in
      *   null if it does not use the progress nav's submit button
      *   (ex: MultipleChoiceInput).
-     * @param {function} validityCheckFn - The progress nav will use this
+     * @param {function|null} validityCheckFn - The progress nav will use this
      *   to decide whether or not to disable the submit button. If the
      *   interaction passes in null, the submit button will remain
      *   enabled (for the entire duration of the current interaction).
@@ -104,7 +138,9 @@ export class CurrentInteractionService {
   }
 
   onSubmit(
-      answer: string, interactionRulesService: InteractionRulesService): void {
+      answer: InteractionAnswer,
+      interactionRulesService: InteractionRulesService
+  ): void {
     for (
       let i = 0; i < CurrentInteractionService.presubmitHooks.length; i++) {
       CurrentInteractionService.presubmitHooks[i]();

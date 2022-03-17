@@ -41,7 +41,7 @@ EXCLUDED_PATHS = (
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
     'core/templates/google-analytics.initializer.ts',
-    'extensions/classifiers/proto/*',
+    'extensions/classifiers/proto/*', '*.rtl.css',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
@@ -347,6 +347,9 @@ class GeneralPurposeLinter:
 
         Returns:
             bool. The failure status of the check.
+
+        Raises:
+            Exception. Given file at filepath is not readable.
         """
         # This boolean list keeps track of the regex matches
         # found in the file.

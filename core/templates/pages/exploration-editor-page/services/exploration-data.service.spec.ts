@@ -30,12 +30,12 @@ import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFact
 import { FetchExplorationBackendResponse } from 'domain/exploration/read-only-exploration-backend-api.service';
 
 describe('Exploration data service', function() {
-  let eds: ExplorationDataService = null;
-  let eebas: EditableExplorationBackendApiService = null;
-  let lss: LocalStorageService = null;
-  let ls: LoggerService = null;
+  let eds: ExplorationDataService;
+  let eebas: EditableExplorationBackendApiService;
+  let lss: LocalStorageService;
+  let ls: LoggerService;
   let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
+  let csrfService: CsrfTokenService;
   let sampleDataResults: ExplorationBackendDict = {
     draft_change_list_id: 3,
     version: 1,
@@ -91,6 +91,7 @@ describe('Exploration data service', function() {
         }
       });
     }
+
     async updateExplorationAsync() {
       return new Promise((resolve, reject) => {
         if (this.resolve) {
@@ -171,6 +172,31 @@ describe('Exploration data service', function() {
       expect(errorCallback).toHaveBeenCalled();
     }
   ));
+
+  it('should trigger errorcallback handler when version number is undefined',
+    fakeAsync(() => {
+      let dataResults: ExplorationBackendDict = {
+        draft_change_list_id: 3,
+        version: undefined,
+        draft_changes: [],
+        is_version_of_draft_valid: true,
+        init_state_name: 'init',
+        param_changes: [],
+        param_specs: {randomProp: {obj_type: 'randomVal'}},
+        states: {},
+        title: 'Test Exploration',
+        language_code: 'en',
+        correctness_feedback_enabled: false
+      };
+      eds.data = dataResults;
+      const errorCallback = jasmine.createSpy('error');
+      const successCallback = jasmine.createSpy('success');
+      eds.autosaveChangeListAsync([], successCallback, errorCallback);
+
+      flushMicrotasks();
+      expect(successCallback).not.toHaveBeenCalled();
+      expect(errorCallback).toHaveBeenCalled();
+    }));
 
   it('should autosave draft changes when draft ids match', fakeAsync(() => {
     const errorCallback = jasmine.createSpy('error');
