@@ -401,6 +401,8 @@ import { ContributionAndReviewService } from 'pages/contributor-dashboard-page/s
 import { ContributionAndReviewBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-and-review-backend-api.service';
 import { FaviconService } from './favicon.service';
 import { StalenessDetectionService } from './staleness-detection.service';
+import { ExplorationImprovementsService } from './exploration-improvements.service';
+import { PlaythroughIssuesService } from './playthrough-issues.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -523,6 +525,7 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationImprovementsBackendApiService],
   ['ExplorationImprovementsTaskRegistryService',
     ExplorationImprovementsTaskRegistryService],
+  ['ExplorationImprovementsService', ExplorationImprovementsService],
   ['ExplorationInitStateNameService', ExplorationInitStateNameService],
   ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
   ['ExplorationObjectiveService', ExplorationObjectiveService],
@@ -662,6 +665,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['PlatformFeatureDummyBackendApiService',
     PlatformFeatureDummyBackendApiService],
   ['PlatformFeatureService', PlatformFeatureService],
+  ['PlaythroughIssuesService', PlaythroughIssuesService],
   ['PlayerCorrectnessFeedbackEnabledService',
     PlayerCorrectnessFeedbackEnabledService],
   ['PlayerPositionService', PlayerPositionService],
