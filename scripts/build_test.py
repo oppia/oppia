@@ -65,7 +65,7 @@ class BuildTests(test_utils.GenericTestBase):
         build.safe_delete_directory_tree(TEST_DIR)
         build.safe_delete_directory_tree(EMPTY_DIR)
 
-    def test_minify_func_with_invalid_filepath(self):
+    def test_minify_func_with_invalid_filepath(self) -> None:
         """Tests minify_func with an invalid filepath."""
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             subprocess.CalledProcessError,
@@ -87,7 +87,7 @@ class BuildTests(test_utils.GenericTestBase):
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
-    def test_join_files(self):
+    def test_join_files(self) -> None:
         """Determine third_party.js contains the content of the first 10 JS
         files in /third_party/static.
         """
@@ -839,7 +839,7 @@ class BuildTests(test_utils.GenericTestBase):
         constants_temp_file.close()
         feconf_temp_file.close()
 
-    def test_safe_delete_file(self):
+    def test_safe_delete_file(self) -> None:
         """Test safe_delete_file with both existent and non-existent
         filepath.
         """
@@ -860,11 +860,11 @@ class BuildTests(test_utils.GenericTestBase):
         error_message = ('File %s does not exist.') % re.escape(
             non_existent_filepaths[0])
         # Exception will be raised at first file determined to be non-existent.
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             OSError, error_message):
             build.safe_delete_file(non_existent_filepaths[0])
 
-    def test_minify_third_party_libs(self):
+    def test_minify_third_party_libs(self) -> None:
 
         def _mock_safe_delete_file(unused_filepath: str) -> None:
             """Mocks build.safe_delete_file()."""
