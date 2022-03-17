@@ -291,7 +291,7 @@ export class LearnerDashboardBackendApiService {
       untrackedTopics: Record<string,
       LearnerTopicSummaryBackendDict[]>): Record<string,
       LearnerTopicSummary[]> {
-    var topics = {};
+    var topics: Record<string, LearnerTopicSummary[]> = {};
     for (var i in untrackedTopics) {
       topics[i] = untrackedTopics[i].map(
         topicSummary => LearnerTopicSummary.createFromBackendDict(
