@@ -51,7 +51,8 @@ class GetTopicsWithInvalidPageTitleFragmentJob(base_jobs.JobBase):
 
         topic_ids_with_exceeding_page_title_fragment = (
             total_topics
-            | 'Filter topics with title frag length greater than 50 or less than 5' >>
+            | 'Filter topics with title frag length greater than 50' +
+            ' or less than 5' >>
                 beam.Filter(lambda topic: (
                     topic[1] is None or
                     (len(topic[1]) > 50 or len(topic[1]) < 5)
