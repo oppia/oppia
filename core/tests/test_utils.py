@@ -47,6 +47,7 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import interaction_registry
+from core.domain import object_registry
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
@@ -1044,8 +1045,11 @@ class TestBase(unittest.TestCase):
             except Exception as e:
                 raise Exception(
                     'Parameter %s not found' % param_change.name) from e
+
+            raw_value = param_change._get_value(new_param_dict)  # pylint: disable=protected-access
             new_param_dict[param_change.name] = (
-                param_change.get_normalized_value(obj_type, new_param_dict))
+                object_registry.Registry.get_object_class_by_type(
+                    obj_type).normalize(raw_value))
         return new_param_dict
 
     def get_static_asset_filepath(self):
