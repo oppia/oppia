@@ -21,6 +21,8 @@ from __future__ import annotations
 import collections
 import logging
 
+from core import feconf
+
 from core.constants import constants
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
@@ -28,6 +30,7 @@ from core.domain import question_fetchers
 from core.domain import story_fetchers
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
+from core.domain import translation_services
 from core.platform import models
 
 (opportunity_models, suggestion_models) = models.Registry.import_models(
@@ -150,7 +153,8 @@ def create_exp_opportunity_summary(topic, story, exploration):
     # TODO(#13903): Find a way to reduce runtime of computing the complete
     # languages.
     complete_translation_language_list = (
-        exploration.get_languages_with_complete_translation())
+        translation_services.get_languages_with_complete_translation(
+            exploration))
     # TODO(#13912): Revisit voiceover language logic.
     language_codes_needing_voice_artists = set(
         complete_translation_language_list)
@@ -165,8 +169,12 @@ def create_exp_opportunity_summary(topic, story, exploration):
         # exploration can be voiceovered in its own language.
         language_codes_needing_voice_artists.add(exploration.language_code)
 
-    content_count = exploration.get_content_count()
-    translation_counts = exploration.get_translation_counts()
+    content_count = translation_services.get_content_count(exploration)
+    translation_counts = translation_services.get_translation_counts(
+        feconf.TranslatableEntityType.EXPLORATION,
+        exploration.id,
+        exploration.version
+    )
 
     story_node = story.story_contents.get_node_with_corresponding_exp_id(
         exploration.id)
@@ -251,12 +259,17 @@ def update_opportunity_with_updated_exploration(exp_id):
             model.
     """
     updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    content_count = updated_exploration.get_content_count()
-    translation_counts = updated_exploration.get_translation_counts()
+    content_count = translation_services.get_content_count(updated_exploration)
+    translation_counts = translation_services.get_translation_counts(
+        feconf.TranslatableEntityType.EXPLORATION,
+        updated_exploration.id,
+        updated_exploration.version
+    )
     # TODO(#13903): Find a way to reduce runtime of computing the complete
     # languages.
     complete_translation_language_list = (
-        updated_exploration.get_languages_with_complete_translation())
+        translation_services.get_languages_with_complete_translation(
+            updated_exploration))
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
     exploration_opportunity_summary = (
         get_exploration_opportunity_summary_from_model(model))

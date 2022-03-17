@@ -23,6 +23,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
+from core.domain import translation_domain
 
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
@@ -112,7 +113,7 @@ class SubtopicPageContents:
                 content_id),
             state_domain.RecordedVoiceovers.from_dict(
                 {'voiceovers_mapping': {content_id: {}}}),
-            state_domain.WrittenTranslations.from_dict(
+            translation_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {content_id: {}}}))
 
     def to_dict(self):
@@ -145,7 +146,7 @@ class SubtopicPageContents:
             page_contents,
             state_domain.RecordedVoiceovers.from_dict(page_contents_dict[
                 'recorded_voiceovers']),
-            state_domain.WrittenTranslations.from_dict(page_contents_dict[
+            translation_domain.WrittenTranslations.from_dict(page_contents_dict[
                 'written_translations']))
 
 
@@ -239,7 +240,7 @@ class SubtopicPage:
             dict. The converted subtopic_page_contents_dict.
         """
         subtopic_page_contents_dict['written_translations'] = (
-            state_domain.WrittenTranslations.
+            translation_domain.WrittenTranslations.
             convert_html_in_written_translations(
                 subtopic_page_contents_dict['written_translations'],
                 conversion_fn))
@@ -356,7 +357,7 @@ class SubtopicPage:
                 the subtopic page.
         """
         self.page_contents.written_translations = (
-            state_domain.WrittenTranslations.from_dict(
+            translation_domain.WrittenTranslations.from_dict(
                 new_page_written_translations_dict))
 
     def validate(self):

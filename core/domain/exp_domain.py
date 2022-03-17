@@ -632,8 +632,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Get all translatable fields in the exploration.
 
         Returns:
-            translatable_contents_collection: TranslatableContentsCollection.
-            An instance of TranslatableContentsCollection class.
+            TranslatableContentsCollection. An instance of
+            TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
@@ -1561,6 +1561,31 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         del self.states[state_name]
 
+    def get_translatable_text(self, language_code):
+        """Returns all the contents which needs translation in the given
+        language.
+        Args:
+            language_code: str. The language code in which translation is
+                required.
+        Returns:
+            dict(str, dict(str, str)). A dict where state_name is the key and a
+            dict with content_id as the key and html content as value.
+        """
+        entity_translation = (
+            translation_fetchers.get_unique_entity_translation_object(
+                feconf.TranslatableEntityType.EXPLORATION,
+                self.id,
+                self.version,
+                language_code)
+        )
+        state_names_to_content_id_mapping = {}
+        for state_name, state in self.states.items():
+            state_names_to_content_id_mapping[state_name] = (
+                state.get_content_id_mapping_needing_translations(
+                    language_code))
+
+        return state_names_to_content_id_mapping
+
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.
@@ -2382,6 +2407,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'tags': self.tags,
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
+            'next_content_id_index': self.next_content_id_index,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })
@@ -2477,6 +2503,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'objective': self.objective,
             'language_code': self.language_code,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
+            'next_content_id_index': self.next_content_id_index
         }
 
     def get_all_html_content_strings(self):

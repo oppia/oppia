@@ -18,10 +18,14 @@
 
 from __future__ import annotations
 
+import collections
 import logging
+
+from core import feconf
 
 from core.domain import translation_fetchers
 from core.domain import translation_domain
+from core.domain import opportunity_services
 from core.platform import models
 
 translate_services = models.Registry.import_translate_services()
@@ -85,7 +89,7 @@ def update_translation_related_change(
 ):
     old_translation_models = (
         translation_models.EntityTranslationsModel.get_all_for_entity(
-            feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.TranslatableEntityType.EXPLORATION,
             exploration_id,
             exploration_version)
     )
@@ -118,7 +122,7 @@ def update_translation_related_change(
 
         new_translation_models.append(new_translation_model)
 
-    translation_model.EntityTranslationsModel.put_multi(
+    translation_models.EntityTranslationsModel.put_multi(
         new_translation_models)
     if opportunity_services.is_exploration_available_for_contribution(
             exploration_id):
@@ -126,7 +130,7 @@ def update_translation_related_change(
             exploration_id)
 
 
-def get_languages_with_complete_translation():
+def get_languages_with_complete_translation(exploration):
     """Returns a list of language code in which the exploration translation
     is 100%.
 
@@ -134,9 +138,13 @@ def get_languages_with_complete_translation():
         list(str). A list of language code in which the translation for the
         exploration is complete i.e, 100%.
     """
-    content_count = get_content_count()
+    content_count = get_content_count(exploration)
     language_code_list = []
-    for language_code, count in get_translation_counts().items():
+    for language_code, count in get_translation_counts(
+        feconf.TranslatableEntityType.EXPLORATION,
+        exploration.id,
+        exploration.version
+    ).items():
         if count == content_count:
             language_code_list.append(language_code)
 

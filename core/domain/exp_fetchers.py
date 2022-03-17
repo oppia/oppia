@@ -86,8 +86,8 @@ def _migrate_states_schema(versioned_exploration_states, init_state_name):
                     states_schema_version, init_state_name)
             )
         exp_domain.Exploration.update_states_from_model(
-                    versioned_exploration_states,
-                    states_schema_version, init_state_name)
+            versioned_exploration_states,
+            states_schema_version, init_state_name)
         states_schema_version += 1
     return next_content_id_index
 
@@ -323,14 +323,11 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
         Exploration. The domain object corresponding to the given exploration.
     """
     sub_namespace = str(version) if version else None
-    # cached_exploration = caching_services.get_multi(
-    #     caching_services.CACHE_NAMESPACE_EXPLORATION,
-    #     sub_namespace,
-    #     [exploration_id]
-    # ).get(exploration_id)
-
-    # Remove this after discussing with @DubeySandeep.
-    cached_exploration = None
+    cached_exploration = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION,
+        sub_namespace,
+        [exploration_id]
+    ).get(exploration_id)
 
     if cached_exploration is not None:
         return cached_exploration

@@ -25,6 +25,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
+from core.domain import translation_domain
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -520,8 +521,8 @@ class SkillContents:
              for example in skill_contents_dict['worked_examples']],
             state_domain.RecordedVoiceovers.from_dict(skill_contents_dict[
                 'recorded_voiceovers']),
-            state_domain.WrittenTranslations.from_dict(skill_contents_dict[
-                'written_translations'])
+            translation_domain.WrittenTranslations.from_dict(
+                skill_contents_dict['written_translations'])
         )
         skill_contents.explanation.validate()
 
@@ -909,7 +910,7 @@ class Skill:
                     explanation_content_id: {}
                 }
             }),
-            state_domain.WrittenTranslations.from_dict({
+            translation_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     explanation_content_id: {}
                 }
@@ -954,7 +955,7 @@ class Skill:
         skill_contents_dict['explanation']['html'] = conversion_fn(
             skill_contents_dict['explanation']['html'])
         skill_contents_dict['written_translations'] = (
-            state_domain.WrittenTranslations.
+            translation_domain.WrittenTranslations.
             convert_html_in_written_translations(
                 skill_contents_dict['written_translations'], conversion_fn))
 

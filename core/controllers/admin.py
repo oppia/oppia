@@ -338,7 +338,6 @@ class AdminHandler(base.BaseHandler):
             'rows': {'value': 1}
         })
 
-        state.update_next_content_id_index(1)
         state.update_linked_skill_id(None)
         state.update_content(state_domain.SubtitledHtml('1', question_content))
         recorded_voiceovers = state_domain.RecordedVoiceovers({})

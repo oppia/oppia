@@ -386,7 +386,7 @@ class EntityTranslation:
     def create_empty_translation_object(cls):
         return cls(
             entity_id='',
-            entity_type='',
+            entity_type=feconf.TranslatableEntityType.EXPLORATION,
             entity_version=0,
             language_code='',
             translations={}
@@ -879,13 +879,6 @@ class WrittenTranslations:
                             conversion_fn(translation_dict['html']))
 
         return written_translations_dict
-
-
-def get_translatable_text(
-    entity,
-    language_code
-):
-    pass
 
 
 class ContentIdGenerator:
