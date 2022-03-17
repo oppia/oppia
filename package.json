@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/oppia/oppia#readme",
   "devDependencies": {
-    "@lhci/cli": "^0.6.0",
+    "@lhci/cli": "^0.9.0",
     "@types/angular": "^1.6.54",
     "@types/angular-animate": "^1.5.10",
     "@types/angular-mocks": "^1.7.0",
