@@ -204,4 +204,3 @@ export class QuestionUpdateService {
 }
 angular.module('oppia').factory(
   'QuestionUpdateService', downgradeInjectable(QuestionUpdateService));
-
