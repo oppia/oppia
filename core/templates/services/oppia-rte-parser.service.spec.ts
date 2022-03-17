@@ -16,6 +16,7 @@
  * @fileoverview Spec for service that parses rich text string.
  */
 
+import { DOCUMENT } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
 import { OppiaRteNode, OppiaRteParserService, TextNode } from './oppia-rte-parser.service';
 
@@ -119,20 +120,27 @@ describe('RTE parser service', () => {
       constructor() {
         super();
       }
+
       get tagName() {
         return undefined;
-      };
+      }
     }
     customElements.define('dummy-element', DummyHtmlElement);
 
-    let node = new DummyHtmlElement();    
     expect(() => {
-      rteParserService.constructFromDomParser(node)
-    }).toThrow(new Error(
+      rteParserService.constructFromDomParser(new DummyHtmlElement());
+    }).toThrowError(
       'tagName is undefined.\n' +
       'body: <dummy-element></dummy-element>\n ' +
-      'node: <dummy-element></dummy-element>'
-    ));
+      'node: <dummy-element></dummy-element>');
+  });
+
+  it('should parse a simple element', () => {
+    const document = TestBed.inject(DOCUMENT);
+    const dummyElement = document.createElement('div');
+    expect(
+      rteParserService.constructFromDomParser(dummyElement).selector
+    ).toEqual('div');
   });
 
   // Noninteractive components are easily identified by the oppia-noninteractive
