@@ -457,7 +457,7 @@
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_UNIT_CHARS": "Veuillez vous assurer que l’unité ne contient que des chiffres, des lettres ou des symboles parmi « ( ) * ^ / - »",
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_VALUE": "Veuillez vous assurer que la valeur est soit une fraction, soit un nombre simple.",
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "Formats possibles des unités",
-	"I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL": "Au moins un séparateur des décimales (.) devrait être présent.",
+	"I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL": "Au plus un séparateur de décimales (.) doit être présent.",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_EXPONENT": "Au moins un signe d’exposant (e) doit être présent.",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_MINUS": "Au moins un signe moins (-) doit être présent.",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_COMMA": "La réponse doit contenir au maximum 15 chiffres (de 0 à 9) sans compter les symboles (, . -).",
