@@ -21,15 +21,19 @@ from __future__ import annotations
 import io
 import json
 import os
-import pkgutil
 import re
 import sys
+
+from typing import Any, Dict
 
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
 
-from typing import Any, Dict
+class FileNotExist(Exception):
+    """Error class for accessing file which does not exist."""
+
+    pass
 
 
 # Here we use Dict[str, Any] as return type because we need to parse and return
@@ -79,14 +83,15 @@ def get_package_file_contents(package: str, filepath: str) -> str:
 
     Returns:
         str. The contents of the file.
+
+    Raises:
+        FileNotExist. The specified file does not exist.
     """
     try:
         file = io.open(os.path.join(package, filepath), 'r', encoding='utf-8')
         return file.read()
-    except FileNotFoundError:
-        data = pkgutil.get_data(package, filepath)
-        assert isinstance(data, bytes)
-        return data.decode('utf-8')
+    except FileNotFoundError as e:
+        raise FileNotExist('no file') from e
 
 
 class Constants(dict):  # type: ignore[type-arg]
@@ -108,8 +113,5 @@ constants = Constants(parse_json_from_ts(  # pylint:disable=invalid-name
     get_package_file_contents('assets', 'constants.ts')))
 
 release_constants = Constants( # pylint:disable=invalid-name
-    json.loads(
-        get_package_file_contents(
-            'assets', 'release_constants.json')
-    )
+    json.loads(get_package_file_contents('assets', 'release_constants.json'))
 )
