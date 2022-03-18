@@ -66,14 +66,14 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
                 lambda exp: exp.status == constants.ACTIVITY_STATUS_PUBLIC
             )
         )
- 
+
         curated_lessons = (
             published_explorations
             | 'Filter out all curated lessons' >> beam.Filter(
                 lambda x,
                 all_curated_lessons: x.id in all_curated_lessons,
                 all_curated_lessons=beam.pvalue.AsIter(all_curated_lessons)
-            )            
+            )
         )
 
         exp_ids_with_category_not_in_constants = (

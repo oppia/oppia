@@ -44,7 +44,7 @@ class GetExpWithInvalidCategoryJobTests(
     def setUp(self):
         super().setUp()
 
-        # This is a story model to emulate curated lessons
+        # This is a story model to emulate curated lessons.
         self.story_1 = self.create_model(
             story_models.StoryModel,
             id='1',
@@ -54,56 +54,56 @@ class GetExpWithInvalidCategoryJobTests(
             corresponding_topic_id='1',
             url_fragment='test',
             story_contents={
-                "nodes": [
+                'nodes': [
                     {
-                        "id": "node_1",
-                        "title": "What are the place values?",
-                        "description": "Test",
-                        "thumbnail_filename": None,
-                        "thumbnail_bg_color": None,
-                        "thumbnail_size_in_bytes": None,
-                        "destination_node_ids": [
-                            "node_2"
+                        'id': 'node_1',
+                        'title': 'What are the place values?',
+                        'description': 'Test',
+                        'thumbnail_filename': None,
+                        'thumbnail_bg_color': None,
+                        'thumbnail_size_in_bytes': None,
+                        'destination_node_ids': [
+                            'node_2'
                         ],
-                        "acquired_skill_ids": [],
-                        "prerequisite_skill_ids": [],
-                        "outline": "",
-                        "outline_is_finalized": False,
-                        "exploration_id": "1"
+                        'acquired_skill_ids': [],
+                        'prerequisite_skill_ids': [],
+                        'outline': '',
+                        'outline_is_finalized': False,
+                        'exploration_id': '1'
                     },
                     {
-                        "id": "node_2",
-                        "title": "Finding the value of a number",
-                        "description": "Test",
-                        "thumbnail_filename": None,
-                        "thumbnail_bg_color": None,
-                        "thumbnail_size_in_bytes": None,
-                        "destination_node_ids": [
-                            "node_3"
+                        'id': 'node_2',
+                        'title': 'Finding the value of a number',
+                        'description': 'Test',
+                        'thumbnail_filename': None,
+                        'thumbnail_bg_color': None,
+                        'thumbnail_size_in_bytes': None,
+                        'destination_node_ids': [
+                            'node_3'
                         ],
-                        "acquired_skill_ids": [],
-                        "prerequisite_skill_ids": [],
-                        "outline": "",
-                        "outline_is_finalized": False,
-                        "exploration_id": "2"
+                        'acquired_skill_ids': [],
+                        'prerequisite_skill_ids': [],
+                        'outline': '',
+                        'outline_is_finalized': False,
+                        'exploration_id': '2'
                     },
                     {
-                        "id": "node_3",
-                        "title": "Comparing Numbers",
-                        "description": "Test",
-                        "thumbnail_filename": None,
-                        "thumbnail_bg_color": None,
-                        "thumbnail_size_in_bytes": None,
-                        "destination_node_ids": [],
-                        "acquired_skill_ids": [],
-                        "prerequisite_skill_ids": [],
-                        "outline": "",
-                        "outline_is_finalized": False,
-                        "exploration_id": "3"
+                        'id': 'node_3',
+                        'title': 'Comparing Numbers',
+                        'description': 'Test',
+                        'thumbnail_filename': None,
+                        'thumbnail_bg_color': None,
+                        'thumbnail_size_in_bytes': None,
+                        'destination_node_ids': [],
+                        'acquired_skill_ids': [],
+                        'prerequisite_skill_ids': [],
+                        'outline': '',
+                        'outline_is_finalized': False,
+                        'exploration_id': '3'
                     }
-                ],  
-                "initial_node_id": "node_1",
-                "next_node_id": "node_4"
+                ],
+                'initial_node_id': 'node_1',
+                'next_node_id': 'node_4'
             }
         )
 
@@ -203,7 +203,8 @@ class GetExpWithInvalidCategoryJobTests(
 
     def test_run_with_mixed_models(self) -> None:
         self.put_multi(
-            [self.story_1, self.exp_1, self.exp_2, self.exp_3, self.exp_4, self.exp_5])
+            [self.story_1, self.exp_1, self.exp_2,
+             self.exp_3, self.exp_4, self.exp_5])
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 3'),
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
