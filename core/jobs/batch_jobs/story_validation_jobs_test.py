@@ -17,8 +17,8 @@
 """Unit tests for jobs.batch_jobs.story_validation_jobs."""
 
 from __future__ import annotations
-from core import feconf
 
+from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import story_validation_jobs
 from core.jobs.types import job_run_result
