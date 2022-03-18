@@ -455,7 +455,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         with self.assertRaisesRegex(Exception, 'User not found'): # type: ignore[no-untyped-call]
             improvements.get_task_dict_with_username_and_profile_picture( # type: ignore[no-untyped-call]
              task_entry)
-    
+
     def test_to_dict_with_non_existing_resolver_id(self) -> None:
         task_entry = improvements_domain.TaskEntry(
             constants.TASK_ENTITY_TYPE_EXPLORATION, self.exp.id, 1,
@@ -464,7 +464,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
             constants.TASK_STATUS_RESOLVED, None,
             self.MOCK_DATE)
-        # In case of non-existing resolver_id, 
+        # In case of non-existing resolver_id,
         # get_task_dict_with_username_and_profile_picture should return
         # with no changes to the TaskEntry dict.
         task_entry_dict = (
@@ -483,7 +483,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
             'resolver_profile_picture_data_url': None,
             'resolved_on_msecs': utils.get_time_in_millisecs(self.MOCK_DATE),
         })
-        
+
 
 class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
 
