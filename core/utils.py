@@ -1283,23 +1283,3 @@ def url_open(source_url: str) -> str:
     # The type ignore is needed, because typestubs define the return type
     # of 'urlopen' as 'Any' which is wrong.
     return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return]
-
-
-def get_args_of_function_node(
-    function_node: ast.FunctionDef, args_to_ignore: List[str]) -> List[str]:
-    """Extracts the arguments from a function definition.
-
-    Args:
-        function_node: ast.FunctionDef. Represents a function.
-        args_to_ignore: list(str). Ignore these arguments in a function
-            definition.
-
-    Returns:
-        list(str). The args for a function as listed in the function
-        definition.
-    """
-    return [
-        a.arg
-        for a in function_node.args.args
-        if a.arg not in args_to_ignore
-    ]
