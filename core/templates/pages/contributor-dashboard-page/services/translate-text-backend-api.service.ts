@@ -20,7 +20,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { TranslatableTexts, TranslatableTextsBackendDict } from 'domain/opportunity/translatable-texts.model';
-import { ImagesData } from 'services/image-local-storage.service';
+import { ImageLocalStorageService, ImagesData } from 'services/image-local-storage.service';
 
 interface Data {
   'suggestion_type': string;
@@ -35,7 +35,10 @@ interface Data {
   providedIn: 'root'
 })
 export class TranslateTextBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private imageLocalStorageService: ImageLocalStorageService
+  ) {}
 
   async getTranslatableTextsAsync(expId: string, languageCode: string):
     Promise<TranslatableTexts> {
@@ -47,27 +50,6 @@ export class TranslateTextBackendApiService {
         }
       }).toPromise().then((backendDict: TranslatableTextsBackendDict) => {
       return TranslatableTexts.createFromBackendDict(backendDict);
-    });
-  }
-
-  async blobtoBase64(blob: Blob): Promise<unknown> {
-    return new Promise<unknown> ((resolve, reject)=> {
-      const reader = new FileReader();
-      reader.onload = () => {
-        // Read the base64 data from result.
-        const dataurl = reader.result as string;
-        const prefixRegex = /^data:image\/(gif|png|jpeg|svg\+xml|jpg);base64,/;
-        if (!dataurl.match(prefixRegex)) {
-          reject(new Error('No valid prefix found in data url'));
-        }
-        // Remove "data:mime/type;base64," prefix from data url.
-        // And just return base64 string.
-        const base64 = dataurl.replace(prefixRegex, '');
-        resolve(base64);
-      };
-      // Read image blob and store the result.
-      reader.readAsDataURL(blob);
-      reader.onerror = error => reject(error);
     });
   }
 
@@ -90,19 +72,12 @@ export class TranslateTextBackendApiService {
         content_html: contentHtml,
         translation_html: translationHtml,
         data_format: dataFormat
-      }
+      },
+      files: (
+        await this.imageLocalStorageService.getFilenameToBase64MappingAsync(
+          imagesData))
     };
     const body = new FormData();
-    if (imagesData.length > 0) {
-      postData.files = {};
-      for await (const obj of imagesData) {
-        if (obj.imageBlob === null) {
-          throw new Error('No image data found');
-        }
-        const image = await this.blobtoBase64(obj.imageBlob);
-        postData.files[obj.filename] = image;
-      }
-    }
     body.append('payload', JSON.stringify(postData));
     return this.http.post(
       '/suggestionhandler/', body).toPromise();
