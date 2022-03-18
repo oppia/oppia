@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.controllers import improvements
 from core.domain import config_domain
@@ -440,7 +441,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         self.assertEqual(task_entry_model.resolver_id, self.owner_id)
         self.assertEqual(task_entry_model.resolved_on, self.MOCK_DATE)
 
-    def test_to_dict_with_non_existing_resolver_id_raises_exception(
+    def test_to_dict_with_invalid_resolver_id_raises_exception(
         self
     ) -> None:
         invalid_resolver_id = 'non_existing_user_id'
@@ -454,7 +455,35 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         with self.assertRaisesRegex(Exception, 'User not found'): # type: ignore[no-untyped-call]
             improvements.get_task_dict_with_username_and_profile_picture( # type: ignore[no-untyped-call]
              task_entry)
-
+    
+    def test_to_dict_with_non_existing_resolver_id(self) -> None:
+        task_entry = improvements_domain.TaskEntry(
+            constants.TASK_ENTITY_TYPE_EXPLORATION, self.exp.id, 1,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            constants.TASK_STATUS_RESOLVED, None,
+            self.MOCK_DATE)
+        # In case of non-existing resolver_id, 
+        # get_task_dict_with_username_and_profile_picture should return
+        # with no changes to the TaskEntry dict.
+        task_entry_dict = (
+            improvements.get_task_dict_with_username_and_profile_picture( # type: ignore[no-untyped-call]
+            task_entry))
+        self.assertEqual(task_entry_dict, {
+            'entity_type': 'exploration',
+            'entity_id': self.exp.id,
+            'entity_version': 1,
+            'task_type': 'high_bounce_rate',
+            'target_type': 'state',
+            'target_id': 'Introduction',
+            'issue_description': 'issue description',
+            'status': 'resolved',
+            'resolver_username': None,
+            'resolver_profile_picture_data_url': None,
+            'resolved_on_msecs': utils.get_time_in_millisecs(self.MOCK_DATE),
+        })
+        
 
 class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
 

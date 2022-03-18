@@ -35,10 +35,11 @@ def get_task_dict_with_username_and_profile_picture(task_entry):
     URL inserted.
 
     Args:
-        task_entry: improvements_domain.TaskEntry. The TaskEntry domain object.
+        task_entry: improvements_domain.TaskEntry. The TaskEntry domain object 
+        whose dict is to be returned.
 
     Returns:
-        TaskEntryDict. TaskEntry dict username and profile picture
+        TaskEntryDict. TaskEntry dict with username and profile picture
         URL inserted.
     """
 
