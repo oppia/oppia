@@ -63,7 +63,7 @@ import subprocess
 import sys
 import threading
 
-from core import python_utils
+from core import utils
 
 # Install third party dependencies before proceeding.
 from . import codeowner_linter
@@ -198,7 +198,7 @@ class FileCache:
         """
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
-            with python_utils.open_file(filepath, mode, newline='') as f:
+            with utils.open_file(filepath, mode, newline='') as f:
                 lines = f.readlines()
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return self._CACHE_DATA_DICT[key]
@@ -219,7 +219,6 @@ def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
     """
     namespace.files = FileCache()
     file_cache = namespace.files
-    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     custom_linters = []
     third_party_linters = []
 
@@ -248,17 +247,13 @@ def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
-        config_path_for_css_in_html = os.path.join(
-            parent_dir, 'oppia', '.stylelintrc')
-        custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_css_in_html, files['.html'])
+        custom_linter, third_party_linter = (
+            css_linter.get_linters(files['.html']))
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'css':
-        config_path_for_oppia_css = os.path.join(
-            parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
-        custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_oppia_css, files['.css'])
+        custom_linter, third_party_linter = (
+            css_linter.get_linters(files['.css']))
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'py':
@@ -392,6 +387,10 @@ def _get_filepaths_from_non_other_shard(shard, namespace=None):
 
     Returns:
         list(str). Paths to lintable files.
+
+    Raises:
+        RuntimeError. Invalid shards because of a duplicate file.
+        AssertionError. A file duplicated across shards.
     """
     filepaths = []
     assert shard != OTHER_SHARD_NAME

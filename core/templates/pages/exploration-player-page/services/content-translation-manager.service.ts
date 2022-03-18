@@ -52,6 +52,7 @@ export class ContentTranslationManagerService {
   private explorationLanguageCode!: string;
   private onStateCardContentUpdateEmitter: EventEmitter<void> = (
     new EventEmitter());
+
   // The 'originalTranscript' is a copy of the transcript in the exploration
   // language in it's initial state.
   private originalTranscript: StateCard[] = [];
@@ -246,10 +247,15 @@ export class ContentTranslationManagerService {
       }
     }
 
-    const element = $(card.getInteractionHtml());
+    // DOMParser().parseFromString() creates a HTML document from
+    // the HTML string and it's body contains our required element
+    // as a childnode.
+    const element = new DOMParser().parseFromString(
+      card.getInteractionHtml(), 'text/html'
+    ).body.childNodes[0] as HTMLElement;
     this.extensionTagAssemblerService.formatCustomizationArgAttrs(
       element, caValues);
-    card.setInteractionHtml(element.get(0).outerHTML);
+    card.setInteractionHtml(element.outerHTML);
   }
 
   _swapContentInRules(card: StateCard, languageCode: string): void {

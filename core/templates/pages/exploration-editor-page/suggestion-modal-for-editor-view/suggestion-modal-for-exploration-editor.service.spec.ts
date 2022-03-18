@@ -139,7 +139,15 @@ describe('Suggestion Modal For Exploration Editor', () => {
     }
   };
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector) {

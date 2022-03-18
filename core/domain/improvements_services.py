@@ -23,7 +23,6 @@ import itertools
 import operator
 
 from core import feconf
-from core import python_utils
 from core.domain import improvements_domain
 from core.platform import models
 
@@ -166,7 +165,7 @@ def put_tasks(tasks, update_last_updated_time=True):
     task_models = improvements_models.TaskEntryModel.get_multi(
         [t.task_id for t in tasks])
     models_to_put = []
-    for task, model in python_utils.ZIP(tasks, task_models):
+    for task, model in zip(tasks, task_models):
         if model is None:
             models_to_put.append(
                 improvements_models.TaskEntryModel(
@@ -200,6 +199,9 @@ def apply_changes_to_model(task_entry, task_entry_model):
 
     Returns:
         bool. Whether any change was made to the model.
+
+    Raises:
+        Exception. Wrong model provided.
     """
     if task_entry_model.id != task_entry.task_id:
         raise Exception('Wrong model provided')

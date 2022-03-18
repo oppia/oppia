@@ -93,6 +93,7 @@ export class State {
     this.writtenTranslations = writtenTranslations;
     this.nextContentIdIndex = nextContentIdIndex;
   }
+
   setName(newName: string): void {
     this.name = newName;
   }
@@ -186,7 +187,10 @@ export class StateObjectFactory {
       written_translations: newStateTemplate.written_translations,
       next_content_id_index: newStateTemplate.next_content_id_index
     });
-    if (newState.interaction.defaultOutcome !== null) {
+    if (
+      newState.interaction.defaultOutcome !== null &&
+      newStateName !== null
+    ) {
       let defaultOutcome = newState.interaction.defaultOutcome;
       defaultOutcome.dest = newStateName as string;
     }

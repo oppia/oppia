@@ -32,7 +32,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { SearchService } from 'services/search.service';
 import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { AppConstants } from 'app.constants';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -56,11 +56,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
+  DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
   currentLanguageText!: string;
   classroomData: CreatorTopicSummary[] = [];
+  topicTitlesTranslationKeys: string[] = [];
   learnDropdownOffset: number = 0;
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
@@ -74,6 +76,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   inClassroomPage: boolean = false;
   showLanguageSelector: boolean = false;
   standardNavIsShown: boolean = false;
+  getInvolvedMenuOffset: number = 0;
+  donateMenuOffset: number = 0;
   ACTION_OPEN!: string;
   ACTION_CLOSE!: string;
   KEYBOARD_EVENT_TO_KEY_CODES!: {
@@ -90,6 +94,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       keyCode: number;
       };
     };
+
   labelForClearingFocus!: string;
   sidebarIsShown: boolean = false;
   windowIsNarrow: boolean = false;
@@ -115,16 +120,19 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     'create', 'explore', 'collection', 'collection_editor',
     'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
     'story_editor', 'blog-dashboard'];
+
   currentWindowWidth = this.windowDimensionsService.getWidth();
   // The order of the elements in this array specifies the order in
   // which they will be hidden. Earlier elements will be hidden first.
   NAV_ELEMENTS_ORDER = [
-    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_LEARN', 'I18N_TOPNAV_ABOUT',
-    'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
+    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_LEARN',
+    'I18N_TOPNAV_ABOUT', 'I18N_TOPNAV_LIBRARY',
+    'I18N_TOPNAV_HOME'];
 
   CLASSROOM_PROMOS_ARE_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg');
+
   navElementsVisibilityStatus: Record<string, boolean> = {};
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
@@ -184,15 +192,29 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
         if (classroomPromosAreEnabled) {
           this.accessValidationBackendApiService.validateAccessToClassroomPage(
-            'math').then(()=>{
+            this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
             this.classroomBackendApiService.fetchClassroomDataAsync(
-              'math').then((classroomData) => {
-              this.classroomData = classroomData.getTopicSummaries();
-            });
+              this.DEFAULT_CLASSROOM_URL_FRAGMENT)
+              .then((classroomData) => {
+                this.classroomData = classroomData.getTopicSummaries();
+                this.classroomBackendApiService.onInitializeTranslation.emit();
+                this.siteAnalyticsService.registerClassroomPageViewed();
+                // Store hacky tranlation keys of topics.
+                for (let i = 0; i < this.classroomData.length; i++) {
+                  let topicSummary = this.classroomData[i];
+                  let hackyTopicTranslationKey = (
+                    this.i18nLanguageCodeService.getTopicTranslationKey(
+                      topicSummary.getId(), TranslationKeyType.TITLE
+                    )
+                  );
+                  this.topicTitlesTranslationKeys.push(
+                    hackyTopicTranslationKey
+                  );
+                }
+              });
           });
         }
       });
-
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
     // first save a reference to that context in a variable, and then use that
@@ -272,6 +294,19 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           }
         })
     );
+
+    let langCode = this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
+
+    if (this.currentLanguageCode !== langCode) {
+      this.currentLanguageCode = langCode;
+      this.supportedSiteLanguages.forEach(element => {
+        if (element.id === this.currentLanguageCode) {
+          this.currentLanguageText = element.text;
+        }
+      });
+      this.changeDetectorRef.detectChanges();
+    }
+
     // The function needs to be run after i18n. A timeout of 0 appears
     // to run after i18n in Chrome, but not other browsers. The
     // will check if i18n is complete and set a new timeout if it is
@@ -283,6 +318,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewChecked(): void {
+    this.getInvolvedMenuOffset = this
+      .getDropdownOffset('.get-involved', 574);
+    this.donateMenuOffset = this
+      .getDropdownOffset('.donate-tab', 286);
     this.learnDropdownOffset = this.getDropdownOffset(
       '.learn-tab', (this.CLASSROOM_PROMOS_ARE_ENABLED) ? 688 : 300);
     // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
@@ -295,10 +334,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // available on the right to calculate the offset. It returns zero if
   // there is enough space to fit the content.
   getDropdownOffset(cssClass: string, width: number): number {
-    var learnTab: HTMLElement | null = document.querySelector(cssClass);
+    let learnTab: HTMLElement | null = document.querySelector(cssClass);
     if (learnTab) {
-      var leftOffset = learnTab.getBoundingClientRect().left;
-      var space = window.innerWidth - leftOffset;
+      let leftOffset = learnTab.getBoundingClientRect().left;
+      let space = window.innerWidth - leftOffset;
       return (space < width) ? (Math.round(space - width)) : 0;
     }
     return 0;
@@ -386,8 +425,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.sidebarStatusService.isSidebarShown();
   }
 
-  toggleSidebar(): void {
+  toggleSidebar(event: Event): void {
     this.sidebarStatusService.toggleSidebar();
+    this.sidebarStatusService.toggleHamburgerIconStatus(event);
+    if (this.isSidebarShown()) {
+      this.windowRef.nativeWindow.document.body.style.overflowY = 'hidden';
+    } else {
+      this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
+    }
   }
 
   navigateToClassroomPage(classroomUrl: string): void {
@@ -459,6 +504,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         }
       }
     }
+  }
+
+  isHackyTopicTitleTranslationDisplayed(index: number): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.topicTitlesTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 
   ngOnDestroy(): void {

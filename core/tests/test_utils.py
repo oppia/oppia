@@ -33,7 +33,6 @@ import re
 import unittest
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
@@ -129,6 +128,9 @@ def get_filepath_from_filename(filename, rootdir):
     Returns:
         str | None. The path of the file if file is found otherwise
         None.
+
+    Raises:
+        Exception. Multiple files found with given file name.
     """
     # This is required since error files are served according to error status
     # code. The file served is error-page.mainpage.html but it is compiled and
@@ -161,7 +163,7 @@ def mock_load_template(filename):
     """
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'pages'))
-    with python_utils.open_file(filepath, 'r') as f:
+    with utils.open_file(filepath, 'r') as f:
         return f.read()
 
 
@@ -518,6 +520,17 @@ class ElasticSearchStub:
 class AuthServicesStub:
     """Test-only implementation of the public API in core.platform.auth."""
 
+    class AuthUser:
+        """Authentication user with ID and deletion status."""
+
+        def __init__(self, user_id, deleted=False):
+            self.id = user_id
+            self.deleted = deleted
+
+        def mark_as_deleted(self):
+            """Marks the user as deleted."""
+            self.deleted = True
+
     def __init__(self):
         """Initializes a new instance that emulates an empty auth server."""
         self._user_id_by_auth_id = {}
@@ -640,9 +653,9 @@ class AuthServicesStub:
             user_id: str. The unique ID of the user whose associations should be
                 deleted.
         """
-        self._user_id_by_auth_id = {
-            a: u for a, u in self._user_id_by_auth_id.items() if u != user_id
-        }
+        for user in self._user_id_by_auth_id.values():
+            if user.id == user_id:
+                user.mark_as_deleted()
 
     def delete_external_auth_associations(self, user_id):
         """Deletes all associations that refer to the user outside of Oppia.
@@ -677,21 +690,31 @@ class AuthServicesStub:
             str|None. The auth ID associated with the given user ID, or None if
             no association exists.
         """
-        return next(
-            (a for a, u in self._user_id_by_auth_id.items() if u == user_id),
-            None)
+        return next((
+            auth_id for auth_id, user in self._user_id_by_auth_id.items()
+            if user.id == user_id and not user.deleted
+        ), None)
 
-    def get_user_id_from_auth_id(self, auth_id):
+    def get_user_id_from_auth_id(self, auth_id, include_deleted=False):
         """Returns the user ID associated with the given auth ID.
 
         Args:
             auth_id: str. The auth ID.
+            include_deleted: bool. Whether to return the ID of models marked for
+                deletion.
 
         Returns:
             str|None. The user ID associated with the given auth ID, or None if
             no association exists.
         """
-        return self._user_id_by_auth_id.get(auth_id, None)
+        user = self._user_id_by_auth_id.get(auth_id, None)
+        if user is None:
+            return None
+
+        if include_deleted or not user.deleted:
+            return user.id
+
+        return None
 
     def get_multi_user_ids_from_auth_ids(self, auth_ids):
         """Returns the user IDs associated with the given auth IDs.
@@ -703,7 +726,7 @@ class AuthServicesStub:
             list(str|None). The user IDs associated with each of the given auth
             IDs, or None for associations which don't exist.
         """
-        return [self._user_id_by_auth_id.get(a, None) for a in auth_ids]
+        return [self.get_user_id_from_auth_id(auth_id) for auth_id in auth_ids]
 
     def get_multi_auth_ids_from_user_ids(self, user_ids):
         """Returns the auth IDs associated with the given user IDs.
@@ -715,8 +738,11 @@ class AuthServicesStub:
             list(str|None). The auth IDs associated with each of the given user
             IDs, or None for associations which don't exist.
         """
-        auth_id_by_user_id = {u: a for a, u in self._user_id_by_auth_id.items()}
-        return [auth_id_by_user_id.get(u, None) for u in user_ids]
+        auth_id_by_user_id = {
+            user.id: auth_id
+            for auth_id, user in self._user_id_by_auth_id.items()
+        }
+        return [auth_id_by_user_id.get(user_id, None) for user_id in user_ids]
 
     def associate_auth_id_with_user_id(self, auth_id_user_id_pair):
         """Commits the association between auth ID and user ID.
@@ -734,11 +760,11 @@ class AuthServicesStub:
         if auth_id in self._user_id_by_auth_id:
             raise Exception(
                 'auth_id=%r is already associated with user_id=%r' % (
-                    auth_id, self._user_id_by_auth_id[auth_id]))
+                    auth_id, self._user_id_by_auth_id[auth_id].id))
         auth_models.UserAuthDetailsModel(
             id=user_id, firebase_auth_id=auth_id).put()
         self._external_user_id_associations.add(user_id)
-        self._user_id_by_auth_id[auth_id] = user_id
+        self._user_id_by_auth_id[auth_id] = AuthServicesStub.AuthUser(user_id)
 
     def associate_multi_auth_ids_with_user_ids(self, auth_id_user_id_pairs):
         """Commits the associations between auth IDs and user IDs.
@@ -753,7 +779,7 @@ class AuthServicesStub:
             Exception. One or more auth associations already exist.
         """
         collisions = ', '.join(
-            '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a])
+            '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a].id)
             for a, _ in auth_id_user_id_pairs if a in self._user_id_by_auth_id)
         if collisions:
             raise Exception('already associated: %s' % collisions)
@@ -763,7 +789,11 @@ class AuthServicesStub:
              for auth_id, user_id in auth_id_user_id_pairs])
         self._external_user_id_associations.add(
             u for _, u in auth_id_user_id_pairs)
-        self._user_id_by_auth_id.update(auth_id_user_id_pairs)
+        auth_id_user_id_pairs_with_deletion = {
+            auth_id: AuthServicesStub.AuthUser(user_id)
+            for auth_id, user_id in auth_id_user_id_pairs
+        }
+        self._user_id_by_auth_id.update(auth_id_user_id_pairs_with_deletion)
 
 
 class TaskqueueServicesStub:
@@ -984,7 +1014,7 @@ class TestBase(unittest.TestCase):
 
     def _assert_validation_error(self, item, error_substring):
         """Checks that the given item passes default validation."""
-        with self.assertRaisesRegexp(utils.ValidationError, error_substring):
+        with self.assertRaisesRegex(utils.ValidationError, error_substring):
             item.validate()
 
     def log_line(self, line):
@@ -1011,8 +1041,9 @@ class TestBase(unittest.TestCase):
         for param_change in param_changes:
             try:
                 obj_type = exp_param_specs[param_change.name].obj_type
-            except:
-                raise Exception('Parameter %s not found' % param_change.name)
+            except Exception as e:
+                raise Exception(
+                    'Parameter %s not found' % param_change.name) from e
             new_param_dict[param_change.name] = (
                 param_change.get_normalized_value(obj_type, new_param_dict))
         return new_param_dict
@@ -1278,9 +1309,9 @@ class TestBase(unittest.TestCase):
     def assertRaises(self, *args, **kwargs):
         raise NotImplementedError(
             'self.assertRaises should not be used in these tests. Please use '
-            'self.assertRaisesRegexp instead.')
+            'self.assertRaisesRegex instead.')
 
-    def assertRaisesRegexp(  # pylint: disable=invalid-name
+    def assertRaisesRegex(  # pylint: disable=invalid-name
             self, expected_exception, expected_regex, *args, **kwargs):
         """Asserts that the message in a raised exception matches a regex.
         This is a wrapper around assertRaisesRegex in unittest that enforces
@@ -1296,13 +1327,16 @@ class TestBase(unittest.TestCase):
 
         Returns:
             bool. Whether the code raised exception in the expected format.
+
+        Raises:
+            Exception. No Regex given.
         """
         if not expected_regex:
             raise Exception(
                 'Please provide a sufficiently strong regexp string to '
                 'validate that the correct error is being raised.')
 
-        return super(TestBase, self).assertRaisesRegexp(
+        return super(TestBase, self).assertRaisesRegex(
             expected_exception, expected_regex, *args, **kwargs)
 
     def assertItemsEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
@@ -1336,7 +1370,7 @@ class TestBase(unittest.TestCase):
         get_match = re.match if full_match else re.search
         differences = [
             '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp)
-            for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items))
+            for i, (regexp, item) in enumerate(zip(regexps, items))
             if get_match(regexp, item, flags=re.DOTALL) is None
         ]
         if len(items) < len(regexps):
@@ -1713,10 +1747,10 @@ class GenericTestBase(AppEngineTestBase):
 
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 init_state_name: %s
 language_code: en
 objective: ''
@@ -1898,6 +1932,9 @@ title: Title
 
         Yields:
             None. Empty yield statement.
+
+        Raises:
+            Exception. Given argument is not a datetime.
         """
         if not isinstance(mocked_now, datetime.datetime):
             raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
@@ -1982,9 +2019,12 @@ title: Title
 
             response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
                 'csrf_token': self.get_new_csrf_token(),
-                'payload': json.dumps(
-                    {'username': username, 'agreed_to_terms': True}),
-            })
+                'payload': json.dumps({
+                    'username': username,
+                    'agreed_to_terms': True,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                    }),
+                })
             self.assertEqual(response.status_int, 200)
 
     def signup_superadmin_user(self):
@@ -2603,6 +2643,10 @@ title: Title
 
         Returns:
             Exploration. The exploration domain object.
+
+        Raises:
+            ValueError. Given list of state names is empty.
+            ValueError. Given list of interaction ids is empty.
         """
         if not state_names:
             raise ValueError('must provide at least one state name')
@@ -2617,7 +2661,7 @@ title: Title
         exploration.correctness_feedback_enabled = correctness_feedback_enabled
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
-                python_utils.ZIP(state_names[:-1], state_names[1:])):
+                zip(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
             self.set_interaction_for_state(
                 from_state, next(interaction_ids))
@@ -3645,7 +3689,11 @@ class FunctionWrapper:
         if self._instance is not None:
             args = [self._instance] + list(args)
 
-        args_dict = inspect.getcallargs(self._func, *args, **kwargs)
+        # Creates a mapping from positional and keyword arguments to parameters
+        # and binds them to the call signature of the method. Serves as a
+        # replacement for inspect.getcallargs() in python versions >= 3.5.
+        sig = inspect.signature(self._func)
+        args_dict = sig.bind_partial(*args, **kwargs).arguments
 
         self.pre_call_hook(args_dict)
 
@@ -3733,6 +3781,10 @@ class FailingFunction(FunctionWrapper):
                 exception, before a call succeeds. If this is 0, all calls will
                 succeed, if it is FailingFunction. INFINITY, all calls will
                 fail.
+
+        Raises:
+            ValueError. The number of times to raise an exception before a call
+                succeeds should be a non-negative interger or INFINITY.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception

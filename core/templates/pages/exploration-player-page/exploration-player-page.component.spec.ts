@@ -12,98 +12,102 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { ContextService } from 'services/context.service';
+import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
+import { PageTitleService } from 'services/page-title.service';
+import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
+
 /**
  * @fileoverview Unit tests for exploration player page component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// App.ts is upgraded to Angular 8.
+describe('Exploration Player Page', () => {
+  let fixture: ComponentFixture<ExplorationPlayerPageComponent>;
+  let componentInstance: ExplorationPlayerPageComponent;
+  let contextService: ContextService;
+  let keyboardShortcutService: KeyboardShortcutService;
+  let metaTagCustomizationService: MetaTagCustomizationService;
+  let pageTitleService: PageTitleService;
+  let readOnlyExplorationBackendApiService:
+  ReadOnlyExplorationBackendApiService;
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        ExplorationPlayerPageComponent
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
 
-import { TestBed } from '@angular/core/testing';
-
-import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
-
-require('pages/exploration-player-page/exploration-player-page.component.ts');
-
-describe('Exploration player page', function() {
-  var ctrl = null;
-  var $q = null;
-  var $scope = null;
-  var ContextService = null;
-  var PageTitleService = null;
-  var ReadOnlyExplorationBackendApiService = null;
-
-  var explorationId = 'exp1';
-  var exploration = {
-    title: 'Exploration Title',
-    objective: 'Exploration Objective',
-  };
-
-  importAllAngularServices();
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'KeyboardShortcutService',
-      TestBed.get(KeyboardShortcutService));
+    fixture = TestBed.createComponent(ExplorationPlayerPageComponent);
+    componentInstance = fixture.componentInstance;
+    contextService = TestBed.inject(ContextService);
+    keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
+    metaTagCustomizationService = TestBed.inject(MetaTagCustomizationService);
+    pageTitleService = TestBed.inject(PageTitleService);
+    readOnlyExplorationBackendApiService = TestBed.inject(
+      ReadOnlyExplorationBackendApiService);
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
-    ContextService = $injector.get('ContextService');
-    PageTitleService = $injector.get('PageTitleService');
-    ReadOnlyExplorationBackendApiService = $injector.get(
-      'ReadOnlyExplorationBackendApiService');
-
-    $scope = $rootScope.$new();
-    ctrl = $componentController('explorationPlayerPage', {
-      $scope: $scope
-    });
-  }));
-
-  it('should load skill based on its id on url when component is initialized' +
-    ' and set angular element content property based on the exploration',
-  function() {
-    spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
-    spyOn(ReadOnlyExplorationBackendApiService, 'fetchExplorationAsync').and
-      .returnValue($q.resolve({
-        exploration: exploration
-      }));
-    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
-
-    var angularElementSpy = spyOn(angular, 'element');
-
-    var elementNameItemProp = $('<div>');
-    angularElementSpy.withArgs(
-      'meta[itemprop="name"]').and.returnValue(elementNameItemProp);
-
-    var elementDescriptionItemProp = $('<div>');
-    angularElementSpy.withArgs(
-      'meta[itemprop="description"]').and.returnValue(
-      elementDescriptionItemProp);
-
-    var elementTitleProperty = $('<div>');
-    angularElementSpy.withArgs(
-      'meta[property="og:title"]').and.returnValue(elementTitleProperty);
-
-    var elementDescriptionProperty = $('<div>');
-    angularElementSpy.withArgs(
-      'meta[property="og:description"]').and.returnValue(
-      elementDescriptionProperty);
-
-    ctrl.$onInit();
-    $scope.$apply();
-
-    expect(PageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'Exploration Title - Oppia');
-    expect(elementNameItemProp.attr('content')).toBe(exploration.title);
-    expect(elementDescriptionItemProp.attr('content')).toBe(
-      exploration.objective);
-    expect(elementTitleProperty.attr('content')).toBe(exploration.title);
-    expect(elementDescriptionProperty.attr('content')).toBe(
-      exploration.objective);
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
   });
+
+  it('should initialize component', fakeAsync(() => {
+    const expId = 'exp_id';
+    const response = {
+      exploration: {
+        title: 'Test',
+        objective: 'test objective',
+      }
+    };
+
+    spyOn(contextService, 'getExplorationId').and.returnValue(expId);
+    spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
+      .and.returnValue(Promise.resolve(
+        response as FetchExplorationBackendResponse));
+    spyOn(pageTitleService, 'setDocumentTitle');
+    spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags');
+    spyOn(keyboardShortcutService, 'bindExplorationPlayerShortcuts');
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(contextService.getExplorationId).toHaveBeenCalled();
+    expect(readOnlyExplorationBackendApiService.fetchExplorationAsync)
+      .toHaveBeenCalledWith(expId, null);
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      response.exploration.title + ' - Oppia');
+    expect(metaTagCustomizationService.addOrReplaceMetaTags)
+      .toHaveBeenCalledWith([
+        {
+          propertyType: 'itemprop',
+          propertyValue: 'name',
+          content: response.exploration.title
+        },
+        {
+          propertyType: 'itemprop',
+          propertyValue: 'description',
+          content: response.exploration.objective
+        },
+        {
+          propertyType: 'property',
+          propertyValue: 'og:title',
+          content: response.exploration.title
+        },
+        {
+          propertyType: 'property',
+          propertyValue: 'og:description',
+          content: response.exploration.objective
+        }
+      ]);
+    expect(keyboardShortcutService.bindExplorationPlayerShortcuts)
+      .toHaveBeenCalled();
+  }));
 });

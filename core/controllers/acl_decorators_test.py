@@ -53,6 +53,471 @@ import webapp2
 import webtest
 
 
+class OpenAccessDecoratorTests(test_utils.GenericTestBase):
+    """Tests for open access decorator."""
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.open_access
+        def get(self):
+            return self.render_json({'success': True})
+
+    def setUp(self):
+        super(OpenAccessDecoratorTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_access_with_logged_in_user(self):
+        self.login(self.VIEWER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock')
+        self.assertTrue(response['success'])
+        self.logout()
+
+    def test_access_with_guest_user(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock')
+        self.assertTrue(response['success'])
+
+
+class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
+    """Tests for is_source_mailchimp decorator."""
+
+    user_email = 'user@example.com'
+    username = 'user'
+    secret = 'webhook_secret'
+    invalid_secret = 'invalid'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'secret': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.is_source_mailchimp
+        def get(self, secret):
+            return self.render_json({'secret': secret})
+
+    def setUp(self):
+        super(IsSourceMailChimpDecoratorTests, self).setUp()
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_secret_page/<secret>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_error_when_mailchimp_webhook_secret_is_none(self):
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+
+        with testapp_swap:
+            response = self.get_json(
+                '/mock_secret_page/%s' % self.secret,
+                expected_status_int=404
+            )
+
+        error_msg = (
+            'Could not find the page http://localhost'
+            '/mock_secret_page/%s.' % self.secret
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.assertEqual(response['status_code'], 404)
+
+    def test_error_when_given_webhook_secret_is_invalid(self):
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        mailchimp_swap = self.swap_to_always_return(
+            feconf, 'MAILCHIMP_WEBHOOK_SECRET', value=self.secret)
+
+        with testapp_swap, mailchimp_swap:
+            response = self.get_json(
+                '/mock_secret_page/%s' % self.invalid_secret,
+                expected_status_int=404
+            )
+
+        error_msg = (
+            'Could not find the page http://localhost'
+            '/mock_secret_page/%s.' % self.invalid_secret
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.assertEqual(response['status_code'], 404)
+
+    def test_no_error_when_given_webhook_secret_is_valid(self):
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        mailchimp_swap = self.swap(
+            feconf, 'MAILCHIMP_WEBHOOK_SECRET', self.secret)
+
+        with testapp_swap, mailchimp_swap:
+            response = self.get_json(
+                '/mock_secret_page/%s' % self.secret,
+                expected_status_int=200
+            )
+
+        self.assertEqual(response['secret'], self.secret)
+
+
+class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_view_skills decorator."""
+
+    class MockHandler(base.BaseHandler):
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'selected_skill_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_view_skills
+        def get(self, selected_skill_ids):
+            return self.render_json({'selected_skill_ids': selected_skill_ids})
+
+    def setUp(self):
+        super(ViewSkillsDecoratorTests, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_view_skills/<selected_skill_ids>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_can_view_skill_with_valid_skill_id(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
+        skill_ids = [skill_id]
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_skills/%s' % json.dumps(skill_ids))
+        self.assertEqual(response['selected_skill_ids'], skill_ids)
+
+    def test_invalid_input_exception_with_invalid_skill_ids(self):
+        skill_ids = ['abcd1234']
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_skills/%s' % json.dumps(skill_ids),
+                expected_status_int=400)
+        self.assertEqual(response['error'], 'Invalid skill id.')
+
+    def test_page_not_found_exception_with_invalid_skill_ids(self):
+        skill_ids = ['invalid_id12', 'invalid_id13']
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_skills/%s' % json.dumps(skill_ids),
+                expected_status_int=404)
+        error_msg = (
+            'Could not find the page http://localhost/mock_view_skills/'
+            '%5B%22invalid_id12%22,%20%22invalid_id13%22%5D.'
+        )
+        self.assertEqual(response['error'], error_msg)
+
+
+class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
+    """Tests for download exploration decorator."""
+
+    user_email = 'user@example.com'
+    username = 'user'
+    published_exp_id = 'exp_id_1'
+    private_exp_id = 'exp_id_2'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_download_exploration
+        def get(self, exploration_id):
+            return self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(DownloadExplorationDecoratorTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_download_exploration/<exploration_id>',
+                self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_cannot_download_exploration_with_disabled_exploration_ids(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_download_exploration/%s' % (
+                    feconf.DISABLED_EXPLORATION_IDS[0]),
+                expected_status_int=404
+            )
+        error_msg = (
+            'Could not find the page '
+            'http://localhost/mock_download_exploration/%s.' % (
+                feconf.DISABLED_EXPLORATION_IDS[0]
+            )
+        )
+        self.assertEqual(response['error'], error_msg)
+
+    def test_guest_can_download_published_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_download_exploration/%s' % self.published_exp_id)
+        self.assertEqual(response['exploration_id'], self.published_exp_id)
+
+    def test_guest_cannot_download_private_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_download_exploration/%s' % self.private_exp_id,
+                expected_status_int=404)
+        error_msg = (
+            'Could not find the page '
+            'http://localhost/mock_download_exploration/%s.' % (
+                self.private_exp_id
+            )
+        )
+        self.assertEqual(response['error'], error_msg)
+
+    def test_moderator_can_download_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_download_exploration/%s' % self.private_exp_id)
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
+        self.logout()
+
+    def test_owner_can_download_private_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_download_exploration/%s' % self.private_exp_id)
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
+        self.logout()
+
+    def test_logged_in_user_cannot_download_unowned_exploration(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_download_exploration/%s' % self.private_exp_id,
+                expected_status_int=404)
+        error_msg = (
+            'Could not find the page '
+            'http://localhost/mock_download_exploration/%s.' % (
+                self.private_exp_id
+            )
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_page_not_found_exception_when_exploration_rights_is_none(self):
+        self.login(self.user_email)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        exp_rights_swap = self.swap_to_always_return(
+            rights_manager, 'get_exploration_rights', value=None)
+        with testapp_swap, exp_rights_swap:
+            response = self.get_json(
+                '/mock_download_exploration/%s' % self.published_exp_id,
+                expected_status_int=404)
+        error_msg = (
+            'Could not find the page '
+            'http://localhost/mock_download_exploration/%s.' % (
+                self.published_exp_id
+            )
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+
+class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
+    """Tests for view exploration stats decorator."""
+
+    user_email = 'user@example.com'
+    username = 'user'
+    published_exp_id = 'exp_id_1'
+    private_exp_id = 'exp_id_2'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_view_exploration_stats
+        def get(self, exploration_id):
+            return self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(ViewExplorationStatsDecoratorTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_view_exploration_stats/<exploration_id>',
+                self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_cannot_view_exploration_stats_with_disabled_exploration_ids(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_exploration_stats/%s' % (
+                    feconf.DISABLED_EXPLORATION_IDS[0]),
+                expected_status_int=404
+            )
+        error_msg = (
+            'Could not find the page '
+            'http://localhost/mock_view_exploration_stats/%s.' % (
+                feconf.DISABLED_EXPLORATION_IDS[0]
+            )
+        )
+        self.assertEqual(response['error'], error_msg)
+
+    def test_guest_can_view_published_exploration_stats(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_exploration_stats/%s' % self.published_exp_id)
+        self.assertEqual(response['exploration_id'], self.published_exp_id)
+
+    def test_guest_cannot_view_private_exploration_stats(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_exploration_stats/%s' % self.private_exp_id,
+                expected_status_int=404)
+        error_msg = (
+            'Could not find the page '
+            'http://localhost/mock_view_exploration_stats/%s.' % (
+                self.private_exp_id
+            )
+        )
+        self.assertEqual(response['error'], error_msg)
+
+    def test_moderator_can_view_private_exploration_stats(self):
+        self.login(self.MODERATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_exploration_stats/%s' % self.private_exp_id)
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
+        self.logout()
+
+    def test_owner_can_view_private_exploration_stats(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_exploration_stats/%s' % self.private_exp_id)
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
+        self.logout()
+
+    def test_logged_in_user_cannot_view_unowned_exploration_stats(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_exploration_stats/%s' % self.private_exp_id,
+                expected_status_int=404)
+        error_msg = (
+            'Could not find the page '
+            'http://localhost/mock_view_exploration_stats/%s.' % (
+                self.private_exp_id
+            )
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_page_not_found_exception_when_exploration_rights_is_none(self):
+        self.login(self.user_email)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        exp_rights_swap = self.swap_to_always_return(
+            rights_manager, 'get_exploration_rights', value=None)
+        with testapp_swap, exp_rights_swap:
+            response = self.get_json(
+                '/mock_view_exploration_stats/%s' % self.published_exp_id,
+                expected_status_int=404)
+        error_msg = (
+            'Could not find the page '
+            'http://localhost/mock_view_exploration_stats/%s.' % (
+                self.published_exp_id
+            )
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+
+class RequireUserIdElseRedirectToHomepageTests(test_utils.GenericTestBase):
+    """Tests for require_user_id_else_redirect_to_homepage decorator."""
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.require_user_id_else_redirect_to_homepage
+        def get(self):
+            self.redirect('/access_page')
+
+    def setUp(self):
+        super(RequireUserIdElseRedirectToHomepageTests, self).setUp()
+        self.signup(self.user_email, self.username)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_logged_in_user_is_redirected_to_access_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_html_response('/mock/', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost/access_page', response.headers['location'])
+        self.logout()
+
+    def test_guest_user_is_redirected_to_homepage(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_html_response('/mock/', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost/', response.headers['location'])
+
+
 class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
     """Tests for play exploration decorator."""
 
@@ -95,7 +560,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_can_not_access_exploration_with_disabled_exploration_ids(self):
+    def test_cannot_access_exploration_with_disabled_exploration_ids(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_exploration/%s'
@@ -239,8 +704,6 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 
     user_email = 'user@example.com'
     username = 'user'
-    published_exp_id = 'exp_id_1'
-    private_exp_id = 'exp_id_2'
     published_col_id = 'col_id_1'
     private_col_id = 'col_id_2'
 
@@ -275,20 +738,15 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
                 '/mock_edit_collection/<collection_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        self.save_new_valid_exploration(
-            self.published_exp_id, self.owner_id)
-        self.save_new_valid_exploration(
-            self.private_exp_id, self.owner_id)
         self.save_new_valid_collection(
             self.published_col_id, self.owner_id,
             exploration_id=self.published_col_id)
         self.save_new_valid_collection(
             self.private_col_id, self.owner_id,
             exploration_id=self.private_col_id)
-        rights_manager.publish_exploration(self.owner, self.published_exp_id)
         rights_manager.publish_collection(self.owner, self.published_col_id)
 
-    def test_can_not_edit_collection_with_invalid_collection_id(self):
+    def test_cannot_edit_collection_with_invalid_collection_id(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -467,7 +925,7 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/create')
-        self.assertEqual(response['success'], True)
+        self.assertTrue(response['success'])
         self.logout()
 
     def test_guest_cannot_create_exploration_via_json_handler(self):
@@ -530,7 +988,7 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/create')
-        self.assertEqual(response['success'], True)
+        self.assertTrue(response['success'])
         self.logout()
 
 
@@ -569,7 +1027,14 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/access')
-        self.assertEqual(response['success'], True)
+        self.assertTrue(response['success'])
+        self.logout()
+
+    def test_guest_user_cannot_access_editor_dashboard(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/access', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
 
 
 class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
@@ -615,10 +1080,9 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
-
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_can_not_comment_on_feedback_threads_with_disabled_exp_id(self):
+    def test_cannot_comment_on_feedback_threads_with_disabled_exp_id(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -638,7 +1102,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
                 'exploration feedback.')
         self.logout()
 
-    def test_can_not_comment_on_feedback_threads_with_invalid_thread_id(self):
+    def test_cannot_comment_on_feedback_threads_with_invalid_thread_id(self):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -737,10 +1201,9 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
-
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_can_not_create_feedback_threads_with_disabled_exp_id(self):
+    def test_cannot_create_feedback_threads_with_disabled_exp_id(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_create_feedback_thread/%s'
@@ -838,7 +1301,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_can_not_view_feedback_threads_with_disabled_exp_id(self):
+    def test_cannot_view_feedback_threads_with_disabled_exp_id(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_view_feedback_thread/%s' % self.disabled_exp_thread_id,
@@ -927,7 +1390,6 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
             return self.render_json({'query_id': query_id})
 
     def setUp(self):
-
         super(ManageEmailDashboardTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
@@ -956,6 +1418,12 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
             response = self.mock_testapp.put('/mock/%s' % self.query_id)
         self.assertEqual(response.status_int, 200)
         self.logout()
+
+    def test_error_when_user_is_not_logged_in(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
 
 
 class RateExplorationTests(test_utils.GenericTestBase):
@@ -1002,6 +1470,8 @@ class RateExplorationTests(test_utils.GenericTestBase):
 
 
 class AccessModeratorPageTests(test_utils.GenericTestBase):
+    """Tests for can_access_moderator_page decorator."""
+
     username = 'user'
     user_email = 'user@example.com'
 
@@ -1036,6 +1506,12 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
         self.logout()
+
+    def test_guest_cannot_access_moderator_page(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
 
 
 class FlagExplorationTests(test_utils.GenericTestBase):
@@ -1112,11 +1588,12 @@ class SubscriptionToUsersTests(test_utils.GenericTestBase):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
-        self.assertEqual(response['success'], True)
+        self.assertTrue(response['success'])
         self.logout()
 
 
 class SendModeratorEmailsTests(test_utils.GenericTestBase):
+    """Tests for can_send_moderator_emails decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1153,8 +1630,15 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
         self.assertEqual(response['success'], 1)
         self.logout()
 
+    def test_guest_cannot_send_moderator_emails(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
 
 class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_access_release_coordinator_page decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1229,6 +1713,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
 
 class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_access_blog_admin_page decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1302,6 +1787,7 @@ class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
 
 
 class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_manage_blog_post_editors decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1376,6 +1862,7 @@ class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
 
 
 class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_access_blog_dashboard decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1496,7 +1983,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
         blog_post = blog_services.create_new_blog_post(self.blog_editor_id)
         self.blog_post_id = blog_post.id
 
-    def test_guest_can_not_delete_blog_post(self):
+    def test_guest_cannot_delete_blog_post(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_blog_post/%s' % self.blog_post_id,
@@ -1531,6 +2018,22 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
                 response['error'],
                 'User %s does not have permissions to delete blog post %s'
                 % (self.user_id, self.blog_post_id))
+        self.logout()
+
+    def test_error_with_invalid_blog_post_id(self):
+        self.login(self.user_email)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        blog_post_rights_swap = self.swap_to_always_return(
+            blog_services, 'get_blog_post_rights', value=None)
+        with testapp_swap, blog_post_rights_swap:
+            response = self.get_json(
+                '/mock_delete_blog_post/%s' % self.blog_post_id,
+                expected_status_int=404)
+        error_msg = (
+            'Could not find the page '
+            'http://localhost/mock_delete_blog_post/%s.' % self.blog_post_id
+        )
+        self.assertEqual(response['error'], error_msg)
         self.logout()
 
 
@@ -1576,13 +2079,13 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-        self.blog_editor_id = (
-            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
+        self.blog_editor_id = self.get_user_id_from_email(
+            self.BLOG_EDITOR_EMAIL)
         self.user_id = self.get_user_id_from_email(self.user_email)
         blog_post = blog_services.create_new_blog_post(self.blog_editor_id)
         self.blog_post_id = blog_post.id
 
-    def test_guest_can_not_edit_blog_post(self):
+    def test_guest_cannot_edit_blog_post(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_blog_post/%s' % self.blog_post_id,
@@ -1619,8 +2122,25 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
                 % (self.user_id, self.blog_post_id))
         self.logout()
 
+    def test_error_with_invalid_blog_post_id(self):
+        self.login(self.user_email)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        blog_post_rights_swap = self.swap_to_always_return(
+            blog_services, 'get_blog_post_rights', value=None)
+        with testapp_swap, blog_post_rights_swap:
+            response = self.get_json(
+                '/mock_edit_blog_post/%s' % self.blog_post_id,
+                expected_status_int=404)
+        error_msg = (
+            'Could not find the page '
+            'http://localhost/mock_edit_blog_post/%s.' % self.blog_post_id
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
 
 class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_run_any_job decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1692,6 +2212,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
 
 class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_manage_memcache decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1766,6 +2287,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
 
 class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_manage_contributors_role decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -1892,6 +2414,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
 
 
 class DeleteAnyUserTests(test_utils.GenericTestBase):
+    """Tests for can_delete_any_user decorator."""
 
     username = 'user'
     user_email = 'user@example.com'
@@ -2065,15 +2588,27 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
         self.logout()
 
-    def test_user_cannot_voiceover_exploration_with_invalid_exp_id(self):
-        self.login(self.user_email)
+    def test_guest_cannot_voiceover_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/invalid_exp_id', expected_status_int=404)
+            response = self.get_json(
+                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+    def test_error_with_invalid_voiceover_exploration_id(self):
+        self.login(self.user_email)
+        invalid_id = 'invalid'
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % invalid_id, expected_status_int=404)
+        error_msg = (
+            'Could not find the page http://localhost/mock/%s.' % invalid_id)
+        self.assertEqual(response['error'], error_msg)
         self.logout()
 
 
 class VoiceArtistManagementTests(test_utils.GenericTestBase):
+    """Tests for can_add_voice_artist and can_remove_voice_artist decorator."""
 
     role = rights_domain.ROLE_VOICE_ARTIST
     username = 'user'
@@ -2345,7 +2880,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_can_not_edit_exploration_with_invalid_exp_id(self):
+    def test_cannot_edit_exploration_with_invalid_exp_id(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -2394,6 +2929,14 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.private_exp_id)
         self.logout()
 
+    def test_guest_cannot_cannot_edit_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_exploration/%s' % self.private_exp_id,
+                expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
 
 class ManageOwnAccountTests(test_utils.GenericTestBase):
     """Tests for decorator can_manage_own_account."""
@@ -2433,6 +2976,135 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
+        self.logout()
+
+    def test_guest_cannot_update_preferences(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+
+class AccessAdminPageTests(test_utils.GenericTestBase):
+    """Tests for decorator can_access_admin_page."""
+
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_access_admin_page
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(AccessAdminPageTests, self).setUp()
+        self.signup(self.banned_user_email, self.banned_user)
+        self.signup(self.user_email, self.username)
+        self.mark_user_banned(self.banned_user)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_cannot_access_admin_page(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/', expected_status_int=401)
+        self.logout()
+
+    def test_normal_user_cannot_access_admin_page(self):
+        self.login(self.user_email)
+        user_id = user_services.get_user_id_from_username(self.username)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = '%s is not a super admin of this application' % user_id
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_super_admin_can_access_admin_page(self):
+        self.login(self.user_email, is_super_admin=True)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/')
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+    def test_guest_cannot_access_admin_page(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+
+class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
+    """Tests for decorator can_access_contributor_dashboard_admin_page."""
+
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_access_contributor_dashboard_admin_page
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(AccessContributorDashboardAdminPageTests, self).setUp()
+        self.signup(self.banned_user_email, self.banned_user)
+        self.signup(self.user_email, self.username)
+        self.mark_user_banned(self.banned_user)
+        self.user = user_services.get_user_actions_info(
+            user_services.get_user_id_from_username(self.username))
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_cannot_access_contributor_dashboard_admin_page(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = (
+            'You do not have credentials to access contributor dashboard '
+            'admin page.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_question_admin_can_access_contributor_dashboard_admin_page(self):
+        self.add_user_role(
+            self.username, feconf.ROLE_ID_QUESTION_ADMIN)
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/')
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+    def test_guest_cannot_access_contributor_dashboard_admin_page(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+    def test_normal_user_cannot_access_contributor_dashboard_admin_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = (
+            'You do not have credentials to access contributor dashboard '
+            'admin page.'
+        )
+        self.assertEqual(response['error'], error_msg)
         self.logout()
 
 
@@ -2522,7 +3194,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_guest_can_not_delete_exploration(self):
+    def test_guest_cannot_delete_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_exploration/%s' % self.private_exp_id,
@@ -2730,6 +3402,16 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
                 '/mock/%s' % self.suggestion_id, expected_status_int=401)
         self.logout()
 
+    def test_error_with_invalid_suggestion_id(self):
+        invalid_id = 'invalid'
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % invalid_id, expected_status_int=400)
+        error_msg = 'No suggestion found with given suggestion id'
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
 
 class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     """Tests for get_decorator_for_accepting_suggestion decorator."""
@@ -2738,15 +3420,39 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL = 'author@example.com'
     VIEWER_USERNAME = 'user'
     VIEWER_EMAIL = 'user@example.com'
-    TARGET_TYPE = 'exploration'
-    SUGGESTION_TYPE = 'edit_exploration_state_content'
+    TARGET_TYPE = feconf.ENTITY_TYPE_EXPLORATION
+    SUGGESTION_TYPE_1 = feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT
+    SUGGESTION_TYPE_2 = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+    SUGGESTION_TYPE_3 = feconf.SUGGESTION_TYPE_ADD_QUESTION
     EXPLORATION_ID = 'exp_id'
+    SKILL_ID = 'skill_id'
     TARGET_VERSION_ID = 1
-    CHANGE_DICT = {
+    CHANGE_DICT_1 = {
         'cmd': 'edit_state_property',
         'property_name': 'content',
         'state_name': 'Introduction',
         'new_value': ''
+    }
+    CHANGE_DICT_2 = {
+        'cmd': 'add_translation',
+        'state_name': 'Introduction',
+        'language_code': constants.DEFAULT_LANGUAGE_CODE,
+        'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+        'content_html': '',
+        'translation_html': ''
+    }
+    CHANGE_DICT_3 = {
+        'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+        'question_dict': {
+            'question_state_data': {},
+            'language_code': 'en',
+            'question_state_data_schema_version': (
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': ['skill_1'],
+            'inapplicable_skill_misconception_ids': ['skillid12345-1']
+        },
+        'skill_id': SKILL_ID,
+        'skill_difficulty': 0.3
     }
 
     class MockHandler(base.BaseHandler):
@@ -2766,7 +3472,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.get_decorator_for_accepting_suggestion(
-            acl_decorators.can_edit_exploration)
+            acl_decorators.open_access)
         def get(self, target_id, suggestion_id):
             self.render_json({
                 'target_id': target_id,
@@ -2778,6 +3484,10 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -2789,21 +3499,33 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         ))
         self.save_new_default_exploration(self.EXPLORATION_ID, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.EXPLORATION_ID)
-        suggestion_services.create_suggestion(
-            self.SUGGESTION_TYPE, self.TARGET_TYPE,
+        self.save_new_skill(self.SKILL_ID, self.author_id)
+        self.CHANGE_DICT_3['question_dict']['question_state_data'] = (
+            self._create_valid_question_data('default_state').to_dict())
+        self.suggestion_1 = suggestion_services.create_suggestion(
+            self.SUGGESTION_TYPE_1, self.TARGET_TYPE,
             self.EXPLORATION_ID, self.TARGET_VERSION_ID,
             self.author_id,
-            self.CHANGE_DICT, '')
-        suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id),
-             ('target_id', self.EXPLORATION_ID)])[0]
-        self.suggestion_id = suggestion.suggestion_id
+            self.CHANGE_DICT_1, '')
+        self.suggestion_2 = suggestion_services.create_suggestion(
+            self.SUGGESTION_TYPE_2, self.TARGET_TYPE,
+            self.EXPLORATION_ID, self.TARGET_VERSION_ID,
+            self.author_id,
+            self.CHANGE_DICT_2, '')
+        self.suggestion_3 = suggestion_services.create_suggestion(
+            self.SUGGESTION_TYPE_3, self.TARGET_TYPE,
+            self.EXPLORATION_ID, self.TARGET_VERSION_ID,
+            self.author_id,
+            self.CHANGE_DICT_3, '')
+        self.suggestion_id_1 = self.suggestion_1.suggestion_id
+        self.suggestion_id_2 = self.suggestion_2.suggestion_id
+        self.suggestion_id_3 = self.suggestion_3.suggestion_id
 
     def test_guest_cannot_accept_suggestion(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
-                % (self.EXPLORATION_ID, self.suggestion_id),
+                % (self.EXPLORATION_ID, self.suggestion_id_1),
                 expected_status_int=401)
         self.assertEqual(
             response['error'],
@@ -2814,18 +3536,177 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
-                % (self.EXPLORATION_ID, self.suggestion_id))
-        self.assertEqual(response['suggestion_id'], self.suggestion_id)
+                % (self.EXPLORATION_ID, self.suggestion_id_1))
+        self.assertEqual(response['suggestion_id'], self.suggestion_id_1)
         self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
-    def test_viewer_cannot_accept_suggestion(self):
-        self.login(self.VIEWER_EMAIL)
+    def test_user_with_review_rights_can_accept_suggestion(self):
+        self.login(self.EDITOR_EMAIL)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        review_swap = self.swap_to_always_return(
+            suggestion_services, 'can_user_review_category', value=True)
+        with testapp_swap, review_swap:
+            response = self.get_json(
+                '/mock_accept_suggestion/%s/%s'
+                % (self.EXPLORATION_ID, self.suggestion_id_1))
+        self.assertEqual(response['suggestion_id'], self.suggestion_id_1)
+        self.assertEqual(response['target_id'], self.EXPLORATION_ID)
+        self.logout()
+
+    def test_user_with_review_rights_can_accept_translation_suggestion(self):
+        self.login(self.EDITOR_EMAIL)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        translation_review_swap = self.swap_to_always_return(
+            user_services, 'can_review_translation_suggestions', value=True)
+        with testapp_swap, translation_review_swap:
+            response = self.get_json(
+                '/mock_accept_suggestion/%s/%s'
+                % (self.EXPLORATION_ID, self.suggestion_id_2))
+        self.assertEqual(response['suggestion_id'], self.suggestion_id_2)
+        self.assertEqual(response['target_id'], self.EXPLORATION_ID)
+        self.logout()
+
+    def test_user_with_review_rights_can_accept_question_suggestion(self):
+        self.login(self.EDITOR_EMAIL)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        question_review_swap = self.swap_to_always_return(
+            user_services, 'can_review_question_suggestions', value=True)
+        with testapp_swap, question_review_swap:
+            response = self.get_json(
+                '/mock_accept_suggestion/%s/%s'
+                % (self.EXPLORATION_ID, self.suggestion_id_3))
+        self.assertEqual(response['suggestion_id'], self.suggestion_id_3)
+        self.assertEqual(response['target_id'], self.EXPLORATION_ID)
+        self.logout()
+
+    def test_curriculum_admin_can_accept_suggestions(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_accept_suggestion/%s/%s'
+                % (self.EXPLORATION_ID, self.suggestion_id_1))
+        self.assertEqual(response['suggestion_id'], self.suggestion_id_1)
+        self.assertEqual(response['target_id'], self.EXPLORATION_ID)
+        self.logout()
+
+    def test_error_when_format_of_suggestion_id_is_invalid(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_accept_suggestion/%s/%s'
+                % (self.EXPLORATION_ID, 'invalid_suggestion_id'),
+                expected_status_int=400)
+        error_msg = (
+            'Invalid format for suggestion_id.'
+            ' It must contain 3 parts separated by \'.\''
+        )
+        self.assertEqual(response['error'], error_msg)
+
+    def test_page_not_found_exception_when_suggestion_id_is_invalid(self):
+        self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_accept_suggestion/%s/%s'
-                % (self.EXPLORATION_ID, self.suggestion_id),
+                % (self.EXPLORATION_ID, 'invalid.suggestion.id'),
+                expected_status_int=404)
+
+
+class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
+    """Tests for can_view_reviewable_suggestions decorator."""
+
+    TARGET_TYPE = feconf.ENTITY_TYPE_EXPLORATION
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'target_type': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'suggestion_type': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_view_reviewable_suggestions
+        def get(self, target_type, suggestion_type):
+            self.render_json({
+                'target_type': target_type,
+                'suggestion_type': suggestion_type
+            })
+
+    def setUp(self):
+        super(ViewReviewableSuggestionsTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_review_suggestion/<target_type>/<suggestion_type>',
+                self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_guest_cannot_review_suggestion(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_review_suggestion/%s/%s' % (
+                    self.TARGET_TYPE, feconf.SUGGESTION_TYPE_ADD_QUESTION),
                 expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+    def test_error_when_suggestion_type_is_invalid(self):
+        self.login(self.VIEWER_EMAIL)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        with testapp_swap:
+            response = self.get_json(
+                '/mock_review_suggestion/%s/%s' % (
+                    self.TARGET_TYPE, 'invalid'),
+                expected_status_int=404)
+        error_msg = (
+            'Could not find the page http://localhost/'
+            'mock_review_suggestion/%s/%s.' % (self.TARGET_TYPE, 'invalid')
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_user_with_review_rights_can_review_translation_suggestions(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        translation_review_swap = self.swap_to_always_return(
+            user_services, 'can_review_translation_suggestions', value=True)
+        with testapp_swap, translation_review_swap:
+            response = self.get_json(
+                '/mock_review_suggestion/%s/%s' % (
+                    self.TARGET_TYPE, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT))
+        self.assertEqual(response['target_type'], self.TARGET_TYPE)
+        self.assertEqual(
+            response['suggestion_type'],
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        )
+        self.logout()
+
+    def test_user_with_review_rights_can_review_question_suggestions(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        question_review_swap = self.swap_to_always_return(
+            user_services, 'can_review_question_suggestions', value=True)
+        with testapp_swap, question_review_swap:
+            response = self.get_json(
+                '/mock_review_suggestion/%s/%s' % (
+                    self.TARGET_TYPE, feconf.SUGGESTION_TYPE_ADD_QUESTION))
+        self.assertEqual(response['target_type'], self.TARGET_TYPE)
+        self.assertEqual(
+            response['suggestion_type'],
+            feconf.SUGGESTION_TYPE_ADD_QUESTION
+        )
         self.logout()
 
 
@@ -2915,6 +3796,8 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
     """Tests for can_modify_exploration_roles decorator."""
 
     private_exp_id = 'exp_0'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -2936,6 +3819,8 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.mark_user_banned(self.banned_user)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -2945,6 +3830,18 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         ))
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
+
+    def test_banned_user_cannot_modify_exploration_roles(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.private_exp_id, expected_status_int=401)
+        error_msg = (
+            'You do not have credentials to change rights '
+            'for this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
 
     def test_owner_can_modify_exploration_roles(self):
         self.login(self.OWNER_EMAIL)
@@ -3114,7 +4011,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_learner_dashboard
         def get(self):
-            return self.render_json({})
+            return self.render_json({'success': True})
 
     def setUp(self):
         super(AccessLearnerDashboardDecoratorTests, self).setUp()
@@ -3126,17 +4023,26 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-    def test_banned_user_is_redirected(self):
+    def test_banned_user_cannot_access_learner_dashboard(self):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock/', expected_status_int=401)
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You do not have the credentials to access this page.'
+        self.assertEqual(response['error'], error_msg)
         self.logout()
 
     def test_exploration_editor_can_access_learner_dashboard(self):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock/')
+            response = self.get_json('/mock/')
+        self.assertTrue(response['success'])
         self.logout()
+
+    def test_guest_user_cannot_access_learner_dashboard(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
 
 
 class EditTopicDecoratorTests(test_utils.GenericTestBase):
@@ -3171,26 +4077,18 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.manager_id = self.get_user_id_from_email(self.manager_email)
         self.viewer_id = self.get_user_id_from_email(self.viewer_email)
-        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_edit_topic/<topic_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
         self.topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            self.topic_id, self.viewer_id, name='Name',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(self.topic_id, self.viewer_id)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
-
         self.set_topic_managers([self.manager_username], self.topic_id)
-        self.manager = user_services.get_user_actions_info(self.manager_id)
 
-    def test_can_not_edit_topic_with_invalid_topic_id(self):
+    def test_cannot_edit_topic_with_invalid_topic_id(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -3217,6 +4115,166 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock_edit_topic/%s' % self.topic_id, expected_status_int=401)
         self.logout()
+
+    def test_guest_user_cannot_edit_topic(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_topic/%s' % self.topic_id, expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+
+class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_delete_topic."""
+
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    topic_id = 'topic_1'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_delete_topic
+        def get(self, topic_id):
+            self.render_json({'topic_id': topic_id})
+
+    def setUp(self):
+        super(DeleteTopicDecoratorTests, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.viewer_email, self.viewer_username)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_delete_topic/<topic_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(self.topic_id, self.viewer_id)
+        topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
+
+    def test_cannot_delete_topic_with_invalid_topic_id(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_delete_topic/invalid_topic_id', expected_status_int=404)
+        self.logout()
+
+    def test_admin_can_delete_topic(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_delete_topic/%s' % self.topic_id)
+        self.assertEqual(response['topic_id'], self.topic_id)
+        self.logout()
+
+    def test_normal_user_cannot_delete_topic(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_topic/%s' % self.topic_id,
+                expected_status_int=401)
+        error_msg = (
+            '%s does not have enough rights to delete the'
+            ' topic.' % self.viewer_id
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_guest_user_cannot_delete_topic(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_topic/%s' % self.topic_id,
+                expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+
+class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_view_any_topic_editor."""
+
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    topic_id = 'topic_1'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_view_any_topic_editor
+        def get(self, topic_id):
+            self.render_json({'topic_id': topic_id})
+
+    def setUp(self):
+        super(ViewAnyTopicEditorDecoratorTests, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.viewer_email, self.viewer_username)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_view_topic_editor/<topic_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(self.topic_id, self.viewer_id)
+        topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
+
+    def test_cannot_delete_topic_with_invalid_topic_id(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_view_topic_editor/invalid_topic_id',
+                expected_status_int=404)
+        self.logout()
+
+    def test_admin_can_view_topic_editor(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_view_topic_editor/%s' % (
+                self.topic_id))
+        self.assertEqual(response['topic_id'], self.topic_id)
+        self.logout()
+
+    def test_normal_user_cannot_view_topic_editor(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_topic_editor/%s' % self.topic_id,
+                expected_status_int=401)
+        error_msg = (
+            '%s does not have enough rights to view any'
+            ' topic editor.' % self.viewer_id
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_guest_user_cannot_view_topic_editor(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_topic_editor/%s' % self.topic_id,
+                expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
 
 
 class EditStoryDecoratorTests(test_utils.GenericTestBase):
@@ -3248,7 +4306,6 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_edit_story/<story_id>', self.MockHandler)],
@@ -3257,21 +4314,18 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.story_id = story_services.get_new_story_id()
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_story(self.story_id, self.admin_id, self.topic_id)
-        self.save_new_topic(
-            self.topic_id, self.admin_id, name='Name',
-            description='Description', canonical_story_ids=[self.story_id],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+        self.topic = self.save_new_topic(
+            self.topic_id, self.admin_id, canonical_story_ids=[self.story_id])
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
-    def test_can_not_edit_story_with_invalid_story_id(self):
+    def test_cannot_edit_story_with_invalid_story_id(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_story/story_id_new', expected_status_int=404)
         self.logout()
 
-    def test_can_not_edit_story_with_invalid_topic_id(self):
+    def test_cannot_edit_story_with_invalid_topic_id(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
@@ -3279,6 +4333,21 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_story/%s' % story_id, expected_status_int=404)
+        self.logout()
+
+    def test_cannot_edit_story_with_invalid_canonical_story_ids(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        canonical_story_ids_swap = self.swap_to_always_return(
+            topic_domain.Topic, 'get_canonical_story_ids', value=[])
+        with testapp_swap, canonical_story_ids_swap:
+            response = self.get_json(
+                '/mock_edit_story/%s' % self.story_id, expected_status_int=404)
+        error_msg = (
+            'Could not find the page http://localhost/mock_edit_story/%s.' % (
+                self.story_id)
+        )
+        self.assertEqual(response['error'], error_msg)
         self.logout()
 
     def test_admin_can_edit_story(self):
@@ -3306,6 +4375,181 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock_edit_story/%s' % self.story_id, expected_status_int=401)
         self.logout()
+
+    def test_guest_user_cannot_edit_story(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_story/%s' % self.story_id, expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+
+class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_delete_story."""
+
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'story_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_delete_story
+        def get(self, story_id):
+            self.render_json({'story_id': story_id})
+
+    def setUp(self):
+        super(DeleteStoryDecoratorTests, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_delete_story/<story_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.story_id = story_services.get_new_story_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_story(self.story_id, self.admin_id, self.topic_id)
+        self.topic = self.save_new_topic(
+            self.topic_id, self.admin_id, canonical_story_ids=[self.story_id])
+        topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
+
+    def test_cannot_delete_story_with_invalid_story_id(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_delete_story/story_id_new', expected_status_int=404)
+        self.logout()
+
+    def test_cannot_delete_story_with_invalid_topic_id(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        story_id = story_services.get_new_story_id()
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_story(story_id, self.admin_id, topic_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_delete_story/%s' % story_id, expected_status_int=404)
+        self.logout()
+
+    def test_admin_can_delete_story(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_delete_story/%s' % self.story_id)
+        self.assertEqual(response['story_id'], self.story_id)
+        self.logout()
+
+    def test_topic_manager_can_delete_story(self):
+        self.signup(self.manager_email, self.manager_username)
+        self.set_topic_managers([self.manager_username], self.topic_id)
+
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_delete_story/%s' % self.story_id)
+        self.assertEqual(response['story_id'], self.story_id)
+        self.logout()
+
+    def test_normal_user_cannot_delete_story(self):
+        self.signup(self.viewer_email, self.viewer_username)
+
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_story/%s' % self.story_id,
+                expected_status_int=401)
+        error_msg = 'You do not have credentials to delete this story.'
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_guest_user_cannot_delete_story(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_story/%s' % self.story_id,
+                expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+
+class AccessTopicsAndSkillsDashboardDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_access_topics_and_skills_dashboard."""
+
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    topic_id = 'topic_1'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_access_topics_and_skills_dashboard
+        def get(self):
+            self.render_json({'success': True})
+
+    def setUp(self):
+        super(AccessTopicsAndSkillsDashboardDecoratorTests, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.manager_email, self.manager_username)
+        self.signup(self.viewer_email, self.viewer_username)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_access_dashboard/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(self.topic_id, self.viewer_id)
+        topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
+        self.set_topic_managers([self.manager_username], self.topic_id)
+
+    def test_admin_can_access_dashboard(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_access_dashboard/')
+        self.assertTrue(response['success'])
+        self.logout()
+
+    def test_topic_manager_can_access_dashboard(self):
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_access_dashboard/')
+        self.assertTrue(response['success'])
+        self.logout()
+
+    def test_normal_user_cannot_access_dashboard(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_access_dashboard/', expected_status_int=401)
+        error_msg = (
+            '%s does not have enough rights to access the topics and skills'
+            ' dashboard.' % self.viewer_id
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_guest_user_cannot_access_dashboard(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_access_dashboard/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
 
 
 class AddStoryToTopicTests(test_utils.GenericTestBase):
@@ -3340,8 +4584,6 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.manager_id = self.get_user_id_from_email(self.manager_email)
-        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.viewer_id = self.get_user_id_from_email(self.viewer_email)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -3350,17 +4592,11 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         self.topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            self.topic_id, self.viewer_id, name='Name',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(self.topic_id, self.viewer_id)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
-
         self.set_topic_managers([self.manager_username], self.topic_id)
-        self.manager = user_services.get_user_actions_info(self.manager_id)
 
-    def test_can_not_add_story_to_topic_with_invalid_topic_id(self):
+    def test_cannot_add_story_to_topic_with_invalid_topic_id(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -3726,6 +4962,16 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 '/mock_subtopic_data/staging/topic-frag/sub-one-frag',
                 expected_status_int=200)
 
+    def test_redirect_to_classroom_if_user_is_banned(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_html_response(
+                '/mock_subtopic_page/staging/topic-frag/revision/000',
+                expected_status_int=302)
+            self.assertEqual(
+                response.headers['location'], 'http://localhost/learn/staging')
+        self.logout()
+
     def test_can_access_subtopic_when_all_url_fragments_are_valid(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3738,6 +4984,19 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_subtopic_page/staging/topic-frag/revision/000',
+                expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic-frag/revision',
+                response.headers['location'])
+
+    def test_fall_back_to_revision_page_when_subtopic_page_does_not_exist(self):
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        subtopic_swap = self.swap_to_always_return(
+            subtopic_page_services, 'get_subtopic_page_by_id', None)
+        with testapp_swap, subtopic_swap:
+            response = self.get_html_response(
+                '/mock_subtopic_page/staging/topic-frag/revision/sub-one-frag',
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic-frag/revision',
@@ -3991,11 +5250,9 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ManageQuestionSkillStatusTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.viewer_email, self.viewer_username)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -4057,11 +5314,8 @@ class CreateTopicTests(test_utils.GenericTestBase):
     def setUp(self):
         super(CreateTopicTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.mark_user_banned(self.banned_user)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -4119,13 +5373,10 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ManageRightsForTopicTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.mark_user_banned(self.banned_user)
-
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
                 '/mock_manage_rights_for_topic/<topic_id>', self.MockHandler)],
@@ -4186,19 +5437,12 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ChangeTopicPublicationStatusTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.mark_user_banned(self.banned_user)
-
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            self.topic_id, self.admin_id, name='Name1',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(self.topic_id, self.admin_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -4213,7 +5457,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
             self.get_json('/mock_change_publication_status/%s' % self.topic_id)
         self.logout()
 
-    def test_can_not_change_topic_publication_status_with_invalid_topic_id(
+    def test_cannot_change_topic_publication_status_with_invalid_topic_id(
             self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -4261,9 +5505,6 @@ class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
     def setUp(self):
         super(PerformTasksInTaskqueueTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.viewer_email, self.viewer_username)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -4315,9 +5556,6 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
         super(PerformCronTaskTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.viewer_email, self.viewer_username)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -4350,8 +5588,6 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
 class EditSkillDecoratorTests(test_utils.GenericTestBase):
     """Tests permissions for accessing the skill editor."""
 
-    second_admin_username = 'adm2'
-    second_admin_email = 'adm2@example.com'
     manager_username = 'topicmanager'
     manager_email = 'topicmanager@example.com'
     viewer_username = 'viewer'
@@ -4376,29 +5612,14 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(EditSkillDecoratorTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.signup(self.second_admin_email, self.second_admin_username)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
-        self.set_curriculum_admins(
-            [self.CURRICULUM_ADMIN_USERNAME, self.second_admin_username])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.second_admin_id = self.get_user_id_from_email(
-            self.second_admin_email)
-        self.manager_id = self.get_user_id_from_email(self.manager_email)
-        self.admin = user_services.get_user_actions_info(self.admin_id)
-        self.manager = user_services.get_user_actions_info(self.manager_id)
 
         self.topic_id = topic_fetchers.get_new_topic_id()
-        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
-        subtopic_1.skill_ids = ['skill_id_1']
-        subtopic_1.url_fragment = 'sub-one-frag'
-        self.save_new_topic(
-            self.topic_id, self.admin_id, name='Name',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[subtopic_1], next_subtopic_id=2)
+        self.save_new_topic(self.topic_id, self.admin_id)
         self.set_topic_managers([self.manager_username], self.topic_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -4420,13 +5641,6 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['skill_id'], self.skill_id)
         self.logout()
 
-    def test_admin_can_edit_other_public_skill(self):
-        self.login(self.second_admin_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock_edit_skill/%s' % self.skill_id)
-        self.assertEqual(response['skill_id'], self.skill_id)
-        self.logout()
-
     def test_topic_manager_can_edit_public_skill(self):
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -4434,17 +5648,77 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['skill_id'], self.skill_id)
         self.logout()
 
-    def test_normal_user_can_not_edit_public_skill(self):
+    def test_normal_user_cannot_edit_public_skill(self):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_skill/%s' % self.skill_id, expected_status_int=401)
+        self.logout()
+
+    def test_guest_cannot_edit_public_skill(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_skill/%s' % self.skill_id, expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+
+class DeleteSkillDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_delete_skill."""
+
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    skill_id = '1'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_delete_skill
+        def get(self):
+            self.render_json({'success': True})
+
+    def setUp(self):
+        super(DeleteSkillDecoratorTests, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.viewer_email, self.viewer_username)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_delete_skill', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_admin_can_delete_skill(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_delete_skill')
+        self.assertTrue(response['success'])
+        self.logout()
+
+    def test_normal_user_cannot_delete_public_skill(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_delete_skill', expected_status_int=401)
+        self.logout()
+
+    def test_guest_cannot_delete_public_skill(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_skill', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
 
 
 class EditQuestionDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_question."""
 
     question_id = 'question_id'
+    user_a = 'A'
+    user_a_email = 'a@example.com'
+    user_b = 'B'
+    user_b_email = 'b@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -4466,36 +5740,19 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup('a@example.com', 'A')
-        self.signup('b@example.com', 'B')
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
-        self.user_id_a = self.get_user_id_from_email('a@example.com')
-        self.user_id_b = self.get_user_id_from_email('b@example.com')
+        self.signup(self.user_a_email, self.user_a)
+        self.signup(self.user_b_email, self.user_b)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.manager_id = self.get_user_id_from_email('a@example.com')
-        self.question_id = 'question_id'
-
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.topic_id = topic_fetchers.get_new_topic_id()
-        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
-        subtopic_1.skill_ids = ['skill_id_1']
-        subtopic_1.url_fragment = 'sub-one-frag'
-        self.save_new_topic(
-            self.topic_id, self.admin_id, name='Name',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[subtopic_1], next_subtopic_id=2)
+        self.save_new_topic(self.topic_id, self.admin_id)
         self.save_new_question(
             self.question_id, self.owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
-        self.set_topic_managers(
-            [user_services.get_username(self.user_id_a)], self.topic_id)
+        self.set_topic_managers([self.user_a], self.topic_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -4529,7 +5786,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_topic_manager_can_edit_question(self):
-        self.login('a@example.com')
+        self.login(self.user_a_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_question/%s' % self.question_id)
@@ -4537,11 +5794,196 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_any_user_cannot_edit_question(self):
-        self.login('b@example.com')
+        self.login(self.user_b_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_question/%s' % self.question_id,
                 expected_status_int=401)
+        self.logout()
+
+
+class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_view_question_editor."""
+
+    question_id = 'question_id'
+    user_a = 'A'
+    user_a_email = 'a@example.com'
+    user_b = 'B'
+    user_b_email = 'b@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'question_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_view_question_editor
+        def get(self, question_id):
+            self.render_json({'question_id': question_id})
+
+    def setUp(self):
+        super(ViewQuestionEditorDecoratorTests, self).setUp()
+
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.user_a_email, self.user_a)
+        self.signup(self.user_b_email, self.user_b)
+
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(self.topic_id, self.admin_id)
+        self.save_new_question(
+            self.question_id, self.owner_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        self.set_topic_managers([self.user_a], self.topic_id)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_view_question_editor/<question_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_guest_cannot_view_question_editor(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_question_editor/%s' % self.question_id,
+                expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+    def test_cannot_view_question_editor_with_invalid_question_id(self):
+        invalid_id = 'invalid_question_id'
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_question_editor/%s' % invalid_id,
+                expected_status_int=404)
+        error_msg = (
+            'Could not find the page http://localhost/'
+            'mock_view_question_editor/%s.' % invalid_id
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_curriculum_admin_can_view_question_editor(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_question_editor/%s' % self.question_id)
+        self.assertEqual(response['question_id'], self.question_id)
+        self.logout()
+
+    def test_topic_manager_can_view_question_editor(self):
+        self.login(self.user_a_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_question_editor/%s' % self.question_id)
+        self.assertEqual(response['question_id'], self.question_id)
+        self.logout()
+
+    def test_normal_user_cannot_view_question_editor(self):
+        self.login(self.user_b_email)
+        user_id_b = self.get_user_id_from_email(self.user_b_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_question_editor/%s' % self.question_id,
+                expected_status_int=401)
+        error_msg = (
+            '%s does not have enough rights to access the questions editor'
+            % user_id_b)
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+
+class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_delete_question."""
+
+    question_id = 'question_id'
+    user_a = 'A'
+    user_a_email = 'a@example.com'
+    user_b = 'B'
+    user_b_email = 'b@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'question_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_delete_question
+        def get(self, question_id):
+            self.render_json({'question_id': question_id})
+
+    def setUp(self):
+        super(DeleteQuestionDecoratorTests, self).setUp()
+
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.user_a_email, self.user_a)
+        self.signup(self.user_b_email, self.user_b)
+
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.manager_id = self.get_user_id_from_email(self.user_a_email)
+
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(self.topic_id, self.admin_id)
+        self.set_topic_managers([self.user_a], self.topic_id)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_delete_question/<question_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_guest_cannot_delete_question(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_question/%s' % self.question_id,
+                expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+    def test_curriculum_admin_can_delete_question(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_question/%s' % self.question_id)
+        self.assertEqual(response['question_id'], self.question_id)
+        self.logout()
+
+    def test_topic_manager_can_delete_question(self):
+        self.login(self.user_a_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_question/%s' % self.question_id)
+        self.assertEqual(response['question_id'], self.question_id)
+        self.logout()
+
+    def test_normal_user_cannot_delete_question(self):
+        self.login(self.user_b_email)
+        user_id_b = self.get_user_id_from_email(self.user_b_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_question/%s' % self.question_id,
+                expected_status_int=401)
+        error_msg = (
+            '%s does not have enough rights to delete the question.'
+            % user_id_b)
+        self.assertEqual(response['error'], error_msg)
         self.logout()
 
 
@@ -4586,7 +6028,7 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
 
 
 class PlayEntityDecoratorTests(test_utils.GenericTestBase):
-    """Test the decorator can_play_entity."""
+    """Tests the decorator can_play_entity."""
 
     user_email = 'user@example.com'
     username = 'user'
@@ -4688,6 +6130,8 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
 
 
 class EditEntityDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_edit_entity."""
+
     username = 'banneduser'
     user_email = 'user@example.com'
     published_exp_id = 'exp_0'
@@ -4962,7 +6406,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
 
-    def test_can_not_save_exploration_with_invalid_exp_id(self):
+    def test_cannot_save_exploration_with_invalid_exp_id(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(

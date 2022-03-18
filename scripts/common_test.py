@@ -33,7 +33,7 @@ import tempfile
 import time
 
 from core import constants
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 from . import common
@@ -75,6 +75,18 @@ class CommonTests(test_utils.GenericTestBase):
         with maxsize_swap:
             self.assertTrue(common.is_x64_architecture())
 
+    def test_is_mac_os(self):
+        with self.swap(common, 'OS_NAME', 'Darwin'):
+            self.assertTrue(common.is_mac_os())
+        with self.swap(common, 'OS_NAME', 'Linux'):
+            self.assertFalse(common.is_mac_os())
+
+    def test_is_linux_os(self):
+        with self.swap(common, 'OS_NAME', 'Linux'):
+            self.assertTrue(common.is_linux_os())
+        with self.swap(common, 'OS_NAME', 'Windows'):
+            self.assertFalse(common.is_linux_os())
+
     def test_run_cmd(self):
         self.assertEqual(
             common.run_cmd(('echo Test for common.py ').split(' ')),
@@ -113,7 +125,7 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_getcwd():
             return 'invalid'
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
-        with getcwd_swap, self.assertRaisesRegexp(
+        with getcwd_swap, self.assertRaisesRegex(
             Exception, 'Please run this script from the oppia/ directory.'):
             common.require_cwd_to_be_oppia()
 
@@ -168,7 +180,7 @@ class CommonTests(test_utils.GenericTestBase):
                 'check_call_gets_called': False
             }
             expected_check_function_calls = {
-                'input_gets_called': 1,
+                'input_gets_called': 2,
                 'check_call_gets_called': True
             }
             def mock_call(unused_cmd_tokens):
@@ -177,6 +189,8 @@ class CommonTests(test_utils.GenericTestBase):
                 check_function_calls['check_call_gets_called'] = True
             def mock_input():
                 check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 2:
+                    return '1'
                 return 'y'
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
@@ -197,7 +211,7 @@ class CommonTests(test_utils.GenericTestBase):
                 'check_call_gets_called': False
             }
             expected_check_function_calls = {
-                'input_gets_called': 2,
+                'input_gets_called': 3,
                 'check_call_gets_called': False
             }
             def mock_call(unused_cmd_tokens):
@@ -206,6 +220,8 @@ class CommonTests(test_utils.GenericTestBase):
                 check_function_calls['check_call_gets_called'] = True
             def mock_input():
                 check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 2:
+                    return '1'
                 return 'y'
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
@@ -224,18 +240,18 @@ class CommonTests(test_utils.GenericTestBase):
         with self.swap(
             subprocess, 'check_output', mock_check_output
         ):
-            self.assertEqual(common.get_remote_alias('url1'), 'remote1')
+            self.assertEqual(common.get_remote_alias(['url1']), 'remote1')
 
     def test_get_remote_alias_with_incorrect_alias(self):
         def mock_check_output(unused_cmd_tokens):
             return b'remote1 url1\nremote2 url2'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
-            'ERROR: There is no existing remote alias for the url3 repo.'
+            'ERROR: There is no existing remote alias for the url3, url4 repo.'
         ):
-            common.get_remote_alias('url3')
+            common.get_remote_alias(['url3', 'url4'])
 
     def test_verify_local_repo_is_clean_with_clean_repo(self):
         def mock_check_output(unused_cmd_tokens):
@@ -250,7 +266,7 @@ class CommonTests(test_utils.GenericTestBase):
             return b'invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception, 'ERROR: This script should be run from a clean branch.'
         ):
             common.verify_local_repo_is_clean()
@@ -261,6 +277,17 @@ class CommonTests(test_utils.GenericTestBase):
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
+
+    def test_update_branch_with_upstream(self):
+        def mock_check_output(unused_cmd_tokens):
+            return b'On branch test'
+
+        def mock_run_cmd(cmd):
+            return cmd
+
+        with self.swap(subprocess, 'check_output', mock_check_output):
+            with self.swap(common, 'run_cmd', mock_run_cmd):
+                common.update_branch_with_upstream()
 
     def test_get_current_release_version_number_with_non_hotfix_branch(self):
         self.assertEqual(
@@ -277,7 +304,7 @@ class CommonTests(test_utils.GenericTestBase):
                 'release-maintenance-1.2.3'), '1.2.3')
 
     def test_get_current_release_version_number_with_invalid_branch(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Invalid branch name: invalid-branch.'):
             common.get_current_release_version_number('invalid-branch')
 
@@ -349,7 +376,7 @@ class CommonTests(test_utils.GenericTestBase):
             return b'On branch invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
             'ERROR: This script can only be run from the "test" branch.'
         ):
@@ -390,13 +417,47 @@ class CommonTests(test_utils.GenericTestBase):
             success = common.wait_for_port_to_not_be_in_use(9999)
         self.assertTrue(success)
 
+    def test_wait_for_port_to_be_in_use_port_never_opens(self):
+        def mock_sleep(unused_seconds):
+            return
+        def mock_is_port_in_use(unused_port_number):
+            return False
+        def mock_exit(unused_code):
+            pass
+
+        sleep_swap = self.swap_with_checks(
+            time, 'sleep', mock_sleep, expected_args=[(1,)] * 60 * 5)
+        is_port_in_use_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_in_use)
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(1,)])
+
+        with sleep_swap, is_port_in_use_swap, exit_swap:
+            common.wait_for_port_to_be_in_use(9999)
+
+    def test_wait_for_port_to_be_in_use_port_opens(self):
+        def mock_sleep(unused_seconds):
+            raise AssertionError('mock_sleep should not be called.')
+        def mock_is_port_in_use(unused_port_number):
+            return True
+        def mock_exit(unused_code):
+            raise AssertionError('mock_exit should not be called.')
+
+        sleep_swap = self.swap(time, 'sleep', mock_sleep)
+        is_port_in_use_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_in_use)
+        exit_swap = self.swap(sys, 'exit', mock_exit)
+
+        with sleep_swap, is_port_in_use_swap, exit_swap:
+            common.wait_for_port_to_be_in_use(9999)
+
     def test_permissions_of_file(self):
         root_temp_dir = tempfile.mkdtemp()
         temp_dirpath = tempfile.mkdtemp(dir=root_temp_dir)
         temp_file = tempfile.NamedTemporaryFile(dir=temp_dirpath)
         temp_file.name = 'temp_file'
         temp_file_path = os.path.join(temp_dirpath, 'temp_file')
-        with python_utils.open_file(temp_file_path, 'w') as f:
+        with utils.open_file(temp_file_path, 'w') as f:
             f.write('content')
 
         common.recursive_chown(root_temp_dir, os.getuid(), -1)
@@ -461,7 +522,7 @@ class CommonTests(test_utils.GenericTestBase):
             """
             temp_file = tempfile.NamedTemporaryFile()
             temp_file.name = 'temp_file'
-            with python_utils.open_file('temp_file', 'w') as f:
+            with utils.open_file('temp_file', 'w') as f:
                 f.write('content')
 
             self.assertTrue(os.path.exists('temp_file'))
@@ -493,7 +554,7 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_getpass(prompt):  # pylint: disable=unused-argument
             return None
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        with getpass_swap, self.assertRaisesRegexp(
+        with getpass_swap, self.assertRaisesRegex(
             Exception,
             'No personal access token provided, please set up a personal '
             'access token at https://github.com/settings/tokens and re-run '
@@ -579,7 +640,7 @@ class CommonTests(test_utils.GenericTestBase):
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         with get_issues_swap, get_label_swap, open_tab_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception, (
                     'There are PRs for current release which do not '
                     'have a \'%s\' label. Please ensure that '
@@ -615,7 +676,7 @@ class CommonTests(test_utils.GenericTestBase):
                 '"DEV_MODE": true,',
                 expected_number_of_replacements=1
             )
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             self.assertEqual(expected_lines, f.readlines())
         # Revert the file.
         os.remove(origin_file)
@@ -628,10 +689,10 @@ class CommonTests(test_utils.GenericTestBase):
             'core', 'tests', 'data', 'inplace_replace_test.json')
         backup_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             origin_content = f.readlines()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, 'Wrong number of replacements. Expected 1. Performed 0.'
         ):
             common.inplace_replace_file(
@@ -641,7 +702,7 @@ class CommonTests(test_utils.GenericTestBase):
                 expected_number_of_replacements=1
             )
         self.assertFalse(os.path.isfile(backup_file))
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
 
@@ -650,21 +711,21 @@ class CommonTests(test_utils.GenericTestBase):
             'core', 'tests', 'data', 'inplace_replace_test.json')
         backup_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             origin_content = f.readlines()
 
         def mock_compile(unused_arg):
             raise ValueError('Exception raised from compile()')
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             re.escape('Exception raised from compile()')
         ), compile_swap:
             common.inplace_replace_file(
                 origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
         self.assertFalse(os.path.isfile(backup_file))
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
 
@@ -673,7 +734,7 @@ class CommonTests(test_utils.GenericTestBase):
             os.path.join('core', 'tests', 'data', 'inplace_replace_test.json'))
         backup_file_path = '%s.bak' % file_path
 
-        with python_utils.open_file(file_path, 'r') as f:
+        with utils.open_file(file_path, 'r') as f:
             self.assertEqual(f.readlines(), [
                 '{\n',
                 '    "RANDMON1" : "randomValue1",\n',
@@ -685,7 +746,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         replace_file_context = common.inplace_replace_file_context(
             file_path, '"DEV_MODE": .*', '"DEV_MODE": true,')
-        with replace_file_context, python_utils.open_file(file_path, 'r') as f:
+        with replace_file_context, utils.open_file(file_path, 'r') as f:
             self.assertEqual(f.readlines(), [
                 '{\n',
                 '    "RANDMON1" : "randomValue1",\n',
@@ -696,7 +757,7 @@ class CommonTests(test_utils.GenericTestBase):
             ])
             self.assertTrue(os.path.isfile(backup_file_path))
 
-        with python_utils.open_file(file_path, 'r') as f:
+        with utils.open_file(file_path, 'r') as f:
             self.assertEqual(f.readlines(), [
                 '{\n',
                 '    "RANDMON1" : "randomValue1",\n',
@@ -737,7 +798,7 @@ class CommonTests(test_utils.GenericTestBase):
         try:
             os.makedirs('readme_test_dir')
             common.create_readme('readme_test_dir', 'Testing readme.')
-            with python_utils.open_file('readme_test_dir/README.md', 'r') as f:
+            with utils.open_file('readme_test_dir/README.md', 'r') as f:
                 self.assertEqual(f.read(), 'Testing readme.')
         finally:
             if os.path.exists('readme_test_dir'):
@@ -747,6 +808,23 @@ class CommonTests(test_utils.GenericTestBase):
         common.fix_third_party_imports()
         # Asserts that imports from problematic modules do not error.
         from google.cloud import tasks_v2  # pylint: disable=unused-import
+
+    def test_cd(self):
+        def mock_chdir(unused_path):
+            pass
+        def mock_getcwd():
+            return '/old/path'
+
+        chdir_swap = self.swap_with_checks(
+            os, 'chdir', mock_chdir, expected_args=[
+                ('/new/path',),
+                ('/old/path',),
+            ])
+        getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
+
+        with chdir_swap, getcwd_swap:
+            with common.CD('/new/path'):
+                pass
 
     def test_swap_env_when_var_had_a_value(self):
         os.environ['ABC'] = 'Hard as Rocket Science'
@@ -792,5 +870,17 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_write_stdout_safe_with_oserror(self):
         write_swap = self.swap_to_always_raise(os, 'write', OSError('OS error'))
-        with write_swap, self.assertRaisesRegexp(OSError, 'OS error'):
+        with write_swap, self.assertRaisesRegex(OSError, 'OS error'):
             common.write_stdout_safe('test')
+
+    def test_write_stdout_safe_with_unsupportedoperation(self):
+        mock_stdout = io.StringIO()
+
+        write_swap = self.swap_to_always_raise(
+            os, 'write',
+            io.UnsupportedOperation('unsupported operation'))
+        stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
+
+        with write_swap, stdout_write_swap:
+            common.write_stdout_safe('test')
+        self.assertEqual(mock_stdout.getvalue(), 'test')

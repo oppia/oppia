@@ -32,6 +32,15 @@ describe('Exploration Graph Component', function() {
   var routerService = null;
   var stateEditorService = null;
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');

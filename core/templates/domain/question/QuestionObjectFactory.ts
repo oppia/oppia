@@ -21,11 +21,12 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { State, StateBackendDict, StateObjectFactory }
   from 'domain/state/StateObjectFactory';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
+/* Null in ID denotes a new question whose ID is yet
+  to be set, this ID is later set in backend API service. */
 export interface QuestionBackendDict {
   'id': string | null;
   'question_state_data': StateBackendDict;
@@ -58,6 +59,7 @@ export class Question {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
   }
+
   // Some methods have either string or null return value,
   // because when we create default question their fields get null value.
   getId(): string | null {
@@ -101,6 +103,7 @@ export class Question {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
   }
+
   // Returns 'null' when the message is valid.
   getValidationErrorMessage(): string | null {
     var interaction = this._stateData.interaction;
@@ -122,7 +125,9 @@ export class Question {
     }
     if (
       !interaction.solution &&
-      INTERACTION_SPECS[interactionId].can_have_solution
+      InteractionSpecsConstants.INTERACTION_SPECS[
+        interactionId
+      ].can_have_solution
     ) {
       return 'A solution must be specified';
     }
@@ -141,7 +146,7 @@ export class Question {
   }
 
   getUnaddressedMisconceptionNames(
-      misconceptionsBySkill: Record<string, Misconception[]>
+      misconceptionsBySkill: MisconceptionSkillMap = {}
   ): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
     var taggedSkillMisconceptionIds: Record<string, boolean> = {};

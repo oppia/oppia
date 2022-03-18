@@ -50,6 +50,8 @@
         "core.controllers.classifier_test",
         "core.controllers.suggestion_test",
         "core.controllers.voice_artist_test",
+        "core.jobs.batch_jobs.skill_migration_jobs_test",
+        "core.jobs.batch_jobs.story_migration_jobs_test",
         "core.jobs.batch_jobs.email_deletion_jobs_test"
     ],
     "2": [
@@ -123,7 +125,8 @@
         "core.platform.app_identity.gae_app_identity_services_test",
         "core.storage.topic.gae_models_test",
         "scripts.release_scripts.cut_release_or_hotfix_branch_test",
-        "scripts.linters.css_linter_test"
+        "scripts.linters.css_linter_test",
+        "scripts.rtl_css_test"
     ],
     "3": [
         "core.controllers.incoming_app_feedback_report_test",
@@ -166,7 +169,8 @@
         "core.domain.learner_progress_services_test",
         "core.domain.config_services_test",
         "core.domain.subtopic_page_services_test",
-        "core.domain.calculation_registry_test"
+        "core.domain.calculation_registry_test",
+        "scripts.extend_index_yaml_test"
     ],
     "4": [
         "core.domain.question_fetchers_test",
@@ -228,6 +232,7 @@
         "core.jobs.batch_jobs.suggestion_stats_computation_jobs_test",
         "core.jobs.batch_jobs.user_stats_computation_jobs_test",
         "core.jobs.batch_jobs.opportunity_management_jobs_test",
+        "core.jobs.batch_jobs.collection_info_jobs_test",
         "core.domain.image_validation_services_test",
         "core.storage.beam_job.gae_models_test",
         "scripts.linters.js_ts_linter_test",
@@ -283,6 +288,7 @@
         "core.controllers.contributor_dashboard_test",
         "core.platform.email.dev_mode_email_services_test",
         "core.jobs.types.blog_validation_errors_test",
+        "core.jobs.batch_jobs.exp_title_validation_jobs_test",
         "core.jobs.batch_jobs.blog_validation_jobs_test",
         "core.jobs.transforms.validation.blog_validation_test",
         "core.jobs.transforms.validation.skill_validation_test",

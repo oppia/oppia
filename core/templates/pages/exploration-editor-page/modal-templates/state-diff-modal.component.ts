@@ -16,7 +16,7 @@
  * @fileoverview Component for state diff modal.
  */
 
-import { OnInit } from '@angular/core';
+import { Input, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -25,7 +25,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { ContextService } from 'services/context.service';
 import { StateDiffModalBackendApiService } from '../services/state-diff-modal-backend-api.service';
 
-interface headersAndYamlStrs {
+export interface headersAndYamlStrs {
   leftPane: string;
   rightPane: string;
 }
@@ -43,65 +43,72 @@ interface mergeviewOptions {
 })
 export class StateDiffModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-    newState: State | null;
-    oldState: State | null;
-    newStateName: string;
-    oldStateName: string;
-    headers: headersAndYamlStrs;
-    yamlStrs: headersAndYamlStrs = {
-      leftPane: '',
-      rightPane: '',
-    };
-    CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
-      lineNumbers: true,
-      readOnly: true,
-      mode: 'yaml',
-      viewportMargin: 100
-    };
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
 
-    constructor(
-        private ngbActiveModal: NgbActiveModal,
-        private contextService: ContextService,
-        private urlInterpolationService: UrlInterpolationService,
-        private stateDiffModalBackendApiService:
-        StateDiffModalBackendApiService,
-    ) {
-      super(ngbActiveModal);
+  // The following properties will be null when there is no change introduced
+  // in either of the state. It remains same as original State.
+  @Input() newState!: State | null;
+  @Input() oldState!: State | null;
+  @Input() newStateName!: string;
+  @Input() oldStateName!: string;
+  @Input() headers!: headersAndYamlStrs;
+  yamlStrs: headersAndYamlStrs = {
+    leftPane: '',
+    rightPane: '',
+  };
+
+  CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
+    lineNumbers: true,
+    readOnly: true,
+    mode: 'yaml',
+    viewportMargin: 100
+  };
+
+  constructor(
+      private ngbActiveModal: NgbActiveModal,
+      private contextService: ContextService,
+      private urlInterpolationService: UrlInterpolationService,
+      private stateDiffModalBackendApiService:
+      StateDiffModalBackendApiService,
+  ) {
+    super(ngbActiveModal);
+  }
+
+  ngOnInit(): void {
+    const url = this.urlInterpolationService.interpolateUrl(
+      '/createhandler/state_yaml/<exploration_id>', {
+        exploration_id: (
+          this.contextService.getExplorationId())
+      });
+
+    if (this.oldState) {
+      this.stateDiffModalBackendApiService.fetchYaml(
+        this.oldState.toBackendDict(), 50, url).then(response => {
+        this.yamlStrs.leftPane = response.yaml;
+      });
+    } else {
+      // Note: the timeout is needed or the string will be sent
+      // before codemirror has fully loaded and will not be
+      // displayed. This causes issues with the e2e tests.
+      setTimeout(() => {
+        this.yamlStrs.leftPane = '';
+      }, 200);
     }
 
-    ngOnInit(): void {
-      const url = this.urlInterpolationService.interpolateUrl(
-        '/createhandler/state_yaml/<exploration_id>', {
-          exploration_id: (
-            this.contextService.getExplorationId())
-        });
-
-      if (this.oldState) {
-        this.stateDiffModalBackendApiService.fetchYaml(
-          this.oldState.toBackendDict(), 50, url).then(response => {
-          this.yamlStrs.leftPane = response.yaml;
-        });
-      } else {
-        // Note: the timeout is needed or the string will be sent
-        // before codemirror has fully loaded and will not be
-        // displayed. This causes issues with the e2e tests.
-        setTimeout(() => {
-          this.yamlStrs.leftPane = '';
-        }, 200);
-      }
-
-      if (this.newState) {
-        this.stateDiffModalBackendApiService.fetchYaml(
-          this.newState.toBackendDict(), 50, url).then(response => {
-          this.yamlStrs.rightPane = response.yaml;
-        });
-      } else {
-        // Note: the timeout is needed or the string will be sent
-        // before codemirror has fully loaded and will not be
-        // displayed. This causes issues with the e2e tests.
-        setTimeout(() => {
-          this.yamlStrs.rightPane = '';
-        }, 200);
-      }
+    if (this.newState) {
+      this.stateDiffModalBackendApiService.fetchYaml(
+        this.newState.toBackendDict(), 50, url).then(response => {
+        this.yamlStrs.rightPane = response.yaml;
+      });
+    } else {
+      // Note: the timeout is needed or the string will be sent
+      // before codemirror has fully loaded and will not be
+      // displayed. This causes issues with the e2e tests.
+      setTimeout(() => {
+        this.yamlStrs.rightPane = '';
+      }, 200);
     }
+  }
 }

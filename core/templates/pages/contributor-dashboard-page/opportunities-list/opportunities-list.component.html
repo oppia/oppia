@@ -22,7 +22,7 @@
     <button type="button"
             class="oppia-pagination-button"
             (click)="gotoPage(activePageNumber + 1)"
-            [disabled]="loadingOpportunityData || activePageNumber >= lastPageNumber">
+            [disabled]="loadingOpportunityData || userIsOnLastPage">
       Next<span class="material-icons">navigate_next</span>
     </button>
   </div>
@@ -39,7 +39,6 @@
     font-style: italic;
     overflow: hidden;
     padding: 0 2%;
-    white-space: nowrap;
   }
   .oppia-end-availability {
     align-items: center;
@@ -49,7 +48,7 @@
   }
   .oppia-end-availability-line {
     border: 1px solid #ababab;
-    width: 35%;
+    flex-grow: 1;
   }
   .oppia-opportunities-list {
     margin: auto;

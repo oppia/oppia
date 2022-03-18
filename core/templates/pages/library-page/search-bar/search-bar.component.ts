@@ -27,6 +27,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SearchService, SelectionDetails } from 'services/search.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -61,6 +62,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   KEYBOARD_EVENT_TO_KEY_CODES!: {};
   directiveSubscriptions: Subscription = new Subscription();
   classroomPageIsActive: boolean = false;
+  searchButtonIsActive: boolean = false;
   searchQuery: string = '';
   searchQueryChanged: Subject<string> = new Subject<string>();
   translationData: Record<string, number> = {};
@@ -70,6 +72,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef,
+    private windowDimensionsService: WindowDimensionsService,
     private searchService: SearchService,
     private urlService: UrlService,
     private navigationService: NavigationService,
@@ -80,6 +83,17 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   ) {
     this.classroomPageIsActive = (
       this.urlService.getPathname().startsWith('/learn'));
+    this.isSearchButtonActive();
+  }
+
+  isMobileViewActive(): boolean {
+    return this.windowDimensionsService.getWidth() <= 766;
+  }
+
+  isSearchButtonActive(): boolean {
+    this.searchButtonIsActive = this.classroomPageIsActive ||
+      this.isMobileViewActive();
+    return this.searchButtonIsActive;
   }
 
   isSearchInProgress(): boolean {
@@ -87,7 +101,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   searchToBeExec(e: {target: {value: string}}): void {
-    if (!this.classroomPageIsActive) {
+    if (!this.searchButtonIsActive) {
       this.searchQueryChanged.next(e.target.value);
     }
   }
@@ -119,6 +133,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       eventsTobeHandled: EventToCodes): void {
     this.navigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
     this.activeMenuName = this.navigationService.activeMenuName;
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   // Update the description, numSelections and summary fields of the
@@ -169,12 +187,14 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
     this.updateSelectionDetails(itemsType);
     this.onSearchQueryChangeExec();
+    this.refreshSearchBarLabels();
   }
 
   deselectAll(itemsType: string): void {
     this.selectionDetails[itemsType].selections = {};
     this.updateSelectionDetails(itemsType);
     this.onSearchQueryChangeExec();
+    this.refreshSearchBarLabels();
   }
 
   onSearchQueryChangeExec(): void {
@@ -208,9 +228,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.selectionDetails.categories.selections = {};
     this.selectionDetails.languageCodes.selections = {};
 
-    this.updateSelectionDetails('categories');
-    this.updateSelectionDetails('languageCodes');
-
     let newQuery = (
       this.searchService.updateSearchFieldsBasedOnUrlQuery(
         this.windowRef.nativeWindow.location.search, this.selectionDetails));
@@ -219,6 +236,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       this.searchQuery = newQuery;
       this.onSearchQueryChangeExec();
     }
+
+    this.updateSelectionDetails('categories');
+    this.updateSelectionDetails('languageCodes');
+    this.refreshSearchBarLabels();
   }
 
   refreshSearchBarLabels(): void {
@@ -283,6 +304,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     for (let itemsType in this.selectionDetails) {
       this.updateSelectionDetails(itemsType);
     }
+
+    this.refreshSearchBarLabels();
 
     this.searchQueryChanged
       .pipe(debounceTime(1000), distinctUntilChanged())

@@ -23,26 +23,48 @@ from __future__ import annotations
 from core.constants import constants
 from core.controllers import base
 from core.domain import blog_domain
-from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import image_validation_services
+from core.domain import question_domain
 from core.domain import state_domain
 
 from typing import Dict, Optional, Union
 
 
-def validate_exploration_change(obj):
-    """Validates exploration change.
+def validate_suggestion_change(obj):
+    """Validates Exploration or Question change.
 
     Args:
         obj: dict. Data that needs to be validated.
 
     Returns:
-        ExplorationChange. Returns an ExplorationChange object.
+        dict. Returns suggestion change dict after validation.
     """
-    # No explicit call to validate_dict method is necessary, because
-    # ExplorationChange calls validate method while initialization.
-    return exp_domain.ExplorationChange(obj)
+    # No explicit call to validate_dict is required, because
+    # ExplorationChange or QuestionSuggestionChange calls
+    # validate method while initialization.
+    if obj.get('cmd') is None:
+        raise base.BaseHandler.InvalidInputException(
+            'Missing cmd key in change dict')
+
+    exp_change_commands = [
+        command['name'] for command in
+        exp_domain.ExplorationChange.ALLOWED_COMMANDS
+    ]
+    question_change_commands = [
+        command['name'] for command in
+        question_domain.QuestionChange.ALLOWED_COMMANDS
+    ]
+
+    if obj['cmd'] in exp_change_commands:
+        exp_domain.ExplorationChange(obj)
+    elif obj['cmd'] in question_change_commands:
+        question_domain.QuestionSuggestionChange(obj)
+    else:
+        raise base.BaseHandler.InvalidInputException(
+            '%s cmd is not allowed.' % obj['cmd'])
+    return obj
 
 
 def validate_new_config_property_values(new_config_property):
@@ -53,13 +75,18 @@ def validate_new_config_property_values(new_config_property):
 
     Returns:
         dict(str, *). Returns a dict for new config properties.
+
+    Raises:
+        Exception. The config property name is not a string.
+        Exception. The value corresponding to config property name
+            don't have any schema.
     """
     for (name, value) in new_config_property.items():
         if not isinstance(name, str):
             raise Exception(
                 'config property name should be a string, received'
                 ': %s' % name)
-        config_property = config_domain.Registry.get_config_property(name) # type: ignore[no-untyped-call]
+        config_property = config_domain.Registry.get_config_property(name)
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 
@@ -79,6 +106,9 @@ def validate_change_dict_for_blog_post(change_dict):
 
     Returns:
         dict. Returns the change_dict after validation.
+
+    Raises:
+        Exception. Invalid tags provided.
     """
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title( # type: ignore[no-untyped-call]
@@ -91,7 +121,7 @@ def validate_change_dict_for_blog_post(change_dict):
             change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
-        list_of_default_tags = config_domain.Registry.get_config_property( # type: ignore[no-untyped-call]
+        list_of_default_tags = config_domain.Registry.get_config_property(
             'list_of_default_tags_for_blog_post').value
         if not all(tag in list_of_default_tags for tag in change_dict['tags']):
             raise Exception(
@@ -101,26 +131,6 @@ def validate_change_dict_for_blog_post(change_dict):
     # to any domain class so we are validating the fields of change_dict
     # as a part of schema validation.
     return change_dict
-
-
-def validate_collection_change(collection_change_dict):
-    """Validates collection change.
-
-    Args:
-        collection_change_dict: dict. Data that needs to be validated.
-
-    Returns:
-        dict. Returns collection change dict after validation.
-    """
-    # No explicit call to validate_dict method is necessary, because
-    # CollectionChange calls validate method while initialization.
-
-    # Object should not be returned from here because it requires modification
-    # in many of the methods in the domain layer of the codebase and we are
-    # planning to remove collections from our codebase hence modification is
-    # not done here.
-    collection_domain.CollectionChange(collection_change_dict)
-    return collection_change_dict
 
 
 def validate_state_dict(state_dict):
@@ -151,6 +161,9 @@ def validate_email_dashboard_data(
 
     Returns:
         dict. Returns the dict after validation.
+
+    Raises:
+        Exception. The key in 'data' is not one of the allowed keys.
     """
     predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     possible_keys = [predicate['backend_attr'] for predicate in predicates]
@@ -239,6 +252,23 @@ def validate_aggregated_stats(aggregated_stats):
     return aggregated_stats
 
 
+def validate_suggestion_images(files):
+    """Validates the files dict.
+
+    Args:
+        files: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns the dict after validation.
+    """
+    for filename, raw_image in files.items():
+        image_validation_services.validate_image_and_filename(
+            raw_image, filename)
+    # The files argument do not represent any domain class, hence dict form
+    # of the data is returned from here.
+    return files
+
+
 def validate_params_dict(params):
     """validates params data type
 
@@ -247,6 +277,9 @@ def validate_params_dict(params):
 
     Returns:
         dict. Returns the params argument in dict form.
+
+    Raises:
+        Exception. The given params is not of type dict as expected.
     """
     if not isinstance(params, dict):
         raise Exception('Excepted dict, received %s' % params)

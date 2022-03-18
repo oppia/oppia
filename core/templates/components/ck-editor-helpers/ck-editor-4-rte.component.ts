@@ -79,6 +79,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   componentRe = (
     /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
   );
+
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
@@ -102,6 +103,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           }
         }));
   }
+
   ngOnChanges(changes: SimpleChanges): void {
     // Ckeditor 'change' event gets triggered when a user types. In the
     // change listener, value is set and it triggers the ngOnChanges
@@ -234,7 +236,11 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       return html;
     }
     return html.replace(this.componentRe, (match, p1, p2, p3) => {
-      if (this.rteHelperService.isInlineComponent(p3)) {
+      // Here we remove the 'ckeditor' part of the string p3 to get the name
+      // of the RTE Component.
+      let rteComponentName = p3.split('-')[1];
+
+      if (this.rteHelperService.isInlineComponent(rteComponentName)) {
         return `<span type="oppia-noninteractive-${p3}">${match}</span>`;
       } else {
         return (
@@ -500,6 +506,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       }
     });
   }
+
   enableRTEicons(): void {
     this.componentsThatRequireInternet.forEach((name) => {
       let buttons = this.elementRef.nativeElement.getElementsByClassName(

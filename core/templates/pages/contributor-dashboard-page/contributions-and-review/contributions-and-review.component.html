@@ -1,4 +1,40 @@
 <div class="oppia-contributions-show-review">
+  <div class="oppia-contributions-dropdown-section">
+    <div class="dropdown-label">View</div>
+    <div class="oppia-contributions-dropdown-container">
+      <div class="oppia-contributions-selection-container" ng-click="$ctrl.toggleDropdown()">
+        {{ $ctrl.activeDropdownTabChoice }}
+        <span class="material-icons oppia-contributions-dropdown-arrow" ng-style="{ 'transform': $ctrl.dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+          arrow_drop_down
+        </span>
+      </div>
+
+      <div ng-if="$ctrl.dropdownShown" class="oppia-contributions-dropdown-list-container">
+        <div class="oppia-contributions-option-group-label"
+             ng-if="$ctrl.reviewTabs.length > 0">
+          Available Tasks
+        </div>
+        <div class="oppia-contributions-dropdown-list-option"
+             ng-repeat="tab in $ctrl.reviewTabs"
+             ng-click="$ctrl.switchToTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType)"
+             ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+          {{ tab.text }}
+        </div>
+        <div class="oppia-contributions-option-group-label"
+             ng-if="$ctrl.userIsLoggedIn">
+          Contributions
+        </div>
+        <div class="oppia-contributions-dropdown-list-option"
+             ng-if="tab.enabled"
+             ng-repeat="tab in $ctrl.contributionTabs"
+             ng-click="$ctrl.switchToTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
+             ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+          {{ tab.text }}
+        </div>
+      </div>
+
+    </div>
+  </div>
   <div class="oppia-contributions-show-review-side-navbar-container" >
     <div class="oppia-contributions-side-navbar-part" ng-if="$ctrl.reviewTabs.length > 0">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks">
@@ -25,8 +61,9 @@
     <div class="oppia-login-required" ng-if="!$ctrl.userDetailsLoading && !$ctrl.userIsLoggedIn">
       <login-required-message></login-required-message>
     </div>
-    <div class="oppia-login-required" ng-if="$ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
-      <oppia-opportunities-list [load-opportunities]="$ctrl.loadContributions"
+    <div class="oppia-login-required" ng-if="ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
+      <oppia-opportunities-list [load-opportunities]="$ctrl.loadOpportunities"
+                                [load-more-opportunities]="$ctrl.loadMoreOpportunities"
                                 (click-action-button)="$ctrl.onClickViewSuggestion($event)"
                                 [label-required]="!$ctrl.activeReviewTab"
                                 [opportunity-heading-truncation-length]="30">
@@ -44,12 +81,74 @@
     min-height: 70vh;
     width: 80%;
   }
-
   contributions-and-review .oppia-contributions-show-review-side-navbar-container {
     background-color: #009688;
-    display: flex;
-    flex-wrap: wrap;
     width: 25%;
+  }
+  contributions-and-review .oppia-contributions-dropdown-section {
+    background-color: white;
+    display: none;
+    font-size: 4vw;
+    font-weight: bold;
+    margin-bottom: 3%;
+    padding: 3%;
+    padding-inline: 6%;
+    width: 100%;
+  }
+  contributions-and-review .dropdown-label {
+    color: rgb(104, 104, 104);
+    font-size: 4.5vw;
+    margin-left: 10px;
+  }
+  contributions-and-review .oppia-contributions-dropdown-container {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    position: relative;
+    width: 60%;
+  }
+  contributions-and-review .oppia-contributions-selection-container {
+    display: flex;
+    flex: 1;
+    font-weight: lighter;
+    justify-content: space-between;
+  }
+  contributions-and-review .oppia-contributions-dropdown-arrow {
+    color: #0b6c63;
+    font-size: 1.5em;
+  }
+  contributions-and-review .oppia-contributions-dropdown-list-container {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    left: 0;
+    padding: 8px 12px;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 100%;
+    z-index: 1;
+  }
+  contributions-and-review .oppia-contributions-option-group-label {
+    color: #009688;
+    font-weight: 500;
+    margin-left: 12px;
+    margin-right: 12px;
+    margin-top: 8px;
+  }
+  contributions-and-review .oppia-contributions-dropdown-list-option {
+    color: rgb(104, 104, 104);
+    display: flex;
+    flex: 1;
+    margin-left: 16px;
+    padding: 8px;
+  }
+  contributions-and-review .oppia-contributions-dropdown-list-option-selected {
+    background-color: rgb(238, 238, 238);
+    border-radius: 4px;
   }
 
   contributions-and-review .oppia-contributions-show-review-container {
@@ -73,8 +172,7 @@
   }
 
   contributions-and-review .oppia-contributions-side-navbar-part {
-    height: 50%;
-    padding-top: 20%;
+    padding-top: 30%;
     width: 100%;
   }
 
@@ -85,6 +183,7 @@
   contributions-and-review .oppia-contributions-navbar-item {
     display: flex;
     flex-direction: column;
+    margin-top: 7%;
   }
 
   contributions-and-review .oppia-contributions-navbar-button {
@@ -93,7 +192,7 @@
     border-bottom-right-radius: 10px;
     border-top-right-radius: 10px;
     color: white;
-    font-size: 16px;
+    font-size: 24px;
     font-weight: bold;
     margin-right: 20%;
     padding-left: 20%;
@@ -111,7 +210,7 @@
     bottom: 110%;
     color: #fff;
     content: attr(navbar-label);
-    font-size: 20px;
+    font-size: 30px;
     font-weight: bold;
     margin-left: 10%;
     position: absolute;
@@ -121,5 +220,36 @@
   contributions-and-review .oppia-login-required {
     height: 100%;
     width: 100%;
+  }
+
+  @media only screen and (max-width: 600px) {
+    contributions-and-review .oppia-contributions-dropdown-section {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+    }
+    contributions-and-review .oppia-contributions-show-review {
+      align-items: center;
+      border-top: 1px solid slategray;
+      flex-direction: column;
+      justify-content: start;
+      margin-top: 0;
+      width: 100%;
+    }
+    contributions-and-review .oppia-contributions-show-review-side-navbar-container {
+      display: none;
+    }
+    contributions-and-review .oppia-contributions-show-review-container {
+      width: 95%;
+    }
+  }
+
+  @media only screen and (min-width: 601px) and (max-width: 1500px) {
+    contributions-and-review .oppia-contributions-navbar-button {
+      font-size: 1.6vw;
+    }
+    contributions-and-review .oppia-contributions-navbar-items-list::before {
+      font-size: 2vw;
+    }
   }
 </style>

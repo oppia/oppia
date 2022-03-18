@@ -21,7 +21,6 @@ from __future__ import annotations
 import copy
 
 from core import feconf
-from core import python_utils
 from core.domain import caching_services
 from core.domain import skill_domain
 from core.platform import models
@@ -38,10 +37,12 @@ def get_multi_skills(skill_ids, strict=True):
 
     Returns:
         list(Skill). The list of skills matching the provided IDs.
+
+    Raises:
+        Exception. No skill exists for given ID.
     """
     local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
-    for skill_id, skill_model in python_utils.ZIP(
-            skill_ids, local_skill_models):
+    for skill_id, skill_model in zip(skill_ids, local_skill_models):
         if strict and skill_model is None:
             raise Exception('No skill exists for ID %s' % skill_id)
     skills = [

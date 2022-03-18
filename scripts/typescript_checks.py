@@ -23,7 +23,7 @@ import shutil
 import subprocess
 import sys
 
-from core import python_utils
+from core import utils
 from . import common
 
 _PARSER = argparse.ArgumentParser(
@@ -44,8 +44,8 @@ STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
 
 
 def validate_compiled_js_dir():
-    """Validates that compiled js dir matches out dir in tsconfig."""
-    with python_utils.open_file(TSCONFIG_FILEPATH, 'r') as f:
+    """Validates that compiled JS dir matches out dir in tsconfig."""
+    with utils.open_file(TSCONFIG_FILEPATH, 'r') as f:
         config_data = json.load(f)
         out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
     if out_dir != COMPILED_JS_DIR:
@@ -61,30 +61,23 @@ def compile_and_check_typescript(config_path):
         config_path: str. The config that should be used to run the typescript
             checks.
     """
-    node_path = common.NODE_PATH
-    os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
-
+    os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
     validate_compiled_js_dir()
 
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
 
     print('Compiling and testing typescript...')
-    cmd = [
-        './node_modules/typescript/bin/tsc', '--project',
-        config_path]
-    process = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, encoding='utf-8')
-    error_messages = []
-    for line in iter(process.stdout.readline, ''):
-        if not line.startswith('node_modules'):
-            error_messages.append(line)
+    cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
+
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
+
+    error_messages = list(iter(process.stdout.readline, ''))
     if error_messages:
         print('Errors found during compilation\n')
-        for message in error_messages:
-            print(message, end='')
+        print('\n'.join(error_messages))
         sys.exit(1)
     else:
         print('Compilation successful!')
@@ -92,7 +85,6 @@ def compile_and_check_typescript(config_path):
 
 def main(args=None):
     """Run the typescript checks."""
-
     parsed_args = _PARSER.parse_args(args=args)
     compile_and_check_typescript(
         STRICT_TSCONFIG_FILEPATH

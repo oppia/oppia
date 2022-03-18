@@ -1,5 +1,7 @@
 <mat-form-field class="preferred-languages-chip-list" appearance="fill">
-  <mat-label>Preferred Exploration Languages</mat-label>
+  <mat-label class="text-capitalize">
+    {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate }}
+  </mat-label>
   <mat-chip-list #chipList aria-label="Subject Interests">
     <mat-chip *ngFor="let language of preferredLanguages"
               [selectable]="selectable"
@@ -12,7 +14,7 @@
       </ng-container>
       <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
     </mat-chip>
-    <input placeholder="Select preferred languages."
+    <input placeholder="{{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_SELECT' | translate }}"
            #languageInput
            [formControl]="formCtrl"
            [matAutocomplete]="auto"

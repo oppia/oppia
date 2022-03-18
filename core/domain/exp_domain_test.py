@@ -32,6 +32,7 @@ from core.domain import exp_services_test
 from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -41,17 +42,17 @@ from core.tests import test_utils
 class ExplorationChangeTests(test_utils.GenericTestBase):
 
     def test_exp_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             exp_domain.ExplorationChange({'invalid': 'data'})
 
     def test_exp_change_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             exp_domain.ExplorationChange({'cmd': 'invalid'})
 
     def test_exp_change_object_with_deprecated_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.DeprecatedCommandError, 'Command clone is deprecated'):
             exp_domain.ExplorationChange({
                 'cmd': 'clone',
@@ -60,7 +61,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exp_change_object_with_deprecated_cmd_argument(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.DeprecatedCommandError,
             'Value for property_name in cmd edit_state_property: '
             'fallbacks is deprecated'):
@@ -72,7 +73,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exp_change_object_with_missing_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_value')):
@@ -83,7 +84,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exp_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             exp_domain.ExplorationChange({
@@ -94,7 +95,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exp_change_object_with_invalid_exploration_property(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd edit_exploration_property: '
                 'invalid is not allowed')):
@@ -106,7 +107,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exp_change_object_with_invalid_state_property(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd edit_state_property: '
                 'invalid is not allowed')):
@@ -359,14 +360,14 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         self.exploration.version += 1
 
     def test_cannot_create_exploration_change_with_invalid_change_dict(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Missing cmd key in change dict'):
             exp_domain.ExplorationChange({
                 'invalid_cmd': 'invalid'
             })
 
     def test_cannot_create_exploration_change_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Command invalid_cmd is not allowed'):
             exp_domain.ExplorationChange({
                 'cmd': 'invalid_cmd'
@@ -381,7 +382,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         })
         self.assertTrue(isinstance(exp_change, exp_domain.ExplorationChange))
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Value for property_name in cmd edit_state_property: '
             'invalid_property is not allowed'):
@@ -401,7 +402,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         })
         self.assertTrue(isinstance(exp_change, exp_domain.ExplorationChange))
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Value for property_name in cmd edit_exploration_property: '
             'invalid_property is not allowed'):
@@ -439,13 +440,13 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
             })
 
     def test_validate_exp_version(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Expected version to be an int, received invalid_version'):
             exp_domain.ExpVersionReference('exp_id', 'invalid_version')
 
     def test_validate_exp_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected exp_id to be a str, received 0'):
             exp_domain.ExpVersionReference(0, 1)
 
@@ -476,7 +477,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
     def test_init_state_with_card_is_checkpoint_false_is_invalid(self):
         self.init_state.update_card_is_checkpoint(False)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected card_is_checkpoint of first state to '
             'be True but found it to be False'):
             self.exploration.validate(strict=True)
@@ -492,7 +493,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'End': self.end_state
         }
         self.end_state.update_card_is_checkpoint(True)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected card_is_checkpoint of terminal state '
             'to be False but found it to be True'):
             self.exploration.validate(strict=True)
@@ -523,7 +524,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.set_interaction_for_state(
                 self.exploration.states['State%s' % i],
                 'Continue')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected checkpoint count to be between 1 and 8 '
             'inclusive but found it to be 9'
             ):
@@ -634,7 +635,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         # The exploration can be completed via third_state. Hence, making
         # second_state a checkpoint raises a validation error.
         second_state.card_is_checkpoint = True
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Cannot make Second a checkpoint as it is'
             ' bypassable'
             ):
@@ -854,7 +855,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         # d_state becomes bypassable. Hence, making d_state a checkpoint raises
         # validation error.
         d_state.update_card_is_checkpoint(True)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Cannot make D a checkpoint as it is bypassable'
             ):
             self.exploration.validate(strict=True)
@@ -985,7 +986,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         c_state.update_interaction_answer_groups(
             c_state_answer_groups)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Cannot make D a checkpoint as it is bypassable'
             ):
             self.exploration.validate(strict=True)
@@ -994,6 +995,16 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
+
+    def setUp(self):
+        super(ExplorationDomainUnitTests, self).setUp()
+        translation_dict = {
+            'content_id_3': translation_domain.TranslatedContent(
+                'My name is Nikhil.', True)
+        }
+        self.dummy_entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
 
     # TODO(bhenning): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
@@ -1137,7 +1148,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'normalizedStrSet': 15
         }}
         rule_spec.rule_type = 'Contains'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Expected list, received 15'
         ):
             exploration.validate()
@@ -1193,7 +1204,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # this causes a strict validation failure but not a normal validation
         # failure.
         outcome.labelled_as_correct = True
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'is labelled correct but is a self-loop.'
         ):
             exploration.validate(strict=True)
@@ -1509,19 +1520,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
         exploration.validate()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'title must be specified'
             ):
             exploration.validate(strict=True)
         exploration.title = 'A title'
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'category must be specified'
             ):
             exploration.validate(strict=True)
         exploration.category = 'A category'
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'objective must be specified'
             ):
             exploration.validate(strict=True)
@@ -1939,7 +1950,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.get_content_html(exploration.init_state_name, 'hint_1'),
             '<p>hint one</p>')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, 'State Invalid state does not exist'):
             exploration.get_content_html('Invalid state', 'hint_1')
 
@@ -2002,7 +2013,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         demo_dict['param_specs'] = {
             'ParamSpec': {'obj_type': 'UnicodeString'}
         }
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Parameter myParam was used in a state but not '
             'declared in the exploration param_specs.'):
@@ -2015,7 +2026,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.category = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected category to be a string, received 1'):
             exploration.validate()
 
@@ -2026,7 +2037,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.objective = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected objective to be a string, received 1'):
             exploration.validate()
 
@@ -2037,7 +2048,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.blurb = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected blurb to be a string, received 1'):
             exploration.validate()
 
@@ -2048,7 +2059,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.language_code = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected language_code to be a string, received 1'):
             exploration.validate()
 
@@ -2059,7 +2070,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.author_notes = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected author_notes to be a string, received 1'):
             exploration.validate()
 
@@ -2070,7 +2081,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.states = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected states to be a dict, received 1'):
             exploration.validate()
 
@@ -2081,7 +2092,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.init_state.interaction.default_outcome.dest = None
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Every outcome should have a destination.'):
             exploration.validate()
 
@@ -2092,7 +2103,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.init_state.interaction.default_outcome.dest = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected outcome dest to be a string, received 1'):
             exploration.validate()
 
@@ -2103,7 +2114,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.states_schema_version = None
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'This exploration has no states schema version.'):
             exploration.validate()
 
@@ -2114,7 +2125,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.auto_tts_enabled = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected auto_tts_enabled to be a bool, received 1'):
             exploration.validate()
 
@@ -2125,7 +2136,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.correctness_feedback_enabled = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Expected correctness_feedback_enabled to be a bool, received 1'):
             exploration.validate()
@@ -2140,7 +2151,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             1: param_domain.ParamSpec.from_dict(
                 {'obj_type': 'UnicodeString'})
         }
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected parameter name to be a string, received 1'):
             exploration.validate()
 
@@ -2151,7 +2162,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.param_changes = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected param_changes to be a list, received 1'):
             exploration.validate()
 
@@ -2168,7 +2179,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'name': 'invalid',
             'generator_id': 'RandomSelector'
         })]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'No parameter named \'invalid\' exists in this '
             'exploration'):
@@ -2187,7 +2198,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'name': 'all',
             'generator_id': 'RandomSelector'
         })]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The exploration-level parameter with name \'all\' is '
             'reserved. Please choose a different name.'):
@@ -2210,7 +2221,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             default_outcome
         )
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The default outcome for state Introduction has a refresher '
             'exploration ID, but is not a self-loop.'):
@@ -2248,7 +2259,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         exploration.init_state.update_interaction_answer_groups(
             [state_answer_group])
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The parameter ParamChange was used in an answer group, '
             'but it does not exist in this exploration'):
@@ -2264,7 +2275,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Please fix the following issues before saving this exploration: '
             '1. The following states are not reachable from the initial state: '
@@ -2280,7 +2291,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.update_init_state_name('End')
         self.assertEqual(exploration.init_state_name, 'End')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Invalid new initial state name: invalid_state;'):
             exploration.update_init_state_name('invalid_state')
@@ -2297,7 +2308,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(exploration.states.get('End'))
         self.assertTrue(exploration.states.get('new state name'))
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'State invalid_state does not exist'):
             exploration.rename_state('invalid_state', 'new state name')
 
@@ -2315,7 +2326,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.interaction.default_outcome
             .dest) = exploration.init_state_name
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The default outcome for state Introduction is labelled '
             'correct but is a self-loop'):
@@ -2330,6 +2341,97 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.to_dict(),
             exp_domain.Exploration.deserialize(
                 exploration.serialize()).to_dict())
+
+    def test_get_all_translatable_content_for_exp(self):
+        """Get all translatable fields from exploration."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_content_dict = {
+            'content_id': 'content',
+            'html': '<p>state content html</p>'
+        }
+        state_answer_group = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                            }})
+            ],
+            [],
+            None
+        )]
+        state_default_outcome = state_domain.Outcome(
+            'State1', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for State1</p>'),
+            False, [], None, None
+        )
+        state_hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state1</p>'
+                )
+            ),
+        ]
+        state_solution_dict = {
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
+        state_interaction_cust_args = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'rows': {'value': 1}
+        }
+        state.update_next_content_id_index(3)
+        state.update_content(
+            state_domain.SubtitledHtml.from_dict(state_content_dict))
+        state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args(state_interaction_cust_args)
+        state.update_interaction_answer_groups(
+            state_answer_group)
+        state.update_interaction_default_outcome(state_default_outcome)
+        state.update_interaction_hints(state_hint_list)
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, state_solution_dict)
+        state.update_interaction_solution(solution)
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            exploration.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents,
+            [
+                '<p>state outcome html</p>',
+                '<p>Default outcome for State1</p>',
+                '<p>Hello, this is html1 for state1</p>',
+                ['Test'],
+                '<p>Hello, this is html2 for state1</p>',
+                '<p>This is solution for state1</p>',
+                '<p>state content html</p>'
+            ])
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
@@ -2351,61 +2453,61 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_invalid_title(self):
         self.exp_summary.title = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected title to be a string, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_category(self):
         self.exp_summary.category = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected category to be a string, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_objective(self):
         self.exp_summary.objective = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected objective to be a string, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_language_code(self):
         self.exp_summary.language_code = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected language_code to be a string, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_unallowed_language_code(self):
         self.exp_summary.language_code = 'invalid'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language_code: invalid'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_tags(self):
         self.exp_summary.tags = 'tags'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected \'tags\' to be a list, received tags'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_tag_in_tags(self):
         self.exp_summary.tags = ['tag', 2]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each tag in \'tags\' to be a string, received \'2\''):
             self.exp_summary.validate()
 
     def test_validation_fails_with_empty_tag_in_tags(self):
         self.exp_summary.tags = ['', 'abc']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Tags should be non-empty'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_unallowed_characters_in_tag(self):
         self.exp_summary.tags = ['123', 'abc']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Tags should only contain lowercase '
                 'letters and spaces, received \'123\'')):
@@ -2413,21 +2515,21 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_whitespace_in_tag_start(self):
         self.exp_summary.tags = [' ab', 'abc']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Tags should not start or end with whitespace, received \' ab\''):
             self.exp_summary.validate()
 
     def test_validation_fails_with_whitespace_in_tag_end(self):
         self.exp_summary.tags = ['ab ', 'abc']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Tags should not start or end with whitespace, received \'ab \''):
             self.exp_summary.validate()
 
     def test_validation_fails_with_adjacent_whitespace_in_tag(self):
         self.exp_summary.tags = ['a   b', 'abc']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Adjacent whitespace in tags should '
                 'be collapsed, received \'a   b\'')):
@@ -2435,93 +2537,99 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_duplicate_tags(self):
         self.exp_summary.tags = ['abc', 'abc', 'ab']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Some tags duplicate each other'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_rating_type(self):
         self.exp_summary.ratings = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected ratings to be a dict, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_rating_keys(self):
         self.exp_summary.ratings = {'1': 0, '10': 1}
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected ratings to have keys: 1, 2, 3, 4, 5, received 1, 10'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_value_type_for_ratings(self):
         self.exp_summary.ratings = {'1': 0, '2': 'one', '3': 0, '4': 0, '5': 0}
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected value to be int, received one'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_value_for_ratings(self):
         self.exp_summary.ratings = {'1': 0, '2': -1, '3': 0, '4': 0, '5': 0}
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected value to be non-negative, received -1'):
             self.exp_summary.validate()
 
+    def test_validation_passes_with_int_scaled_average_rating(self):
+        self.exp_summary.scaled_average_rating = 1
+        self.exp_summary.validate()
+        self.assertEqual(self.exp_summary.scaled_average_rating, 1)
+
     def test_validation_fails_with_invalid_scaled_average_rating(self):
         self.exp_summary.scaled_average_rating = 'one'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected scaled_average_rating to be float, received one'):
+            'Expected scaled_average_rating to be float, received one'
+        ):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_status(self):
         self.exp_summary.status = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected status to be string, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_community_owned(self):
         self.exp_summary.community_owned = '1'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected community_owned to be bool, received 1'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_contributors_summary(self):
         self.exp_summary.contributors_summary = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected contributors_summary to be dict, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_owner_ids_type(self):
         self.exp_summary.owner_ids = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected owner_ids to be list, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_owner_id_in_owner_ids(self):
         self.exp_summary.owner_ids = ['1', 2, '3']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in owner_ids to be string, received 2'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_editor_ids_type(self):
         self.exp_summary.editor_ids = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected editor_ids to be list, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_editor_id_in_editor_ids(self):
         self.exp_summary.editor_ids = ['1', 2, '3']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in editor_ids to be string, received 2'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_voice_artist_ids_type(self):
         self.exp_summary.voice_artist_ids = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected voice_artist_ids to be list, received 0'):
             self.exp_summary.validate()
@@ -2529,28 +2637,40 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_invalid_voice_artist_id_in_voice_artists_ids(
             self):
         self.exp_summary.voice_artist_ids = ['1', 2, '3']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in voice_artist_ids to be string, received 2'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_viewer_ids_type(self):
         self.exp_summary.viewer_ids = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected viewer_ids to be list, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_viewer_id_in_viewer_ids(self):
         self.exp_summary.viewer_ids = ['1', 2, '3']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in viewer_ids to be string, received 2'):
             self.exp_summary.validate()
 
+    def test_validation_fails_with_duplicate_user_role(self):
+        self.exp_summary.owner_ids = ['1']
+        self.exp_summary.editor_ids = ['2', '3']
+        self.exp_summary.voice_artist_ids = ['4']
+        self.exp_summary.viewer_ids = ['2']
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'Users should not be assigned to multiple roles at once, '
+                'received users: 1, 2, 3, 4, 2')
+        ):
+            self.exp_summary.validate()
+
     def test_validation_fails_with_invalid_contributor_ids_type(self):
         self.exp_summary.contributor_ids = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected contributor_ids to be list, received 0'):
             self.exp_summary.validate()
@@ -2558,7 +2678,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_invalid_contributor_id_in_contributor_ids(
             self):
         self.exp_summary.contributor_ids = ['1', 2, '3']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in contributor_ids to be string, received 2'):
             self.exp_summary.validate()
@@ -2765,7 +2885,7 @@ title: Title
 
     def test_creation_with_invalid_yaml_schema_version(self):
         """Test that a schema version that is too big is detected."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v46 to v[0-9]+ exploration YAML files '
             'at present.'):
@@ -2789,12 +2909,12 @@ title: Title
         yaml_content_2 = exploration2.to_yaml()
         self.assertEqual(yaml_content_2, yaml_content)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Please ensure that you are uploading a YAML text file, '
             'not a zip file. The YAML parser returned the following error: '):
             exp_domain.Exploration.from_yaml('exp3', 'No_initial_state_name')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Please ensure that you are uploading a YAML text file, not a zip'
             ' file. The YAML parser returned the following error: mapping '
@@ -2802,7 +2922,7 @@ title: Title
             exp_domain.Exploration.from_yaml(
                 'exp4', 'Invalid\ninit_state_name:\nMore stuff')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Please ensure that you are uploading a YAML text file, not a zip'
             ' file. The YAML parser returned the following error: while '
@@ -4174,7 +4294,7 @@ title: Title
         """Tests the migration of ItemSelectionInput rule inputs."""
         sample_yaml_content = (
             """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
@@ -4290,7 +4410,7 @@ title: Title
 
         latest_sample_yaml_content = (
             """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
@@ -4933,7 +5053,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'param_specs': {},
             'language_code': 'en',
-            'correctness_feedback_enabled': False,
+            'correctness_feedback_enabled': True,
         })
 
 
@@ -4945,7 +5065,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.add_states(['first state'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, 'Cannot delete initial state'
             ):
             exploration.delete_state(exploration.init_state_name)
@@ -4953,7 +5073,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['second state'])
         exploration.delete_state('second state')
 
-        with self.assertRaisesRegexp(ValueError, 'fake state does not exist'):
+        with self.assertRaisesRegex(ValueError, 'fake state does not exist'):
             exploration.delete_state('fake state')
 
 

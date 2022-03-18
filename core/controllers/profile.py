@@ -24,6 +24,7 @@ import zipfile
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -38,6 +39,20 @@ from core.domain import wipeout_service
 
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_valid_username_string'
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -197,8 +212,8 @@ class PreferencesHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'User bio exceeds maximum character limit: %s'
                     % feconf.MAX_BIO_LENGTH_IN_CHARS)
-            else:
-                user_services.update_user_bio(self.user_id, data)
+
+            user_services.update_user_bio(self.user_id, data)
         elif update_type == 'subject_interests':
             user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':
@@ -291,11 +306,23 @@ class SignupPage(base.BaseHandler):
     """The page which prompts for username and acceptance of terms."""
 
     REDIRECT_UNFINISHED_SIGNUPS = False
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'return_url': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
-        return_url = self.request.get('return_url', self.request.uri)
+        return_url = self.normalized_request.get(
+            'return_url', self.request.uri)
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
@@ -308,6 +335,42 @@ class SignupPage(base.BaseHandler):
 
 class SignupHandler(base.BaseHandler):
     """Provides data for the editor prerequisites page."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
+                }
+            },
+            'agreed_to_terms': {
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': False
+            },
+            'default_dashboard': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        constants.DASHBOARD_TYPE_LEARNER,
+                        constants.DASHBOARD_TYPE_CREATOR
+                    ]
+                }
+            },
+            'can_receive_email_updates': {
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     REDIRECT_UNFINISHED_SIGNUPS = False
 
@@ -331,10 +394,10 @@ class SignupHandler(base.BaseHandler):
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self):
         """Handles POST requests."""
-        username = self.payload.get('username')
-        agreed_to_terms = self.payload.get('agreed_to_terms')
-        default_dashboard = self.payload.get('default_dashboard')
-        can_receive_email_updates = self.payload.get(
+        username = self.normalized_payload.get('username')
+        agreed_to_terms = self.normalized_payload.get('agreed_to_terms')
+        default_dashboard = self.normalized_payload.get('default_dashboard')
+        can_receive_email_updates = self.normalized_payload.get(
             'can_receive_email_updates')
         bulk_email_signup_message_should_be_shown = False
 
@@ -361,18 +424,15 @@ class SignupHandler(base.BaseHandler):
             self.render_json({})
             return
 
-        if not isinstance(agreed_to_terms, bool) or not agreed_to_terms:
+        if not agreed_to_terms:
             raise self.InvalidInputException(
                 'In order to edit explorations on this site, you will '
                 'need to accept the license terms.')
-        else:
-            user_services.record_agreement_to_terms(self.user_id)
+
+        user_services.record_agreement_to_terms(self.user_id)
 
         if not user_services.get_username(self.user_id):
-            try:
-                user_services.set_username(self.user_id, username)
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
+            user_services.set_username(self.user_id, username)
 
         # Note that an email is only sent when the user registers for the first
         # time.
@@ -411,6 +471,11 @@ class ExportAccountHandler(base.BaseHandler):
     """Provides user with relevant data for Takeout."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_manage_own_account
     def get(self):
@@ -472,6 +537,20 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'site_language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': list(map(
+                        lambda x: x['id'], constants.SUPPORTED_SITE_LANGUAGES
+                    ))
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
@@ -483,8 +562,12 @@ class SiteLanguageHandler(base.BaseHandler):
 
 class UserInfoHandler(base.BaseHandler):
     """Provides info about user. If user is not logged in,
-    return dict containing false as logged in status.
-    """
+    return dict containing false as logged in status."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -527,16 +610,22 @@ class UrlHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'current_url': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     @acl_decorators.open_access
     def get(self):
         if self.user_id:
             self.render_json({'login_url': None})
         else:
-            if self.request and self.request.get('current_url'):
-                target_url = self.request.get('current_url')
-                login_url = user_services.create_login_url(target_url)
-                self.render_json({'login_url': login_url})
-            else:
-                raise self.InvalidInputException(
-                    'Incomplete or empty GET parameters passed'
-                )
+            target_url = self.normalized_request.get('current_url')
+            login_url = user_services.create_login_url(target_url)
+            self.render_json({'login_url': login_url})

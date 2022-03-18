@@ -22,8 +22,12 @@ import re
 
 from core import feconf
 from core import utils
-from core.domain import object_registry
 from core.domain import value_generators_domain
+
+from core.domain import object_registry  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 
 class ParamSpec:
@@ -210,9 +214,9 @@ class ParamChange:
 
         try:
             hasattr(self, 'generator')
-        except KeyError:
+        except KeyError as e:
             raise utils.ValidationError(
-                'Invalid generator ID %s' % self._generator_id)
+                'Invalid generator ID %s' % self._generator_id) from e
 
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(

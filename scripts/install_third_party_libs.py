@@ -30,11 +30,12 @@ TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 # These libraries need to be installed before running or importing any script.
 
 PREREQUISITES = [
-    ('pyyaml', '5.4.1', os.path.join(TOOLS_DIR, 'pyyaml-5.4.1')),
+    ('pyyaml', '6.0', os.path.join(TOOLS_DIR, 'pyyaml-6.0')),
     ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
     ('six', '1.16.0', os.path.join('third_party', 'python_libs')),
-    ('certifi', '2021.5.30', os.path.join(
-        TOOLS_DIR, 'certifi-2021.5.30')),
+    ('certifi', '2021.10.8', os.path.join(
+        TOOLS_DIR, 'certifi-2021.10.8')),
+    ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs')),
 ]
 
 for package_name, version_number, target_path in PREREQUISITES:
@@ -49,7 +50,7 @@ for package_name, version_number, target_path in PREREQUISITES:
         subprocess.check_call(command_text + uextention_text)
 
 
-from core import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -136,8 +137,8 @@ def install_buf_and_protoc():
         with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:
             zfile.extractall(path=PROTOC_DIR)
         os.remove(os.path.join(BUF_DIR, protoc_file))
-    except Exception:
-        raise Exception('Error installing protoc binary')
+    except Exception as e:
+        raise Exception('Error installing protoc binary') from e
     common.recursive_chmod(buf_path, 0o744)
     common.recursive_chmod(protoc_path, 0o744)
 
@@ -189,11 +190,25 @@ def ensure_pip_library_is_installed(package, version, path):
     """
     print('Checking if %s is installed in %s' % (package, path))
 
-    exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
+    if package.startswith('git+'):
+        exact_lib_path = os.path.join(
+            path,
+            '%s-%s' % (
+                package[package.rindex('/') + 1:package.index('.git')],
+                version
+            )
+        )
+    else:
+        exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
+
     if not os.path.exists(exact_lib_path):
         print('Installing %s' % package)
-        install_backend_python_libs.pip_install(
-            '%s==%s' % (package, version), exact_lib_path)
+        if package.startswith('git+'):
+            install_backend_python_libs.pip_install(
+                '%s@%s' % (package, version), exact_lib_path)
+        else:
+            install_backend_python_libs.pip_install(
+                '%s==%s' % (package, version), exact_lib_path)
 
 
 def ensure_system_python_libraries_are_installed(package, version):
@@ -218,7 +233,6 @@ def main() -> None:
     # looks for them in the default system paths when it is run. Therefore, we
     # must install these libraries to the developer's computer.
     system_pip_dependencies = [
-        ('enum34', common.ENUM_VERSION),
         ('protobuf', common.PROTOBUF_VERSION),
         ('grpcio', common.GRPCIO_VERSION),
     ]
@@ -290,7 +304,7 @@ def main() -> None:
     for path_list in os.walk(correct_google_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
-            with python_utils.open_file(
+            with utils.open_file(
                 os.path.join(root_path, '__init__.py'), 'a'):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.

@@ -49,6 +49,12 @@ class StaleAuthSessionError(Exception):
     pass
 
 
+class UserDisabledError(Exception):
+    """Error raised when the user whose details are requested is disabled."""
+
+    pass
+
+
 class AuthClaimsDict(TypedDict):
     """Dictionary representing the AuthClaims object."""
 

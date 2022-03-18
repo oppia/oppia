@@ -42,6 +42,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         suggestion_models.SCORE_TYPE_TRANSLATION +
         suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
 
+    topic_name = 'topic'
     target_id = 'exp1'
     target_version_at_submission = 1
     # TODO(#13523): Use of Any here in the type annotation below will
@@ -171,7 +172,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_create_suggestion_fails_if_id_collides_with_existing_one(
             self
     ) -> None:
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'There is already a suggestion with the given id: '
                        'exploration.exp1.thread_1'):
             suggestion_models.GeneralSuggestionModel.create(
@@ -191,7 +192,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 queries)), 5)
         queries = [('suggestion_type', 'invalid_suggestion_type')]
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Value \'invalid_suggestion_type\' for property'
                        ' suggestion_type is not an allowed choice'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
@@ -295,7 +296,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             ('target_id', self.target_id),
             ('invalid_field', 'value')
         ]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Not allowed to query on field invalid_field'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
 
@@ -408,12 +409,212 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestions[0].status,
             suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(suggestions[1].target_id, 'exp1')
+
+    def test_get_translation_suggestions_in_review_with_exp_ids_by_offset(
+            self) -> None:
+        limit = 1
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_6', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_4',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_7', self.translation_language_code)
+
+        suggestions, offset_1 = (
+            suggestion_models
+                .GeneralSuggestionModel
+                .get_in_review_translation_suggestions_with_exp_ids_by_offset(
+                    limit, 0, 'author_4',
+                    [self.translation_language_code], ['exp1']))
+
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(suggestions[0].target_id, 'exp1')
+        self.assertEqual(offset_1, 1)
         self.assertEqual(
-            suggestions[1].suggestion_type,
+            suggestions[0].suggestion_type,
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
         self.assertEqual(
-            suggestions[1].status,
+            suggestions[0].status,
             suggestion_models.STATUS_IN_REVIEW)
+
+    def test_get_in_review_translation_suggestions_by_offset(self) -> None:
+        suggestion_1_id = 'exploration.exp1.thread_6'
+        suggestion_2_id = 'exploration.exp1.thread_7'
+        user_id = 'author1'
+        limit = 1
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            suggestion_1_id, self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_4',
+            'reviewer_2', self.change_cmd, self.score_category,
+            suggestion_2_id, self.translation_language_code)
+
+        results, offset_1 = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_translation_suggestions_by_offset(
+                limit=limit,
+                offset=0,
+                user_id=user_id,
+                language_codes=[self.translation_language_code]))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), limit)
+        self.assertEqual(results[0].id, suggestion_1_id)
+        self.assertEqual(offset_1, 1)
+
+        results, offset_2 = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_translation_suggestions_by_offset(
+                limit=limit,
+                offset=offset_1,
+                user_id=user_id,
+                language_codes=[self.translation_language_code]))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), limit)
+        self.assertEqual(results[0].id, suggestion_2_id)
+        self.assertEqual(offset_2, 2)
+
+        results, offset_3 = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_translation_suggestions_by_offset(
+                limit=limit,
+                offset=offset_2,
+                user_id=user_id,
+                language_codes=[self.translation_language_code]))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), 0)
+        self.assertEqual(offset_3, 2)
+
+    def test_get_in_review_question_suggestions_by_offset(self) -> None:
+        suggestion_1_id = 'skill1.thread1'
+        suggestion_2_id = 'skill1.thread2'
+        user_id = 'author1'
+        limit = 1
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category1',
+            suggestion_1_id, self.question_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_4',
+            'reviewer_2', self.change_cmd, 'category1',
+            suggestion_2_id, self.question_language_code)
+
+        results, offset_1 = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_question_suggestions_by_offset(
+                limit=limit,
+                offset=0,
+                user_id=user_id))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), limit)
+        self.assertEqual(results[0].id, suggestion_1_id)
+        self.assertEqual(offset_1, 1)
+
+        results, offset_2 = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_question_suggestions_by_offset(
+                limit=limit,
+                offset=offset_1,
+                user_id=user_id))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), limit)
+        self.assertEqual(results[0].id, suggestion_2_id)
+        self.assertEqual(offset_2, 2)
+
+        results, offset_3 = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_question_suggestions_by_offset(
+                limit=limit,
+                offset=offset_2,
+                user_id=user_id))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), 0)
+        self.assertEqual(offset_3, 2)
+
+    def test_user_created_suggestions_by_offset(self) -> None:
+        authored_translation_suggestion_id = 'exploration.exp1.thread_6'
+        non_authored_translation_suggestion_id = 'exploration.exp1.thread_7'
+        authored_question_suggestion_id = 'skill1.thread1'
+        user_id = 'author1'
+        limit = 1
+        # User created translation suggestion.
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, user_id,
+            'reviewer_2', self.change_cmd, self.score_category,
+            authored_translation_suggestion_id, self.translation_language_code)
+        # Translation suggestion created by a different user.
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_4',
+            'reviewer_2', self.change_cmd, self.score_category,
+            non_authored_translation_suggestion_id,
+            self.translation_language_code)
+        # User created question suggestion.
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, user_id,
+            'reviewer_2', self.change_cmd, 'category1',
+            authored_question_suggestion_id, self.question_language_code)
+
+        results, translation_suggestion_offset = (
+            suggestion_models.GeneralSuggestionModel
+            .get_user_created_suggestions_by_offset(
+                limit=limit,
+                offset=0,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                user_id=user_id))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), limit)
+        self.assertEqual(results[0].id, authored_translation_suggestion_id)
+        self.assertEqual(translation_suggestion_offset, 1)
+
+        results, question_suggestion_offset = (
+            suggestion_models.GeneralSuggestionModel
+            .get_user_created_suggestions_by_offset(
+                limit=limit,
+                offset=0,
+                suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                user_id=user_id))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), limit)
+        self.assertEqual(results[0].id, authored_question_suggestion_id)
+        self.assertEqual(question_suggestion_offset, 1)
 
     def test_get_translation_suggestions_in_review_with_exp_id_with_invalid_exp(
             self
@@ -619,7 +820,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     ) -> None:
         with self.swap(
             feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
-            with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 Exception,
                 'Expected the suggestion types offered on the Contributor '
                 'Dashboard to be nonempty.'):
@@ -906,7 +1107,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralSuggestionModel
             .get_in_review_suggestions_in_score_categories(
                 ['category1', 'category_invalid'], 'author_2')), 1)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Received empty list of score categories'):
             self.assertEqual(len(
                 suggestion_models.GeneralSuggestionModel
