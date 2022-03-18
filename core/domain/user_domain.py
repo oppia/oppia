@@ -202,8 +202,8 @@ class UserSettings:
         self.deleted = deleted
         self.created_on = created_on
 
-    # TODO(#15136): Limit the use of type validation. Once all the python files
-    # are annotated.
+    # TODO(#15136): Make sure handler schema related to user_domain is also
+    # type annotated.
     def validate(self) -> None:
         """Checks that the user_id, email, roles, banned, pin and display_alias
         fields of this UserSettings domain object are valid.
@@ -562,15 +562,15 @@ class UserContributions:
         self.created_exploration_ids = created_exploration_ids
         self.edited_exploration_ids = edited_exploration_ids
 
-    # TODO(#15136): Limit the use of type validation. Once all the python files
-    # are annotated.
+    # TODO(#15136): Make sure handler schema related to user_domain is also
+    # type annotated.
     def validate(self) -> None:
         """Checks that user_id, created_exploration_ids and
         edited_exploration_ids fields of this UserContributions
         domain object are valid.
 
         Raises:
-            ValidationError. No user id sepecified.
+            ValidationError. No user id specified.
             ValidationError. The user_id is not str.
             ValidationError. The created_exploration_ids is not a list.
             ValidationError. The exploration_id in created_exploration_ids
@@ -1134,16 +1134,16 @@ class UserContributionRights:
         Returns:
             boolean. Whether user has rights to review at east one item.
         """
-        # Due to comparison between different types (List[str] and bool) MyPy
-        # expecting to return Union[List[str], bool] type. So, in order to
-        # return bool, we explicitly convert the operation to bool.
+        # Note that 'can_review_translation_for_language_codes' and
+        # 'can_review_voiceover_for_language_codes' are List[str], so we need
+        # the bool cast to ensure that the return value is boolean.
         return bool(
             self.can_review_translation_for_language_codes or
             self.can_review_voiceover_for_language_codes or
             self.can_review_questions)
 
-    # TODO(#15136): Limit the use of type validation. Once all the python files
-    # are annotated.
+    # TODO(#15136): Make sure handler schema related to user_domain is also
+    # type annotated.
     def validate(self) -> None:
         """Validates different attributes of the class."""
         if not isinstance(self.can_review_translation_for_language_codes, list):
