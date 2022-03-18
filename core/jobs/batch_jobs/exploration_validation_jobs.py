@@ -28,7 +28,8 @@ from core.platform import models
 
 import apache_beam as beam
 
-(exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, story_models, ) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.story])
 
 
 class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
@@ -42,6 +43,15 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
             PCollection. Returns PCollection of invalid explorations with
             their id and category.
         """
+        all_curated_lessons = (
+            self.pipeline
+            | 'Get all StoryModels' >> ndb_io.GetModels(
+                story_models.StoryModel.get_all(include_deleted=False))
+            | 'Get chapters' >> beam.FlatMap(
+                lambda x: x.story_contents['nodes'])
+            | 'Get exploration ids' >> beam.Map(lambda x: x['exploration_id'])
+        )
+
         total_explorations = (
             self.pipeline
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
@@ -56,18 +66,27 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
                 lambda exp: exp.status == constants.ACTIVITY_STATUS_PUBLIC
             )
         )
+ 
+        curated_lessons = (
+            published_explorations
+            | 'Filter out all curated lessons' >> beam.Filter(
+                lambda x,
+                all_curated_lessons: x.id in all_curated_lessons,
+                all_curated_lessons=beam.pvalue.AsIter(all_curated_lessons)
+            )            
+        )
 
         exp_ids_with_category_not_in_constants = (
-            published_explorations
+            curated_lessons
             | 'Combine exp id and category' >> beam.Map(
                 lambda exp: (exp.id, exp.category))
             | 'Filter exploraton with category not in constants.ts' >>
-                beam.Filter(lambda exp: not exp[1] in constants.ALL_CATEGORIES)
+                beam.Filter(lambda exp: exp[1] not in constants.ALL_CATEGORIES)
         )
 
         report_number_of_exps_queried = (
-            published_explorations
-            | 'Report count of published exp models' >> (
+            curated_lessons
+            | 'Report count of curated exp models' >> (
                 job_result_transforms.CountObjectsToJobRunResult('EXPS'))
         )
 
@@ -91,64 +110,6 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
                 report_number_of_exps_queried,
                 report_number_of_invalid_exps,
                 report_invalid_ids_and_their_category
-            )
-            | 'Combine results' >> beam.Flatten()
-        )
-
-
-class GetExpWithInvalidRatingJob(base_jobs.JobBase):
-    """Job that returns exploration having invalid scaled avg rating."""
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns PCollection of invalid explorations with their id and
-        scaled average rating.
-
-        Returns:
-            PCollection. Returns PCollection of invalid explorations with
-            their id and scaled avg rating.
-        """
-        total_explorations = (
-            self.pipeline
-            | 'Get all ExplorationModels' >> ndb_io.GetModels(
-                exp_models.ExpSummaryModel.get_all(include_deleted=False))
-            | 'Get exploration from model' >> beam.Map(
-                exp_fetchers.get_exploration_summary_from_model)
-        )
-
-        exp_ids_with_invalid_rating = (
-            total_explorations
-            | 'Combine exploration ids and scaled avg ratings' >> beam.Map(
-                lambda exp: (exp.id, exp.scaled_average_rating))
-            | 'Filter exploratons with invalid scaled avg ratings' >>
-                beam.Filter(lambda exp: exp[1] > 5 or exp[1] < 0)
-        )
-
-        report_number_of_exps_queried = (
-            total_explorations
-            | 'Report count of exp models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('EXPS'))
-        )
-
-        report_number_of_invalid_exps = (
-            exp_ids_with_invalid_rating
-            | 'Report count of invalid exp models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('INVALID'))
-        )
-
-        report_invalid_ids_and_their_scaled_avg_rating = (
-            exp_ids_with_invalid_rating
-            | 'Save info on invalid exps' >> beam.Map(
-                lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The id of exp is %s and its scaled avg rating is %s'
-                    % (objects[0], objects[1])
-                ))
-        )
-
-        return (
-            (
-                report_number_of_exps_queried,
-                report_number_of_invalid_exps,
-                report_invalid_ids_and_their_scaled_avg_rating
             )
             | 'Combine results' >> beam.Flatten()
         )
