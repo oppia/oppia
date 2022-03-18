@@ -26,14 +26,9 @@ import sys
 
 from typing import Any, Dict
 
+# Adding third_party to path as early as possible.
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
-
-
-class FileNotExist(Exception):
-    """Error class for accessing file which does not exist."""
-
-    pass
 
 
 # Here we use Dict[str, Any] as return type because we need to parse and return
@@ -85,13 +80,14 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         str. The contents of the file.
 
     Raises:
-        FileNotExist. The specified file does not exist.
+        OSError. The specified file does not exist.
     """
     try:
         file = io.open(os.path.join(package, filepath), 'r', encoding='utf-8')
         return file.read()
     except FileNotFoundError as e:
-        raise FileNotExist('no file') from e
+        raise IOError(
+            'File does not exist: %s' % os.path.join(package, filepath)) from e
 
 
 class Constants(dict):  # type: ignore[type-arg]
