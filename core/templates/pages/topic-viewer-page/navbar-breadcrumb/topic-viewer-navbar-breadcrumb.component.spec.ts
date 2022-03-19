@@ -86,23 +86,22 @@ describe('Topic viewer navbar breadcrumb component', () => {
       });
     }));
 
-  it('should set topic name translation key and check whether ' +
-    'hacky translations are displayed or not correctly',
-    waitForAsync(() => {
-      component.ngOnInit();
-      fixture.whenStable().then(() => {
-        fixture.detectChanges();
-        expect(component.topicNameTranslationKey)
-          .toBe('I18N_TOPIC_topic1_TITLE');
+  it('should set topic name translation key and check whether hacky ' +
+    'translations are displayed or not correctly', waitForAsync(() => {
+    component.ngOnInit();
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(component.topicNameTranslationKey)
+        .toBe('I18N_TOPIC_topic1_TITLE');
 
-        spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-          .and.returnValue(true);
-        spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-          .and.returnValue(false);
-    
-        let hackyTopicNameTranslationIsDisplayed =
-          component.isHackyTopicNameTranslationDisplayed();
-        expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
-      });
-    }));
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValue(true);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValue(false);
+
+      let hackyTopicNameTranslationIsDisplayed =
+        component.isHackyTopicNameTranslationDisplayed();
+      expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
+    });
+  }));
 });
