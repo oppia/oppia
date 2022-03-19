@@ -72,14 +72,14 @@ SCHEMA_TYPE_WEAK_MULTIPLE = 'weak_multiple'
 
 SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
 SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
-ALL_SCHEMAS: Dict[str, Union[type, Tuple[type, ...]]] = {
-    SCHEMA_TYPE_BOOL: bool,
-    SCHEMA_TYPE_DICT: dict,
-    SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS: dict,
-    SCHEMA_TYPE_FLOAT: float,
+ALL_SCHEMAS: Dict[str, Tuple[type, ...]] = {
+    SCHEMA_TYPE_BOOL: (bool,),
+    SCHEMA_TYPE_DICT: (dict,),
+    SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS: (dict,),
+    SCHEMA_TYPE_FLOAT: (float,),
     SCHEMA_TYPE_HTML: (str, bytes),
-    SCHEMA_TYPE_INT: int,
-    SCHEMA_TYPE_LIST: list,
+    SCHEMA_TYPE_INT: (int,),
+    SCHEMA_TYPE_LIST: (list,),
     SCHEMA_TYPE_UNICODE: (str, bytes),
     SCHEMA_TYPE_BASESTRING: (str, bytes),
     SCHEMA_TYPE_UNICODE_OR_NONE: (str, bytes),
