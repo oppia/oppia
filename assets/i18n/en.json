@@ -1020,7 +1020,7 @@
     "I18N_TOPIC_VIEWER_LESSON": "Lesson",
     "I18N_TOPIC_VIEWER_LESSONS": "Lessons",
     "I18N_TOPIC_VIEWER_LESSONS_UNAVAILABLE": "Come back later when lessons are available for this topic.",
-    "I18N_TOPIC_VIEWER_MASTER_SKILLS": "Master Skills for <[topicName]>",
+    "I18N_TOPIC_VIEWER_MASTER_SKILLS": "Master Skills for <[topicName]> (beta)",
     "I18N_TOPIC_VIEWER_NO_QUESTION_WARNING": "There are no questions created yet for the selected subtopic(s).",
     "I18N_TOPIC_VIEWER_PRACTICE": "Practice",
     "I18N_TOPIC_VIEWER_QUESTIONS_UNAVAILABLE": "Come back later when practice questions are available for this topic.",

@@ -39,7 +39,7 @@
           <button mat-raised-button
                   [disabled]="isStartButtonDisabled() && questionsStatusCallIsComplete"
                   [ngClass]="{'practice-button-background-status-pending': !questionsStatusCallIsComplete, 'practice-button-background-status-complete': questionsStatusCallIsComplete}"
-                  (click)="openNewPracticeSession()"
+                  (click)="checkSiteLanguageBeforeBeginningPracticeSession()"
                   class="practice-session-button protractor-test-practice-start-button" >
             <span *ngIf="questionsStatusCallIsComplete"
                   class="font-heavy"

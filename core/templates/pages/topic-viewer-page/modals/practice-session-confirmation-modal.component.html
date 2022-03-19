@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <h2 class="modal-title">
+    Practice session language confirmation
+  </h2>
+</div>
+<div class="modal-body">
+  <p>The Practice feature is still in beta and is only available in English. Would you like to continue?</p>
+</div>
+<div class="modal-footer">
+  <button type="button" (click)="cancel()" class="btn btn-secondary">
+    Cancel
+  </button>
+  <button type="button" (click)="confirm()" class="btn practice-session-btn-continue">
+    Start session
+  </button>
+</div>
+
+<style>
+  .practice-session-btn-continue {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: #fff;
+  }
+</style>

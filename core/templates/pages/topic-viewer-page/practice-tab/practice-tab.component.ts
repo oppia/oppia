@@ -29,6 +29,8 @@ import { PracticeSessionPageConstants } from
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PracticeSessionConfirmationModal } from 'pages/topic-viewer-page/modals/practice-session-confirmation-modal.component';
 
 @Component({
   selector: 'practice-tab',
@@ -60,7 +62,8 @@ export class PracticeTabComponent implements OnInit {
     private questionBackendApiService: QuestionBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -126,6 +129,18 @@ export class PracticeTabComponent implements OnInit {
       this.questionsAreAvailable = false;
       this.questionsStatusCallIsComplete = true;
     }
+  }
+
+  checkSiteLanguageBeforeBeginningPracticeSession(): void {
+    if (this.i18nLanguageCodeService.isCurrentLanguageEnglish()) {
+      this.openNewPracticeSession();
+      return;
+    }
+    this.ngbModal.open(PracticeSessionConfirmationModal, {
+      backdrop: 'static'
+    }).result.then(() => {
+      this.openNewPracticeSession();
+    }, () => { });
   }
 
   openNewPracticeSession(): void {
