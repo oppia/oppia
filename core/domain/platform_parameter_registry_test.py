@@ -51,7 +51,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.parameter_registry.clear()
 
         # Parameter names that might be used in following tests.
-        parameter_names = ('parameter_a', 'parameter_b')
+        parameter_names = ['parameter_a', 'parameter_b']
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             parameter_names)
@@ -89,22 +89,22 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_A, 'test', DataTypes.BOOL)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
-        parameter.validate()
+        parameter.validate() # type: ignore[no-untyped-call]
 
     def test_create_platform_parameter_with_invalid_type_failure(self) -> None:
         class DataType(enum.Enum):
             """Enum for data type."""
 
             INVALID = 'invalid'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Unsupported data type \'invalid\''):
             registry.Registry.create_platform_parameter(
-                ParamNames.PARAMETER_A, 'test', DataType.INVALID)
+                ParamNames.PARAMETER_A, 'test', DataType.INVALID) # type: ignore[arg-type]
 
     def test_create_platform_parameter_with_the_same_name_failure(self) -> None:
         param_name = 'parameter_a'
         self._create_example_parameter_with_name(param_name)
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Parameter with name %s already exists' % param_name):
             self._create_example_parameter_with_name(param_name)
 
@@ -114,24 +114,24 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertEqual(feature.data_type, DataTypes.BOOL.value)
         self.assertTrue(feature.is_feature)
         self.assertEqual(feature.feature_stage, FeatureStages.DEV.value)
-        feature.validate()
+        feature.validate() # type: ignore[no-untyped-call]
 
     def test_default_value_of_bool_platform_parameter(self) -> None:
         parameter = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_A, 'test feature', DataTypes.BOOL)
-        parameter.validate()
+        parameter.validate() # type: ignore[no-untyped-call]
         self.assertEqual(parameter.default_value, False)
 
     def test_default_value_of_string_platform_parameter(self) -> None:
         parameter = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_A, 'test', DataTypes.STRING)
-        parameter.validate()
+        parameter.validate() # type: ignore[no-untyped-call]
         self.assertEqual(parameter.default_value, '')
 
     def test_default_value_of_number_platform_parameter(self) -> None:
         parameter = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_A, 'test', DataTypes.NUMBER)
-        parameter.validate()
+        parameter.validate() # type: ignore[no-untyped-call]
         self.assertEqual(parameter.default_value, 0)
 
     def test_get_platform_parameter(self) -> None:
@@ -142,7 +142,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
 
     def test_get_non_existing_parameter_failure(self) -> None:
-        with self.assertRaisesRegex(Exception, 'not found'):
+        with self.assertRaisesRegex(Exception, 'not found'): # type: ignore[no-untyped-call]
             registry.Registry.get_platform_parameter('parameter_a')
 
     def test_get_all_parameter_names(self) -> None:
@@ -174,7 +174,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
             [
-                parameter_domain.PlatformParameterRule.from_dict({
+                parameter_domain.PlatformParameterRule.from_dict({ # type: ignore[no-untyped-call]
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -202,7 +202,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
             [
-                parameter_domain.PlatformParameterRule.from_dict({
+                parameter_domain.PlatformParameterRule.from_dict({ # type: ignore[no-untyped-call]
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -222,16 +222,16 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self._create_example_parameter_with_name(parameter_name)
 
         param = registry.Registry.get_platform_parameter(parameter_name)
-        param.validate()
+        param.validate() # type: ignore[no-untyped-call]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected string'):
             registry.Registry.update_platform_parameter(
                 parameter_name,
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
                 [
-                    parameter_domain.PlatformParameterRule.from_dict({
+                    parameter_domain.PlatformParameterRule.from_dict({ # type: ignore[no-untyped-call]
                         'filters': [
                             {
                                 'type': 'server_mode',
@@ -249,7 +249,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Feature in dev stage cannot be enabled in test or production '
             'environments.'):
@@ -258,7 +258,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
                 [
-                    parameter_domain.PlatformParameterRule.from_dict({
+                    parameter_domain.PlatformParameterRule.from_dict({ # type: ignore[no-untyped-call]
                         'filters': [
                             {
                                 'type': 'server_mode',
@@ -276,7 +276,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Feature in dev stage cannot be enabled in test or production '
             'environments.'):
@@ -285,7 +285,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
                 [
-                    parameter_domain.PlatformParameterRule.from_dict({
+                    parameter_domain.PlatformParameterRule.from_dict({ # type: ignore[no-untyped-call]
                         'filters': [
                             {
                                 'type': 'server_mode',
@@ -303,7 +303,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.TEST)
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Feature in test stage cannot be enabled in production '
             'environment.'):
@@ -312,7 +312,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
                 [
-                    parameter_domain.PlatformParameterRule.from_dict({
+                    parameter_domain.PlatformParameterRule.from_dict({ # type: ignore[no-untyped-call]
                         'filters': [
                             {
                                 'type': 'server_mode',
@@ -336,7 +336,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
             [
-                parameter_domain.PlatformParameterRule.from_dict({
+                parameter_domain.PlatformParameterRule.from_dict({ # type: ignore[no-untyped-call]
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -355,7 +355,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertIsNotNone(parameter_updated)
 
     def test_evaluate_all_parameters(self) -> None:
-        context = parameter_domain.EvaluationContext.from_dict(
+        context = parameter_domain.EvaluationContext.from_dict( # type: ignore[no-untyped-call]
             {
                 'platform_type': 'Android',
                 'browser_type': None,

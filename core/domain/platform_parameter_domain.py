@@ -776,7 +776,7 @@ class PlatformParameter:
                             'production environment.')
 
     @classmethod
-    def from_dict(cls, param_dict) -> PlatformParameter:
+    def from_dict(cls, param_dict):
         """Returns an PlatformParameter object from a dict.
 
         Args:
