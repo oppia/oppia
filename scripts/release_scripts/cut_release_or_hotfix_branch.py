@@ -296,6 +296,8 @@ def execute_branch_cut(target_version, hotfix_number):
             branch_to_cut_from = 'release-%s-hotfix-%s' % (
                 target_version, hotfix_number - 1)
         print('Cutting a new hotfix branch: %s' % new_branch_name)
+        subprocess.check_call(['git', 'checkout', branch_to_cut_from])
+        common.update_branch_with_upstream()
         subprocess.check_call([
             'git', 'checkout', '-b', new_branch_name, branch_to_cut_from])
     else:
