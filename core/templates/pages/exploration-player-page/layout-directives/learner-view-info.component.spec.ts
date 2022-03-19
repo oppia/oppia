@@ -106,7 +106,7 @@ describe('Learner view info component', () => {
       topic_id: 'topic1',
       topic_description: 'Description',
       practice_tab_is_displayed: false
-    }
+    };
 
     spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
       readOnlyTopicObjectFactory.createFromBackendDict(
@@ -228,32 +228,31 @@ describe('Learner view info component', () => {
 
   it('should set topic name and subtopic title translation key and ' +
   'check whether hacky translations are displayed or not correctly',
-    waitForAsync(() => {
-      componentInstance.ngOnInit();
-      fixture.whenStable().then(() => {
-        fixture.detectChanges();
+  waitForAsync(() => {
+    componentInstance.ngOnInit();
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
 
-        let explorationId = 'expId';
-        spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+      let explorationId = 'expId';
+      spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
 
-        expect(componentInstance.topicNameTranslationKey)
-          .toBe('I18N_TOPIC_topic1_TITLE');
-        expect(componentInstance.explorationTitleTranslationKey)
-          .toBe('I18N_EXPLORATION_expId_TITLE');
+      expect(componentInstance.topicNameTranslationKey)
+        .toBe('I18N_TOPIC_topic1_TITLE');
+      expect(componentInstance.explorationTitleTranslationKey)
+        .toBe('I18N_EXPLORATION_expId_TITLE');
 
-        spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-          .and.returnValues(true, false);
-        spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-          .and.returnValues(false, false);
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValues(true, false);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValues(false, false);
 
-        let hackyTopicNameTranslationIsDisplayed =
-          componentInstance.isHackyTopicNameTranslationDisplayed();
-        expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
+      let hackyTopicNameTranslationIsDisplayed =
+        componentInstance.isHackyTopicNameTranslationDisplayed();
+      expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
 
-        let hackyExpTitleTranslationIsDisplayed =
-          componentInstance.isHackyExpTitleTranslationDisplayed();
-        expect(hackyExpTitleTranslationIsDisplayed).toBe(false);
-      });
-    })
-  );
+      let hackyExpTitleTranslationIsDisplayed =
+        componentInstance.isHackyExpTitleTranslationDisplayed();
+      expect(hackyExpTitleTranslationIsDisplayed).toBe(false);
+    });
+  }));
 });

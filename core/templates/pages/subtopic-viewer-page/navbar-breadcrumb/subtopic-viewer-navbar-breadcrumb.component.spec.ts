@@ -115,28 +115,27 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
 
   it('should set topic name and subtopic title translation key and ' +
   'check whether hacky translations are displayed or not correctly',
-    waitForAsync(() => {
-      component.ngOnInit();
-      fixture.whenStable().then(() => {
-        fixture.detectChanges();
-        expect(component.topicNameTranslationKey)
-          .toBe('I18N_TOPIC_topic_1_TITLE');
-        expect(component.subtopicTitleTranslationKey)
-          .toBe('I18N_SUBTOPIC_topic_1_subtopic_1_TITLE');
+  waitForAsync(() => {
+    component.ngOnInit();
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(component.topicNameTranslationKey)
+        .toBe('I18N_TOPIC_topic_1_TITLE');
+      expect(component.subtopicTitleTranslationKey)
+        .toBe('I18N_SUBTOPIC_topic_1_subtopic_1_TITLE');
 
-        spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-          .and.returnValues(true, false);
-        spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-          .and.returnValues(false, false);
-    
-        let hackyTopicNameTranslationIsDisplayed =
-          component.isHackyTopicNameTranslationDisplayed();
-        expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValues(true, false);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValues(false, false);
 
-        let hackySubtopicTitleTranslationIsDisplayed =
-          component.isHackySubtopicTitleTranslationDisplayed();
-        expect(hackySubtopicTitleTranslationIsDisplayed).toBe(false);
-      });
-    })
-  );
+      let hackyTopicNameTranslationIsDisplayed =
+        component.isHackyTopicNameTranslationDisplayed();
+      expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
+
+      let hackySubtopicTitleTranslationIsDisplayed =
+        component.isHackySubtopicTitleTranslationDisplayed();
+      expect(hackySubtopicTitleTranslationIsDisplayed).toBe(false);
+    });
+  }));
 });

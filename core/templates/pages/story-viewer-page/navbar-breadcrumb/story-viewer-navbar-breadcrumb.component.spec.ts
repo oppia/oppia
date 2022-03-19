@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for storyViewerNavbarBreadcrumb.
  */
 
-import { ComponentFixture, TestBed, async, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StoryViewerNavbarBreadcrumbComponent } from './story-viewer-navbar-breadcrumb.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -131,29 +131,28 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
 
   it('should set topic name and story title translation key and ' +
   'check whether hacky translations are displayed or not correctly',
-    waitForAsync(() => {
-      component.ngOnInit();
-      fixture.whenStable().then(() => {
-        fixture.detectChanges();
+  waitForAsync(() => {
+    component.ngOnInit();
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
 
-        expect(component.topicNameTranslationKey)
-          .toBe('I18N_TOPIC_topic_1_TITLE');
-        expect(component.storyTitleTranslationKey)
-          .toBe('I18N_STORY_id_TITLE');
+      expect(component.topicNameTranslationKey)
+        .toBe('I18N_TOPIC_topic_1_TITLE');
+      expect(component.storyTitleTranslationKey)
+        .toBe('I18N_STORY_id_TITLE');
 
-        spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-          .and.returnValues(true, false);
-        spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-          .and.returnValues(false, false);
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValues(true, false);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValues(false, false);
 
-        let hackyTopicNameTranslationIsDisplayed =
-          component.isHackyTopicNameTranslationDisplayed();
-        expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
+      let hackyTopicNameTranslationIsDisplayed =
+        component.isHackyTopicNameTranslationDisplayed();
+      expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
 
-        let hackyStoryTitleTranslationIsDisplayed =
-          component.isHackyStoryTitleTranslationDisplayed();
-        expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
-      });
-    })
-  );
+      let hackyStoryTitleTranslationIsDisplayed =
+        component.isHackyStoryTitleTranslationDisplayed();
+      expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
+    });
+  }));
 });
