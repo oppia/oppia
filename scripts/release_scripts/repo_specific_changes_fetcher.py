@@ -28,7 +28,7 @@ from core import utils
 from scripts import common
 
 GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING = 'git diff --name-only %s %s'
-GIT_CMD_SHOW_FORMAT_STRING = 'git show %s:feconf.py'
+GIT_CMD_SHOW_FORMAT_STRING = 'git show %s:core/feconf.py'
 VERSION_RE_FORMAT_STRING = r'%s\s*=\s*(\d+|\.)+'
 FECONF_SCHEMA_VERSION_CONSTANT_NAMES = [
     'CURRENT_STATE_SCHEMA_VERSION', 'CURRENT_COLLECTION_SCHEMA_VERSION']

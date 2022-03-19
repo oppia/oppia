@@ -16,25 +16,39 @@
  * @fileoverview Module for the classroom page.
  */
 
-import { NgModule } from '@angular/core';
-import { ClassroomPageComponent } from './classroom-page.component';
-import { TopicSummaryTileComponent } from
-  'components/summary-tile/topic-summary-tile.component';
-import { ClassroomPageRootComponent } from './classroom-page-root.component';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgModule } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
+
+import { BackgroundBannerComponent } from 'components/common-layout-directives/common-elements/background-banner.component';
+import { BaseModule } from 'base-components/base.module';
+import { ClassroomPageComponent } from './classroom-page.component';
+import { ClassroomPageRootComponent } from './classroom-page-root.component';
 import { ClassroomPageRoutingModule } from './classroom-page-routing.module';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
+import { TopicSummaryTileComponent } from 'components/summary-tile/topic-summary-tile.component';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 
 @NgModule({
   imports: [
+    BaseModule,
     CommonModule,
-    SharedComponentsModule,
-    ClassroomPageRoutingModule
+    ClassroomPageRoutingModule,
+    FormsModule,
+    RichTextComponentsModule,
+    TranslateModule,
   ],
   declarations: [
+    BackgroundBannerComponent,
     ClassroomPageComponent,
     ClassroomPageRootComponent,
-    TopicSummaryTileComponent
+    OppiaAngularRootComponent,
+    SearchBarComponent,
+    TopicSummaryTileComponent,
+    TruncatePipe
   ],
   entryComponents: [
     ClassroomPageComponent,
