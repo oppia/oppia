@@ -37,15 +37,15 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
         """
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             TypeError, 'not a valid translatable object class'):
-                translatable_object_registry.Registry.get_object_class(
-                    'Int') # type: ignore[arg-type]
+            translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
+                'Int')
 
     def test_fake_class_is_not_gettable(self) -> None:
         """Tests that trying to retrieve a fake class raises an error."""
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             TypeError, 'not a valid translatable object class'):
-            translatable_object_registry.Registry.get_object_class(
-                'FakeClass') # type: ignore[arg-type]
+            translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
+                'FakeClass')
 
     def test_base_objects_are_not_gettable(self) -> None:
         """Tests that the base objects exist but are not included in the
@@ -54,14 +54,14 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
         assert getattr(objects, 'BaseObject')
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             TypeError, 'not a valid translatable object class'):
-            translatable_object_registry.Registry.get_object_class(
-                'BaseObject') # type: ignore[arg-type]
+            translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
+                'BaseObject')
 
         assert getattr(objects, 'BaseTranslatableObject')
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             TypeError, 'not a valid translatable object class'):
-            translatable_object_registry.Registry.get_object_class(
-                'BaseTranslatableObject') # type: ignore[arg-type]
+            translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
+                'BaseTranslatableObject')
 
     def test_get_translatable_object_classes(self) -> None:
         """Tests the normal behavior of get_translatable_object_classes()."""

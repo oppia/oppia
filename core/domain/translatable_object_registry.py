@@ -19,7 +19,8 @@ from __future__ import annotations
 import inspect
 
 from extensions.objects.models import objects
-from typing import Dict, List, Type, Union
+
+from typing import Dict, List, Type, Union, overload
 from typing_extensions import Literal
 
 TranslatableObjectNames = Literal[
@@ -76,6 +77,34 @@ class Registry:
         """
         cls._refresh_registry()
         return sorted(cls._translatable_objects_dict.keys())
+
+    @overload
+    @classmethod
+    def get_object_class(
+        cls,
+        obj_type: Literal['TranslatableHtml']
+        ) -> Type[objects.TranslatableHtml]: ...
+
+    @overload
+    @classmethod
+    def get_object_class(
+        cls,
+        obj_type: Literal['TranslatableUnicodeString']
+        ) -> Type[objects.TranslatableUnicodeString]: ...
+
+    @overload
+    @classmethod
+    def get_object_class(
+        cls,
+        obj_type: Literal['TranslatableSetOfUnicodeString']
+        ) -> Type[objects.TranslatableSetOfUnicodeString]: ...
+
+    @overload
+    @classmethod
+    def get_object_class(
+        cls,
+        obj_type: Literal['TranslatableSetOfNormalizedString']
+        ) -> Type[objects.TranslatableSetOfNormalizedString]: ...
 
     @classmethod
     def get_object_class(
