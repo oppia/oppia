@@ -83,7 +83,6 @@ export class SideNavigationBarComponent {
               .then((classroomData) => {
                 this.classroomData = classroomData.getTopicSummaries();
                 this.classroomBackendApiService.onInitializeTranslation.emit();
-                this.siteAnalyticsService.registerClassroomPageViewed();
                 // Store hacky tranlation keys of topics.
                 for (let i = 0; i < this.classroomData.length; i++) {
                   let topicSummary = this.classroomData[i];
