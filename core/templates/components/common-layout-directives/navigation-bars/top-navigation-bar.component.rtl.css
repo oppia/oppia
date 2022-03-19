@@ -136,6 +136,8 @@
 .language-dropdown {
   max-height: 60vh;
   overflow-y: auto;
+  min-width: 90px;
+  max-width: 500px;
 }
 .learn {
   height: 66.5px;
