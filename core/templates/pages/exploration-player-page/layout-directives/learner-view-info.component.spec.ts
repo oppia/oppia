@@ -229,17 +229,20 @@ describe('Learner view info component', () => {
   it('should set topic name and subtopic title translation key and ' +
   'check whether hacky translations are displayed or not correctly',
   waitForAsync(() => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
+      .and.returnValue('topic_url_fragment');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('classroom_url_fragment');
+    spyOn(componentInstance, 'getTopicUrl').and.returnValue('topic_url');
+
     componentInstance.ngOnInit();
     fixture.whenStable().then(() => {
       fixture.detectChanges();
 
-      let explorationId = 'expId';
-      spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-
       expect(componentInstance.topicNameTranslationKey)
         .toBe('I18N_TOPIC_topic1_TITLE');
       expect(componentInstance.explorationTitleTranslationKey)
-        .toBe('I18N_EXPLORATION_expId_TITLE');
+        .toBe('I18N_EXPLORATION_test_id_TITLE');
 
       spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
         .and.returnValues(true, false);
