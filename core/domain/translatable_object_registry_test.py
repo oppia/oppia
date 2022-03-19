@@ -36,7 +36,8 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
         error.
         """
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            TypeError, 'not a valid translatable object class'):
+            TypeError, 'not a valid translatable object class'
+        ):
             translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
                 'Int')
 
