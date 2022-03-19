@@ -96,13 +96,14 @@ class CyclicStateTransitionsTracker {
     this.pathOfVisitedStates.push(destStateName);
   }
 
-  generateIssueCustomizationArgs(): CyclicStateTransitionsCustomizationArgs {
-    if (this.cycleOfVisitedStates === null) {
-      throw new Error('Cycle of visited states is null.');
+  // Return undefined if no cycle has been found.
+  generateIssueCustomizationArgs():
+    CyclicStateTransitionsCustomizationArgs | undefined {
+    if (this.cycleOfVisitedStates !== null) {
+      return {
+        state_names: {value: this.cycleOfVisitedStates}
+      };
     }
-    return {
-      state_names: {value: this.cycleOfVisitedStates}
-    };
   }
 
   private makeCycle(collisionIndex: number): string[] {
@@ -131,14 +132,14 @@ class EarlyQuitTracker {
     this.expDurationInSecs = expDurationInSecs;
   }
 
-  generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs {
-    if (this.stateName === null) {
-      throw new Error('State name is null.');
+  // Return undefined if no issue has been found.
+  generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs | undefined {
+    if (this.stateName !== null) {
+      return {
+        state_name: {value: this.stateName},
+        time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
+      };
     }
-    return {
-      state_name: {value: this.stateName},
-      time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
-    };
   }
 }
 
@@ -314,20 +315,28 @@ export class PlaythroughService {
         this.cstTracker &&
         this.cstTracker.foundAnIssue()
       ) {
-        return this.playthroughObjectFactory
-          .createNewCyclicStateTransitionsPlaythrough(
-            this.explorationId, this.explorationVersion,
-            this.cstTracker.generateIssueCustomizationArgs(),
-            this.recordedLearnerActions);
+        const cstTrackerIssueCustomizationArgs = (
+          this.cstTracker.generateIssueCustomizationArgs());
+        if (cstTrackerIssueCustomizationArgs !== undefined) {
+          return this.playthroughObjectFactory
+            .createNewCyclicStateTransitionsPlaythrough(
+              this.explorationId, this.explorationVersion,
+              cstTrackerIssueCustomizationArgs,
+              this.recordedLearnerActions);
+        }
       } else if (
         this.eqTracker &&
         this.eqTracker.foundAnIssue()
       ) {
-        return this.playthroughObjectFactory
-          .createNewEarlyQuitPlaythrough(
-            this.explorationId, this.explorationVersion,
-            this.eqTracker.generateIssueCustomizationArgs(),
-            this.recordedLearnerActions);
+        const eqTrackerIssueCustomizationArgs = (
+          this.eqTracker.generateIssueCustomizationArgs());
+        if (eqTrackerIssueCustomizationArgs !== undefined) {
+          return this.playthroughObjectFactory
+            .createNewEarlyQuitPlaythrough(
+              this.explorationId, this.explorationVersion,
+              eqTrackerIssueCustomizationArgs,
+              this.recordedLearnerActions);
+        }
       }
     }
     return null;
