@@ -93,6 +93,7 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SubtopicViewerNavbarBreadcrumbComponent);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

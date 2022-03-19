@@ -45,6 +45,7 @@ class MockUrlService {
 let component: StoryViewerNavbarBreadcrumbComponent;
 let fixture: ComponentFixture<StoryViewerNavbarBreadcrumbComponent>;
 let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
+let topicViewerBackendApiService: TopicViewerBackendApiService;
 let i18nLanguageCodeService: I18nLanguageCodeService;
 
 describe('Subtopic viewer navbar breadcrumb component', () => {
@@ -74,28 +75,6 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
             )
           }
         },
-        {
-          provide: TopicViewerBackendApiService,
-          useValue: {
-            fetchTopicDataAsync: async() => (
-              new Promise((resolve) => {
-                resolve(
-                  readOnlyTopicObjectFactory.createFromBackendDict({
-                    subtopics: [],
-                    skill_descriptions: {},
-                    uncategorized_skill_ids: [],
-                    degrees_of_mastery: {},
-                    canonical_story_dicts: [],
-                    additional_story_dicts: [],
-                    topic_name: 'Topic Name 1',
-                    topic_id: 'topic1',
-                    topic_description: 'Description',
-                    practice_tab_is_displayed: false
-                  } as ReadOnlyTopicBackendDict));
-              })
-            )
-          }
-        },
         { provide: UrlService, useClass: MockUrlService },
         UrlInterpolationService,
       ],
@@ -103,9 +82,27 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
   }));
 
   beforeEach(() => {
+    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
+    topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     fixture = TestBed.createComponent(StoryViewerNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
+      readOnlyTopicObjectFactory.createFromBackendDict({
+        subtopics: [],
+        skill_descriptions: {},
+        uncategorized_skill_ids: [],
+        degrees_of_mastery: {},
+        canonical_story_dicts: [],
+        additional_story_dicts: [],
+        topic_name: 'Topic Name 1',
+        topic_id: 'topic1',
+        topic_description: 'Description',
+        practice_tab_is_displayed: false
+      } as ReadOnlyTopicBackendDict)
+    );
   });
 
   afterEach(() => {
@@ -137,7 +134,7 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
       fixture.detectChanges();
 
       expect(component.topicNameTranslationKey)
-        .toBe('I18N_TOPIC_topic_1_TITLE');
+        .toBe('I18N_TOPIC_topic1_TITLE');
       expect(component.storyTitleTranslationKey)
         .toBe('I18N_STORY_id_TITLE');
 
