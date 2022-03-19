@@ -73,7 +73,7 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   getWarningsCount(): number {
-    return this.validationIssues.length;
+    return this.story ? this.validationIssues.length : 0;
   }
 
   getTotalWarningsCount(): number {

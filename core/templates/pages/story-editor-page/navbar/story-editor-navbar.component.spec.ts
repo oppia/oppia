@@ -349,6 +349,45 @@ describe('Story editor navbar component', () => {
     expect(component.storyIsPublished).toBe(false);
   }));
 
+  it('should not validate story if the story is undefined',
+    fakeAsync(() => {
+      let mockStoryInitializedEventEmitter = new EventEmitter();
+
+      spyOn(storyEditorStateService, 'getStory').and.returnValue(undefined);
+      spyOnProperty(storyEditorStateService, 'onStoryInitialized')
+        .and.returnValue(mockStoryInitializedEventEmitter);
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        setTimeout(opt.beforeDismiss);
+        return ({
+          result: Promise.resolve('success')
+        } as NgbModalRef);
+      });
+
+      component.ngOnInit();
+      mockStoryInitializedEventEmitter.emit();
+      fixture.detectChanges();
+
+      expect(component.storyIsPublished).toBe(undefined);
+
+      storyEditorStateService.setStory(story);
+      fixture.detectChanges();
+      // This check will make sure that story is
+      // loaded correctly before publishing it.
+      expect(storyEditorStateService.hasLoadedStory()).toBe(true);
+
+      // Publishing story will acts as pre-check here.
+      component.publishStory();
+      tick(1000);
+      fixture.detectChanges();
+      expect(component.storyIsPublished).toBe(true);
+
+      component.unpublishStory();
+      tick(1000);
+      fixture.detectChanges();
+      expect(modalSpy).toHaveBeenCalled();
+      expect(component.storyIsPublished).toBe(false);
+    }));
+
   it('should toggle warning text', () => {
     component.warningsAreShown = true;
 
@@ -402,6 +441,15 @@ describe('Story editor navbar component', () => {
     component.discardChanges();
 
     expect(clearChangesSpy).toHaveBeenCalled();
+  });
+
+  it('should throw error if the story is undefined', () => {
+    let story;
+    component.story = story;
+
+    expect(() => {
+      component.discardChanges();
+    }).toThrowError('Story cannot be undefined');
   });
 
   describe('open a confirmation modal for saving changes ', () => {
