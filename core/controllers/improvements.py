@@ -40,7 +40,7 @@ def get_task_dict_with_username_and_profile_picture(task_entry):
 
     Returns:
         TaskEntryDict. TaskEntry dict with username and profile picture
-        URL inserted.
+        URL of the task resolver inserted.
     """
 
     task_entry_dict = task_entry.to_dict()
