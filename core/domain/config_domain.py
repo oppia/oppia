@@ -459,7 +459,6 @@ BATCH_INDEX_FOR_MAILCHIMP = ConfigProperty(
     'batch_index_for_mailchimp', INT_SCHEMA,
     'Index of batch to populate mailchimp database.', 0)
 
-
 FEATURED_TRANSLATION_LANGUAGES = ConfigProperty(
     'featured_translation_languages',
     LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA,

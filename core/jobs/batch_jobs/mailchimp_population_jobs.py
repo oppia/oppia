@@ -30,37 +30,29 @@ import apache_beam as beam
 import mailchimp3
 from mailchimp3 import mailchimpclient
 import result
-from typing import Dict, Iterable, List, Tuple
+from typing import Iterable, List
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import config_models
     from mypy_imports import user_models
 
-(config_models, user_models,) = models.Registry.import_models(
+(config_models, user_models) = models.Registry.import_models(
     [models.NAMES.config, models.NAMES.user])
 
-datastore_services = models.Registry.import_datastore_services()
 
-
-class SendBatchMailchimpRequest(beam.DoFn): # type: ignore[misc]
+class SendBatchMailchimpRequest(beam.DoFn):
     """DoFn to send batch mailchimp request for 500 users at a time."""
 
-    # The tuples argument has a lot of nested list values due to the way the
-    # PCollections were grouped and combined in the beam job.
     def process(
-        self,
-        email_tuples: List[List[Tuple[List[str], List[bool]]]],
-        batch_index_dict: Dict[str, int]
-    ) -> result.Result[str]:
+        self, emails: List[str], batch_index_dict: int) -> result.Result[str]:
         """Add 500 users at a time, who have subscribed for newsletters,
             to the mailchimp db.
 
         Args:
-            email_tuples: list(Tuple). List of tuples consisting of user emails
-                and 'true' status. The second value is always true as the step
-                before this function in the beam job filtered for the same.
-            batch_index_dict: Dict. Single element dictionary of current batch
-                index.
+            emails: list(str). List of emails of users subscribed to
+                newsletters.
+            batch_index_dict: int. Current batch index.
 
         Raises:
             Exception. Exception thrown by the api is raised.
@@ -69,17 +61,16 @@ class SendBatchMailchimpRequest(beam.DoFn): # type: ignore[misc]
             JobRunResult. Job run result which is either 'Ok' or an error with
             corresponding error message.
         """
-        client = mailchimp3.MailChimp(    # pragma: no cover
+        client = mailchimp3.MailChimp(
             mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
 
-        email_tuples = email_tuples[0][
-            batch_index_dict['batch_index_for_mailchimp'] * 500:
-            (batch_index_dict['batch_index_for_mailchimp'] + 1) * 500]
+        emails = emails[
+            batch_index_dict * 500: (batch_index_dict + 1) * 500]
         mailchimp_data = []
 
-        for email, _ in email_tuples:
+        for email in emails:
             mailchimp_data.append({
-                'email_address': email[0],
+                'email_address': email,
                 'status': 'subscribed'
             })
 
@@ -93,7 +84,7 @@ class SendBatchMailchimpRequest(beam.DoFn): # type: ignore[misc]
 
         if (
                 len(response['new_members']) + len(response['updated_members'])
-                == len(email_tuples)):
+                == len(emails)):
             yield result.Ok()
         else:
             failed_emails = []
@@ -109,7 +100,7 @@ class CombineTuples(beam.CombineFn):  # type: ignore[misc]
         """Base accumulator where the tuples are added."""
         return []
 
-    def add_input(self, accumulator: List, model: Tuple) -> List:
+    def add_input(self, accumulator: List, model: str) -> List:
         """Append each tuple to the accumulator list."""
         accumulator.append(model)
         return accumulator
@@ -124,7 +115,7 @@ class CombineTuples(beam.CombineFn):  # type: ignore[misc]
         self, accumulator: List
     ) -> List:
         """Output is the accumulator itself."""
-        return accumulator
+        return accumulator[0]
 
 
 class MailchimpPopulateJob(base_jobs.JobBase):
@@ -139,44 +130,40 @@ class MailchimpPopulateJob(base_jobs.JobBase):
                 config_models.ConfigPropertyModel.get_all())
             | 'Get the batch_index_for_mailchimp property value' >> beam.Filter(
                 lambda model: model.id == 'batch_index_for_mailchimp')
-            | 'Convert model into a dict' >> beam.Map(
-                lambda model: (model.id, model.value)))
-        batch_index_dict = beam.pvalue.AsDict(config_property)
+            | 'Get value' >> beam.Map(lambda model: model.value)
+        )
+
+        batch_index_dict = beam.pvalue.AsSingleton(config_property)
 
         # PCollection with all user ids that have opted in for email
         # newsletters.
         relevant_user_ids = (
             self.pipeline
             | 'Get all UserEmailPreferencesModel' >> ndb_io.GetModels(
-                user_models.UserEmailPreferencesModel.get_all().order(
-                    'created_on'))
-            | 'Filter for site_updates == true' >> beam.Filter(
-                lambda model: model.site_updates is True)
+                user_models.UserEmailPreferencesModel.get_all().filter(
+                    user_models.UserEmailPreferencesModel.site_updates == True # pylint: disable=singleton-comparison
+                ).order('created_on'))
             | 'Extract user id as tuple' >> beam.Map(
-                lambda preferences_model: (preferences_model.id, True))
+                lambda preferences_model: preferences_model.id)
         )
 
-        # PCollection of all user ids in oppia mapped to their emails.
+        valid_user_ids = beam.pvalue.AsIter(relevant_user_ids)
+
+        # PCollection of all user emails opted in for newsletters.
         relevant_user_emails = (
             self.pipeline
             | 'Get all user settings models' >> ndb_io.GetModels(
-                user_models.UserSettingsModel.get_all())
-            | 'Extract user email' >> beam.Map(
-                lambda settings_model: (settings_model.id, settings_model.email)
-            )
+                user_models.UserSettingsModel.get_all().order(
+                    'created_on'))
+            | 'Filter user models' >> (
+                beam.Filter(
+                    lambda model, ids: model.id in ids, ids=valid_user_ids))
+            | 'Get email' >> (beam.Map(lambda model: model.email))
         )
 
-        # Merge both PCollections to map the user email to the user ids along
-        # with a bool 'True' if they have opted in for newsletter.
         mailchimp_results = (
-            (relevant_user_emails, relevant_user_ids)
-            | 'Group by user_id' >> beam.CoGroupByKey()
-            | 'Drop user id' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Filter for valid user emails' >> beam.Filter(
-                lambda email_status: (
-                    len(email_status[1]) == 1 and email_status[1][0] is True)
-            )
-            | 'Combine all valid tuples into a single list' >>
+            relevant_user_emails
+            | 'Combine all valid emails into a single list' >>
                 beam.CombineGlobally(CombineTuples())
             | 'Send mailchimp request for current batch' >> beam.ParDo(
                 SendBatchMailchimpRequest(), batch_index_dict=batch_index_dict)
