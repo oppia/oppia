@@ -1023,6 +1023,8 @@
     "I18N_TOPIC_VIEWER_MASTER_SKILLS": "Master Skills for <[topicName]> (beta)",
     "I18N_TOPIC_VIEWER_NO_QUESTION_WARNING": "There are no questions created yet for the selected subtopic(s).",
     "I18N_TOPIC_VIEWER_PRACTICE": "Practice",
+    "I18N_TOPIC_VIEWER_PRACTICE_SESSION_CONFIRMATION_MODAL_TITLE": "Practice session language confirmation",
+    "I18N_TOPIC_VIEWER_PRACTICE_SESSION_CONFIRMATION_MODAL_MESSAGE": "The Practice feature is still in beta and is only available in English. Would you like to continue?",
     "I18N_TOPIC_VIEWER_QUESTIONS_UNAVAILABLE": "Come back later when practice questions are available for this topic.",
     "I18N_TOPIC_VIEWER_REVISION": "Revision",
     "I18N_TOPIC_VIEWER_SELECT_SKILLS": "Select the skills from the <[topicName]> lessons you would like to practice.",
