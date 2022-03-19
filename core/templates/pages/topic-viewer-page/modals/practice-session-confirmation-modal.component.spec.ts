@@ -19,6 +19,7 @@
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { PracticeSessionConfirmationModal } from './practice-session-confirmation-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Practice session confirmation modal component', function() {
   let component: PracticeSessionConfirmationModal;
@@ -26,7 +27,7 @@ describe('Practice session confirmation modal component', function() {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [PracticeSessionConfirmationModal],
+      declarations: [PracticeSessionConfirmationModal, MockTranslatePipe],
       providers: [NgbActiveModal]
     }).compileComponents();
   }));
