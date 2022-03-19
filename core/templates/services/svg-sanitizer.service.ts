@@ -162,7 +162,10 @@ export class SvgSanitizerService {
   getSvgFromDataUri(dataURI: string): Document {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
-    let svgString = atob(dataURI.split(',')[1]);
+    let svgString = decodeURIComponent(
+      atob(dataURI.split(',')[1]).split('').map(char => {
+        return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
     let domParser = new DOMParser();
     return domParser.parseFromString(svgString, 'image/svg+xml');
   }
