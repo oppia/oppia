@@ -209,7 +209,6 @@ describe('Side Navigation Bar Component', () => {
       spyOn(
         classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.resolveTo(classroomData);
-      spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
 
       componentInstance.ngOnInit();
 
@@ -218,8 +217,6 @@ describe('Side Navigation Bar Component', () => {
       expect(componentInstance.classroomData).toEqual(array);
       expect(componentInstance.topicTitlesTranslationKeys).toEqual(
         topicTitlesTranslationKeys);
-      expect(siteAnalyticsService.registerClassroomPageViewed)
-        .toHaveBeenCalled();
     }));
 
   it('should check whether hacky translations are displayed or not', () => {
