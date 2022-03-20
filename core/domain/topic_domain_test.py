@@ -48,8 +48,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'dummy-subtopic-url')]
         self.topic.next_subtopic_id = 2
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
 
         self.user_a = user_services.get_user_actions_info(self.user_id_a)  # type: ignore[no-untyped-call]
         self.user_b = user_services.get_user_actions_info(self.user_id_b)  # type: ignore[no-untyped-call]
@@ -1339,8 +1339,8 @@ class TopicRightsTests(test_utils.GenericTestBase):
         super(TopicRightsTests, self).setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
 
         self.topic_summary = topic_domain.TopicRights(
             'topic_id', [self.user_id_a], False)

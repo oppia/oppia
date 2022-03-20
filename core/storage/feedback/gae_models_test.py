@@ -274,7 +274,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 
         self.signup('export_author_1@example.com', 'exportAuthor1')
         test_export_author_id = (
-            self.get_user_id_from_email('export_author_1@example.com')) # type: ignore[no-untyped-call]
+            self.get_user_id_from_email('export_author_1@example.com'))
 
         thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
             test_export_thread_type,

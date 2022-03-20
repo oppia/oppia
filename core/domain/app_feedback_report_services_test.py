@@ -152,7 +152,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(AppFeedbackReportServicesUnitTests, self).setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL) # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
         self.android_report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
@@ -1321,7 +1321,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             scrubbed_android_model, self.user_id)
 
         self.signup('user2@test.com', 'user2')
-        different_user = self.get_user_id_from_email('user2@test.com') # type: ignore[no-untyped-call]
+        different_user = self.get_user_id_from_email('user2@test.com')
         to_scrub_report_id = (
             self._add_expiring_android_report_with_no_scrubber())
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(

@@ -33,7 +33,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(BlogPostDomainUnitTests, self).setUp()
         self.signup('a@example.com', 'A')
-        self.user_id_a = self.get_user_id_from_email('a@example.com') # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
 
         self.blog_post = blog_services.create_new_blog_post(self.user_id_a)  # type: ignore[no-untyped-call]
 
@@ -323,8 +323,8 @@ class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com') # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com') # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
 
         blog_post = blog_services.create_new_blog_post(self.user_id_a) # type: ignore[no-untyped-call]
         self.blog_post_id = blog_post.id
@@ -350,7 +350,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(BlogPostSummaryUnitTests, self).setUp()
         self.signup('a@example.com', 'A')
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
         blog_post = blog_services.create_new_blog_post(self.user_id_a) # type: ignore[no-untyped-call]
         self.blog_post_id = blog_post.id
         self.blog_post_summary = (

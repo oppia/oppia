@@ -95,7 +95,7 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(UserAuthDetailsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_auth_details_model = (
             auth_models.UserAuthDetailsModel.get(self.owner_id))
         self.user_auth_details = auth_services.get_user_auth_details_from_model( # type: ignore[no-untyped-call]

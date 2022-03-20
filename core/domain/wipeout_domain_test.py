@@ -30,7 +30,7 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         super(PendingDeletionRequestUnitTests, self).setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.user_id_a = self.get_user_id_from_email('a@example.com') # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
 
     def test_create_default_pending_deletion_request(self) -> None:
         """Tests the create_default_topic() function."""
