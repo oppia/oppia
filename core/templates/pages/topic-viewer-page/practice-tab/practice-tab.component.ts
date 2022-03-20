@@ -56,6 +56,8 @@ export class PracticeTabComponent implements OnInit {
   clientWidth!: number;
   subtopicMasteryArray: number[] = [];
   questionsStatusCallIsComplete: boolean = true;
+  betaTopics = ['place-values'];
+  topicIsInBeta!: boolean;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -92,6 +94,9 @@ export class PracticeTabComponent implements OnInit {
         this.urlService.getTopicUrlFragmentFromLearnerUrl());
       this.classroomUrlFragment = (
         this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    }
+    if (this.betaTopics.includes(this.topicUrlFragment)) {
+      this.topicIsInBeta = true;
     }
   }
 
@@ -132,7 +137,8 @@ export class PracticeTabComponent implements OnInit {
   }
 
   checkSiteLanguageBeforeBeginningPracticeSession(): void {
-    if (this.i18nLanguageCodeService.isCurrentLanguageEnglish()) {
+    if (this.i18nLanguageCodeService.isCurrentLanguageEnglish() ||
+      !this.topicIsInBeta) {
       this.openNewPracticeSession();
       return;
     }

@@ -8,6 +8,7 @@
       <h2 class="tab-title"
           *ngIf="displayArea === 'topicViewer'">
         <span [innerHTML]="'I18N_TOPIC_VIEWER_MASTER_SKILLS' | translate: {topicName: topicName}"></span>
+        <span *ngIf="topicIsInBeta"> (beta)</span>
       </h2>
       <div class="practice-content"
            *ngIf="displayArea === 'topicViewer'">

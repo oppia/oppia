@@ -67,6 +67,7 @@ describe('Practice tab component', function() {
   let questionBackendApiService: MockQuestionBackendApiService;
   let ngbModal: NgbModal;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let urlService: UrlService;
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
@@ -121,9 +122,11 @@ describe('Practice tab component', function() {
       1: 0,
       2: 1
     };
+    component.topicIsInBeta = false;
     fixture.detectChanges();
     ngbModal = TestBed.inject(NgbModal);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    urlService = TestBed.inject(UrlService);
   });
 
   it('should initialize controller properties after its initilization',
@@ -132,7 +135,17 @@ describe('Practice tab component', function() {
       expect(component.selectedSubtopics).toEqual([]);
       expect(component.availableSubtopics.length).toBe(1);
       expect(component.selectedSubtopicIndices).toEqual([false]);
+      expect(component.topicIsInBeta).toBe(false);
     });
+
+  it('should determine if topic is in beta', () => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
+      .and.returnValue('place-values');
+    component.ngOnInit();
+
+    expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(component.topicIsInBeta).toBe(true);
+  });
 
   it('should have start button enabled when a subtopic is selected',
     function() {
@@ -175,10 +188,30 @@ describe('Practice tab component', function() {
     }));
 
   it('should not ask learner for confirmation before starting a new practice ' +
+    'session if the topic is out of beta', fakeAsync(() => {
+    let isLanguageEnglishSpy = spyOn(
+      i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValue(false);
+    component.topicIsInBeta = false;
+    let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (modal, modalOptions) => {
+        return ({
+          result: Promise.resolve()
+        } as NgbModalRef);
+      });
+    component.checkSiteLanguageBeforeBeginningPracticeSession();
+    tick();
+
+    expect(isLanguageEnglishSpy).toHaveBeenCalled();
+    expect(ngbModalSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should not ask learner for confirmation before starting a new practice ' +
     'session if site language is set to English', fakeAsync(() => {
     let isLanguageEnglishSpy = spyOn(
       i18nLanguageCodeService, 'isCurrentLanguageEnglish')
       .and.returnValue(true);
+    component.topicIsInBeta = true;
     let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
       (modal, modalOptions) => {
         return ({
@@ -193,10 +226,12 @@ describe('Practice tab component', function() {
   }));
 
   it('should ask learner for confirmation before starting a new practice ' +
-    'session if site language is not set to English', fakeAsync(() => {
+    'session if site language is not set to English and topic is in beta',
+  fakeAsync(() => {
     let isLanguageEnglishSpy = spyOn(
       i18nLanguageCodeService, 'isCurrentLanguageEnglish')
       .and.returnValue(false);
+    component.topicIsInBeta = true;
     let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
       (modal, modalOptions) => {
         return ({
@@ -215,6 +250,7 @@ describe('Practice tab component', function() {
     let isLanguageEnglishSpy = spyOn(
       i18nLanguageCodeService, 'isCurrentLanguageEnglish')
       .and.returnValue(false);
+    component.topicIsInBeta = true;
     let newPracticeSessionSpy = spyOn(component, 'openNewPracticeSession');
     let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
       (modal, modalOptions) => {
@@ -235,6 +271,7 @@ describe('Practice tab component', function() {
     let isLanguageEnglishSpy = spyOn(
       i18nLanguageCodeService, 'isCurrentLanguageEnglish')
       .and.returnValue(false);
+    component.topicIsInBeta = true;
     let newPracticeSessionSpy = spyOn(component, 'openNewPracticeSession');
     let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
       (modal, modalOptions) => {
