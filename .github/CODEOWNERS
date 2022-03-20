@@ -50,7 +50,6 @@
 /core/templates/components/code-mirror/ @srijanreddy98 @ashutoshc8101
 /core/templates/components/filter-fields/ @srijanreddy98 @ashutoshc8101
 /core/templates/components/oppia-angular-root.component.* @srijanreddy98 @ashutoshc8101
-/core/templates/components/smooth-height/smooth-height-animator.component.* @srijanreddy98 @ashutoshc8101
 /core/templates/modules/ @srijanreddy98 @ashutoshc8101
 /core/templates/pages/common-imports.ts @srijanreddy98 @ashutoshc8101
 /core/templates/pages/mock-ajs.ts @srijanreddy98 @ashutoshc8101
@@ -220,6 +219,7 @@
 /core/templates/components/save-pending-changes/ @kevintab95
 /core/templates/components/version-diff-visualization/ @aks681
 /core/templates/domain/editor/ @kevintab95
+/core/templates/domain/entity_editor_browser_tabs_info/ @kevintab95
 /core/templates/domain/exploration/ @kevintab95
 /core/templates/domain/recommendations/ @kevintab95
 /core/templates/domain/state/ @kevintab95
@@ -311,6 +311,7 @@
 /core/templates/services/contextual/window-ref.service*.ts @srijanreddy98
 /core/templates/services/internet-connectivity.service*.ts @srijanreddy98
 /core/templates/services/server-connection-backend-api.service*.ts @srijanreddy98
+/core/templates/services/number-conversion.service*.ts @srijanreddy98
 
 
 # Global stylesheet.

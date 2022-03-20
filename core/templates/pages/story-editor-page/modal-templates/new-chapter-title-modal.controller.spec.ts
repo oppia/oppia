@@ -23,8 +23,6 @@ import { AlertsService } from 'services/alerts.service';
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { StoryContentsObjectFactory } from
-  'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { ExplorationIdValidationService } from
   'domain/exploration/exploration-id-validation.service';
@@ -67,7 +65,7 @@ describe('Create New Chapter Modal Controller', function() {
         EditableStoryBackendApiService));
     $provide.value(
       'StoryObjectFactory',
-      new StoryObjectFactory(new StoryContentsObjectFactory()));
+      new StoryObjectFactory());
     $provide.value('AlertsService', new AlertsService(new LoggerService()));
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
