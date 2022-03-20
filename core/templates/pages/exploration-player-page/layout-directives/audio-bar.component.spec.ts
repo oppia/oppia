@@ -500,6 +500,43 @@ describe('Audio Bar Component', () => {
       expect(playCacheAudioSpy).toHaveBeenCalled();
       expect(playSpy).toHaveBeenCalled();
     }));
+
+    it('should restart audio track if audio is not' +
+      'stored in cache', fakeAsync(() => {
+      let audioTranslation = {
+        en: Voiceover.createFromBackendDict({
+          filename: 'audio-en.mp3',
+          file_size_bytes: 0.5,
+          needs_update: false,
+          duration_secs: 0.5
+        }),
+        es: Voiceover.createFromBackendDict({
+          filename: 'audio-es.mp3',
+          file_size_bytes: 0.5,
+          needs_update: false,
+          duration_secs: 0.5
+        })
+      };
+      spyOn(audioTranslationManagerService, 'getCurrentAudioTranslations')
+        .and.returnValue(audioTranslation);
+      // Setting selected language to be 'en'.
+      spyOn(audioTranslationLanguageService, 'getCurrentAudioLanguageCode')
+        .and.returnValue('en');
+      spyOn(audioPreloaderService, 'setMostRecentlyRequestedAudioFilename')
+        .and.callThrough();
+      // Setting cached value to be true.
+      spyOn(assetsBackendApiService, 'isCached').and.returnValue(false);
+      spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+        'Start');
+      let restartAudioSpy = spyOn(
+        audioPreloaderService, 'restartAudioPreloader').and.returnValue();
+
+      component.loadAndPlayAudioTranslation();
+      tick();
+      flush();
+      discardPeriodicTasks();
+      expect(restartAudioSpy).toHaveBeenCalled();
+    }));
   });
 
   it('should play audio from cache after finishing loading', () => {
@@ -523,6 +560,7 @@ describe('Audio Bar Component', () => {
         displayed: 'spanish'
       }
     ];
+    component.selectedLanguage.value = 'en';
     let audioTranslation = {
       en: Voiceover.createFromBackendDict({
         filename: 'audio-en.mp3',
