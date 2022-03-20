@@ -139,6 +139,10 @@
   min-width: 90px;
   max-width: 500px;
 }
+.language-dropdown.dropdown-menu.oppia-navbar-dropdown {
+  right: 0px !important;
+  left: 5px !important;
+}
 .learn {
   height: 66.5px;
 }

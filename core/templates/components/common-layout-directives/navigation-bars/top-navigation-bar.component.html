@@ -332,7 +332,6 @@
       <ul ngbDropdownMenu
           class="dropdown-menu oppia-navbar-dropdown language-dropdown"
           [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
-          style="left: 5px !important;right:  0 !important;"
           (mouseover)="openSubmenu($event, 'languageMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)">
         <li class="nav-item" [ngClass]="'protractor-test-i18n-language-' + language.id" *ngFor="let language of supportedSiteLanguages">
