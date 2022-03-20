@@ -135,13 +135,13 @@
 }
 .language-dropdown {
   max-height: 60vh;
-  overflow-y: auto;
-  min-width: 90px;
   max-width: 500px;
+  min-width: 90px;
+  overflow-y: auto;
 }
 .language-dropdown.dropdown-menu.oppia-navbar-dropdown {
-  right: 0px !important;
   left: 5px !important;
+  right: 0 !important;
 }
 .learn {
   height: 66.5px;
