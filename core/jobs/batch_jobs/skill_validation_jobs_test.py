@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core.constants import constants
 from core.domain import skill_domain
 from core.jobs import job_test_utils
@@ -50,17 +49,14 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
             )
         ]
 
-        explanations = []
-        for i in range(0, 15):
-            explanations.append('<p> Explanation </p>')
         self.invalid_rubrics_2 = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[1],
-                explanations
+                ['<p> Explanation </p>'] * 15
             )
         ]
 
-        # Skill model with valid rubrics
+        # Skill model with valid rubrics.
         self.skill_model_1 = skill_models.SkillModel(
             id='skill_id_1',
             description='description 1',

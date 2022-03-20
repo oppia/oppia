@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core.constants import constants
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -29,7 +28,6 @@ import apache_beam as beam
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import story_models
     from mypy_imports import skill_models
 
 (story_models, skill_models, ) = models.Registry.import_models([
@@ -59,7 +57,7 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
 
     def filter_skills_havin_rubrics_with_invalid_explanations(self, skill):
         """Returns True if skill has rubrics with invalid explanation.
-        
+
         Returns:
             bool. Returns True if skill has rubrics with invalid explanation.
         """
@@ -71,7 +69,7 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of skills with invalid rubric explanations.
-        
+
         Returns:
             PCollection. Returns a PCollection of skills with invalid
             rubric explanations.
