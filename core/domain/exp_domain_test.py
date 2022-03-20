@@ -2155,7 +2155,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rows': {'value': 1}
         }
-        state.update_next_content_id_index(3)
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('TextInput')
@@ -4169,23 +4168,24 @@ category: Category
 correctness_feedback_enabled: false
 init_state_name: (untitled state)
 language_code: en
+next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 54
+schema_version: 55
 states:
   (untitled state):
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: ''
     interaction:
       answer_groups:
       - outcome:
           dest: END
           feedback:
-            content_id: feedback_1
+            content_id: feedback_2
             html: <p>Correct!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -4215,7 +4215,7 @@ states:
       default_outcome:
         dest: (untitled state)
         feedback:
-          content_id: default_outcome
+          content_id: feedback_1
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -4231,7 +4231,6 @@ states:
           content_id: solution
           html: This is <i>solution</i> for state1
     linked_skill_id: null
-    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -4242,19 +4241,11 @@ states:
         feedback_1: {}
         solution: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_2: {}
-        ca_choices_3: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        solution: {}
   END:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_6
       html: <p>Congratulations, you have finished!</p>
     interaction:
       answer_groups: []
@@ -4267,16 +4258,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 49
+states_schema_version: 50
 tags: []
 title: Title
 """)
@@ -4422,23 +4409,24 @@ category: Category
 correctness_feedback_enabled: false
 init_state_name: (untitled state)
 language_code: en
+next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 54
+schema_version: 55
 states:
   (untitled state):
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: ''
     interaction:
       answer_groups:
       - outcome:
           dest: END
           feedback:
-            content_id: feedback_1
+            content_id: feedback_2
             html: <p>Correct!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -4477,7 +4465,7 @@ states:
       default_outcome:
         dest: (untitled state)
         feedback:
-          content_id: default_outcome
+          content_id: feedback_1
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -4494,7 +4482,6 @@ states:
           content_id: solution
           html: This is <i>solution</i> for state1
     linked_skill_id: null
-    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -4505,19 +4492,11 @@ states:
         feedback_1: {}
         solution: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_2: {}
-        ca_choices_3: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        solution: {}
   END:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_6
       html: <p>Congratulations, you have finished!</p>
     interaction:
       answer_groups: []
@@ -4530,203 +4509,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 49
-tags: []
-title: Title
-""")
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content)
-        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
-
-    def test_load_from_v46_with_invalid_unicode_written_translations(self):
-        """Tests the migration of unicode written translations rule inputs."""
-        sample_yaml_content = (
-            """author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 46
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        buttonText:
-          value:
-            content_id: ca_buttonText
-            unicode_str: Continue
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: Continue
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 4
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_buttonText: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        solution: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_buttonText:
-          bn:
-            data_format: html
-            needs_update: false
-            translation: <p>hello</p>
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        solution: {}
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 0
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 41
-tags: []
-title: Title
-""")
-
-        latest_sample_yaml_content = (
-            """author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 54
-states:
-  (untitled state):
-    card_is_checkpoint: true
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        buttonText:
-          value:
-            content_id: ca_buttonText
-            unicode_str: Continue
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: Continue
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 4
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_buttonText: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        solution: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_buttonText:
-          bn:
-            data_format: unicode
-            needs_update: false
-            translation: hello
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        solution: {}
-  END:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 0
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 49
+states_schema_version: 50
 tags: []
 title: Title
 """)
@@ -4750,7 +4538,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             """Gets the default state dict of the exploration."""
             return {
                 'linked_skill_id': None,
-                'next_content_id_index': 0,
                 'classifier_model_id': None,
                 'content': {
                     'content_id': 'content',
@@ -4764,12 +4551,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 },
                 'solicit_answer_details': False,
                 'card_is_checkpoint': is_init_state,
-                'written_translations': {
-                    'translations_mapping': {
-                        'content': {},
-                        'default_outcome': {}
-                    }
-                },
                 'interaction': {
                     'answer_groups': [],
                     'confirmed_unclassified_answers': [],
@@ -4807,6 +4588,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'param_specs': {},
             'language_code': 'en',
             'correctness_feedback_enabled': True,
+            'next_content_id_index': 0
         })
 
 
@@ -5099,12 +4881,6 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'new_value': 2,
-            'old_value': 1
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
             'property_name': 'widget_id',
             'new_value': 'Continue',
             'old_value': None
@@ -5267,12 +5043,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
-            'new_value': 2,
-            'state_name': 'Introduction',
-            'old_value': 1,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index'
-        }), exp_domain.ExplorationChange({
             'new_value': [{
                 'hint_content': {
                     'content_id': 'hint_1',
@@ -5334,12 +5104,6 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args'
-        }), exp_domain.ExplorationChange({
-            'new_value': 2,
-            'state_name': 'Introduction',
-            'old_value': 1,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index'
         }), exp_domain.ExplorationChange({
             'new_value': 'Continue',
             'state_name': 'Introduction',
@@ -5421,12 +5185,6 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'state_name': 'End',
             'cmd': 'edit_state_property',
-            'new_value': 1,
-            'old_value': 0,
-            'property_name': 'next_content_id_index'
-        }), exp_domain.ExplorationChange({
-            'state_name': 'End',
-            'cmd': 'edit_state_property',
             'new_value': [{
                 'outcome': {
                     'refresher_exploration_id': None,
@@ -5491,12 +5249,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args'
         }), exp_domain.ExplorationChange({
-            'new_value': 2,
-            'state_name': 'Introduction',
-            'old_value': 1,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index'
-        }), exp_domain.ExplorationChange({
             'new_value': 'Continue',
             'state_name': 'Introduction',
             'old_value': None,
@@ -5545,12 +5297,6 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args'
-        }), exp_domain.ExplorationChange({
-            'new_value': 2,
-            'state_name': 'Introduction',
-            'old_value': 1,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index'
         }), exp_domain.ExplorationChange({
             'new_value': 'Continue',
             'state_name': 'Introduction',
@@ -5608,12 +5354,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
-            'new_value': 2,
-            'state_name': 'Introduction',
-            'old_value': 1,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index'
-        }), exp_domain.ExplorationChange({
             'new_value': [{
                 'hint_content': {
                     'content_id': 'hint_1',
@@ -5634,12 +5374,6 @@ class ExplorationChangesMergeabilityUnitTests(
             }],
             'cmd': 'edit_state_property',
             'property_name': 'hints'
-        }), exp_domain.ExplorationChange({
-            'new_value': 3,
-            'state_name': 'Introduction',
-            'old_value': 2,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index'
         }), exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
@@ -5731,12 +5465,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
-            'old_value': 1,
-            'property_name': 'next_content_id_index',
-            'new_value': 3,
-            'cmd': 'edit_state_property'
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
             'old_value': None,
             'property_name': 'widget_id',
             'new_value': 'NumericInput',
@@ -5758,12 +5486,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'value': False
                 }
             },
-            'cmd': 'edit_state_property'
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
-            'old_value': 3,
-            'property_name': 'next_content_id_index',
-            'new_value': 4,
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
@@ -5839,12 +5561,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'new_value': {}
         }), exp_domain.ExplorationChange({
-            'old_value': 0,
-            'state_name': 'End',
-            'property_name': 'next_content_id_index',
-            'cmd': 'edit_state_property',
-            'new_value': 4
-        }), exp_domain.ExplorationChange({
             'old_value': None,
             'state_name': 'End',
             'property_name': 'widget_id',
@@ -5894,12 +5610,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [],
                 'labelled_as_correct': False
             }
-        }), exp_domain.ExplorationChange({
-            'old_value': 4,
-            'state_name': 'End',
-            'property_name': 'next_content_id_index',
-            'cmd': 'edit_state_property',
-            'new_value': 5
         }), exp_domain.ExplorationChange({
             'old_value': [],
             'state_name': 'End',
@@ -6021,12 +5731,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
-            'old_value': 1,
-            'property_name': 'next_content_id_index',
-            'new_value': 3,
-            'cmd': 'edit_state_property'
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
             'old_value': None,
             'property_name': 'widget_id',
             'new_value': 'NumericInput',
@@ -6048,12 +5752,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'value': False
                 }
             },
-            'cmd': 'edit_state_property'
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
-            'old_value': 3,
-            'property_name': 'next_content_id_index',
-            'new_value': 4,
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
@@ -6144,12 +5842,6 @@ class ExplorationChangesMergeabilityUnitTests(
         # Adding answer_groups and solutions to the existing state.
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 1,
-            'state_name': 'Introduction',
-            'new_value': 3
-        }), exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
             'old_value': [],
             'state_name': 'Introduction',
@@ -6188,12 +5880,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'html': '<p>Hint 1.</p>'
                 }
             }]
-        }), exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 3,
-            'state_name': 'Introduction',
-            'new_value': 4
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'solution',
@@ -6250,12 +5936,6 @@ class ExplorationChangesMergeabilityUnitTests(
             }],
             'cmd': 'edit_state_property',
             'property_name': 'hints'
-        }), exp_domain.ExplorationChange({
-            'new_value': 5,
-            'state_name': 'Introduction',
-            'old_value': 4,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index'
         }), exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
@@ -6385,12 +6065,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'html': '<p>Explanation.</p>'
                 }
             }
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Introduction',
-            'new_value': 6,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 4
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': [{
@@ -6535,12 +6209,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'new_value': {}
         }), exp_domain.ExplorationChange({
-            'old_value': 0,
-            'state_name': 'End',
-            'property_name': 'next_content_id_index',
-            'cmd': 'edit_state_property',
-            'new_value': 4
-        }), exp_domain.ExplorationChange({
             'old_value': None,
             'state_name': 'End',
             'property_name': 'widget_id',
@@ -6591,12 +6259,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 'labelled_as_correct': False
             }
         }), exp_domain.ExplorationChange({
-            'old_value': 4,
-            'state_name': 'End',
-            'property_name': 'next_content_id_index',
-            'cmd': 'edit_state_property',
-            'new_value': 5
-        }), exp_domain.ExplorationChange({
             'old_value': [],
             'state_name': 'End',
             'property_name': 'answer_groups',
@@ -6637,12 +6299,6 @@ class ExplorationChangesMergeabilityUnitTests(
         # Adding answer_groups and solutions to the existing state.
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 1,
-            'state_name': 'Introduction',
-            'new_value': 3
-        }), exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
             'old_value': [],
             'state_name': 'Introduction',
@@ -6681,12 +6337,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'html': '<p>Hint 1.</p>'
                 }
             }]
-        }), exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 3,
-            'state_name': 'Introduction',
-            'new_value': 4
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'solution',
@@ -6783,12 +6433,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'html': '<p>Explanation.</p>'
                 }
             }
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Introduction',
-            'new_value': 6,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 4
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': [{
@@ -6960,12 +6604,6 @@ class ExplorationChangesMergeabilityUnitTests(
         # Adding new answer_groups and solutions.
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 1,
-            'state_name': 'Introduction',
-            'new_value': 3
-        }), exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
             'old_value': [],
             'state_name': 'Introduction',
@@ -7007,12 +6645,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'html': '<p>Hint 1.</p>'
                 }
             }]
-        }), exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 3,
-            'state_name': 'Introduction',
-            'new_value': 4
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'solution',
@@ -7071,12 +6703,6 @@ class ExplorationChangesMergeabilityUnitTests(
             }],
             'cmd': 'edit_state_property',
             'property_name': 'hints'
-        }), exp_domain.ExplorationChange({
-            'new_value': 5,
-            'state_name': 'Introduction',
-            'old_value': 4,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index'
         }), exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
@@ -7173,12 +6799,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'html': '<p>Explanation.</p>'
                 }
             }
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Introduction',
-            'new_value': 6,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 4
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': [{
@@ -7345,12 +6965,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'default_outcome',
             'state_name': 'End'
         }), exp_domain.ExplorationChange({
-            'old_value': 0,
-            'new_value': 1,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'state_name': 'End'
-        }), exp_domain.ExplorationChange({
             'old_value': [],
             'new_value': [{
                 'outcome': {
@@ -7386,12 +7000,6 @@ class ExplorationChangesMergeabilityUnitTests(
             }],
             'cmd': 'edit_state_property',
             'property_name': 'hints',
-            'state_name': 'End'
-        }), exp_domain.ExplorationChange({
-            'old_value': 1,
-            'new_value': 2,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
             'state_name': 'End'
         }), exp_domain.ExplorationChange({
             'old_value': None,
@@ -7441,12 +7049,6 @@ class ExplorationChangesMergeabilityUnitTests(
         # Adding new answer_groups and solutions.
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 1,
-            'state_name': 'Introduction',
-            'new_value': 3
-        }), exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
             'old_value': [],
             'state_name': 'Introduction',
@@ -7488,12 +7090,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'html': '<p>Hint 1.</p>'
                 }
             }]
-        }), exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 3,
-            'state_name': 'Introduction',
-            'new_value': 4
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'solution',
@@ -7587,12 +7183,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'html': '<p>Explanation.</p>'
                 }
             }
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Introduction',
-            'new_value': 6,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 4
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': [{
@@ -7740,12 +7330,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': []
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
-            'new_value': 2,
-            'property_name': 'next_content_id_index',
-            'cmd': 'edit_state_property',
-            'old_value': 1
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Introduction',
             'new_value': {
                 'answer_is_exclusive': False,
                 'explanation': {
@@ -7856,12 +7440,6 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
-            'property_name': 'next_content_id_index',
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'old_value': 2,
-            'new_value': 3
-        }), exp_domain.ExplorationChange({
             'property_name': 'answer_groups',
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
@@ -7967,12 +7545,6 @@ class ExplorationChangesMergeabilityUnitTests(
             }],
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
-            'old_value': 2,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'new_value': 3,
-            'state_name': 'Introduction'
-        }), exp_domain.ExplorationChange({
             'old_value': [{
                 'hint_content': {
                     'html': '<p>Hint 1.</p>',
@@ -8051,12 +7623,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': []
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
-            'new_value': 2,
-            'property_name': 'next_content_id_index',
-            'cmd': 'edit_state_property',
-            'old_value': 1
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Introduction',
             'new_value': {
                 'answer_is_exclusive': False,
                 'explanation': {
@@ -8096,12 +7662,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'content_id': 'hint_2'
                 }
             }],
-            'state_name': 'Introduction'
-        }), exp_domain.ExplorationChange({
-            'old_value': 2,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'new_value': 3,
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': [{
@@ -8223,12 +7783,6 @@ class ExplorationChangesMergeabilityUnitTests(
             ]
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
-            'new_value': 2,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 1
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Introduction',
             'new_value': None,
             'cmd': 'edit_state_property',
             'property_name': 'widget_id',
@@ -8273,12 +7827,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'cmd': 'edit_state_property'
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Introduction',
-            'new_value': 3,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 2
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': [
@@ -8412,12 +7960,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'content_id': 'hint_1'
                 }
             }]
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Introduction',
-            'new_value': 4,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 3
         }), exp_domain.ExplorationChange({
             'state_name': 'End',
             'new_value': {
@@ -8720,12 +8262,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             ]
         }), exp_domain.ExplorationChange({
-            'property_name': 'next_content_id_index',
-            'old_value': 1,
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': 2
-        }), exp_domain.ExplorationChange({
             'property_name': 'solution',
             'old_value': None,
             'state_name': 'Introduction',
@@ -8809,10 +8345,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'translation_html': '<p>Translation Feedback 1.</p>',
             'state_name': 'Introduction',
             'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'cmd': 'mark_written_translations_as_needing_update',
-            'state_name': 'Introduction',
-            'content_id': 'default_outcome'
         })]
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
@@ -9086,12 +8618,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             ]
         }), exp_domain.ExplorationChange({
-            'property_name': 'next_content_id_index',
-            'old_value': 1,
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': 2
-        }), exp_domain.ExplorationChange({
             'property_name': 'solution',
             'old_value': None,
             'state_name': 'Introduction',
@@ -9354,12 +8880,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     }
                 }
             ]
-        }), exp_domain.ExplorationChange({
-            'property_name': 'next_content_id_index',
-            'old_value': 1,
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': 2
         }), exp_domain.ExplorationChange({
             'property_name': 'solution',
             'old_value': None,
@@ -9694,12 +9214,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             ]
         }), exp_domain.ExplorationChange({
-            'property_name': 'next_content_id_index',
-            'old_value': 1,
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': 2
-        }), exp_domain.ExplorationChange({
             'property_name': 'solution',
             'old_value': None,
             'state_name': 'Introduction',
@@ -9902,12 +9416,6 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
-            'old_value': 1,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'new_value': 2,
-            'state_name': 'Introduction'
-        }), exp_domain.ExplorationChange({
             'old_value': [],
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
@@ -9949,12 +9457,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     }
                 }
             ],
-            'state_name': 'Introduction'
-        }), exp_domain.ExplorationChange({
-            'old_value': 2,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'new_value': 3,
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': {
@@ -10187,12 +9689,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': 'NumericInput',
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
-            'old_value': 1,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'new_value': 2,
-            'state_name': 'Introduction'
-        }), exp_domain.ExplorationChange({
             'old_value': [],
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
@@ -10234,12 +9730,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     }
                 }
             ],
-            'state_name': 'Introduction'
-        }), exp_domain.ExplorationChange({
-            'old_value': 2,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index',
-            'new_value': 3,
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': {
@@ -10327,12 +9817,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'cmd': 'edit_state_property'
             }), exp_domain.ExplorationChange({
-                'old_value': 1,
-                'cmd': 'edit_state_property',
-                'property_name': 'next_content_id_index',
-                'new_value': 2,
-                'state_name': 'Introduction'
-            }), exp_domain.ExplorationChange({
                 'old_value': [],
                 'cmd': 'edit_state_property',
                 'property_name': 'answer_groups',
@@ -10374,12 +9858,6 @@ class ExplorationChangesMergeabilityUnitTests(
                         }
                     }
                 ],
-                'state_name': 'Introduction'
-            }), exp_domain.ExplorationChange({
-                'old_value': 2,
-                'cmd': 'edit_state_property',
-                'property_name': 'next_content_id_index',
-                'new_value': 3,
                 'state_name': 'Introduction'
             }), exp_domain.ExplorationChange({
                 'old_value': {

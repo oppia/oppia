@@ -76,7 +76,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
 
     def get_translatable_contents_collection(
-        self
+        self, **kwargs
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the answer group.
 
@@ -93,6 +93,8 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 .add_fields_from_translatable_object(self.outcome)
             )
         for rule_spec in self.rule_specs:
+            if kwargs['interaction_id'] not in ['TextInput', 'SetInput']:
+                break
             (
                 translatable_contents_collection
                 .add_fields_from_translatable_object(rule_spec)
@@ -591,7 +593,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         for answer_group in self.answer_groups:
             (
                 translatable_contents_collection
-                .add_fields_from_translatable_object(answer_group)
+                .add_fields_from_translatable_object(
+                    answer_group,
+                    interaction_id=self.id
+                )
             )
         for customization_arg in self.customization_args.values():
             (

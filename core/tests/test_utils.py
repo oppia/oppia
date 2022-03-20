@@ -1753,6 +1753,7 @@ category: Category
 correctness_feedback_enabled: true
 init_state_name: %s
 language_code: en
+next_content_id_index: 0
 objective: ''
 param_changes: []
 param_specs: {}
@@ -1781,17 +1782,12 @@ states:
       id: null
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
   New state:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -1815,17 +1811,12 @@ states:
       id: null
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: Title

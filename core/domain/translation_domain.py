@@ -206,7 +206,8 @@ class TranslatableContentsCollection:
 
     def add_fields_from_translatable_object(
         self,
-        translatable_object: BaseTranslatableObject
+        translatable_object: BaseTranslatableObject,
+        **kwargs
     ) -> None:
         """Adds translatable fields from a translatable object parameter to
         'content_id_to_translatable_content' dict.
@@ -222,7 +223,7 @@ class TranslatableContentsCollection:
                 BaseTranslatableObject class.
         """
         self.content_id_to_translatable_content.update(
-            translatable_object.get_translatable_contents_collection()
+            translatable_object.get_translatable_contents_collection(**kwargs)
             .content_id_to_translatable_content)
 
 
