@@ -818,40 +818,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         return interaction_proto
 
-    def __init__(
-            self, interaction_id, customization_args, answer_groups,
-            default_outcome, confirmed_unclassified_answers, hints, solution):
-        """Initializes a InteractionInstance domain object.
-
-        Args:
-            interaction_id: str. The interaction id.
-            customization_args: dict. The customization dict. The keys are
-                names of customization_args and the values are dicts with a
-                single key, 'value', whose corresponding value is the value of
-                the customization arg.
-            answer_groups: list(AnswerGroup). List of answer groups of the
-                interaction instance.
-            default_outcome: Outcome. The default outcome of the interaction
-                instance.
-            confirmed_unclassified_answers: list(*). List of answers which have
-                been confirmed to be associated with the default outcome.
-            hints: list(Hint). List of hints for this interaction.
-            solution: Solution. A possible solution for the question asked in
-                this interaction.
-        """
-        self.id = interaction_id
-        # Customization args for the interaction's view. Parts of these
-        # args may be Jinja templates that refer to state parameters.
-        # This is a dict: the keys are names of customization_args and the
-        # values are dicts with a single key, 'value', whose corresponding
-        # value is the value of the customization arg.
-        self.customization_args = customization_args
-        self.answer_groups = answer_groups
-        self.default_outcome = default_outcome
-        self.confirmed_unclassified_answers = confirmed_unclassified_answers
-        self.hints = hints
-        self.solution = solution
-
     @property
     def is_terminal(self):
         """Determines if this interaction type is terminal. If no ID is set for
