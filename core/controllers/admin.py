@@ -637,9 +637,9 @@ class AdminHandler(base.BaseHandler):
                 '[ADMIN] %s generated %s number of dummy explorations' %
                 (self.user_id, num_dummy_exps_to_generate))
             possible_titles = ['Hulk Neuroscience', 'Quantum Starks',
-                            'Wonder Anatomy',
-                            'Elvish, language of "Lord of the Rings',
-                            'The Science of Superheroes']
+                               'Wonder Anatomy',
+                               'Elvish, language of "Lord of the Rings',
+                               'The Science of Superheroes']
             exploration_ids_to_publish = []
             for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
