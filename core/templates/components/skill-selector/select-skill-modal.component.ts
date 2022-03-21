@@ -42,7 +42,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
 
   confirm(): void {
     let totalSkills:
-    (ShortSkillSummary | SkillSummaryBackendDict | SkillSummary)[]= [];
+    (ShortSkillSummary | SkillSummaryBackendDict | SkillSummary)[] = [];
     if (this.skillSummaries) {
       totalSkills = [...this.skillSummaries];
     }
