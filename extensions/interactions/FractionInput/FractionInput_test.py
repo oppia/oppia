@@ -98,7 +98,7 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
                         }
                     }
                 }, {
-                    'rule_type': 'IsGreaterThanSpec',
+                    'rule_type': 'IsGreaterThan',
                     'inputs': {
                         'f': {
                             'denominator': 5,

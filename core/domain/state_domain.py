@@ -1719,6 +1719,8 @@ class Voiceover:
         Returns:
             VoiceoverDto. The proto object.
         """
+        # TODO(#15176): Investigate on how to found problematic exploration
+        # and remove the type casting.
         return languages_pb2.VoiceoverFileDto(
             filename=self.filename,
             file_size_bytes=int(self.file_size_bytes),

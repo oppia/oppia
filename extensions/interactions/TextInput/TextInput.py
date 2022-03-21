@@ -319,6 +319,8 @@ class TextInput(base.BaseInteraction):
         placeholder_proto = (
             customization_args['placeholder'].value.to_android_content_proto())
 
+        # TODO(#15176): Investigate on how to found problematic exploration
+        # and remove the type casting.
         return state_pb2.TextInputInstanceDto.CustomizationArgsDto(
             placeholder=placeholder_proto,
             rows=int(customization_args['rows'].value)

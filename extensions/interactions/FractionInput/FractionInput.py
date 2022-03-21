@@ -203,6 +203,8 @@ class FractionInput(base.BaseInteraction):
         Returns:
             FractionDto. The proto object.
         """
+        # TODO(#15176): Investigate on how to found problematic exploration
+        # and remove the type casting.
         return objects_pb2.FractionDto(
             is_negative=fraction['isNegative'],
             whole_number=int(fraction['wholeNumber']),
@@ -228,7 +230,7 @@ class FractionInput(base.BaseInteraction):
             'IsEquivalentToAndInSimplestForm': (
                 cls._convert_is_equivalent_to_and_in_simplest_form_rule_spec_to_proto), # pylint: disable=line-too-long
             'IsLessThan': cls._convert_is_less_than_rule_spec_to_proto,
-            'IsGreaterThanSpec': (
+            'IsGreaterThan': (
                 cls._convert_is_greater_than_rule_spec_to_proto),
             'HasNumeratorEqualTo': (
                 cls._convert_has_numerator_equal_rule_spec_to_proto),
@@ -254,7 +256,7 @@ class FractionInput(base.BaseInteraction):
             'IsLessThan': lambda x: (
                 state_pb2.FractionInputInstanceDto.RuleSpecDto(
                     is_less_than=x)),
-            'IsGreaterThanSpec': lambda x: (
+            'IsGreaterThan': lambda x: (
                 state_pb2.FractionInputInstanceDto.RuleSpecDto(
                     is_greater_than=x)),
             'HasNumeratorEqualTo': lambda x: (
@@ -369,6 +371,8 @@ class FractionInput(base.BaseInteraction):
         Returns:
             HasNumeratorEqualToSpecDto. The proto object.
         """
+        # TODO(#15176): Investigate on how to found problematic exploration
+        # and remove the type casting.
         return RULE_SPEC_DTO.HasNumeratorEqualToSpecDto(
             input=int(input_dict['x'])
         )
@@ -383,6 +387,8 @@ class FractionInput(base.BaseInteraction):
         Returns:
             HasDenominatorEqualToSpecDto. The proto object.
         """
+        # TODO(#15176): Investigate on how to found problematic exploration
+        # and remove the type casting.
         return RULE_SPEC_DTO.HasDenominatorEqualToSpecDto(
             input=int(input_dict['x'])
         )
@@ -397,6 +403,8 @@ class FractionInput(base.BaseInteraction):
         Returns:
             HasIntegerPartEqualToSpecDto. The proto object.
         """
+        # TODO(#15176): Investigate on how to found problematic exploration
+        # and remove the type casting.
         return RULE_SPEC_DTO.HasIntegerPartEqualToSpecDto(
             input=int(input_dict['x'])
         )

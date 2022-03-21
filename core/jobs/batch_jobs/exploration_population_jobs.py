@@ -226,6 +226,8 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
                     'EXPLORATION PROCESSED'))
         )
 
+        # TODO(#15176): Investigate on how to found problematic exploration
+        # and remove the type casting.
         migrated_exploration_object_list = (
             {
                 'exp_model': unmigrated_exploration_models,

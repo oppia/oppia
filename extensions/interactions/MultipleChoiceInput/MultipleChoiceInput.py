@@ -208,6 +208,8 @@ class MultipleChoiceInput(base.BaseInteraction):
         """
         multiple_choice_dto = state_pb2.MultipleChoiceInputInstanceDto
 
+        # TODO(#15176): Investigate on how to found problematic exploration
+        # and remove the type casting.
         return multiple_choice_dto.RuleSpecDto.EqualsSpecDto(
             input=int(equal)
         )
