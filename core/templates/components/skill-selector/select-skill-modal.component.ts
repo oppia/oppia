@@ -19,7 +19,7 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 
 @Component({
@@ -27,12 +27,12 @@ import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-pag
   templateUrl: './select-skill-modal.component.html',
 })
 export class SelectSkillModalComponent extends ConfirmOrCancelModal {
-  categorizedSkills: SkillsCategorizedByTopics;
-  skillsInSameTopicCount: number;
-  skillSummaries: SkillSummaryBackendDict[];
-  untriagedSkillSummaries: ShortSkillSummary[];
-  allowSkillsFromOtherTopics: boolean;
-  selectedSkillId: string = null;
+  categorizedSkills!: SkillsCategorizedByTopics;
+  skillsInSameTopicCount!: number;
+  skillSummaries!: SkillSummaryBackendDict[];
+  untriagedSkillSummaries!: ShortSkillSummary[];
+  allowSkillsFromOtherTopics!: boolean;
+  selectedSkillId: string | null = null;
 
   constructor(
     private ngbActiveModal: NgbActiveModal
@@ -41,7 +41,10 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   }
 
   confirm(): void {
-    let totalSkills = [];
+    let totalSkills: 
+    (ShortSkillSummary | 
+      SkillSummaryBackendDict | 
+      SkillSummary)[] = [];
     if (this.skillSummaries) {
       totalSkills = [...this.skillSummaries];
     }
