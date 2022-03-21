@@ -32,8 +32,71 @@ from typing import List
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 
-class GetNumberOfExpExceedsMaxTagsListLengthJob(base_jobs.JobBase):
+class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
     """Job that returns exploration having tags list length more than 10"""
+
+    def _check_tags_validity(self, tags: List[str]) -> bool:
+        """checks whether tags list is valid or not.
+
+        Args:
+            tags: List[str]. The list of all tag in exlporation.
+
+        Returns:
+            bool. If list contain invalid tag or tags length is more than 10
+            then it return true, otherwise false.
+        """
+        if len(tags) > 10:
+            return True
+        if len(set(tags)) < len(tags):
+            return True
+        for tag in tags:
+            if tag.strip() == '':
+                return True
+            elif len(tag) > 30:
+                return True
+        return False
+
+    def _get_description_of_wrong_exp(self, tags: List[str]) -> str:
+        """Returns the description of invalid tags property.
+
+        Args:
+            tags: List[str]. The list of all tag in exlporation.
+
+        Returns:
+            str. Description of invalid tags property.
+        """
+        output_string = ''
+        visited = set()
+        dup: List[str] = []
+        empty_tag = max_length_exceed_tag = 0
+
+        if len(tags) > 10:
+            output_string += ' tags length more than 10,'
+        if len(set(tags)) < len(tags):
+            for ele in tags:
+                if ele.strip() != '':
+                    if ele in visited or (visited.add(ele)):
+                        dup.append(ele)
+            if len(dup) != 0:
+                output_string += f' {len(dup)} duplicate values {dup},'
+
+        for tag in tags:
+            if tag.strip() == '':
+                empty_tag += 1
+            elif len(tag) > 30:
+                max_length_exceed_tag += 1
+
+        if (empty_tag != 0) or (max_length_exceed_tag != 0):
+            output_string += (
+                f' {empty_tag} empty tag and'
+                + f' {max_length_exceed_tag} tag having length more than 30, ')
+
+        last_comma_index = output_string.rfind(',')
+        output_string = (
+            output_string[:last_comma_index] + '.'
+            + output_string[last_comma_index + 1:])
+
+        return output_string.rstrip()
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid explorations with their id and
@@ -56,7 +119,7 @@ class GetNumberOfExpExceedsMaxTagsListLengthJob(base_jobs.JobBase):
             | 'Combine exploration tags and ids' >> beam.Map(
                 lambda exp: (exp.id, exp.tags))
             | 'Filter exploraton with tags length greater than 10' >>
-                beam.Filter(lambda exp: len(exp[1]) > 10)
+                beam.Filter(lambda exp: self._check_tags_validity(exp[1]))
         )
 
         report_number_of_exps_queried = (
@@ -75,85 +138,10 @@ class GetNumberOfExpExceedsMaxTagsListLengthJob(base_jobs.JobBase):
             exp_ids_with_exceeding_max_tags_len
             | 'Save info on invalid exps' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The id of exp is %s and its actual tags len is %s'
-                    % (objects[0], len(objects[1]))
-                ))
-        )
-
-        return (
-            (
-                report_number_of_exps_queried,
-                report_number_of_invalid_exps,
-                report_invalid_ids_and_their_actual_len
-            )
-            | 'Combine results' >> beam.Flatten()
-        )
-
-
-class GetNumberOfExpHavingDuplicatetTagValuesJob(base_jobs.JobBase):
-    """Job that returns exploration having duplicate values in tags"""
-
-    def _get_duplicate_values_in_tags(self, tags: List[str]) -> List[str]:
-        """Return all duplicate values in tags of exploration.
-
-        Args:
-            tags: List[str]. The list of all tag in exploration.
-
-        Returns:
-            List[str]. List of all the duplicate values in tags.
-        """
-        visited = set()
-        dup: List[str] = []
-        for ele in tags:
-            if ele in visited or (visited.add(ele)):
-                dup.append(ele)
-
-        return dup
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns PCollection of invalid explorations with their id and
-        duplicate values in tags.
-
-        Returns:
-            PCollection. Returns PCollection of invalid explorations with
-            their id and duplicate values in tags.
-        """
-        total_explorations = (
-            self.pipeline
-            | 'Get all ExplorationModels' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all(include_deleted=False))
-            | 'Get exploration from model' >> beam.Map(
-                exp_fetchers.get_exploration_from_model)
-        )
-
-        exp_ids_with_duplicate_tags = (
-            total_explorations
-            | 'Combine exploration tags and ids' >> beam.Map(
-                lambda exp: (exp.id, exp.tags))
-            | 'Filter exploraton with tags containing duplicates' >>
-                beam.Filter(lambda exp: len(set(exp[1])) < len(exp[1]))
-        )
-
-        report_number_of_exps_queried = (
-            total_explorations
-            | 'Report count of exp models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('EXPS'))
-        )
-
-        report_number_of_invalid_exps = (
-            exp_ids_with_duplicate_tags
-            | 'Report count of invalid exp models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('INVALID'))
-        )
-
-        report_invalid_ids_and_their_duplicate_values = (
-            exp_ids_with_duplicate_tags
-            | 'Save info on invalid exps' >> beam.Map(
-                lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The id of exp is %s and its duplicate tags are %s'
+                    'The exp of id %s contains%s'
                     % (
                         objects[0],
-                        self._get_duplicate_values_in_tags(objects[1])
+                        self._get_description_of_wrong_exp(objects[1])
                     )
                 ))
         )
@@ -162,107 +150,7 @@ class GetNumberOfExpHavingDuplicatetTagValuesJob(base_jobs.JobBase):
             (
                 report_number_of_exps_queried,
                 report_number_of_invalid_exps,
-                report_invalid_ids_and_their_duplicate_values
-            )
-            | 'Combine results' >> beam.Flatten()
-        )
-
-
-class GetNumberOfExpHavingIncorrectTagLengthJob(base_jobs.JobBase):
-    """Job that returns exploration in which tags having empty tag
-    or having tag with length more than 30.
-    """
-
-    def _check_tag_string_validity(self, tags: List[str]) -> bool:
-        """checks whether tags list contain invalid tag or not.
-
-        Args:
-            tags: List[str]. The list of all tag in exploration.
-
-        Returns:
-            bool. If list contain invalid tag returns true, otherwise false.
-        """
-        for tag in tags:
-            if tag.strip() == '':
-                return True
-            elif len(tag) > 30:
-                return True
-        return False
-
-    def _get_number_of_invalid_tags(self, tags: List) -> str:
-        """counts the number of invalid tag in tags list.
-
-        Args:
-            tags: List[str]. The list of all tag in exploration.
-
-        Returns:
-            str. Returns string which describes number of invalid tag in
-            tags list.
-        """
-        empty_tags = 0
-        length_exceeding_tags = 0
-
-        for tag in tags:
-            if tag.strip() == '':
-                empty_tags += 1
-            elif len(tag) > 30:
-                length_exceeding_tags += 1
-
-        return (f'contains {empty_tags} empty tags and' +
-                f' {length_exceeding_tags} max length exceeding tags')
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns PCollection of invalid explorations with their id,
-        number of empty tag and number of tags having length more
-        than 30.
-
-        Returns:
-            PCollection. Returns PCollection of invalid explorations with
-            their id, number of empty tag and number of tags having
-            length more than 30.
-        """
-        total_explorations = (
-            self.pipeline
-            | 'Get all ExplorationModels' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all(include_deleted=False))
-            | 'Get exploration from model' >> beam.Map(
-                exp_fetchers.get_exploration_from_model)
-        )
-
-        exp_ids_with_invalid_tag_length = (
-            total_explorations
-            | 'Combine exploration tags and ids' >> beam.Map(
-                lambda exp: (exp.id, exp.tags))
-            | 'Filter exploraton with tags containing invalid tag' >>
-                beam.Filter(lambda exp: self._check_tag_string_validity(exp[1]))
-        )
-
-        report_number_of_exps_queried = (
-            total_explorations
-            | 'Report count of exp models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('EXPS'))
-        )
-
-        report_number_of_invalid_exps = (
-            exp_ids_with_invalid_tag_length
-            | 'Report count of invalid exp models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('INVALID'))
-        )
-
-        report_invalid_ids_and_their_number_of_invalid_tags = (
-            exp_ids_with_invalid_tag_length
-            | 'Save info on invalid exps' >> beam.Map(
-                lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The id of exp is %s and it %s'
-                    % (objects[0], self._get_number_of_invalid_tags(objects[1]))
-                ))
-        )
-
-        return (
-            (
-                report_number_of_exps_queried,
-                report_number_of_invalid_exps,
-                report_invalid_ids_and_their_number_of_invalid_tags
+                report_invalid_ids_and_their_actual_len
             )
             | 'Combine results' >> beam.Flatten()
         )
