@@ -1129,7 +1129,8 @@ describe('Admin backend api service', () => {
     const payload = {
       action: action,
       num_sample_ops: numSampleOpsToGenerate,
-      num_sample_interactions: numSampleInteractionsToGenerate,
+      num_sample_interactions_per_opportunity:
+        numSampleInteractionsToGenerate,
       should_submit_suggestions: shouldSubmitSuggestions
     };
 
@@ -1138,7 +1139,7 @@ describe('Admin backend api service', () => {
       numSampleInteractionsToGenerate,
       shouldSubmitSuggestions).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/adminhandler');
+    const req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(200);
@@ -1158,7 +1159,8 @@ describe('Admin backend api service', () => {
       const payload = {
         action: action,
         num_sample_ops: numSampleOpsToGenerate,
-        num_sample_interactions: numSampleInteractionsToGenerate,
+        num_sample_interactions_per_opportunity:
+          numSampleInteractionsToGenerate,
         should_submit_suggestions: shouldSubmitSuggestions
       };
 
@@ -1167,7 +1169,7 @@ describe('Admin backend api service', () => {
         numSampleInteractionsToGenerate,
         shouldSubmitSuggestions).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/adminhandler');
+      const req = httpTestingController.expectOne('/adminhandler');
       expect(req.request.method).toEqual('POST');
       expect(req.request.body).toEqual(payload);
       req.flush(200);

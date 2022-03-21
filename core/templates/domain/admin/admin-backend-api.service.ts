@@ -466,7 +466,8 @@ export class AdminBackendApiService {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_sample_opportunities',
       num_sample_ops: numSampleOpsToGenerate,
-      num_sample_interactions: numSampleInteractionsToGenerate,
+      num_sample_interactions_per_opportunity:
+        numSampleInteractionsToGenerate,
       should_submit_suggestions: shouldSubmitSuggestions
     });
   }

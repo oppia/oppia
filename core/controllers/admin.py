@@ -126,7 +126,7 @@ class AdminHandler(base.BaseHandler):
                 },
                 'default_value': None
             },
-            'num_sample_interactions': {
+            'num_sample_interactions_per_opportunity': {
                 'schema': {
                     'type': 'int'
                 },
@@ -255,13 +255,14 @@ class AdminHandler(base.BaseHandler):
             elif action == 'generate_sample_opportunities':
                 num_sample_ops = self.normalized_payload.get(
                     'num_sample_ops')
-                num_sample_interactions = self.normalized_payload.get(
-                    'num_sample_interactions')
+                num_sample_interactions_per_opportunity = (
+                    self.normalized_payload.get(
+                        'num_sample_interactions_per_opportunity'))
                 should_submit_suggestions = self.normalized_payload.get(
                     'should_submit_suggestions')
                 self._generate_sample_opportunities(
                     num_sample_ops,
-                    num_sample_interactions,
+                    num_sample_interactions_per_opportunity,
                     should_submit_suggestions)
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
@@ -538,9 +539,9 @@ class AdminHandler(base.BaseHandler):
             }]
 
             len_story = len(story_node_dicts)
-            for i, story_node_dict in enumerate(story_node_dicts):
-                self._generate_sample_story_nodes(
-                    story, len_story, i + 1, **story_node_dict)
+            for i, story_node_dict in enumerate(story_node_dicts, 1):
+                self._generate_sample_story_node(
+                    story, len_story, i, **story_node_dict)
 
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
@@ -659,83 +660,88 @@ class AdminHandler(base.BaseHandler):
 
     def _generate_sample_opportunities(
             self, num_sample_ops,
-            num_sample_interactions, should_submit_suggestions):
+            num_sample_interactions_per_opportunity,
+            should_submit_suggestions):
         """Generates and publishes the given number of sample opportunities.
 
         Args:
-            num_sample_ops: int. Count of sample opportunities to
-                be generated.
-            num_sample_interactions: int. Count of sample
-                interactions to be generated.
-            should_submit_suggestions: boolean. Boolean to track
-                whether suggestions should be submitted.
+            num_sample_ops: int. Number of sample opportunities to
+                generate.
+            num_sample_interactions_per_opportunity: int. Number of sample
+                interactions to generate per opportunity.
+            should_submit_suggestions: boolean.
+                Track whether suggestions should be submitted.
 
         Raises:
             Exception. Environment is not DEVMODE.
         """
         if constants.DEV_MODE:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+                raise Exception(
+                    'User does not have enough rights to generate data.')
             if story_services.does_story_exist_with_url_fragment(
-                'no-help-jamie'):
+                'sample-story-title'):
                 self._generate_sample_opportunities_with_existing_topic(
                     num_sample_ops,
-                    num_sample_interactions,
+                    num_sample_interactions_per_opportunity,
                     should_submit_suggestions,
-                    'no-help-jamie')
+                    'sample-story-title')
             else:
                 self._generate_sample_opportunities_without_existing_topic(
                     num_sample_ops,
-                    num_sample_interactions,
+                    num_sample_interactions_per_opportunity,
                     should_submit_suggestions)
 
     def _generate_sample_opportunities_without_existing_topic(
             self, num_sample_ops,
-            num_sample_interactions, should_submit_suggestions):
+            num_sample_interactions_per_opportunity,
+            should_submit_suggestions):
         """Generates a topic and story and creates
         the given number of sample opportunities.
 
         Args:
-            num_sample_ops: int. Count of sample opportunities to
-                be generated.
-            num_sample_interactions: int. Count of sample
-                interactions to be generate.
-            should_submit_suggestions: boolean. Boolean to track
-                whether suggestions should be submitted.
+            num_sample_ops: int. Number of sample opportunities to
+                generate.
+            num_sample_interactions_per_opportunity: int. Number of sample
+                interactions to generate per opportunity.
+            should_submit_suggestions: boolean.
+                Track whether suggestions should be submitted.
         """
-        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
 
-        topic_1 = topic_domain.Topic.create_default_topic(
-            topic_id_1, 'Sample Topic 1', 'sample-topic-one', 'description')
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'Sample Topic 1', 'sample-topic-one', 'description')
 
-        topic_1.add_canonical_story(story_id)
-        topic_1.add_subtopic(1, 'Sample Subtopic Title')
+        topic.add_canonical_story(story_id)
+        topic.add_subtopic(1, 'Sample Subtopic Title')
 
         subtopic_page = (
         subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-            1, topic_id_1))
+            1, topic_id))
 
         story = story_domain.Story.create_default_story(
-            story_id, 'Help Jaime win the Arcade1', 'Description',
-            topic_id_1, 'no-help-jamie')
+            story_id, 'Sample Story Title', 'Description',
+            topic_id, 'sample-story-title')
 
         story_node_dicts = self._generate_sample_chapters(
             num_sample_ops,
-            num_sample_interactions, 0)
+            num_sample_interactions_per_opportunity, 0)
 
         len_story = len(story_node_dicts)
-        for i, story_node_dict in enumerate(story_node_dicts):
-            self._generate_sample_story_nodes(
-                story, len_story, i + 1, **story_node_dict)
+        for i, story_node_dict in enumerate(story_node_dicts, 1):
+            self._generate_sample_story_node(
+                story, len_story, i, **story_node_dict)
 
         story_services.save_new_story(self.user_id, story)
-        topic_services.save_new_topic(self.user_id, topic_1)
+        topic_services.save_new_topic(self.user_id, topic)
 
         subtopic_page_services.save_subtopic_page(
             self.user_id, subtopic_page, 'Added subtopic',
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Dummy Subtopic Title'
+                'title': 'Sample Subtopic Title'
             })]
         )
 
@@ -744,29 +750,25 @@ class AdminHandler(base.BaseHandler):
             story_id, exp_ids_in_story)
 
         if should_submit_suggestions:
-            for i in range(num_sample_ops):
-                for j in range(num_sample_ops):
-                    if j == 0:
-                        self._submit_suggestion(
-                            exp_ids_in_story[i], 'Introduction')
-                    else:
-                        self._submit_suggestion(
-                            exp_ids_in_story[i], 'Interaction' + str(j))
+            self._submit_suggestions(
+                num_sample_ops,
+                num_sample_interactions_per_opportunity,
+                exp_ids_in_story)
 
     def _generate_sample_opportunities_with_existing_topic(
             self, num_sample_ops,
-            num_sample_interactions,
+            num_sample_interactions_per_opportunity,
             should_submit_suggestions, story_url_fragment):
         """Creates the given number of sample opportunities
         and adds them to an existing story.
 
         Args:
-            num_sample_ops: int. Count of sample opportunities to
-                be generated.
-            num_sample_interactions: int. Count of sample
-                interactions to generate.
-            should_submit_suggestions: boolean. Boolean to track
-                whether suggestions should be submitted.
+            num_sample_ops: int. Number of sample opportunities to
+                generate.
+            num_sample_interactions_per_opportunity: int. Number of sample
+                interactions to generate per opportunity.
+            should_submit_suggestions: boolean.
+                Track whether suggestions should be submitted.
             story_url_fragment: stringType. Story fragment of existing story.
         """
         story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
@@ -777,14 +779,14 @@ class AdminHandler(base.BaseHandler):
         topic_id = topic.id
 
         story_node_dicts = self._generate_sample_chapters(
-            num_sample_ops, num_sample_interactions, len_nodes)
+            num_sample_ops, num_sample_interactions_per_opportunity, len_nodes)
 
         story_change_list = []
         len_story = len(story_node_dicts)
-        for i, story_node_dict in enumerate(story_node_dicts):
-            self._generate_sample_story_nodes(
-                story, len_story, len_nodes + i + 1, **story_node_dict)
-            cur_node_id = 'node_' + str(len_nodes + i + 1)
+        for i, story_node_dict in enumerate(story_node_dicts, 1):
+            self._generate_sample_story_node(
+                story, len_story, len_nodes + i, **story_node_dict)
+            cur_node_id = 'node_' + str(len_nodes + i)
             story_change_list.append(story_domain.StoryChange({
                 'cmd': 'add_story_node',
                 'node_id': cur_node_id,
@@ -818,22 +820,44 @@ class AdminHandler(base.BaseHandler):
             story_id, exp_ids_in_story)
 
         if should_submit_suggestions:
-            for i in range(num_sample_ops):
-                for j in range(num_sample_ops):
-                    if j == 0:
-                        self._submit_suggestion(
-                            exp_ids_in_story[i], 'Introduction')
-                    else:
-                        self._submit_suggestion(
-                            exp_ids_in_story[i], 'Interaction' + str(j))
+            self._submit_suggestions(
+                num_sample_ops,
+                num_sample_interactions_per_opportunity,
+                exp_ids_in_story)
+
+    def _submit_suggestions(
+        self,
+        num_sample_ops,
+        num_sample_interactions_per_opportunity,
+        exp_ids_in_story):
+        """Submits suggestions to explorations linked to the given exp_ids.
+
+        Args:
+            num_sample_ops: int. Number of sample opportunities that
+                have been generated.
+            num_sample_interactions_per_opportunity: int. Number of sample
+                interactions that have been generated.
+            exp_ids_in_story: list. List of the exploration ids of explorations
+                that will have suggestions submitted to them.
+        """
+        for opportunity_num in range(num_sample_ops):
+            for interaction_num in range(
+                num_sample_interactions_per_opportunity):
+                if interaction_num == 0:
+                    self._submit_suggestion(
+                        exp_ids_in_story[opportunity_num], 'Introduction')
+                else:
+                    self._submit_suggestion(
+                        exp_ids_in_story[opportunity_num],
+                        'Interaction' + str(interaction_num))
 
     def _submit_suggestion(self, exp_id, state_name):
-        """Submits suggestions to explorations that
-        have the given exploration id and state name.
+        """Submits a suggestions to the exploration that
+        has the given exploration id and state content.
 
         Args:
             exp_id: str. Exploration id of the exploration
-                that will recieve suggestions.
+                that will receive suggestions.
             state_name: str. Name of the state content
                 which will be translated.
         """
@@ -895,28 +919,21 @@ class AdminHandler(base.BaseHandler):
 
     def _generate_sample_chapters(
         self, num_sample_ops,
-        num_sample_interactions, starting_chapter):
-        """Generates the given number of sample chapters.
+        num_sample_interactions_per_opportunity, num_chapters):
+        """Generates sample chapters and creates a list of story_node_dicts.
 
         Args:
-            num_sample_ops: int. Count of dummy opportunities to
-                be generated.
-            num_sample_interactions: int. Count of dummy
-                interactions to be generated.
-            starting_chapter: int. Starting number of chapters in
+            num_sample_ops: int. Number of sample opportunities that have
+                been generated.
+            num_sample_interactions_per_opportunity: int. Number of sample
+                interactions that have been generated per opportunity.
+            num_chapters: int. Current number of chapters in
                 story.
 
         Returns:
-            story_node_dicts. List. The list with story nodes dicts.
+            story_node_dicts. List. A list of dicts that represent story nodes.
         """
         story_node_dicts = []
-
-        customization_args = {'recommendedExplorationIds': {'value': []}}
-        end_state = state_domain.State.create_default_state('End')
-        end_state.update_interaction_id('EndExploration')
-        end_state.update_interaction_customization_args(
-            customization_args)
-        end_state.update_interaction_default_outcome(None)
 
         possible_titles = ['Hulk Neuroscience', 'Quantum Starks',
                             'Wonder Anatomy',
@@ -925,31 +942,23 @@ class AdminHandler(base.BaseHandler):
         exploration_ids_to_publish = []
         for opportunity_num in range(num_sample_ops):
             title = random.choice(possible_titles) + ' ' + str(
-                opportunity_num + starting_chapter)
+                opportunity_num + num_chapters)
             category = 'Algorithms'
             new_exploration_id = exp_fetchers.get_new_exploration_id()
             exp = exp_domain.Exploration.create_default_exploration(
                 new_exploration_id, title=title, category=category,
                 objective='Dummy Objective')
+            self._populate_sample_interactions(
+                num_sample_interactions_per_opportunity, exp)
 
-            for interaction_num in range(num_sample_interactions):
-                if interaction_num == num_sample_interactions - 1:
-                    dest = 'End'
-                else:
-                    dest = 'Interaction' + str(interaction_num + 1)
-                if interaction_num == 0:
-                    self._create_sample_interactions(
-                        exp.states['Introduction'], dest)
-                else:
-                    if interaction_num == num_sample_interactions - 1:
-                        dest = 'End'
-                    cur_state = state_domain.State.create_default_state(
-                        'Interaction' + str(interaction_num))
-                    exp.states[
-                        'Interaction' + str(interaction_num)] = cur_state
-                    self._create_sample_interactions(cur_state, dest)
-
+            customization_args = {'recommendedExplorationIds': {'value': []}}
+            end_state = state_domain.State.create_default_state('End')
+            end_state.update_interaction_id('EndExploration')
+            end_state.update_interaction_customization_args(
+                customization_args)
+            end_state.update_interaction_default_outcome(None)
             exp.states['End'] = end_state
+
             exp_services.save_new_exploration(self.user_id, exp)
             if opportunity_num <= num_sample_ops - 1:
                 exploration_ids_to_publish.append(new_exploration_id)
@@ -973,7 +982,35 @@ class AdminHandler(base.BaseHandler):
 
         return story_node_dicts
 
-    def _create_sample_interactions(self, state, dest):
+    def _populate_sample_interactions(
+        self, num_sample_interactions_per_opportunity, exp):
+        """Populates all interactions for a given exploration.
+
+        Args:
+            num_sample_interactions_per_opportunity: int.
+                Number of interactions to populate.
+            exp: exp_domain. Target exploration to populate.
+        """
+        def is_last_interaction():
+            return (
+                interaction_num == num_sample_interactions_per_opportunity - 1)
+
+        for interaction_num in range(num_sample_interactions_per_opportunity):
+            if is_last_interaction():
+                dest = 'End'
+            else:
+                dest = 'Interaction' + str(interaction_num + 1)
+            if interaction_num == 0:
+                self._create_sample_interaction(
+                    exp.states['Introduction'], dest)
+            else:
+                cur_state = state_domain.State.create_default_state(
+                    'Interaction' + str(interaction_num))
+                exp.states[
+                    'Interaction' + str(interaction_num)] = cur_state
+                self._create_sample_interaction(cur_state, dest)
+
+    def _create_sample_interaction(self, state, dest):
         """Populates a sample interaction
         and links to a destination interaction.
 
@@ -1034,19 +1071,19 @@ class AdminHandler(base.BaseHandler):
             )
         )
 
-    def _generate_sample_story_nodes(
+    def _generate_sample_story_node(
         self, story, len_story, node_id, exp_id, title, description):
         """Generates and connects sequential story nodes.
 
         Args:
-            story: story_domain. The story.
+            story: story_domain. The story that the story node
+                will be appended to.
             len_story: int. The number of story nodes in the story.
-            node_id: int. The node id.
-            exp_id: str. The exploration id.
+            node_id: int. The node id of the story node.
+            exp_id: str. The exploration id of the story node.
             title: str. The title of the story node.
             description: str. The description of the story node.
         """
-
         story.add_node(
             '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
             title)

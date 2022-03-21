@@ -929,7 +929,7 @@ class GenerateSampleOpportunitiesTest(test_utils.GenericTestBase):
             '/adminhandler', {
                 'action': 'generate_sample_opportunities',
                 'num_sample_ops': 8,
-                'num_sample_interactions': 10,
+                'num_sample_interactions_per_opportunity': 10,
                 'should_submit_suggestions': False
 
             }, csrf_token=csrf_token)
@@ -942,7 +942,7 @@ class GenerateSampleOpportunitiesTest(test_utils.GenericTestBase):
             '/adminhandler', {
                 'action': 'generate_sample_opportunities',
                 'num_sample_ops': 2,
-                'num_sample_interactions': 10,
+                'num_sample_interactions_per_opportunity': 10,
                 'should_submit_suggestions': False
 
             }, csrf_token=csrf_token)
@@ -960,7 +960,7 @@ class GenerateSampleOpportunitiesTest(test_utils.GenericTestBase):
             '/adminhandler', {
                 'action': 'generate_sample_opportunities',
                 'num_sample_ops': 5,
-                'num_sample_interactions': 5,
+                'num_sample_interactions_per_opportunity': 5,
                 'should_submit_suggestions': True
 
             }, csrf_token=csrf_token)
@@ -973,7 +973,7 @@ class GenerateSampleOpportunitiesTest(test_utils.GenericTestBase):
             '/adminhandler', {
                 'action': 'generate_sample_opportunities',
                 'num_sample_ops': 5,
-                'num_sample_interactions': 5,
+                'num_sample_interactions_per_opportunity': 5,
                 'should_submit_suggestions': True
 
             }, csrf_token=csrf_token)
