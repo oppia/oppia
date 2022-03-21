@@ -30,6 +30,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { LoaderService } from 'services/loader.service';
 
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {
@@ -67,6 +68,7 @@ describe('Practice tab component', function() {
   let questionBackendApiService: MockQuestionBackendApiService;
   let ngbModal: NgbModal;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let loaderService: LoaderService;
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
@@ -76,6 +78,7 @@ describe('Practice tab component', function() {
       providers: [
         NgbModal,
         I18nLanguageCodeService,
+        LoaderService,
         UrlInterpolationService,
         { provide: UrlService, useClass: MockUrlService },
         { provide: WindowRef, useValue: windowRef },
@@ -124,6 +127,7 @@ describe('Practice tab component', function() {
     fixture.detectChanges();
     ngbModal = TestBed.inject(NgbModal);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    loaderService = TestBed.inject(LoaderService);
   });
 
   it('should initialize controller properties after its initilization',
@@ -155,6 +159,7 @@ describe('Practice tab component', function() {
 
   it('should open a new practice session containing the selected subtopic' +
     ' when start button is clicked for topicViewer display area', function() {
+    spyOn(loaderService, 'showLoadingScreen');
     component.selectedSubtopicIndices[0] = true;
     component.openNewPracticeSession();
 
@@ -162,6 +167,8 @@ describe('Practice tab component', function() {
       '/learn/classroom_1/topic_1/practice/session?' +
       'selected_subtopic_ids=%5B1%5D'
     );
+
+    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
   });
 
   it('should check if questions exist for the selected subtopics',
@@ -252,6 +259,7 @@ describe('Practice tab component', function() {
 
   it('should open a new practice session containing the selected subtopic' +
     ' when start button is clicked and learner agrees to continue', function() {
+    spyOn(loaderService, 'showLoadingScreen');
     component.displayArea = 'progressTab';
     component.topicUrlFragment = 'topic_1';
     component.classroomUrlFragment = 'classroom_1';
@@ -262,6 +270,8 @@ describe('Practice tab component', function() {
       '/learn/classroom_1/topic_1/practice/session?' +
       'selected_subtopic_ids=%5B1%5D'
     );
+
+    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
   });
 
   it('should return background for progress of a subtopic', () => {

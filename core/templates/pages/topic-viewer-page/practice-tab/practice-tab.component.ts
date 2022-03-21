@@ -31,6 +31,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PracticeSessionConfirmationModal } from 'pages/topic-viewer-page/modals/practice-session-confirmation-modal.component';
+import { LoaderService } from 'services/loader.service';
 
 @Component({
   selector: 'practice-tab',
@@ -63,7 +64,8 @@ export class PracticeTabComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private loaderService: LoaderService
   ) {}
 
   ngOnInit(): void {
@@ -158,6 +160,7 @@ export class PracticeTabComponent implements OnInit {
         stringified_subtopic_ids: JSON.stringify(selectedSubtopicIds)
       });
     this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
+    this.loaderService.showLoadingScreen('Loading');
   }
 
   isAtLeastOneSubtopicSelected(): boolean {

@@ -36,12 +36,12 @@ require('pages/interaction-specs.constants.ajs.ts');
 angular.module('oppia').component('practiceSessionPage', {
   template: require('./practice-session-page.component.html'),
   controller: [
-    '$http', 'PageTitleService', 'UrlInterpolationService', 'UrlService',
-    'PRACTICE_SESSIONS_DATA_URL', 'PRACTICE_SESSIONS_URL',
+    '$http', 'LoaderService', 'PageTitleService', 'UrlInterpolationService',
+    'UrlService', 'PRACTICE_SESSIONS_DATA_URL', 'PRACTICE_SESSIONS_URL',
     'TOPIC_VIEWER_PAGE', 'TOTAL_QUESTIONS',
     function(
-        $http, PageTitleService, UrlInterpolationService, UrlService,
-        PRACTICE_SESSIONS_DATA_URL, PRACTICE_SESSIONS_URL,
+        $http, LoaderService, PageTitleService, UrlInterpolationService,
+        UrlService, PRACTICE_SESSIONS_DATA_URL, PRACTICE_SESSIONS_URL,
         TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS) {
       var ctrl = this;
       var _fetchSkillDetails = function() {
@@ -109,6 +109,7 @@ angular.module('oppia').component('practiceSessionPage', {
         ctrl.stringifiedSubtopicIds = (
           UrlService.getSelectedSubtopicsFromUrl());
         _fetchSkillDetails();
+        LoaderService.hideLoadingScreen();
       };
     }
   ]
