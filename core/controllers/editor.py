@@ -71,7 +71,7 @@ SCHEMA_FOR_VERSION = {
 }
 
 
-def replace_ids_with_names_in_dict(exploration_id):
+def get_exploration_rights_with_names(exploration_id):
     """Replace ids with the names and return rights as a dictionary.
 
     Args:
