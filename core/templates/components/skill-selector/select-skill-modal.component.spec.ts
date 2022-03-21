@@ -95,10 +95,9 @@ describe('Select Skill Modal', () => {
   it('should close modal on confirm', () => {
     spyOn(ngbActiveModal, 'close');
     componentInstance.selectedSkillId = '2';
-    let totalSkills: 
-    (ShortSkillSummary | 
-      SkillSummaryBackendDict | 
-      SkillSummary)[] = [];
+    let totalSkills:
+    (ShortSkillSummary |SkillSummaryBackendDict | SkillSummary)[]
+    = [];
     if (componentInstance.skillSummaries) {
       totalSkills = [...componentInstance.skillSummaries];
     }
