@@ -619,7 +619,7 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot reload a collection in production.')
 
     def _generate_dummy_explorations(
-        self, num_dummy_exps_to_generate, num_dummy_exps_to_publish):
+            self, num_dummy_exps_to_generate, num_dummy_exps_to_publish):
         """Generates and publishes the given number of dummy explorations.
 
         Args:
