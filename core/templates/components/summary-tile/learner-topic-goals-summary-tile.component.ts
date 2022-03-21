@@ -32,9 +32,9 @@ import { StorySummary } from 'domain/story/story-summary.model';
   templateUrl: 'learner-topic-goals-summary-tile.component.html'
 })
 export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
-  @Input() topicSummary: LearnerTopicSummary;
-  @Input() displayArea: string;
-  @Input() topicName?: string;
+  @Input() topicSummary!: LearnerTopicSummary;
+  @Input() displayArea!: string;
+  @Input() topicName!: string;
   incompleteStoryNodes: StoryNode[];
   storySummaryToDisplay: StorySummary;
   storyName: string;
@@ -103,22 +103,20 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
     this.incompleteStoryNodes = this.getAllIncompleteStoryNodes();
     if (this.incompleteStoryNodes.length > 0) {
       this.storyNodeToDisplay = this.incompleteStoryNodes[0];
-    }
 
-    if (this.storyNodeToDisplay) {
       if (this.storyNodeToDisplay.getThumbnailFilename()) {
         this.thumbnailUrl = (
           this.assetsBackendApiService.getThumbnailUrlForPreview(
             AppConstants.ENTITY_TYPE.STORY, this.storySummaryToDisplay.getId(),
-            this.storyNodeToDisplay.getThumbnailFilename()));
+            this.storyNodeToDisplay.getThumbnailFilename()
+          )
+        );
       }
 
       this.storyNodeTitle = this.storyNodeToDisplay.getTitle();
       this.thumbnailBgColor = this.storyNodeToDisplay.getThumbnailBgColor();
       this.storyName = this.storySummaryToDisplay.getTitle();
-    }
 
-    if (this.storySummaryToDisplay) {
       this.storyNodeLink = this.getStoryNodeLink();
       let totalStoryNodesCount = (
         this.storySummaryToDisplay.getAllNodes().length

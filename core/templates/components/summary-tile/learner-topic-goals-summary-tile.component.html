@@ -1,4 +1,4 @@
-<div class="learner-topic-goals-summary-tile">
+<div class="learner-topic-goals-summary-tile" *ngIf="incompleteStoryNodes.length > 0">
   <mat-card class="oppia-story-dashboard-card" (mouseenter)="cardIsHovered=true" (mouseleave)="cardIsHovered=false">
     <a [href]="getStoryNodeLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link">
       <div class="story-card">
