@@ -21,8 +21,8 @@ export interface SkillSummaryBackendDict {
   'description': string;
   'language_code': string;
   'version': number;
-  'misconception_count': number;
-  'worked_examples_count': number;
+  'misconception_count': number | null;
+  'worked_examples_count': number | null;
   'skill_model_created_on': number;
   'skill_model_last_updated': number;
 }
@@ -33,8 +33,8 @@ export class SkillSummary {
     public description: string,
     public languageCode: string,
     public version: number,
-    public misconceptionCount: number,
-    public workedExamplesCount: number,
+    public misconceptionCount: number | null,
+    public workedExamplesCount: number | null,
     public skillModelCreatedOn: number,
     public skillModelLastUpdated: number) {}
 
