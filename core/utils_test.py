@@ -901,7 +901,8 @@ class UtilsTests(test_utils.GenericTestBase):
         final_result = (result[0], set(result[1]))
         self.assertEqual(
             final_result,
-            (yaml_content,
+            (
+                yaml_content,
                 set(
                     [
                         (
@@ -917,7 +918,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_get_current_time_in_millisecs_with_current_time(self) -> None:
         time_instance1 = utils.get_current_time_in_millisecs()
-        if (isinstance(time_instance1, float)):
+        if isinstance(time_instance1, float):
             pass
         time_instance2 = utils.get_current_time_in_millisecs()
         self.assertLess(time_instance1, time_instance2)
