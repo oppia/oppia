@@ -68,10 +68,10 @@ export class PretestQuestionBackendApiService {
       var pretestQuestionDicts = (
         cloneDeep(data.pretest_question_dicts));
       var pretestQuestionObjects = pretestQuestionDicts.map(
-        function(pretestQuestionDict) {
+        (pretestQuestionDict) => {
           return this.questionObjectFactory.createFromBackendDict(
             pretestQuestionDict);
-        }, this);
+        });
       if (successCallback) {
         successCallback(pretestQuestionObjects);
       }

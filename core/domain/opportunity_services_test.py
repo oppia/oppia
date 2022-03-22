@@ -191,35 +191,33 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 0)
-
         self.add_exploration_0_to_story()
         self.create_translation_suggestion_for_exploration_0_and_verify()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
+
         self.assertEqual(len(translation_opportunities), 1)
         opportunity = translation_opportunities[0]
-        languages_of_translations_in_review = (
-            opportunity.translation_in_review_counts.keys())
-        self.assertEqual(len(languages_of_translations_in_review), 1)
+        self.assertEqual(
+            opportunity.translation_in_review_counts,
+            {'hi': 1})
 
     def test_get_translation_opportunities_with_no_translations_in_review(self):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 0)
-
         self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
+
         self.assertEqual(len(translation_opportunities), 1)
         opportunity = translation_opportunities[0]
-        languages_of_translations_in_review = (
-            opportunity.translation_in_review_counts.keys())
-        self.assertEqual(len(languages_of_translations_in_review), 0)
+        self.assertEqual(opportunity.translation_in_review_counts, {})
 
     def test_opportunity_get_deleted_with_removing_exploration_from_story_node(
             self):
@@ -850,6 +848,26 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunities['0'],
             opportunity_domain.ExplorationOpportunitySummary)
         self.assertEqual(opportunities['0'].id, '0')
+
+    def test_get_exploration_opportunity_summaries_by_no_topic_id(self):
+        opportunity_summaries = (
+            opportunity_services
+                .get_exploration_opportunity_summaries_by_topic_id(
+                'None'))
+
+        self.assertEqual(opportunity_summaries, [])
+
+    def test_get_exploration_opportunity_summaries_by_valid_topic_id(self):
+        opportunity_summaries = (
+            opportunity_services
+                .get_exploration_opportunity_summaries_by_topic_id(
+                'topic'))
+
+        self.assertEqual(len(opportunity_summaries), 1)
+        self.assertIsInstance(
+            opportunity_summaries[0],
+            opportunity_domain.ExplorationOpportunitySummary)
+        self.assertEqual(opportunity_summaries[0].topic_id, 'topic')
 
     def test_get_exploration_opportunity_summaries_by_ids_for_invalid_id(self):
         opportunities = (

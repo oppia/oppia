@@ -311,7 +311,8 @@ export class SvgEditorComponent implements OnInit {
             svgDataUrl as string),
           unsafeUrl: svgDataUrl as string
         };
-        this.savedSvgDiagram = atob(svgDataUrl.split(',')[1]);
+        this.savedSvgDiagram = this._base64DecodeUnicode(
+          svgDataUrl.split(',')[1]);
       } else {
         this.svgFileFetcherBackendApiService.fetchSvg(
           this.data.savedSvgUrl as string
@@ -322,6 +323,15 @@ export class SvgEditorComponent implements OnInit {
         );
       }
     }
+  }
+
+  private _base64DecodeUnicode(base64String: string) {
+    // Coverting base64 to unicode string. This technique converts bytestream
+    // to percent-encoding, to original string.
+    // See https://stackoverflow.com/a/30106551
+    return decodeURIComponent(atob(base64String).split('').map(char => {
+      return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
   }
 
   postSvgToServer(
@@ -1130,7 +1140,8 @@ export class SvgEditorComponent implements OnInit {
     } else {
       this.drawMode = this.DRAW_MODE_NONE;
       if (this.uploadedSvgDataUrl !== null) {
-        var svgString = atob(this.uploadedSvgDataUrl.unsafeUrl.split(',')[1]);
+        const svgString = this._base64DecodeUnicode(
+          this.uploadedSvgDataUrl.unsafeUrl.split(',')[1]);
         fabric.loadSVGFromString(svgString, (args) => this.loadSvgFile(args));
       }
       this.canvas.renderAll();

@@ -24,11 +24,11 @@ import argparse
 import os
 import re
 
-from core import python_utils
+from core import utils
 from scripts import common
 
 GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING = 'git diff --name-only %s %s'
-GIT_CMD_SHOW_FORMAT_STRING = 'git show %s:feconf.py'
+GIT_CMD_SHOW_FORMAT_STRING = 'git show %s:core/feconf.py'
 VERSION_RE_FORMAT_STRING = r'%s\s*=\s*(\d+|\.)+'
 FECONF_SCHEMA_VERSION_CONSTANT_NAMES = [
     'CURRENT_STATE_SCHEMA_VERSION', 'CURRENT_COLLECTION_SCHEMA_VERSION']
@@ -57,7 +57,7 @@ def get_changed_schema_version_constant_names(release_tag_to_diff_against):
     changed_version_constants_in_feconf = []
     git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % release_tag_to_diff_against)
     old_feconf = common.run_cmd(git_show_cmd.split(' '))
-    with python_utils.open_file(FECONF_FILEPATH, 'r') as feconf_file:
+    with utils.open_file(FECONF_FILEPATH, 'r') as feconf_file:
         new_feconf = feconf_file.read()
     for version_constant in FECONF_SCHEMA_VERSION_CONSTANT_NAMES:
         old_version = re.findall(
