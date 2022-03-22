@@ -22,6 +22,7 @@ import base64
 import copy
 import datetime
 import os
+import sys
 import urllib
 
 from core import feconf
@@ -813,27 +814,36 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_random_choice(list_instance2)
 
     def test_get_human_readable_time_string(self) -> None:
-        """Should we test for negative time."""
-        self.assertEqual('December 12 06:42:12', utils.get_human_readable_time_string(944980932342.38))  # pylint: disable=line-too-long
-
+        self.assertEqual(
+            'December 12 06:42:12',
+            utils.get_human_readable_time_string(944980932342.38)
+        ) 
     def test_generate_new_session_id(self) -> None:
         self.assertEqual(24, len(utils.generate_new_session_id()))
-        self.assertEqual(type(utils.generate_new_session_id()).__name__, 'str')
+        self.assertIsInstance(utils.generate_new_session_id(), str)
 
     def test_require_valid_name_with_incorrect_input(self) -> None:
         """ADD TEST ESCAPE SEQUENCE CHARACTERS CHECK."""
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'The length of the exploration title should be between 1 and 50 ' 'characters; received '''):   # pylint: disable=line-too-long
+            utils.ValidationError,
+            'The length of the exploration title should be between 1 and 50 ' 'characters; received '''):   # pylint: disable=line-too-long
             utils.require_valid_name('', 'the exploration title')
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Names should not start or end with whitespace.'):  # pylint: disable=line-too-long
+            utils.ValidationError,
+            'Names should not start or end with whitespace.'):
             utils.require_valid_name(' 123\n', 'the exploration title')
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Adjacent whitespace in the exploration title should be collapsed.'):  # pylint: disable=line-too-long
+            utils.ValidationError,
+            'Adjacent whitespace in the exploration title should be collapsed.'):
             utils.require_valid_name('1  23', 'the exploration title')
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Invalid character : in the exploration title: 1\n:23'):  # pylint: disable=line-too-long
+            utils.ValidationError,
+            'Invalid character : in the exploration title: 1\n:23'): 
             utils.require_valid_name('1\n:23', 'the exploration title')
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Invalid character : in the exploration title: 1\\n:23'): 
+            utils.require_valid_name('1\\n:23', 'the exploration title')
 
     def test_get_hex_color_for_category(self) -> None:
         self.assertEqual(
@@ -842,17 +852,36 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_hex_color_for_category('Quantum Physics'), '#a33f40')
 
     def test_unescape_encoded_uri_component(self) -> None:
-        self.assertEqual(utils.unescape_encoded_uri_component('/El%20Ni%C3%B1o/'), '/El Niño/')  # pylint: disable=line-too-long
+        self.assertEqual(
+            utils.unescape_encoded_uri_component('/El%20Ni%C3%B1o/'),
+            '/El Niño/')
 
     def test_compress_and_decompress_zlib(self) -> None:
-        string_instance = b'This is for testing'
+        string_instance = b'a'*26
         string_compressed = utils.compress_to_zlib(string_instance)
-        self.assertNotEqual(len(string_compressed), len(string_instance))
-        self.assertEqual(len(utils.decompress_from_zlib(string_compressed)), len(string_instance))  # pylint: disable=line-too-long
+        self.assertNotEqual(sys.getsizeof(string_compressed), sys.getsizeof(string_instance))
+        self.assertEqual(
+            utils.decompress_from_zlib(string_compressed),
+            string_instance)
 
     def test_compute_list_difference(self) -> None:
-        self.assertEqual(utils.compute_list_difference(['-5', '-1', '0', '7', '-4'], ['2', '0', '-5', '-2', '7']), ['-1', '-4'])  # pylint: disable=line-too-long
-
+        self.assertEqual(utils.compute_list_difference(
+                ['-1', '-2', '-3', '-4', '-5'],
+                ['-2', '-5', '-4']),
+                ['-1', '-3'])
+        self.assertEqual(utils.compute_list_difference(
+                ['-1', '-2', '-3', '-4', '-5'],
+                ['-5', '-4', '-3', '-2', '-1']),
+                [])
+        self.assertEqual(utils.compute_list_difference(
+                ['-1', '-2', '-3', '-4', '-5'],
+                ['-6', '-7', '-8', '-9', '-10']),
+                ['-1', '-2', '-3', '-4', '-5'])
+        self.assertEqual(utils.compute_list_difference(
+                ['-1', '-2'],
+                ['-1', '-2', '-3', '-4', '-5']),
+                [])
+        
     def test_convert_png_binary_to_data_url(self) -> None:
         filepath_png = os.path.join('core', 'tests', 'data', 'test_png_img.png')
         file_contents_png = utils.get_file_contents(
@@ -865,14 +894,25 @@ class UtilsTests(test_utils.GenericTestBase):
         img1_file_content = b'<svg width="100" height="100"><circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" /></svg>'  # pylint: disable=line-too-long
         img2_file_content = b'<svg width="400" height="110"><rect width="300" height="100" style="fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)" /></svg>'  # pylint: disable=line-too-long
         yaml_content = 'name: John Smith\ncontact:\n    home:   1012355532\n    office:  5002586256\naddress:\n  street: |\n            123 Tornado Alley\n            Suite 16            \n    city:   East Centerville\n    state:  KS'   # pylint: disable=line-too-long
-        result = utils.get_exploration_components_from_dir('core/tests/data/dummy_assets_yaml') # pylint: disable=line-too-long
+        result = utils.get_exploration_components_from_dir(
+            'core/tests/data/dummy_assets_yaml')
         final_result = (result[0], set(result[1]))
-        self.assertEqual(final_result, (yaml_content, set([(img2_path, img2_file_content), (img1_path, img1_file_content)])))  # pylint: disable=line-too-long
+        self.assertEqual(
+            final_result,
+            (yaml_content,
+                set([(img2_path,
+                    img2_file_content),
+                    (img1_path,
+                    img1_file_content)])
+                )
+            )
 
     def test_get_current_time_in_millisecs_with_current_time(self) -> None:
         time_instance1 = utils.get_current_time_in_millisecs()
+        if(True):
+            pass
         time_instance2 = utils.get_current_time_in_millisecs()
-        self.assertNotEqual(time_instance1, time_instance2)
+        self.assertLess(time_instance1, time_instance2)
 
     def test_get_require_valid_name_with_empty_string(self) -> None:
         utils.require_valid_name('', 'the exploration title', allow_empty=True)

@@ -333,10 +333,12 @@ def get_random_int(upper_bound: int) -> int:
     Returns:
         int. Randomly generated integer less than the upper_bound.
     """
-    assert upper_bound >= 0 and isinstance(upper_bound, int), 'Only positive integers allowed' # pylint: disable=line-too-long
-
-    generator = random.SystemRandom()
-    return generator.randrange(0, stop=upper_bound)
+    if upper_bound >= 0 and isinstance(upper_bound, int):
+        generator = random.SystemRandom()
+        return generator.randrange(0, stop=upper_bound)
+    else:
+        raise AssertionError('Only positive integers allowed')
+    
 
 
 def get_random_choice(alist: List[T]) -> T:
@@ -348,10 +350,11 @@ def get_random_choice(alist: List[T]) -> T:
     Returns:
         *. Random element choosen from the passed input list.
     """
-    assert isinstance(alist, list) and len(alist) > 0, 'Only non-empty lists allowed' # pylint: disable=line-too-long
-
-    index = get_random_int(len(alist))
-    return alist[index]
+    if isinstance(alist, list) and len(alist) > 0:
+        index = get_random_int(len(alist))
+        return alist[index]
+    else:
+        raise AssertionError('Only non-empty lists allowed')
 
 
 def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
@@ -607,8 +610,11 @@ def get_human_readable_time_string(time_msec: float) -> str:
     """
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
-    return time.strftime(
-        '%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
+    if time_msec < 0:
+        raise AssertionError("Time cannot be negative")
+    else:
+        return time.strftime(
+            '%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
 
 
 def create_string_from_largest_unit_in_timedelta(
