@@ -1,8 +1,22 @@
 <div *ngIf="subtopicTitle" class="nav navbar-nav oppia-navbar-breadcrumb oppia-subtopic-viewer-nav-breadcrumb">
   <div class="oppia-subtopic-viewer-nav-separator"></div>
   <div class="oppia-subtopic-viewer-nav-labels-container">
-    <p class="oppia-subtopic-title-text">{{ subtopicTitle }}</p>
-    <a class="topic-name oppia-topic-name-text" [href]="getTopicUrl()">{{ topicName }}</a>
+    <p class="oppia-subtopic-title-text">
+      <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()">
+        {{ subtopicTitle }}
+      </span>
+      <span *ngIf="isHackySubtopicTitleTranslationDisplayed()">
+        {{ subtopicTitleTranslationKey | translate }}
+      </span>
+    </p>
+    <a class="topic-name oppia-topic-name-text" [href]="getTopicUrl()">
+      <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+        {{ topicName }}
+      </span>
+      <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+        {{ topicNameTranslationKey | translate }}
+      </span>
+    </a>
   </div>
 </div>
 
