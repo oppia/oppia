@@ -2212,19 +2212,21 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
                 '/mock_without_schema', self.MockHandlerWithoutSchema),
         ], debug=feconf.DEBUG))
 
-    def test_raise_error_on_get(self):
+    def test_object_which_raises_error_on_get(self):
         err_message = 'err_message'
         error = base.RaiseErrorOnGet(err_message)
         with self.assertRaisesRegex(ValueError, err_message):
             error.get('key')
 
-    def test_raise_error_on_get_for_payload_request_with_schema(self):
+    def test_request_with_schema_using_payload_or_request_attr_raise_error(
+            self):
         with self.swap(self, 'testapp', self.testapp):
             self.post_json(
                 '/mock_with_schema', self.payload, csrf_token=self.csrf_token,
                 expected_status_int=500)
 
-    def test_raise_no_error_on_get_for_payload_request_without_schema(self):
+    def test_request_without_schema_using_payload_or_request_attr_raise_no_err(
+            self):
         test_app_ctx = self.swap(self, 'testapp', self.testapp)
         handler_class_still_needs_schema_list_ctx = self.swap(
             handler_schema_constants, 'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
