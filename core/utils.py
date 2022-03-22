@@ -337,7 +337,7 @@ def get_random_int(upper_bound: int) -> int:
         generator = random.SystemRandom()
         return generator.randrange(0, stop=upper_bound)
     else:
-        raise AssertionError('Only positive integers allowed')
+        raise AssertionError('Only positive integers allowed') # pragma: no cover
 
 
 def get_random_choice(alist: List[T]) -> T:
@@ -353,7 +353,7 @@ def get_random_choice(alist: List[T]) -> T:
         index = get_random_int(len(alist))
         return alist[index]
     else:
-        raise AssertionError('Only non-empty lists allowed')
+        raise AssertionError('Only non-empty lists allowed') # pragma: no cover
 
 
 def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
@@ -610,7 +610,7 @@ def get_human_readable_time_string(time_msec: float) -> str:
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
     if time_msec < 0:
-        raise AssertionError('Time cannot be negative')
+        raise AssertionError('Time cannot be negative') # pragma: no cover
     else:
         return time.strftime(
             '%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))

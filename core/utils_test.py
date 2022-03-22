@@ -818,6 +818,9 @@ class UtilsTests(test_utils.GenericTestBase):
             'December 12 06:42:12',
             utils.get_human_readable_time_string(944980932342.38)
         )
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            AssertionError, 'Time cannot be negative'):
+            utils.get_human_readable_time_string(-1.42)
 
     def test_generate_new_session_id(self) -> None:
         self.assertEqual(24, len(utils.generate_new_session_id()))
@@ -841,10 +844,6 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Invalid character : in the exploration title: 1\n:23'):
             utils.require_valid_name('1\n:23', 'the exploration title')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Invalid character : in the exploration title: 1\\n:23'):
-            utils.require_valid_name('1\\n:23', 'the exploration title')
 
     def test_get_hex_color_for_category(self) -> None:
         self.assertEqual(
@@ -905,19 +904,20 @@ class UtilsTests(test_utils.GenericTestBase):
             (yaml_content,
                 set(
                     [
-                        (img2_path,
-                        img2_file_content),
-                        (img1_path,
-                        img1_file_content)
-                        ]
+                        (
+                            img2_path,
+                            img2_file_content),
+                        (
+                            img1_path,
+                            img1_file_content)
+                            ]
+                        )
                     )
                 )
-            )
 
     def test_get_current_time_in_millisecs_with_current_time(self) -> None:
         time_instance1 = utils.get_current_time_in_millisecs()
-        x = 1
-        if (x==1):
+        if (isinstance(time_instance1, float)):
             pass
         time_instance2 = utils.get_current_time_in_millisecs()
         self.assertLess(time_instance1, time_instance2)
