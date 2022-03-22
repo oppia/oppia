@@ -60,6 +60,7 @@ export default {
     "ASSIGNED": "Assigned",
     "UNASSIGNED": "Unassigned"
   },
+  "TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE": 10,
   "TOPIC_SKILL_DASHBOARD_SORT_OPTIONS": {
     "IncreasingCreatedOn": "Newly Created",
     "DecreasingCreatedOn": "Oldest Created",
