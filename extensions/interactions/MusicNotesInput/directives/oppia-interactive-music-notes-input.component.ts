@@ -78,7 +78,8 @@ export class MusicNotesInputComponent implements
   noteSequence: NoteSequence[] = [];
   _currentNoteId = 0;
   NOTE_TYPE_NATURAL = 0;
-  // TODO(wagnerdmike): More notes types will be added to NOTE_TYPES.
+  // TODO(#15177): Add more features to Music-Notes-Input Interaction
+  // More notes types will be added to NOTE_TYPES.
   NOTE_TYPES = [this.NOTE_TYPE_NATURAL];
   NOTES_ON_LINES = ['E4', 'G4', 'B4', 'D5', 'F5'];
   LEDGER_LINE_NOTES = ['C4', 'A5'];
@@ -119,10 +120,10 @@ export class MusicNotesInputComponent implements
       ) as MusicNotesInputCustomizationArgs);
 
     this.sequenceToGuess = sequenceToGuess;
-    this.interactionIsActive = (this.lastAnswer === null);
+    this.interactionIsActive = this.lastAnswer === null;
 
-    this.initialSequence = this.interactionIsActive ?
-      initialSequence : this.lastAnswer;
+    this.initialSequence = (
+      this.interactionIsActive ? initialSequence : this.lastAnswer);
     this.staffContainerElt = $(this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-staff'));
 
@@ -189,12 +190,14 @@ export class MusicNotesInputComponent implements
    */
   generateNoteId(): string {
     this._currentNoteId += 1;
-    return 'note_id_' + (this._currentNoteId - 1);
+    let nodeId = 'note_id_' + (this._currentNoteId - 1);
+    return nodeId;
   }
 
   // Staff has to be reinitialized every time that the staff is resized or
   // displayed. The staffContainerElt and all subsequent measurements
   // must be recalculated in order for the grid to work properly.
+  // TODO(#14340): Remove some usages of jQuery from the codebase.
   reinitStaff(): void {
     $('.oppia-music-input-valid-note-area').css('visibility', 'hidden');
     setTimeout(() => {
@@ -245,12 +248,14 @@ export class MusicNotesInputComponent implements
   }
 
   // Removes all notes from staff.
+  // TODO(#14340): Remove some usages of jQuery from the codebase.
   clearNotesFromStaff(): void {
     $(this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-note-choices div')).remove();
   }
 
   // Removes all droppable staff lines.
+  // TODO(#14340): Remove some usages of jQuery from the codebase.
   clearDroppableStaff(): void {
     $(this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-staff div')).remove();
@@ -258,6 +263,7 @@ export class MusicNotesInputComponent implements
 
   // Returns an Object containing the baseNoteMidiValues (81, 79, 77...)
   // as keys and the vertical positions of the staff lines as values.
+  // TODO(#14340): Remove some usages of jQuery from the codebase.
   getStaffLinePositions(): Object {
     let staffLinePositionsArray = [];
     let staffLinePositions = {};
@@ -275,22 +281,19 @@ export class MusicNotesInputComponent implements
   }
 
   // Creates the notes and helper-clone notes for the noteChoices div.
+  // TODO(#14340): Remove some usages of jQuery from the codebase.
   initPalette(): void {
     let noteChoicesDiv = $(this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-note-choices'));
     let validNoteArea = $(this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-valid-note-area'));
     for (let i = 0; i < this.NOTE_TYPES.length; i++) {
-      let innerDiv = $('<div></div>')
-        .data('noteType', this.NOTE_TYPES[i])
-        .addClass((index, currentClassName) => {
-          let addedClass = null;
-          if ($(currentClassName).data('noteType') === this.NOTE_TYPE_NATURAL) {
-            addedClass = 'oppia-music-input-natural-note';
-            $(currentClassName).addClass('oppia-music-input-natural-note');
-          }
-          return addedClass;
-        });
+      let innerDiv = $('<div></div>').data('noteType', this.NOTE_TYPES[i]);
+      let addedClass = null;
+      if ($(innerDiv).data('noteType') === this.NOTE_TYPE_NATURAL) {
+        addedClass = 'oppia-music-input-natural-note';
+        $(innerDiv).addClass(addedClass);
+      }
       if (this.interactionIsActive) {
         innerDiv.draggable({
           // Keeps note from being placed on top of the clef.
@@ -304,13 +307,13 @@ export class MusicNotesInputComponent implements
               // This makes the helper clone a new draggable note.
               $(ui.helper)
               // Retains original note type (e.g. natural, flat, sharp).
-                .data('noteType', $(this).data('noteType'))
+                .data('noteType', $(innerDiv).data('noteType'))
                 .draggable({
                 // The leftPosBeforeDrag helps with the sorting of user
                 // sequence.
                   start: () => {
-                    $(this).data(
-                      'leftPosBeforeDrag', $(this).position().left);
+                    $(innerDiv).data(
+                      'leftPosBeforeDrag', $(innerDiv).position().left);
                   },
                   containment: '.oppia-music-input-valid-note-area',
                   cursor: 'pointer',
@@ -320,7 +323,7 @@ export class MusicNotesInputComponent implements
                   stack: '.oppia-music-input-note-choices div',
                   tolerance: 'intersect',
                   revert: () => {
-                    let draggableOptions = $(this);
+                    let draggableOptions = $(innerDiv);
                     // If note is out of droppable or off staff,
                     // remove it.
                     if (this.isCloneOffStaff(draggableOptions)) {
@@ -339,9 +342,12 @@ export class MusicNotesInputComponent implements
     }
   }
 
+  // TODO(#14340): Remove some usages of jQuery from the codebase.
   repaintNotes(): void {
     let noteChoicesDiv = $(this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-note-choices'));
+    let validNoteArea = $(this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-valid-note-area'));
     for (let i = 0; i < this.noteSequence.length; i++) {
       let innerDiv = $('<div></div>')
         .data('noteType', this.NOTE_TYPE_NATURAL)
@@ -363,15 +369,15 @@ export class MusicNotesInputComponent implements
       if (this.interactionIsActive) {
         innerDiv.draggable({
           // Keeps note from being placed on top of the clef.
-          containment: '.oppia-music-input-valid-note-area',
+          containment: validNoteArea,
           cursor: 'pointer',
           stack: '.oppia-music-input-note-choices div',
           grid: [this.HORIZONTAL_GRID_SPACING, 1],
           start: () => {
-            $(this).data('leftPosBeforeDrag', $(this).position().left);
+            $(innerDiv).data('leftPosBeforeDrag', $(innerDiv).position().left);
           },
           revert: () => {
-            let draggableOptions = $(this);
+            let draggableOptions = $(innerDiv);
             // If note is out of droppable or off staff, remove it.
             if (this.isCloneOffStaff(draggableOptions)) {
               this._removeNotesFromNoteSequenceWithId(
@@ -388,6 +394,7 @@ export class MusicNotesInputComponent implements
   }
 
   // Creates a staff of droppable lines.
+  // TODO(#14340): Remove some usages of jQuery from the codebase.
   buildDroppableStaff(): void {
     let lineValues = Object.keys(this.NOTE_NAMES_TO_MIDI_VALUES);
     for (let i = 0; i < lineValues.length; i++) {
@@ -436,7 +443,7 @@ export class MusicNotesInputComponent implements
             let topPos = $(evt.target).position().top;
 
             // The staff line's value.
-            let lineValue = $(this).data('lineValue');
+            let lineValue = $(evt.target).data('lineValue');
             let noteType = ui.draggable.data('noteType');
 
             // A note that is dragged from noteChoices box
@@ -596,6 +603,7 @@ export class MusicNotesInputComponent implements
 
   // Clear noteSequence values and remove all notes
   // and Ledger Lines from the staff.
+  // TODO(#14340): Remove some usages of jQuery from the codebase.
   clearSequence(): void {
     this.noteSequence = [];
     $('.oppia-music-input-on-staff').remove();
@@ -619,7 +627,7 @@ export class MusicNotesInputComponent implements
    */
   getHorizontalPosition(noteStartAsFloat: number): number {
     let lastHorizontalPositionOffset = $(
-      this.elementRef.nativeElement.querySelectorAll(
+      this.elementRef.nativeElement.querySelector(
         '.oppia-music-input-note-choices div:first-child')).position().left;
     let leftOffset =
       lastHorizontalPositionOffset - (
@@ -638,6 +646,7 @@ export class MusicNotesInputComponent implements
     return this.LEDGER_LINE_NOTES.indexOf(lineValue) !== -1;
   }
 
+  // TODO(#14340): Remove some usages of jQuery from the codebase.
   drawLedgerLine(topPos: number, leftPos: number): void {
     let ledgerLineDiv = $('<div></div>')
       .addClass(
@@ -647,7 +656,7 @@ export class MusicNotesInputComponent implements
         // When a ledgerLine note is moved out of its droppable,
         // remove ledger line.
         out: () => {
-          $(this).hide();
+          $(ledgerLineDiv).hide();
         },
         hoverClass: 'oppia-music-input-hovered',
         containment: '.oppia-music-input-valid-note-area'
@@ -660,7 +669,8 @@ export class MusicNotesInputComponent implements
         top: topPos + this.VERTICAL_GRID_SPACING * 0.4
       });
 
-    $('.oppia-music-input-staff').append(ledgerLineDiv);
+    $(this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-staff')).append(ledgerLineDiv);
   }
 
   repaintLedgerLines(): void {
@@ -754,7 +764,8 @@ export class MusicNotesInputComponent implements
   }
 
   // For each note in a sequence, add a noteDuration property.
-  // TODO(wagnerdmike): - Add more options for note durations.
+  // TODO(#15177): Add more features to Music-Notes-Input Interaction
+  // Add more options for note durations.
   _makeAllNotesHaveDurationOne(
       noteArray: ReadableMusicNote[]): ReadableMusicNote[] {
     for (let i = 0; i < noteArray.length; i++) {
@@ -843,7 +854,8 @@ export class MusicNotesInputComponent implements
   }
 
   // Return the MIDI value for each note in the sequence.
-  // TODO(wagnerdmike): - Add chord functionality.
+  // TODO(#15177): Add more features to Music-Notes-Input Interaction.
+  // Add chord functionality.
   convertSequenceToGuessToMidiSequence(sequence: MusicNote[]): number[][] {
     let midiSequence = [];
     for (let i = 0; i < sequence.length; i++) {
@@ -857,7 +869,8 @@ export class MusicNotesInputComponent implements
   }
 
   // Return the MIDI value for each note in the sequence.
-  // TODO(wagnerdmike): - Add chord functionality.
+  // TODO(#15177): Add more features to Music-Notes-Input Interaction.
+  // Add chord functionality.
   convertNoteSequenceToMidiSequence(sequence: NoteSequence[]): number[][] {
     let midiSequence = [];
     for (let i = 0; i < sequence.length; i++) {
