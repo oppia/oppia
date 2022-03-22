@@ -35,6 +35,8 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
         """Tests that trying to retrieve a non-translatable class raises an
         error.
         """
+        # TODO(#13059): Remove the no-untyped-call ignore when assertRaisesRegex
+        # function has been type annotated
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             TypeError, 'not a valid translatable object class'
         ):
@@ -43,6 +45,8 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_fake_class_is_not_gettable(self) -> None:
         """Tests that trying to retrieve a fake class raises an error."""
+        # TODO(#13059): Remove the no-untyped-call ignore when assertRaisesRegex
+        # function has been type annotated
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             TypeError, 'not a valid translatable object class'):
             translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
@@ -52,12 +56,16 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
         """Tests that the base objects exist but are not included in the
         registry.
         """
+        # TODO(#13059): Remove the no-untyped-call ignore when assertRaisesRegex
+        # function has been type annotated
         assert getattr(objects, 'BaseObject')
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             TypeError, 'not a valid translatable object class'):
             translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
                 'BaseObject')
 
+        # TODO(#13059): Remove the no-untyped-call ignore when assertRaisesRegex
+        # function has been type annotated
         assert getattr(objects, 'BaseTranslatableObject')
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             TypeError, 'not a valid translatable object class'):

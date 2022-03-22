@@ -81,35 +81,30 @@ class Registry:
     @overload
     @classmethod
     def get_object_class(
-        cls,
-        obj_type: Literal['TranslatableHtml']
-        ) -> Type[objects.TranslatableHtml]: ...
+        cls, obj_type: Literal['TranslatableHtml']
+    ) -> Type[objects.TranslatableHtml]: ...
 
     @overload
     @classmethod
     def get_object_class(
-        cls,
-        obj_type: Literal['TranslatableUnicodeString']
-        ) -> Type[objects.TranslatableUnicodeString]: ...
+        cls, obj_type: Literal['TranslatableUnicodeString']
+    ) -> Type[objects.TranslatableUnicodeString]: ...
 
     @overload
     @classmethod
     def get_object_class(
-        cls,
-        obj_type: Literal['TranslatableSetOfUnicodeString']
-        ) -> Type[objects.TranslatableSetOfUnicodeString]: ...
+        cls, obj_type: Literal['TranslatableSetOfUnicodeString']
+    ) -> Type[objects.TranslatableSetOfUnicodeString]: ...
 
     @overload
     @classmethod
     def get_object_class(
-        cls,
-        obj_type: Literal['TranslatableSetOfNormalizedString']
-        ) -> Type[objects.TranslatableSetOfNormalizedString]: ...
+        cls, obj_type: Literal['TranslatableSetOfNormalizedString']
+    ) -> Type[objects.TranslatableSetOfNormalizedString]: ...
 
     @classmethod
     def get_object_class(
-        cls,
-        obj_type: TranslatableObjectNames
+        cls, obj_type: TranslatableObjectNames
     ) -> TranslatableObjectClasses:
         """Gets a translatable object class by its type.
 
