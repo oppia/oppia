@@ -439,9 +439,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id))
         self.assertEqual(self.story_id, json_response['story']['id'])
         self.assertEqual('Name', json_response['topic_name'])
-        self.assertEqual(len(json_response['skill_summaries']), 1)
-        self.assertEqual(
-            json_response['skill_summaries'][0]['description'], 'Description 3')
+        self.assertEqual(len(json_response['skill_summaries']), 0)
         self.logout()
 
     def test_editable_story_handler_put(self):

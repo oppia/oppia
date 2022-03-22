@@ -67,8 +67,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
-            None, False, ['skill_id_2']
-        )
+            None, False, ['skill_id_2'],
+            created_on=datetime.datetime.now(),
+            last_updated=datetime.datetime.now())
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the skill passes strict validation."""
@@ -99,6 +100,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         misconception_name = 'This string is smaller than 50'
         self.skill.update_misconception_name(0, misconception_name)
         self.skill.validate()
+        with self.assertRaisesRegex(
+            ValueError,
+            'There is no misconception with the given id.'
+        ):
+            self.skill.update_misconception_name(1, misconception_name)
         misconception_name = (
             'etiam non quam lacus suspendisse faucibus interdum posuere lorem '
             'ipsum dolor sit amet consectetur adipiscing elit duis tristique '
@@ -107,6 +113,283 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Misconception name should be less than 100 chars'
         )
+        self.assertEqual(self.skill.get_incremented_misconception_id(0), 1)
+
+    def test_update_contents_from_model(self):
+        versioned_skill_contents = {
+            'schema_version': 1,
+            'skill_contents': {
+                'explanation': {
+                    'content_id': '1',
+                    'html': '<p>Feedback</p>'
+                    '<oppia-noninteractive-math raw_latex-with-valu'
+                    'e="&amp;quot;+,-,-,+&amp;quot;">'
+                    '</oppia-noninteractive-math>',
+                },
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'explanation': {}
+                    }
+                },
+                'written_translations': {
+                    'translations_mapping': {
+                        'explanation': {}
+                    }
+                },
+                'worked_examples': [
+                    {
+                        'question': {
+                            'html': '<p>A Question</p>'
+                        },
+                        'explanation': {
+                            'html': '<p>An explanation</p>'
+                        }
+                    }
+                ]
+            }
+        }
+        self.skill.update_skill_contents_from_model(
+            versioned_skill_contents,
+            versioned_skill_contents['schema_version']
+        )
+        self.skill.validate()
+        self.assertEqual(versioned_skill_contents['schema_version'], 2)
+        self.assertEqual(
+            versioned_skill_contents['skill_contents']['explanation'],
+            {
+                'content_id': '1',
+                'html': '<p>Feedback</p><oppia-noninteractive-math '
+                'math_content-with-v'
+                'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+                '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
+                ';quot;}"></oppia-noninteractive-math>',
+            }
+        )
+        versioned_skill_contents['skill_contents']['explanation'] = {
+            'content_id': '1',
+            'html': '<oppia-noninteractive-svgdiagram '
+                'svg_filename-with-value="&amp;quot;img1.svg&amp;quot;"'
+                ' alt-with-value="&amp;quot;Image&amp;quot;">'
+                '</oppia-noninteractive-svgdiagram>'
+        }
+        self.skill.update_skill_contents_from_model(
+            versioned_skill_contents,
+            versioned_skill_contents['schema_version']
+        )
+        self.skill.validate()
+        self.assertEqual(versioned_skill_contents['schema_version'], 3)
+        self.assertEqual(
+            versioned_skill_contents['skill_contents']['explanation'],
+            {
+                'content_id': '1',
+                'html': '<oppia-noninteractive-image '
+                'alt-with-value="&amp;quot;Image&amp;quot;" '
+                'caption-with-value="&amp;quot;&amp;quot;" '
+                'filepath-with-value="&amp;quot;img1.svg&amp;quot;">'
+                '</oppia-noninteractive-image>',
+            }
+        )
+        versioned_skill_contents['skill_contents']['explanation']['html'] = (
+            '<p><span>Test&nbsp;</span></p>'
+        )
+        self.skill.update_skill_contents_from_model(
+            versioned_skill_contents,
+            versioned_skill_contents['schema_version']
+        )
+        self.skill.validate()
+        self.assertEqual(versioned_skill_contents['schema_version'], 4)
+        self.assertEqual(
+            versioned_skill_contents['skill_contents']['explanation'],
+            {
+                'content_id': '1',
+                'html': '<p><span>Test </span></p>',
+            }
+        )
+
+    def test_update_misconceptions_from_model(self):
+        versioned_misconceptions = {
+            'schema_version': 1,
+            'misconceptions': [
+                {
+                    'misconception_id': self.MISCONCEPTION_ID,
+                    'name': 'name',
+                    'notes': '<p>notes</p>',
+                    'feedback': '<p>feedback</p>',
+                }
+            ]
+        }
+        self.skill.update_misconceptions_from_model(
+            versioned_misconceptions,
+            versioned_misconceptions['schema_version']
+        )
+        self.skill.validate()
+        self.assertEqual(versioned_misconceptions['schema_version'], 2)
+        self.assertEqual(
+            versioned_misconceptions['misconceptions'][0]['must_be_addressed'],
+            True
+        )
+        versioned_misconceptions['misconceptions'][0]['feedback'] = (
+            '<p>'
+            'Feedback</p>'
+            '<oppia-noninteractive-math raw_latex-with-valu'
+            'e="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+        )
+        expected_feedback = (
+            '<p>Feedback</p>'
+            '<oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
+            ';quot;}"></oppia-noninteractive-math>'
+        )
+        self.skill.update_misconceptions_from_model(
+            versioned_misconceptions,
+            versioned_misconceptions['schema_version']
+        )
+        self.skill.validate()
+        self.assertEqual(versioned_misconceptions['schema_version'], 3)
+        self.assertEqual(
+            versioned_misconceptions['misconceptions'][0]['feedback'],
+            expected_feedback
+        )
+        self.skill.update_misconceptions_from_model(
+            versioned_misconceptions,
+            versioned_misconceptions['schema_version']
+        )
+        self.skill.validate()
+        self.assertEqual(versioned_misconceptions['schema_version'], 4)
+        versioned_misconceptions['misconceptions'][0]['feedback'] = (
+            '<span>'
+            'feedback&nbsp;</span>'
+        )
+        self.skill.update_misconceptions_from_model(
+            versioned_misconceptions,
+            versioned_misconceptions['schema_version']
+        )
+        self.assertEqual(versioned_misconceptions['schema_version'], 5)
+        self.assertEqual(
+            versioned_misconceptions['misconceptions'][0]['feedback'],
+            '<span>feedback </span>'
+        )
+
+    def test_update_misconception_feedback(self):
+        feedback = '<p>new_feedback</p>'
+        self.skill.update_misconception_feedback(
+            0, feedback)
+        self.skill.validate()
+        self.assertEqual(self.skill.misconceptions[0].feedback, feedback)
+        with self.assertRaisesRegex(
+            ValueError,
+            'There is no misconception with the given id.'
+        ):
+            self.skill.update_misconception_feedback(1, feedback)
+
+    def test_update_misconception_notes(self):
+        new_notes = '<p>Update notes</p>'
+        self.skill.update_misconception_notes(
+            0, new_notes)
+        self.skill.validate()
+        self.assertEqual(self.skill.misconceptions[0].notes, new_notes)
+        with self.assertRaisesRegex(
+            ValueError,
+            'There is no misconception with the given id.'
+        ):
+            self.skill.update_misconception_notes(1, new_notes)
+
+    def test_update_misconception_must_be_addressed(self):
+        must_be_addressed = False
+        self.skill.update_misconception_must_be_addressed(
+            0, must_be_addressed)
+        self.skill.validate()
+        self.assertEqual(
+            self.skill.misconceptions[0].must_be_addressed,
+            must_be_addressed
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            'There is no misconception with the given id.'
+        ):
+            self.skill.update_misconception_must_be_addressed(
+                1, must_be_addressed)
+
+    def test_delete_misconceptions(self):
+        self.skill.delete_misconception(0)
+        self.assertEqual(len(self.skill.misconceptions), 0)
+        with self.assertRaisesRegex(
+            ValueError,
+            'There is no misconception with the given id.'
+        ):
+            self.skill.delete_misconception(0)
+
+    def test_add_misconception(self):
+        misconception = skill_domain.Misconception(
+            self.MISCONCEPTION_ID + 1, 'name_2', '<p>notes_2</p>',
+            '<p>default_feedback_2</p>', True)
+        self.skill.add_misconception(misconception)
+        self.skill.validate()
+        self.assertEqual(self.skill.misconceptions[1], misconception)
+
+    def test_delete_prerequisite_skill(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            'The skill to remove is not a prerequisite skill.'
+        ):
+            self.skill.delete_prerequisite_skill('some_id')
+        self.skill.delete_prerequisite_skill('skill_id_2')
+        self.assertEqual(len(self.skill.prerequisite_skill_ids), 0)
+
+    def test_add_prerequisite_skill(self):
+        self.skill.add_prerequisite_skill('skill_id_3')
+        self.assertEqual(len(self.skill.prerequisite_skill_ids), 2)
+        self.assertEqual(self.skill.prerequisite_skill_ids[1], 'skill_id_3')
+        with self.assertRaisesRegex(
+            ValueError,
+            'The skill is already a prerequisite skill.'
+        ):
+            self.skill.add_prerequisite_skill('skill_id_2')
+
+    def test_find_prerequisite_skill_id_index(self):
+        # Disabling pylint protected access because this is a test.
+        self.assertEqual(
+            self.skill._find_prerequisite_skill_id_index('skill_id_2'), # pylint: disable=protected-access
+            0
+        )
+        self.assertEqual(
+            self.skill._find_prerequisite_skill_id_index('skill_id_3'), # pylint: disable=protected-access
+            None
+        )
+
+    def test_update_explanation(self):
+        new_explanation = state_domain.SubtitledHtml(
+            '1',
+            '<p>New Explanation</p>'
+        )
+        self.skill.update_explanation(new_explanation)
+        self.skill.validate()
+        self.assertEqual(
+            self.skill.skill_contents.explanation,
+            new_explanation
+        )
+
+    def test_update_rubric(self):
+        difficulty = constants.SKILL_DIFFICULTIES[0]
+        explanations = ['explanation1']
+        self.skill.update_rubric(difficulty, explanations)
+        with self.assertRaisesRegex(
+            ValueError,
+            'There is no rubric for the given difficulty.'
+        ):
+            self.skill.update_rubric('difficulty', explanations)
+
+    def test_updates_on_skill(self):
+        self.skill.update_description('Update Description')
+        self.skill.update_language_code('de')
+        self.skill.update_superseding_skill_id('1')
+        self.skill.record_that_all_questions_are_merged(True)
+        self.skill.validate()
+        self.assertEqual(self.skill.description, 'Update Description')
+        self.assertEqual(self.skill.language_code, 'de')
+        self.assertEqual(self.skill.superseding_skill_id, '1')
+        self.assertEqual(self.skill.all_questions_merged, True)
 
     def test_valid_misconception_must_be_addressed(self):
         self.skill.validate()
@@ -518,6 +801,71 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 {'explanations': ['explanation2']}
             ]
         })
+        versioned_rubrics['rubrics'][0]['explanations'] = [
+        '<p>Explanation</p>'
+        '<oppia-noninteractive-math raw_latex-with-valu'
+        'e="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+        ]
+        skill_domain.Skill.update_rubrics_from_model(
+            versioned_rubrics, 2)
+        self.skill.validate()
+        self.assertEqual(versioned_rubrics, {
+            'schema_version': 3,
+            'rubrics': [
+                {
+                    'explanations': [
+                        (
+                            '<p>Explanation</p>'
+                            '<oppia-noninteractive-math math_content-with-v'
+                            'alue="{&amp;quot;raw_latex&amp;quot;:'
+                            ' &amp;quot;+,-,-,'
+                            '+&amp;quot;, &amp;quot;svg_filename'
+                            '&amp;quot;: &amp;quot;&amp'
+                            ';quot;}"></oppia-noninteractive-math>'
+                        )
+                    ]
+                 },
+                {'explanations': ['explanation2']}
+            ]
+        })
+        versioned_rubrics['rubrics'][0]['explanations'] = [(
+            '<oppia-noninteractive-svgdiagram '
+            'svg_filename-with-value="&amp;quot;img1.svg&amp;quot;"'
+            ' alt-with-value="&amp;quot;Image&amp;quot;">'
+            '</oppia-noninteractive-svgdiagram>'
+        )]
+        skill_domain.Skill.update_rubrics_from_model(
+            versioned_rubrics, 3)
+        self.skill.validate()
+        self.assertEqual(versioned_rubrics, {
+            'schema_version': 4,
+            'rubrics': [
+                {
+                    'explanations': [
+                        '<oppia-noninteractive-image '
+                        'alt-with-value="&amp;quot;Image&amp;quot;" '
+                        'caption-with-value="&amp;quot;&amp;quot;" '
+                        'filepath-with-value="&amp;quot;img1.svg&amp;quot;">'
+                        '</oppia-noninteractive-image>'
+                    ]
+                 },
+                {'explanations': ['explanation2']}
+            ]
+        })
+        versioned_rubrics['rubrics'][0]['explanations'] = [
+            '<span>explanation&nbsp;</span>']
+        skill_domain.Skill.update_rubrics_from_model(
+            versioned_rubrics, 4)
+        self.skill.validate()
+        self.assertEqual(versioned_rubrics, {
+            'schema_version': 5,
+            'rubrics': [
+                {
+                    'explanations': ['<span>explanation </span>']
+                 },
+                {'explanations': ['explanation2']}
+            ]
+        })
 
 
 class SkillChangeTests(test_utils.GenericTestBase):
@@ -866,3 +1214,95 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.topic_assignments.to_dict(),
             topic_assignments_dict)
+
+
+class CategorizedSkillsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CategorizedSkillsTests, self).setUp()
+        self.categorized_skills = skill_domain.CategorizedSkills()
+        self.subtopic_titles = ['Subtopic Title 1', 'Subtopic Title 2']
+        self.categorized_skills.add_topic('Topic Name', self.subtopic_titles)
+
+    def test_validation_fails_with_duplicate_topic_name(self):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Topic name \'Topic Name\' is already added.'):
+            self.categorized_skills.add_topic('Topic Name', [])
+
+    def test_uncategorized_skill_gets_added(self):
+        self.categorized_skills.add_uncategorized_skill(
+            'Topic Name', 'skill_1', 'Description 1')
+
+        self.assertEqual(self.categorized_skills.to_dict(), {
+            'Topic Name': {
+                'uncategorized': [{
+                    'skill_id': 'skill_1',
+                    'skill_description': 'Description 1',
+                }],
+                'Subtopic Title 1': [],
+                'Subtopic Title 2': []
+            }
+        })
+
+    def test_validation_fails_with_topic_name_not_added(self):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Topic name \'Topic Name 1\' is not added.'):
+            self.categorized_skills.add_uncategorized_skill(
+                'Topic Name 1', 'skill_1', 'Description 1')
+
+    def test_subtopic_skill_gets_added(self):
+        self.categorized_skills.add_subtopic_skill(
+            'Topic Name', 'Subtopic Title 1', 'skill_2', 'Description 2')
+        self.categorized_skills.add_subtopic_skill(
+            'Topic Name', 'Subtopic Title 2', 'skill_3', 'Description 3')
+
+        self.assertEqual(self.categorized_skills.to_dict(), {
+            'Topic Name': {
+                'uncategorized': [],
+                'Subtopic Title 1': [{
+                    'skill_id': 'skill_2',
+                    'skill_description': 'Description 2'
+                }],
+                'Subtopic Title 2': [{
+                    'skill_id': 'skill_3',
+                    'skill_description': 'Description 3'
+                }]
+            }
+        })
+
+    def test_validation_fails_with_subtopic_title_not_added(self):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Subtopic title \'Subtopic Title 3\' is not added.'):
+            self.categorized_skills.add_subtopic_skill(
+                'Topic Name', 'Subtopic Title 3', 'skill_1', 'Description 1')
+
+
+class ShortSkillSummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ShortSkillSummaryTests, self).setUp()
+        self.skill_summary = skill_domain.SkillSummary(
+            'skill_1', 'Description 1', 'en', 1,
+            0, 0, datetime.datetime.now(), datetime.datetime.now())
+        self.short_skill_summary = skill_domain.ShortSkillSummary(
+            'skill_1', 'Description 1')
+
+    def test_short_skill_summary_gets_created(self):
+        short_skill_summary_dict = {
+            'skill_id': 'skill_1',
+            'skill_description': 'Description 1',
+        }
+        self.assertEqual(
+            self.short_skill_summary.to_dict(),
+            short_skill_summary_dict)
+
+    def test_short_skill_summary_gets_created_from_skill_summary(self):
+        short_skill_summary = (
+            skill_domain.ShortSkillSummary.from_skill_summary(
+                self.skill_summary))
+        self.assertEqual(
+            short_skill_summary.to_dict(),
+            self.short_skill_summary.to_dict())

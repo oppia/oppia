@@ -1748,6 +1748,9 @@ def get_composite_change_list(exp_id, from_version, to_version):
     Returns:
         list(ExplorationChange). List of ExplorationChange domain objects
         consisting of changes from from_version to to_version.
+
+    Raises:
+        Exception. From version is higher than to version.
     """
     if from_version > to_version:
         raise Exception(
@@ -1955,8 +1958,12 @@ def get_exp_with_draft_applied(exp_id, user_id):
         Exploration or None. Returns the exploration domain object with draft
         applied, or None if draft can not be applied.
     """
+    # TODO(#15075): Refactor this function.
+
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    draft_change_list = None
+    draft_change_list_exp_version = None
     if exp_user_data:
         if exp_user_data.draft_change_list:
             draft_change_list_exp_version = (

@@ -27,7 +27,7 @@ import subprocess
 import sys
 
 from core import constants
-from core import python_utils
+from core import utils
 from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -45,10 +45,12 @@ CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
 CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
 PACKAGE_JSON_FILEPATH = os.path.join('', 'package.json')
 SETUP_PY_FILEPATH = os.path.join('', 'setup.py')
+FECONF_PY_FILEPATH = os.path.join('core', 'feconf.py')
 LIST_OF_FILEPATHS_TO_MODIFY = (
     CHANGELOG_FILEPATH,
     AUTHORS_FILEPATH,
     CONTRIBUTORS_FILEPATH,
+    FECONF_PY_FILEPATH,
     ABOUT_PAGE_CONSTANTS_FILEPATH,
     PACKAGE_JSON_FILEPATH
 )
@@ -90,7 +92,7 @@ def update_sorted_file(filepath, new_list):
             add to the file.
     """
     file_lines = []
-    with python_utils.open_file(filepath, 'r') as f:
+    with utils.open_file(filepath, 'r') as f:
         file_lines = f.readlines()
 
     for line in file_lines:
@@ -105,7 +107,7 @@ def update_sorted_file(filepath, new_list):
     updated_list = list(set(new_list + file_lines[start_index:]))
     updated_list = sorted(updated_list, key=lambda s: s.lower())
     file_lines = file_lines[:start_index] + updated_list
-    with python_utils.open_file(filepath, 'w') as f:
+    with utils.open_file(filepath, 'w') as f:
         for line in file_lines:
             f.write(line)
 
@@ -222,7 +224,7 @@ def update_changelog(
         u'------------------------\n'] + release_summary_lines[
             start_index:end_index]
     changelog_lines = []
-    with python_utils.open_file(CHANGELOG_FILEPATH, 'r') as changelog_file:
+    with utils.open_file(CHANGELOG_FILEPATH, 'r') as changelog_file:
         changelog_lines = changelog_file.readlines()
 
     if constants.release_constants.BRANCH_TYPE_HOTFIX in branch_name:
@@ -247,7 +249,7 @@ def update_changelog(
                 changelog_lines)
 
     changelog_lines[2:2] = release_version_changelog
-    with python_utils.open_file(CHANGELOG_FILEPATH, 'w') as changelog_file:
+    with utils.open_file(CHANGELOG_FILEPATH, 'w') as changelog_file:
         for line in changelog_lines:
             changelog_file.write(line)
     print('Updated Changelog!')
@@ -338,7 +340,7 @@ def update_developer_names(release_summary_lines):
     new_developer_names = get_new_contributors(
         release_summary_lines, return_only_names=True)
 
-    with python_utils.open_file(
+    with utils.open_file(
         ABOUT_PAGE_CONSTANTS_FILEPATH, 'r') as about_page_file:
         about_page_lines = about_page_file.readlines()
         start_index = about_page_lines.index(CREDITS_START_LINE) + 1
@@ -350,7 +352,7 @@ def update_developer_names(release_summary_lines):
             list(set(all_developer_names)), key=lambda s: s.lower())
         about_page_lines[start_index:end_index] = all_developer_names
 
-    with python_utils.open_file(
+    with utils.open_file(
         ABOUT_PAGE_CONSTANTS_FILEPATH, 'w') as about_page_file:
         for line in about_page_lines:
             about_page_file.write(str(line))
@@ -365,6 +367,9 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
         repo_fork: github.Repository.Repository. The PyGithub object for the
             forked repo.
         target_branch: str. The name of the target branch.
+
+    Raises:
+        Exception. The target branch not deleted before re-run.
     """
 
     common.run_cmd(GIT_CMD_CHECKOUT.split(' '))
@@ -397,14 +402,14 @@ def create_branch(
     """
     print(
         'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
-        'CHANGELOG, about-page, and package.json...')
+        'CHANGELOG, feconf.py, about-page, and package.json...')
     sb = repo.get_branch('develop')
     repo_fork.create_git_ref(
         ref='refs/heads/%s' % target_branch, sha=sb.commit.sha)
 
     for filepath in LIST_OF_FILEPATHS_TO_MODIFY:
         contents = repo_fork.get_contents(filepath, ref=target_branch)
-        with python_utils.open_file(filepath, 'r') as f:
+        with utils.open_file(filepath, 'r') as f:
             repo_fork.update_file(
                 contents.path, 'Update %s' % filepath, f.read(),
                 contents.sha, branch=target_branch)
@@ -455,7 +460,7 @@ def get_release_summary_lines():
     invalid_email_is_present = True
     ordering_is_invalid = True
     while invalid_email_is_present or ordering_is_invalid:
-        release_summary_file = python_utils.open_file(
+        release_summary_file = utils.open_file(
             constants.release_constants.RELEASE_SUMMARY_FILEPATH, 'r')
         release_summary_lines = release_summary_file.readlines()
         invalid_email_is_present = is_invalid_email_present(
@@ -551,12 +556,6 @@ def main():
         'the emails of the form: %s.' % (
             constants.release_constants.RELEASE_SUMMARY_FILEPATH,
             constants.release_constants.INVALID_EMAIL_SUFFIX))
-    common.open_new_tab_in_browser_if_possible(
-        constants.release_constants.CREDITS_FORM_URL)
-    common.ask_user_to_confirm(
-        'Check the credits form and add any additional contributors '
-        'to the contributor list in the file: %s.' % (
-            constants.release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(
         'Categorize the PR titles in the Uncategorized section of the '
         'changelog in the file: %s, and arrange the changelog '
@@ -578,6 +577,10 @@ def main():
 
     release_summary_lines = get_release_summary_lines()
 
+    # Note to developers: If you edit any files apart from
+    # LIST_OF_FILEPATHS_TO_MODIFY in this script, please add it to this list
+    # so that it gets commited as part of the PR that is automatically
+    # generated.
     update_changelog(
         branch_name, release_summary_lines, current_release_version_number)
     update_authors(release_summary_lines)
