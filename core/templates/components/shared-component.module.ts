@@ -140,6 +140,7 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { OutcomeEditorComponent } from './state-directives/outcome-editor/outcome-editor.component';
 
 @NgModule({
   imports: [
@@ -215,6 +216,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
@@ -319,6 +321,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ExplorationEmbedButtonModalComponent,
     LearnerAnswerInfoCard,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
@@ -429,6 +432,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
     SearchBarComponent,

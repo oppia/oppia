@@ -20,33 +20,33 @@
   }
 </style>
 <div *ngIf="!feedbackEditorIsOpen && displayFeedback"
-     title="{{ isEditable() ? 'Edit feedback' : '' }}"
+     title="{{ isEditable ? 'Edit feedback' : '' }}"
      class="h-100">
   <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-feedback-button"
-       [ngClass]="{'oppia-editable-section': isEditable()}">
+       [ngClass]="{'oppia-editable-section': isEditable}">
     <div class="oppia-rule-preview oppia-transition-200">
       <div class="oppia-click-to-start-editing protractor-test-open-outcome-feedback-editor"
-           *ngIf="isEditable()" ng-click="openFeedbackEditor()">
-        <i *ngIf="isEditable()" class="material-icons oppia-editor-edit-icon float-right"
+           *ngIf="isEditable" (click)="openFeedbackEditor()">
+        <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
            title="Edit Feedback">&#xE254;
         </i>
       </div>
 
       <strong>Oppia tells the learner...</strong>
       <div class="position-relative">
-        <span *ngIf="isSelfLoopWithNoFeedback(outcome) && !areWarningsSuppressed()">
+        <span *ngIf="isSelfLoopWithNoFeedback() && !areWarningsSuppressed">
           <span class="oppia-confusing-outcome-warning-text">
             <i class="material-icons">&#xE002;</i>
             Please give Oppia something useful to say here.
           </span>
         </span>
-        <span *ngIf="(!isSelfLoopWithNoFeedback(outcome) && !outcome.hasNonemptyFeedback()) || (isSelfLoopWithNoFeedback(outcome) && areWarningsSuppressed())"
+        <span *ngIf="(!isSelfLoopWithNoFeedback() && !this.outcome.hasNonemptyFeedback()) || (isSelfLoopWithNoFeedback() && areWarningsSuppressed())"
               class="oppia-nothing-text">
           <em>Nothing</em>
         </span>
-        <span *ngIf="outcome.hasNonemptyFeedback()" class="oppia-non-empty-feedback-text">
-          <angular-html-bind class="oppia-rte-editor" html-data="outcome.feedback.html">
-          </angular-html-bind>
+        <span *ngIf="this.outcome.hasNonemptyFeedback()" class="oppia-non-empty-feedback-text">
+          <angular-html-bind-wrapper classStr="oppia-rte-editor" [htmlData]="outcome.feedback.html">
+          </angular-html-bind-wrapper>
         </span>
       </div>
     </div>
@@ -55,29 +55,27 @@
   </div>
 </div>
 
-<div *ngIf="isEditable() && feedbackEditorIsOpen">
-  <form role="form"
-        class="form-inline protractor-test-edit-outcome-feedback"
-        name="editOutcomeForm.editFeedbackForm">
+<div *ngIf="isEditable && feedbackEditorIsOpen">
+  <div class="form-inline protractor-test-edit-outcome-feedback">
     <oppia-outcome-feedback-editor [outcome]="outcome">
     </oppia-outcome-feedback-editor>
-  </form>
+  </div>
 
   <div *ngIf="isFeedbackLengthExceeded()" class="oppia-length-validation-error">
     The feedback length is too long. Please use at most 500 characters.
   </div>
 
   <div class="oppia-rule-save-cancel-buttons">
-    <div class="float-right">
+    <div class="modal-footer">
       <button type="button"
               class="btn btn-secondary"
-              ng-click="cancelThisFeedbackEdit()">
+              (click)="cancelThisFeedbackEdit()">
         Cancel
       </button>
       <button type="button"
               class="btn btn-success protractor-test-save-outcome-feedback"
-              ng-disabled="invalidStateAfterFeedbackSave() || editOutcomeForm.editFeedbackForm.$invalid || isFeedbackLengthExceeded()"
-              ng-click="saveThisFeedback(true)">
+              [disabled]="invalidStateAfterFeedbackSave() || isFeedbackLengthExceeded()"
+              (click)="saveThisFeedback(true)">
         Save Feedback
       </button>
     </div>
@@ -90,13 +88,13 @@
 
 <div *ngIf="!destinationEditorIsOpen && !isInQuestionMode()"
      class="h-100"
-     title="<[isEditable() ? 'Change the destination card' : '']>">
+     title="{{ isEditable ? 'Change the destination card' : '' }}">
   <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-button"
-       [ngClass]="{'oppia-editable-section': isEditable()}">
+       [ngClass]="{'oppia-editable-section': isEditable}">
     <div class="oppia-rule-preview oppia-transition-200">
       <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-editor"
-           *ngIf="isEditable()" ng-click="openDestinationEditor()">
-        <i *ngIf="isEditable()" class="material-icons oppia-editor-edit-icon float-right"
+           *ngIf="isEditable" (click)="openDestinationEditor()">
+        <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
            title="Edit Destination">&#xE254;
         </i>
       </div>
@@ -105,47 +103,57 @@
         <strong *ngIf="displayFeedback">And afterwards, directs the learner
         to...</strong>
         <strong *ngIf="!displayFeedback">Oppia directs the learner to...</strong>
-        <span *ngIf="!isSelfLoop(outcome)" class="position-relative">
-          <[outcome.dest]>
+        <span *ngIf="!isSelfLoop()" class="position-relative">
+          {{ outcome.dest }}
         </span>
-        <span *ngIf="isSelfLoop(outcome)" class="position-relative">
-          <span *ngIf="!outcome.refresherExplorationId">(try again)</span>
-          <span *ngIf="outcome.refresherExplorationId">
-            (try again, with refresher exploration "<[outcome.refresherExplorationId]>")
+        <span *ngIf="isSelfLoop()" class="position-relative">
+          <span *ngIf="!this.outcome.refresherExplorationId">(try again)</span>
+          <span *ngIf="this.outcome.refresherExplorationId">
+            (try again, with refresher exploration "{{ outcome.refresherExplorationId }}")
           </span>
         </span>
-        <div class="oppia-prerequisite-skill-text" *ngIf="outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
+        <div class="oppia-prerequisite-skill-text" *ngIf="this.outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
           <strong> Attached prerequisite skill for the current state: </strong>
-          <[outcome.missingPrerequisiteSkillId]>
+          {{ outcome.missingPrerequisiteSkillId }}
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<div *ngIf="isEditable() && destinationEditorIsOpen && !isInQuestionMode()">
+<<<<<<< HEAD
+<div *ngIf="isEditable && destinationEditorIsOpen && !isInQuestionMode()">
+  <form class="form-inline protractor-test-edit-outcome-dest"
+        (submit)="saveThisDestination()">
+    <oppia-outcome-destination-editor [outcome]="outcome"
+                                      (getChanges)="getChanges()"
+                                      [outcomeHasFeedback]="displayFeedback"
+                                      (addState)="addState($event)">
+=======
+<div ng-if="$ctrl.isEditable() && $ctrl.destinationEditorIsOpen && !$ctrl.isInQuestionMode()">
   <form role="form"
         class="form-inline protractor-test-edit-outcome-dest"
-        name="editOutcomeForm.editDestForm"
-        ng-submit="saveThisDestination()">
-    <oppia-outcome-destination-editor [outcome]="outcome"
+        name="$ctrl.editOutcomeForm.editDestForm"
+        ng-submit="$ctrl.saveThisDestination()">
+    <oppia-outcome-destination-editor [outcome]="$ctrl.outcome"
                                       (get-changes)="getChanges()"
-                                      [outcome-has-feedback]="displayFeedback"
-                                      (add-state)="addState($event)">
+                                      [outcome-has-feedback]="$ctrl.displayFeedback"
+                                      (add-state)="$ctrl.addState($event)">
+>>>>>>> upstream/develop
     </oppia-outcome-destination-editor>
   </form>
 
   <div class="oppia-rule-save-cancel-buttons">
-    <div class="float-right">
+    <div class="modal-footer">
       <button type="button"
               class="btn btn-secondary protractor-test-cancel-outcome-dest"
-              ng-click="cancelThisDestinationEdit()">
+              (click)="cancelThisDestinationEdit()">
         Cancel
       </button>
       <button type="button"
               class="btn btn-success protractor-test-save-outcome-dest"
-              ng-disabled="invalidStateAfterDestinationSave() || editOutcomeForm.editDestForm.$invalid"
-              ng-click="saveThisDestination()">
+              [disabled]="invalidStateAfterDestinationSave()"
+              (click)="saveThisDestination()">
         Save Destination
       </button>
     </div>
@@ -156,15 +164,15 @@
 
 
 <div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
-  <div *ngIf="!isEditable()"
-       title="<[isEditable() ? 'Edit correctness setting' : '']>"
+  <div *ngIf="!isEditable"
+       title="{{ isEditable ? 'Edit correctness setting' : '' }}"
        class="h-100">
     <div class="oppia-readonly-rule-tile"
-         [ngClass]="{'oppia-editable-section': isEditable()}">
+         [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-details-header">
         <div class="oppia-click-to-start-editing"
-             *ngIf="isEditable()" ng-click="openCorrectnessLabelEditor()">
-          <i *ngIf="isEditable()" class="material-icons oppia-editor-edit-icon float-right"
+             *ngIf="isEditable" (click)="openCorrectnessLabelEditor()">
+          <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
              title="Edit Correctness setting">&#xE254;
           </i>
         </div>
@@ -181,8 +189,8 @@
     </div>
   </div>
 
-  <div *ngIf="isEditable()">
+  <div *ngIf="isEditable">
     <strong>The answers in this group are correct</strong>
-    <input class="protractor-test-editor-correctness-toggle" type="checkbox" ng-model="outcome.labelledAsCorrect" ng-change="onChangeCorrectnessLabel()">
+    <input class="protractor-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
   </div>
 </div>

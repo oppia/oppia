@@ -109,16 +109,15 @@
 
   <br ng-if="rules">
 
-  <outcome-editor is-editable="$ctrl.isEditable"
-                  display-feedback="$ctrl.displayFeedback"
-                  on-save-dest="$ctrl.getOnSaveAnswerGroupDestFn()"
-                  on-save-feedback="$ctrl.getOnSaveAnswerGroupFeedbackFn()"
-                  on-save-correctness-label="$ctrl.getOnSaveAnswerGroupCorrectnessLabelFn()"
-                  outcome="$ctrl.outcome"
-                  add-state="$ctrl.addState"
-                  warnings-are-suppressed="$ctrl.suppressWarnings()"
-                  show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
-  </outcome-editor>
+  <oppia-outcome-editor [is-editable]="$ctrl.isEditable"
+                        [display-feedback]="$ctrl.displayFeedback"
+                        (save-dest)="$ctrl.getOnSaveAnswerGroupDestFn()"
+                        (save-feedback)="$ctrl.getOnSaveAnswerGroupFeedbackFn()"
+                        (save-correctness-label)="$ctrl.getOnSaveAnswerGroupCorrectnessLabelFn()"
+                        [outcome]="$ctrl.outcome"
+                        [add-state]="$ctrl.addState"
+                        (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
+  </oppia-outcome-editor>
   <oppia-question-misconception-editor [is-editable]="$ctrl.isEditable"
                                        ng-if="$ctrl.isInQuestionMode()"
                                        (save-tagged-misconception)="$ctrl.onSaveTaggedMisconception"
