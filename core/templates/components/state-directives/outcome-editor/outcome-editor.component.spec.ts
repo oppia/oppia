@@ -226,7 +226,7 @@ describe('Outcome Editor Component', () => {
   });
 
   it('should check if a state is in self loop', () => {
-    component.outcome = new Outcome(
+    let outcome = new Outcome(
       'Hola',
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
@@ -234,12 +234,13 @@ describe('Outcome Editor Component', () => {
       null,
       null,
     );
+    component.outcome = outcome;
     spyOn(stateEditorService, 'getActiveStateName')
       .and.returnValue('Hola');
 
-    expect(component.isSelfLoop()).toBeTrue();
+    expect(component.isSelfLoop(outcome)).toBeTrue();
 
-    component.outcome = new Outcome(
+    outcome = new Outcome(
       'Introduction',
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
@@ -247,11 +248,12 @@ describe('Outcome Editor Component', () => {
       null,
       null,
     );
-    expect(component.isSelfLoop()).toBeFalse();
+    component.outcome = outcome;
+    expect(component.isSelfLoop(outcome)).toBeFalse();
   });
 
   it('should check if state if of self loop with no feedback', () => {
-    component.outcome = new Outcome(
+    let outcome = new Outcome(
       'Introduction',
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
@@ -259,11 +261,12 @@ describe('Outcome Editor Component', () => {
       null,
       null,
     );
+    component.outcome = outcome;
     spyOn(stateEditorService, 'getActiveStateName')
       .and.returnValue('State Name');
 
-    expect(component.isSelfLoopWithNoFeedback()).toBeTrue();
-    expect(component.isSelfLoopWithNoFeedback()).toBeFalse();
+    expect(component.isSelfLoopWithNoFeedback(outcome)).toBeTrue();
+    expect(component.isSelfLoopWithNoFeedback(outcome)).toBeFalse();
   });
 
   it('should check if state will become invalid after feedback' +
