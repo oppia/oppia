@@ -338,7 +338,6 @@ def get_random_int(upper_bound: int) -> int:
         return generator.randrange(0, stop=upper_bound)
     else:
         raise AssertionError('Only positive integers allowed')
-    
 
 
 def get_random_choice(alist: List[T]) -> T:
@@ -611,7 +610,7 @@ def get_human_readable_time_string(time_msec: float) -> str:
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
     if time_msec < 0:
-        raise AssertionError("Time cannot be negative")
+        raise AssertionError('Time cannot be negative')
     else:
         return time.strftime(
             '%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))

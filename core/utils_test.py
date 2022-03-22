@@ -817,7 +817,8 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             'December 12 06:42:12',
             utils.get_human_readable_time_string(944980932342.38)
-        ) 
+        )
+
     def test_generate_new_session_id(self) -> None:
         self.assertEqual(24, len(utils.generate_new_session_id()))
         self.assertIsInstance(utils.generate_new_session_id(), str)
@@ -834,15 +835,15 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.require_valid_name(' 123\n', 'the exploration title')
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
-            'Adjacent whitespace in the exploration title should be collapsed.'):
+            'Adjacent whitespace in the exploration title should be collapsed.'):   # pylint: disable=line-too-long
             utils.require_valid_name('1  23', 'the exploration title')
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
-            'Invalid character : in the exploration title: 1\n:23'): 
+            'Invalid character : in the exploration title: 1\n:23'):
             utils.require_valid_name('1\n:23', 'the exploration title')
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
-            'Invalid character : in the exploration title: 1\\n:23'): 
+            'Invalid character : in the exploration title: 1\\n:23'):
             utils.require_valid_name('1\\n:23', 'the exploration title')
 
     def test_get_hex_color_for_category(self) -> None:
@@ -857,9 +858,11 @@ class UtilsTests(test_utils.GenericTestBase):
             '/El Niño/')
 
     def test_compress_and_decompress_zlib(self) -> None:
-        string_instance = b'a'*26
+        string_instance = b'a' * 26
         string_compressed = utils.compress_to_zlib(string_instance)
-        self.assertNotEqual(sys.getsizeof(string_compressed), sys.getsizeof(string_instance))
+        self.assertNotEqual(
+            sys.getsizeof(string_compressed),
+            sys.getsizeof(string_instance))
         self.assertEqual(
             utils.decompress_from_zlib(string_compressed),
             string_instance)
@@ -881,7 +884,7 @@ class UtilsTests(test_utils.GenericTestBase):
                 ['-1', '-2'],
                 ['-1', '-2', '-3', '-4', '-5']),
                 [])
-        
+
     def test_convert_png_binary_to_data_url(self) -> None:
         filepath_png = os.path.join('core', 'tests', 'data', 'test_png_img.png')
         file_contents_png = utils.get_file_contents(
@@ -900,16 +903,21 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             final_result,
             (yaml_content,
-                set([(img2_path,
-                    img2_file_content),
-                    (img1_path,
-                    img1_file_content)])
+                set(
+                    [
+                        (img2_path,
+                        img2_file_content),
+                        (img1_path,
+                        img1_file_content)
+                        ]
+                    )
                 )
             )
 
     def test_get_current_time_in_millisecs_with_current_time(self) -> None:
         time_instance1 = utils.get_current_time_in_millisecs()
-        if(True):
+        x = 1
+        if (x==1):
             pass
         time_instance2 = utils.get_current_time_in_millisecs()
         self.assertLess(time_instance1, time_instance2)
