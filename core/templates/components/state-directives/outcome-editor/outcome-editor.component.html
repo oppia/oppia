@@ -121,7 +121,6 @@
   </div>
 </div>
 
-<<<<<<< HEAD
 <div *ngIf="isEditable && destinationEditorIsOpen && !isInQuestionMode()">
   <form class="form-inline protractor-test-edit-outcome-dest"
         (submit)="saveThisDestination()">
@@ -129,17 +128,6 @@
                                       (getChanges)="getChanges()"
                                       [outcomeHasFeedback]="displayFeedback"
                                       (addState)="addState($event)">
-=======
-<div ng-if="$ctrl.isEditable() && $ctrl.destinationEditorIsOpen && !$ctrl.isInQuestionMode()">
-  <form role="form"
-        class="form-inline protractor-test-edit-outcome-dest"
-        name="$ctrl.editOutcomeForm.editDestForm"
-        ng-submit="$ctrl.saveThisDestination()">
-    <oppia-outcome-destination-editor [outcome]="$ctrl.outcome"
-                                      (get-changes)="getChanges()"
-                                      [outcome-has-feedback]="$ctrl.displayFeedback"
-                                      (add-state)="$ctrl.addState($event)">
->>>>>>> upstream/develop
     </oppia-outcome-destination-editor>
   </form>
 

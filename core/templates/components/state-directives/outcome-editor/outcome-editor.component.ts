@@ -103,22 +103,22 @@ export class OutcomeEditorComponent implements OnInit {
     return (this.outcome.feedback._html.length > 10000);
   }
 
-  isSelfLoop(): boolean {
+  isSelfLoop(outcome: Outcome): boolean {
     return Boolean (
-      this.outcome &&
-      this.outcome.dest === this.stateEditorService.getActiveStateName());
+      outcome &&
+      outcome.dest === this.stateEditorService.getActiveStateName());
   }
 
   getCurrentInteractionId(): string {
     return this.stateInteractionIdService.savedMemento;
   }
 
-  isSelfLoopWithNoFeedback(): boolean {
-    if (this.outcome && typeof this.outcome === 'object' &&
-      this.outcome.constructor.name === 'Outcome') {
+  isSelfLoopWithNoFeedback(outcome: Outcome): boolean {
+    if (outcome && typeof outcome === 'object' &&
+      outcome.constructor.name === 'Outcome') {
       return Boolean (
-        this.isSelfLoop() &&
-        !this.outcome.hasNonemptyFeedback());
+        this.isSelfLoop(outcome) &&
+        !outcome.hasNonemptyFeedback());
     }
     return false;
   }
@@ -181,7 +181,7 @@ export class OutcomeEditorComponent implements OnInit {
     this.stateEditorService.onSaveOutcomeDestDetails.emit();
     this.destinationEditorIsOpen = false;
     this.savedOutcome.dest = cloneDeep(this.outcome.dest);
-    if (!this.isSelfLoop()) {
+    if (!this.isSelfLoop(this.outcome)) {
       this.outcome.refresherExplorationId = null;
     }
     this.savedOutcome.refresherExplorationId = (
