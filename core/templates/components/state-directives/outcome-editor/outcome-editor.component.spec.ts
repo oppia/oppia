@@ -75,18 +75,18 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = outcome;
 
-    expect(component.canAddPrerequisiteSkill).toBe(undefined);
-    expect(component.feedbackEditorIsOpen).toBe(undefined);
-    expect(component.destinationEditorIsOpen).toBe(undefined);
-    expect(component.correctnessLabelEditorIsOpen).toBe(undefined);
-    expect(component.savedOutcome).toBe(undefined);
+    expect(component.canAddPrerequisiteSkill).toBeUndefined();
+    expect(component.feedbackEditorIsOpen).toBeUndefined();
+    expect(component.destinationEditorIsOpen).toBeUndefined();
+    expect(component.correctnessLabelEditorIsOpen).toBeUndefined();
+    expect(component.savedOutcome).toBeUndefined();
 
     component.ngOnInit();
 
-    expect(component.canAddPrerequisiteSkill).toBe(false);
-    expect(component.feedbackEditorIsOpen).toBe(false);
-    expect(component.destinationEditorIsOpen).toBe(false);
-    expect(component.correctnessLabelEditorIsOpen).toBe(false);
+    expect(component.canAddPrerequisiteSkill).toBeFalse();
+    expect(component.feedbackEditorIsOpen).toBeFalse();
+    expect(component.destinationEditorIsOpen).toBeFalse();
+    expect(component.correctnessLabelEditorIsOpen).toBeFalse();
     expect(component.savedOutcome).toEqual(outcome);
   });
 
@@ -140,7 +140,7 @@ describe('Outcome Editor Component', () => {
     onExternalSaveEmitter.emit();
 
     // Post-check.
-    expect(component.feedbackEditorIsOpen).toBe(false);
+    expect(component.feedbackEditorIsOpen).toBeFalse();
     expect(component.outcome.feedback).toBe('Saved Outcome');
   });
 
@@ -194,7 +194,7 @@ describe('Outcome Editor Component', () => {
     onInteractionIdChangedEmitter.emit();
 
     // Post-check.
-    expect(component.destinationEditorIsOpen).toBe(false);
+    expect(component.destinationEditorIsOpen).toBeFalse();
     expect(component.outcome.dest).toBe('Saved Dest');
     expect(component.outcome.refresherExplorationId).toBe('ExpId');
     expect(component.outcome.missingPrerequisiteSkillId).toBe('SkillId');
@@ -203,7 +203,7 @@ describe('Outcome Editor Component', () => {
   it('should check if state is in question mode', () => {
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
 
-    expect(component.isInQuestionMode()).toBe(true);
+    expect(component.isInQuestionMode()).toBeTrue();
   });
 
   it('should get current interaction\'s ID', () => {
@@ -216,13 +216,13 @@ describe('Outcome Editor Component', () => {
     spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled')
       .and.returnValue(true);
 
-    expect(component.isCorrectnessFeedbackEnabled()).toBe(true);
+    expect(component.isCorrectnessFeedbackEnabled()).toBeTrue();
   });
 
   it('should check if current interaction is linear or not', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
 
-    expect(component.isCurrentInteractionLinear()).toBe(false);
+    expect(component.isCurrentInteractionLinear()).toBeFalse();
   });
 
   it('should check if a state is in self loop', () => {
@@ -237,7 +237,7 @@ describe('Outcome Editor Component', () => {
     spyOn(stateEditorService, 'getActiveStateName')
       .and.returnValue('Hola');
 
-    expect(component.isSelfLoop()).toBe(true);
+    expect(component.isSelfLoop()).toBeTrue();
 
     component.outcome = new Outcome(
       'Introduction',
@@ -247,7 +247,7 @@ describe('Outcome Editor Component', () => {
       null,
       null,
     );
-    expect(component.isSelfLoop()).toBe(false);
+    expect(component.isSelfLoop()).toBeFalse();
   });
 
   it('should check if state if of self loop with no feedback', () => {
@@ -262,8 +262,8 @@ describe('Outcome Editor Component', () => {
     spyOn(stateEditorService, 'getActiveStateName')
       .and.returnValue('State Name');
 
-    expect(component.isSelfLoopWithNoFeedback()).toBe(true);
-    expect(component.isSelfLoopWithNoFeedback()).toBe(false);
+    expect(component.isSelfLoopWithNoFeedback()).toBeTrue();
+    expect(component.isSelfLoopWithNoFeedback()).toBeFalse();
   });
 
   it('should check if state will become invalid after feedback' +
@@ -275,7 +275,7 @@ describe('Outcome Editor Component', () => {
     component.savedOutcome = outcomeObjectFactory.createNew(
       'State Name', '1', '', []);
 
-    expect(component.invalidStateAfterFeedbackSave()).toBe(true);
+    expect(component.invalidStateAfterFeedbackSave()).toBeTrue();
   });
 
   it('should check if state will become invalid after destination' +
@@ -287,7 +287,7 @@ describe('Outcome Editor Component', () => {
     component.savedOutcome = outcomeObjectFactory.createNew(
       'State Name', '1', '', []);
 
-    expect(component.invalidStateAfterDestinationSave()).toBe(true);
+    expect(component.invalidStateAfterDestinationSave()).toBeTrue();
   });
 
   it('should open feedback editor if it is editable', () => {
@@ -295,7 +295,7 @@ describe('Outcome Editor Component', () => {
 
     component.openFeedbackEditor();
 
-    expect(component.feedbackEditorIsOpen).toBe(true);
+    expect(component.feedbackEditorIsOpen).toBeTrue();
   });
 
   it('should open destination editor if it is editable', () => {
@@ -303,7 +303,7 @@ describe('Outcome Editor Component', () => {
 
     component.openDestinationEditor();
 
-    expect(component.destinationEditorIsOpen).toBe(true);
+    expect(component.destinationEditorIsOpen).toBeTrue();
   });
 
   it('should save correctness label when it is changed', () => {
@@ -326,7 +326,7 @@ describe('Outcome Editor Component', () => {
 
     component.onChangeCorrectnessLabel();
 
-    expect(component.savedOutcome.labelledAsCorrect).toBe(true);
+    expect(component.savedOutcome.labelledAsCorrect).toBeTrue();
   });
 
   it('should set destination as null when saving feedback in' +
@@ -418,7 +418,7 @@ describe('Outcome Editor Component', () => {
       'OutcomeExpId',
       'SkillId',
     );
-    expect(component.isFeedbackLengthExceeded()).toBe(false);
+    expect(component.isFeedbackLengthExceeded()).toBeFalse();
 
     component.outcome = new Outcome(
       'Dest',
@@ -428,6 +428,6 @@ describe('Outcome Editor Component', () => {
       'OutcomeExpId',
       'SkillId',
     );
-    expect(component.isFeedbackLengthExceeded()).toBe(true);
+    expect(component.isFeedbackLengthExceeded()).toBeTrue();
   });
 });
