@@ -135,8 +135,8 @@ describe('Lesson Information card modal component', () => {
     expect(hackyExpDescTranslationIsDisplayed).toBe(false);
   }));
 
-  it('should set data correctly when' +
-      ' storyId is not undefined',
+  it('should correctly set story title' +
+      ' when storyId is present',
   fakeAsync(() => {
     spyOn(urlService, 'getUrlParams').and.returnValue({
       story_id: storyId,
@@ -173,8 +173,8 @@ describe('Lesson Information card modal component', () => {
       'I18N_STORY_storyId_TITLE');
   }));
 
-  it('should set data correctly when' +
-      ' storyId is undefined',
+  it('should correctly set story title' +
+      ' when storyId is not present',
   fakeAsync(() => {
     spyOn(urlService, 'getUrlParams').and.returnValue({
       story_id: undefined,

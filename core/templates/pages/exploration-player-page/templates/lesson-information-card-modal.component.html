@@ -49,8 +49,8 @@
   <span class="oppia-icon-accessibility-label">Close</span>
 </button>
 <div ngbDropdown>
-  <div ngbDropdownToggle class="authors-title">LESSON AUTHORS</div>
-  <div ngbDropdownMenu class="dropdown-menu">
+  <div ngbDropdownToggle class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
+  <div ngbDropdownMenu class="dropdown-menu authors-dropdown-menu">
     <div *ngFor="let name of contributorNames" ngbDropdownItem>{{ name }}</div>
   </div>
 </div>
@@ -65,7 +65,7 @@
     text-align: center;
   }
 
-  .dropdown-menu {
+  .authors-dropdown-menu {
     border: 0;
     margin: 0;
     max-height: 50px;
