@@ -22,7 +22,7 @@ gunicorn==20.1.0
 html5lib==1.1
 mailchimp3==3.0.15
 mutagen==1.45.1
-pillow==9.0.0
+pillow==9.0.1
 pylatexenc==2.10
 pytest==6.2.5
 redis==3.5.3

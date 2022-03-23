@@ -40,6 +40,18 @@ ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
 
+
+class ValidCmdDict(TypedDict):
+    """Dictionary representing valid commands specs."""
+
+    name: str
+    required_attribute_names: List[str]
+    optional_attribute_names: List[str]
+    user_id_attribute_names: List[str]
+    allowed_values: Dict[str, List[str]]
+    deprecated_values: Dict[str, List[str]]
+
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
@@ -1534,6 +1546,10 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
+
+# This represents a literal constant for All and is used whereever
+# we need to compare a value with value All (for example, all topics)
+ALL_LITERAL_CONSTANT = 'All'
 
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is
