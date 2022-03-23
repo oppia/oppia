@@ -95,11 +95,10 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   discardChanges(): void {
-    if (this.story === undefined) {
-      throw new Error('Story cannot be undefined');
-    }
     this.undoRedoService.clearChanges();
-    this.storyEditorStateService.loadStory(this.story.getId());
+    if (this.story !== undefined) {
+      this.storyEditorStateService.loadStory(this.story.getId());
+    }
     this._validateStory();
     this.forceValidateExplorations = true;
   }

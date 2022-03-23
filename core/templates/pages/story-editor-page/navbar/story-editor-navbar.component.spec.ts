@@ -443,15 +443,6 @@ describe('Story editor navbar component', () => {
     expect(clearChangesSpy).toHaveBeenCalled();
   });
 
-  it('should throw error if the story is undefined', () => {
-    let story;
-    component.story = story;
-
-    expect(() => {
-      component.discardChanges();
-    }).toThrowError('Story cannot be undefined');
-  });
-
   describe('open a confirmation modal for saving changes ', () => {
     it('should save story successfully on' +
       'clicking save draft button', fakeAsync(() => {
