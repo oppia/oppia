@@ -58,11 +58,7 @@ export class ApplyValidationDirective implements Validator {
           allValidationErrors = {...allValidationErrors, ...error};
         }
       } else {
-        throw new Error(
-          `${validatorName} Not a valid validator.` +
-          'Validator should be one of the following:' +
-          Object.getOwnPropertyNames(SchemaValidators).slice(3).toString()
-        );
+        // TODO(#15190): Throw an error if validator not found.
       }
     }
     if (!errorsPresent) {
