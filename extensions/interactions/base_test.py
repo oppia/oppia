@@ -57,14 +57,14 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'ItemSelectionInput',
     'MathEquationInput',
     'MultipleChoiceInput',
+    'MusicNotesInput',
     'NumericExpressionInput',
-    'PencilCodeEditor',
-    'RatioExpressionInput',
     'NumericInput',
     'NumberWithUnits',
+    'PencilCodeEditor',
+    'RatioExpressionInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput'
 ]
 
 _INTERACTION_CONFIG_SCHEMA = [

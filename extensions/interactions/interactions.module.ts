@@ -35,6 +35,7 @@ import { NumericInputModule } from './NumericInput/numeric-input-interactions.mo
 import { MathEquationInputModule } from './MathEquationInput/math-equation-input-interactions.module';
 import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-map-interactions.module';
 import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/multiple-choice-input-interactions.module';
+import { MusicNotesInputModule } from './MusicNotesInput/music-notes-input-interactions.module';
 import { SetInputInteractionModule } from './SetInput/set-input-interactions.module';
 import { TextInputInteractionModule } from './TextInput/text-input-interactions.module';
 import { RatioExpressionInputInteractionModule } from './RatioExpressionInput/ratio-expression-input-interactions.module';
@@ -56,6 +57,7 @@ import { PencilCodeEditorModule } from './PencilCodeEditor/pencil-code-editor-in
     NumericExpressionInputModule,
     NumericInputModule,
     MathEquationInputModule,
+    MusicNotesInputModule,
     PencilCodeEditorModule,
     InteractiveMapInteractionModule,
     MultipleChoiceInputInteractionModule,
@@ -80,6 +82,7 @@ import { PencilCodeEditorModule } from './PencilCodeEditor/pencil-code-editor-in
     PencilCodeEditorModule,
     NumericInputModule,
     MathEquationInputModule,
+    MusicNotesInputModule,
     InteractiveMapInteractionModule,
     MultipleChoiceInputInteractionModule,
     RatioExpressionInputInteractionModule,

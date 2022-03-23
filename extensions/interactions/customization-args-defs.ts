@@ -36,8 +36,12 @@ export interface ImageWithRegions {
   imagePath: string;
 }
 
-interface ReadableMusicNote {
+export interface ReadableMusicNote {
   readableNoteName: string;
+  noteDuration: {
+    num: number;
+    den: number;
+  };
 }
 
 export interface AlgebraicExpressionInputCustomizationArgs {
