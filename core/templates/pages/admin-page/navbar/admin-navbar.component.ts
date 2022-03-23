@@ -30,10 +30,12 @@ import { AppConstants } from 'app.constants';
   templateUrl: './admin-navbar.component.html',
 })
 export class AdminNavbarComponent implements OnInit {
-  // These properties are initialized using Angular lifecycle hooks
+  // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   imagePath!: string;
+  // Username is set to null if the user is not logged in.
+  username: string | null = '';
   profilePictureDataUrl: string = '';
   isModerator: boolean = false;
   isSuperAdmin: boolean = false;
@@ -98,10 +100,10 @@ export class AdminNavbarComponent implements OnInit {
 
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
-    const username = userInfo.getUsername();
+    this.username = userInfo.getUsername();
 
-    if (username === null) {
-      throw new Error('Username is not exist');
+    if (this.username === null) {
+      throw new Error('Username does not exist.');
     }
     this.isModerator = userInfo.isModerator();
     this.isSuperAdmin = userInfo.isSuperAdmin();
@@ -109,7 +111,7 @@ export class AdminNavbarComponent implements OnInit {
     this.profileUrl = (
       this.urlInterpolationService.interpolateUrl(
         AdminPageConstants.PROFILE_URL_TEMPLATE, {
-          username: username
+          username: this.username
         })
     );
   }

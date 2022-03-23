@@ -33,7 +33,7 @@ import { BlogPostData } from 'domain/blog/blog-post.model';
 export class BlogDashboardPageService {
   private _blogPostId: string = '';
   private _authorPictureUrl: string = '';
-  private _blogPostData!: BlogPostData;
+  private _blogPostData: null | BlogPostData = null;
   private _BLOG_POST_EDITOR_URL_TEMPLATE = (
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
 
@@ -111,6 +111,9 @@ export class BlogDashboardPageService {
   }
 
   get blogPostData(): BlogPostData {
+    if (this._blogPostData === null) {
+      throw new Error('Blog post data is not set.');
+    }
     return this._blogPostData;
   }
 

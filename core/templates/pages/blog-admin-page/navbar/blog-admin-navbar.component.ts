@@ -65,7 +65,7 @@ export class BlogAdminNavbarComponent implements OnInit {
     const username = userInfo.getUsername();
 
     if (username === null) {
-      throw new Error('Username is not exist');
+      throw new Error('Username does not exist.');
     }
     this.profileUrl = (
       this.urlInterpolationService.interpolateUrl(

@@ -60,7 +60,7 @@ export class BlogCardPreviewModalComponent
 
     const blogPostId = this.blogPostData.id;
     if (blogPostId === null) {
-      throw new Error('Blog post is not exist');
+      throw new Error('Blog post does not exist.');
     }
     this.blogPostSummary = new BlogPostSummary (
       blogPostId,

@@ -77,9 +77,8 @@ interface ActiveSuggestionDict {
   'target_type': string;
 }
 
-// Details of the active contribution. This is used to display the details of
-// the active contribution in the modal. The details are null if there is no
-// active contribution.
+// This is used to display the details of the active contribution in the modal.
+// The details are null if there is no active contribution.
 interface ActiveContributionDict {
   'details': ActiveContributionDetailsDict | null;
   'suggestion': ActiveSuggestionDict;
@@ -192,7 +191,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       const username = userInfo.getUsername();
 
       if (username === null) {
-        throw new Error('Username is not exist');
+        throw new Error('Username does not exist.');
       }
       this.username = username,
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();

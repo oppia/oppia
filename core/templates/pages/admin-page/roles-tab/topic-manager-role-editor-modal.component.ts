@@ -34,8 +34,8 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   @Input() managedTopicIds!: string[];
   @Input() topicIdToName!: {[topicId: string]: string};
   @Input() username!: string;
-  newTopicId!: string;
-  topicIdInUpdate!: string;
+  newTopicId: string | null = null;
+  topicIdInUpdate: string | null = null;
 
   topicIdsForSelection: string[] = [];
 
@@ -52,21 +52,22 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   }
 
   addTopic(): void {
+    if (this.newTopicId === null || this.topicIdInUpdate === null) {
+      throw new Error('Topic id is null.');
+    }
     this.managedTopicIds.push(this.newTopicId);
     this.topicIdInUpdate = this.newTopicId;
-    // Empty the newTopicId to prevent the user from adding the same topic
-    // twice.
-    this.newTopicId = '';
+    this.newTopicId = null;
     this.adminBackendApiService.assignManagerToTopicAsync(
       this.username, this.topicIdInUpdate).then(()=> {
-      // Empty the topicIdInUpdate to prevent the user from removing the
-      // same topic twice.
-      this.topicIdInUpdate = '';
+      this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();
     }, errorMessage => {
-      let topicIdIndex = this.managedTopicIds.indexOf(
-        this.newTopicId);
-      this.managedTopicIds.splice(topicIdIndex, 1);
+      if (this.newTopicId !== null) {
+        let topicIdIndex = this.managedTopicIds.indexOf(
+          this.newTopicId);
+        this.managedTopicIds.splice(topicIdIndex, 1);
+      }
       this.alertsService.addWarning(
         errorMessage || 'Error communicating with server.');
     });

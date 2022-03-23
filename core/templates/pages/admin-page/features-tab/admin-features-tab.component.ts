@@ -44,6 +44,8 @@ import { PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
+type FilterType = keyof typeof PlatformParameterFilterType;
+
 @Component({
   selector: 'admin-features-tab',
   templateUrl: './admin-features-tab.component.html'
@@ -54,7 +56,6 @@ export class AdminFeaturesTabComponent implements OnInit {
   readonly availableFilterTypes: PlatformParameterFilterType[] = Object
     .keys(PlatformParameterFilterType)
     .map(key => {
-      type FilterType = keyof typeof PlatformParameterFilterType;
       var filterType = key as FilterType;
       return PlatformParameterFilterType[filterType];
     });
@@ -221,6 +222,8 @@ export class AdminFeaturesTabComponent implements OnInit {
       this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
 
       this.setStatusMessage.emit('Saved successfully.');
+    // The type of error 'e' is unknown because it could be anything.
+    // This gave the freedom to access any property of 'e' at any time.
     } catch (e: unknown) {
       // A response that represents an error or failure, from a
       // non-successful HTTP status during the parsing of the response.
@@ -242,7 +245,11 @@ export class AdminFeaturesTabComponent implements OnInit {
     }
     const backup = this.featureFlagNameToBackupMap.get(
       featureFlag.name
-    ) as PlatformParameter;
+    );
+
+    if (backup === undefined) {
+      throw new Error('Backup not found for feature flag: ' + featureFlag.name);
+    }
     featureFlag.rules = cloneDeep(backup.rules);
   }
 
@@ -253,7 +260,10 @@ export class AdminFeaturesTabComponent implements OnInit {
   isFeatureFlagRulesChanged(feature: PlatformParameter): boolean {
     const original = this.featureFlagNameToBackupMap.get(
       feature.name
-    ) as PlatformParameter;
+    );
+    if (original === undefined) {
+      throw new Error('Backup not found for feature flag: ' + feature.name);
+    }
     return !isEqual(original.rules, feature.rules);
   }
 
