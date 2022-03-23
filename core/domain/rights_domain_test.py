@@ -42,7 +42,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.viewer = user_services.get_user_actions_info(self.viewer_id) # type: ignore[no-untyped-call]
 
         self.exp_id = 'exp_id'
-        self.save_new_valid_exploration(self.exp_id, self.owner_id) # type: ignore[no-untyped-call]
+        self.save_new_valid_exploration(self.exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.exp_id) # type: ignore[no-untyped-call]
         self.activity_rights = rights_manager.get_exploration_rights( # type: ignore[no-untyped-call]
             self.exp_id)
