@@ -400,6 +400,8 @@ import { ExplorationStatesService } from 'pages/exploration-editor-page/services
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
 import { ContributionAndReviewService } from 'pages/contributor-dashboard-page/services/contribution-and-review.service';
 import { ContributionAndReviewBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-and-review-backend-api.service';
+import { ExplorationImprovementsService } from './exploration-improvements.service';
+import { PlaythroughIssuesService } from './playthrough-issues.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -523,6 +525,7 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationImprovementsBackendApiService],
   ['ExplorationImprovementsTaskRegistryService',
     ExplorationImprovementsTaskRegistryService],
+  ['ExplorationImprovementsService', ExplorationImprovementsService],
   ['ExplorationInitStateNameService', ExplorationInitStateNameService],
   ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
   ['ExplorationObjectiveService', ExplorationObjectiveService],
@@ -661,6 +664,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['PlatformFeatureDummyBackendApiService',
     PlatformFeatureDummyBackendApiService],
   ['PlatformFeatureService', PlatformFeatureService],
+  ['PlaythroughIssuesService', PlaythroughIssuesService],
   ['PlayerCorrectnessFeedbackEnabledService',
     PlayerCorrectnessFeedbackEnabledService],
   ['PlayerPositionService', PlayerPositionService],
