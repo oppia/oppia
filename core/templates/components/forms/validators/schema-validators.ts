@@ -20,6 +20,34 @@ import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { AppConstants } from 'app.constants';
 
 export class SchemaValidators {
+  static hasLengthAtLeast(
+      args: {minValue: number}
+  ): (control: AbstractControl) => ValidationErrors | null {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      if (value.length >= args.minValue) {
+        return null;
+      }
+      return {
+        isAtLeast: {minValue: args.minValue, actual: control.value.length}
+      };
+    };
+  }
+
+  static hasLengthAtMost(
+      args: {maxValue: number}
+  ): (control: AbstractControl) => ValidationErrors | null {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      if (value.length <= args.maxValue) {
+        return null;
+      }
+      return {
+        isAtMost: {maxValue: args.maxValue, actual: control.value.length}
+      };
+    };
+  }
+
   static isAtLeast(
       args: {minValue: number}
   ): (control: AbstractControl) => ValidationErrors | null {

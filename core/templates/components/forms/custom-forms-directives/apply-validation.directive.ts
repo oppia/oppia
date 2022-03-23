@@ -59,8 +59,9 @@ export class ApplyValidationDirective implements Validator {
         }
       } else {
         throw new Error(
-          'Not a valid validator. Validator should be one of the following: ' +
-          Object.keys(SchemaValidators.toString())
+          `${validatorName} Not a valid validator.` +
+          'Validator should be one of the following:' +
+          Object.getOwnPropertyNames(SchemaValidators).slice(3).toString()
         );
       }
     }
