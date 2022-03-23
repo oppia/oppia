@@ -55,8 +55,8 @@ interface Sequence {
   selector: 'oppia-interactive-music-notes-input',
   templateUrl: './music-notes-input-interaction.component.html'
 })
-export class MusicNotesInputComponent implements
- OnInit, OnDestroy, AfterViewInit {
+export class MusicNotesInputComponent
+ implements OnInit, OnDestroy, AfterViewInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -124,6 +124,7 @@ export class MusicNotesInputComponent implements
 
     this.initialSequence = (
       this.interactionIsActive ? initialSequence : this.lastAnswer);
+    // TODO(#14340): Remove some usages of jQuery from the codebase.
     this.staffContainerElt = $(this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-staff'));
 
