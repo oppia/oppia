@@ -26,6 +26,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+import bleach
 
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -87,6 +88,9 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
         """
         state_content_html = []
         for _, value in states_dict.items():
-            state_content_html.append(value.content.html)
+            state_content_html.append(
+                bleach.clean(
+                    value.content.html, tags=['oppia-noninteractive-image'],
+                    attributes=['filepath-with-value'], strip=True))
 
         return state_content_html
