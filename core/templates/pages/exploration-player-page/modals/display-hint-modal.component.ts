@@ -38,12 +38,13 @@ export class DisplayHintModalComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   index!: number;
-  // Null is allowed here because displayhint() funtion in
-  // Hints-and-solution-manager.service.ts can return null.
+  // If index of hint is equal to or greater than number of hints
+  // released then hint remains null. A null hint means that there is
+  // no more available hint.
   hint!: SubtitledHtml | null;
-  // Null is allowed here because in SubtitledHtml class in the
-  // Subtitled-html.model.ts file the type of contentID is
-  // Defined as string | null.
+  // A null hintContentId indicates that the SubtitledHtml has been created
+  // but not saved. Before the SubtitledHtml object is saved into a State,
+  // the hintContentId should be set to a string.
   hintContentId!: string | null;
 
   constructor(
