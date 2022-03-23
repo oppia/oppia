@@ -39,13 +39,15 @@ import { Stopwatch } from 'domain/utilities/stopwatch.model';
 class CyclicStateTransitionsTracker {
   /** A path of visited states without any repeats. */
   private pathOfVisitedStates: string[];
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   /** The most recently discovered cycle of visited states. */
-  private cycleOfVisitedStates: string[] | null;
+  private cycleOfVisitedStates!: string[];
   private numLoops: number;
 
   constructor(initStateName: string) {
     this.pathOfVisitedStates = [initStateName];
-    this.cycleOfVisitedStates = null;
     this.numLoops = 0;
   }
 
@@ -99,7 +101,7 @@ class CyclicStateTransitionsTracker {
   // Return undefined if no cycle has been found.
   generateIssueCustomizationArgs():
     CyclicStateTransitionsCustomizationArgs | undefined {
-    if (this.cycleOfVisitedStates !== null) {
+    if (this.cycleOfVisitedStates !== undefined) {
       return {
         state_names: {value: this.cycleOfVisitedStates}
       };
@@ -118,7 +120,10 @@ class CyclicStateTransitionsTracker {
 }
 
 class EarlyQuitTracker {
-  private stateName: string | null = null;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private stateName!: string;
   private expDurationInSecs: number = 0;
 
   foundAnIssue(): boolean {
@@ -134,7 +139,7 @@ class EarlyQuitTracker {
 
   // Return undefined if no issue has been found.
   generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs | undefined {
-    if (this.stateName !== null) {
+    if (this.stateName !== undefined) {
       return {
         state_name: {value: this.stateName},
         time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
@@ -178,18 +183,18 @@ class MultipleIncorrectAnswersTracker {
   providedIn: 'root'
 })
 export class PlaythroughService {
-  // The properties below are set to null when the service is initialized.
-  // They are set to non-null values when recording and scrutinizing
-  // playthroughs is enabled.
-  private explorationId: string | null = null;
-  private explorationVersion: number | null = null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private explorationId!: string;
+  private explorationVersion!: number;
   private learnerIsInSamplePopulation: boolean = false;
 
-  private eqTracker: EarlyQuitTracker | null = null;
-  private cstTracker: CyclicStateTransitionsTracker | null = null;
-  private misTracker: MultipleIncorrectAnswersTracker | null = null;
-  private recordedLearnerActions: LearnerAction[] | null = null;
-  private playthroughStopwatch: Stopwatch | null = null;
+  private eqTracker!: EarlyQuitTracker;
+  private cstTracker!: CyclicStateTransitionsTracker;
+  private misTracker!: MultipleIncorrectAnswersTracker;
+  private recordedLearnerActions!: LearnerAction[];
+  private playthroughStopwatch!: Stopwatch;
   private playthroughDurationInSecs: number = 0;
 
   constructor(
@@ -235,9 +240,9 @@ export class PlaythroughService {
     }
 
     if (
-      this.recordedLearnerActions !== null &&
-      this.misTracker !== null &&
-      this.cstTracker !== null
+      this.recordedLearnerActions !== undefined &&
+      this.misTracker !== undefined &&
+      this.cstTracker !== undefined
     ) {
       this.recordedLearnerActions.push(
         this.learnerActionObjectFactory.createNewAnswerSubmitAction({
@@ -261,9 +266,9 @@ export class PlaythroughService {
     }
 
     if (
-      this.recordedLearnerActions !== null &&
-      this.playthroughStopwatch !== null &&
-      this.eqTracker !== null
+      this.recordedLearnerActions !== undefined &&
+      this.playthroughStopwatch !== undefined &&
+      this.eqTracker !== undefined
     ) {
       this.recordedLearnerActions.push(
         this.learnerActionObjectFactory.createNewExplorationQuitAction({
@@ -298,9 +303,9 @@ export class PlaythroughService {
    */
   private createNewPlaythrough(): Playthrough | null {
     if (
-      this.explorationId !== null &&
-      this.explorationVersion !== null &&
-      this.recordedLearnerActions !== null
+      this.explorationId !== undefined &&
+      this.explorationVersion !== undefined &&
+      this.recordedLearnerActions !== undefined
     ) {
       if (
         this.misTracker &&
@@ -351,12 +356,12 @@ export class PlaythroughService {
   private hasRecordingBegun(): boolean {
     return (
       this.isPlaythroughRecordingEnabled() &&
-      this.recordedLearnerActions !== null);
+      this.recordedLearnerActions !== undefined);
   }
 
   private hasRecordingFinished(): boolean {
     return (
-      this.recordedLearnerActions !== null &&
+      this.recordedLearnerActions !== undefined &&
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
       this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
@@ -365,7 +370,7 @@ export class PlaythroughService {
 
   private isRecordedPlaythroughHelpful(): boolean {
     return (
-      this.recordedLearnerActions !== null &&
+      this.recordedLearnerActions !== undefined &&
       // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.
