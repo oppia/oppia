@@ -105,7 +105,7 @@ describe('Story Validation Service', () => {
       ],
       next_node_id: 'node_3'
     };
-    let sampleStoryContents = StoryContents.createFromBackendDict(
+    let sampleStoryContents = storyContentsObjectFactory.createFromBackendDict(
       sampleStoryContentsBackendDict);
     let issues = svs.validatePrerequisiteSkillsInStoryContents(
       ['skill_3'], sampleStoryContents);
