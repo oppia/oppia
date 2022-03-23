@@ -135,7 +135,7 @@
 }
 .language-dropdown {
   max-height: 60vh;
-  max-width: 500px;
+  max-width: inherit;
   min-width: 90px;
   overflow-y: auto;
 }

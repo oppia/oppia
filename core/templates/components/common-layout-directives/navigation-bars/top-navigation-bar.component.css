@@ -147,12 +147,12 @@
 }
 .language-dropdown {
   max-height: 60vh;
-  max-width: 500px;
+  max-width: inherit;
   min-width: 90px;
   overflow-y: auto;
 }
 .language-dropdown.dropdown-menu.oppia-navbar-dropdown {
-  left: 5px !important;
+  left: 5px;
   right: 0 !important;
 }
 .learn {
