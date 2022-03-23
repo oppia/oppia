@@ -25,6 +25,15 @@ export class SchemaValidators {
   ): (control: AbstractControl) => ValidationErrors | null {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = control.value;
+      if (value === null || value === undefined) {
+        return {
+          isAtLeast: {minValue: args.minValue, actual: control.value}
+        };
+      }
+      if (!(typeof value === 'string' || Array.isArray(value))) {
+        throw new Error(
+          'Not valid value passed in control. Expecting a string or Array');
+      }
       if (value.length >= args.minValue) {
         return null;
       }
@@ -39,6 +48,15 @@ export class SchemaValidators {
   ): (control: AbstractControl) => ValidationErrors | null {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = control.value;
+      if (value === null || value === undefined) {
+        return {
+          isAtMost: {minValue: args.maxValue, actual: control.value}
+        };
+      }
+      if (!(typeof value === 'string' || Array.isArray(value))) {
+        throw new Error(
+          'Not valid value passed in control. Expecting a string or Array');
+      }
       if (value.length <= args.maxValue) {
         return null;
       }
