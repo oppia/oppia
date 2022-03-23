@@ -53,7 +53,7 @@ def delete_file(filepath: str) -> None:
     os.remove(filepath)
 
 
-def main(args: Optional[Sequence[str]]=None) -> None:
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the script to clean temporary and installed files."""
     unused_parsed_args = _PARSER.parse_args(args=args)
 
