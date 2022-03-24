@@ -289,12 +289,12 @@ export class MusicNotesInputComponent
     let validNoteArea = $(this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-valid-note-area'));
     for (let i = 0; i < this.NOTE_TYPES.length; i++) {
-      let innerDiv = $('<div></div>').data('noteType', this.NOTE_TYPES[i]);
-      let addedClass = null;
-      if ($(innerDiv).data('noteType') === this.NOTE_TYPE_NATURAL) {
+      var addedClass = null;
+      if (this.NOTE_TYPES[i] === this.NOTE_TYPE_NATURAL) {
         addedClass = 'oppia-music-input-natural-note';
-        $(innerDiv).addClass(addedClass);
       }
+      var innerDiv = $(`<div class="${addedClass}"></div>`)
+        .data('noteType', this.NOTE_TYPES[i]);
       if (this.interactionIsActive) {
         innerDiv.draggable({
           // Keeps note from being placed on top of the clef.
@@ -350,11 +350,11 @@ export class MusicNotesInputComponent
     let validNoteArea = $(this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-valid-note-area'));
     for (let i = 0; i < this.noteSequence.length; i++) {
-      let innerDiv = $('<div></div>')
+      var innerDiv = $(
+        '<div class="oppia-music-input-natural-note' +
+      ' oppia-music-input-on-staff"></div>')
         .data('noteType', this.NOTE_TYPE_NATURAL)
         .data('noteId', this.noteSequence[i].note.noteId)
-        .addClass('oppia-music-input-natural-note')
-        .addClass('oppia-music-input-on-staff')
         // Position notes horizontally by their noteStart positions and
         // vertically by the midi value they hold.
         .css({
@@ -399,8 +399,8 @@ export class MusicNotesInputComponent
   buildDroppableStaff(): void {
     let lineValues = Object.keys(this.NOTE_NAMES_TO_MIDI_VALUES);
     for (let i = 0; i < lineValues.length; i++) {
-      let staffLineDiv = $('<div></div>')
-        .addClass('oppia-music-staff-position')
+      var staffLineDiv = $(
+        '<div class="oppia-music-staff-position"></div>')
         .css('height', this.VERTICAL_GRID_SPACING)
         .data('lineValue', lineValues[i])
         .droppable({
@@ -533,11 +533,10 @@ export class MusicNotesInputComponent
       // line.
       if (this.NOTES_ON_LINES.indexOf(noteName) !== -1) {
         staffLineDiv.append(
-          $('<div></div>')
+          $('<div class="oppia-music-staff-line"></div>')
             // Positions and centers the staff line directly on top of its
             // associated droppable.
             .css('margin-top', this.VERTICAL_GRID_SPACING / 2.5)
-            .addClass('oppia-music-staff-line')
         );
       }
     }
@@ -649,9 +648,9 @@ export class MusicNotesInputComponent
 
   // TODO(#14340): Remove some usages of jQuery from the codebase.
   drawLedgerLine(topPos: number, leftPos: number): void {
-    let ledgerLineDiv = $('<div></div>')
-      .addClass(
-        'oppia-music-input-ledger-line oppia-music-input-natural-note')
+    var ledgerLineDiv = $(
+      '<div class"oppia-music-input-ledger-line ' +
+    'oppia-music-input-natural-note"></div>')
       .droppable({
         accept: '.oppia-music-input-note-choices div',
         // When a ledgerLine note is moved out of its droppable,
