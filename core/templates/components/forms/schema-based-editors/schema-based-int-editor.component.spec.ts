@@ -50,16 +50,19 @@ describe('Schema Based Int Editor Component', () => {
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
 
     component.labelForFocusTarget = {};
-    component.registerOnTouched();
-    component.registerOnChange(null);
-    component.onChange = (val: number) => {
-      return;
-    };
   });
 
-  it('should get empty object on validating', () => {
+  it('should set component properties on initialization', fakeAsync(() => {
+    let mockFunction = function(value: number) {
+      return value;
+    };
+    component.registerOnChange(mockFunction);
+    component.registerOnTouched();
+
+    expect(component).toBeDefined();
     expect(component.validate(null)).toEqual({});
-  });
+    expect(component.onChange).toEqual(mockFunction);
+  }));
 
   it('should set local value on initialization and set focus' +
     ' on the input field', fakeAsync(() => {
@@ -90,6 +93,32 @@ describe('Schema Based Int Editor Component', () => {
 
     component.updateValue(1);
 
+    expect(component.localValue).toBe(1);
+  });
+
+  it('should update value when local value change', () => {
+    component.localValue = 1;
+
+    // PreCheck.
+    expect(component.localValue).toBe(1);
+
+    // Action: Update local value.
+    component.updateValue(2);
+
+    // PostCheck: local value should be updated.
+    expect(component.localValue).toBe(2);
+  });
+
+  it('should not update value when local value not change', () => {
+    component.localValue = 1;
+
+    // PreCheck.
+    expect(component.localValue).toBe(1);
+
+    // Action: Update local value.
+    component.updateValue(1);
+
+    // PostCheck: local value should not be updated as it is same.
     expect(component.localValue).toBe(1);
   });
 

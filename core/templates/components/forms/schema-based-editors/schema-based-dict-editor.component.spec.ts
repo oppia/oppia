@@ -17,7 +17,7 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { IdGenerationService } from 'services/id-generation.service';
@@ -46,13 +46,20 @@ describe('Schema Based Dict Editor Component', () => {
     fixture = TestBed.createComponent(SchemaBasedDictEditorComponent);
     component = fixture.componentInstance;
     idGenerationService = TestBed.inject(IdGenerationService);
-
-    component.registerOnTouched();
-    component.registerOnChange(null);
-    component.onChange = (val: boolean) => {
-      return;
-    };
   });
+
+  it('should set component properties on initialization', fakeAsync(() => {
+    let mockFunction = function(value: number) {
+      return value;
+    };
+    component.registerOnChange(mockFunction);
+    component.registerOnTouched();
+
+    expect(component).toBeDefined();
+    expect(component.validate(null)).toEqual({});
+    expect(component.onChange).toEqual(mockFunction);
+    expect(component.onChange(true)).toEqual(true);
+  }));
 
   it('should set directive properties on initialization', () => {
     component.propertySchemas = [
@@ -86,15 +93,33 @@ describe('Schema Based Dict Editor Component', () => {
     expect(component.localValue).toBeTrue();
   });
 
-  it('should update local value', () => {
+  it('should update value when local value change', () => {
     component.localValue = {
-      first: false
+      first: true
     };
 
-    expect(component.localValue.first).toBeFalse();
+    // PreCheck.
+    expect(component.localValue.first).toBeTrue();
 
+    // Action: Update local value.
+    component.updateValue(false, 'first');
+
+    // PostCheck: local value should be updated.
+    expect(component.localValue.first).toBeFalse();
+  });
+
+  it('should not update value when local value not change', () => {
+    component.localValue = {
+      first: true
+    };
+
+    // PreCheck.
+    expect(component.localValue.first).toBeTrue();
+
+    // Action: Update local value.
     component.updateValue(true, 'first');
 
+    // PostCheck: local value should not be updated as it is same.
     expect(component.localValue.first).toBeTrue();
   });
 
@@ -111,10 +136,6 @@ describe('Schema Based Dict Editor Component', () => {
     ];
 
     expect(component.getSchema(0)).toBe('schema');
-  });
-
-  it('should get empty string', () => {
-    expect(component.getEmptyString()).toBe('');
   });
 
   it('should get label for focus target', () => {

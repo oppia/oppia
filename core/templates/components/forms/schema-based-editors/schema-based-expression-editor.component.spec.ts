@@ -46,17 +46,20 @@ describe('Schema Based Expression Editor Component', () => {
     fixture = TestBed.createComponent(SchemaBasedExpressionEditorComponent);
     component = fixture.componentInstance;
     focusManagerService = TestBed.inject(FocusManagerService);
+  });
 
-    component.registerOnTouched();
-    component.registerOnChange(null);
-    component.onChange = (val: boolean) => {
-      return;
+  it('should set component properties on initialization', fakeAsync(() => {
+    let mockFunction = function(value: number) {
+      return value;
     };
-  });
+    component.registerOnChange(mockFunction);
+    component.registerOnTouched();
 
-  it('should get empty object on validating', () => {
+    expect(component).toBeDefined();
     expect(component.validate(null)).toEqual({});
-  });
+    expect(component.onChange).toEqual(mockFunction);
+    expect(component.onChange(true)).toEqual(true);
+  }));
 
   it('should overwrite local value', () => {
     expect(component.localValue).toBe(undefined);
@@ -75,15 +78,29 @@ describe('Schema Based Expression Editor Component', () => {
     expect(focusManagerService.setFocusWithoutScroll).toHaveBeenCalled();
   }));
 
-  it('should update local value', () => {
-    component.localValue = false;
+  it('should update value when local value change', () => {
+    component.localValue = true;
 
+    // PreCheck.
+    expect(component.localValue).toBeTrue();
+
+    // Action: Update local value.
     component.localValueChange(false);
 
+    // PostCheck: local value should be updated.
     expect(component.localValue).toBeFalse();
+  });
 
+  it('should not update value when local value not change', () => {
+    component.localValue = true;
+
+    // PreCheck.
+    expect(component.localValue).toBeTrue();
+
+    // Action: Update local value.
     component.localValueChange(true);
 
+    // PostCheck: local value should not be updated as it is same.
     expect(component.localValue).toBeTrue();
   });
 });

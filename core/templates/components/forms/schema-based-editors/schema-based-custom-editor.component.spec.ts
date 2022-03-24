@@ -18,7 +18,7 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { SchemaBasedCustomEditorComponent } from './schema-based-custom-editor.component';
 
 describe('Schema Based Custom Editor Component', () => {
@@ -38,14 +38,18 @@ describe('Schema Based Custom Editor Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SchemaBasedCustomEditorComponent);
     component = fixture.componentInstance;
-    component.registerOnTouched(() => {});
+  });
+
+  it('should set component properties on initialization', fakeAsync(() => {
     component.registerOnChange(null);
+    component.registerOnTouched(() => {});
     component.onValidatorChange();
     component.onTouch();
-    component.onChange = (val: string) => {
-      return;
-    };
-  });
+
+    expect(component).toBeDefined();
+    expect(component.validate(null)).toEqual({});
+    expect(component.onChange).toEqual(null);
+  }));
 
   it('should overwrite local value', () => {
     expect(component.localValue).toBe(undefined);
@@ -60,18 +64,32 @@ describe('Schema Based Custom Editor Component', () => {
 
     component.writeValue('true');
 
-    expect(component.localValue).toBeTrue();
+    expect(component.localValue).toBe('true');
   });
 
-  it('should update local value', () => {
-    component.localValue = 'false';
+  it('should update value when local value change', () => {
+    component.localValue = 'true';
 
+    // PreCheck.
+    expect(component.localValue).toBe('true');
+
+    // Action: Update local value.
     component.updateValue('false');
 
+    // PostCheck: local value should be updated.
     expect(component.localValue).toBe('false');
+  });
 
+  it('should not update value when local value not change', () => {
+    component.localValue = 'true';
+
+    // PreCheck.
+    expect(component.localValue).toBe('true');
+
+    // Action: Update local value.
     component.updateValue('true');
 
+    // PostCheck: local value should not be updated as it is same.
     expect(component.localValue).toBe('true');
   });
 });

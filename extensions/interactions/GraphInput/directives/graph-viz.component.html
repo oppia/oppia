@@ -40,7 +40,7 @@
         <ng-container *ngIf="canEditOptions">
           <g *ngFor="let button of graphOptions; let idx = index">
             <rect *ngIf="graph"
-                  attr.class="{{(button.text).toLowerCase()}}"
+                  attr.class="{{button.text.toLowerCase()}}"
                   width="70"
                   height="30"
                   x="10"

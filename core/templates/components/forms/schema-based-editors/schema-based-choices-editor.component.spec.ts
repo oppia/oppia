@@ -16,9 +16,8 @@
  * @fileoverview Unit tests for Schema Based Choices Editor Component
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { SchemaBasedChoicesEditorComponent } from './schema-based-choices-editor.component';
 
 describe('Schema Based Choices Editor Component', () => {
@@ -30,8 +29,7 @@ describe('Schema Based Choices Editor Component', () => {
       imports: [FormsModule],
       declarations: [
         SchemaBasedChoicesEditorComponent
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      ]
     }).compileComponents();
   }));
 
@@ -40,12 +38,20 @@ describe('Schema Based Choices Editor Component', () => {
     component = fixture.componentInstance;
 
     component.ngOnInit();
-    component.registerOnTouched();
-    component.registerOnChange(null);
-    component.onChange = (val: boolean) => {
-      return;
-    };
   });
+
+  it('should set component properties on initialization', fakeAsync(() => {
+    let mockFunction = function(value: number) {
+      return value;
+    };
+    component.registerOnChange(mockFunction);
+    component.registerOnTouched();
+
+    expect(component).toBeDefined();
+    expect(component.validate(null)).toEqual({});
+    expect(component.onChange).toEqual(mockFunction);
+    expect(component.onChange(true)).toEqual(true);
+  }));
 
   it('should get empty object on validating', () => {
     expect(component.validate(null)).toEqual({});
@@ -59,15 +65,29 @@ describe('Schema Based Choices Editor Component', () => {
     expect(component.localValue).toBeTrue();
   });
 
-  it('should update local value', () => {
-    component.localValue = false;
+  it('should update value when local value change', () => {
+    component.localValue = true;
 
+    // PreCheck.
+    expect(component.localValue).toBeTrue();
+
+    // Action: Update local value.
     component.updateValue(false);
 
+    // PostCheck: local value should be updated.
     expect(component.localValue).toBeFalse();
+  });
 
+  it('should not update value when local value not change', () => {
+    component.localValue = true;
+
+    // PreCheck.
+    expect(component.localValue).toBeTrue();
+
+    // Action: Update local value.
     component.updateValue(true);
 
+    // PostCheck: local value should not be updated as it is same.
     expect(component.localValue).toBeTrue();
   });
 });
