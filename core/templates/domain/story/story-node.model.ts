@@ -260,6 +260,9 @@ export class StoryNode {
     if (this._prerequisiteSkillIds.indexOf(skillId) !== -1) {
       throw new Error('The given skill id is already a prerequisite skill.');
     }
+    if (this._acquiredSkillIds.indexOf(skillId) !== -1) {
+      throw new Error('The given skill is an acquired skill.');
+    }
     this._prerequisiteSkillIds.push(skillId);
   }
 
