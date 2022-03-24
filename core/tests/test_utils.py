@@ -70,7 +70,7 @@ import elasticsearch
 import requests_mock
 import webtest
 
-from typing import Any, Dict, Optional # isort: skip
+from typing import Any, Dict, List, Optional # isort: skip
 
 (
     auth_models, base_models, exp_models,
@@ -3577,7 +3577,7 @@ class GenericEmailTestBase(GenericTestBase):
             self.emails_dict[recipient_email].append(new_email)
         return True
 
-    def _get_sent_email_messages(self, to):
+    def _get_sent_email_messages(self, to: str) -> List[EmailMessageMock]:
         """Gets messages to a single recipient email.
 
         Args:
