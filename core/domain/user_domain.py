@@ -37,6 +37,7 @@ class UserSettingsDict(TypedDict):
     email: str
     roles: List[str]
     banned: bool
+    user_has_viewed_lesson_info_once: bool
     username: Optional[str]
     normalized_username: Optional[str]
     last_agreed_to_terms: Optional[datetime.datetime]
