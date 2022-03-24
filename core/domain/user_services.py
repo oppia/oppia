@@ -177,6 +177,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
                 ],
                 banned=False,
                 username='admin',
+                user_has_viewed_lesson_info_once='False',
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:
@@ -659,7 +660,9 @@ def _get_user_settings_from_model(user_settings_model):
         pin=user_settings_model.pin,
         display_alias=user_settings_model.display_alias,
         deleted=user_settings_model.deleted,
-        created_on=user_settings_model.created_on
+        created_on=user_settings_model.created_on,
+        user_has_viewed_lesson_info_once=(
+            user_settings_model.user_has_viewed_lesson_info_once)
     )
 
 
@@ -755,7 +758,7 @@ def create_new_user(auth_id, email):
             user_settings.user_id, auth_id))
     user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = user_domain.UserSettings(
-        user_id, email, [feconf.ROLE_ID_FULL_USER], False,
+        user_id, email, [feconf.ROLE_ID_FULL_USER], False, False,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
     _create_new_user_transactional(auth_id, user_settings)
     return user_settings
@@ -810,7 +813,7 @@ def create_new_profiles(auth_id, email, modifiable_user_data_list):
             raise Exception('User id cannot already exist for a new user.')
         user_id = user_models.UserSettingsModel.get_new_id()
         user_settings = user_domain.UserSettings(
-            user_id, email, [feconf.ROLE_ID_MOBILE_LEARNER], False,
+            user_id, email, [feconf.ROLE_ID_MOBILE_LEARNER], False, False,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
             pin=modifiable_user_data.pin)
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)

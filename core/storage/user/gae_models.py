@@ -131,6 +131,9 @@ class UserSettingsModel(base_models.BaseModel):
         repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES)
     # Flag to indicate whether the user is banned.
     banned = datastore_services.BooleanProperty(indexed=True, default=False)
+    # Flag to check whether user has viewed lesson info once.
+    user_has_viewed_lesson_info_once = datastore_services.BooleanProperty(
+        indexed=True, default=False)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -195,6 +198,8 @@ class UserSettingsModel(base_models.BaseModel):
             'creator_dashboard_display_pref':
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'user_has_viewed_lesson_info_once':
                 base_models.EXPORT_POLICY.EXPORTED,
             # Pin is not exported since this is an auth mechanism.
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -289,6 +294,8 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
             'display_alias': user.display_alias,
+            'user_has_viewed_lesson_info_once': (
+                user.user_has_viewed_lesson_info_once)
         }
 
     @classmethod
@@ -1475,6 +1482,12 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # The user's preference for receiving feedback emails for this exploration.
     mute_feedback_notifications = datastore_services.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
+    # The exploration version of the last completed checkpoint.
+    last_completed_checkpoint_exp_version = datastore_services.IntegerProperty(default=None)
+    # The state name of the last completed checkpoint.
+    last_completed_checkpoint_state_name = datastore_services.StringProperty(default=None)
+    # The state name of the last visited checkpoint.
+    last_visited_checkpoint_state_name = datastore_services.StringProperty(default=None)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1530,6 +1543,12 @@ class ExplorationUserDataModel(base_models.BaseModel):
             'mute_suggestion_notifications':
                 base_models.EXPORT_POLICY.EXPORTED,
             'mute_feedback_notifications':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_completed_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_completed_checkpoint_state_name':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_visited_checkpoint_state_name':
                 base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -1661,7 +1680,13 @@ class ExplorationUserDataModel(base_models.BaseModel):
                 'mute_suggestion_notifications': (
                     user_model.mute_suggestion_notifications),
                 'mute_feedback_notifications': (
-                    user_model.mute_feedback_notifications)
+                    user_model.mute_feedback_notifications),
+                'last_completed_checkpoint_exp_version': (
+                    user_model.last_completed_checkpoint_exp_version),
+                'last_completed_checkpoint_state_name': (
+                    user_model.last_completed_checkpoint_state_name),
+                'last_visited_checkpoint_state_name': (
+                user_model.last_visited_checkpoint_state_name)
             }
 
         return user_data

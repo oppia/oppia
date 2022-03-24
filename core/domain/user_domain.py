@@ -103,6 +103,7 @@ class UserSettings:
         email: str,
         roles: List[str],
         banned: bool,
+        user_has_viewed_lesson_info_once: bool,
         username: Optional[str] = None,
         last_agreed_to_terms: Optional[datetime.datetime] = None,
         last_started_state_editor_tutorial: (
@@ -201,6 +202,7 @@ class UserSettings:
         self.banned = banned
         self.deleted = deleted
         self.created_on = created_on
+        self.user_has_viewed_lesson_info_once = user_has_viewed_lesson_info_once
 
     def validate(self) -> None:
         """Checks that the user_id, email, roles, banned, pin and display_alias
@@ -383,7 +385,9 @@ class UserSettings:
             'pin': self.pin,
             'display_alias': self.display_alias,
             'deleted': self.deleted,
-            'created_on': self.created_on
+            'created_on': self.created_on,
+            'user_has_viewed_lesson_info_once': (
+                self.user_has_viewed_lesson_info_once)
         }
 
     @property
@@ -482,6 +486,9 @@ class UserSettings:
         """
         self.banned = False
         self.roles = [default_role]
+
+    def set_user_has_viewed_lesson_info_once(self) -> None:
+        self.user_has_viewed_lesson_info_once = True
 
 
 class UserActionsInfo:
