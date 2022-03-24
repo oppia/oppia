@@ -139,7 +139,7 @@ class UserSettings:
             email: str. The user email.
             roles: list(str). Roles of the user.
             banned: bool. Whether the uses is banned.
-            user_has_viewed_lesson_info_once. Whether the user has viewed
+            user_has_viewed_lesson_info_once: bool. Whether the user has viewed
                 lesson info once.
             username: str or None. Identifiable username to display in the UI.
             last_agreed_to_terms: datetime.datetime or None. When the user
