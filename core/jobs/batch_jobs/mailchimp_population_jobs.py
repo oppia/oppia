@@ -30,7 +30,7 @@ import apache_beam as beam
 import mailchimp3
 from mailchimp3 import mailchimpclient
 import result
-from typing import Iterable, List
+from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -41,13 +41,33 @@ if MYPY: # pragma: no cover
     [models.NAMES.config, models.NAMES.user])
 
 
+@staticmethod
+def _get_mailchimp_class() -> mailchimp3.MailChimp:
+    """Returns the mailchimp api class. This is separated into a separate
+    function to facilitate testing.
+
+    NOTE: No other functionalities should be added to this function.
+
+    Returns:
+        Mailchimp. A mailchimp class instance with the API key and username
+        initialized.
+    """
+
+    # The following is a class initialized in the library with the API key and
+    # username and hence cannot be tested directly. The mailchimp functions are
+    # tested with a mock class.
+    return mailchimp3.MailChimp(    # pragma: no cover
+        mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
+
+
 class SendBatchMailchimpRequest(beam.DoFn):
     """DoFn to send batch mailchimp request for 500 users at a time."""
 
     def process(
-        self, emails: List[str], batch_index_dict: int) -> result.Result[str]:
+        self, emails: List[str], batch_index_dict: int
+    ) -> result.Result[str]:
         """Add 500 users at a time, who have subscribed for newsletters,
-            to the mailchimp db.
+            to the MailChimp DB.
 
         Args:
             emails: list(str). List of emails of users subscribed to
@@ -61,9 +81,7 @@ class SendBatchMailchimpRequest(beam.DoFn):
             JobRunResult. Job run result which is either 'Ok' or an error with
             corresponding error message.
         """
-        client = mailchimp3.MailChimp(
-            mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
-
+        client = _get_mailchimp_class()
         emails = emails[
             batch_index_dict * 500: (batch_index_dict + 1) * 500]
         mailchimp_data = []
@@ -77,45 +95,22 @@ class SendBatchMailchimpRequest(beam.DoFn):
         try:
             response = client.lists.update_members(
                 feconf.MAILCHIMP_AUDIENCE_ID,
-                {'members': mailchimp_data, 'update_existing': True})
+                {'members': mailchimp_data, 'update_existing': False})
         except mailchimpclient.MailChimpError as error:
             error_message = ast.literal_eval(str(error))
-            raise Exception(error_message['detail']) from error
+            yield result.Err(error_message['detail'])
+            return
 
-        if (
-                len(response['new_members']) + len(response['updated_members'])
-                == len(emails)):
-            yield result.Ok()
+        response_emails_count = (
+            len(response['new_members']) + len(response['updated_members']))
+        source_emails_count = len(emails)
+        if response_emails_count == source_emails_count:
+            yield result.Ok('Request successful')
         else:
             failed_emails = []
             for user in response['errors']:
                 failed_emails.append(user['email_address'])
             yield result.Err('User update failed for: %s' % failed_emails)
-
-
-class CombineTuples(beam.CombineFn):  # type: ignore[misc]
-    """CombineFn for combining all user email, status tuples."""
-
-    def create_accumulator(self) -> List:
-        """Base accumulator where the tuples are added."""
-        return []
-
-    def add_input(self, accumulator: List, model: str) -> List:
-        """Append each tuple to the accumulator list."""
-        accumulator.append(model)
-        return accumulator
-
-    def merge_accumulators(self, accumulators: Iterable[List]) -> List:
-        """Merging accumulators is just combining both of them into a single
-        list.
-        """
-        return list(accumulators)
-
-    def extract_output(
-        self, accumulator: List
-    ) -> List:
-        """Output is the accumulator itself."""
-        return accumulator[0]
 
 
 class MailchimpPopulateJob(base_jobs.JobBase):
@@ -143,7 +138,7 @@ class MailchimpPopulateJob(base_jobs.JobBase):
                 user_models.UserEmailPreferencesModel.get_all().filter(
                     user_models.UserEmailPreferencesModel.site_updates == True # pylint: disable=singleton-comparison
                 ).order('created_on'))
-            | 'Extract user id as tuple' >> beam.Map(
+            | 'Extract user ID' >> beam.Map(
                 lambda preferences_model: preferences_model.id)
         )
 
@@ -163,8 +158,10 @@ class MailchimpPopulateJob(base_jobs.JobBase):
 
         mailchimp_results = (
             relevant_user_emails
-            | 'Combine all valid emails into a single list' >>
-                beam.CombineGlobally(CombineTuples())
+            # A large batch size is given so that all emails are included in a
+            # single list.
+            | 'Combine into a list' >> beam.transforms.util.BatchElements(
+                min_batch_size=50000, max_batch_size=50000)
             | 'Send mailchimp request for current batch' >> beam.ParDo(
                 SendBatchMailchimpRequest(), batch_index_dict=batch_index_dict)
             | 'Get final result' >> beam.Map(
