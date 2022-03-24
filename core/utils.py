@@ -766,7 +766,7 @@ def require_valid_name(
     for character in constants.INVALID_NAME_CHARS:
         if character in name:
             raise ValidationError(
-                'Invalid character %s in %s: %s' %
+                r'Invalid character %s in %s: %s' %
                 (character, name_type, name))
 
 

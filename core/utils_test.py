@@ -823,8 +823,9 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_human_readable_time_string(-1.42)
 
     def test_generate_new_session_id(self) -> None:
-        self.assertEqual(24, len(utils.generate_new_session_id()))
-        self.assertIsInstance(utils.generate_new_session_id(), str)
+        test_string = utils.generate_new_session_id()
+        self.assertEqual(24, len(test_string))
+        self.assertIsInstance(test_string, str)
 
     def test_require_valid_name_with_incorrect_input(self) -> None:
         """ADD TEST ESCAPE SEQUENCE CHARACTERS CHECK."""
@@ -844,6 +845,10 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Invalid character : in the exploration title: 1\n:23'):
             utils.require_valid_name('1\n:23', 'the exploration title')
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            r'Invalid character \\n in the exploration title: 1\\n23'):
+            utils.require_valid_name('1\\n23', 'the exploration title')
 
     def test_get_hex_color_for_category(self) -> None:
         self.assertEqual(
