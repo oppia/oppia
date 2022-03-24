@@ -43,7 +43,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
             PCollection. Returns PCollection of invalid explorations with
             their id and category.
         """
-        all_curated_lessons = (
+        all_curated_exploration_ids = (
             self.pipeline
             | 'Get all StoryModels' >> ndb_io.GetModels(
                 story_models.StoryModel.get_all(include_deleted=False))
