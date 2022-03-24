@@ -1489,7 +1489,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
     last_completed_checkpoint_state_name = datastore_services.StringProperty(
         default=None)
     # The state name of the last visited checkpoint.
-    last_visited_checkpoint_state_name = datastore_services.StringProperty(
+    latest_visited_checkpoint_state_name = datastore_services.StringProperty(
         default=None)
 
     @staticmethod
@@ -1551,7 +1551,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'last_completed_checkpoint_state_name':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'last_visited_checkpoint_state_name':
+            'latest_visited_checkpoint_state_name':
                 base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -1688,8 +1688,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
                     user_model.last_completed_checkpoint_exp_version),
                 'last_completed_checkpoint_state_name': (
                     user_model.last_completed_checkpoint_state_name),
-                'last_visited_checkpoint_state_name': (
-                user_model.last_visited_checkpoint_state_name)
+                'latest_visited_checkpoint_state_name': (
+                user_model.latest_visited_checkpoint_state_name)
             }
 
         return user_data
