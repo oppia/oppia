@@ -92,6 +92,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconception ID to be an integer')
 
+    def test_valid_misconception_id_greater_than_zero(self):
+        self.skill.next_misconception_id = -12
+        self._assert_validation_error(
+            'Expected misconception ID to be >= 0')
+
     def test_get_all_html_content_strings(self):
         html_strings = self.skill.get_all_html_content_strings()
         self.assertEqual(len(html_strings), 8)
@@ -1214,3 +1219,95 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.topic_assignments.to_dict(),
             topic_assignments_dict)
+
+
+class CategorizedSkillsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CategorizedSkillsTests, self).setUp()
+        self.categorized_skills = skill_domain.CategorizedSkills()
+        self.subtopic_titles = ['Subtopic Title 1', 'Subtopic Title 2']
+        self.categorized_skills.add_topic('Topic Name', self.subtopic_titles)
+
+    def test_validation_fails_with_duplicate_topic_name(self):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Topic name \'Topic Name\' is already added.'):
+            self.categorized_skills.add_topic('Topic Name', [])
+
+    def test_uncategorized_skill_gets_added(self):
+        self.categorized_skills.add_uncategorized_skill(
+            'Topic Name', 'skill_1', 'Description 1')
+
+        self.assertEqual(self.categorized_skills.to_dict(), {
+            'Topic Name': {
+                'uncategorized': [{
+                    'skill_id': 'skill_1',
+                    'skill_description': 'Description 1',
+                }],
+                'Subtopic Title 1': [],
+                'Subtopic Title 2': []
+            }
+        })
+
+    def test_validation_fails_with_topic_name_not_added(self):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Topic name \'Topic Name 1\' is not added.'):
+            self.categorized_skills.add_uncategorized_skill(
+                'Topic Name 1', 'skill_1', 'Description 1')
+
+    def test_subtopic_skill_gets_added(self):
+        self.categorized_skills.add_subtopic_skill(
+            'Topic Name', 'Subtopic Title 1', 'skill_2', 'Description 2')
+        self.categorized_skills.add_subtopic_skill(
+            'Topic Name', 'Subtopic Title 2', 'skill_3', 'Description 3')
+
+        self.assertEqual(self.categorized_skills.to_dict(), {
+            'Topic Name': {
+                'uncategorized': [],
+                'Subtopic Title 1': [{
+                    'skill_id': 'skill_2',
+                    'skill_description': 'Description 2'
+                }],
+                'Subtopic Title 2': [{
+                    'skill_id': 'skill_3',
+                    'skill_description': 'Description 3'
+                }]
+            }
+        })
+
+    def test_validation_fails_with_subtopic_title_not_added(self):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Subtopic title \'Subtopic Title 3\' is not added.'):
+            self.categorized_skills.add_subtopic_skill(
+                'Topic Name', 'Subtopic Title 3', 'skill_1', 'Description 1')
+
+
+class ShortSkillSummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ShortSkillSummaryTests, self).setUp()
+        self.skill_summary = skill_domain.SkillSummary(
+            'skill_1', 'Description 1', 'en', 1,
+            0, 0, datetime.datetime.now(), datetime.datetime.now())
+        self.short_skill_summary = skill_domain.ShortSkillSummary(
+            'skill_1', 'Description 1')
+
+    def test_short_skill_summary_gets_created(self):
+        short_skill_summary_dict = {
+            'skill_id': 'skill_1',
+            'skill_description': 'Description 1',
+        }
+        self.assertEqual(
+            self.short_skill_summary.to_dict(),
+            short_skill_summary_dict)
+
+    def test_short_skill_summary_gets_created_from_skill_summary(self):
+        short_skill_summary = (
+            skill_domain.ShortSkillSummary.from_skill_summary(
+                self.skill_summary))
+        self.assertEqual(
+            short_skill_summary.to_dict(),
+            self.short_skill_summary.to_dict())
