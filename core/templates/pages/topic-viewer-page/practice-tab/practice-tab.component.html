@@ -7,7 +7,9 @@
     <mat-card class="oppia-page-card oppia-long-text">
       <h2 class="tab-title"
           *ngIf="displayArea === 'topicViewer'">
-        <span [innerHTML]="'I18N_TOPIC_VIEWER_MASTER_SKILLS' | translate: {topicName: topicName}"></span>&nbsp;<span [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG' | translate"></span>
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_MASTER_SKILLS' | translate: {topicName: topicName}"></span>
+        <span>&nbsp;</span>
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG' | translate"></span>
       </h2>
       <div class="practice-content"
            *ngIf="displayArea === 'topicViewer'">
