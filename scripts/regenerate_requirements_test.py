@@ -34,7 +34,7 @@ from piptools.scripts import compile  # isort:skip pylint: disable=redefined-bui
 class RegenerateRequirementsTests(test_utils.GenericTestBase):
     """Test the functionality of regenerating requirements."""
 
-    def test_main_calls_correct_commands(self):
+    def test_main_calls_correct_commands(self) -> None:
         check_function_calls = {
             'cli_is_called': False
         }
@@ -44,7 +44,7 @@ class RegenerateRequirementsTests(test_utils.GenericTestBase):
         system_args = [None]
         swap_system_args = self.swap(sys, 'argv', system_args)
 
-        def mock_swap_cli():
+        def mock_swap_cli() -> None:
             check_function_calls['cli_is_called'] = True
 
         swap_compile_cli = self.swap(compile, 'cli', mock_swap_cli)
