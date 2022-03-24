@@ -85,11 +85,13 @@ describe('Schema Based Dict Editor Component', () => {
     );
   });
 
-  it('should overwrite local value', () => {
-    expect(component.localValue).toBe(undefined);
+  it('should write value', () => {
+    component.localValue = null;
+    component.writeValue(null);
+
+    expect(component.localValue).toEqual(null);
 
     component.writeValue(true);
-
     expect(component.localValue).toBeTrue();
   });
 

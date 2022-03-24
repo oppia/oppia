@@ -134,12 +134,14 @@ describe('Schema Based Unicode Editor', () => {
     expect(component.validate(null)).toEqual({});
   });
 
-  it('should overwrite local value', () => {
-    expect(component.localValue).toBe(undefined);
+  it('should write value', () => {
+    component.localValue = null;
+    component.writeValue(null);
 
-    component.writeValue('val');
+    expect(component.localValue).toEqual(null);
 
-    expect(component.localValue).toBe('val');
+    component.writeValue('test');
+    expect(component.localValue).toEqual('test');
   });
 
   it('should get coding mode', () => {
