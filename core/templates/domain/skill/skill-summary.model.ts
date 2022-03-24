@@ -33,8 +33,8 @@ export class SkillSummary {
     public description: string,
     public languageCode: string,
     public version: number,
-    public misconceptionCount: number | null,
-    public workedExamplesCount: number | null,
+    public misconceptionCount: number,
+    public workedExamplesCount: number,
     public skillModelCreatedOn: number,
     public skillModelLastUpdated: number) {}
 
@@ -45,8 +45,8 @@ export class SkillSummary {
       summaryDict.description,
       summaryDict.language_code,
       summaryDict.version,
-      summaryDict.misconception_count,
-      summaryDict.worked_examples_count,
+      summaryDict.misconception_count!,
+      summaryDict.worked_examples_count!,
       summaryDict.skill_model_created_on,
       summaryDict.skill_model_last_updated);
   }
