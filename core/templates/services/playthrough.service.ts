@@ -101,7 +101,9 @@ class CyclicStateTransitionsTracker {
   // Return undefined if no cycle has been found.
   generateIssueCustomizationArgs():
     CyclicStateTransitionsCustomizationArgs | undefined {
-    if (this.cycleOfVisitedStates !== undefined) {
+    // TODO(#15212): Remove not null check (!==) after whole codebase is
+    // strictly typed.
+    if (this.cycleOfVisitedStates !== null) {
       return {
         state_names: {value: this.cycleOfVisitedStates}
       };
@@ -139,7 +141,9 @@ class EarlyQuitTracker {
 
   // Return undefined if no issue has been found.
   generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs | undefined {
-    if (this.stateName !== undefined) {
+    // TODO(#15212): Remove not null check (!==) after whole codebase is
+    // strictly typed.
+    if (this.stateName !== null) {
       return {
         state_name: {value: this.stateName},
         time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
@@ -239,10 +243,12 @@ export class PlaythroughService {
       return;
     }
 
+    // TODO(#15212): Remove not null check (!==) after whole codebase is
+    // strictly typed.
     if (
-      this.recordedLearnerActions !== undefined &&
-      this.misTracker !== undefined &&
-      this.cstTracker !== undefined
+      this.recordedLearnerActions !== null &&
+      this.misTracker !== null &&
+      this.cstTracker !== null
     ) {
       this.recordedLearnerActions.push(
         this.learnerActionObjectFactory.createNewAnswerSubmitAction({
@@ -265,10 +271,12 @@ export class PlaythroughService {
       return;
     }
 
+    // TODO(#15212): Remove not null check (!==) after whole codebase is
+    // strictly typed.
     if (
-      this.recordedLearnerActions !== undefined &&
-      this.playthroughStopwatch !== undefined &&
-      this.eqTracker !== undefined
+      this.recordedLearnerActions !== null &&
+      this.playthroughStopwatch !== null &&
+      this.eqTracker !== null
     ) {
       this.recordedLearnerActions.push(
         this.learnerActionObjectFactory.createNewExplorationQuitAction({
@@ -302,10 +310,12 @@ export class PlaythroughService {
    * If none of the issue types have been discovered, returns null instead.
    */
   private createNewPlaythrough(): Playthrough | null {
+    // TODO(#15212): Remove not null check (!==) after whole codebase is
+    // strictly typed.
     if (
-      this.explorationId !== undefined &&
-      this.explorationVersion !== undefined &&
-      this.recordedLearnerActions !== undefined
+      this.explorationId !== null &&
+      this.explorationVersion !== null &&
+      this.recordedLearnerActions !== null
     ) {
       if (
         this.misTracker &&
@@ -356,12 +366,16 @@ export class PlaythroughService {
   private hasRecordingBegun(): boolean {
     return (
       this.isPlaythroughRecordingEnabled() &&
-      this.recordedLearnerActions !== undefined);
+      // TODO(#15212): Remove not null check (!==) after whole codebase is
+      // strictly typed.
+      this.recordedLearnerActions !== null);
   }
 
   private hasRecordingFinished(): boolean {
     return (
-      this.recordedLearnerActions !== undefined &&
+      // TODO(#15212): Remove not null check (!==) after whole codebase is
+      // strictly typed.
+      this.recordedLearnerActions !== null &&
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
       this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
@@ -370,7 +384,9 @@ export class PlaythroughService {
 
   private isRecordedPlaythroughHelpful(): boolean {
     return (
-      this.recordedLearnerActions !== undefined &&
+      // TODO(#15212): Remove not null check (!==) after whole codebase is
+      // strictly typed.
+      this.recordedLearnerActions !== null &&
       // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.
