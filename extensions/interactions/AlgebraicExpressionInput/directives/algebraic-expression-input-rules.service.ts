@@ -57,7 +57,8 @@ export class AlgebraicExpressionInputRulesService {
 
   MatchesUpToTrivialManipulations(
       answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
+      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder
+  ): boolean {
     let mis = new MathInteractionsService();
     let numericExpressionRuleService = (
       new NumericExpressionInputRulesService());
