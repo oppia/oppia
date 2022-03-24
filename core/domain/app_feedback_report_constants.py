@@ -137,7 +137,7 @@ class AndroidNetworkType(enum.Enum):
     NONE = 'none'
 
 
-FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
+FilterFieldNames = app_feedback_report_models.FilterFieldNames
 
 ANDROID_ENTRY_POINT = [
     ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
@@ -171,13 +171,13 @@ ALLOWED_STATS_PARAMETERS = [
     STATS_PARAMETER_NAMES.android_sdk_version,
     STATS_PARAMETER_NAMES.version_name]
 ALLOWED_FILTERS = [
-    FILTER_FIELD_NAMES.report_type, FILTER_FIELD_NAMES.platform,
-    FILTER_FIELD_NAMES.entry_point, FILTER_FIELD_NAMES.submitted_on,
-    FILTER_FIELD_NAMES.android_device_model,
-    FILTER_FIELD_NAMES.android_sdk_version,
-    FILTER_FIELD_NAMES.text_language_code,
-    FILTER_FIELD_NAMES.audio_language_code, FILTER_FIELD_NAMES.platform_version,
-    FILTER_FIELD_NAMES.android_device_country_locale_code]
+    FilterFieldNames.REPORT_TYPE, FilterFieldNames.PLATFORM,
+    FilterFieldNames.ENTRY_POINT, FilterFieldNames.SUBMITTED_ON,
+    FilterFieldNames.ANDROID_DEVICE_MODEL,
+    FilterFieldNames.ANDROID_SDK_VERSION,
+    FilterFieldNames.TEXT_LANGUAGE_CODE,
+    FilterFieldNames.AUDIO_LANGUAGE_CODE, FilterFieldNames.PLATFORM_VERSION,
+    FilterFieldNames.ANDROID_DEVICE_COUNTRY_LOCALE_CODE]
 ALLOWED_ANDROID_NETWORK_TYPES = [
     AndroidNetworkType.WIFI, AndroidNetworkType.CELLULAR,
     AndroidNetworkType.NONE]

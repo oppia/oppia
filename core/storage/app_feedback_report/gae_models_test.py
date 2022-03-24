@@ -298,7 +298,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'The field %s is not a valid field to filter reports on' % (
-                InvalidFilter.INVALID_FIELD.name)
+                InvalidFilter.INVALID_FIELD.value)
         ):
             with self.swap(
                 model_class, 'query',

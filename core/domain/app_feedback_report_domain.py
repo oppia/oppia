@@ -1712,13 +1712,13 @@ class AppFeedbackReportFilter:
 
     def __init__(
         self,
-        filter_field: app_feedback_report_constants.FILTER_FIELD_NAMES,
+        filter_field: app_feedback_report_constants.FilterFieldNames,
         filter_options: List[str]
     ) -> None:
         """Constructs a AppFeedbackReportFilter domain object.
 
         Args:
-            filter_field: FILTER_FIELD_NAMES. The enum type for the filter
+            filter_field: FilterFieldNames. The enum type for the filter
                 category, correponding to a field in the AppFeedbackReport
                 object.
             filter_options: list(str). The possible values for the given filter.
@@ -1736,7 +1736,7 @@ class AppFeedbackReportFilter:
         """
         self.filter_options.sort()
         return {
-            'filter_field': self.filter_field.name,
+            'filter_field': self.filter_field.value,
             'filter_options': self.filter_options
         }
 
@@ -1753,7 +1753,7 @@ class AppFeedbackReportFilter:
                 'The filter field should be one of %s, received: %s' % (
                     [item.name for item in (
                         app_feedback_report_constants.ALLOWED_FILTERS)],
-                    self.filter_field.name))
+                    self.filter_field.value))
         if not isinstance(self.filter_options, list):
             raise utils.ValidationError(
                 'The filter options should be a list, received: %r' % (
