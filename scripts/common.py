@@ -131,6 +131,8 @@ CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
 # Directory for storing/fetching data related to the Firebase emulator.
 FIREBASE_EMULATOR_CACHE_DIR = (
     os.path.join(CURR_DIR, os.pardir, 'firebase_emulator_cache'))
+sys.path.insert(0, PY_GITHUB_PATH)
+import github # isort:skip  pylint: disable=wrong-import-position
 
 ES_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
@@ -201,9 +203,6 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR,
 ]
-sys.path.insert(0, PY_GITHUB_PATH)
-
-import github # isort:skip  pylint: disable=wrong-import-position
 
 
 def is_windows_os() -> bool:

@@ -26,7 +26,7 @@ import sys
 from scripts import common
 
 
-def main():
+def main() -> None:
     """Run the tests."""
     node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     nyc_path = os.path.join('node_modules', 'nyc', 'bin', 'nyc.js')
@@ -56,9 +56,10 @@ def main():
         print('All tests passed')
         print('---------------------------')
 
-    coverage_result = re.search = re.search(
+    coverage_result = re.search(
         r'All files\s*\|\s*(?P<stmts>\S+)\s*\|\s*(?P<branch>\S+)\s*\|\s*'
         r'(?P<funcs>\S+)\s*\|\s*(?P<lines>\S+)\s*\|\s*', tests_stdout)
+    assert coverage_result is not None
     if (coverage_result.group('stmts') != '100' or
             coverage_result.group('branch') != '100' or
             coverage_result.group('funcs') != '100' or

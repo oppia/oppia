@@ -247,7 +247,6 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/rtl_css.py',
     'scripts/rtl_css_test.py',
     'scripts/run_backend_tests.py',
-    'scripts/run_custom_eslint_tests.py',
     'scripts/run_e2e_tests.py',
     'scripts/run_e2e_tests_test.py',
     'scripts/run_lighthouse_tests.py',
