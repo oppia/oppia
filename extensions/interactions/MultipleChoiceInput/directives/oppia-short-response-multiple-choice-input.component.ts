@@ -47,7 +47,7 @@ export class ShortResponseMultipleChoiceInputComponent implements OnInit {
 
   ngOnInit(): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer) as string;
+      this.answer) as number;
     const _choices = this.htmlEscaperService.escapedJsonToObj(
       this.choices) as { _html: string; _contentId: string }[];
     const response = this.convertToPlainText.transform(_choices[_answer]._html);

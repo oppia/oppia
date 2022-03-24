@@ -64,6 +64,8 @@ describe('ResponseItemSelectionInput', () => {
     'no answer selected', () => {
     expect(component.responses).toBe(undefined);
 
+    // The value that is received when the learner submits with no options
+    // selected is an empty string.
     component.answer = '""';
     component.ngOnInit();
 
