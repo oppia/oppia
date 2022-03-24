@@ -40,6 +40,18 @@ ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
 
+
+class ValidCmdDict(TypedDict):
+    """Dictionary representing valid commands specs."""
+
+    name: str
+    required_attribute_names: List[str]
+    optional_attribute_names: List[str]
+    user_id_attribute_names: List[str]
+    allowed_values: Dict[str, List[str]]
+    deprecated_values: Dict[str, List[str]]
+
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
