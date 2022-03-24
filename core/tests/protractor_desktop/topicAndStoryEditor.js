@@ -411,7 +411,7 @@ describe('Chapter editor functionality', function() {
   it('should fail to add one prerequisite skill which is already added as' +
     ' acquired skill', async function() {
     await storyEditorPage.navigateToChapterWithName('Chapter 1');
-    await storyEditorPage.addAcquiredSkill(dummySkills[1]);
+    await storyEditorPage.addPrerequisiteSkill(dummySkills[0]);
     await storyEditorPage.expectSaveStoryDisabled();
     var warningRegex = 'The given skill is an acquired skill.';
     await storyEditorPage.expectWarningInIndicator(warningRegex);
