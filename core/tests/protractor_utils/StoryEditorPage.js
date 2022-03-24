@@ -341,7 +341,7 @@ var StoryEditorPage = function() {
     await waitFor.visibilityOf(
       saveStoryButton, 'Save story button taking too long to appear');
     return expect(
-      await saveStoryButton.getAttribute('disabled')).toEqual(null);
+      await saveStoryButton.getAttribute('disabled')).toEqual('true');
   };
 
   this.setChapterExplorationId = async function(explorationId) {
