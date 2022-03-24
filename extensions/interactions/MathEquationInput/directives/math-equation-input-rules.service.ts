@@ -85,7 +85,8 @@ export class MathEquationInputRulesService {
 
   MatchesUpToTrivialManipulations(
       answer: MathEquationAnswer,
-      inputs: MathEquationRuleInputsWithSide): boolean {
+      inputs: MathEquationRuleInputsWithSide
+  ): boolean {
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();
     let mathInteractionsService = new MathInteractionsService();
 
