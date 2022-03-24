@@ -22,11 +22,18 @@ import copy
 import datetime
 import enum
 import os
+import sys
 
 from core.constants import constants
 
 from typing import Dict, List, Union
-from typing_extensions import TypedDict
+
+# We require typing_extensions which is present in thiry_party so we add it to
+# path here.
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
+
+from typing_extensions import TypedDict # isort:skip  # pylint: disable=wrong-import-position
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
