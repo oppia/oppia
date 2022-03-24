@@ -30,9 +30,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import skill_models
 
-(story_models, skill_models, ) = models.Registry.import_models([
-    models.NAMES.story, models.NAMES.skill
-])
+(skill_models, ) = models.Registry.import_models([models.NAMES.skill])
 
 
 class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
