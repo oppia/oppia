@@ -19,9 +19,9 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
 ## Proof that changes are correct
 
 <!--
-Add videos/screenshots of the user-facing interface to demonstrate that the changes made 
-in this PR work correctly. if you work on some developer facing feature provide 
-the videos/screenshots of the developer-facing interface. 
+Add videos/screenshots of the user-facing interface to demonstrate that the changes 
+made in this PR work correctly. If this PR is for a developer-facing feature, 
+provide the videos/screenshots of developer-facing interface. 
 
 Please also include videos/screenshots of the developer tools 
 browser console, so that we can be sure that there are no console errors.
@@ -53,6 +53,10 @@ In some cases this is not needed (e.g. for pages that we do not expect to
 support mobile phone or when working on a backend feature).
 
 Feel free to use the Developer Tools emulator for this.
+
+Reference:
+ - Chrome: https://developer.chrome.com/docs/devtools/device-mode/
+ - Firefox: https://firefox-source-docs.mozilla.org/devtools-user/index.html#responsive-design-mode
 -->
 
 #### Proof of changes in Arabic language
