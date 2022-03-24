@@ -131,7 +131,7 @@ class UserSettingsModel(base_models.BaseModel):
         repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES)
     # Flag to indicate whether the user is banned.
     banned = datastore_services.BooleanProperty(indexed=True, default=False)
-    # Flag to check whether user has viewed lesson info once.
+    # Flag to check whether the user has viewed lesson info once.
     user_has_viewed_lesson_info_once = datastore_services.BooleanProperty(
         indexed=True, default=False)
 
@@ -1483,11 +1483,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
     mute_feedback_notifications = datastore_services.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
     # The exploration version of the last completed checkpoint.
-    last_completed_checkpoint_exp_version = datastore_services.IntegerProperty(default=None)
+    last_completed_checkpoint_exp_version = datastore_services.IntegerProperty(
+        default=None)
     # The state name of the last completed checkpoint.
-    last_completed_checkpoint_state_name = datastore_services.StringProperty(default=None)
+    last_completed_checkpoint_state_name = datastore_services.StringProperty(
+        default=None)
     # The state name of the last visited checkpoint.
-    last_visited_checkpoint_state_name = datastore_services.StringProperty(default=None)
+    last_visited_checkpoint_state_name = datastore_services.StringProperty(
+        default=None)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

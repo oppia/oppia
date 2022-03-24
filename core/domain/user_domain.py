@@ -67,6 +67,8 @@ class UserSettings:
         user_id: str. The unique ID of the user.
         email: str. The user email.
         roles: list(str). Roles of the user.
+        user_has_viewed_lesson_info_once. Flag to check whether the user has viewed
+            lesson info once.
         username: str or None. Identifiable username to display in the UI.
         last_agreed_to_terms: datetime.datetime or None. When the user last
             agreed to the terms of the site.
@@ -488,6 +490,7 @@ class UserSettings:
         self.roles = [default_role]
 
     def set_user_has_viewed_lesson_info_once(self) -> None:
+        """Sets user_has_viewed_lesson_info_once to true."""
         self.user_has_viewed_lesson_info_once = True
 
 
