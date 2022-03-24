@@ -22,13 +22,8 @@ import io
 import json
 import os
 import re
-import sys
 
 from typing import Any, Dict
-
-# Adding third_party to path as early as possible.
-_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _THIRD_PARTY_PATH)
 
 
 # Here we use Dict[str, Any] as return type because we need to parse and return

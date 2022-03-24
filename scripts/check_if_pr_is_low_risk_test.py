@@ -17,17 +17,14 @@
 from __future__ import annotations
 
 import builtins
-from io import StringIO  # pylint: disable=import-only-modules
+import io
 from core import utils
 from core.tests import test_utils
 from scripts import check_if_pr_is_low_risk
 from scripts import common
 
-# We import StringIO directly because we need to inherit from StringIO,
-# so we need the StringIO class.
 
-
-class MockResponse(StringIO):
+class MockResponse(io.StringIO):
     """Mock for the objects returned by urllib2.url_open."""
 
     def __init__(self, data='', code=200):
@@ -38,7 +35,7 @@ class MockResponse(StringIO):
             data: str. Response data.
             code: int. HTTP response code.
         """
-        StringIO.__init__(self, data)
+        io.StringIO.__init__(self, data)
         self.code = code
 
     def getcode(self):

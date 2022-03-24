@@ -40,7 +40,7 @@ class ConstantsTests(test_utils.GenericTestBase):
             self.assertTrue(isinstance(json, dict))
             self.assertEqual(json['TESTING_CONSTANT'], 'test')
 
-    def test_loading_non_existing_file(self) -> None:
+    def test_loading_non_existing_file_throws_error(self) -> None:
         """Test if the constants file is valid json file."""
         try:
             constants.get_package_file_contents('assets', 'non_exit_file.xy')
