@@ -92,13 +92,13 @@ class InformSubscribersTest(test_utils.EmailTestBase):
             # Make sure correct number of emails is sent and no email is sent
             # to the person who has unsubscribed from subscription emails.
             messages = (
-                self._get_sent_email_messages(self.NEW_USER_EMAIL))  # type: ignore[no-untyped-call]
+                self._get_sent_email_messages(self.NEW_USER_EMAIL))
             self.assertEqual(len(messages), 1)
             messages = (
-                self._get_sent_email_messages(self.NEW_USER_EMAIL))  # type: ignore[no-untyped-call]
+                self._get_sent_email_messages(self.NEW_USER_EMAIL))
             self.assertEqual(len(messages), 1)
             messages = (
-                self._get_sent_email_messages(self.USER_EMAIL_2))  # type: ignore[no-untyped-call]
+                self._get_sent_email_messages(self.USER_EMAIL_2))
             self.assertEqual(len(messages), 0)
 
             # Make sure correct email models are stored.
