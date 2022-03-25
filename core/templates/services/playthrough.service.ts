@@ -98,9 +98,8 @@ class CyclicStateTransitionsTracker {
     this.pathOfVisitedStates.push(destStateName);
   }
 
-  // Return undefined if no cycle has been found.
   generateIssueCustomizationArgs():
-    CyclicStateTransitionsCustomizationArgs | undefined {
+    CyclicStateTransitionsCustomizationArgs {
     // TODO(#15212): Remove not null check (!==) after whole codebase is
     // strictly typed.
     if (this.cycleOfVisitedStates !== null) {
@@ -108,6 +107,7 @@ class CyclicStateTransitionsTracker {
         state_names: {value: this.cycleOfVisitedStates}
       };
     }
+    throw new Error('CyclicStateTransitionsTracker: no cycle found.');
   }
 
   private makeCycle(collisionIndex: number): string[] {
@@ -139,16 +139,16 @@ class EarlyQuitTracker {
     this.expDurationInSecs = expDurationInSecs;
   }
 
-  // Return undefined if no issue has been found.
-  generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs | undefined {
+  generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs {
     // TODO(#15212): Remove not null check (!==) after whole codebase is
     // strictly typed.
-    if (this.stateName !== null) {
+    if (this.stateName !== undefined) {
       return {
         state_name: {value: this.stateName},
         time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
       };
     }
+    throw new Error('EarlyQuitTracker: no quit found.');
   }
 }
 
@@ -246,9 +246,9 @@ export class PlaythroughService {
     // TODO(#15212): Remove not null check (!==) after whole codebase is
     // strictly typed.
     if (
-      this.recordedLearnerActions !== null &&
-      this.misTracker !== null &&
-      this.cstTracker !== null
+      this.recordedLearnerActions !== undefined &&
+      this.misTracker !== undefined &&
+      this.cstTracker !== undefined
     ) {
       this.recordedLearnerActions.push(
         this.learnerActionObjectFactory.createNewAnswerSubmitAction({
@@ -274,9 +274,9 @@ export class PlaythroughService {
     // TODO(#15212): Remove not null check (!==) after whole codebase is
     // strictly typed.
     if (
-      this.recordedLearnerActions !== null &&
-      this.playthroughStopwatch !== null &&
-      this.eqTracker !== null
+      this.recordedLearnerActions !== undefined &&
+      this.playthroughStopwatch !== undefined &&
+      this.eqTracker !== undefined
     ) {
       this.recordedLearnerActions.push(
         this.learnerActionObjectFactory.createNewExplorationQuitAction({
@@ -313,9 +313,9 @@ export class PlaythroughService {
     // TODO(#15212): Remove not null check (!==) after whole codebase is
     // strictly typed.
     if (
-      this.explorationId !== null &&
-      this.explorationVersion !== null &&
-      this.recordedLearnerActions !== null
+      this.explorationId !== undefined &&
+      this.explorationVersion !== undefined &&
+      this.recordedLearnerActions !== undefined
     ) {
       if (
         this.misTracker &&
@@ -368,14 +368,14 @@ export class PlaythroughService {
       this.isPlaythroughRecordingEnabled() &&
       // TODO(#15212): Remove not null check (!==) after whole codebase is
       // strictly typed.
-      this.recordedLearnerActions !== null);
+      this.recordedLearnerActions !== undefined);
   }
 
   private hasRecordingFinished(): boolean {
     return (
       // TODO(#15212): Remove not null check (!==) after whole codebase is
       // strictly typed.
-      this.recordedLearnerActions !== null &&
+      this.recordedLearnerActions !== undefined &&
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
       this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
@@ -386,7 +386,7 @@ export class PlaythroughService {
     return (
       // TODO(#15212): Remove not null check (!==) after whole codebase is
       // strictly typed.
-      this.recordedLearnerActions !== null &&
+      this.recordedLearnerActions !== undefined &&
       // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.
