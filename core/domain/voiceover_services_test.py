@@ -66,7 +66,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.USER_ID = 'user'
         self.SKILL_ID = 'skill'
         self.QUESTION_ID = question_services.get_new_question_id()  # type: ignore[no-untyped-call]
-        explorations = [self.save_new_valid_exploration(  # type: ignore[no-untyped-call]
+        explorations = [self.save_new_valid_exploration(
             '%s' % i,
             self.owner_id,
             title='title %d' % i,

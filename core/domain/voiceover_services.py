@@ -53,8 +53,7 @@ def _get_voiceover_application_class(
     """
     target_type_to_classes: Dict[
         str, Type[suggestion_registry.ExplorationVoiceoverApplication]
-    ] = (
-        suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
+    ] = suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES
     if target_type in target_type_to_classes:
         return target_type_to_classes[target_type]
     else:
@@ -159,9 +158,8 @@ def get_voiceover_application_by_id(
     """
     voiceover_application_model: (
         suggestion_models.GeneralVoiceoverApplicationModel
-    ) = (
-        suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-            voiceover_application_id))
+    ) = suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
+            voiceover_application_id)
     return _get_voiceover_application_from_model(voiceover_application_model)
 
 
