@@ -117,10 +117,8 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
             job_run_result.JobRunResult.as_stdout('SKILLS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The id of the skill is %s and its rubrics are %s'
-                % ('skill_id_2', [
-                    rubric.to_dict() for rubric in self.invalid_rubrics_1
-                ])),
+                'The id of the skill is %s and number of '
+                'invalid rubrics are %s' % ('skill_id_2', 1))
         ])
 
     def test_run_with_mixed_models(self) -> None:
@@ -130,13 +128,9 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
             job_run_result.JobRunResult.as_stdout('SKILLS SUCCESS: 3'),
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
             job_run_result.JobRunResult.as_stderr(
-                'The id of the skill is %s and its rubrics are %s'
-                % ('skill_id_2', [
-                    rubric.to_dict() for rubric in self.invalid_rubrics_1])
-            ),
+                'The id of the skill is %s and number of '
+                'invalid rubrics are %s' % ('skill_id_2', 1)),
             job_run_result.JobRunResult.as_stderr(
-                'The id of the skill is %s and its rubrics are %s'
-                % ('skill_id_3', [
-                    rubric.to_dict() for rubric in self.invalid_rubrics_2])
-            ),
+                'The id of the skill is %s and number of ' 
+                'invalid rubrics are %s' % ('skill_id_3', 1))
         ])

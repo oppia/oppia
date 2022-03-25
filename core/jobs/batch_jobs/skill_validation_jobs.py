@@ -53,7 +53,19 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
 
         return False
 
-    def filter_skills_havin_rubrics_with_invalid_explanations(self, skill):
+    def get_count_of_rubrics_with_invalid_explanations(self, skill):
+        """Returns the count of rubrics with invalid explanations in a skill.
+        
+        Returns: int. The count of rubrics with invalid explanations.
+        """
+        count = 0
+        rubrics = skill[1]
+        for rubric in rubrics:
+            if self.rubric_explanations_are_invalid(rubric['explanations']):
+                count = count + 1
+        return count
+
+    def filter_skills_having_rubrics_with_invalid_explanations(self, skill):
         """Returns True if skill has rubrics with invalid explanation.
 
         Returns:
@@ -84,7 +96,7 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
         skills_having_rubrics_with_invalid_explanation = (
             total_skills
             | 'Filter skills with invalid rubrics explanation' >> beam.Filter(
-                self.filter_skills_havin_rubrics_with_invalid_explanations)
+                self.filter_skills_having_rubrics_with_invalid_explanations)
         )
 
         report_number_of_skills_queried = (
@@ -104,8 +116,12 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
             | 'Report invalid skill ids and rubrics' >> (
               beam.Map(
                 lambda skill: job_run_result.JobRunResult.as_stderr(
-                    'The id of the skill is %s and its rubrics are %s' % (
-                        skill[0], skill[1]))
+                    'The id of the skill is %s and number of '
+                    'invalid rubrics are %s' % (
+                        skill[0],
+                        self.get_count_of_rubrics_with_invalid_explanations(
+                            skill
+                        )))
               )
             )
         )
