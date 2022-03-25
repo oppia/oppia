@@ -25,9 +25,12 @@
  * and avoid failure in the future while saving their work.
  */
 
-export interface EntityEditorBrowserTabsInfoObject {
+export interface EntityEditorBrowserTabsInfoDict {
+  [entityId: string]: EntityEditorBrowserTabsInfoLocalStorageDict;
+}
+
+export interface EntityEditorBrowserTabsInfoLocalStorageDict {
   entityType: string;
-  id: string;
   latestVersion: number;
   numberOfOpenedTabs: number;
   someTabHasUnsavedChanges: boolean;
@@ -91,22 +94,23 @@ export class EntityEditorBrowserTabsInfo {
     );
   }
 
-  static createFromDict(
-      entityEditorBrowserTabsInfoObject: EntityEditorBrowserTabsInfoObject
+  static fromLocalStorageDict(
+      entityEditorBrowserTabsInfoLocalStorageDict:
+        EntityEditorBrowserTabsInfoLocalStorageDict,
+      entityId: string
   ): EntityEditorBrowserTabsInfo {
     return new EntityEditorBrowserTabsInfo(
-      entityEditorBrowserTabsInfoObject.entityType,
-      entityEditorBrowserTabsInfoObject.id,
-      entityEditorBrowserTabsInfoObject.latestVersion,
-      entityEditorBrowserTabsInfoObject.numberOfOpenedTabs,
-      entityEditorBrowserTabsInfoObject.someTabHasUnsavedChanges
+      entityEditorBrowserTabsInfoLocalStorageDict.entityType,
+      entityId,
+      entityEditorBrowserTabsInfoLocalStorageDict.latestVersion,
+      entityEditorBrowserTabsInfoLocalStorageDict.numberOfOpenedTabs,
+      entityEditorBrowserTabsInfoLocalStorageDict.someTabHasUnsavedChanges
     );
   }
 
-  toDict(): EntityEditorBrowserTabsInfoObject {
+  toLocalStorageDict(): EntityEditorBrowserTabsInfoLocalStorageDict {
     return {
       entityType: this.getEntityType(),
-      id: this.getId(),
       latestVersion: this.getLatestVersion(),
       numberOfOpenedTabs: this.getNumberOfOpenedTabs(),
       someTabHasUnsavedChanges: (
