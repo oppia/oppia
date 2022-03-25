@@ -27,6 +27,7 @@ from core.platform.app_identity import (
 from core.platform.cache import redis_cache_services as memory_cache_services
 from core.platform.datastore import (
     cloud_datastore_services as datastore_services)
+from core.platform.email import dev_mode_email_services as email_services
 from core.platform.search import elastic_search_services as search_services
 from core.platform.storage import cloud_storage_services as storage_services
 from core.platform.transactions import (
@@ -73,6 +74,7 @@ __all__ = [
     'config_models',
     'datastore_services',
     'email_models',
+    'email_services',
     'exp_models',
     'feedback_models',
     'improvements_models',
