@@ -177,7 +177,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
                 ],
                 banned=False,
                 username='admin',
-                user_has_viewed_lesson_info_once='False',
+                user_has_viewed_lesson_info_once=False,
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:
