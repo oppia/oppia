@@ -22,18 +22,12 @@ from __future__ import annotations
 
 import fnmatch
 import linecache
-import os
 import re
-import sys
 import tokenize
 
 from core import handler_schema_constants
 
 from .. import docstrings_checker
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
-sys.path.insert(0, _PYLINT_PATH)
 
 # List of punctuation symbols that can be used at the end of
 # comments and docstrings.
