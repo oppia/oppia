@@ -399,6 +399,8 @@ import { ExplorationStatesService } from 'pages/exploration-editor-page/services
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
 import { ContributionAndReviewService } from 'pages/contributor-dashboard-page/services/contribution-and-review.service';
 import { ContributionAndReviewBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-and-review-backend-api.service';
+import { FaviconService } from './favicon.service';
+import { StalenessDetectionService } from './staleness-detection.service';
 import { ExplorationImprovementsService } from './exploration-improvements.service';
 import { PlaythroughIssuesService } from './playthrough-issues.service';
 
@@ -553,6 +555,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExtractImageFilenamesFromModelService',
     ExtractImageFilenamesFromModelService],
   ['EventBusService', EventBusService],
+  ['FaviconService', FaviconService],
   ['FatigueDetectionService',
     FatigueDetectionService],
   ['FeedbackPopupBackendApiService', FeedbackPopupBackendApiService],
@@ -730,6 +733,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SolutionValidityService', SolutionValidityService],
   ['SolutionVerificationService', SolutionVerificationService],
   ['SpeechSynthesisChunkerService', SpeechSynthesisChunkerService],
+  ['StalenessDetectionService', StalenessDetectionService],
   ['StateCardIsCheckpointService', StateCardIsCheckpointService],
   ['StateClassifierMappingService', StateClassifierMappingService],
   ['StateContentService', StateContentService],
