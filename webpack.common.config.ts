@@ -544,6 +544,8 @@ module.exports = {
   },
   optimization: {
     runtimeChunk: 'single',
+    sideEffects: true,
+    usedExports: true,
     splitChunks: {
       chunks: 'all'
     },
