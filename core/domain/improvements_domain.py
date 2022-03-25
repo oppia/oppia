@@ -20,12 +20,23 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
 from core import utils
-from core.constants import constants
 
 from typing import Optional
 from typing_extensions import TypedDict
+
+from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
+from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import improvements_models
+
+(improvements_models,) = (
+    models.Registry.import_models([models.NAMES.improvements]))
 
 
 class TaskEntryDict(TypedDict):
@@ -102,7 +113,7 @@ class TaskEntry:
             resolved_on: datetime. The datetime at which this task was resolved.
                 Only used when status is resolved, otherwise replaced with None.
         """
-        if status != constants.TASK_STATUS_RESOLVED:
+        if status != improvements_models.TASK_STATUS_RESOLVED:
             resolver_id = None
             resolved_on = None
         self.entity_type = entity_type
@@ -126,7 +137,7 @@ class TaskEntry:
         Returns:
             str. The ID of this task.
         """
-        return feconf.TASK_ENTRY_ID_TEMPLATE % (
+        return improvements_models.TaskEntryModel.generate_task_id(
             self.entity_type, self.entity_id, self.entity_version,
             self.task_type, self.target_type, self.target_id)
 
@@ -140,7 +151,7 @@ class TaskEntry:
         Returns:
             str. The value of the utility field.
         """
-        return feconf.COMPOSITE_ENTITY_ID_TEMPLATE % (
+        return improvements_models.TaskEntryModel.generate_composite_entity_id(
             self.entity_type, self.entity_id, self.entity_version)
 
     def to_dict(self) -> TaskEntryDict:
@@ -171,7 +182,9 @@ class TaskEntry:
                     milliseconds since epoch at which the task was resolved
                     when status is resolved. Otherwise None.
         """
-
+        resolver_settings = (
+            self.resolver_id and
+            user_services.get_user_settings(self.resolver_id, strict=True)) # type: ignore[no-untyped-call]
         return {
             'entity_type': self.entity_type,
             'entity_id': self.entity_id,
@@ -181,8 +194,11 @@ class TaskEntry:
             'target_id': self.target_id,
             'issue_description': self.issue_description,
             'status': self.status,
-            'resolver_username': None,
-            'resolver_profile_picture_data_url': None,
+            'resolver_username': (
+                resolver_settings and resolver_settings.username),
+            'resolver_profile_picture_data_url': (
+                resolver_settings and
+                resolver_settings.profile_picture_data_url),
             'resolved_on_msecs': (
                 None if not self.resolved_on
                 else utils.get_time_in_millisecs(self.resolved_on)),

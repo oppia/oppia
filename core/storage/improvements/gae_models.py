@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core.constants import constants
 from core.platform import models
 
@@ -33,25 +32,36 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
+TASK_ENTITY_TYPE_EXPLORATION = constants.TASK_ENTITY_TYPE_EXPLORATION
 TASK_ENTITY_TYPES = (
-    constants.TASK_ENTITY_TYPE_EXPLORATION,
+    TASK_ENTITY_TYPE_EXPLORATION,
 )
 
+TASK_STATUS_OPEN = constants.TASK_STATUS_OPEN
+TASK_STATUS_OBSOLETE = constants.TASK_STATUS_OBSOLETE
+TASK_STATUS_RESOLVED = constants.TASK_STATUS_RESOLVED
 TASK_STATUS_CHOICES = (
-    constants.TASK_STATUS_OPEN,
-    constants.TASK_STATUS_OBSOLETE,
-    constants.TASK_STATUS_RESOLVED,
+    TASK_STATUS_OPEN,
+    TASK_STATUS_OBSOLETE,
+    TASK_STATUS_RESOLVED,
 )
 
+TASK_TARGET_TYPE_STATE = constants.TASK_TARGET_TYPE_STATE
 TASK_TARGET_TYPES = (
-    constants.TASK_TARGET_TYPE_STATE,
+    TASK_TARGET_TYPE_STATE,
 )
 
+TASK_TYPE_HIGH_BOUNCE_RATE = constants.TASK_TYPE_HIGH_BOUNCE_RATE
+TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP = (
+    constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP)
+TASK_TYPE_NEEDS_GUIDING_RESPONSES = constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES
+TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS = (
+    constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS)
 TASK_TYPES = (
-    constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-    constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-    constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-    constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+    TASK_TYPE_HIGH_BOUNCE_RATE,
+    TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+    TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+    TASK_TYPE_NEEDS_GUIDING_RESPONSES,
 )
 
 
@@ -227,7 +237,7 @@ class TaskEntryModel(base_models.BaseModel):
         Returns:
             str. The ID for the given task.
         """
-        return feconf.TASK_ENTRY_ID_TEMPLATE % (
+        return '%s.%s.%d.%s.%s.%s' % (
             entity_type, entity_id, entity_version, task_type, target_type,
             target_id)
 
@@ -249,8 +259,7 @@ class TaskEntryModel(base_models.BaseModel):
         Returns:
             str. The composite_entity_id for the given task.
         """
-        return feconf.COMPOSITE_ENTITY_ID_TEMPLATE % (
-            entity_type, entity_id, entity_version)
+        return '%s.%s.%d' % (entity_type, entity_id, entity_version)
 
     @classmethod
     def create(
@@ -262,7 +271,7 @@ class TaskEntryModel(base_models.BaseModel):
             target_type: str,
             target_id: str,
             issue_description: Optional[str] = None,
-            status: str = constants.TASK_STATUS_OBSOLETE,
+            status: str = TASK_STATUS_OBSOLETE,
             resolver_id: Optional[str] = None,
             resolved_on: Optional[str] = None
     ) -> str:

@@ -766,13 +766,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         improvements_models.TaskEntryModel(
             id=self.GENERIC_MODEL_ID,
             composite_entity_id=self.GENERIC_MODEL_ID,
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.GENERIC_MODEL_ID,
             entity_version=1,
-            task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
+            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            target_type=improvements_models.TASK_TARGET_TYPE_STATE,
             target_id=self.GENERIC_MODEL_ID,
-            status=constants.TASK_STATUS_OPEN,
+            status=improvements_models.TASK_STATUS_OPEN,
             resolver_id=self.USER_ID_1
         ).put()
 
