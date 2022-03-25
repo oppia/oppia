@@ -28,7 +28,7 @@ from core.constants import constants
 
 from typing import Dict, List, Union
 
-# We require typing_extensions which is present in thiry_party so we add it to
+# We require typing_extensions which is present in third_party so we add it to
 # path here.
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
