@@ -241,7 +241,11 @@ def main() -> None:
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
         ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
         ('Pillow', common.PILLOW_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', common.PYLINT_QUOTES_VERSION, common.OPPIA_TOOLS_DIR),
+        (
+            'git+https://github.com/oppia/pylint-quotes.git',
+            common.PYLINT_QUOTES_VERSION,
+            common.OPPIA_TOOLS_DIR
+        ),
         ('webtest', common.WEBTEST_VERSION, common.OPPIA_TOOLS_DIR),
         ('isort', common.ISORT_VERSION, common.OPPIA_TOOLS_DIR),
         ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
