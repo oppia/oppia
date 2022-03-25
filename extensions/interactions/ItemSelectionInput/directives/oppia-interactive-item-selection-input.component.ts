@@ -29,6 +29,12 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { AudioTranslationManagerService } from 'pages/exploration-player-page/services/audio-translation-manager.service';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
+import { StateCard } from 'domain/state_card/state-card.model';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { AudioPlayerService, AutoPlayAudioEvent } from 'services/audio-player.service';
 
 @Component({
   selector: 'oppia-interactive-item-selection-input',
@@ -36,6 +42,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
   styleUrls: []
 })
 export class InteractiveItemSelectionInputComponent implements OnInit {
+  COMPONENT_NAME_RULE_INPUT!: string;
   @Input() choicesWithValue: string;
   @Input() maxAllowableSelectionCountWithValue: string;
   @Input() minAllowableSelectionCountWithValue: string;
@@ -49,13 +56,19 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
   preventAdditionalSelections: boolean;
   selectionCount: number;
   userSelections: {[key: string]: boolean};
+  displayedCard!: StateCard;
+  recordedVoiceovers!: RecordedVoiceovers;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService,
-    private itemSelectionInputRulesService: ItemSelectionInputRulesService) {}
+    private itemSelectionInputRulesService: ItemSelectionInputRulesService,
+    private audioTranslationManagerService: AudioTranslationManagerService,
+    private playerPositionService: PlayerPositionService,
+    private playerTranscriptService: PlayerTranscriptService,
+    private audioPlayerService: AudioPlayerService) {}
 
   ngOnInit(): void {
     const {
@@ -83,9 +96,31 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     // choice was selected by the user (default is false).
     this.userSelections = {};
 
-    for (let i = 0; i < this.choices.length; i++) {
-      this.userSelections[this.choices[i]] = false;
+    // Setup voiceover.
+    this.displayedCard = this.playerTranscriptService.getCard(
+      this.playerPositionService.getDisplayedCardIndex());
+    this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
+
+
+    let combinedChoceLabels = '';
+    for (const choiceLabel of this.choices) {
+      // If the labels are in html format, remove the tags and leave the
+      // content only.
+      const cleanChoiceLabel = choiceLabel.replace(/<[^>]+>/g, '');
+
+      combinedChoceLabels += cleanChoiceLabel + '. ';
     }
+    // Say the options aloud if autoplay is enabled.
+    this.audioTranslationManagerService.setSequentialAudioTranslations(
+      this.recordedVoiceovers.getBindableVoiceovers(
+        this.choicesValue[0]._contentId),
+      combinedChoceLabels, this.COMPONENT_NAME_RULE_INPUT
+    );
+
+    this.audioPlayerService.onAutoplayAudio.subscribe(
+      (params: AutoPlayAudioEvent) => {
+        this.audioPlayerService.onAutoplayAudio.emit();
+      });
 
     this.displayCheckboxes = this.maxAllowableSelectionCount > 1;
 
