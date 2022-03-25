@@ -131,6 +131,6 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
                 'The id of the skill is %s and number of '
                 'invalid rubrics are %s' % ('skill_id_2', 1)),
             job_run_result.JobRunResult.as_stderr(
-                'The id of the skill is %s and number of ' 
+                'The id of the skill is %s and number of '
                 'invalid rubrics are %s' % ('skill_id_3', 1))
         ])

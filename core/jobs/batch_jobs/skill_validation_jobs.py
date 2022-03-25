@@ -55,7 +55,7 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
 
     def get_count_of_rubrics_with_invalid_explanations(self, skill):
         """Returns the count of rubrics with invalid explanations in a skill.
-        
+
         Returns: int. The count of rubrics with invalid explanations.
         """
         count = 0
