@@ -414,16 +414,17 @@ def get_exploration_summaries_where_user_has_role(user_id):
         for exp_summary_model in exp_summary_models
     ]
 
+
 def get_exploration_user_data(user_id, exp_id):
     """Returns an ExplorationUserData domain object.
 
     Args:
-        user_id: The Id of the user.
-        exp_id: The Id of the exploration.
+        user_id: str. The Id of the user.
+        exp_id: str. The Id of the exploration.
 
     Returns:
         ExplorationUserData. The domain object corresponding to the given user
-        and exploration. 
+        and exploration.
     """
     exploration_user_data = user_models.ExplorationUserDataModel.get(
             user_id, exp_id)

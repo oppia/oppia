@@ -1332,6 +1332,7 @@ class UrlHandlerTests(test_utils.GenericTestBase):
         }
         self.assertEqual(response, error)
 
+
 class ViewedLessonInfoHandlerTests(test_utils.GenericTestBase):
     def test_set_user_has_viewed_lesson_info_once_to_true(self):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)

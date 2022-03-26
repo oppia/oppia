@@ -17,7 +17,6 @@
 """Unit tests for core.domain.exp_fetchers."""
 
 from __future__ import annotations
-from ensurepip import version
 
 from core import feconf
 from core.domain import caching_services

@@ -2673,7 +2673,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertIsNone(exploration_user_model)
         user_services.set_last_completed_checkpoint(
             user_id, exploration_id, 'checkpoint1', 1)
-        
+
         exploration_user_model = (
             user_services.user_models.ExplorationUserDataModel.get(
                 user_id, exploration_id))
@@ -2686,7 +2686,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_user_model.latest_visited_checkpoint_state_name,
             'checkpoint1')
-    
+
     def test_set_latest_visited_checkpoint(self):
         auth_id = 'someUser'
         exploration_id = 'someExploration'

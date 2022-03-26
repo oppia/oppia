@@ -630,6 +630,7 @@ class UrlHandler(base.BaseHandler):
             login_url = user_services.create_login_url(target_url)
             self.render_json({'login_url': login_url})
 
+
 class ViewedLessonInfoHandler(base.BaseHandler):
     """The handler for setting 'user_has_viewed_lesson_info_once' to true."""
 

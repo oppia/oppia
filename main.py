@@ -495,7 +495,8 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
     get_redirect_route(r'/userinfohandler', profile.UserInfoHandler),
-    get_redirect_route(r'/userinfohandler/data', profile.ViewedLessonInfoHandler),
+    get_redirect_route(
+        r'/userinfohandler/data', profile.ViewedLessonInfoHandler),
     get_redirect_route(r'/url_handler', profile.UrlHandler),
     get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(

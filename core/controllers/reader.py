@@ -1295,6 +1295,7 @@ class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
             interaction_id, answer, answer_details)
         self.render_json({})
 
+
 class CheckpointCompletedEventHandler(base.BaseHandler):
     """Tracks a learner completing a checkpoint."""
 
@@ -1343,6 +1344,7 @@ class CheckpointCompletedEventHandler(base.BaseHandler):
             last_completed_checkpoint_exp_version)
 
         self.render_json(self.values)
+
 
 class CheckpointVisitedEventHandler(base.BaseHandler):
     """Tracks a learner completing a checkpoint."""

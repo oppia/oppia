@@ -2291,14 +2291,15 @@ def get_dashboard_stats(user_id):
         'average_ratings': average_ratings
     }
 
+
 def set_last_completed_checkpoint(user_id, exploration_id, state_name, version):
     """Set the last completed checkpoint.
 
     Args:
         user_id: str. The Id of the user.
         exploration_id: str. The Id of the exploration.
-        state_name: The state name of the completed checkpoint.
-        version: The version of the exploration
+        state_name: str. The state name of the completed checkpoint.
+        version: int. The version of the exploration
     """
 
     exploration_user_model = user_models.ExplorationUserDataModel.get(
@@ -2311,6 +2312,7 @@ def set_last_completed_checkpoint(user_id, exploration_id, state_name, version):
     exploration_user_model.latest_visited_checkpoint_state_name = state_name
     exploration_user_model.update_timestamps()
     exploration_user_model.put()
+
 
 def set_latest_visited_checkpoint(user_id, exploration_id, state_name):
     """Set the last visited checkpoint.
@@ -2326,6 +2328,7 @@ def set_latest_visited_checkpoint(user_id, exploration_id, state_name):
     exploration_user_model.latest_visited_checkpoint_state_name = state_name
     exploration_user_model.update_timestamps()
     exploration_user_model.put()
+
 
 def set_user_has_viewed_lesson_info_once(user_id):
     """Set the 'user_has_viewed_lesson_info_once' to true.
