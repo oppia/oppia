@@ -83,7 +83,7 @@ def get_exploration_rights_with_names(exploration_id):
 
     rights_dict = rights_manager.get_exploration_rights(
         exploration_id).to_dict()
-    ids = ['owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids']
+    user_ids = ['owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids']
     for i in ids:
         rights_dict[i] = (
             user_services.get_human_readable_user_ids(
