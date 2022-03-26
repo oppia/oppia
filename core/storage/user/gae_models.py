@@ -1689,7 +1689,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
                 'last_completed_checkpoint_state_name': (
                     user_model.last_completed_checkpoint_state_name),
                 'latest_visited_checkpoint_state_name': (
-                user_model.latest_visited_checkpoint_state_name)
+                    user_model.latest_visited_checkpoint_state_name)
             }
 
         return user_data

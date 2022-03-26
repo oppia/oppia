@@ -33,7 +33,8 @@ from core.domain import exp_domain
 from core.domain import subscription_services
 from core.platform import models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, user_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -412,3 +413,21 @@ def get_exploration_summaries_where_user_has_role(user_id):
         get_exploration_summary_from_model(exp_summary_model)
         for exp_summary_model in exp_summary_models
     ]
+
+def get_exploration_user_data(user_id, exp_id):
+    """Returns an ExplorationUserData domain object.
+
+    Args:
+        user_id: The Id of the user.
+        exp_id: The Id of the exploration.
+
+    Returns:
+        ExplorationUserData. The domain object corresponding to the given user
+        and exploration. 
+    """
+    exploration_user_data = user_models.ExplorationUserDataModel.get(
+            user_id, exp_id)
+    if exploration_user_data:
+        return exploration_user_data
+    else:
+        return None

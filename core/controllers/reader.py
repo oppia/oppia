@@ -274,6 +274,8 @@ class ExplorationHandler(base.BaseHandler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         user_settings = user_services.get_user_settings(self.user_id)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.user_id, exploration_id)
 
         preferred_audio_language_code = None
         preferred_language_codes = None
@@ -283,6 +285,16 @@ class ExplorationHandler(base.BaseHandler):
                 user_settings.preferred_audio_language_code)
             preferred_language_codes = (
                 user_settings.preferred_language_codes)
+            user_has_viewed_lesson_info_once = (
+                user_settings.user_has_viewed_lesson_info_once)
+
+        if exploration_user_data is not None:
+            last_completed_checkpoint_exp_version = (
+                exploration_user_data.last_completed_checkpoint_exp_version)
+            last_completed_checkpoint_state_name = (
+                exploration_user_data.last_completed_checkpoint_state_name)
+            latest_visited_checkpoint_state_name = (
+                exploration_user_data.latest_visited_checkpoint_state_name)
 
         self.values.update({
             'can_edit': (
@@ -300,6 +312,14 @@ class ExplorationHandler(base.BaseHandler):
                 exploration.correctness_feedback_enabled),
             'record_playthrough_probability': (
                 config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value),
+            'user_has_viewed_lesson_info_once': (
+                user_has_viewed_lesson_info_once),
+            'last_completed_checkpoint_exp_version': (
+                last_completed_checkpoint_exp_version),
+            'last_completed_checkpoint_state_name': (
+                last_completed_checkpoint_state_name),
+            'latest_visited_checkpoint_state_name': (
+                latest_visited_checkpoint_state_name)
         })
         self.render_json(self.values)
 
@@ -1274,3 +1294,95 @@ class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
             entity_type, state_reference,
             interaction_id, answer, answer_details)
         self.render_json({})
+
+class CheckpointCompletedEventHandler(base.BaseHandler):
+    """Tracks a learner completing a checkpoint."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+        }
+    }
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+
+        user_id = self.user_id
+        last_completed_checkpoint_state_name = self.normalized_payload.get(
+            'state_name')
+        last_completed_checkpoint_exp_version = self.normalized_payload.get(
+            'version')
+
+        user_services.set_last_completed_checkpoint(
+            user_id,
+            exploration_id,
+            last_completed_checkpoint_state_name,
+            last_completed_checkpoint_exp_version)
+
+        self.render_json(self.values)
+
+class CheckpointVisitedEventHandler(base.BaseHandler):
+    """Tracks a learner completing a checkpoint."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+        }
+    }
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+
+        user_id = self.user_id
+        latest_visited_checkpoint_state_name = self.normalized_payload.get(
+            'state_name')
+
+        user_services.set_latest_visited_checkpoint(
+            user_id,
+            exploration_id,
+            latest_visited_checkpoint_state_name)
+
+        self.render_json(self.values)

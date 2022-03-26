@@ -2657,3 +2657,81 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             Exception, 'Invalid category: invalid_category'):
             user_services.get_contributor_usernames(
                 'invalid_category', language_code='hi')
+
+    def test_set_last_completed_checkpoint(self):
+        auth_id = 'someUser'
+        exploration_id = 'someExploration'
+        username = 'username'
+        user_email = 'user@example.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+
+        exploration_user_model = (
+            user_services.user_models.ExplorationUserDataModel.get(
+                user_id, exploration_id))
+        self.assertIsNone(exploration_user_model)
+        user_services.set_last_completed_checkpoint(
+            user_id, exploration_id, 'checkpoint1', 1)
+        
+        exploration_user_model = (
+            user_services.user_models.ExplorationUserDataModel.get(
+                user_id, exploration_id))
+        self.assertIsNotNone(exploration_user_model)
+        self.assertEqual(
+            exploration_user_model.last_completed_checkpoint_state_name,
+            'checkpoint1')
+        self.assertEqual(
+            exploration_user_model.last_completed_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exploration_user_model.latest_visited_checkpoint_state_name,
+            'checkpoint1')
+    
+    def test_set_latest_visited_checkpoint(self):
+        auth_id = 'someUser'
+        exploration_id = 'someExploration'
+        username = 'username'
+        user_email = 'user@example.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+
+        exploration_user_model = (
+            user_services.user_models.ExplorationUserDataModel.get(
+                user_id, exploration_id))
+        self.assertIsNone(exploration_user_model)
+
+        user_services.set_last_completed_checkpoint(
+            user_id, exploration_id, 'checkpoint2', 1)
+        exploration_user_model = (
+            user_services.user_models.ExplorationUserDataModel.get(
+                user_id, exploration_id))
+        self.assertIsNotNone(exploration_user_model)
+        self.assertEqual(
+            exploration_user_model.latest_visited_checkpoint_state_name,
+            'checkpoint2')
+
+        user_services.set_latest_visited_checkpoint(
+            user_id, exploration_id, 'checkpoint1')
+        exploration_user_model = (
+            user_services.user_models.ExplorationUserDataModel.get(
+                user_id, exploration_id))
+        self.assertIsNotNone(exploration_user_model)
+        self.assertEqual(
+            exploration_user_model.latest_visited_checkpoint_state_name,
+            'checkpoint1')
+
+    def test_set_user_has_viewed_lesson_info_once(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        self.assertFalse(user_settings_model.user_has_viewed_lesson_info_once)
+
+        user_services.set_user_has_viewed_lesson_info_once(user_id)
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        self.assertTrue(user_settings_model.user_has_viewed_lesson_info_once)

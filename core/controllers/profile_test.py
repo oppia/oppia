@@ -1331,3 +1331,18 @@ class UrlHandlerTests(test_utils.GenericTestBase):
             'status_code': 400
         }
         self.assertEqual(response, error)
+
+class ViewedLessonInfoHandlerTests(test_utils.GenericTestBase):
+    def test_set_user_has_viewed_lesson_info_once_to_true(self):
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertEqual(user_settings.user_has_viewed_lesson_info_once, False)
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json('/userinfohandler/data', {}, csrf_token=csrf_token)
+
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertEqual(user_settings.user_has_viewed_lesson_info_once, True)

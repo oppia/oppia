@@ -1475,9 +1475,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
                     feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
                 'mute_feedback_notifications': (
                     feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
-                'last_completed_checkpoint_exp_version': 1,
-                'last_completed_checkpoint_state_name': 'checkpoint1',
-                'latest_visited_checkpoint_state_name': 'checkpoint1'
+                'last_completed_checkpoint_exp_version': None,
+                'last_completed_checkpoint_state_name': None,
+                'latest_visited_checkpoint_state_name': None
             },
             self.EXP_ID_THREE: {
                 'rating': 5,
@@ -1495,7 +1495,6 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
                 'latest_visited_checkpoint_state_name': 'checkpoint2'
             }
         }
-
         self.assertDictEqual(expected_data, user_data)
 
 

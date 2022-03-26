@@ -17,12 +17,14 @@
 """Unit tests for core.domain.exp_fetchers."""
 
 from __future__ import annotations
+from ensurepip import version
 
 from core import feconf
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -251,6 +253,30 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'doesnt_exist'):
             exp_fetchers.get_multiple_explorations_by_id(
                 exp_ids + ['doesnt_exist'])
+
+    def test_get_exploration_user_data(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        self.assertIsNone(exp_fetchers.get_exploration_user_data(
+            user_id, self.EXP_1_ID))
+        user_services.set_last_completed_checkpoint(
+            user_id, self.EXP_1_ID, 'checkpoint1', 1)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            user_id, self.EXP_1_ID)
+        self.assertIsNotNone(exploration_user_data)
+        self.assertEqual(exploration_user_data.user_id, user_id)
+        self.assertEqual(exploration_user_data.exploration_id, self.EXP_1_ID)
+        self.assertEqual(
+            exploration_user_data.last_completed_checkpoint_state_name,
+            'checkpoint1')
+        self.assertEqual(
+            exploration_user_data.last_completed_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exploration_user_data.latest_visited_checkpoint_state_name,
+            'checkpoint1')
 
 
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
