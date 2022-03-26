@@ -156,13 +156,12 @@ export class AudioBarComponent {
       .getCurrentAudioLanguageDescription();
   }
 
-  getVoiceoverInCurrentLanguage(): Voiceover {
+  getVoiceoverInCurrentLanguage(): Voiceover | undefined {
     const currentAudioLanguageCode = this.getCurrentAudioLanguageCode();
     if (currentAudioLanguageCode) {
       return this.audioTranslationManagerService.getCurrentAudioTranslations()[
         currentAudioLanguageCode];
     }
-    throw new Error('No current audio language code');
   }
 
   isAudioPlaying(): boolean {

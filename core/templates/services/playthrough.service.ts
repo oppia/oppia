@@ -99,7 +99,7 @@ class CyclicStateTransitionsTracker {
   }
 
   generateIssueCustomizationArgs():
-    CyclicStateTransitionsCustomizationArgs {
+    CyclicStateTransitionsCustomizationArgs | undefined {
     // TODO(#15212): Remove not null check (!==) after whole codebase is
     // strictly typed.
     if (this.cycleOfVisitedStates !== null) {
@@ -107,7 +107,6 @@ class CyclicStateTransitionsTracker {
         state_names: {value: this.cycleOfVisitedStates}
       };
     }
-    throw new Error('CyclicStateTransitionsTracker: no cycle found.');
   }
 
   private makeCycle(collisionIndex: number): string[] {
@@ -148,7 +147,6 @@ class EarlyQuitTracker {
         time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
       };
     }
-    throw new Error('EarlyQuitTracker: no quit found.');
   }
 }
 
