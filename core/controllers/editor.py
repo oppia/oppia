@@ -84,16 +84,10 @@ def get_exploration_rights_with_names(exploration_id):
     rights_dict = rights_manager.get_exploration_rights(
         exploration_id).to_dict()
     ids = ['owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids']
-    if rights_dict['community_owned']:
-        rights_dict['owner_names'] = []
-        rights_dict['editor_names'] = []
-        rights_dict['voice_artist_names'] = []
-        rights_dict['viewer_names'] = []
-    else:
-        for i in ids:
-            rights_dict[i] = (
-                user_services.get_human_readable_user_ids(
-                    rights_dict[i]))
+    for i in ids:
+        rights_dict[i] = (
+            user_services.get_human_readable_user_ids(
+                rights_dict[i]))
     for i in ids:
         rights_dict.pop(i)
     return rights_dict
