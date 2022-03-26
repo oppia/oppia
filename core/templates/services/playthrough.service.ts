@@ -100,9 +100,6 @@ class CyclicStateTransitionsTracker {
 
   generateIssueCustomizationArgs():
     CyclicStateTransitionsCustomizationArgs {
-    if (this.cycleOfVisitedStates === null) {
-      throw new Error('Cycle of visited states is not initialized.');
-    }
     return {
       state_names: {value: this.cycleOfVisitedStates}
     };
@@ -138,9 +135,6 @@ class EarlyQuitTracker {
   }
 
   generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs {
-    if (this.stateName === null) {
-      throw new Error('State name is not initialized.');
-    }
     return {
       state_name: {value: this.stateName},
       time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
@@ -239,12 +233,11 @@ export class PlaythroughService {
       return;
     }
 
-    // TODO(#15212): Remove not null check (!==) after whole codebase is
-    // strictly typed.
+    // TODO(#15212): Remove the below check once codebase is strictly typed.
     if (
-      this.recordedLearnerActions !== undefined &&
-      this.misTracker !== undefined &&
-      this.cstTracker !== undefined
+      this.recordedLearnerActions &&
+      this.misTracker &&
+      this.cstTracker
     ) {
       this.recordedLearnerActions.push(
         this.learnerActionObjectFactory.createNewAnswerSubmitAction({
@@ -267,12 +260,11 @@ export class PlaythroughService {
       return;
     }
 
-    // TODO(#15212): Remove not null check (!==) after whole codebase is
-    // strictly typed.
+    // TODO(#15212): Remove the below check once codebase is strictly typed.
     if (
-      this.recordedLearnerActions !== undefined &&
-      this.playthroughStopwatch !== undefined &&
-      this.eqTracker !== undefined
+      this.recordedLearnerActions &&
+      this.playthroughStopwatch &&
+      this.eqTracker
     ) {
       this.recordedLearnerActions.push(
         this.learnerActionObjectFactory.createNewExplorationQuitAction({
@@ -306,12 +298,11 @@ export class PlaythroughService {
    * If none of the issue types have been discovered, returns null instead.
    */
   private createNewPlaythrough(): Playthrough | null {
-    // TODO(#15212): Remove not null check (!==) after whole codebase is
-    // strictly typed.
+    // TODO(#15212): Remove the below check once codebase is strictly typed.
     if (
-      this.explorationId !== undefined &&
-      this.explorationVersion !== undefined &&
-      this.recordedLearnerActions !== undefined
+      this.explorationId &&
+      this.explorationVersion &&
+      this.recordedLearnerActions
     ) {
       if (
         this.misTracker &&
@@ -361,17 +352,18 @@ export class PlaythroughService {
 
   private hasRecordingBegun(): boolean {
     return (
-      this.isPlaythroughRecordingEnabled() &&
-      // TODO(#15212): Remove not null check (!==) after whole codebase is
-      // strictly typed.
-      this.recordedLearnerActions !== undefined);
+      // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
+      // codebase is strictly typed.
+      this.recordedLearnerActions &&
+      this.isPlaythroughRecordingEnabled()
+    );
   }
 
   private hasRecordingFinished(): boolean {
     return (
-      // TODO(#15212): Remove not null check (!==) after whole codebase is
-      // strictly typed.
-      this.recordedLearnerActions !== undefined &&
+      // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
+      // codebase is strictly typed.
+      this.recordedLearnerActions &&
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
       this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
@@ -380,9 +372,9 @@ export class PlaythroughService {
 
   private isRecordedPlaythroughHelpful(): boolean {
     return (
-      // TODO(#15212): Remove not null check (!==) after whole codebase is
-      // strictly typed.
-      this.recordedLearnerActions !== undefined &&
+      // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
+      // codebase is strictly typed.
+      this.recordedLearnerActions &&
       // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.

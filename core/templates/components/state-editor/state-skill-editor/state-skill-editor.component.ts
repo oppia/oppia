@@ -136,9 +136,6 @@ export class StateSkillEditorComponent implements OnInit {
   }
 
   getSkillEditorUrl(): string {
-    if (this.isSkillSelected === false) {
-      throw new Error('No skill is selected.');
-    }
     return this.urlInterpolationService.interpolateUrl(
       '/skill_editor/<skill_id>', {
         skill_id: this.stateLinkedSkillIdService.displayed
