@@ -485,8 +485,10 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))
                     state.update_recorded_voiceovers(recorded_voiceovers)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                elif (
+                    change.property_name ==
+                    exp_domain.DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS
+                ):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
                             'Expected written_translations to be a dict, '

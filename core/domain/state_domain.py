@@ -97,7 +97,9 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 break
             (
                 translatable_contents_collection
-                .add_fields_from_translatable_object(rule_spec)
+                .add_fields_from_translatable_object(
+                    rule_spec,
+                    interaction_id=kwargs['interaction_id'])
             )
         return translatable_contents_collection
 
@@ -318,8 +320,9 @@ class Hint(translation_domain.BaseTranslatableObject):
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            translation_domain.TranslatableContentFormat.HTML,
             self.hint_content.content_id,
+            translation_domain.ContentType.HINT,
+            translation_domain.TranslatableContentFormat.HTML,
             self.hint_content.html)
         return translatable_contents_collection
 
@@ -416,8 +419,9 @@ class Solution(translation_domain.BaseTranslatableObject):
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            translation_domain.TranslatableContentFormat.HTML,
             self.explanation.content_id,
+            translation_domain.ContentType.SOLUTION,
+            translation_domain.TranslatableContentFormat.HTML,
             self.explanation.html)
         return translatable_contents_collection
 
@@ -601,7 +605,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         for customization_arg in self.customization_args.values():
             (
                 translatable_contents_collection
-                .add_fields_from_translatable_object(customization_arg)
+                .add_fields_from_translatable_object(
+                    customization_arg,
+                    interaction_id=self.id)
             )
         for hint in self.hints:
             (
@@ -1065,7 +1071,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         self.schema = schema
 
     def get_translatable_contents_collection(
-        self
+        self, **kwargs
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the interaction customization args.
 
@@ -1083,16 +1089,20 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             # numbers. See issue #13055.
             if not html_string.isnumeric():
                 translatable_contents_collection.add_translatable_field(
-                    translation_domain.TranslatableContentFormat.HTML,
                     subtitled_html.content_id,
-                    html_string)
+                    translation_domain.ContentType.INTERACTION,
+                    translation_domain.TranslatableContentFormat.HTML,
+                    html_string,
+                    kwargs['interaction_id'])
 
         subtitled_unicodes = self.get_subtitled_unicode()
         for subtitled_unicode in subtitled_unicodes:
             translatable_contents_collection.add_translatable_field(
-                translation_domain.TranslatableContentFormat.UNICODE_STRING,
                 subtitled_unicode.content_id,
-                subtitled_unicode.unicode_str)
+                translation_domain.ContentType.INTERACTION,
+                translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                subtitled_unicode.unicode_str,
+                kwargs['interaction_id'])
         return translatable_contents_collection
 
     def to_customization_arg_dict(self):
@@ -1444,8 +1454,9 @@ class Outcome(translation_domain.BaseTranslatableObject):
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            translation_domain.TranslatableContentFormat.HTML,
             self.feedback.content_id,
+            translation_domain.ContentType.FEEDBACK,
+            translation_domain.TranslatableContentFormat.HTML,
             self.feedback.html)
         return translatable_contents_collection
 
@@ -1820,7 +1831,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         self.inputs = inputs
 
     def get_translatable_contents_collection(
-        self
+        self, **kwargs
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the rule spec.
 
@@ -1834,16 +1845,22 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         for input_value in self.inputs.values():
             if 'normalizedStrSet' in input_value:
                 translatable_contents_collection.add_translatable_field(
+                    input_value['contentId'],
+                    translation_domain.ContentType.RULE,
                     translation_domain.TranslatableContentFormat
                     .SET_OF_NORMALIZED_STRING,
-                    input_value['contentId'],
-                    input_value['normalizedStrSet'])
+                    input_value['normalizedStrSet'],
+                    kwargs['interaction_id'],
+                    self.rule_type)
             if 'unicodeStrSet' in input_value:
                 translatable_contents_collection.add_translatable_field(
+                    input_value['contentId'],
+                    translation_domain.ContentType.RULE,
                     translation_domain.TranslatableContentFormat
                     .SET_OF_UNICODE_STRING,
-                    input_value['contentId'],
-                    input_value['unicodeStrSet'])
+                    input_value['unicodeStrSet'],
+                    kwargs['interaction_id'],
+                    self.rule_type)
         return translatable_contents_collection
 
     def to_dict(self):
@@ -2241,8 +2258,9 @@ class State(translation_domain.BaseTranslatableObject):
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            translation_domain.TranslatableContentFormat.HTML,
             self.content.content_id,
+            translation_domain.ContentType.CONTENT,
+            translation_domain.TranslatableContentFormat.HTML,
             self.content.html)
         translatable_contents_collection.add_fields_from_translatable_object(
             self.interaction)
@@ -3204,3 +3222,19 @@ class State(translation_domain.BaseTranslatableObject):
             states_to_content_id,
             content_id_generator.next_content_id_index
         )
+
+    def has_content_id(self, content_id):
+        """Returns whether a given content ID is available in the translatable
+        content.
+        Args:
+            content_id: str. The content ID that needs to be checked for the
+                availability.
+        Returns:
+            bool. A boolean that indicates the availability of the content ID
+            in the translatable content.
+        """
+
+        available_translate_content = (
+            self.get_translatable_contents_collection()
+            .content_id_to_translatable_content)
+        return bool(content_id in available_translate_content)

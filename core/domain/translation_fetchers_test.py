@@ -60,9 +60,6 @@ class MachineTranslationFetchersTests(test_utils.GenericTestBase):
 
 class EntityTranslationFetchersTests(test_utils.GenericTestBase):
 
-    def test_get_entity_translation_from_model(self):
-        pass
-
     def test_get_all_entity_translation_objects_for_entity_returns_correclty(
             self):
         pass

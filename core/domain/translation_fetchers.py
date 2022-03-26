@@ -70,7 +70,7 @@ def get_machine_translation(
     return get_translation_from_model(translation_model)
 
 
-def get_entity_translation_from_model(entity_translation_model):
+def _populate_entity_translation_from_model(entity_translation_model):
     """Returns the EntityTranslation domain object from its model representation
     (EntityTranslationModel).
 
@@ -92,43 +92,45 @@ def get_entity_translation_from_model(entity_translation_model):
     return entity_translation
 
 
-def get_all_entity_translation_objects_for_entity(
+def get_all_entity_translations_for_entity(
         entity_type, entity_id, entity_version):
     """Returns a list of entity translation domain objects.
 
     Args:
-        entity_type:
-        entity_id:
-        entity_version:
+        entity_type: TranslatableEntityType. The type of the entity whose
+            translations are to be fetched.
+        entity_id: str. The ID of the entity whose translations are to be
+            fetched.
+        entity_version: int. The version of the entity whose translations
+            are to be fetched.
 
     Returns:
-        list(EnitityTranslation).
+        list(EnitityTranslation). A list of EntityTranslation domain objects.
     """
     entity_translation_models = (
         translation_models.EntityTranslationsModel.get_all_for_entity(
             entity_type, entity_id, entity_version)
     )
     entity_translation_objects = []
-
     for model in entity_translation_models:
         if model:
-            domain_object = get_entity_translation_from_model(model)
+            domain_object = _populate_entity_translation_from_model(model)
             entity_translation_objects.append(domain_object)
 
     return entity_translation_objects
 
-def get_unique_entity_translation_object(
+def get_entity_translation(
         entity_type, entity_id, entity_version, language_code):
     """Returns a unique entity translation domain object.
 
     Args:
-        entity_type:
-        entity_id:
-        entity_version:
-        language_code:
+        entity_type: TranslatableEntityType. The type of the entity.
+        entity_id: str. The ID of the entity.
+        entity_version: int. The version of the entity.
+        language_code: str. The language code for the entity.
 
     Returns:
-        EnitityTranslation.
+        EnitityTranslation. An instance of Entitytranslations.
     """
     entity_translation_model = (
         translation_models.EntityTranslationsModel.get_model(
@@ -136,7 +138,7 @@ def get_unique_entity_translation_object(
     )
 
     if entity_translation_model:
-        domain_object = get_entity_translation_from_model(
+        domain_object = _populate_entity_translation_from_model(
             entity_translation_model)
         return domain_object
     return None

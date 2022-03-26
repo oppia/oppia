@@ -17,8 +17,9 @@
  */
 
 export interface TranslatableItemBackendDict {
-  'content': string | string[];
-  'data_format': string;
+  'content_id': string,
+  'content_value': string | string[];
+  'content_format': string;
   'content_type': string;
   'interaction_id': string | null;
   'rule_type': string | null;
@@ -26,6 +27,7 @@ export interface TranslatableItemBackendDict {
 
 export class TranslatableItem {
   constructor(
+    readonly contentId: string,
     readonly content: string | string[],
     readonly dataFormat: string,
     readonly contentType: string,
@@ -36,8 +38,9 @@ export class TranslatableItem {
   static createFromBackendDict(
       backendDict: TranslatableItemBackendDict): TranslatableItem {
     return new TranslatableItem(
-      backendDict.content,
-      backendDict.data_format,
+      backendDict.content_id,
+      backendDict.content_value,
+      backendDict.content_format,
       backendDict.content_type,
       backendDict.interaction_id,
       backendDict.rule_type);

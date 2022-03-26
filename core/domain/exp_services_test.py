@@ -153,12 +153,6 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             'property_name': (
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
             'new_value': interaction_answer_groups
-        }), exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
-            'new_value': 4
         })]
 
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
@@ -270,11 +264,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                         }]
                     },
                     'showChoicesInShuffledOrder': {'value': False}
-                }) +
-            _get_change_list(
-                'Introduction',
-                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                2
+                }
             ),
             ''
         )
@@ -2408,13 +2398,6 @@ title: A title
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'New state',
-                    'new_value': 1
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'New state',
                     'old_value': state_domain.SubtitledHtml(
@@ -2499,13 +2482,6 @@ title: A title
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'New state',
-                    'new_value': 1
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'New state',
                     'old_value': state_domain.SubtitledHtml(
@@ -2582,12 +2558,6 @@ title: A title
                 },
                 'rows': {'value': 1}
             }
-        }), exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name':
-                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-            'state_name': 'New state',
-            'new_value': 1
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -2830,13 +2800,6 @@ written_translations:
                         },
                         'rows': {'value': 1}
                     }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'New state',
-                    'new_value': 1
                 })], 'Add state name')
 
         dict_output = exp_services.export_states_to_yaml(
@@ -2882,12 +2845,6 @@ written_translations:
                 },
                 'rows': {'value': 1}
             }
-        }), exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name':
-                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-            'state_name': 'New state',
-            'new_value': 1
         })]
         exploration.objective = 'The objective'
         with utils.open_file(
@@ -3442,10 +3399,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     },
                     'showChoicesInShuffledOrder': {'value': False}
                 }) +
-            _get_change_list(
-                'State 2',
-                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                4) +
             _get_change_list(
                 'State 2',
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
@@ -6462,12 +6415,6 @@ title: Old Title
         }]
 
         change_list = [exp_domain.ExplorationChange({
-            'property_name': 'next_content_id_index',
-            'cmd': 'edit_state_property',
-            'old_value': 1,
-            'state_name': exploration.init_state_name,
-            'new_value': 3
-        }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
             'state_name': exploration.init_state_name,
@@ -7026,7 +6973,6 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             }
         }
         state.update_interaction_id('ItemSelectionInput')
-        state.update_next_content_id_index(4)
         state.update_interaction_customization_args(
             state_customization_args_dict)
         exp_services.save_new_exploration(self.USER_ID, exploration)

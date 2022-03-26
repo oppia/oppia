@@ -647,9 +647,10 @@ class SuggestionTranslateContent(BaseSuggestion):
         # If the translation is for a set of strings, we don't want to process
         # the HTML strings for images.
         if (
-                hasattr(self.change, 'data_format') and
-                state_domain.WrittenTranslation.is_data_format_list(
-                    self.change.data_format)
+                hasattr(self.change, 'data_format') and (
+                    translation_domain.TranslatableContentFormat
+                    .is_data_format_list(self.change.data_format)
+                )
         ):
             translated_content_dict = translation_domain.TranslatedContent(
                     self.change.translation_html,

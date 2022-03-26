@@ -37,6 +37,7 @@ from core.domain import change_domain
 from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
+from core.domain import translation_fetchers
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -1560,31 +1561,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     outcome.dest = other_state_name
 
         del self.states[state_name]
-
-    def get_translatable_text(self, language_code):
-        """Returns all the contents which needs translation in the given
-        language.
-        Args:
-            language_code: str. The language code in which translation is
-                required.
-        Returns:
-            dict(str, dict(str, str)). A dict where state_name is the key and a
-            dict with content_id as the key and html content as value.
-        """
-        entity_translation = (
-            translation_fetchers.get_unique_entity_translation_object(
-                feconf.TranslatableEntityType.EXPLORATION,
-                self.id,
-                self.version,
-                language_code)
-        )
-        state_names_to_content_id_mapping = {}
-        for state_name, state in self.states.items():
-            state_names_to_content_id_mapping[state_name] = (
-                state.get_content_id_mapping_needing_translations(
-                    language_code))
-
-        return state_names_to_content_id_mapping
 
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration

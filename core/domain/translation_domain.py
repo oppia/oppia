@@ -46,6 +46,20 @@ class TranslatableContentFormat(enum.Enum):
     SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
     SET_OF_UNICODE_STRING = 'set_of_unicode_string'
 
+    @classmethod
+    def is_data_format_list(cls, data_format):
+        """Checks whether the content of translation with given format is of
+        a list type.
+        Args:
+            data_format: str. The format of the translation.
+        Returns:
+            bool. Whether the content of translation is a list.
+        """
+        return data_format in (
+            cls.SET_OF_NORMALIZED_STRING,
+            cls.SET_OF_UNICODE_STRING
+        )
+
 
 class TranslatableContentDict(TypedDict):
     """Dictionary representing TranslatableContent object."""
@@ -70,12 +84,18 @@ class TranslatableContent:
     def __init__(
         self,
         content_id: str,
+        content_type: ContentType,
+        content_format: TranslatableContentFormat,
         content_value: feconf.ContentValueType,
-        content_type: TranslatableContentFormat
+        interaction_id: str = None,
+        rule_type: str = None
     ) -> None:
         self.content_id = content_id
-        self.content_value = content_value
         self.content_type = content_type
+        self.content_format = content_format
+        self.content_value = content_value
+        self.interaction_id = interaction_id
+        self.rule_type = rule_type
 
     @classmethod
     def from_dict(
@@ -85,7 +105,7 @@ class TranslatableContent:
         """Returns a TranslatableContent object from its dict representation.
 
         Args:
-            translatable_content_dict: dict. Dict representation of
+            translatable_content_dict: dict. The dict representation of
                 TranslatableContent object.
 
         Returns:
@@ -93,22 +113,26 @@ class TranslatableContent:
         """
         return cls(
             translatable_content_dict['content_id'],
+            translatable_content_dict['content_type'],
+            translatable_content_dict['content_format'],
             translatable_content_dict['content_value'],
-            translatable_content_dict['content_type'])
+            translatable_content_dict['interaction_id'],
+            translatable_content_dict['rule_type'])
 
     def to_dict(self) -> TranslatableContentDict:
         """Returns the dict representation of TranslatableContent object.
 
         Returns:
-            TranslatableContentDict. A dict, mapping content_id, content_value
-            and content_type of a TranslatableContent instance to
-            corresponding keys 'content_id', 'content_value' and
-            'content_type'.
+            TranslatableContentDict. The dict representation of
+            TranslatableContent.
         """
         return {
             'content_id': self.content_id,
+            'content_type': self.content_type.value,
+            'content_format': self.content_format.value,
             'content_value': self.content_value,
-            'content_type': self.content_type
+            'interaction_id': self.interaction_id,
+            'rule_type': self.rule_type
         }
 
 
@@ -178,9 +202,12 @@ class TranslatableContentsCollection:
 
     def add_translatable_field(
         self,
-        field_type: TranslatableContentFormat,
         content_id: str,
-        content_value: feconf.ContentValueType
+        content_type: ContentType,
+        content_format: TranslatableContentFormat,
+        content_value: feconf.ContentValueType,
+        interaction_id: str = None,
+        rule_type: str = None
     ) -> None:
         """Adds translatable field parameter to
         'content_id_to_translatable_content' dict.
@@ -202,7 +229,14 @@ class TranslatableContentsCollection:
                 'TranslatableContentsCollection.' % content_id)
 
         self.content_id_to_translatable_content[content_id] = (
-            TranslatableContent(content_id, content_value, field_type))
+            TranslatableContent(
+                content_id,
+                content_type,
+                content_format,
+                content_value,
+                interaction_id,
+                rule_type)
+        )
 
     def add_fields_from_translatable_object(
         self,
@@ -266,7 +300,8 @@ class BaseTranslatableObject:
             .content_id_to_translatable_content.values())
         content_ids_for_translated_contents = (
             entity_translation.translations.keys())
-        contents_which_need_translation = []
+
+        content_id_to_translatable_content = {}
 
         for translatable_content in translatable_content_list:
             if translatable_content.content_value == '':
@@ -276,14 +311,16 @@ class BaseTranslatableObject:
                 translatable_content.content_id not in
                 content_ids_for_translated_contents
             ):
-                contents_which_need_translation.append(translatable_content)
+                content_id_to_translatable_content[
+                    translatable_content.content_id] = translatable_content
             elif (
                 entity_translation.translations[
                 translatable_content.content_id].needs_update
             ):
-                contents_which_need_translation.append(translatable_content)
+                content_id_to_translatable_content[
+                    translatable_content.content_id] = translatable_content
 
-        return contents_which_need_translation
+        return content_id_to_translatable_content
 
 
 class EntityTranslation:
@@ -384,15 +421,14 @@ class EntityTranslation:
                         content_value)
 
     @classmethod
-    def create_empty_translation_object(cls):
+    def create_empty(cls, entity_id, entity_type, language_code):
         return cls(
-            entity_id='',
-            entity_type=feconf.TranslatableEntityType.EXPLORATION,
+            entity_id=entity_id,
+            entity_type=entity_type,
             entity_version=0,
-            language_code='',
+            language_code=language_code,
             translations={}
         )
-
 
 
 class MachineTranslation:
