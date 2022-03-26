@@ -22,7 +22,7 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -340,9 +340,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_STORY, self.story.id))
+        fs = fs_services.GcsFileSystem(
+                feconf.ENTITY_TYPE_STORY, self.story.id)
         fs.commit(
             '%s/new_image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -522,9 +521,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_STORY, self.story.id))
+        fs = fs_services.GcsFileSystem(
+                feconf.ENTITY_TYPE_STORY, self.story.id)
         fs.commit(
             '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')

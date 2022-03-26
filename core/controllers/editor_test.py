@@ -32,7 +32,6 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import question_services
 from core.domain import rights_domain
@@ -3207,8 +3206,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
 
         # Check that the file is not already present.
         file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(
-            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
 
@@ -3227,8 +3225,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
 
         # Check that the file is not uploaded.
         file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(
-            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
 
@@ -3254,8 +3251,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
 
         # Check that the file is not already present.
         file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(
-            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
 
@@ -3267,7 +3263,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             raw_image = f.read()
 
         get_image_exists_swap = self.swap_to_always_return(
-            fs_domain.GcsFileSystem, 'isfile', value=True)
+            fs_services.GcsFileSystem, 'isfile', value=True)
 
         with get_image_exists_swap:
             response = self.post_json(
@@ -3289,8 +3285,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
 
         # Check that the file is not uploaded.
         file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(
-            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
 
@@ -3314,8 +3309,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
 
         # Check that the file is not already present.
         file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(
-            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
         # Read raw image for testing.
@@ -3339,8 +3333,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
 
         # Check that the file is uploaded successfully.
         file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(
-            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertTrue(fs.isfile(filepath))
 

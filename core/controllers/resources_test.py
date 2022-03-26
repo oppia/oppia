@@ -22,7 +22,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rights_manager
 from core.domain import skill_services
@@ -592,8 +591,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, '0'))
+        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, '0')
 
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),

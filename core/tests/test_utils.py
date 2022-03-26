@@ -44,7 +44,6 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import question_domain
@@ -3667,8 +3666,8 @@ class ClassifierTestBase(GenericEmailTestBase):
         """
         filename = classifier_training_job.classifier_data_filename
         file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
+        fs = file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id)
         classifier_data = utils.decompress_from_zlib(fs.get(filename))
         classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
         classifier_data_proto.ParseFromString(classifier_data)

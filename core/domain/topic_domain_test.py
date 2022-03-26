@@ -24,7 +24,7 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
@@ -747,9 +747,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(  # type: ignore[no-untyped-call]
-            fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
-                feconf.ENTITY_TYPE_TOPIC, self.topic.id))
+        fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
+                feconf.ENTITY_TYPE_TOPIC, self.topic.id)
         fs.commit(  # type: ignore[no-untyped-call]
             '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -801,9 +800,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(  # type: ignore[no-untyped-call]
-            fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
-                feconf.ENTITY_TYPE_TOPIC, self.topic_id))
+        fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
+                feconf.ENTITY_TYPE_TOPIC, self.topic_id)
         fs.commit(  # type: ignore[no-untyped-call]
             'thumbnail/new_image.svg', raw_image, mimetype='image/svg+xml')
         self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')

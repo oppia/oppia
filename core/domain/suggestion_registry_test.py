@@ -25,7 +25,6 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_validation_service
 from core.domain import question_domain
@@ -2588,9 +2587,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         question = question_services.get_questions_by_skill_ids(
             1, ['skill1'], False)[0]
-        destination_fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_QUESTION, question.id))
+        destination_fs = fs_services.GcsFileSystem(
+                feconf.ENTITY_TYPE_QUESTION, question.id)
         self.assertTrue(destination_fs.isfile('image/%s' % 'image.png'))
         self.assertEqual(
             suggestion.status,

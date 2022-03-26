@@ -31,7 +31,6 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import question_services
@@ -982,8 +981,7 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException(e)
 
         file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            entity_type, entity_id))
+        fs = file_system_class(entity_type, entity_id)
         filepath = '%s/%s' % (
             filename_prefix, filename)
 

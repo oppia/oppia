@@ -29,12 +29,12 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import fs_domain
 from core.domain import subtopic_page_domain
 
 from typing import List, Optional
 from typing_extensions import TypedDict
 
+from core.domain import fs_services # pylint: disable=invalid-import-from # isort:skip
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
@@ -1187,8 +1187,8 @@ class Topic:
         Returns:
             dict. The converted subtopic_dict.
         """
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
-            feconf.ENTITY_TYPE_TOPIC, topic_id))
+        fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
+            feconf.ENTITY_TYPE_TOPIC, topic_id)
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
         subtopic_dict['thumbnail_size_in_bytes'] = (
@@ -1347,8 +1347,8 @@ class Topic:
             Exception. The thumbnail does not exist for expected topic in
                 the filesystem.
         """
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
-            feconf.ENTITY_TYPE_TOPIC, self.id))
+        fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
+            feconf.ENTITY_TYPE_TOPIC, self.id)
 
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
@@ -1558,8 +1558,8 @@ class Topic:
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
 
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
-            feconf.ENTITY_TYPE_TOPIC, self.id))
+        fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
+            feconf.ENTITY_TYPE_TOPIC, self.id)
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
         if fs.isfile(filepath):  # type: ignore[no-untyped-call]

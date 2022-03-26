@@ -46,7 +46,7 @@ from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
-from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import opportunity_services
@@ -306,9 +306,8 @@ def export_to_zip_file(exploration_id, version=None):
         else:
             zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
+        fs = fs_services.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         html_string_list = exploration.get_all_html_content_strings()
         image_filenames = (
             html_cleaner.get_image_filenames_from_html_strings(
@@ -1492,9 +1491,8 @@ def save_new_exploration_from_yaml_and_assets(
     # images. So we need to have images in the datastore before we could
     # perform the migration.
     for (asset_filename, asset_content) in assets_list:
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
+        fs = fs_services.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         fs.commit(asset_filename, asset_content)
 
     exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)
