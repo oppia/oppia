@@ -2712,7 +2712,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             'checkpoint2')
 
         user_services.set_latest_visited_checkpoint(
-            user_id, exploration_id, 'checkpoint1')
+            user_id, exploration_id, 'checkpoint1', 1)
         exploration_user_model = (
             user_services.user_models.ExplorationUserDataModel.get(
                 user_id, exploration_id))

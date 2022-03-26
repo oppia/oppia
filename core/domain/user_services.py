@@ -2314,18 +2314,20 @@ def set_last_completed_checkpoint(user_id, exploration_id, state_name, version):
     exploration_user_model.put()
 
 
-def set_latest_visited_checkpoint(user_id, exploration_id, state_name):
+def set_latest_visited_checkpoint(user_id, exploration_id, state_name, version):
     """Set the last visited checkpoint.
 
     Args:
         user_id: str. The Id of the user.
         exploration_id: str. The Id of the exploration.
         state_name: str. The state name of the completed checkpoint.
+        version: int. The version of the exploration.
     """
 
     exploration_user_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
     exploration_user_model.latest_visited_checkpoint_state_name = state_name
+    exploration_user_model.last_completed_checkpoint_exp_version = version
     exploration_user_model.update_timestamps()
     exploration_user_model.put()
 
@@ -2338,5 +2340,5 @@ def set_user_has_viewed_lesson_info_once(user_id):
     """
 
     user_settings = get_user_settings(user_id)
-    user_settings.set_lesson_info_once_to_true()
+    user_settings.set_viewed_lesson_info_once_to_true()
     _save_user_settings(user_settings)

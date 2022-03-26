@@ -566,7 +566,8 @@ class UserInfoHandler(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
+        'GET': {},
+        'POST': {}
     }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -604,6 +605,12 @@ class UserInfoHandler(base.BaseHandler):
                 'user_is_logged_in': False
             })
 
+    @acl_decorators.open_access
+    def post(self):
+        """Handles POST requests."""
+        user_services.set_user_has_viewed_lesson_info_once(self.user_id)
+        self.render_json({'success': True})
+
 
 class UrlHandler(base.BaseHandler):
     """The handler for generating login URL."""
@@ -629,18 +636,3 @@ class UrlHandler(base.BaseHandler):
             target_url = self.normalized_request.get('current_url')
             login_url = user_services.create_login_url(target_url)
             self.render_json({'login_url': login_url})
-
-
-class ViewedLessonInfoHandler(base.BaseHandler):
-    """The handler for setting 'user_has_viewed_lesson_info_once' to true."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'POST': {}
-    }
-
-    @acl_decorators.open_access
-    def post(self):
-        """Handles POST requests."""
-        user_services.set_user_has_viewed_lesson_info_once(self.user_id)
-        self.render_json({'success': True})

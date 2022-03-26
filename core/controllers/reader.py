@@ -1347,7 +1347,7 @@ class CheckpointCompletedEventHandler(base.BaseHandler):
 
 
 class CheckpointVisitedEventHandler(base.BaseHandler):
-    """Tracks a learner completing a checkpoint."""
+    """Tracks a learner visiting a previously completed checkpoint."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
@@ -1356,6 +1356,9 @@ class CheckpointVisitedEventHandler(base.BaseHandler):
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
+            'version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
             'state_name': {
                 'schema': {
                     'type': 'basestring',
@@ -1381,10 +1384,13 @@ class CheckpointVisitedEventHandler(base.BaseHandler):
         user_id = self.user_id
         latest_visited_checkpoint_state_name = self.normalized_payload.get(
             'state_name')
+        last_completed_checkpoint_exp_version = self.normalized_payload.get(
+            'version')
 
         user_services.set_latest_visited_checkpoint(
             user_id,
             exploration_id,
-            latest_visited_checkpoint_state_name)
+            latest_visited_checkpoint_state_name,
+            last_completed_checkpoint_exp_version)
 
         self.render_json(self.values)
