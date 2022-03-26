@@ -117,7 +117,8 @@ def get_exploration_titles_and_categories(exp_ids):
     """
     explorations = [
         (exp_fetchers.get_exploration_from_model(e) if e else None)
-        for e in exp_models.ExplorationModel.get_multi(exp_ids)]
+        for e in exp_models.ExplorationModel.get_multi(
+            exp_ids, include_deleted=True)]
 
     result = {}
     for exploration in explorations:
