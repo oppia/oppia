@@ -26,6 +26,17 @@ import { tap } from 'rxjs/operators';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+interface LastCompletedCheckpointPostData {
+  exploration_id: number
+  last_completed_checkpoint_exp_version: number
+  last_completed_checkpoint_state_name: string
+  latest_visited_checkpoint_state_name: string
+}
+
+interface LastCompletedCheckpointPostData {
+  latest_visited_checkpoint_state_name: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -122,6 +133,13 @@ export class EditableExplorationBackendApiService {
       changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
     return this._updateExplorationAsync(
       explorationId, explorationVersion, commitMessage, changeList);
+  }
+
+  async recordLastCompletedCheckpointAsync(
+    explorationId: string,
+    explorationVersion: number, 
+  ): Promise<void> {
+    
   }
 
   /**

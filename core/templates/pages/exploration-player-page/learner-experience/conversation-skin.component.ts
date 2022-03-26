@@ -1052,6 +1052,10 @@ export class ConversationSkinComponent {
         }, millisecsLeftToWait);
       }
     );
+
+    if (this.answerIsCorrect && this.explorationEngineService.getState().cardIsCheckpoint) {
+      // Update last_completed_checkpoint & latest_visited_checkpoint
+    }
   }
 
   showPendingCard(): void {
