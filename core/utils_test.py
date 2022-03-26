@@ -826,6 +826,12 @@ class UtilsTests(test_utils.GenericTestBase):
         test_string = utils.generate_new_session_id()
         self.assertEqual(24, len(test_string))
         self.assertIsInstance(test_string, str)
+        test_string_utf8 = test_string.encode('utf-8')
+        test_string_utf16 = test_string.encode('utf-16')
+        self.assertEqual(
+            len(test_string), len(test_string_utf8))
+        self.assertNotEqual(
+            len(test_string), len(test_string_utf16))
 
     def test_require_valid_name_with_incorrect_input(self) -> None:
         """ADD TEST ESCAPE SEQUENCE CHARACTERS CHECK."""
