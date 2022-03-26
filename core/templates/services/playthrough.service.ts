@@ -99,14 +99,13 @@ class CyclicStateTransitionsTracker {
   }
 
   generateIssueCustomizationArgs():
-    CyclicStateTransitionsCustomizationArgs | undefined {
-    // TODO(#15212): Remove not null check (!==) after whole codebase is
-    // strictly typed.
-    if (this.cycleOfVisitedStates !== null) {
-      return {
-        state_names: {value: this.cycleOfVisitedStates}
-      };
+    CyclicStateTransitionsCustomizationArgs {
+    if (this.cycleOfVisitedStates === null) {
+      throw new Error('Cycle of visited states is not initialized.');
     }
+    return {
+      state_names: {value: this.cycleOfVisitedStates}
+    };
   }
 
   private makeCycle(collisionIndex: number): string[] {
@@ -139,14 +138,13 @@ class EarlyQuitTracker {
   }
 
   generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs {
-    // TODO(#15212): Remove not null check (!==) after whole codebase is
-    // strictly typed.
-    if (this.stateName !== undefined) {
-      return {
-        state_name: {value: this.stateName},
-        time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
-      };
+    if (this.stateName === null) {
+      throw new Error('State name is not initialized.');
     }
+    return {
+      state_name: {value: this.stateName},
+      time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
+    };
   }
 }
 

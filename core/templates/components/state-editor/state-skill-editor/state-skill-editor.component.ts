@@ -135,14 +135,14 @@ export class StateSkillEditorComponent implements OnInit {
     });
   }
 
-  // Return undefined if the skill is not linked to the state.
-  getSkillEditorUrl(): string | undefined {
-    if (this.isSkillSelected) {
-      return this.urlInterpolationService.interpolateUrl(
-        '/skill_editor/<skill_id>', {
-          skill_id: this.stateLinkedSkillIdService.displayed
-        });
+  getSkillEditorUrl(): string {
+    if (this.isSkillSelected === false) {
+      throw new Error('No skill is selected.');
     }
+    return this.urlInterpolationService.interpolateUrl(
+      '/skill_editor/<skill_id>', {
+        skill_id: this.stateLinkedSkillIdService.displayed
+      });
   }
 
   toggleSkillEditor(): void {
