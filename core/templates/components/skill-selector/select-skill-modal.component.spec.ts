@@ -28,6 +28,7 @@ import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-pag
 import { ShortSkillSummary, ShortSkillSummaryBackendDict } from 'domain/skill/short-skill-summary.model';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SkillSummary } from '../../domain/skill/skill-summary.model';
 
 
 describe('Select Skill Modal', () => {
@@ -95,7 +96,11 @@ describe('Select Skill Modal', () => {
     spyOn(ngbActiveModal, 'close');
     componentInstance.selectedSkillId = '2';
     let totalSkills:
+<<<<<<< HEAD
     (ShortSkillSummary |SkillSummaryBackendDict)[] = [];
+=======
+    (ShortSkillSummary |SkillSummaryBackendDict | SkillSummary)[] = [];
+>>>>>>> 117d6b6cc1b7304149c7a8652e6ee56b5e930271
     if (componentInstance.skillSummaries) {
       totalSkills = [...componentInstance.skillSummaries];
     }
