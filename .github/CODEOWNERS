@@ -40,7 +40,7 @@
 /core/templates/pages/ @srijanreddy98
 /core/templates/services/ @nithusha21
 /extensions/ @vojtechjelinek
-/scripts/ @oppia/dev-workflow-team
+/scripts/ @oppia/dev-workflow-reviewers
 
 
 # Angular Migration team
@@ -175,27 +175,27 @@
 
 # Dev workflow team.
 /.circleci/ @oppia/automated-qa-reviewers
-/.eslintignore @Hudda @oppia/dev-workflow-team
-/.eslintrc @Hudda @oppia/dev-workflow-team
-/.htmllintrc @Hudda @oppia/dev-workflow-team
-/.coveragerc @Hudda @oppia/dev-workflow-team
-/.gitattributes @oppia/dev-workflow-team
-/.gitignore @oppia/dev-workflow-team
-/.isort.cfg @Hudda @oppia/dev-workflow-team
-/.pylintrc @Hudda @oppia/dev-workflow-team
-/.stylelintrc @Hudda @oppia/dev-workflow-team
-/.yarnrc @oppia/dev-workflow-team
-/tox.ini @Hudda @oppia/dev-workflow-team
-/scripts/*.py @oppia/dev-workflow-team
+/.eslintignore @Hudda @oppia/dev-workflow-reviewers
+/.eslintrc @Hudda @oppia/dev-workflow-reviewers
+/.htmllintrc @Hudda @oppia/dev-workflow-reviewers
+/.coveragerc @Hudda @oppia/dev-workflow-reviewers
+/.gitattributes @oppia/dev-workflow-reviewers
+/.gitignore @oppia/dev-workflow-reviewers
+/.isort.cfg @Hudda @oppia/dev-workflow-reviewers
+/.pylintrc @Hudda @oppia/dev-workflow-reviewers
+/.stylelintrc @Hudda @oppia/dev-workflow-reviewers
+/.yarnrc @oppia/dev-workflow-reviewers
+/tox.ini @Hudda @oppia/dev-workflow-reviewers
+/scripts/*.py @oppia/dev-workflow-reviewers
 /scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/automated-qa-reviewers
 /scripts/check_frontend_test_coverage*.py @oppia/automated-qa-reviewers @nithusha21
-/scripts/create_topological_sort_of_all_services*.py @oppia/dev-workflow-team
-/scripts/install_prerequisites.sh @oppia/dev-workflow-team
-/scripts/linters/ @Hudda @oppia/dev-workflow-team
-/scripts/linters/codeowner_linter*.py @oppia/dev-workflow-team
-/scripts/linters/pylint_extensions*.py @oppia/dev-workflow-team
-/scripts/linters/python_linter*.py @oppia/dev-workflow-team
-/ubuntu_dockerfile @oppia/dev-workflow-team
+/scripts/create_topological_sort_of_all_services*.py @oppia/dev-workflow-reviewers
+/scripts/install_prerequisites.sh @oppia/dev-workflow-reviewers
+/scripts/linters/ @Hudda @oppia/dev-workflow-reviewers
+/scripts/linters/codeowner_linter*.py @oppia/dev-workflow-reviewers
+/scripts/linters/pylint_extensions*.py @oppia/dev-workflow-reviewers
+/scripts/linters/python_linter*.py @oppia/dev-workflow-reviewers
+/ubuntu_dockerfile @oppia/dev-workflow-reviewers
 
 
 # Exploration project.
@@ -735,11 +735,11 @@
 /dependencies.json @vojtechjelinek
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek
-/scripts/install_third_party_libs.py @oppia/dev-workflow-team
-/.github/ @oppia/dev-workflow-team
-/.github/CODEOWNERS @oppia/dev-workflow-team
+/scripts/install_third_party_libs.py @oppia/dev-workflow-reviewers
+/.github/ @oppia/dev-workflow-reviewers
+/.github/CODEOWNERS @oppia/dev-workflow-reviewers
 /.github/stale.yml @vojtechjelinek
-/.github/workflows/ @oppia/dev-workflow-team @oppia/automated-qa-reviewers
+/.github/workflows/ @oppia/dev-workflow-reviewers @oppia/automated-qa-reviewers
 # Files needed by the Android team.
 # TODO(#14285): Re-add @BenHenning for the following 3.
 /core/controllers/android_e2e_config*.py @seanlip
