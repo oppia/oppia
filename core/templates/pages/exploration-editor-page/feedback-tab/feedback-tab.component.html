@@ -1,14 +1,5 @@
 <md-card class="oppia-editor-card oppia-feedback-card">
   <div ng-if="!$ctrl.activeThread">
-    <div ng-if="$ctrl.threadData.suggestionThreads.length > 0">
-      <h2>Suggestions from Learners</h2>
-      <oppia-thread-table ng-if="$ctrl.threadData.suggestionThreads"
-                          [threads]="$ctrl.threadData.suggestionThreads"
-                          (row-click)="$ctrl.setActiveThread($event)">
-      </oppia-thread-table>
-      <br>
-    </div>
-
     <div class="float-right">
       <button ng-if="$ctrl.userIsLoggedIn" class="btn btn-success float-right oppia-thread-button oppia-autofocus"
               ng-click="$ctrl.showCreateThreadModal()" focus-on="newThreadButton">
