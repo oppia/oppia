@@ -43,7 +43,11 @@ require('pages/interaction-specs.constants.ajs.ts');
 require('pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts');
 require('services/loader.service.ts');
 require('services/prevent-page-unload-event.service.ts');
+require('services/local-storage.service.ts');
+require('services/favicon.service.ts');
 
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
+import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoDict } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('topicEditorPage', [
@@ -58,14 +62,16 @@ angular.module('oppia').directive('topicEditorPage', [
       controllerAs: '$ctrl',
       controller: [
         '$rootScope', 'BottomNavbarStatusService', 'ContextService',
-        'LoaderService', 'PageTitleService', 'PreventPageUnloadEventService',
+        'FaviconService', 'LoaderService', 'LocalStorageService',
+        'PageTitleService', 'PreventPageUnloadEventService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'UndoRedoService', 'UrlService',
+        'UndoRedoService', 'UrlService', 'WindowRef',
         function(
             $rootScope, BottomNavbarStatusService, ContextService,
-            LoaderService, PageTitleService, PreventPageUnloadEventService,
+            FaviconService, LoaderService, LocalStorageService,
+            PageTitleService, PreventPageUnloadEventService,
             TopicEditorRoutingService, TopicEditorStateService,
-            UndoRedoService, UrlService) {
+            UndoRedoService, UrlService, WindowRef) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getActiveTabName = function() {
@@ -178,6 +184,119 @@ angular.module('oppia').directive('topicEditorPage', [
             return validationIssuesCount + prepublishValidationIssuesCount;
           };
 
+          var createTopicEditorBrowserTabsInfo = function() {
+            var topic = TopicEditorStateService.getTopic();
+
+            var topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+              LocalStorageService.getEntityEditorBrowserTabsInfo(
+                EntityEditorBrowserTabsInfoDomainConstants
+                  .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
+
+            if (topicEditorBrowserTabsInfo) {
+              topicEditorBrowserTabsInfo.setLatestVersion(topic.getVersion());
+              topicEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
+              topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+            } else {
+              topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+                'topic', topic.getId(), topic.getVersion(), 1, false);
+            }
+
+            LocalStorageService.updateEntityEditorBrowserTabsInfo(
+              topicEditorBrowserTabsInfo,
+              EntityEditorBrowserTabsInfoDomainConstants
+                .OPENED_TOPIC_EDITOR_BROWSER_TABS);
+          };
+
+          var updateTopicEditorBrowserTabsInfo = function() {
+            const topic = TopicEditorStateService.getTopic();
+
+            const topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+              LocalStorageService.getEntityEditorBrowserTabsInfo(
+                EntityEditorBrowserTabsInfoDomainConstants
+                  .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
+
+            topicEditorBrowserTabsInfo.setLatestVersion(topic.getVersion());
+            topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+
+            LocalStorageService.updateOpenedEntityEditorBrowserTabsInfo(
+              topicEditorBrowserTabsInfo,
+              EntityEditorBrowserTabsInfoDomainConstants
+                .OPENED_TOPIC_EDITOR_BROWSER_TABS);
+          };
+
+          var onClosingTopicEditorBrowserTab = function() {
+            const topic = TopicEditorStateService.getTopic();
+
+            const topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+              LocalStorageService.getEntityEditorBrowserTabsInfo(
+                EntityEditorBrowserTabsInfoDomainConstants
+                  .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
+
+            if (topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
+                UndoRedoService.getChangeCount() > 0) {
+              topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+            }
+            topicEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
+
+            LocalStorageService.updateOpenedEntityEditorBrowserTabsInfo(
+              topicEditorBrowserTabsInfo,
+              EntityEditorBrowserTabsInfoDomainConstants
+                .OPENED_TOPIC_EDITOR_BROWSER_TABS);
+          };
+
+          var onCreateOrUpdateTopicEditorBrowserTabsInfo = function(event) {
+            const topic = TopicEditorStateService.getTopic();
+            if (event.key === (
+              EntityEditorBrowserTabsInfoDomainConstants
+                .OPENED_TOPIC_EDITOR_BROWSER_TABS)
+            ) {
+              const oldTopicEditorBrowserTabsInfoDict:
+                EntityEditorBrowserTabsInfoDict = (
+                  JSON.parse(event.oldValue) || {});
+              const newOpenedTopicEditorPagesObject:
+                EntityEditorBrowserTabsInfoDict = (
+                  JSON.parse(event.newValue));
+
+              const oldOpenedTopicEditorBrowserTabsInfo = {};
+              for (let topicId in oldTopicEditorBrowserTabsInfoDict) {
+                oldOpenedTopicEditorBrowserTabsInfo[topicId] = (
+                  EntityEditorBrowserTabsInfo.fromLocalStorageDict(
+                    oldTopicEditorBrowserTabsInfoDict[topicId], topicId)
+                );
+              }
+
+              const newOpenedTopicEditorBrowserTabsInfo = {};
+              for (let topicId in newOpenedTopicEditorPagesObject) {
+                newOpenedTopicEditorBrowserTabsInfo[topicId] = (
+                  EntityEditorBrowserTabsInfo.fromLocalStorageDict(
+                    newOpenedTopicEditorPagesObject[topicId], topicId)
+                );
+              }
+
+              const oldTopicEditorBrowserTabInfo = (
+                oldOpenedTopicEditorBrowserTabsInfo[topic.getId()]);
+              const newTopicEditorBrowserTabInfo = (
+                newOpenedTopicEditorBrowserTabsInfo[topic.getId()]);
+
+              if (
+                newTopicEditorBrowserTabInfo
+                  .getLatestVersion() !== topic.getVersion()
+              ) {
+                FaviconService.setFavicon(
+                  '/assets/images/favicon_alert/favicon_alert.ico');
+                $rootScope.$applyAsync();
+              }
+              if (oldTopicEditorBrowserTabInfo &&
+                    oldTopicEditorBrowserTabInfo
+                      .doesSomeTabHaveUnsavedChanges() !==
+                        newTopicEditorBrowserTabInfo
+                          .doesSomeTabHaveUnsavedChanges()
+              ) {
+                $rootScope.$applyAsync();
+              }
+            }
+          };
+
           ctrl.$onInit = function() {
             LoaderService.showLoadingScreen('Loading Topic');
             ctrl.directiveSubscriptions.add(
@@ -185,6 +304,7 @@ angular.module('oppia').directive('topicEditorPage', [
                 () => {
                   LoaderService.hideLoadingScreen();
                   setDocumentTitle();
+                  createTopicEditorBrowserTabsInfo();
                   $rootScope.$applyAsync();
                 }
               ));
@@ -192,6 +312,7 @@ angular.module('oppia').directive('topicEditorPage', [
               TopicEditorStateService.onTopicReinitialized.subscribe(
                 () => {
                   setDocumentTitle();
+                  updateTopicEditorBrowserTabsInfo();
                   $rootScope.$applyAsync();
                 }
               ));
@@ -216,6 +337,11 @@ angular.module('oppia').directive('topicEditorPage', [
                 () => setDocumentTitle()
               )
             );
+            WindowRef.nativeWindow.addEventListener('beforeunload', (event) => {
+              onClosingTopicEditorBrowserTab();
+            });
+            LocalStorageService.registerNewStorageEventListener(
+              onCreateOrUpdateTopicEditorBrowserTabsInfo);
           };
 
           ctrl.$onDestroy = function() {
