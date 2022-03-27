@@ -279,6 +279,7 @@ class ExplorationHandler(base.BaseHandler):
 
         preferred_audio_language_code = None
         preferred_language_codes = None
+        user_has_viewed_lesson_info_once = None
 
         if user_settings is not None:
             preferred_audio_language_code = (
@@ -287,6 +288,10 @@ class ExplorationHandler(base.BaseHandler):
                 user_settings.preferred_language_codes)
             user_has_viewed_lesson_info_once = (
                 user_settings.user_has_viewed_lesson_info_once)
+
+        last_completed_checkpoint_exp_version = None
+        last_completed_checkpoint_state_name = None
+        latest_visited_checkpoint_state_name = None
 
         if exploration_user_data is not None:
             last_completed_checkpoint_exp_version = (
