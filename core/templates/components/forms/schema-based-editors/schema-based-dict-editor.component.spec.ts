@@ -97,26 +97,26 @@ describe('Schema Based Dict Editor Component', () => {
 
   it('should update value when local value change', () => {
     component.localValue = {
-      first: true
+      first: 'true'
     };
 
-    expect(component.localValue.first).toBeTrue();
+    expect(component.localValue.first).toEqual('true');
 
-    component.updateValue(false, 'first');
+    component.updateValue('false', 'first');
 
-    expect(component.localValue.first).toBeFalse();
+    expect(component.localValue.first).toEqual('false');
   });
 
   it('should not update value when local value not change', () => {
     component.localValue = {
-      first: true
+      first: 'true'
     };
 
-    expect(component.localValue.first).toBeTrue();
+    expect(component.localValue.first).toEqual('true');
 
-    component.updateValue(true, 'first');
+    component.updateValue('true', 'first');
 
-    expect(component.localValue.first).toBeTrue();
+    expect(component.localValue.first).toEqual('true');
   });
 
   it('should get empty object on validating', () => {
