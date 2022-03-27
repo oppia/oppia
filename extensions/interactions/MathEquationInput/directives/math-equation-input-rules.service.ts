@@ -36,10 +36,12 @@ import { MathInteractionsService } from 'services/math-interactions.service';
   providedIn: 'root'
 })
 export class MathEquationInputRulesService {
+  constructor(
+    private algebraicRulesService: AlgebraicExpressionInputRulesService) {}
+
   MatchesExactlyWith(
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide): boolean {
-    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
     let mathInteractionsService = new MathInteractionsService();
 
     let positionOfTerms = inputs.y;
@@ -52,13 +54,17 @@ export class MathEquationInputRulesService {
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
 
     if (positionOfTerms === 'lhs') {
-      return algebraicRulesService.MatchesExactlyWith(lhsAnswer, {x: lhsInput});
+      return this.algebraicRulesService.MatchesExactlyWith(
+        lhsAnswer, {x: lhsInput});
     } else if (positionOfTerms === 'rhs') {
-      return algebraicRulesService.MatchesExactlyWith(rhsAnswer, {x: rhsInput});
+      return this.algebraicRulesService.MatchesExactlyWith(
+        rhsAnswer, {x: rhsInput});
     } else if (positionOfTerms === 'both') {
       return (
-        algebraicRulesService.MatchesExactlyWith(lhsAnswer, {x: lhsInput}) && (
-          algebraicRulesService.MatchesExactlyWith(rhsAnswer, {x: rhsInput})));
+        this.algebraicRulesService.MatchesExactlyWith(
+          lhsAnswer, {x: lhsInput}) && (
+          this.algebraicRulesService.MatchesExactlyWith(
+            rhsAnswer, {x: rhsInput})));
     } else {
       // Position of terms is irrelevant. So, we bring all terms on one side
       // and perform an exact match.
@@ -79,7 +85,7 @@ export class MathEquationInputRulesService {
       let rhsInputModified = nerdamer(rhsInput).multiply('-1').text();
       let expressionInput = nerdamer(rhsInputModified).add(lhsInput).text();
 
-      return algebraicRulesService.MatchesExactlyWith(
+      return this.algebraicRulesService.MatchesExactlyWith(
         expressionAnswer, {x: expressionInput});
     }
   }
@@ -88,7 +94,6 @@ export class MathEquationInputRulesService {
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide
   ): boolean {
-    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
     let mathInteractionsService = new MathInteractionsService();
 
     let positionOfTerms = inputs.y;
@@ -101,17 +106,17 @@ export class MathEquationInputRulesService {
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
 
     if (positionOfTerms === 'lhs') {
-      return algebraicRulesService.MatchesUpToTrivialManipulations(
+      return this.algebraicRulesService.MatchesUpToTrivialManipulations(
         lhsAnswer, {x: lhsInput});
     } else if (positionOfTerms === 'rhs') {
-      return algebraicRulesService.MatchesUpToTrivialManipulations(
+      return this.algebraicRulesService.MatchesUpToTrivialManipulations(
         rhsAnswer, {x: rhsInput});
     } else if (positionOfTerms === 'both') {
       return (
-        algebraicRulesService.MatchesUpToTrivialManipulations(
+        this.algebraicRulesService.MatchesUpToTrivialManipulations(
           lhsAnswer, {x: lhsInput}
         ) &&
-        algebraicRulesService.MatchesUpToTrivialManipulations(
+        this.algebraicRulesService.MatchesUpToTrivialManipulations(
           rhsAnswer, {x: rhsInput}
         )
       );
@@ -135,7 +140,7 @@ export class MathEquationInputRulesService {
       let rhsInputModified = nerdamer(rhsInput).multiply('-1').text();
       let expressionInput = nerdamer(rhsInputModified).add(lhsInput).text();
 
-      return algebraicRulesService.MatchesUpToTrivialManipulations(
+      return this.algebraicRulesService.MatchesUpToTrivialManipulations(
         expressionAnswer, {x: expressionInput});
     }
   }
@@ -143,7 +148,6 @@ export class MathEquationInputRulesService {
   IsEquivalentTo(
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithoutSide): boolean {
-    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
 
     let splitAnswer = answer.split('=');
     let lhsAnswer = splitAnswer[0];
@@ -162,9 +166,9 @@ export class MathEquationInputRulesService {
     let expressionInput1 = nerdamer(lhsInput).subtract(rhsInput).text();
     let expressionInput2 = nerdamer(rhsInput).subtract(lhsInput).text();
 
-    if (algebraicRulesService.IsEquivalentTo(
+    if (this.algebraicRulesService.IsEquivalentTo(
       expressionAnswer, {x: expressionInput1}) ||
-      algebraicRulesService.IsEquivalentTo(
+      this.algebraicRulesService.IsEquivalentTo(
         expressionAnswer, {x: expressionInput2})) {
       return true;
     }
@@ -183,9 +187,9 @@ export class MathEquationInputRulesService {
       expressionInput1 = nerdamer(lhsInput).divide(rhsInput).text();
       expressionInput2 = nerdamer(rhsInput).divide(lhsInput).text();
 
-      if (algebraicRulesService.IsEquivalentTo(
+      if (this.algebraicRulesService.IsEquivalentTo(
         expressionAnswer, {x: expressionInput1}) ||
-        algebraicRulesService.IsEquivalentTo(
+        this.algebraicRulesService.IsEquivalentTo(
           expressionAnswer, {x: expressionInput2})) {
         return true;
       }
@@ -197,7 +201,6 @@ export class MathEquationInputRulesService {
   ContainsSomeOf(
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide): boolean {
-    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
 
     let positionOfTerms = inputs.y;
 
@@ -209,13 +212,15 @@ export class MathEquationInputRulesService {
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
 
     if (positionOfTerms === 'lhs') {
-      return algebraicRulesService.ContainsSomeOf(lhsAnswer, {x: lhsInput});
+      return this.algebraicRulesService.ContainsSomeOf(
+        lhsAnswer, {x: lhsInput});
     } else if (positionOfTerms === 'rhs') {
-      return algebraicRulesService.ContainsSomeOf(rhsAnswer, {x: rhsInput});
+      return this.algebraicRulesService.ContainsSomeOf(
+        rhsAnswer, {x: rhsInput});
     } else if (positionOfTerms === 'both') {
       return (
-        algebraicRulesService.ContainsSomeOf(lhsAnswer, {x: lhsInput}) && (
-          algebraicRulesService.ContainsSomeOf(rhsAnswer, {x: rhsInput})));
+        this.algebraicRulesService.ContainsSomeOf(lhsAnswer, {x: lhsInput}) && (
+          this.algebraicRulesService.ContainsSomeOf(rhsAnswer, {x: rhsInput})));
     } else {
       // Position of terms is irrelevant. So, we bring all terms on one side
       // and perform an exact match.
@@ -225,7 +230,7 @@ export class MathEquationInputRulesService {
       let rhsInputModified = nerdamer(rhsInput).multiply('-1').text();
       let expressionInput = nerdamer(rhsInputModified).add(lhsInput).text();
 
-      return algebraicRulesService.ContainsSomeOf(
+      return this.algebraicRulesService.ContainsSomeOf(
         expressionAnswer, {x: expressionInput});
     }
   }
@@ -233,7 +238,6 @@ export class MathEquationInputRulesService {
   OmitsSomeOf(
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide): boolean {
-    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
 
     let positionOfTerms = inputs.y;
 
@@ -245,13 +249,13 @@ export class MathEquationInputRulesService {
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
 
     if (positionOfTerms === 'lhs') {
-      return algebraicRulesService.OmitsSomeOf(lhsAnswer, {x: lhsInput});
+      return this.algebraicRulesService.OmitsSomeOf(lhsAnswer, {x: lhsInput});
     } else if (positionOfTerms === 'rhs') {
-      return algebraicRulesService.OmitsSomeOf(rhsAnswer, {x: rhsInput});
+      return this.algebraicRulesService.OmitsSomeOf(rhsAnswer, {x: rhsInput});
     } else if (positionOfTerms === 'both') {
       return (
-        algebraicRulesService.OmitsSomeOf(lhsAnswer, {x: lhsInput}) && (
-          algebraicRulesService.OmitsSomeOf(rhsAnswer, {x: rhsInput})));
+        this.algebraicRulesService.OmitsSomeOf(lhsAnswer, {x: lhsInput}) && (
+          this.algebraicRulesService.OmitsSomeOf(rhsAnswer, {x: rhsInput})));
     } else {
       // Position of terms is irrelevant. So, we bring all terms on one side
       // and perform an exact match.
@@ -261,7 +265,7 @@ export class MathEquationInputRulesService {
       let rhsInputModified = nerdamer(rhsInput).multiply('-1').text();
       let expressionInput = nerdamer(rhsInputModified).add(lhsInput).text();
 
-      return algebraicRulesService.OmitsSomeOf(
+      return this.algebraicRulesService.OmitsSomeOf(
         expressionAnswer, {x: expressionInput});
     }
   }
@@ -269,7 +273,6 @@ export class MathEquationInputRulesService {
   MatchesWithGeneralForm(
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithPlaceholder): boolean {
-    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
 
     let splitAnswer = answer.split('=');
     let lhsAnswer = splitAnswer[0];
@@ -280,9 +283,9 @@ export class MathEquationInputRulesService {
 
     let placeholders = inputs.y;
 
-    return algebraicRulesService.MatchesWithGeneralForm(
+    return this.algebraicRulesService.MatchesWithGeneralForm(
       lhsAnswer, {x: lhsInput, y: placeholders}) && (
-      algebraicRulesService.MatchesWithGeneralForm(
+      this.algebraicRulesService.MatchesWithGeneralForm(
         rhsAnswer, {x: rhsInput, y: placeholders}));
   }
 }

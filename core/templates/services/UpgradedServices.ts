@@ -580,7 +580,9 @@ export class UpgradedServices {
     upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
       new UtilsService);
     upgradedServices['MathEquationInputRulesService'] =
-      new MathEquationInputRulesService();
+      new MathEquationInputRulesService(
+        upgradedServices['AlgebraicExpressionInputRulesService']
+      );
     upgradedServices['Meta'] = new Meta({});
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();

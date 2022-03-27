@@ -16,16 +16,24 @@
  * @fileoverview Unit tests for math equation input interaction rules.
  */
 
+import { AlgebraicExpressionInputRulesService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import { MathEquationInputRulesService } from
 // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
+import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import { MathInteractionsService } from 'services/math-interactions.service';
 
 describe('Math equation input rules service', () => {
   let meirs: MathEquationInputRulesService;
   let inputString, positionOfTerms;
 
   beforeEach(() => {
-    meirs = new MathEquationInputRulesService();
+    meirs = new MathEquationInputRulesService(
+      new AlgebraicExpressionInputRulesService(
+        new MathInteractionsService(),
+        new NumericExpressionInputRulesService()
+      )
+    );
   });
 
   it('should have a correct MatchesExactlyWith rule', () => {
