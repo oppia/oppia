@@ -71,13 +71,13 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
             published_explorations
             | 'Filter out all curated lessons' >> beam.Filter(
                 lambda x,
-                all_curated_lessons: x.id in all_curated_lessons,
-                all_curated_lessons=beam.pvalue.AsIter(all_curated_lessons)
+                all_curated_exploration_ids: x.id in all_curated_exploration_ids,           # pylint: disable=line-too-long
+                all_curated_exploration_ids=beam.pvalue.AsIter(all_curated_exploration_ids) # pylint: disable=line-too-long
             )
         )
 
         exp_ids_with_category_not_in_constants = (
-            curated_lessons
+            curated_explorations
             | 'Combine exp id and category' >> beam.Map(
                 lambda exp: (exp.id, exp.category))
             | 'Filter exploraton with category not in constants.ts' >>
@@ -85,7 +85,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
         )
 
         report_number_of_exps_queried = (
-            curated_lessons
+            curated_explorations
             | 'Report count of curated exp models' >> (
                 job_result_transforms.CountObjectsToJobRunResult('EXPS'))
         )
