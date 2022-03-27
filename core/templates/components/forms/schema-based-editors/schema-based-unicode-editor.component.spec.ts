@@ -72,12 +72,6 @@ describe('Schema Based Unicode Editor', () => {
       coding_mode: 'python',
     };
     component.disabled = true;
-    component.registerOnTouched(null);
-    component.registerOnChange(null);
-    component.onChange = (val: string) => {
-      return;
-    };
-    component.updateLocalValue();
 
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
   });
@@ -100,6 +94,12 @@ describe('Schema Based Unicode Editor', () => {
     spyOn(cm, 'replaceSelection');
     component.ngOnInit();
 
+    component.registerOnTouched(null);
+    component.registerOnChange(null);
+    component.onChange = (val: string) => {
+      return;
+    };
+    component.updateLocalValue();
     expect(component.codemirrorStatus).toBeFalse();
     tick(200);
 
@@ -134,12 +134,14 @@ describe('Schema Based Unicode Editor', () => {
     expect(component.validate(null)).toEqual({});
   });
 
-  it('should overwrite local value', () => {
-    expect(component.localValue).toBe(undefined);
+  it('should write value', () => {
+    component.localValue = null;
+    component.writeValue(null);
 
-    component.writeValue('val');
+    expect(component.localValue).toEqual(null);
 
-    expect(component.localValue).toBe('val');
+    component.writeValue('test');
+    expect(component.localValue).toEqual('test');
   });
 
   it('should get coding mode', () => {

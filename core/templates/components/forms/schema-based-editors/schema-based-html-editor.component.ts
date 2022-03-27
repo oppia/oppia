@@ -45,7 +45,6 @@ implements ControlValueAccessor, OnInit, Validator {
   @Input() uiConfig: unknown;
   @Input() headersEnabled: boolean;
   onChange: (val: string) => void = () => {};
-  constructor() { }
 
   // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: string): void {

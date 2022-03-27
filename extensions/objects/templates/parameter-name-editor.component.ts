@@ -45,7 +45,7 @@ export class ParameterNameEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.availableParamNames = (
-      // Find a solution for this.
+      // TODO(#13015): Remove use of unknown as a type.
       (this.explorationParamSpecsService.savedMemento as unknown as ParamSpecs)
         .getParamNames());
 

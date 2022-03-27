@@ -203,8 +203,8 @@ export class ImageWithRegionsEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.alwaysEditable = true;
-    // The following is check is to prevent cases when value not defined.
-    // This is a dynamically created component and in some cases we get
+    // The following check is used to prevent cases when the value is not
+    // defined. This is a dynamically created component and in some cases we get
     // undefined. This happens when ngOnInit runs before we can assign
     // this.value the value that is supposed to be passed from object editor
     // component.
