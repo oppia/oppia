@@ -19,13 +19,18 @@
 import { AlgebraicExpressionInputRulesService } from
 // eslint-disable-next-line max-len
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
+import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import { MathInteractionsService } from 'services/math-interactions.service';
 
 describe('Algebraic expression input rules service', () => {
   let algebraicRulesService: AlgebraicExpressionInputRulesService;
   let inputString;
 
   beforeEach(() => {
-    algebraicRulesService = new AlgebraicExpressionInputRulesService();
+    algebraicRulesService = new AlgebraicExpressionInputRulesService(
+      new MathInteractionsService(),
+      new NumericExpressionInputRulesService()
+    );
   });
 
   it('should have a correct MatchesExactlyWith rule', () => {

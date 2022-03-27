@@ -45,7 +45,8 @@ export class MathEquationInputRulesService {
     let positionOfTerms = inputs.y;
 
     let splitAnswer = answer.split('=');
-    let lhsAnswer = splitAnswer[0], rhsAnswer = splitAnswer[1];
+    let lhsAnswer = splitAnswer[0];
+    let rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
@@ -93,7 +94,8 @@ export class MathEquationInputRulesService {
     let positionOfTerms = inputs.y;
 
     let splitAnswer = answer.split('=');
-    let lhsAnswer = splitAnswer[0], rhsAnswer = splitAnswer[1];
+    let lhsAnswer = splitAnswer[0];
+    let rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
@@ -144,7 +146,8 @@ export class MathEquationInputRulesService {
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();
 
     let splitAnswer = answer.split('=');
-    let lhsAnswer = splitAnswer[0], rhsAnswer = splitAnswer[1];
+    let lhsAnswer = splitAnswer[0];
+    let rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
@@ -199,7 +202,8 @@ export class MathEquationInputRulesService {
     let positionOfTerms = inputs.y;
 
     let splitAnswer = answer.split('=');
-    let lhsAnswer = splitAnswer[0], rhsAnswer = splitAnswer[1];
+    let lhsAnswer = splitAnswer[0];
+    let rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
@@ -234,7 +238,8 @@ export class MathEquationInputRulesService {
     let positionOfTerms = inputs.y;
 
     let splitAnswer = answer.split('=');
-    let lhsAnswer = splitAnswer[0], rhsAnswer = splitAnswer[1];
+    let lhsAnswer = splitAnswer[0];
+    let rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
@@ -267,7 +272,8 @@ export class MathEquationInputRulesService {
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();
 
     let splitAnswer = answer.split('=');
-    let lhsAnswer = splitAnswer[0], rhsAnswer = splitAnswer[1];
+    let lhsAnswer = splitAnswer[0];
+    let rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
