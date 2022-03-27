@@ -590,8 +590,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, '0')
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, '0')
 
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),

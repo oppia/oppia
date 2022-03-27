@@ -3665,8 +3665,7 @@ class ClassifierTestBase(GenericEmailTestBase):
             FrozenModel. Protobuf object containing classifier data.
         """
         filename = classifier_training_job.classifier_data_filename
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = file_system_class(
+        fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id)
         classifier_data = utils.decompress_from_zlib(fs.get(filename))
         classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()

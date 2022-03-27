@@ -153,16 +153,16 @@ class FileSystemServicesTests(test_utils.GenericTestBase):
 
     def test_get_exploration_file_system_with_dev_mode_enabled(self):
         with self.swap(constants, 'DEV_MODE', True):
-            file_system = fs_services.get_entity_file_system_class()
             self.assertIsInstance(
-                file_system(feconf.ENTITY_TYPE_EXPLORATION, 'entity_id'),
+                fs_services.GcsFileSystem(
+                    feconf.ENTITY_TYPE_EXPLORATION, 'entity_id'),
                 fs_services.GcsFileSystem)
 
     def test_get_exploration_file_system_with_dev_mode_disabled(self):
         with self.swap(constants, 'DEV_MODE', False):
-            file_system = fs_services.get_entity_file_system_class()
             self.assertIsInstance(
-                file_system(feconf.ENTITY_TYPE_EXPLORATION, 'entity_id'),
+                fs_services.GcsFileSystem(
+                    feconf.ENTITY_TYPE_EXPLORATION, 'entity_id'),
                 fs_services.GcsFileSystem)
 
 
@@ -327,8 +327,8 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
         fs_services.save_classifier_data(
             'exp_id', 'job_id', self.classifier_data_proto)
         filepath = 'job_id-classifier-data.pb.xz'
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
         classifier_data = utils.decompress_from_zlib(fs.get(filepath))
         classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
         classifier_data_proto.ParseFromString(classifier_data)

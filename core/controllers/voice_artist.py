@@ -112,8 +112,8 @@ class AudioUploadHandler(base.BaseHandler):
 
         # Audio files are stored to the datastore in the dev env, and to GCS
         # in production.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         fs.commit(
             '%s/%s' % (self._FILENAME_PREFIX, filename),
             raw_audio_file, mimetype=mimetype)

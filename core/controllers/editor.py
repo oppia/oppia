@@ -980,8 +980,7 @@ class ImageUploadHandler(EditorHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = file_system_class(entity_type, entity_id)
+        fs = fs_services.GcsFileSystem(entity_type, entity_id)
         filepath = '%s/%s' % (
             filename_prefix, filename)
 

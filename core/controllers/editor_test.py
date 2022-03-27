@@ -3205,8 +3205,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
         # Check that the file is not already present.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
 
@@ -3224,8 +3223,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertEqual(response['error'], error_msg)
 
         # Check that the file is not uploaded.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
 
@@ -3250,8 +3248,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
         # Check that the file is not already present.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
 
@@ -3284,8 +3281,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertEqual(response['error'], error_msg)
 
         # Check that the file is not uploaded.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
 
@@ -3308,8 +3304,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
         # Check that the file is not already present.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
         # Read raw image for testing.
@@ -3332,8 +3327,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertEqual(response['filename'], filename)
 
         # Check that the file is uploaded successfully.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertTrue(fs.isfile(filepath))
 

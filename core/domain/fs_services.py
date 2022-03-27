@@ -282,8 +282,7 @@ def save_original_and_compressed_versions_of_image(
         filename_wo_filetype, filetype)
     micro_image_filepath = '%s/%s' % (filename_prefix, micro_image_filename)
 
-    file_system_class = get_entity_file_system_class()
-    fs = file_system_class(entity_type, entity_id)
+    fs = GcsFileSystem(entity_type, entity_id)
 
     if image_is_compressible:
         compressed_image_content = image_services.compress_image(
@@ -326,8 +325,7 @@ def save_classifier_data(exp_id, job_id, classifier_data_proto):
             to be stored.
     """
     filepath = '%s-classifier-data.pb.xz' % (job_id)
-    file_system_class = get_entity_file_system_class()
-    fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+    fs = GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
     content = utils.compress_to_zlib(
         classifier_data_proto.SerializeToString())
     fs.commit(
@@ -342,19 +340,9 @@ def delete_classifier_data(exp_id, job_id):
         job_id: str. The id of the classifier training job model.
     """
     filepath = '%s-classifier-data.pb.xz' % (job_id)
-    file_system_class = get_entity_file_system_class()
-    fs = file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+    fs = GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
     if fs.isfile(filepath):
         fs.delete(filepath)
-
-
-def get_entity_file_system_class():
-    """Returns GcsFileSystem class to the client.
-
-    Returns:
-        class. GcsFileSystem class.
-    """
-    return GcsFileSystem
 
 
 def copy_images(
@@ -369,9 +357,8 @@ def copy_images(
         destination_entity_type: str. The entity type of the destination.
         filenames: list(str). The list of filenames to copy.
     """
-    file_system_class = get_entity_file_system_class()
-    source_fs = file_system_class(source_entity_type, source_entity_id)
-    destination_fs = file_system_class(
+    source_fs = GcsFileSystem(source_entity_type, source_entity_id)
+    destination_fs = GcsFileSystem(
         destination_entity_type, destination_entity_id)
     for filename in filenames:
         filename_wo_filetype = filename[:filename.rfind('.')]
