@@ -65,7 +65,7 @@ implements ControlValueAccessor, OnInit, Validator {
     return {};
   }
 
-  updateValue(val: boolean): void {
+  updateValue(val: unknown[]): void {
     if (this.localValue === val) {
       return;
     }

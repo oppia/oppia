@@ -81,22 +81,22 @@ describe('Schema Based Expression Editor Component', () => {
   }));
 
   it('should update value when local value change', () => {
-    component.localValue = true;
+    component.localValue = ['item1'];
 
-    expect(component.localValue).toBeTrue();
+    expect(component.localValue).toEqual(['item1']);
 
-    component.localValueChange(false);
+    component.localValueChange(['item2']);
 
-    expect(component.localValue).toBeFalse();
+    expect(component.localValue).toEqual(['item2']);
   });
 
   it('should not update value when local value not change', () => {
-    component.localValue = true;
+    component.localValue = ['item1'];
 
-    expect(component.localValue).toBeTrue();
+    expect(component.localValue).toEqual(['item1']);
 
-    component.localValueChange(true);
+    component.localValueChange(['item1']);
 
-    expect(component.localValue).toBeTrue();
+    expect(component.localValue).toEqual(['item1']);
   });
 });
