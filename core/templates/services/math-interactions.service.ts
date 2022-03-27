@@ -522,7 +522,7 @@ export class MathInteractionsService {
   }
 
   replaceConstantsWithVariables(
-    expressionString: string, replaceZero = true): string {
+      expressionString: string, replaceZero = true): string {
     // Multiple instances of the same constant will be replaced by the same
     // variable.
 
