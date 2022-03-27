@@ -777,7 +777,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         default_collection = (
-            collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
+            collection_domain.Collection.create_default_collection(
                 collection_id))
 
         caching_services.set_multi(
@@ -793,7 +793,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_collection.to_dict(),
-            collections[collection_id].to_dict()) # type: ignore[no-untyped-call]
+            collections[collection_id].to_dict())
 
     def test_skills_with_unicode_characters_are_set_and_get_correctly(
         self
