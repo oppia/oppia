@@ -70,7 +70,6 @@ export class AlgebraicExpressionInputRulesService {
   IsEquivalentTo(
       answer: AlgebraicExpressionAnswer,
       inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
-
     // If the answer and the inputs are both purely numeric, we use the numeric
     // expression input's rule functions.
     if (

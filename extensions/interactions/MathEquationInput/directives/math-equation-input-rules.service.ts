@@ -110,7 +110,7 @@ export class MathEquationInputRulesService {
       return (
         algebraicRulesService.MatchesUpToTrivialManipulations(
           lhsAnswer, {x: lhsInput}
-        ) && 
+        ) &&
         algebraicRulesService.MatchesUpToTrivialManipulations(
           rhsAnswer, {x: rhsInput}
         )
