@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Service for extracting customization argument values from
- * attrs for interactions.
+ * attrs for interactions
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
