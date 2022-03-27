@@ -21,9 +21,9 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import { ReadOnlyTopicBackendDict, ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
+import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContextService } from 'services/context.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -47,7 +47,8 @@ describe('Learner view info component', () => {
   let statsReportingService: StatsReportingService;
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
-  let storyViewerBackendApiService: StoryViewerBackendApiService;
+  let topicViewerBackendApiService: TopicViewerBackendApiService;
+  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
@@ -69,7 +70,8 @@ describe('Learner view info component', () => {
         StatsReportingService,
         UrlInterpolationService,
         UrlService,
-        StoryViewerBackendApiService
+        TopicViewerBackendApiService,
+        ReadOnlyTopicObjectFactory
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -88,8 +90,29 @@ describe('Learner view info component', () => {
     statsReportingService = TestBed.inject(StatsReportingService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
-    storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
+    topicViewerBackendApiService = TestBed.inject(
+      TopicViewerBackendApiService);
+
+    let topicDataDict = {
+      subtopics: [],
+      skill_descriptions: {},
+      uncategorized_skill_ids: [],
+      degrees_of_mastery: {},
+      canonical_story_dicts: [],
+      additional_story_dicts: [],
+      topic_name: 'Topic Name 1',
+      topic_id: 'topic1',
+      topic_description: 'Description',
+      practice_tab_is_displayed: false
+    };
+
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
+      readOnlyTopicObjectFactory.createFromBackendDict(
+        topicDataDict as ReadOnlyTopicBackendDict
+      )
+    );
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
@@ -117,9 +140,6 @@ describe('Learner view info component', () => {
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
       .and.returnValue('');
-    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue('');
-    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
-      Promise.resolve(new StoryPlaythrough('', [], '', '', '', '')));
     spyOn(statsReportingService, 'setTopicName');
     spyOn(siteAnalyticsService, 'registerCuratedLessonStarted');
 
@@ -134,8 +154,7 @@ describe('Learner view info component', () => {
     expect(urlService.getExplorationVersionFromUrl).toHaveBeenCalled();
     expect(componentInstance.getTopicUrl).toHaveBeenCalled();
     expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
-    expect(urlService.getStoryUrlFragmentFromLearnerUrl).toHaveBeenCalled();
-    expect(storyViewerBackendApiService.fetchStoryDataAsync).toHaveBeenCalled();
+    expect(topicViewerBackendApiService.fetchTopicDataAsync).toHaveBeenCalled();
     expect(statsReportingService.setTopicName).toHaveBeenCalled();
     expect(siteAnalyticsService.registerCuratedLessonStarted)
       .toHaveBeenCalled();
@@ -213,4 +232,37 @@ describe('Learner view info component', () => {
   it('should get RTL language status correctly', () => {
     expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
+
+  it('should set topic name and subtopic title translation key and ' +
+  'check whether hacky translations are displayed or not correctly',
+  waitForAsync(() => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
+      .and.returnValue('topic_url_fragment');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('classroom_url_fragment');
+    spyOn(componentInstance, 'getTopicUrl').and.returnValue('topic_url');
+
+    componentInstance.ngOnInit();
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+
+      expect(componentInstance.topicNameTranslationKey)
+        .toBe('I18N_TOPIC_topic1_TITLE');
+      expect(componentInstance.explorationTitleTranslationKey)
+        .toBe('I18N_EXPLORATION_test_id_TITLE');
+
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValues(true, false);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValues(false, false);
+
+      let hackyTopicNameTranslationIsDisplayed =
+        componentInstance.isHackyTopicNameTranslationDisplayed();
+      expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
+
+      let hackyExpTitleTranslationIsDisplayed =
+        componentInstance.isHackyExpTitleTranslationDisplayed();
+      expect(hackyExpTitleTranslationIsDisplayed).toBe(false);
+    });
+  }));
 });
