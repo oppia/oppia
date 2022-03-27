@@ -20,14 +20,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { ExtensionTagAssemblerService } from
-  'services/extension-tag-assembler.service';
+import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ExtensionTagAssemblerService } from 'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
-import { InteractionCustomizationArgs } from
-  'interactions/customization-args-defs';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
@@ -49,6 +46,7 @@ export class ExplorationHtmlFormatterService {
     'MultipleChoiceInput',
     'NumberWithUnits',
     'ItemSelectionInput',
+    'MusicNotesInput',
     'NumericExpressionInput',
     'NumericInput',
     'PencilCodeEditor',
