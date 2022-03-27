@@ -101,26 +101,20 @@ describe('Schema Based Int Editor Component', () => {
   it('should update value when local value change', () => {
     component.localValue = 1;
 
-    // PreCheck.
     expect(component.localValue).toBe(1);
 
-    // Action: Update local value.
     component.updateValue(2);
 
-    // PostCheck: local value should be updated.
     expect(component.localValue).toBe(2);
   });
 
   it('should not update value when local value not change', () => {
     component.localValue = 1;
 
-    // PreCheck.
     expect(component.localValue).toBe(1);
 
-    // Action: Update local value.
     component.updateValue(1);
 
-    // PostCheck: local value should not be updated as it is same.
     expect(component.localValue).toBe(1);
   });
 

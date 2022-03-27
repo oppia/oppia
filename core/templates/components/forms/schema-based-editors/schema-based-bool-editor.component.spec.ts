@@ -70,26 +70,20 @@ describe('Schema Based Bool Editor Component', () => {
   it('should update value when local value change', () => {
     component.localValue = true;
 
-    // PreCheck.
     expect(component.localValue).toBeTrue();
 
-    // Action: Update local value.
     component.updateValue(false);
 
-    // PostCheck: local value should be updated.
     expect(component.localValue).toBeFalse();
   });
 
   it('should not update value when local value not change', () => {
     component.localValue = true;
 
-    // PreCheck.
     expect(component.localValue).toBeTrue();
 
-    // Action: Update local value.
     component.updateValue(true);
 
-    // PostCheck: local value should not be updated as it is same.
     expect(component.localValue).toBeTrue();
   });
 });

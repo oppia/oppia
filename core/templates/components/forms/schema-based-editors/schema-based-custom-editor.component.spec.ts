@@ -72,26 +72,20 @@ describe('Schema Based Custom Editor Component', () => {
   it('should update value when local value change', () => {
     component.localValue = 'true';
 
-    // PreCheck.
     expect(component.localValue).toBe('true');
 
-    // Action: Update local value.
     component.updateValue('false');
 
-    // PostCheck: local value should be updated.
     expect(component.localValue).toBe('false');
   });
 
   it('should not update value when local value not change', () => {
     component.localValue = 'true';
 
-    // PreCheck.
     expect(component.localValue).toBe('true');
 
-    // Action: Update local value.
     component.updateValue('true');
 
-    // PostCheck: local value should not be updated as it is same.
     expect(component.localValue).toBe('true');
   });
 });

@@ -100,13 +100,10 @@ describe('Schema Based Dict Editor Component', () => {
       first: true
     };
 
-    // PreCheck.
     expect(component.localValue.first).toBeTrue();
 
-    // Action: Update local value.
     component.updateValue(false, 'first');
 
-    // PostCheck: local value should be updated.
     expect(component.localValue.first).toBeFalse();
   });
 
@@ -115,13 +112,10 @@ describe('Schema Based Dict Editor Component', () => {
       first: true
     };
 
-    // PreCheck.
     expect(component.localValue.first).toBeTrue();
 
-    // Action: Update local value.
     component.updateValue(true, 'first');
 
-    // PostCheck: local value should not be updated as it is same.
     expect(component.localValue.first).toBeTrue();
   });
 
