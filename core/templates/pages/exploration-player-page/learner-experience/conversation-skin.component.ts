@@ -70,6 +70,8 @@ import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/services/collection-player-backend-api.service';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -183,7 +185,9 @@ export class ConversationSkinComponent {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private userService: UserService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private eebas: EditableExplorationBackendApiService,
+    private roebas: ReadOnlyExplorationBackendApiService,
   ) {}
 
   ngOnInit(): void {
@@ -315,6 +319,24 @@ export class ConversationSkinComponent {
               'summary.');
           }
         );
+    }
+    // Test.
+    if (this.explorationEngineService.getState().cardIsCheckpoint) {
+      // Update only latest_visited_checkpoint.
+
+      let version: number;
+      this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+        response => {
+          version = response.version;
+        }
+      );
+      this.eebas.recordLatestVisitedCheckpointAsync(
+        this.explorationId,
+        this.displayedCard.getStateName(),
+        version
+      ).then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
     }
   }
 
@@ -987,6 +1009,31 @@ export class ConversationSkinComponent {
             // the feedback, and display a 'Continue' button.
             this.pendingCardWasSeenBefore = false;
             this.displayedCard.markAsCompleted();
+            if (this.explorationEngineService.getState().cardIsCheckpoint) {
+              // Update last_completed_checkpoint & latest_visited_checkpoint.
+              let version: number;
+              this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+                response => {
+                  version = response.version;
+                }
+              );
+              this.eebas.recordLastCompletedCheckpointAsync(
+                this.explorationId,
+                version,
+                this.displayedCard.getStateName(),
+                this.displayedCard.getStateName(),
+              ).then(() => {
+                // Required for the post operation to deliver data to backend.
+              });
+
+              this.eebas.recordLatestVisitedCheckpointAsync(
+                this.explorationId,
+                this.displayedCard.getStateName(),
+                version,
+              ).then(() => {
+                // Required for the post operation to deliver data to backend.
+              });
+            }
             if (isFinalQuestion) {
               if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
                 // We will redirect to the results page here.
@@ -1052,10 +1099,6 @@ export class ConversationSkinComponent {
         }, millisecsLeftToWait);
       }
     );
-
-    if (this.answerIsCorrect && this.explorationEngineService.getState().cardIsCheckpoint) {
-      // Update last_completed_checkpoint & latest_visited_checkpoint
-    }
   }
 
   showPendingCard(): void {

@@ -51,6 +51,10 @@ export interface FetchExplorationBackendResponse {
   'correctness_feedback_enabled': boolean;
   'record_playthrough_probability': number;
   'draft_change_list_id': number;
+  'user_has_viewed_lesson_info_once': boolean;
+  'last_completed_checkpoint_exp_version': number;
+  'last_completed_checkpoint_state_name': string;
+  'latest_visited_checkpoint_state_name': string;
 }
 
 @Injectable({

@@ -31,7 +31,6 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
@@ -75,7 +74,6 @@ export class ExplorationFooterComponent {
     private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
     private loggerService: LoggerService,
     private playerPositionService: PlayerPositionService,
-    private explorationEngineService: ExplorationEngineService
   ) {}
 
   ngOnInit(): void {
@@ -134,8 +132,6 @@ export class ExplorationFooterComponent {
       windowClass: 'oppia-modal-lesson-information-card'
     });
 
-    let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
-
     modalRef.componentInstance.checkpointCount = this.checkpointCount;
     // Note to developers:
     // The checkpointArray is used to track the number of
@@ -143,25 +139,16 @@ export class ExplorationFooterComponent {
     // since the first card is always a checkpoint. For
     // displayedCardindex > 1, 1 is pushed if the card is a
     // checkpoint, else 0 is pushed.
-    let completedCheckpoints = 0;
-    for (let i = 0; i <= displayedCardIndex; i++) {
-      completedCheckpoints = completedCheckpoints + this.checkpointArray[i];
-    }
-    this.completedWidth = (
-      (100 / (this.checkpointCount)) * completedCheckpoints
-    );
-
-    if (displayedCardIndex > 0) {
-      let state = this.explorationEngineService.getState();
-      if (state.cardIsCheckpoint) {
-        this.checkpointArray.push(1);
-      } else {
-        this.checkpointArray.push(0);
-      }
-    } else {
-      this.checkpointArray.push(1);
-    }
-    modalRef.componentInstance.completedWidth = this.completedWidth;
+    // if (displayedCardIndex > 0) {
+    //   let state = this.explorationEngineService.getState();
+    //   if (state.cardIsCheckpoint) {
+    //     this.checkpointArray.push(1);
+    //   } else {
+    //     this.checkpointArray.push(0);
+    //   }
+    // } else {
+    //   this.checkpointArray.push(1);
+    // }
     modalRef.componentInstance.contributorNames = this.contributorNames;
     modalRef.componentInstance.expInfo = this.expInfo;
 

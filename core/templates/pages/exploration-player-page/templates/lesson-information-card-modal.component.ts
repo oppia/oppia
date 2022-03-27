@@ -19,11 +19,13 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary.model';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
@@ -58,6 +60,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth!: number;
   separatorArray: number[] = [];
+  lastCompletedCheckpointStateName: string;
 
 
   constructor(
@@ -66,6 +69,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
+    private explorationStatesService: ExplorationStatesService,
+    private roebas: ReadOnlyExplorationBackendApiService,
   ) {
     super(ngbActiveModal);
   }
@@ -114,6 +119,24 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     // the number of separators.The purpose of separatorArray
     // is to provide the number of checkpoints in the template file.
     this.separatorArray = new Array(this.checkpointCount);
+
+    this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+      response => {
+        if (response.last_completed_checkpoint_state_name) {
+          this.lastCompletedCheckpointStateName = (
+            response.last_completed_checkpoint_state_name);
+        }
+      }
+    );
+
+    let completedCheckpoints = this.getCheckpointIndexFromStateName();
+
+    // Old Code: for (let i = 0; i <= displayedCardIndex; i++) {
+    //   completedCheckpoints = completedCheckpoints + this.checkpointArray[i];
+    // }
+    this.completedWidth = (
+      (100 / (this.checkpointCount)) * completedCheckpoints
+    );
   }
 
   isHackyStoryTitleTranslationDisplayed(): boolean {
@@ -138,5 +161,19 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
         this.expDescTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  getCheckpointIndexFromStateName(): number {
+    let stateNames = this.explorationStatesService.getStateNames();
+    let checkpointIndex = 0;
+    for (let i = 0; i < stateNames.length; i++) {
+      if (this.explorationStatesService.getState(stateNames[i])
+        .cardIsCheckpoint) {
+        checkpointIndex++;
+        if (stateNames[i] === this.lastCompletedCheckpointStateName) {
+          return checkpointIndex;
+        }
+      }
+    }
   }
 }
