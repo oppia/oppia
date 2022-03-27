@@ -80,20 +80,7 @@ export class InteractionAttributesExtractorService {
 
     const ca = this.interactionFactory.convertFromCustomizationArgsBackendDict(
       interactionId, caBackendDict);
-    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
-      return ca;
-    }
-    const caValues: InteractionCustomizationArgs = {};
-    const caKeys = Object.keys(ca) as (keyof InteractionCustomizationArgs)[];
-    caKeys.forEach(caName => {
-      const attr = ca[caName] as { value: Object };
-      Object.defineProperty(caValues, caName, {
-        value: attr.value,
-        enumerable: true
-      });
-    });
-
-    return caValues;
+    return ca;
   }
 }
 angular.module('oppia').factory(
