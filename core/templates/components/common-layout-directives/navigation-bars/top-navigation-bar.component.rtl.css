@@ -121,7 +121,7 @@
 
 .navbar-header {
   display: flex;
-  margin-left: -30px;
+  margin-left: -10px;
 }
 .dropdown-toggle::after {
   margin-right: 0.255em;
