@@ -67,7 +67,7 @@ class GetExpWithInvalidCategoryJob(base_jobs.JobBase):
             )
         )
 
-        curated_lessons = (
+        curated_explorations = (
             published_explorations
             | 'Filter out all curated lessons' >> beam.Filter(
                 lambda x,
