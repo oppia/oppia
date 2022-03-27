@@ -503,8 +503,8 @@
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
 /core/templates/services/contextual/meta-tag-customization.service*.ts @srijanreddy98
-/core/templates/services/interaction-rules-registry.service*.ts @oppia/lace-backend-reviewers
-/core/templates/services/interaction-specs.service*.ts @oppia/lace-backend-reviewers
+/core/templates/services/interaction-rules-registry.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/interaction-specs.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @nithusha21
 /redis.conf @seanlip @vojtechjelinek
 /.firebase.json @seanlip @vojtechjelinek
