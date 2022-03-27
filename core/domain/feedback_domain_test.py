@@ -24,7 +24,7 @@ from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.tests import test_utils
 
-from typing import Dict
+from typing import Any, Dict, cast
 
 
 class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
@@ -198,17 +198,17 @@ class FeedbackThreadSummaryDomainUnitTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration = self.save_new_valid_exploration(
             self.exp_id, self.owner_id)
-        self.thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
+        self.thread_id = feedback_services.create_thread(
             'exploration', self.exp_id, self.owner_id,
             'A subject', 'Random text'
         )
 
     def test_to_dict(self) -> None:
         thread_ids = [self.thread_id]
-        thread_summary_dict = feedback_services.get_exp_thread_summaries( # type: ignore[no-untyped-call]
+        thread_summary_dict = feedback_services.get_exp_thread_summaries(
             self.owner_id,
             thread_ids)[0][0].to_dict()
-        thread = feedback_services.get_thread(self.thread_id) # type: ignore[no-untyped-call]
+        thread = feedback_services.get_thread(self.thread_id)
         expected_thread_summary_dict = {
             'status': thread.status,
             'original_author_id': thread.original_author_id,
@@ -226,5 +226,5 @@ class FeedbackThreadSummaryDomainUnitTests(test_utils.GenericTestBase):
         }
         self.assertDictEqual(
             expected_thread_summary_dict,
-            thread_summary_dict
+            cast(Dict[Any, Any], thread_summary_dict)
         )

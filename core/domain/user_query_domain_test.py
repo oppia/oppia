@@ -56,7 +56,7 @@ class UserQueryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(UserQueryTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL) # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.user_query_params = user_query_domain.UserQueryParams(
             inactive_in_last_n_days=20
         )

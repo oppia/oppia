@@ -30,6 +30,7 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 
+from typing import Tuple
 (
     email_models, expl_models, feedback_models,
     question_models, skill_models, suggestion_models,
@@ -116,7 +117,7 @@ def _create_models_for_thread_and_first_message(
 
 def create_thread(
         entity_type, entity_id, original_author_id, subject, text,
-        has_suggestion=False):
+        has_suggestion=False) -> str:
     """Creates a thread and its first message.
 
     Args:
@@ -681,7 +682,9 @@ def _get_thread_from_model(thread_model):
         thread_model.last_nonempty_message_author_id)
 
 
-def get_exp_thread_summaries(user_id, thread_ids):
+def get_exp_thread_summaries(
+        user_id,
+        thread_ids) -> Tuple[list[feedback_domain.FeedbackThreadSummary], int]:
     """Returns a list of summaries corresponding to the exploration threads from
     the given thread ids. Non-exploration threads are not included in the list.
     It also returns the number of threads that are currently not read by the
@@ -783,7 +786,7 @@ def get_threads(entity_type, entity_id):
     return [_get_thread_from_model(m) for m in thread_models]
 
 
-def get_thread(thread_id):
+def get_thread(thread_id) -> feedback_domain.FeedbackThread:
     """Fetches the thread by thread id.
 
     Args:
