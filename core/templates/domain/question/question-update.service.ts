@@ -57,9 +57,9 @@ export class QuestionUpdateService {
       reverse: (
        backendChangeObject:
        BackendChangeObject, domainObject: DomainObject) => void): void {
-    var changeDict = angular.copy(params);
+    let changeDict = angular.copy(params);
     changeDict.cmd = command;
-    var changeObj = new Change(changeDict, apply, reverse);
+    let changeObj = new Change(changeDict, apply, reverse);
     this.QuestionUndoRedoService.applyChange(changeObj, question);
   }
 
@@ -82,7 +82,7 @@ export class QuestionUpdateService {
   }
 
   private getAllContentIds(state) {
-    var allContentIdsSet = new Set();
+    let allContentIdsSet = new Set();
     allContentIdsSet.add(state.content.contentId);
     state.interaction.answerGroups.forEach((answerGroup) => {
       allContentIdsSet.add(answerGroup.outcome.feedback.contentId);
@@ -116,18 +116,18 @@ export class QuestionUpdateService {
   }
 
   private getElementsInFirstSetButNotInSecond(setA, setB) {
-    var diffList = Array.from(setA).filter((element) => {
+    let diffList = Array.from(setA).filter((element) => {
       return !setB.has(element);
     });
     return diffList;
   }
 
   private updateContentIdsInAssets(newState, oldState) {
-    var newContentIds = this.getAllContentIds(newState);
-    var oldContentIds = this.getAllContentIds(oldState);
-    var contentIdsToDelete = this.getElementsInFirstSetButNotInSecond(
+    let newContentIds = this.getAllContentIds(newState);
+    let oldContentIds = this.getAllContentIds(oldState);
+    let contentIdsToDelete = this.getElementsInFirstSetButNotInSecond(
       oldContentIds, newContentIds);
-    var contentIdsToAdd = this.getElementsInFirstSetButNotInSecond(
+    let contentIdsToAdd = this.getElementsInFirstSetButNotInSecond(
       newContentIds, oldContentIds);
     contentIdsToDelete.forEach((contentId) => {
       newState.recordedVoiceovers.deleteContentId(contentId);
@@ -141,12 +141,12 @@ export class QuestionUpdateService {
 
   public setQuestionLanguageCode(
       question: Question, newLanguageCode: string): void {
-    var oldLanguageCode = angular.copy(question.getLanguageCode());
+    let oldLanguageCode = angular.copy(question.getLanguageCode());
     this.applyPropertyChange(
       question, this.QUESTION_PROPERTY_LANGUAGE_CODE,
       newLanguageCode, oldLanguageCode,
       (changeDict, question) => {
-        var languageCode = this.getNewPropertyValueFromChangeDict(changeDict);
+        let languageCode = this.getNewPropertyValueFromChangeDict(changeDict);
         question.setLanguageCode(languageCode);
       }, (changeDict, question) => {
         question.setLanguageCode(oldLanguageCode);
@@ -156,14 +156,14 @@ export class QuestionUpdateService {
   public setQuestionInapplicableSkillMisconceptionIds(
       question: Question,
       newInapplicableSkillMisconceptionIds: string[]): void {
-    var oldInapplicableSkillMisconceptionIds = angular.copy(
+    let oldInapplicableSkillMisconceptionIds = angular.copy(
       question.getInapplicableSkillMisconceptionIds());
     this.applyPropertyChange(
       question, this.QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
       newInapplicableSkillMisconceptionIds,
       oldInapplicableSkillMisconceptionIds,
       (changeDict, question) => {
-        var languageCode = this.getNewPropertyValueFromChangeDict(changeDict);
+        let languageCode = this.getNewPropertyValueFromChangeDict(changeDict);
         question.setInapplicableSkillMisconceptionIds(languageCode);
       }, (changeDict, question) => {
         question.setInapplicableSkillMisconceptionIds(
@@ -174,7 +174,7 @@ export class QuestionUpdateService {
   public setQuestionStateData(
       question: Question,
       updateFunction: () => void): void {
-    var oldStateData = angular.copy(question.getStateData());
+    let oldStateData = angular.copy(question.getStateData());
     // We update the question here before making the change,
     // so that we can obtain the new state to save to the backend via
     // the change list.
@@ -189,7 +189,7 @@ export class QuestionUpdateService {
     // have to defer the extraction of the new state data, which we need
     // for creating the change to send to the backend.
     updateFunction();
-    var newStateData = question.getStateData();
+    let newStateData = question.getStateData();
     this.updateContentIdsInAssets(newStateData, oldStateData);
     this.applyPropertyChange(
       question, this.QUESTION_PROPERTY_QUESTION_STATE_DATA,

@@ -16,24 +16,29 @@
  * @fileoverview Unit tests for question update service.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { TestBed } from '@angular/core/testing';
+import {importAllAngularServices} from 'tests/unit-test-utils.ajs';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {TestBed} from '@angular/core/testing';
 import {QuestionUpdateService} from 'domain/question/question-update.service';
-import { QuestionObjectFactory } from './QuestionObjectFactory';
+import {QuestionObjectFactory} from './QuestionObjectFactory';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 
 describe('Question update service', function() {
-  var questionUpdateService = null;
-  var questionObjectFactory = null;
-  var questionUndoRedoService = null;
-  var stateObjectFactory = null;
-  var sampleQuestion = null;
-  var sampleStateDict = null;
-  var expectedOutputStateDict = null;
-  var expectedOutputState = null;
-  var sampleQuestionBackendObject = null;
+  let questionUpdateService = null;
+  let questionObjectFactory = null;
+  let questionUndoRedoService = null;
+  let stateObjectFactory = null;
+  let sampleQuestion = null;
+  let sampleStateDict = null;
+  let sampleQuestion1 = null;
+  let sampleStateDict1 = null;
+  let expectedOutputStateDict1 = null;
+  let expectedOutputState1 = null;
+  let expectedOutputStateDict = null;
+  let expectedOutputState = null;
+  let sampleQuestionBackendObject = null;
+  let sampleQuestionBackendObject1 = null;
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() =>{
@@ -41,6 +46,130 @@ describe('Question update service', function() {
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     questionUndoRedoService = TestBed.inject(UndoRedoService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
+
+    sampleStateDict1 = {
+      name: 'question',
+      classifier_model_id: 0,
+      content: {
+        html: 'old content',
+        content_id: 'content'
+      },
+      param_changes: [],
+      interaction: {
+        answer_groups: [{
+          rule_specs: [{
+            rule_type: 'Contains',
+            inputs: {x: {
+              contentId: 'rule_input',
+              normalizedStrSet: ['hola']
+            }}
+          }],
+          outcome: {
+            dest: 'Me Llamo',
+            feedback: {
+              content_id: 'feedback_1',
+              html: 'buen trabajo!'
+            },
+            labelled_as_correct: true
+          }
+        }],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
+        default_outcome: {
+          dest: 'Hola',
+          feedback: {
+            content_id: 'default_outcome',
+            html: 'try again!'
+          },
+          labelled_as_correct: false
+        },
+        hints: [],
+        id: 'TextInput',
+      },
+      linked_skill_id: null,
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
+    };
+
+    expectedOutputStateDict1 = {
+      name: 'question',
+      classifier_model_id: 0,
+      content: {
+        html: 'test content',
+        content_id: 'content'
+      },
+      param_changes: [],
+      interaction: {
+        answer_groups: [{
+          rule_specs: [{
+            rule_type: 'Contains',
+            inputs: {x: {
+              contentId: 'rule_input',
+              normalizedStrSet: ['hola']
+            }}
+          }],
+          outcome: {
+            dest: 'Me Llamo',
+            feedback: {
+              content_id: 'feedback_1',
+              html: 'buen trabajo!'
+            },
+            labelled_as_correct: true
+          }
+        }],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
+        default_outcome: {
+          dest: 'Hola',
+          feedback: {
+            content_id: 'default_outcome',
+            html: 'try again!'
+          },
+          labelled_as_correct: false
+        },
+        hints: [],
+        id: 'TextInput',
+      },
+      linked_skill_id: null,
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
+    };
 
     sampleStateDict = {
       name: 'question',
@@ -195,6 +324,16 @@ describe('Question update service', function() {
     expectedOutputState = stateObjectFactory.createFromBackendDict(
       'question', expectedOutputStateDict);
 
+    expectedOutputState1 = stateObjectFactory.createFromBackendDict(
+      'question', expectedOutputStateDict1);
+
+    sampleQuestionBackendObject1 = {
+      id: '0',
+      question_state_data: sampleStateDict1,
+      language_code: 'en',
+      version: 1
+    };
+
     sampleQuestionBackendObject = {
       id: '0',
       question_state_data: sampleStateDict,
@@ -203,6 +342,10 @@ describe('Question update service', function() {
     };
     sampleQuestion = questionObjectFactory.createFromBackendDict(
       sampleQuestionBackendObject);
+
+    sampleQuestion1 = questionObjectFactory.createFromBackendDict(
+      sampleQuestionBackendObject1
+    );
   });
 
   it('should update the language code of the question', () => {
@@ -213,10 +356,10 @@ describe('Question update service', function() {
     expect(sampleQuestion.getLanguageCode()).toEqual('en');
   });
 
-  it('should update the state data of the question', () => {
-    var oldStateData = angular.copy(sampleQuestion.getStateData());
-    var updateFunction = function() {
-      var stateData = sampleQuestion.getStateData();
+  it('should update the state data of the question and add content ids', () => {
+    let oldStateData = angular.copy(sampleQuestion.getStateData());
+    let updateFunction = function() {
+      let stateData = sampleQuestion.getStateData();
       stateData.content = SubtitledHtml.createDefault(
         'test content', 'content_1');
     };
@@ -225,6 +368,20 @@ describe('Question update service', function() {
     expect(sampleQuestion.getStateData()).toEqual(expectedOutputState);
     questionUndoRedoService.undoChange(sampleQuestion);
     expect(sampleQuestion.getStateData()).toEqual(oldStateData);
+  });
+
+  it('should update the state data of the question', () =>{
+    let oldStateData = angular.copy(sampleQuestion1.getStateData());
+    let updateFunction = function() {
+      let stateData = sampleQuestion1.getStateData();
+      stateData.content = SubtitledHtml.createDefault(
+        'test content', 'content');
+    };
+    questionUpdateService.setQuestionStateData(
+      sampleQuestion1, updateFunction);
+    expect(sampleQuestion1.getStateData()).toEqual(expectedOutputState1);
+    questionUndoRedoService.undoChange(sampleQuestion1);
+    expect(sampleQuestion1.getStateData()).toEqual(oldStateData);
   });
 
   it('should set question inapplicable skills misconception ids when ' +
