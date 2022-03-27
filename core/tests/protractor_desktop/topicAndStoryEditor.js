@@ -413,6 +413,7 @@ describe('Chapter editor functionality', function() {
     await storyEditorPage.navigateToChapterWithName('Chapter 1');
     await storyEditorPage.addPrerequisiteSkill(dummySkills[0]);
     await storyEditorPage.expectSaveStoryDisabled();
+    await storyEditorPage.discardStoryChanges();
   });
 
   it('should delete prerequisite skill and acquired skill', async function() {
