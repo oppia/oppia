@@ -702,7 +702,8 @@ export class UpgradedServices {
     upgradedServices['ItemSelectionInputValidationService'] =
       new ItemSelectionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['LocalStorageService'] = new LocalStorageService();
+    upgradedServices['LocalStorageService'] = new LocalStorageService(
+      upgradedServices['WindowRef']);
     upgradedServices['MathEquationInputValidationService'] =
       new MathEquationInputValidationService(
         upgradedServices['baseInteractionValidationService']);
