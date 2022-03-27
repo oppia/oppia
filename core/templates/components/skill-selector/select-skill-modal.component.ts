@@ -19,9 +19,12 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 
-type TotalSkills = SkillSummaryBackendDict[];
+export interface CategorizedSkills {
+  [topic: string]: {
+    [subtopic: string]: SkillSummaryBackendDict[];
+  };
+}
 
 @Component({
   selector: 'oppia-select-skill',
@@ -31,7 +34,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  categorizedSkills!: SkillsCategorizedByTopics;
+  categorizedSkills!: CategorizedSkills;
   skillsInSameTopicCount!: number;
   skillSummaries!: SkillSummaryBackendDict[];
   untriagedSkillSummaries!: SkillSummaryBackendDict[];
@@ -45,7 +48,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   }
 
   confirm(): void {
-    let totalSkills: TotalSkills = [];
+    let totalSkills: SkillSummaryBackendDict[] = [];
     if (this.skillSummaries) {
       totalSkills = [...this.skillSummaries];
     }

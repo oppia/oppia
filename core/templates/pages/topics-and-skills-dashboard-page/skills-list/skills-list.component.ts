@@ -22,8 +22,9 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
 import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
 import { AugmentedSkillSummary } from 'domain/skill/augmented-skill-summary.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -36,7 +37,7 @@ import { TopicAssignmentsSummary, UnassignSkillFromTopicsModalComponent } from '
 
 export interface SkillsCategorizedByTopics {
   [topicName: string]: {
-    [subtopicName: string]: SkillSummaryBackendDict[];
+    [subtopicName: string]: ShortSkillSummary[];
   };
 }
 
