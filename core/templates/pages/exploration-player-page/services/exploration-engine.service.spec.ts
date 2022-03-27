@@ -336,7 +336,11 @@ describe('Exploration engine service ', () => {
       preferred_language_codes: [],
       auto_tts_enabled: false,
       correctness_feedback_enabled: true,
-      record_playthrough_probability: 1
+      record_playthrough_probability: 1,
+      user_has_viewed_lesson_info_once: false,
+      last_completed_checkpoint_exp_version: 1,
+      last_completed_checkpoint_state_name: 'Intro',
+      latest_visited_checkpoint_state_name: 'Intro',
     };
 
     explorationFeatures = {

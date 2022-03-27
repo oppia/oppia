@@ -81,7 +81,11 @@ describe('Read only exploration backend API service', () => {
     preferred_language_codes: [],
     auto_tts_enabled: true,
     correctness_feedback_enabled: true,
-    record_playthrough_probability: 1
+    record_playthrough_probability: 1,
+    user_has_viewed_lesson_info_once: false,
+    last_completed_checkpoint_exp_version: 1,
+    last_completed_checkpoint_state_name: 'Intro',
+    latest_visited_checkpoint_state_name: 'Intro',
   };
 
   beforeEach(() => {
@@ -210,7 +214,11 @@ describe('Read only exploration backend API service', () => {
       correctness_feedback_enabled: false,
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
-      preferred_language_codes: []
+      preferred_language_codes: [],
+      user_has_viewed_lesson_info_once: false,
+      last_completed_checkpoint_exp_version: 1,
+      last_completed_checkpoint_state_name: 'Intro',
+      latest_visited_checkpoint_state_name: 'Intro',
     });
 
     // It should now be cached.
@@ -253,7 +261,11 @@ describe('Read only exploration backend API service', () => {
       correctness_feedback_enabled: false,
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
-      preferred_language_codes: []
+      preferred_language_codes: [],
+      user_has_viewed_lesson_info_once: false,
+      last_completed_checkpoint_exp_version: 1,
+      last_completed_checkpoint_state_name: 'Intro',
+      latest_visited_checkpoint_state_name: 'Intro',
     });
     expect(roebas.isCached('0')).toBe(true);
 

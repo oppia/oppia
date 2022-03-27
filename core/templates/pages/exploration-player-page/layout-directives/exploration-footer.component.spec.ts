@@ -462,7 +462,11 @@ describe('ExplorationFooterComponent', () => {
       auto_tts_enabled: true,
       correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
-      draft_change_list_id: 0
+      draft_change_list_id: 0,
+      user_has_viewed_lesson_info_once: false,
+      last_completed_checkpoint_exp_version: 1,
+      last_completed_checkpoint_state_name: 'Intro',
+      latest_visited_checkpoint_state_name: 'Intro',
     };
 
     spyOn(roebas, 'fetchExplorationAsync')
