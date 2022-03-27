@@ -521,21 +521,28 @@ export class MathInteractionsService {
     return listOfTerms;
   }
 
-  replaceConstantsWithVariables(expressionString: string): string {
+  replaceConstantsWithVariables(
+    expressionString: string, replaceZero = true): string {
     // Multiple instances of the same constant will be replaced by the same
     // variable.
 
-    // Replacing decimals with variables.
-    // Eg: 3.4 + x => const3point4 + x
-    // We need to do this differently since const3.4 would be
-    // an invalid variable.
-    expressionString = expressionString.replace(
-      /(\d+)\.(\d+)/g, 'const$1point$2');
+    if (replaceZero) {
+      // Replacing decimals with variables.
+      // Eg: 3.4 + x => const3point4 + x
+      // We need to do this differently since const3.4 would be
+      // an invalid variable.
+      expressionString = expressionString.replace(
+        /([0-9]+)\.([0-9]+)/g, 'const$1point$2');
 
-    // Replacing integers with variables.
-    // Eg: 2 + x * 4 + 2 => const2 + x * const4 + const2
-    // const2, const4 are considered as variables by nerdamer, just like x.
-    expressionString = expressionString.replace(/(\d+)/g, 'const$1');
+      // Replacing integers with variables.
+      // Eg: 2 + x * 4 + 2 => const2 + x * const4 + const2
+      // const2, const4 are considered as variables by nerdamer, just like x.
+      expressionString = expressionString.replace(/([0-9]+)/g, 'const$1');
+    } else {
+      expressionString = expressionString.replace(
+        /([1-9]+)\.([1-9]+)/g, 'const$1point$2');
+      expressionString = expressionString.replace(/([1-9]+)/g, 'const$1');
+    }
     return expressionString;
   }
 

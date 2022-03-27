@@ -51,7 +51,8 @@ export class MathEquationInputRulesService {
     let rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
-    let lhsInput = splitInput[0], rhsInput = splitInput[1];
+    let lhsInput = splitInput[0];
+    let rhsInput = splitInput[1];
 
     if (positionOfTerms === 'lhs') {
       return this.algebraicRulesService.MatchesExactlyWith(
@@ -71,13 +72,13 @@ export class MathEquationInputRulesService {
 
       // Replacing constants to ensure that they don't get simplified.
       rhsAnswer = mathInteractionsService.replaceConstantsWithVariables(
-        rhsAnswer);
+        rhsAnswer, false);
       lhsAnswer = mathInteractionsService.replaceConstantsWithVariables(
-        lhsAnswer);
+        lhsAnswer, false);
       rhsInput = mathInteractionsService.replaceConstantsWithVariables(
-        rhsInput);
+        rhsInput, false);
       lhsInput = mathInteractionsService.replaceConstantsWithVariables(
-        lhsInput);
+        lhsInput, false);
 
       let rhsAnswerModified = nerdamer(rhsAnswer).multiply('-1').text();
       let expressionAnswer = nerdamer(rhsAnswerModified).add(lhsAnswer).text();
@@ -103,7 +104,8 @@ export class MathEquationInputRulesService {
     let rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
-    let lhsInput = splitInput[0], rhsInput = splitInput[1];
+    let lhsInput = splitInput[0];
+    let rhsInput = splitInput[1];
 
     if (positionOfTerms === 'lhs') {
       return this.algebraicRulesService.MatchesUpToTrivialManipulations(
@@ -153,7 +155,8 @@ export class MathEquationInputRulesService {
     let rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
-    let lhsInput = splitInput[0], rhsInput = splitInput[1];
+    let lhsInput = splitInput[0];
+    let rhsInput = splitInput[1];
 
     // We bring all terms in both equations to one side and then compare.
 
@@ -207,7 +210,8 @@ export class MathEquationInputRulesService {
     let rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
-    let lhsInput = splitInput[0], rhsInput = splitInput[1];
+    let lhsInput = splitInput[0];
+    let rhsInput = splitInput[1];
 
     if (positionOfTerms === 'lhs') {
       return this.algebraicRulesService.ContainsSomeOf(
@@ -243,7 +247,8 @@ export class MathEquationInputRulesService {
     let rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
-    let lhsInput = splitInput[0], rhsInput = splitInput[1];
+    let lhsInput = splitInput[0];
+    let rhsInput = splitInput[1];
 
     if (positionOfTerms === 'lhs') {
       return this.algebraicRulesService.OmitsSomeOf(lhsAnswer, {x: lhsInput});
@@ -275,7 +280,8 @@ export class MathEquationInputRulesService {
     let rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
-    let lhsInput = splitInput[0], rhsInput = splitInput[1];
+    let lhsInput = splitInput[0];
+    let rhsInput = splitInput[1];
 
     let placeholders = inputs.y;
 

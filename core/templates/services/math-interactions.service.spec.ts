@@ -540,9 +540,6 @@ describe('MathInteractionsService', () => {
       'x*(y+z)', '(y+z)*x')).toBeTrue();
     expect(mathInteractionsService.doTermsMatch(
       'x*(y+z)*(3-alpha)/2', '(3-alpha)/2*(z+y)*x')).toBeTrue();
-    expect(mathInteractionsService.doTermsMatch(
-      'a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z + 1',
-      '1 + a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r*s*t*u*v*w*x*y*z')).toBeTrue();
 
     expect(mathInteractionsService.doTermsMatch('4*5', '20')).toBeFalse();
     expect(mathInteractionsService.doTermsMatch('3*10^2', '300')).toBeFalse();

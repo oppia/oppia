@@ -218,7 +218,6 @@ describe('Numeric expression input rules service', () => {
     inputString = '3*10^(-5)';
 
     expect(neirs.ContainsSomeOf('3*10^(-5)', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf('3/10^5', {x: inputString})).toBeTrue();
 
     expect(neirs.ContainsSomeOf('3*10^5', {x: inputString})).toBeFalse();
     expect(neirs.ContainsSomeOf('3', {x: inputString})).toBeFalse();
@@ -266,7 +265,6 @@ describe('Numeric expression input rules service', () => {
     expect(neirs.OmitsSomeOf('10^(-5)', {x: inputString})).toBeTrue();
 
     expect(neirs.OmitsSomeOf('3*10^(-5)', {x: inputString})).toBeFalse();
-    expect(neirs.OmitsSomeOf('3/10^5', {x: inputString})).toBeFalse();
 
 
     inputString = '1000 + 200 + 30 + 4 + 0.5 + 0.06';
