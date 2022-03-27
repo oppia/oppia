@@ -18,12 +18,11 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 
-type TotalSkills = (
-  (SkillSummaryBackendDict | SkillSummary | ShortSkillSummary)[]);
+type TotalSkills = SkillSummaryBackendDict[];
+
 @Component({
   selector: 'oppia-select-skill',
   templateUrl: './select-skill-modal.component.html',
@@ -35,7 +34,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   categorizedSkills!: SkillsCategorizedByTopics;
   skillsInSameTopicCount!: number;
   skillSummaries!: SkillSummaryBackendDict[];
-  untriagedSkillSummaries!: ShortSkillSummary[];
+  untriagedSkillSummaries!: SkillSummaryBackendDict[];
   selectedSkillId!: string;
   allowSkillsFromOtherTopics: boolean = false;
 
