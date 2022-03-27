@@ -148,7 +148,6 @@ export class MathEquationInputRulesService {
   IsEquivalentTo(
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithoutSide): boolean {
-
     let splitAnswer = answer.split('=');
     let lhsAnswer = splitAnswer[0];
     let rhsAnswer = splitAnswer[1];
@@ -201,7 +200,6 @@ export class MathEquationInputRulesService {
   ContainsSomeOf(
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide): boolean {
-
     let positionOfTerms = inputs.y;
 
     let splitAnswer = answer.split('=');
@@ -238,7 +236,6 @@ export class MathEquationInputRulesService {
   OmitsSomeOf(
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide): boolean {
-
     let positionOfTerms = inputs.y;
 
     let splitAnswer = answer.split('=');
@@ -273,7 +270,6 @@ export class MathEquationInputRulesService {
   MatchesWithGeneralForm(
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithPlaceholder): boolean {
-
     let splitAnswer = answer.split('=');
     let lhsAnswer = splitAnswer[0];
     let rhsAnswer = splitAnswer[1];
