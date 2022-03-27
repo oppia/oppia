@@ -112,6 +112,7 @@ angular.module('oppia').component('questionEditor', {
         }
         QuestionUpdateService.setQuestionStateData(
           ctrl.question, updateFunction);
+        $rootScope.$apply();
       };
 
       ctrl.saveStateContent = function(displayedValue) {
@@ -179,6 +180,7 @@ angular.module('oppia').component('questionEditor', {
           angular.copy(displayedValue));
         QuestionUpdateService.setQuestionInapplicableSkillMisconceptionIds(
           ctrl.question, displayedValue);
+        $rootScope.$apply();
       };
 
       ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
