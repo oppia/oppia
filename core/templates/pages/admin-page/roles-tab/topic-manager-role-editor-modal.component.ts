@@ -34,6 +34,8 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   @Input() managedTopicIds!: string[];
   @Input() topicIdToName!: {[topicId: string]: string};
   @Input() username!: string;
+  // Set to null before adding a new topic id to prevent the new topic id
+  // from being selected.
   newTopicId: string | null = null;
   topicIdInUpdate: string | null = null;
 
@@ -79,9 +81,7 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
     this.adminBackendApiService.deassignManagerFromTopicAsync(
       this.username, topicIdToRemove).then(() => {
       this.managedTopicIds.splice(topicIdIndex, 1);
-      // Empty the topicIdInUpdate to prevent the user from removing the
-      // same topic twice.
-      this.topicIdInUpdate = '';
+      this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();
     }, errorMessage => {
       this.alertsService.addWarning(

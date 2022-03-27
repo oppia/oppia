@@ -31,9 +31,12 @@ import { BlogPostData } from 'domain/blog/blog-post.model';
   providedIn: 'root'
 })
 export class BlogDashboardPageService {
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private _blogPostData!: BlogPostData;
   private _blogPostId: string = '';
   private _authorPictureUrl: string = '';
-  private _blogPostData: null | BlogPostData = null;
   private _BLOG_POST_EDITOR_URL_TEMPLATE = (
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
 
@@ -111,9 +114,6 @@ export class BlogDashboardPageService {
   }
 
   get blogPostData(): BlogPostData {
-    if (this._blogPostData === null) {
-      throw new Error('Blog post data is not set.');
-    }
     return this._blogPostData;
   }
 
