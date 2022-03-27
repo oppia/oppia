@@ -31,25 +31,28 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 require('services/ngb-modal.service.ts');
+require('services/local-storage.service.ts');
 
 import { Subscription } from 'rxjs';
 import { TopicEditorSendMailComponent } from '../modal-templates/topic-editor-send-mail-modal.component';
 import { TopicEditorSaveModalComponent } from '../modal-templates/topic-editor-save-modal.component';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 angular.module('oppia').component('topicEditorNavbar', {
   template: require('./topic-editor-navbar.component.html'),
   controller: [
     '$rootScope', '$scope', '$window', 'AlertsService',
-    'NgbModal', 'TopicEditorRoutingService',
+    'LocalStorageService', 'NgbModal', 'TopicEditorRoutingService',
     'TopicEditorStateService', 'TopicRightsBackendApiService',
     'UndoRedoService', 'UrlInterpolationService',
     'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
     function(
         $rootScope, $scope, $window, AlertsService,
-        NgbModal, TopicEditorRoutingService, TopicEditorStateService,
-        TopicRightsBackendApiService, UndoRedoService,
-        UrlInterpolationService, UrlService,
-        TOPIC_VIEWER_URL_TEMPLATE) {
+        LocalStorageService, NgbModal, TopicEditorRoutingService,
+        TopicEditorStateService, TopicRightsBackendApiService,
+        UndoRedoService, UrlInterpolationService,
+        UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       $scope.isSaveInProgress = function() {
@@ -125,7 +128,28 @@ angular.module('oppia').component('topicEditorNavbar', {
         return UndoRedoService.getChangeCount();
       };
 
+      $scope.updateTopicEditorBrowserTabsUnsavedChangesStatus = function() {
+        var topic = TopicEditorStateService.getTopic();
+
+        const topicEditorBrowserTabsInfo:
+          EntityEditorBrowserTabsInfo = (
+            LocalStorageService.getEntityEditorBrowserTabsInfo(
+              EntityEditorBrowserTabsInfoDomainConstants
+                .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
+
+        if (topicEditorBrowserTabsInfo && $scope.getChangeListLength() > 0 &&
+              !topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+        ) {
+          topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+          LocalStorageService.updateEntityEditorBrowserTabsInfo(
+            topicEditorBrowserTabsInfo,
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_TOPIC_EDITOR_BROWSER_TABS);
+        }
+      };
+
       $scope.isTopicSaveable = function() {
+        $scope.updateTopicEditorBrowserTabsUnsavedChangesStatus();
         return (
           $scope.getChangeListLength() > 0 &&
               $scope.getWarningsCount() === 0 && (

@@ -43,12 +43,18 @@ require('pages/interaction-specs.constants.ajs.ts');
 require('pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts');
 require('services/loader.service.ts');
 require('services/prevent-page-unload-event.service.ts');
-require('services/local-storage.service.ts');
 require('services/favicon.service.ts');
+require('services/local-storage.service.ts');
+require('services/staleness-detection.service');
+require('services/ngb-modal.service.ts');
 
+import { EventEmitter } from '@angular/core';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoDict } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { Subscription } from 'rxjs';
+import { StaleTabInfoModalComponent } from './modal-templates/stale-tab-info-modal.component';
+import { UnsavedChangesStatusInfoModalComponent } from './modal-templates/unsaved-changes-status-info-modal.component';
 
 angular.module('oppia').directive('topicEditorPage', [
   'UrlInterpolationService', function(
@@ -63,15 +69,17 @@ angular.module('oppia').directive('topicEditorPage', [
       controller: [
         '$rootScope', 'BottomNavbarStatusService', 'ContextService',
         'FaviconService', 'LoaderService', 'LocalStorageService',
-        'PageTitleService', 'PreventPageUnloadEventService',
-        'TopicEditorRoutingService', 'TopicEditorStateService',
-        'UndoRedoService', 'UrlService', 'WindowRef',
+        'NgbModal', 'PageTitleService', 'PreventPageUnloadEventService',
+        'StalenessDetectionService', 'TopicEditorRoutingService',
+        'TopicEditorStateService', 'UndoRedoService',
+        'UrlService', 'WindowRef',
         function(
             $rootScope, BottomNavbarStatusService, ContextService,
             FaviconService, LoaderService, LocalStorageService,
-            PageTitleService, PreventPageUnloadEventService,
-            TopicEditorRoutingService, TopicEditorStateService,
-            UndoRedoService, UrlService, WindowRef) {
+            NgbModal, PageTitleService, PreventPageUnloadEventService,
+            StalenessDetectionService, TopicEditorRoutingService,
+            TopicEditorStateService, UndoRedoService,
+            UrlService, WindowRef) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getActiveTabName = function() {
@@ -80,6 +88,9 @@ angular.module('oppia').directive('topicEditorPage', [
           ctrl.getEntityType = function() {
             return ContextService.getEntityType();
           };
+
+          var staleTabEventEmitter = new EventEmitter();
+          var presenceOfUnsavedChangesEventEmitter = new EventEmitter();
 
           var setDocumentTitle = function() {
             let topicName = TopicEditorStateService.getTopic().getName();
@@ -218,7 +229,7 @@ angular.module('oppia').directive('topicEditorPage', [
             topicEditorBrowserTabsInfo.setLatestVersion(topic.getVersion());
             topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
 
-            LocalStorageService.updateOpenedEntityEditorBrowserTabsInfo(
+            LocalStorageService.updateEntityEditorBrowserTabsInfo(
               topicEditorBrowserTabsInfo,
               EntityEditorBrowserTabsInfoDomainConstants
                 .OPENED_TOPIC_EDITOR_BROWSER_TABS);
@@ -238,26 +249,26 @@ angular.module('oppia').directive('topicEditorPage', [
             }
             topicEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
 
-            LocalStorageService.updateOpenedEntityEditorBrowserTabsInfo(
+            LocalStorageService.updateEntityEditorBrowserTabsInfo(
               topicEditorBrowserTabsInfo,
               EntityEditorBrowserTabsInfoDomainConstants
                 .OPENED_TOPIC_EDITOR_BROWSER_TABS);
           };
 
           var onCreateOrUpdateTopicEditorBrowserTabsInfo = function(event) {
-            const topic = TopicEditorStateService.getTopic();
+            var topic = TopicEditorStateService.getTopic();
             if (event.key === (
               EntityEditorBrowserTabsInfoDomainConstants
                 .OPENED_TOPIC_EDITOR_BROWSER_TABS)
             ) {
-              const oldTopicEditorBrowserTabsInfoDict:
+              var oldTopicEditorBrowserTabsInfoDict:
                 EntityEditorBrowserTabsInfoDict = (
                   JSON.parse(event.oldValue) || {});
-              const newOpenedTopicEditorPagesObject:
+              var newOpenedTopicEditorPagesObject:
                 EntityEditorBrowserTabsInfoDict = (
                   JSON.parse(event.newValue));
 
-              const oldOpenedTopicEditorBrowserTabsInfo = {};
+              var oldOpenedTopicEditorBrowserTabsInfo = {};
               for (let topicId in oldTopicEditorBrowserTabsInfoDict) {
                 oldOpenedTopicEditorBrowserTabsInfo[topicId] = (
                   EntityEditorBrowserTabsInfo.fromLocalStorageDict(
@@ -265,7 +276,7 @@ angular.module('oppia').directive('topicEditorPage', [
                 );
               }
 
-              const newOpenedTopicEditorBrowserTabsInfo = {};
+              var newOpenedTopicEditorBrowserTabsInfo = {};
               for (let topicId in newOpenedTopicEditorPagesObject) {
                 newOpenedTopicEditorBrowserTabsInfo[topicId] = (
                   EntityEditorBrowserTabsInfo.fromLocalStorageDict(
@@ -273,15 +284,16 @@ angular.module('oppia').directive('topicEditorPage', [
                 );
               }
 
-              const oldTopicEditorBrowserTabInfo = (
+              var oldTopicEditorBrowserTabInfo = (
                 oldOpenedTopicEditorBrowserTabsInfo[topic.getId()]);
-              const newTopicEditorBrowserTabInfo = (
+              var newTopicEditorBrowserTabInfo = (
                 newOpenedTopicEditorBrowserTabsInfo[topic.getId()]);
 
               if (
                 newTopicEditorBrowserTabInfo
                   .getLatestVersion() !== topic.getVersion()
               ) {
+                staleTabEventEmitter.emit();
                 FaviconService.setFavicon(
                   '/assets/images/favicon_alert/favicon_alert.ico');
                 $rootScope.$applyAsync();
@@ -292,6 +304,7 @@ angular.module('oppia').directive('topicEditorPage', [
                         newTopicEditorBrowserTabInfo
                           .doesSomeTabHaveUnsavedChanges()
               ) {
+                presenceOfUnsavedChangesEventEmitter.emit();
                 $rootScope.$applyAsync();
               }
             }
@@ -342,6 +355,36 @@ angular.module('oppia').directive('topicEditorPage', [
             });
             LocalStorageService.registerNewStorageEventListener(
               onCreateOrUpdateTopicEditorBrowserTabsInfo);
+            ctrl.directiveSubscriptions.add(
+              staleTabEventEmitter.subscribe(() => {
+                NgbModal.dismissAll();
+                const modalRef: NgbModalRef = NgbModal.open(
+                  StaleTabInfoModalComponent, {
+                    backdrop: 'static',
+                  });
+                modalRef.result.then(() => {
+                  WindowRef.nativeWindow.location.reload();
+                }, () => {});
+              })
+            );
+            ctrl.directiveSubscriptions.add(
+              presenceOfUnsavedChangesEventEmitter.subscribe(() => {
+                if (
+                  StalenessDetectionService
+                    .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
+                      EntityEditorBrowserTabsInfoDomainConstants
+                        .OPENED_TOPIC_EDITOR_BROWSER_TABS,
+                      TopicEditorStateService.getTopic().getId())
+                ) {
+                  NgbModal.dismissAll();
+                  const modalRef: NgbModalRef = NgbModal.open(
+                    UnsavedChangesStatusInfoModalComponent, {
+                      backdrop: 'static',
+                    });
+                  modalRef.result.then(() => {}, () => {});
+                }
+              })
+            );
           };
 
           ctrl.$onDestroy = function() {
