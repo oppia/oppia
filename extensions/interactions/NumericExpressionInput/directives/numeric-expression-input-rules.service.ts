@@ -40,7 +40,8 @@ export class NumericExpressionInputRulesService {
 
   MatchesUpToTrivialManipulations(
       answer: NumericExpressionAnswer,
-      inputs: NumericExpressionRuleInputs): boolean {
+      inputs: NumericExpressionRuleInputs
+  ): boolean {
     let mis = new MathInteractionsService();
 
     // The expression is first split into terms by addition and subtraction.

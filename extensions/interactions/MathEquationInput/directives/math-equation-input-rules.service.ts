@@ -85,7 +85,8 @@ export class MathEquationInputRulesService {
 
   MatchesUpToTrivialManipulations(
       answer: MathEquationAnswer,
-      inputs: MathEquationRuleInputsWithSide): boolean {
+      inputs: MathEquationRuleInputsWithSide
+  ): boolean {
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();
     let mathInteractionsService = new MathInteractionsService();
 
@@ -106,9 +107,12 @@ export class MathEquationInputRulesService {
     } else if (positionOfTerms === 'both') {
       return (
         algebraicRulesService.MatchesUpToTrivialManipulations(
-          lhsAnswer, {x: lhsInput}) && (
-          algebraicRulesService.MatchesUpToTrivialManipulations(
-            rhsAnswer, {x: rhsInput})));
+          lhsAnswer, {x: lhsInput}
+        ) && 
+        algebraicRulesService.MatchesUpToTrivialManipulations(
+          rhsAnswer, {x: rhsInput}
+        )
+      );
     } else {
       // Position of terms is irrelevant. So, we bring all terms on one side
       // and perform an exact match.
