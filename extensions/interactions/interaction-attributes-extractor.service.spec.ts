@@ -36,22 +36,6 @@ describe('Interaction attributes extractor service', () => {
     hes = TestBed.inject(HtmlEscaperService);
   });
 
-  it('should properly extract customization arguments values from attributes',
-    () => {
-      const recommendedExplorationIdsWithValue = hes.objToEscapedJson(['0']);
-      const attributes = {
-        recommendedExplorationIdsWithValue
-      };
-
-      const caValues = iaes.getValuesFromAttributes(
-        'EndExploration',
-        attributes
-      );
-      expect(caValues).toEqual({
-        recommendedExplorationIds: ['0'],
-      });
-    });
-
   it('should properly extract migrated customization arguments values from' +
     'attributes', () => {
     const buttonTextWithValue = hes.objToEscapedJson({
