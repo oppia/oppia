@@ -37,6 +37,7 @@ export class ExplorationHtmlFormatterService {
     'CodeRepl',
     'Continue',
     'DragAndDropSortInput',
+    'EndExploration',
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
@@ -148,20 +149,14 @@ export class ExplorationHtmlFormatterService {
     // set as attribute keys (like '[' or ']'). So when interaction is migrated
     // we first test whether the other parts of the attribute can be added
     // (code above) and then we add the attribute using string concatenation.
-    if (
-      this.migratedInteractions.indexOf(interactionId) >= 0 &&
-      (lastAnswerPropValue !== null || savedSolution === 'savedMemento()')
-    ) {
-      let interactionHtml = element.outerHTML;
-      const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
-      let interactionHtmlWithoutEnd = interactionHtml.replace(tagEnd, '');
-      if (savedSolution === 'savedMemento()') {
-        interactionHtmlWithoutEnd += ` [saved-solution]="${savedSolution}"`;
-      }
-      interactionHtmlWithoutEnd += ` [last-answer]="${lastAnswerPropValue}"`;
-      return interactionHtmlWithoutEnd + tagEnd;
+    let interactionHtml = element.outerHTML;
+    const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
+    let interactionHtmlWithoutEnd = interactionHtml.replace(tagEnd, '');
+    if (savedSolution === 'savedMemento()') {
+      interactionHtmlWithoutEnd += ` [saved-solution]="${savedSolution}"`;
     }
-    return element.outerHTML;
+    interactionHtmlWithoutEnd += ` [last-answer]="${lastAnswerPropValue}"`;
+    return interactionHtmlWithoutEnd + tagEnd;
   }
 
   getAnswerHtml(
