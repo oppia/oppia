@@ -40,37 +40,24 @@ _PARSER.add_argument(
     required=True, choices=['validate', 'generate'])
 
 css_files_list = [
-    'core/templates/pages/learner-dashboard-page/home-tab.component.css',
-    'core/templates/pages/learner-dashboard-page/goals-tab.component.css',
-    'core/templates/pages/about-page/about-page.component.css',
-    'core/templates/pages/splash-page/splash-page.component.css',
     'core/templates/base-components/base-content.component.css',
-    'core/templates/pages/library-page/library-page.component.css',
-    'core/templates/pages/topic-viewer-page/practice-tab/'
-    'practice-tab.component.css',
-    'core/templates/pages/classroom-page/classroom-page.component.css',
-    'core/templates/pages/topic-viewer-page/subtopics-list/'
-    'subtopics-list.component.css',
-    'core/templates/pages/story-viewer-page/story-viewer-page.component.css',
-    'core/templates/pages/topic-viewer-page/topic-viewer-page.component.css',
-    'core/templates/components/summary-tile/story-summary-tile.component.css',
-    'core/templates/pages/subtopic-viewer-page/'
-    'subtopic-viewer-page.component.css',
-    'core/templates/pages/learner-dashboard-page/'
-    'community-lessons-tab.component.css',
-    'core/templates/pages/story-viewer-page/'
-    'story-viewer-page-root.component.css',
-    'core/templates/pages/learner-dashboard-page/'
-    'learner-dashboard-page.component.css',
-    'core/templates/pages/topic-viewer-page/stories-list/'
-    'topic-viewer-stories-list.component.css',
-    'core/templates/pages/library-page/search-bar/search-bar.component.css',
+    'core/templates/base-components/oppia-footer.component.css',
     'core/templates/components/button-directives/'
     'hint-and-solution-buttons.component.css',
+    'core/templates/components/button-directives/social-buttons.component.css',
     'core/templates/components/common-layout-directives/common-elements/'
     'attribution-guide.component.css',
     'core/templates/components/common-layout-directives/navigation-bars/'
+    'side-navigation-bar.component.css',
+    'core/templates/components/common-layout-directives/navigation-bars/'
     'top-navigation-bar.component.css',
+    'core/templates/components/summary-tile/story-summary-tile.component.css',
+    'core/templates/pages/about-page/about-page.component.css',
+    'core/templates/pages/classroom-page/classroom-page.component.css',
+    'core/templates/pages/collection-player-page/'
+    'collection-player-page.component.css',
+    'core/templates/pages/collection-player-page/collection-footer/'
+    'collection-footer.component.css',
     'core/templates/pages/exploration-player-page/learner-experience/'
     'tutor-card.component.css',
     'core/templates/pages/exploration-player-page/learner-experience/'
@@ -83,21 +70,33 @@ css_files_list = [
     'progress-nav.component.css',
     'core/templates/pages/exploration-player-page/layout-directives/'
     'exploration-footer.component.css',
-    'core/templates/base-components/oppia-footer.component.css',
-    'core/templates/pages/profile-page/profile-page.component.css',
-    'core/templates/pages/exploration-player-page/layout-directives/'
-    'learner-view-info.component.css',
-    'core/templates/pages/participation-playbook/playbook.component.css',
     'core/templates/pages/exploration-player-page/templates/'
     'information-card-modal.component.css',
     'core/templates/pages/exploration-player-page/layout-directives/'
     'learner-view-info.component.css',
-    'core/templates/pages/collection-player-page/'
-    'collection-player-page.component.css',
-    'core/templates/components/common-layout-directives/navigation-bars/'
-    'side-navigation-bar.component.css',
-    'core/templates/pages/collection-player-page/collection-footer/'
-    'collection-footer.component.css'
+    'core/templates/pages/learner-dashboard-page/home-tab.component.css',
+    'core/templates/pages/learner-dashboard-page/goals-tab.component.css',
+    'core/templates/pages/learner-dashboard-page/'
+    'learner-dashboard-page.component.css',
+    'core/templates/pages/learner-dashboard-page/'
+    'community-lessons-tab.component.css',
+    'core/templates/pages/library-page/library-page.component.css',
+    'core/templates/pages/library-page/search-bar/search-bar.component.css',
+    'core/templates/pages/profile-page/profile-page.component.css',
+    'core/templates/pages/participation-playbook/playbook.component.css',
+    'core/templates/pages/splash-page/splash-page.component.css',
+    'core/templates/pages/story-viewer-page/story-viewer-page.component.css',
+    'core/templates/pages/subtopic-viewer-page/'
+    'subtopic-viewer-page.component.css',
+    'core/templates/pages/story-viewer-page/'
+    'story-viewer-page-root.component.css',
+    'core/templates/pages/topic-viewer-page/stories-list/'
+    'topic-viewer-stories-list.component.css',
+    'core/templates/pages/topic-viewer-page/practice-tab/'
+    'practice-tab.component.css',
+    'core/templates/pages/topic-viewer-page/subtopics-list/'
+    'subtopics-list.component.css',
+    'core/templates/pages/topic-viewer-page/topic-viewer-page.component.css'
 ]
 
 

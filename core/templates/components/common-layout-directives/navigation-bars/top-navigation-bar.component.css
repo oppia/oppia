@@ -122,6 +122,10 @@
   padding-top: 27px;
 }
 
+.oppia-top-navigation-bar.navbar-header {
+  float: left !important;
+}
+
 /*rtl:raw:
 .navbar-header {
   display: flex;
@@ -489,6 +493,15 @@
   .desktop-view-language-code {
     display: none;
   }
+}
+
+@media (min-width: 768px) {
+  /*rtl:raw:
+  .oppia-top-navigation-bar.navbar-header {
+    float: right !important;
+    margin-right: -15px;
+  }
+  */
 }
 
 @media screen and (max-width: 768px) {
