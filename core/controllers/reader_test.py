@@ -2680,7 +2680,7 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
             },
             csrf_token=csrf_token)
         exploration_user_data = exp_fetchers.get_exploration_user_data(
-            self.user_id, exp_id)
+            user_id, exp_id)
         self.assertEqual(
             exploration_user_data.last_completed_checkpoint_state_name,
             'checkpoint2')
@@ -2700,7 +2700,7 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
             },
             csrf_token=csrf_token)
         exploration_user_data = exp_fetchers.get_exploration_user_data(
-            self.user_id, exp_id)
+            user_id, exp_id)
         self.assertEqual(
             exploration_user_data.last_completed_checkpoint_state_name,
             'checkpoint2')
