@@ -175,23 +175,23 @@
 
 # Dev workflow team.
 /.circleci/ @oppia/automated-qa-reviewers
-/.eslintignore @Hudda @oppia/dev-workflow-reviewers
-/.eslintrc @Hudda @oppia/dev-workflow-reviewers
-/.htmllintrc @Hudda @oppia/dev-workflow-reviewers
-/.coveragerc @Hudda @oppia/dev-workflow-reviewers
+/.eslintignore @oppia/dev-workflow-reviewers
+/.eslintrc @oppia/dev-workflow-reviewers
+/.htmllintrc @oppia/dev-workflow-reviewers
+/.coveragerc @oppia/dev-workflow-reviewers
 /.gitattributes @oppia/dev-workflow-reviewers
 /.gitignore @oppia/dev-workflow-reviewers
-/.isort.cfg @Hudda @oppia/dev-workflow-reviewers
-/.pylintrc @Hudda @oppia/dev-workflow-reviewers
-/.stylelintrc @Hudda @oppia/dev-workflow-reviewers
+/.isort.cfg @oppia/dev-workflow-reviewers
+/.pylintrc @oppia/dev-workflow-reviewers
+/.stylelintrc @oppia/dev-workflow-reviewers
 /.yarnrc @oppia/dev-workflow-reviewers
-/tox.ini @Hudda @oppia/dev-workflow-reviewers
+/tox.ini @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
 /scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/automated-qa-reviewers
 /scripts/check_frontend_test_coverage*.py @oppia/automated-qa-reviewers @nithusha21
 /scripts/create_topological_sort_of_all_services*.py @oppia/dev-workflow-reviewers
 /scripts/install_prerequisites.sh @oppia/dev-workflow-reviewers
-/scripts/linters/ @Hudda @oppia/dev-workflow-reviewers
+/scripts/linters/ @oppia/dev-workflow-reviewers
 /scripts/linters/codeowner_linter*.py @oppia/dev-workflow-reviewers
 /scripts/linters/pylint_extensions*.py @oppia/dev-workflow-reviewers
 /scripts/linters/python_linter*.py @oppia/dev-workflow-reviewers
