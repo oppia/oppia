@@ -1317,7 +1317,9 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(user_settings.user_has_viewed_lesson_info_once, False)
 
         csrf_token = self.get_new_csrf_token()
-        self.post_json('/userinfohandler/data', {}, csrf_token=csrf_token)
+        self.post_json('/userinfohandler/data', {
+            'user_has_viewed_lesson_info_once': True
+        }, csrf_token=csrf_token)
 
         user_settings = user_services.get_user_settings(user_id)
         self.assertEqual(user_settings.user_has_viewed_lesson_info_once, True)

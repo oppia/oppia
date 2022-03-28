@@ -567,7 +567,13 @@ class UserInfoHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
-        'POST': {}
+        'POST': {
+            'user_has_viewed_lesson_info_once': {
+                'schema': {
+                    'type': 'bool'
+                },
+            }
+        }
     }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -608,7 +614,10 @@ class UserInfoHandler(base.BaseHandler):
     @acl_decorators.open_access
     def post(self):
         """Handles POST requests."""
-        user_services.set_user_has_viewed_lesson_info_once(self.user_id)
+        user_has_viewed_lesson_info_once = self.normalized_payload.get(
+            'user_has_viewed_lesson_info_once')
+        if(user_has_viewed_lesson_info_once):
+            user_services.set_user_has_viewed_lesson_info_once(self.user_id)
         self.render_json({'success': True})
 
 

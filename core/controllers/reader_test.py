@@ -2594,3 +2594,102 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                     'answer': 'This is an answer.',
                     'answer_details': 'This is an answer details.',
                 }, csrf_token=csrf_token, expected_status_int=500)
+
+class CheckpointCompletedEventHandlerTests(test_utils.GenericEmailTestBase):
+
+    def test_last_completed_checkpoint_is_updated_correctly(self):
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        # Begin an exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(exploration_dict['last_completed_checkpoint_state_name'])
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/explorehandler/checkpoint_completed/%s' % exp_id,
+            {
+                'version': 1,
+                'state_name': 'checkpoint1'
+            },
+            csrf_token=csrf_token)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(self.user_id, exp_id)
+        self.assertEqual(
+            exploration_user_data.last_completed_checkpoint_state_name, 'checkpoint1')
+        self.assertEqual(
+            exploration_user_data.last_completed_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exploration_user_data.latest_visited_checkpoint_state_name, 'checkpoint1')
+
+class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
+
+    def test_latest_visited_checkpoint_is_updated_correctly(self):
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        # Begin an exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(exploration_dict['last_completed_checkpoint_state_name'])
+
+        # First checkpoint completed.
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/explorehandler/checkpoint_completed/%s' % exp_id,
+            {
+                'version': 1,
+                'state_name': 'checkpoint1'
+            },
+            csrf_token=csrf_token)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(self.user_id, exp_id)
+        self.assertEqual(
+            exploration_user_data.last_completed_checkpoint_state_name, 'checkpoint1')
+        self.assertEqual(
+            exploration_user_data.last_completed_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exploration_user_data.latest_visited_checkpoint_state_name, 'checkpoint1')
+
+        # Second checkpoint completed.
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/explorehandler/checkpoint_completed/%s' % exp_id,
+            {
+                'version': 1,
+                'state_name': 'checkpoint2'
+            },
+            csrf_token=csrf_token)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(self.user_id, exp_id)
+        self.assertEqual(
+            exploration_user_data.last_completed_checkpoint_state_name, 'checkpoint2')
+        self.assertEqual(
+            exploration_user_data.last_completed_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exploration_user_data.latest_visited_checkpoint_state_name, 'checkpoint2')
+
+        # First checkpoint visited.
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/explorehandler/checkpoint_visited/%s' % exp_id,
+            {
+                'version': 1,
+                'state_name': 'checkpoint1'
+            },
+            csrf_token=csrf_token)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(self.user_id, exp_id)
+        self.assertEqual(
+            exploration_user_data.last_completed_checkpoint_state_name, 'checkpoint2')
+        self.assertEqual(
+            exploration_user_data.last_completed_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exploration_user_data.latest_visited_checkpoint_state_name, 'checkpoint1')
