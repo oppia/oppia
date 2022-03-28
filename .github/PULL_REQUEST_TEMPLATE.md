@@ -38,10 +38,10 @@ Make sure to properly verify that everything works correctly, and that there are
 no weird UI mistakes or other problems. Also, if there are any newly added fields, 
 try to fill them out and test that different inputs are correctly accepted/rejected.
 
-Throttle the network (to 3G) using the browser Developer Tools. There should be no
-performance or UI issues while the network is slow.
+Throttle the network (to 3G) using the browser Developer Tools (see references below). 
+There should be no performance or UI issues while the network is slow.
 
-Reference: 
+References: 
  - Chrome: https://css-tricks.com/throttling-the-network/
  - Firefox: https://developer.mozilla.org/en-US/docs/Tools/Network_Monitor/Throttling
 -->
@@ -50,11 +50,11 @@ Reference:
 
 <!--
 In some cases this is not needed (e.g. for pages that we do not expect to 
-support mobile phone or when working on a backend feature).
+support mobile phones, or for backend-only features).
 
 Feel free to use the Developer Tools emulator for this.
 
-Reference:
+References:
  - Chrome: https://developer.chrome.com/docs/devtools/device-mode/
  - Firefox: https://firefox-source-docs.mozilla.org/devtools-user/index.html#responsive-design-mode
 -->
@@ -64,7 +64,7 @@ Reference:
 <!--
 If the PR changes the UI in any of the files listed in rtl_css.py (i.e, those that have 
 a separate .rtl.css file for styling), make sure to add screenshots with the site 
-language set to Arabic as well (we use Arabic as it is language written from right to left).  
+language set to Arabic as well (we use Arabic as it is a language written from right to left).  
 -->
 
 ## PR Pointers
