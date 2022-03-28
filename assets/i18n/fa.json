@@ -23,7 +23,7 @@
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "خطا: ناتوان در خواندن پروندهٔ تصویری",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "افزودن یک بندانگشتی",
 	"I18N_CLASSROOM_PAGE_COMING_SOON": "به‌زودی",
-	"I18N_COMPLETE_STORY": "داستان را در <[topicName]> کامل کنید.",
+	"I18N_COMPLETE_CHAPTER": "داستان را در <[topicName]> کامل کنید.",
 	"I18N_CREATE_ACTIVITY_QUESTION": "چه چیزی را میخواهید بسازید؟",
 	"I18N_CREATE_ACTIVITY_TITLE": "ایجاد یک فعالیت",
 	"I18N_CREATE_COLLECTION": "ایجاد مجموعه",
