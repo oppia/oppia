@@ -118,18 +118,6 @@ class UserFacingExceptions:
 
         pass
 
-    class TemporaryMaintenanceException(Exception):
-        """Error class for when the server is currently down for temporary
-        maintenance (error code 503).
-        """
-
-        def __init__(self):
-            super(
-                UserFacingExceptions.TemporaryMaintenanceException, self
-            ).__init__(
-                'Oppia is currently being upgraded, and the site should be up '
-                'and running again in a few hours. Thanks for your patience!')
-
 
 class BaseHandler(webapp2.RequestHandler):
     """Base class for all Oppia handlers."""
@@ -288,8 +276,7 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         if not self._is_requested_path_currently_accessible_to_user():
-            self.handle_exception(
-                self.TemporaryMaintenanceException(), self.app.debug)
+            self.render_template('maintenance-page.mainpage.html')
             return
 
         if self.user_is_scheduled_for_deletion:
@@ -628,8 +615,6 @@ class BaseHandler(webapp2.RequestHandler):
             if self.iframed:
                 self.render_template(
                     'error-iframed.mainpage.html', iframe_restriction=None)
-            elif values['status_code'] == 503:
-                self.render_template('maintenance-page.mainpage.html')
             elif values['status_code'] == 404:
                 # Only 404 routes can be handled with angular router as it only
                 # has access to the path, not to the status code.
@@ -655,7 +640,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
         # The error codes here should be in sync with the error pages
         # generated via webpack.common.config.ts.
-        assert error_code in [400, 401, 404, 500, 503]
+        assert error_code in [400, 401, 404, 500]
         values['status_code'] = error_code
         method = self.request.environ['REQUEST_METHOD']
 
@@ -728,11 +713,6 @@ class BaseHandler(webapp2.RequestHandler):
             self._render_exception(500, {'error': str(exception)})
             return
 
-        if isinstance(exception, self.TemporaryMaintenanceException):
-            self.error(503)
-            self._render_exception(503, {'error': str(exception)})
-            return
-
         self.error(500)
         self._render_exception(500, {'error': str(exception)})
 
@@ -741,8 +721,6 @@ class BaseHandler(webapp2.RequestHandler):
     NotLoggedInException = UserFacingExceptions.NotLoggedInException
     PageNotFoundException = UserFacingExceptions.PageNotFoundException
     UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
-    TemporaryMaintenanceException = (
-        UserFacingExceptions.TemporaryMaintenanceException)
 
 
 class Error404Handler(BaseHandler):
