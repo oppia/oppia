@@ -53,7 +53,7 @@ export class ThreadDataBackendApiService {
     new Map<string, SuggestionAndFeedbackThread>());
 
   // Cached number of open threads requiring action.
-  feedbackThreads: FeedbackThread[];
+  feedbackThreads: FeedbackThread[] = [];
   countOfOpenFeedbackThreads = 0;
   _feedbackThreadsInitializedEventEmitter = new EventEmitter();
 
