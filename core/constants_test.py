@@ -40,6 +40,15 @@ class ConstantsTests(test_utils.GenericTestBase):
             self.assertTrue(isinstance(json, dict))
             self.assertEqual(json['TESTING_CONSTANT'], 'test')
 
+    def test_loading_non_existing_file_throws_error(self) -> None:
+        """Test get_package_file_contents with imaginary file."""
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            IOError,
+            'No such file or directory: \'assets/non_exist_file.xy\''
+        ):
+            constants.get_package_file_contents(
+                'assets', 'non_exist_file.xy')
+
     def test_difficulty_values_are_matched(self) -> None:
         """Tests that the difficulty values and strings are matched in the
         various constants.

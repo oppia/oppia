@@ -22,11 +22,18 @@ import copy
 import datetime
 import enum
 import os
+import sys
 
 from core.constants import constants
 
 from typing import Dict, List, Union
-from typing_extensions import TypedDict
+
+# We require typing_extensions which is present in third_party so we add it to
+# path here.
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
+
+from typing_extensions import TypedDict # isort:skip  # pylint: disable=wrong-import-position
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
@@ -39,6 +46,18 @@ ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 # The values which a post_commit_status can have: public, private.
 POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
+
+
+class ValidCmdDict(TypedDict):
+    """Dictionary representing valid commands specs."""
+
+    name: str
+    required_attribute_names: List[str]
+    optional_attribute_names: List[str]
+    user_id_attribute_names: List[str]
+    allowed_values: Dict[str, List[str]]
+    deprecated_values: Dict[str, List[str]]
+
 
 # Whether to unconditionally log info messages.
 DEBUG = False
@@ -1550,6 +1569,12 @@ COMMIT_TYPE_CREATE = 'create'
 COMMIT_TYPE_REVERT = 'revert'
 COMMIT_TYPE_EDIT = 'edit'
 COMMIT_TYPE_DELETE = 'delete'
+
+# The task entry ID template used by the task entry model.
+TASK_ENTRY_ID_TEMPLATE = '%s.%s.%d.%s.%s.%s'
+
+# The composite entity ID template used by the task entry model.
+COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
 
 # The data type for the translated or translatable content in any
 # BaseTranslatableObject.

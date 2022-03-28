@@ -31,7 +31,7 @@ OBJECT = builtins.object
 
 
 def test_function(unused_arg):
-    return OBJECT
+    return builtins.object
 
 
 class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):

@@ -235,7 +235,9 @@
 /core/templates/services/editability.service*.ts @kevintab95
 /core/templates/services/exploration-features*.ts @kevintab95
 /core/templates/services/exploration-html-formatter.service*.ts @kevintab95
+/core/templates/services/favicon.service*.ts @kevintab95
 /core/templates/services/image-upload-helper.service*.ts @kevintab95
+/core/templates/services/staleness-detection.service*.ts @kevintab95
 /core/templates/services/validators.service*.ts @kevintab95
 
 
@@ -519,7 +521,6 @@
 /core/templates/domain/utilities/ @DubeySandeep
 /core/templates/Polyfills.ts @srijanreddy98
 /extensions/extensions.module.ts @vojtechjelinek
-/core/python_utils*.py @DubeySandeep
 /core/schema_utils*.py @DubeySandeep
 /core/utils*.py @aks681
 
