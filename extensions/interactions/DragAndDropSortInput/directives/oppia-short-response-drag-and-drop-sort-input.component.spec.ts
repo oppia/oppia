@@ -59,6 +59,16 @@ describe('Drag and drop sort input short response component', () => {
         '"ca_choices_3"' +
       ']' +
     ']';
+    component.choices = '[{' +
+      '"_html": "Choice 1",' +
+      '"_contentId": "ca_choices_1"' +
+    '}, {' +
+      '"_html": "Choice 2",' +
+      '"_contentId": "ca_choices_2"' +
+    '}, {' +
+      '"_html": "Choice 3",' +
+      '"_contentId": "ca_choices_3"' +
+    '}]';
   });
 
   it('should initialise component when user submits answer', () => {
@@ -66,13 +76,13 @@ describe('Drag and drop sort input short response component', () => {
 
     expect(component.responseList).toEqual([
       [
-        'ca_choices_1'
+        'Choice 1'
       ],
       [
-        'ca_choices_2'
+        'Choice 2'
       ],
       [
-        'ca_choices_3'
+        'Choice 3'
       ]
     ]);
     expect(component.isAnswerLengthGreaterThanZero).toBe(true);
