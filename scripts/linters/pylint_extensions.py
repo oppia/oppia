@@ -284,10 +284,10 @@ class HangingIndentChecker(checkers.BaseChecker):
                     split_line = line.split()
                     if '#' in split_line:
                         comment_index = split_line.index('#')
-                        if (split_line[comment_index - 1].endswith('):') or
-                                split_line[comment_index - 1].endswith(':')):
+                        if (split_line[comment_index - 1].endswith(':') or
+                                split_line[comment_index - 1].endswith('):')):
                             excluded = False
-                    elif line.endswith('):') or line.endswith(':'):
+                    elif line.endswith(':') or line.endswith('):'):
                         excluded = False
                 if excluded:
                     continue
