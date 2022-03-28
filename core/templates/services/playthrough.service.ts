@@ -121,11 +121,11 @@ class EarlyQuitTracker {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private stateName!: string;
-  private expDurationInSecs: number = 0;
+  private expDurationInSecs!: number;
 
   foundAnIssue(): boolean {
     return (
-      this.expDurationInSecs !== 0 &&
+      this.expDurationInSecs !== undefined &&
       this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
   }
 
@@ -189,7 +189,7 @@ export class PlaythroughService {
   private misTracker!: MultipleIncorrectAnswersTracker;
   private recordedLearnerActions!: LearnerAction[];
   private playthroughStopwatch!: Stopwatch;
-  private playthroughDurationInSecs: number = 0;
+  private playthroughDurationInSecs!: number;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
