@@ -304,19 +304,13 @@ export class PlaythroughService {
       this.explorationVersion &&
       this.recordedLearnerActions
     ) {
-      if (
-        this.misTracker &&
-        this.misTracker.foundAnIssue()
-      ) {
+      if (this.misTracker && this.misTracker.foundAnIssue()) {
         return this.playthroughObjectFactory
           .createNewMultipleIncorrectSubmissionsPlaythrough(
             this.explorationId, this.explorationVersion,
             this.misTracker.generateIssueCustomizationArgs(),
             this.recordedLearnerActions);
-      } else if (
-        this.cstTracker &&
-        this.cstTracker.foundAnIssue()
-      ) {
+      } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
         const cstTrackerIssueCustomizationArgs = (
           this.cstTracker.generateIssueCustomizationArgs());
         if (cstTrackerIssueCustomizationArgs !== undefined) {
@@ -326,10 +320,7 @@ export class PlaythroughService {
               cstTrackerIssueCustomizationArgs,
               this.recordedLearnerActions);
         }
-      } else if (
-        this.eqTracker &&
-        this.eqTracker.foundAnIssue()
-      ) {
+      } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
         const eqTrackerIssueCustomizationArgs = (
           this.eqTracker.generateIssueCustomizationArgs());
         if (eqTrackerIssueCustomizationArgs !== undefined) {
