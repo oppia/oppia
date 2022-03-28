@@ -27,7 +27,6 @@ import zipfile
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
-
 # These libraries need to be installed before running or importing any script.
 
 PREREQUISITES = [

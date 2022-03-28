@@ -59,6 +59,10 @@ def remove_comments(text: str) -> str:
     return re.sub(r'  //.*\n', r'', text)
 
 
+# This function could be in utils but a race conditions happens because of
+# the chronology of our files execution. utils imports constants and constants
+# need utils.get_package_file_contents but it does not have it loaded to memory
+# yet. If called from utils we get error as `module has no attribute`.
 def get_package_file_contents(package: str, filepath: str) -> str:
     """Open file and return its contents. This needs to be used for files that
     are loaded by the Python code directly, like constants.ts or
@@ -73,16 +77,10 @@ def get_package_file_contents(package: str, filepath: str) -> str:
 
     Returns:
         str. The contents of the file.
-
-    Raises:
-        OSError. The specified file does not exist.
     """
-    try:
-        file = io.open(os.path.join(package, filepath), 'r', encoding='utf-8')
+    with io.open(
+        os.path.join(package, filepath), 'r', encoding='utf-8') as file:
         return file.read()
-    except FileNotFoundError as e:
-        raise IOError(
-            'File does not exist: %s' % os.path.join(package, filepath)) from e
 
 
 class Constants(dict):  # type: ignore[type-arg]
