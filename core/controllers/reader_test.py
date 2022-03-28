@@ -2679,13 +2679,16 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
                 'state_name': 'checkpoint2'
             },
             csrf_token=csrf_token)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(self.user_id, exp_id)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.user_id, exp_id)
         self.assertEqual(
-            exploration_user_data.last_completed_checkpoint_state_name, 'checkpoint2')
+            exploration_user_data.last_completed_checkpoint_state_name,
+            'checkpoint2')
         self.assertEqual(
             exploration_user_data.last_completed_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.latest_visited_checkpoint_state_name, 'checkpoint2')
+            exploration_user_data.latest_visited_checkpoint_state_name,
+            'checkpoint2')
 
         # First checkpoint visited.
         csrf_token = self.get_new_csrf_token()
@@ -2696,10 +2699,13 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
                 'state_name': 'checkpoint1'
             },
             csrf_token=csrf_token)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(self.user_id, exp_id)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.user_id, exp_id)
         self.assertEqual(
-            exploration_user_data.last_completed_checkpoint_state_name, 'checkpoint2')
+            exploration_user_data.last_completed_checkpoint_state_name,
+            'checkpoint2')
         self.assertEqual(
             exploration_user_data.last_completed_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.latest_visited_checkpoint_state_name, 'checkpoint1')
+            exploration_user_data.latest_visited_checkpoint_state_name,
+            'checkpoint1')
