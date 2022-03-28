@@ -1,0 +1,163 @@
+<mat-card class="oppia-lesson-info-card">
+  <div class="oppia-lesson-info-content">
+    <p class="oppia-story-title" *ngIf="hasStoryTitle && !isHackyStoryTitleTranslationDisplayed()">
+      {{ storyTitle }}
+    </p>
+    <p class="oppia-story-title" *ngIf="hasStoryTitle && isHackyStoryTitleTranslationDisplayed()">
+      {{ storyTitleTranslationKey | translate}}
+    </p>
+    <hr>
+    <h3 class="oppia-exploration-header" *ngIf="!isHackyExpTitleTranslationDisplayed()">
+      {{ expTitle }}
+    </h3>
+    <h3 class="oppia-exploration-header" *ngIf="isHackyExpTitleTranslationDisplayed()">
+      {{ expTitleTranslationKey | translate }}
+    </h3>
+    <h4 class="oppia-exploration-description" *ngIf="!isHackyExpDescTranslationDisplayed()">
+      {{ expDesc | truncateAndCapitalize: 90 }}
+    </h4>
+    <h4 class="oppia-exploration-description" *ngIf="isHackyExpDescTranslationDisplayed()">
+      {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
+    </h4>
+    <p class="progress-text">Progress</p>
+    <div class="progress">
+      <div class="progress-bar-separator-container">
+        <div class="progress-bar-separator"
+             *ngFor="let i of separatorArray;"
+             [style.width.%]="100 / checkpointCount">
+        </div>
+      </div>
+      <div class="lesson-progress-bar completed-checkpoints-progress-bar"
+           role="progressbar"
+           [style.width.%]="completedWidth">
+      </div>
+      <div *ngIf="completedWidth != 100"
+           class="lesson-progress-bar started-checkpoint-progress-bar"
+           role="progressbar"
+           [style.width.%]="100 / checkpointCount">
+      </div>
+      <div *ngIf="completedWidth == 100"
+           class="lesson-progress-bar started-checkpoint-progress-bar"
+           role="progressbar"
+           [style.width.%]="0">
+      </div>
+    </div>
+  </div>
+</mat-card>
+<button type="button" class="oppia-close-popover-button" (click)="cancel()">
+  <i class="material-icons md-18">&#xE5CD;</i>
+  <span class="oppia-icon-accessibility-label">Close</span>
+</button>
+<div ngbDropdown>
+  <div ngbDropdownToggle class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
+  <div ngbDropdownMenu class="dropdown-menu authors-dropdown-menu">
+    <div *ngFor="let name of contributorNames" ngbDropdownItem>{{ name }}</div>
+  </div>
+</div>
+
+<style>
+  .authors-title {
+    color: #00645c;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 5px;
+    padding-bottom: 2px;
+    text-align: center;
+  }
+
+  .authors-dropdown-menu {
+    border: 0;
+    margin: 0;
+    max-height: 50px;
+    max-width: 350px;
+    min-width: 269px;
+    overflow-y: auto;
+    padding-top: 2px;
+    right: 0;
+    width: 100%;
+  }
+
+  .oppia-exploration-header {
+    font-size: 17px;
+    font-weight: normal;
+    margin: 10px 0 10px 0;
+  }
+
+  .oppia-lesson-info-card {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    padding: 10px;
+    padding-bottom: 16px;
+  }
+
+  .oppia-story-title {
+      color: #3b3b3b;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+      font-size: 13px;
+      margin-bottom: -10px;
+  }
+
+  .oppia-lesson-info-content {
+      padding: 12px;
+      padding-bottom: 0;
+  }
+
+  .oppia-exploration-description {
+      color: #333;
+      font-size: 15px;
+      font-weight: normal;
+      padding-bottom: 10px;
+  }
+
+  .progress {
+      background: #f0ffff;
+      border: 1px solid #707070;
+      border-radius: 10px;
+      height: 10px;
+      position: relative;
+      transition: none;
+  }
+
+  .progress-text {
+      color: #000;
+      font-size: 12px;
+      margin-bottom: 2px;
+      margin-left: 5px;
+  }
+
+  .oppia-close-popover-button {
+    outline: none;
+    padding: 0;
+    right: 0;
+    top: 0;
+  }
+
+  .lesson-progress-bar {
+      left: 0;
+      width: 0;
+  }
+
+  .completed-checkpoints-progress-bar {
+      background-color: #2d4a9d;
+      transition: none;
+  }
+
+  .started-checkpoint-progress-bar {
+      background-color: #2d4a9d99;
+      transition: none;
+  }
+
+  .progress-bar-separator {
+      border: 1px solid #707070;
+      height: 10px;
+      z-index: 1;
+  }
+
+  .progress-bar-separator-container {
+      display: flex;
+      height: 10px;
+      position: absolute;
+      width: 100%;
+      z-index: 0;
+  }
+</style>
