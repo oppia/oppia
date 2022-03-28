@@ -20,14 +20,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { ExtensionTagAssemblerService } from
-  'services/extension-tag-assembler.service';
+import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ExtensionTagAssemblerService } from 'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
-import { InteractionCustomizationArgs } from
-  'interactions/customization-args-defs';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
@@ -40,6 +37,7 @@ export class ExplorationHtmlFormatterService {
     'CodeRepl',
     'Continue',
     'DragAndDropSortInput',
+    'EndExploration',
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
@@ -48,6 +46,7 @@ export class ExplorationHtmlFormatterService {
     'MultipleChoiceInput',
     'NumberWithUnits',
     'ItemSelectionInput',
+    'MusicNotesInput',
     'NumericExpressionInput',
     'NumericInput',
     'PencilCodeEditor',
@@ -150,20 +149,14 @@ export class ExplorationHtmlFormatterService {
     // set as attribute keys (like '[' or ']'). So when interaction is migrated
     // we first test whether the other parts of the attribute can be added
     // (code above) and then we add the attribute using string concatenation.
-    if (
-      this.migratedInteractions.indexOf(interactionId) >= 0 &&
-      (lastAnswerPropValue !== null || savedSolution === 'savedMemento()')
-    ) {
-      let interactionHtml = element.outerHTML;
-      const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
-      let interactionHtmlWithoutEnd = interactionHtml.replace(tagEnd, '');
-      if (savedSolution === 'savedMemento()') {
-        interactionHtmlWithoutEnd += ` [saved-solution]="${savedSolution}"`;
-      }
-      interactionHtmlWithoutEnd += ` [last-answer]="${lastAnswerPropValue}"`;
-      return interactionHtmlWithoutEnd + tagEnd;
+    let interactionHtml = element.outerHTML;
+    const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
+    let interactionHtmlWithoutEnd = interactionHtml.replace(tagEnd, '');
+    if (savedSolution === 'savedMemento()') {
+      interactionHtmlWithoutEnd += ` [saved-solution]="${savedSolution}"`;
     }
-    return element.outerHTML;
+    interactionHtmlWithoutEnd += ` [last-answer]="${lastAnswerPropValue}"`;
+    return interactionHtmlWithoutEnd + tagEnd;
   }
 
   getAnswerHtml(

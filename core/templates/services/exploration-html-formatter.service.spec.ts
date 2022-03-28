@@ -48,7 +48,7 @@ describe('Exploration Html Formatter Service', () => {
     var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
       'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
-      'quot;}" rows-with-value="1" last-answer="lastAnswer">' +
+      'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
       '</oppia-interactive-end-exploration>';
     expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null, null))
       .toBe(expectedHtmlTag);
@@ -116,7 +116,7 @@ describe('Exploration Html Formatter Service', () => {
       var interactionId = 'EndExploration';
       var focusLabel = 'sampleLabel';
       var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
-        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
+        'label-for-focus-target="' + focusLabel + '" [last-answer]="null">' +
         '</oppia-interactive-end-exploration>';
       expect(
         ehfs.getInteractionHtml(interactionId, {}, false, focusLabel, null)
@@ -128,8 +128,8 @@ describe('Exploration Html Formatter Service', () => {
       var interactionId = 'EndExploration';
       var focusLabel = 'sampleLabel';
       var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
-        'saved-solution="savedMemento()" ' +
-        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
+        'label-for-focus-target="' + focusLabel + '" ' +
+        '[saved-solution]="savedMemento()" [last-answer]="null">' +
         '</oppia-interactive-end-exploration>';
       expect(
         ehfs.getInteractionHtml(
