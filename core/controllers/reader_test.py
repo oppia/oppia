@@ -2606,6 +2606,8 @@ class CheckpointCompletedEventHandlerTests(test_utils.GenericEmailTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         user_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        user_services.set_email_preferences_for_exploration(
+            user_id, exp_id, mute_feedback_notifications=True)
 
         # Begin an exploration.
         exploration_dict = self.get_json(
