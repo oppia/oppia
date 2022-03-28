@@ -2642,7 +2642,7 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
         exp_services.load_demo('0')
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        self.user_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        user_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         # Begin an exploration.
         exploration_dict = self.get_json(
@@ -2660,7 +2660,7 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
             },
             csrf_token=csrf_token)
         exploration_user_data = exp_fetchers.get_exploration_user_data(
-            self.user_id, exp_id)
+            user_id, exp_id)
         self.assertEqual(
             exploration_user_data.last_completed_checkpoint_state_name,
             'checkpoint1')
