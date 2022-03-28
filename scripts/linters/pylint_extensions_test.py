@@ -331,7 +331,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
-    
+
     def test_hanging_indentation_with_a_if_statement_before(self):
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
