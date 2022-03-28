@@ -20,7 +20,17 @@
  * followed by the name of the arg.
  */
 
-angular.module('oppia').component('oppiaResponseEndExploration', {
-  controllerAs: '$ctrl',
-  controller: [function() {}]
-});
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+@Component({
+  selector: 'oppia-response-end-exploration',
+  templateUrl: './end-exploration-response.component.html',
+  styleUrls: []
+})
+export class ResponseEndExplorationComponent {}
+
+angular.module('oppia').directive('oppiaResponseEndExploration',
+  downgradeComponent({
+    component: ResponseEndExplorationComponent
+  }) as angular.IDirectiveFactory);
