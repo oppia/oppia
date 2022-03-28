@@ -32,7 +32,7 @@ require(
   'thread-data-backend-api.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
-  '$scope', '$uibModal', '$uibModalInstance', 'ContextService',
+  '$rootScope', '$scope', '$uibModal', '$uibModalInstance', 'ContextService',
   'ContributionOpportunitiesService', 'SkillBackendApiService',
   'SiteAnalyticsService', 'SuggestionModalService',
   'ThreadDataBackendApiService', 'UrlInterpolationService',
@@ -41,7 +41,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   'suggestion', 'suggestionId', 'ACTION_ACCEPT_SUGGESTION',
   'ACTION_REJECT_SUGGESTION', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
-      $scope, $uibModal, $uibModalInstance, ContextService,
+      $rootScope, $scope, $uibModal, $uibModalInstance, ContextService,
       ContributionOpportunitiesService, SkillBackendApiService,
       SiteAnalyticsService, SuggestionModalService,
       ThreadDataBackendApiService, UrlInterpolationService,
@@ -96,6 +96,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         const threadMessageBackendDicts = response.messages;
         $scope.reviewMessage = threadMessageBackendDicts.map(
           m => ThreadMessage.createFromBackendDict(m))[1].text;
+        $rootScope.$applyAsync();
       });
     };
 

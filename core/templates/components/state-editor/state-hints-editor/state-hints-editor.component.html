@@ -64,7 +64,7 @@
                   <div class="oppia-editor-card-section protractor-test-hint-body-{{index}}">
                     <oppia-hint-editor [hint]="hint"
                                        [indexPlusOne]="index + 1"
-                                       (saveHint)="onSaveInlineHint"
+                                       (saveHint)="onSaveInlineHint()"
                                        (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
                     </oppia-hint-editor>
                   </div>
