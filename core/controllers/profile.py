@@ -616,7 +616,7 @@ class UserInfoHandler(base.BaseHandler):
         """Handles POST requests."""
         user_has_viewed_lesson_info_once = self.normalized_payload.get(
             'user_has_viewed_lesson_info_once')
-        if(user_has_viewed_lesson_info_once):
+        if user_has_viewed_lesson_info_once:
             user_services.set_user_has_viewed_lesson_info_once(self.user_id)
         self.render_json({'success': True})
 
