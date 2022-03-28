@@ -150,7 +150,8 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
-            tags=['Topic', 'topic11111111111111111111111111111111111111', 'topic2', 'topic3', 'topic4', 'topic5'],
+            tags=['Topic', 'topic11111111111111111111111111111111111111',
+                'topic2', 'topic3', 'topic4', 'topic5'],
             blurb='blurb',
             author_notes='author notes',
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
@@ -219,14 +220,15 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
                 + ' 2 duplicate values [\'10\', \'11\'], 3 empty tag and'
                 + ' 1 tag having length more than 30.'),
         ])
-        
+
     def test_run_with_single_invalid_model5(self) -> None:
         self.put_multi([self.exp_5])
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The exp of id 5 contains 0 empty tag and 1 tag having length more than 30.'),
+                'The exp of id 5 contains 0 empty tag and 1 tag having'
+                + ' length more than 30.'),
         ])
 
     def test_run_with_single_invalid_model6(self) -> None:
@@ -237,7 +239,6 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
             job_run_result.JobRunResult.as_stderr(
                 'The exp of id 6 contains 1 duplicate values [\'topic2\'].'),
         ])
-
 
     def test_run_with_mixed_models(self) -> None:
         self.put_multi([self.exp_1, self.exp_2, self.exp_3, self.exp_4])
