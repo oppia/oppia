@@ -22,7 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import state_domain
 from core.jobs import job_test_utils
-from core.jobs.batch_jobs import exp_tags_validation_jobs
+from core.jobs.batch_jobs import exp_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -33,12 +33,14 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
     job_test_utils.JobTestBase):
 
     JOB_CLASS = (
-        exp_tags_validation_jobs.GetNumberOfExpHavingInvalidTagsListJob)
+        exp_validation_jobs.GetNumberOfExpHavingInvalidTagsListJob)
 
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
     EXPLORATION_ID_3 = '3'
     EXPLORATION_ID_4 = '4'
+    EXPLORATION_ID_5 = '5'
+    EXPLORATION_ID_6 = '6'
     STATE_1 = state_domain.State.create_default_state(
         feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
     STATE_2 = state_domain.State.create_default_state(
@@ -47,11 +49,15 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
         feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
     STATE_4 = state_domain.State.create_default_state(
         feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
+    STATE_5 = state_domain.State.create_default_state(
+        feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
+    STATE_6 = state_domain.State.create_default_state(
+        feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
 
     def setUp(self):
         super().setUp()
 
-        # This is an invalid model with tags having 3 empty values.
+        # This is an invalid model with tags having empty value.
         self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_1,
@@ -60,7 +66,7 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
-            tags=['Topic', 'a', 'b', '', '', '', 'f', 'g'],
+            tags=['Topic', 'a', 'b', '', 'f', 'g'],
             blurb='blurb',
             author_notes='author notes',
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
@@ -136,6 +142,44 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
             states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_4}
         )
 
+        self.exp_5 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_5,
+            title='title',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic', 'topic11111111111111111111111111111111111111', 'topic2', 'topic3', 'topic4', 'topic5'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_5}
+        )
+
+        self.exp_6 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_6,
+            title='title',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic', 'topic2', 'topic2', 'topic3', 'topic4', 'topic5'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_6}
+        )
+
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is([])
 
@@ -152,7 +196,7 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
                 'The exp of id 1 contains'
-                + ' 3 empty tag and 0 tag having length more than 30.'),
+                + ' 1 empty tag and 0 tag having length more than 30.'),
         ])
 
     def test_run_with_single_invalid_model2(self) -> None:
@@ -175,6 +219,25 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
                 + ' 2 duplicate values [\'10\', \'11\'], 3 empty tag and'
                 + ' 1 tag having length more than 30.'),
         ])
+        
+    def test_run_with_single_invalid_model5(self) -> None:
+        self.put_multi([self.exp_5])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stderr(
+                'The exp of id 5 contains 0 empty tag and 1 tag having length more than 30.'),
+        ])
+
+    def test_run_with_single_invalid_model6(self) -> None:
+        self.put_multi([self.exp_6])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stderr(
+                'The exp of id 6 contains 1 duplicate values [\'topic2\'].'),
+        ])
+
 
     def test_run_with_mixed_models(self) -> None:
         self.put_multi([self.exp_1, self.exp_2, self.exp_3, self.exp_4])
@@ -183,7 +246,7 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 3'),
             job_run_result.JobRunResult.as_stderr(
                 'The exp of id 1 contains'
-                + ' 3 empty tag and 0 tag having length more than 30.'),
+                + ' 1 empty tag and 0 tag having length more than 30.'),
             job_run_result.JobRunResult.as_stderr(
                 'The exp of id 2 contains tags length more than 10,'
                 + ' 0 empty tag and 1 tag having length more than 30.'),

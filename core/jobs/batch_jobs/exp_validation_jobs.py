@@ -42,8 +42,9 @@ class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
             tags: List[str]. The list of all tag in exlporation.
 
         Returns:
-            bool. If list contain invalid tag or tags length is more than 10
-            then it return true, otherwise false.
+            bool. If the list containing tags have length more than 10 or
+            individual tag have length more than 30, then it returns True
+            otherwise False.
         """
         if len(tags) > 10:
             return True
@@ -114,7 +115,7 @@ class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
                 exp_fetchers.get_exploration_from_model)
         )
 
-        exp_ids_with_exceeding_max_tags_len = (
+        exp_ids_with_invalid_tags = (
             total_explorations
             | 'Combine exploration tags and ids' >> beam.Map(
                 lambda exp: (exp.id, exp.tags))
@@ -129,13 +130,13 @@ class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
         )
 
         report_number_of_invalid_exps = (
-            exp_ids_with_exceeding_max_tags_len
+            exp_ids_with_invalid_tags
             | 'Report count of invalid exp models' >> (
                 job_result_transforms.CountObjectsToJobRunResult('INVALID'))
         )
 
         report_invalid_ids_and_their_actual_len = (
-            exp_ids_with_exceeding_max_tags_len
+            exp_ids_with_invalid_tags
             | 'Save info on invalid exps' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
                     'The exp of id %s contains%s'
