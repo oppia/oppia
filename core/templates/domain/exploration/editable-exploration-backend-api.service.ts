@@ -132,7 +132,7 @@ export class EditableExplorationBackendApiService {
   ): Promise<void> {
     const requestUrl =
       '/explorehandler/checkpoint_completed/' + explorationId;
-    return this.httpClient.post<void>(requestUrl, {
+    return this.httpClient.put<void>(requestUrl, {
       exploration_id: explorationId,
       last_completed_checkpoint_exp_version: LastCompletedCheckpointExpVersion,
       last_completed_checkpoint_state_name: LastCompletedCheckpointStateName,
@@ -147,7 +147,7 @@ export class EditableExplorationBackendApiService {
   ): Promise<void> {
     const requestUrl =
       '/explorehandler/checkpoint_visited/' + explorationId;
-    return this.httpClient.post<void>(requestUrl, {
+    return this.httpClient.put<void>(requestUrl, {
       last_completed_checkpoint_exp_version: LastCompletedCheckpointExpVersion,
       latest_visited_checkpoint_state_name: LatestVisitedCheckpointStateName,
     }).toPromise();

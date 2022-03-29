@@ -20,7 +20,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ExplorationFooterComponent } from './exploration-footer.component';
-import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { LimitToPipe } from 'filters/limit-to.pipe';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -33,9 +33,6 @@ import { QuestionPlayerStateService } from 'components/question-directives/quest
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { PlayerPositionService } from '../services/player-position.service';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 
 describe('ExplorationFooterComponent', () => {
@@ -45,9 +42,6 @@ describe('ExplorationFooterComponent', () => {
   let urlService: UrlService;
   let learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService;
   let loggerService: LoggerService;
-  let explorationEngineService: ExplorationEngineService;
-  let stateObjectFactory: StateObjectFactory;
-  let playerPositionService: PlayerPositionService;
   let roebas: ReadOnlyExplorationBackendApiService;
   let windowDimensionsService: WindowDimensionsService;
   let questionPlayerStateService: QuestionPlayerStateService;
@@ -67,23 +61,18 @@ describe('ExplorationFooterComponent', () => {
         QuestionPlayerStateService,
         LearnerViewInfoBackendApiService,
         LoggerService,
-        ExplorationEngineService,
-        PlayerPositionService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    stateObjectFactory = TestBed.get(StateObjectFactory);
     contextService = TestBed.inject(ContextService);
     urlService = TestBed.inject(UrlService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     learnerViewInfoBackendApiService = TestBed.inject(
       LearnerViewInfoBackendApiService);
     loggerService = TestBed.inject(LoggerService);
-    explorationEngineService = TestBed.inject(ExplorationEngineService);
-    playerPositionService = TestBed.inject(PlayerPositionService);
     roebas = TestBed.inject(ReadOnlyExplorationBackendApiService);
     explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService);

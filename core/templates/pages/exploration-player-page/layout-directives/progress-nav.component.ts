@@ -70,6 +70,7 @@ export class ProgressNavComponent {
   isIframed: boolean;
   lastDisplayedCard: StateCard;
   explorationId: string;
+  newCardStateName: string;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -146,6 +147,25 @@ export class ProgressNavComponent {
       }
     }
     this.helpCardHasContinueButton = false;
+    this.newCardStateName = this.displayedCard.getStateName();
+    this.explorationId = this.explorationEngineService.getExplorationId();
+    if (this.explorationEngineService.
+      getStateFromStateName(this.newCardStateName).cardIsCheckpoint) {
+      // Update latest_visited_checkpoint when a checkpoint is encountered.
+      let version: number;
+      this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+        response => {
+          version = response.version;
+        }
+      );
+      this.eebas.recordLatestVisitedCheckpointAsync(
+        this.explorationId,
+        this.newCardStateName,
+        version,
+      ).then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
+    }
   }
 
   doesInteractionHaveNavSubmitButton(): boolean {
@@ -186,24 +206,6 @@ export class ProgressNavComponent {
     } else {
       throw new Error('Target card index out of bounds.');
     }
-    this.explorationId = this.explorationEngineService.getExplorationId();
-    if (this.explorationEngineService.getState().cardIsCheckpoint) {
-    // Update latest_visited_checkpoint when a checkpoint is encountered.
-    let version: number;
-    this.roebas.loadLatestExplorationAsync(this.explorationId).then(
-      response => {
-        version = response.version;
-      }
-    );
-    this.eebas.recordLatestVisitedCheckpointAsync(
-      this.explorationId,
-      this.explorationEngineService.getState().name,
-      version,
-    ).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
-    console.log(this.explorationEngineService.getState().name);
-  }
   }
 
   // Returns whether the screen is wide enough to fit two
