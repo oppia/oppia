@@ -31,6 +31,9 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 
 @Component({
   selector: 'oppia-progress-nav',
@@ -66,6 +69,7 @@ export class ProgressNavComponent {
   helpCardHasContinueButton: boolean;
   isIframed: boolean;
   lastDisplayedCard: StateCard;
+  explorationId: string;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -76,7 +80,10 @@ export class ProgressNavComponent {
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private explorationEngineService: ExplorationEngineService,
+    private roebas: ReadOnlyExplorationBackendApiService,
+    private eebas: EditableExplorationBackendApiService,
   ) {}
 
   ngOnChanges(): void {
@@ -179,6 +186,24 @@ export class ProgressNavComponent {
     } else {
       throw new Error('Target card index out of bounds.');
     }
+    this.explorationId = this.explorationEngineService.getExplorationId();
+    if (this.explorationEngineService.getState().cardIsCheckpoint) {
+    // Update latest_visited_checkpoint when a checkpoint is encountered.
+    let version: number;
+    this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+      response => {
+        version = response.version;
+      }
+    );
+    this.eebas.recordLatestVisitedCheckpointAsync(
+      this.explorationId,
+      this.explorationEngineService.getState().name,
+      version,
+    ).then(() => {
+      // Required for the post operation to deliver data to backend.
+    });
+    console.log(this.explorationEngineService.getState().name);
+  }
   }
 
   // Returns whether the screen is wide enough to fit two

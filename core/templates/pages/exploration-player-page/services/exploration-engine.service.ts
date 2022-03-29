@@ -386,6 +386,10 @@ export class ExplorationEngineService {
     return this.exploration.getState(stateName);
   }
 
+  getStateFromStateName(stateName: string): State {
+    return this.exploration.getState(stateName);
+  }
+
   getExplorationId(): string {
     return this._explorationId;
   }

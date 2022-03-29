@@ -20,6 +20,7 @@
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
@@ -31,8 +32,10 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
+import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 
 @Component({
@@ -59,6 +62,8 @@ export class ExplorationFooterComponent {
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth: number = 0;
   expStates: StateObjectsBackendDict;
+  lastCompletedCheckpointStateName: string;
+  completedCheckpoints: number = 0;
 
   constructor(
     private contextService: ContextService,
@@ -74,6 +79,9 @@ export class ExplorationFooterComponent {
     private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
     private loggerService: LoggerService,
     private playerPositionService: PlayerPositionService,
+    private roebas: ReadOnlyExplorationBackendApiService,
+    private playerTranscriptService: PlayerTranscriptService,
+    private explorationEngineService: ExplorationEngineService,
   ) {}
 
   ngOnInit(): void {
@@ -133,22 +141,23 @@ export class ExplorationFooterComponent {
     });
 
     modalRef.componentInstance.checkpointCount = this.checkpointCount;
-    // Note to developers:
-    // The checkpointArray is used to track the number of
-    // completedCheckpoints. For the first card, 1 is pushed
-    // since the first card is always a checkpoint. For
-    // displayedCardindex > 1, 1 is pushed if the card is a
-    // checkpoint, else 0 is pushed.
-    // if (displayedCardIndex > 0) {
-    //   let state = this.explorationEngineService.getState();
-    //   if (state.cardIsCheckpoint) {
-    //     this.checkpointArray.push(1);
-    //   } else {
-    //     this.checkpointArray.push(0);
-    //   }
-    // } else {
-    //   this.checkpointArray.push(1);
-    // }
+
+    this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+      response => {
+        if (response.last_completed_checkpoint_state_name) {
+          this.lastCompletedCheckpointStateName = (
+            response.last_completed_checkpoint_state_name);
+        }
+      }
+    );
+
+    this.completedCheckpoints = this.getCheckpointIndexFromStateName();
+
+    this.completedWidth = (
+      (100 / (this.checkpointCount)) * this.completedCheckpoints
+    );
+
+    modalRef.componentInstance.completedWidth = this.completedWidth;
     modalRef.componentInstance.contributorNames = this.contributorNames;
     modalRef.componentInstance.expInfo = this.expInfo;
 
@@ -183,6 +192,21 @@ export class ExplorationFooterComponent {
   ngOnDestroy(): void {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
+    }
+  }
+
+  getCheckpointIndexFromStateName(): number {
+    let checkpointIndex = 0;
+    let numberOfCards = this.playerTranscriptService.getNumCards();
+    for(let i=0;i<numberOfCards;i++) {
+      let stateName = this.playerTranscriptService.getCard(i).getStateName();
+      let correspondingState = this.explorationEngineService.getStateFromStateName(stateName);
+      if(correspondingState.cardIsCheckpoint){
+        checkpointIndex++;
+        if(stateName === this.lastCompletedCheckpointStateName){
+          return checkpointIndex;
+        }
+      }
     }
   }
 

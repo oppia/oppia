@@ -71,7 +71,7 @@ import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { ReadOnlyExplorationBackendApiService, ReadOnlyExplorationBackendDict } from 'domain/exploration/read-only-exploration-backend-api.service';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -320,24 +320,39 @@ export class ConversationSkinComponent {
           }
         );
     }
-    // Test.
-    if (this.explorationEngineService.getState().cardIsCheckpoint) {
-      // Update only latest_visited_checkpoint.
 
-      let version: number;
-      this.roebas.loadLatestExplorationAsync(this.explorationId).then(
-        response => {
-          version = response.version;
-        }
-      );
-      this.eebas.recordLatestVisitedCheckpointAsync(
-        this.explorationId,
-        this.displayedCard.getStateName(),
-        version
-      ).then(() => {
-        // Required for the post operation to deliver data to backend.
-      });
-    }
+    // Since first state is always a checkpoint, recording both
+    // last_completed_checkpoint & latest_visited_checkpoint.
+    let firstStateName: string;
+    this.getLastSavedDataAsync().then(
+      response => {
+        firstStateName = response.init_state_name;
+      }
+    )
+    let version: number;
+    this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+      response => {
+        version = response.version;
+      }
+    );
+    this.eebas.recordLastCompletedCheckpointAsync(
+      this.explorationId,
+      version,
+      firstStateName,
+      firstStateName,
+    ).then(() => {
+      // Required for the post operation to deliver data to backend.
+    });
+    console.log('both for 1');
+  }
+
+  // Returns a promise supplying the last saved version for the current
+  // exploration.
+  async getLastSavedDataAsync(): Promise<ReadOnlyExplorationBackendDict> {
+    return this.roebas.loadLatestExplorationAsync(
+      this.explorationId).then(response => {
+      return response.exploration;
+    });
   }
 
   doesCollectionAllowsGuestProgress(collectionId: string): boolean {
@@ -1009,31 +1024,6 @@ export class ConversationSkinComponent {
             // the feedback, and display a 'Continue' button.
             this.pendingCardWasSeenBefore = false;
             this.displayedCard.markAsCompleted();
-            if (this.explorationEngineService.getState().cardIsCheckpoint) {
-              // Update last_completed_checkpoint & latest_visited_checkpoint.
-              let version: number;
-              this.roebas.loadLatestExplorationAsync(this.explorationId).then(
-                response => {
-                  version = response.version;
-                }
-              );
-              this.eebas.recordLastCompletedCheckpointAsync(
-                this.explorationId,
-                version,
-                this.displayedCard.getStateName(),
-                this.displayedCard.getStateName(),
-              ).then(() => {
-                // Required for the post operation to deliver data to backend.
-              });
-
-              this.eebas.recordLatestVisitedCheckpointAsync(
-                this.explorationId,
-                this.displayedCard.getStateName(),
-                version,
-              ).then(() => {
-                // Required for the post operation to deliver data to backend.
-              });
-            }
             if (isFinalQuestion) {
               if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
                 // We will redirect to the results page here.
@@ -1130,6 +1120,24 @@ export class ConversationSkinComponent {
 
   showUpcomingCard(): void {
     let currentIndex = this.playerPositionService.getDisplayedCardIndex();
+    if (currentIndex > 0 && this.explorationEngineService.getState().cardIsCheckpoint) {
+      // Update last_completed_checkpoint & latest_visited_checkpoint.
+      let version: number;
+      this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+        response => {
+          version = response.version;
+        }
+      );
+      this.eebas.recordLastCompletedCheckpointAsync(
+        this.explorationId,
+        version,
+        this.displayedCard.getStateName(),
+        this.displayedCard.getStateName(),
+      ).then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
+      console.log('both');
+    }
     let conceptCardIsBeingShown = (
       this.displayedCard.getStateName() === null &&
       !this.explorationPlayerStateService.isInQuestionMode());
