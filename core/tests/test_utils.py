@@ -203,7 +203,7 @@ def get_storage_model_classes():
                     yield clazz
 
 
-def generate_random_str_from_regex() -> str:
+def generate_random_str_from_regex():
     """Generate random string for [a-fA-F0-9]{32} regex pattern.
 
     Returns:
