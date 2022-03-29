@@ -33,7 +33,7 @@ interface FetchSuggestionsResponse {
 interface ReviewExplorationSuggestionRequestBody {
   action: string;
   'review_message': string;
-  'commit_message': string;
+  'commit_message': string | null;
 }
 
 interface ReviewSkillSuggestionRequestBody {

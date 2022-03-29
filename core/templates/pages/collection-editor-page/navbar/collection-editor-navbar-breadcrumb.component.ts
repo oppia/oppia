@@ -24,10 +24,6 @@ import { CollectionEditorPageConstants } from '../collection-editor-page.constan
 import { CollectionEditorRoutingService } from '../services/collection-editor-routing.service';
 import { CollectionEditorStateService } from '../services/collection-editor-state.service';
 
-interface TabNamesToHumanReadableNames {
-  [tabName: string]: string;
-}
-
 // TODO(bhenning): After the navbar is moved to a directive, this directive
 // should be updated to say 'Loading...' if the collection editor's controller
 // is not yet finished loading the collection. Also, this directive should
@@ -46,7 +42,7 @@ export class CollectionEditorNavbarBreadcrumbComponent {
   activeTabName!: string;
   collection!: Collection;
 
-  _TAB_NAMES_TO_HUMAN_READABLE_NAMES: TabNamesToHumanReadableNames = {
+  _TAB_NAMES_TO_HUMAN_READABLE_NAMES: Record<string, string> = {
     edit: 'Edit',
     settings: 'Settings',
     stats: 'Statistics',

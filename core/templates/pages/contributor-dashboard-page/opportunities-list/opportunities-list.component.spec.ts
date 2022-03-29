@@ -296,11 +296,11 @@ describe('Opportunities List Component', () => {
       ContributionOpportunitiesService);
 
     component.loadOpportunities = () => Promise.resolve({
-      opportunitiesDicts: explorationOpportunitiesLoad1,
+      opportunities: explorationOpportunitiesLoad1,
       more: true
     });
     component.loadMoreOpportunities = () => Promise.resolve({
-      opportunitiesDicts: explorationOpportunitiesLoad2,
+      opportunities: explorationOpportunitiesLoad2,
       more: false
     });
 
@@ -691,7 +691,7 @@ describe('Opportunities List Component', () => {
       'are less then page length', fakeAsync(() => {
       // Setting more option to be false.
       component.loadMoreOpportunities = () => Promise.resolve({
-        opportunitiesDicts: explorationOpportunitiesLoad1,
+        opportunities: explorationOpportunitiesLoad1,
         more: false
       });
       expect(component.activePageNumber).toBe(1);

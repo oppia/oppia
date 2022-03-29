@@ -115,14 +115,14 @@ describe('Admin misc tab component ', () => {
       confirmSpy.and.returnValue(true);
       let clearSearchIndexSpy = spyOn(
         adminBackendApiService, 'clearSearchIndexAsync')
-        .and.resolveTo();
+        .and.callThrough();
 
       component.clearSearchIndex();
       tick();
 
       expect(clearSearchIndexSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Index successfully cleared.');
+        'Clearing search index...');
     }));
 
     it('should not clear search index in case of backend ' +

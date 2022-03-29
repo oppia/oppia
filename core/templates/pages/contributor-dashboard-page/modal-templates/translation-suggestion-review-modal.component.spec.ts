@@ -708,11 +708,7 @@ describe('Translation Suggestion Review Modal Component', function() {
 
     const contribution1 = {
       suggestion: suggestion1,
-      details: {
-        topic_name: '',
-        story_title: '',
-        chapter_title: ''
-      }
+      details: null
     };
     const contribution2 = {
       suggestion: suggestion2,

@@ -17,7 +17,8 @@
  */
 
 import {
-  Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild
+  Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild,
+  ElementRef
 } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
@@ -29,6 +30,11 @@ import { FeaturedTranslationLanguage } from
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 
+interface Options {
+  id: string;
+  description: string;
+}
+
 @Component({
   selector: 'translation-language-selector',
   templateUrl: './translation-language-selector.component.html'
@@ -39,10 +45,9 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activeLanguageCode!: string;
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
-  @ViewChild('dropdown', {'static': false}) dropdownRef!:
-    { nativeElement: { contains: (arg0: HTMLElement) => never}};
+  @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
 
-  options!: { id: string; description: string }[];
+  options!: Options[];
   languageSelection!: string;
   languageIdToDescription: {[id: string]: string} = {};
   featuredLanguages: FeaturedTranslationLanguage[] = [];

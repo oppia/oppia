@@ -27,7 +27,8 @@ import constants from 'assets/constants';
 import { Subscription } from 'rxjs';
 
 type LoadOpportunities = Promise<{
-  opportunitiesDicts: ExplorationOpportunity[]; more: boolean;
+  opportunities: ExplorationOpportunity[];
+  more: boolean;
 }>;
 
 @Component({
@@ -40,8 +41,8 @@ export class OpportunitiesListComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() loadOpportunities!: () => LoadOpportunities;
-  @Input() labelRequired!: boolean;
-  @Input() progressBarRequired!: boolean;
+  @Input() labelRequired: boolean = false;
+  @Input() progressBarRequired: boolean = false;
   @Input() loadMoreOpportunities!: () => LoadOpportunities;
   @Input() opportunityHeadingTruncationLength!: number;
   @Input() opportunityType!: string;
@@ -108,11 +109,11 @@ export class OpportunitiesListComponent {
   ngOnInit(): void {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
-    this.loadOpportunities().then(({opportunitiesDicts, more}) => {
+    this.loadOpportunities().then(({opportunities, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.
       this.zone.run(() => {
-        this.opportunities = opportunitiesDicts;
+        this.opportunities = opportunities;
         this.more = more;
         this.visibleOpportunities = this.opportunities.slice(
           0, this.OPPORTUNITIES_PAGE_SIZE);
@@ -135,9 +136,9 @@ export class OpportunitiesListComponent {
       this.visibleOpportunities = [];
       this.loadingOpportunityData = true;
       this.loadMoreOpportunities().then(
-        ({opportunitiesDicts, more}) => {
+        ({opportunities, more}) => {
           this.more = more;
-          this.opportunities = this.opportunities.concat(opportunitiesDicts);
+          this.opportunities = this.opportunities.concat(opportunities);
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
           this.userIsOnLastPage = this.calculateUserIsOnLastPage(

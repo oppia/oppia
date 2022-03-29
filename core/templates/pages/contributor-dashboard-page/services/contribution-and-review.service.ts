@@ -204,7 +204,7 @@ export class ContributionAndReviewService {
       review_message: reviewMessage,
       commit_message: (
         action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
-        commitMessage : ''
+        commitMessage : null
       )
     };
 

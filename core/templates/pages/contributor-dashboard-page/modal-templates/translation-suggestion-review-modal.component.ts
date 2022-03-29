@@ -34,12 +34,6 @@ import constants from 'assets/constants';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
 import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
 
-type Contribution = [string, ActiveContributionDict];
-
-interface SuggestionIdToContribution {
-  [key: string]: ActiveContributionDict;
-}
-
 interface HTMLSchema {
   'type': string;
 }
@@ -77,8 +71,7 @@ interface ActiveSuggestionDict {
   'target_type': string;
 }
 
-// This is used to display the details of the active contribution in the modal.
-// The details are null if there is no active contribution.
+// Details are null if suggestion's corresponding opportunity is deleted.
 interface ActiveContributionDict {
   'details': ActiveContributionDetailsDict | null;
   'suggestion': ActiveSuggestionDict;
@@ -101,28 +94,28 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   activeSuggestionId!: string;
   contentHtml!: string | string[];
   editedContent!: EditedContentDict;
-  errorFound!: boolean;
+  errorFound: boolean = false;
   errorMessage!: string;
   explorationContentHtml!: string | string[];
   finalCommitMessage!: string;
-  isCurriculumAdmin!: boolean;
-  isHtmlContent!: boolean;
+  isCurriculumAdmin: boolean = false;
+  isHtmlContent: boolean = false;
   initialSuggestionId!: string;
-  isSetOfStringsContent!: boolean;
-  isUnicodeContent!: boolean;
+  isSetOfStringsContent: boolean = false;
+  isUnicodeContent: boolean = false;
   languageCode!: string;
   languageDescription!: string;
-  lastSuggestionToReview!: boolean;
+  lastSuggestionToReview: boolean = false;
   preEditTranslationHtml!: string;
-  remainingContributions!: Contribution[];
-  resolvingSuggestion!: boolean;
-  reviewable!: boolean;
+  remainingContributions!: Record<string, ActiveContributionDict>;
+  resolvingSuggestion: boolean = false;
+  reviewable: boolean = false;
   reviewMessage!: string;
   resolvedSuggestionIds: string[] = [];
   status!: string;
   subheading!: string;
-  suggestionIdToContribution!: SuggestionIdToContribution;
-  suggestionIsRejected!: boolean;
+  suggestionIdToContribution!: Record<string, ActiveContributionDict>;
+  suggestionIsRejected: boolean = false;
   translationHtml!: string;
   userCanReviewTranslationSuggestionsInLanguages!: string[];
   username!: string;
@@ -171,8 +164,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         .registerContributorDashboardViewSuggestionForReview('Translation');
     }
     delete this.suggestionIdToContribution[this.initialSuggestionId];
-    this.remainingContributions = (
-      Object.entries(this.suggestionIdToContribution));
+    this.remainingContributions = this.suggestionIdToContribution;
     this.init();
     // The 'html' value is passed as an object as it is required for
     // schema-based-editor. Otherwise the corrrectly updated value for
@@ -191,9 +183,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       const username = userInfo.getUsername();
 
       if (username === null) {
-        throw new Error('Username does not exist.');
+        throw new Error('Cannot fetch username.');
       }
-      this.username = username,
+      this.username = username;
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
     });
     this.userService.getUserContributionRightsDataAsync().then(
@@ -213,7 +205,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.errorFound = false;
     this.startedEditing = false;
     this.resolvingSuggestion = false;
-    this.lastSuggestionToReview = this.remainingContributions.length <= 0;
+    this.lastSuggestionToReview = (
+      Object.keys(this.remainingContributions).length <= 0);
     this.translationHtml = (
       this.activeSuggestion.change.translation_html);
     this.status = this.activeSuggestion.status;
@@ -286,11 +279,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
 
-    let lastContributionsDetail = (
-      this.remainingContributions.pop()
-    ) as Contribution;
-    this.activeSuggestionId = lastContributionsDetail[0];
-    this.activeContribution = lastContributionsDetail[1];
+    let lastContribution = (
+      Object.keys(this.remainingContributions)[
+        Object.keys(this.remainingContributions).length - 1]);
+    this.activeSuggestionId = lastContribution;
+    this.activeContribution = this.remainingContributions[
+      lastContribution];
     // Close modal instance if the suggestion's corresponding opportunity
     // is deleted. See issue #14234.
     if (!this.activeContribution.details) {

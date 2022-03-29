@@ -35,7 +35,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   uploadedImage!: SafeResourceUrl;
   croppedFilename!: string;
-  windowIsNarrow!: boolean;
+  windowIsNarrow: boolean = false;
   cropper!: Cropper;
   @ViewChild('croppableImage') croppableImageRef!: ElementRef;
   invalidTagsAndAttributes!: { tags: string[]; attrs: string[] };

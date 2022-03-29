@@ -35,7 +35,7 @@ export class AdminNavbarComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   imagePath!: string;
   // Username is set to null if the user is not logged in.
-  username: string | null = '';
+  username: string | null = null;
   profilePictureDataUrl: string = '';
   isModerator: boolean = false;
   isSuperAdmin: boolean = false;
@@ -103,7 +103,7 @@ export class AdminNavbarComponent implements OnInit {
     this.username = userInfo.getUsername();
 
     if (this.username === null) {
-      throw new Error('Username does not exist.');
+      throw new Error('Cannot fetch username.');
     }
     this.isModerator = userInfo.isModerator();
     this.isSuperAdmin = userInfo.isSuperAdmin();

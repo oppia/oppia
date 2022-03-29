@@ -172,9 +172,10 @@ export class CollectionEditorStateService {
   saveCollection(commitMessage: string, successCallback?: () => void): boolean {
     const collectionId = this._collection.getId();
     const collectionVersion = this._collection.getVersion();
-    if (!collectionId ||
-        !this._collectionIsInitialized ||
-        !collectionVersion
+    if (
+      !collectionId ||
+      !this._collectionIsInitialized ||
+      !collectionVersion
     ) {
       this.alertsService.fatalWarning(
         'Cannot save a collection before one is loaded.');
@@ -188,7 +189,8 @@ export class CollectionEditorStateService {
     this._collectionIsBeingSaved = true;
     this.editableCollectionBackendApiService.updateCollectionAsync(
       collectionId, collectionVersion, commitMessage,
-      this.undoRedoService.getCommittableChangeList()).then(
+      this.undoRedoService.getCommittableChangeList()
+    ).then(
       (collectionObject) => {
         this._updateCollection(collectionObject);
         this.undoRedoService.clearChanges();

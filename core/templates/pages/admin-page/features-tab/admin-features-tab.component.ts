@@ -225,13 +225,12 @@ export class AdminFeaturesTabComponent implements OnInit {
     // The type of error 'e' is unknown because it could be anything.
     // This gave the freedom to access any property of 'e' at any time.
     } catch (e: unknown) {
-      // A response that represents an error or failure, from a
-      // non-successful HTTP status during the parsing of the response.
-      let httpError = e as HttpErrorResponse;
-      if (httpError.error && httpError.error.error) {
-        this.setStatusMessage.emit(`Update failed: ${httpError.error.error}`);
-      } else {
-        this.setStatusMessage.emit('Update failed.');
+      if (e instanceof HttpErrorResponse) {
+        if (e.error && e.error.error) {
+          this.setStatusMessage.emit(`Update failed: ${e.error.error}`);
+        } else {
+          this.setStatusMessage.emit('Update failed.');
+        }
       }
     } finally {
       this.adminTaskManager.finishTask();

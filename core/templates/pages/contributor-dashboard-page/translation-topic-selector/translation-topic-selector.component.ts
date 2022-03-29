@@ -17,7 +17,8 @@
  */
 
 import {
-  Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild
+  Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild,
+  ElementRef
 } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
@@ -35,8 +36,7 @@ export class TranslationTopicSelectorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activeTopicName!: string;
   @Output() setActiveTopicName: EventEmitter<string> = new EventEmitter();
-  @ViewChild('dropdown', {'static': false}) dropdownRef!:
-    { nativeElement: { contains: (arg0: HTMLElement) => never}};
+  @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
 
   options!: string[];
   dropdownShown = false;

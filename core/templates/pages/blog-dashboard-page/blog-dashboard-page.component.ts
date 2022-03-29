@@ -39,7 +39,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   activeTab!: string;
   authorProfilePictureUrl!: string;
   blogDashboardData!: BlogDashboardData;
-  windowIsNarrow!: boolean;
+  windowIsNarrow: boolean = false;
   activeView: string = 'gridView';
   directiveSubscriptions = new Subscription();
   DEFAULT_PROFILE_PICTURE_URL: string = '';

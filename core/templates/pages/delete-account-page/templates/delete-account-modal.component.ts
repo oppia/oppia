@@ -41,7 +41,7 @@ export class DeleteAccountModalComponent implements OnInit {
       const expectedUsername = userInfo.getUsername();
 
       if (expectedUsername === null) {
-        throw new Error('Username does not exist.');
+        throw new Error('Cannot fetch username.');
       }
       this.expectedUsername = expectedUsername;
     });

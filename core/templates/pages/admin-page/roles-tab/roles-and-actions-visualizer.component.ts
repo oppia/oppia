@@ -37,7 +37,7 @@ export class RolesAndActionsVisualizerComponent implements OnInit {
   activeRole!: string;
   activeTab!: string;
   avatarPictureUrl!: string;
-  loadingAssignedUsernames!: boolean;
+  loadingAssignedUsernames: boolean = false;
   roles!: string[];
   assignUsersToActiveRole!: string[];
   TAB_ACTIONS: string = 'TAB_ACTIONS';
