@@ -503,10 +503,10 @@
             </div>
           </div>
         </div>
-        <span class="form-text secondary-info-text" ng-if="!$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()">
+        <span class="form-text secondary-info-text" ng-if="$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()">
           You are currently receiving notifications of new feedback for this exploration.
         </span>
-        <span class="form-text secondary-info-text" ng-if="$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()">
+        <span class="form-text secondary-info-text" ng-if="!$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()">
           You have muted feedback notifications for this exploration. You will not receive an email when new feedback is submitted.
         </span>
       </div>
@@ -526,10 +526,11 @@
               </label>
             </div>
           </div>
-          <span class="form-text secondary-info-text" ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
+        </div>
+          <span class="form-text secondary-info-text" ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
             You are currently receiving notifications of new suggestions for this exploration.
           </span>
-          <span class="form-text secondary-info-text" ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
+          <span class="form-text secondary-info-text" ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
             You have muted suggestion notifications for this exploration. You will not receive an email when new suggestion is submitted.
           </span>
         </div>
