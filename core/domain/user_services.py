@@ -2292,14 +2292,16 @@ def get_dashboard_stats(user_id):
     }
 
 
-def update_learner_checkpoint_progress(user_id, exploration_id, state_name, version):
-    """Set the last completed checkpoint.
+def update_learner_checkpoint_progress(
+    user_id, exploration_id, state_name, exp_version):
+    """Sets the last_completed and latest_visited checkpoint.
 
     Args:
         user_id: str. The Id of the user.
         exploration_id: str. The Id of the exploration.
-        state_name: str. The state name of the completed checkpoint.
-        version: int. The version of the exploration.
+        state_name: str. The state name of the last_completed checkpoint.
+        exp_version: int. The exploration version of the last_completed
+            checkpoint.
     """
 
     exploration_user_model = user_models.ExplorationUserDataModel.get(
@@ -2308,7 +2310,7 @@ def update_learner_checkpoint_progress(user_id, exploration_id, state_name, vers
         exploration_user_model = user_models.ExplorationUserDataModel.create(
             user_id, exploration_id)
 
-    exploration_user_model.last_completed_checkpoint_exp_version = version
+    exploration_user_model.last_completed_checkpoint_exp_version = exp_version
     # On completing a checkpoint, we update both last_completed and
     # latest_visited checkpoint.
     exploration_user_model.last_completed_checkpoint_state_name = state_name
