@@ -35,7 +35,6 @@ describe('Skill question tab directive', function() {
   let directive = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let initEventEmitter = new EventEmitter();
-  let fetchSkillSpy = null;
   const sampleSkill = new Skill(
     null, 'Skill description loading',
     [], [], null, 'en', 1, 0, null, false, []);
@@ -66,7 +65,8 @@ describe('Skill question tab directive', function() {
   }));
 
   it('should fetch skill when initialized', function() {
-    spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
+    const fetchSkillSpy = spyOn(
+      skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
     initEventEmitter.emit();
     $scope.$apply();
@@ -77,7 +77,7 @@ describe('Skill question tab directive', function() {
   });
 
   it('should not initialize when skill is not available', function() {
-    fetchSkillSpy = spyOn(
+    const fetchSkillSpy = spyOn(
       skillEditorStateService, 'getSkill').and.returnValue(undefined);
     spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
 
@@ -90,7 +90,7 @@ describe('Skill question tab directive', function() {
   });
 
   it('should initialize when skill is available', function() {
-    fetchSkillSpy = spyOn(
+    const fetchSkillSpy = spyOn(
       skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
 
