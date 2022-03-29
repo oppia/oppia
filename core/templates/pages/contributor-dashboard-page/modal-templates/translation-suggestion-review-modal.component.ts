@@ -99,11 +99,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   errorMessage!: string;
   explorationContentHtml!: string | string[];
   finalCommitMessage!: string;
-  curriculumIsAdmin: boolean = false;
-  htmlIsContent: boolean = false;
+  userIsCurriculumAdmin: boolean = false;
+  contentTypeIsHtml: boolean = false;
   initialSuggestionId!: string;
-  setOfStringsIsContent: boolean = false;
-  unicodeIsContent: boolean = false;
+  contentTypeIsSetOfStrings: boolean = false;
+  contentTypeIsUnicode: boolean = false;
   languageCode!: string;
   languageDescription!: string;
   lastSuggestionToReview: boolean = false;
@@ -187,7 +187,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         throw new Error('Cannot fetch username.');
       }
       this.username = username;
-      this.curriculumIsAdmin = userInfo.isCurriculumAdmin();
+      this.userIsCurriculumAdmin = userInfo.isCurriculumAdmin();
     });
     this.userService.getUserContributionRightsDataAsync().then(
       (userContributionRights) => {
@@ -215,13 +215,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.change.content_html);
     this.explorationContentHtml = (
       this.activeSuggestion.exploration_content_html);
-    this.htmlIsContent = (
+    this.contentTypeIsHtml = (
       this.activeSuggestion.change.data_format === 'html'
     );
-    this.unicodeIsContent = (
+    this.contentTypeIsUnicode = (
       this.activeSuggestion.change.data_format === 'unicode'
     );
-    this.setOfStringsIsContent = (
+    this.contentTypeIsSetOfStrings = (
       this.activeSuggestion.change.data_format ===
         'set_of_normalized_string' ||
       this.activeSuggestion.change.data_format ===
