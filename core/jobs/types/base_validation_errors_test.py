@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import base64
 import datetime
 import pickle
 
@@ -27,6 +28,13 @@ from core.jobs.types import base_validation_errors
 from core.jobs.types import model_property
 from core.platform import models
 from core.tests import test_utils as core_test_utils
+
+from typing import Union
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -48,87 +56,98 @@ class BarModel(base_models.BaseModel):
 class FooError(base_validation_errors.BaseAuditError):
     """A simple test-only error."""
 
-    def __init__(self, model):
+    def __init__(self, model: Union[base_models.BaseModel, bytes]) -> None:
         super(FooError, self).__init__('foo', model)
 
 
 class BarError(base_validation_errors.BaseAuditError):
     """A simple test-only error."""
 
-    def __init__(self, model):
+    def __init__(self, model: Union[base_models.BaseModel, bytes]) -> None:
         super(BarError, self).__init__('bar', model)
 
 
 class AuditErrorsTestBase(core_test_utils.TestBase):
     """Base class for validator error tests."""
 
-    NOW = datetime.datetime.utcnow()
-    YEAR_AGO = NOW - datetime.timedelta(weeks=52)
-    YEAR_LATER = NOW + datetime.timedelta(weeks=52)
+    NOW: datetime.datetime = datetime.datetime.utcnow()
+    YEAR_AGO: datetime.datetime = NOW - datetime.timedelta(weeks=52)
+    YEAR_LATER: datetime.datetime = NOW + datetime.timedelta(weeks=52)
 
 
 class BaseAuditErrorTests(AuditErrorsTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(BaseAuditErrorTests, self).setUp()
         self.model = base_models.BaseModel(id='123')
 
-    def test_message(self):
+    def test_message(self) -> None:
         error = FooError(self.model)
 
         self.assertEqual(error.stderr, 'FooError in BaseModel(id="123"): foo')
 
-    def test_stdout(self):
+    def test_stdout(self) -> None:
         error = FooError(self.model)
 
         self.assertEqual(error.stdout, '')
 
-    def test_stderr(self):
+    def test_stderr(self) -> None:
         error = FooError(self.model)
 
         self.assertEqual(error.stderr, 'FooError in BaseModel(id="123"): foo')
 
-    def test_message_raises_type_error_if_assigned_a_non_string_value(self):
+    def test_message_raises_type_error_if_assigned_a_non_string_value(
+        self
+    ) -> None:
         class ErrorWithIntMessage(base_validation_errors.BaseAuditError):
             """Subclass that tries to assign an int value to self.stderr."""
 
-            def __init__(self, model):
-                super(ErrorWithIntMessage, self).__init__(123, model)
+            def __init__(
+                self, model: Union[base_models.BaseModel, bytes]
+            ) -> None:
+                # Here, str type is expected but for test purpose we're
+                # assigning it an int type. Thus to avoid MyPy error, we
+                # added an ignore here.
+                super(ErrorWithIntMessage, self).__init__(123, model)  # type: ignore[arg-type]
 
-        with self.assertRaisesRegex(TypeError, 'must be a string'):
+        with self.assertRaisesRegex(TypeError, 'must be a string'):  # type: ignore[no-untyped-call]
             ErrorWithIntMessage(self.model)
 
-    def test_message_raises_value_error_if_assigned_an_empty_value(self):
+    def test_message_raises_value_error_if_assigned_an_empty_value(
+        self
+    ) -> None:
         class ErrorWithEmptyMessage(base_validation_errors.BaseAuditError):
             """Subclass that tries to assign an empty value to self.stderr."""
 
-            def __init__(self, model):
+            def __init__(
+                self, model: Union[base_models.BaseModel, bytes]
+            ) -> None:
                 super(ErrorWithEmptyMessage, self).__init__('', model)
 
-        with self.assertRaisesRegex(ValueError, 'must be a non-empty string'):
+        with self.assertRaisesRegex(ValueError, 'must be a non-empty string'):  # type: ignore[no-untyped-call]
             ErrorWithEmptyMessage(self.model)
 
-    def test_equality_between_different_types(self):
+    def test_equality_between_different_types(self) -> None:
         self.assertNotEqual(FooError(self.model), BarError(self.model))
 
-    def test_equality_between_same_types_and_same_values(self):
+    def test_equality_between_same_types_and_same_values(self) -> None:
         self.assertEqual(
             FooError(self.model),
             FooError(job_utils.clone_model(self.model)))
 
-    def test_equality_between_same_types_and_different_values(self):
+    def test_equality_between_same_types_and_different_values(self) -> None:
         self.assertNotEqual(
             FooError(self.model),
             FooError(job_utils.clone_model(self.model, id='987')))
 
-    def test_hashable(self):
+    def test_hashable(self) -> None:
         set_of_errors = {
             FooError(self.model),
             FooError(job_utils.clone_model(self.model)),
         }
         self.assertEqual(len(set_of_errors), 1)
 
-    def test_pickling_sub_classes(self):
+    def test_pickling_sub_classes(self) -> None:
         foo_error, bar_error = FooError(self.model), BarError(self.model)
 
         pickled_foo_error, pickled_bar_error = (
@@ -143,7 +162,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
 
 class InconsistentTimestampsErrorTests(AuditErrorsTestBase):
 
-    def test_message(self):
+    def test_message(self) -> None:
         model = base_models.BaseModel(
             id='123',
             created_on=self.NOW,
@@ -159,7 +178,7 @@ class InconsistentTimestampsErrorTests(AuditErrorsTestBase):
 
 class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
 
-    def test_message_for_invalid_post_commit_status(self):
+    def test_message_for_invalid_post_commit_status(self) -> None:
         model = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -175,7 +194,7 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
             'InvalidCommitStatusError in BaseCommitLogEntryModel(id="123"): '
             'post_commit_status is invalid')
 
-    def test_message_for_private_post_commit_status(self):
+    def test_message_for_private_post_commit_status(self) -> None:
         model = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -193,7 +212,7 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
             'BaseCommitLogEntryModel(id="123"): post_commit_status=private '
             'but post_commit_is_private=False')
 
-    def test_message_for_public_post_commit_status(self):
+    def test_message_for_public_post_commit_status(self) -> None:
         model = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -211,7 +230,9 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
             'BaseCommitLogEntryModel(id="123"): post_commit_status=public '
             'but post_commit_is_private=True')
 
-    def test_message_for_public_post_commit_status_raise_exception(self):
+    def test_message_for_public_post_commit_status_raise_exception(
+        self
+    ) -> None:
         model = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -232,7 +253,7 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
 
 class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
 
-    def test_message(self):
+    def test_message(self) -> None:
         model = base_models.BaseModel(
             id='123',
             created_on=self.NOW,
@@ -248,7 +269,7 @@ class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
 
 class ModelIdRegexErrorTests(AuditErrorsTestBase):
 
-    def test_message(self):
+    def test_message(self) -> None:
         model = base_models.BaseModel(
             id='?!"',
             created_on=self.YEAR_AGO,
@@ -263,7 +284,7 @@ class ModelIdRegexErrorTests(AuditErrorsTestBase):
 
 class ModelExpiredErrorTests(AuditErrorsTestBase):
 
-    def test_message(self):
+    def test_message(self) -> None:
         model = base_models.BaseModel(
             id='123',
             deleted=True,
@@ -280,7 +301,7 @@ class ModelExpiredErrorTests(AuditErrorsTestBase):
 
 class ModelDomainObjectValidateErrorTests(AuditErrorsTestBase):
 
-    def test_model_domain_object_validate_error(self):
+    def test_model_domain_object_validate_error(self) -> None:
         model = base_models.BaseModel(
             id='123',
             deleted=True,
@@ -300,7 +321,7 @@ class ModelDomainObjectValidateErrorTests(AuditErrorsTestBase):
 
 class InvalidCommitTypeErrorTests(AuditErrorsTestBase):
 
-    def test_model_invalid_id_error(self):
+    def test_model_invalid_id_error(self) -> None:
         model = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -319,10 +340,12 @@ class InvalidCommitTypeErrorTests(AuditErrorsTestBase):
 
 class ModelRelationshipErrorTests(AuditErrorsTestBase):
 
-    def test_message(self):
+    def test_message(self) -> None:
         error = base_validation_errors.ModelRelationshipError(
-            model_property.ModelProperty(FooModel, FooModel.bar_id), '123',
-            'BarModel', '123')
+            model_property.ModelProperty(FooModel, FooModel.bar_id),  # type: ignore[no-untyped-call]
+            base64.b64encode(b'123'),
+            'BarModel',
+            base64.b64encode(b'123'))
 
         self.assertEqual(
             error.stderr,
@@ -333,7 +356,7 @@ class ModelRelationshipErrorTests(AuditErrorsTestBase):
 
 class CommitCmdsNoneErrorTests(AuditErrorsTestBase):
 
-    def test_message(self):
+    def test_message(self) -> None:
         model = base_models.BaseCommitLogEntryModel(
             id='invalid',
             created_on=self.YEAR_AGO,
@@ -353,7 +376,7 @@ class CommitCmdsNoneErrorTests(AuditErrorsTestBase):
 
 class CommitCmdsValidateErrorTests(AuditErrorsTestBase):
 
-    def test_message(self):
+    def test_message(self) -> None:
         model = base_models.BaseCommitLogEntryModel(
             id='invalid',
             created_on=self.YEAR_AGO,

@@ -202,8 +202,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/jobs/batch_jobs',
     'core/jobs/decorators',
     'core/jobs/transforms',
-    'core/jobs/types/base_validation_errors.py',
-    'core/jobs/types/base_validation_errors_test.py',
     'core/jobs/types/blog_validation_errors.py',
     'core/jobs/types/blog_validation_errors_test.py',
     'core/jobs/types/feedback_validation_errors.py',

@@ -22,12 +22,27 @@ from core import feconf
 from core import utils
 from core.jobs import job_utils
 from core.jobs.types import job_run_result
+from core.jobs.types import model_property
+from core.platform import models
+
+from typing import Dict, Optional, Union
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class BaseAuditError(job_run_result.JobRunResult):
     """Base class for model audit errors."""
 
-    def __init__(self, message, model_or_kind, model_id=None):
+    def __init__(
+        self,
+        message: str,
+        model_or_kind: Union[base_models.BaseModel, bytes],
+        model_id: Optional[Union[bytes, str]] = None
+    ) -> None:
         """Initializes a new audit error.
 
         Args:
@@ -49,11 +64,22 @@ class BaseAuditError(job_run_result.JobRunResult):
             raise ValueError('message must be a non-empty string')
 
         if model_id is None:
-            model_id = job_utils.get_model_id(model_or_kind)
-            model_kind = job_utils.get_model_kind(model_or_kind)
+            # Here, get_model_id and get_model_kind can only accept argument
+            # of type base_models.BaseModel but model_or_kind is defined as a
+            # type of Union[base_models.BaseModel, bytes]. So, to rule out the
+            # possibility of bytes of model_or_kind for mypy type checking.
+            # We added an [arg-type] ignore here.
+            model_id = job_utils.get_model_id(model_or_kind)  # type: ignore[arg-type]
+            model_kind = job_utils.get_model_kind(model_or_kind)  # type: ignore[arg-type]
         else:
-            model_kind = model_or_kind
+            # The type of model_or_kind is Union[base_models.BaseModel, bytes]
+            # and the type of model_kind is str, due to difference in type MyPy
+            # throws an assignment error. Thus to silent an error, we added an
+            # ignore here.
+            model_kind = model_or_kind  # type: ignore[assignment]
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert model_id is not None
         error_message = '%s in %s(id=%s): %s' % (
             self.__class__.__name__,
             model_kind, utils.quoted(model_id), message)
@@ -64,7 +90,7 @@ class BaseAuditError(job_run_result.JobRunResult):
 class InconsistentTimestampsError(BaseAuditError):
     """Error class for models with inconsistent timestamps."""
 
-    def __init__(self, model):
+    def __init__(self, model: base_models.BaseModel) -> None:
         message = 'created_on=%r is later than last_updated=%r' % (
             model.created_on, model.last_updated)
         super(InconsistentTimestampsError, self).__init__(message, model)
@@ -73,7 +99,7 @@ class InconsistentTimestampsError(BaseAuditError):
 class InvalidCommitStatusError(BaseAuditError):
     """Error class for commit models with inconsistent status values."""
 
-    def __init__(self, model):
+    def __init__(self, model: base_models.BaseCommitLogEntryModel) -> None:
         message = 'post_commit_status is %s' % model.post_commit_status
         super(InvalidCommitStatusError, self).__init__(message, model)
 
@@ -81,7 +107,7 @@ class InvalidCommitStatusError(BaseAuditError):
 class InvalidPublicCommitStatusError(BaseAuditError):
     """Error class for commit models with inconsistent public status values."""
 
-    def __init__(self, model):
+    def __init__(self, model: base_models.BaseCommitLogEntryModel) -> None:
         message = (
             'post_commit_status=%s but post_commit_community_owned=%s' % (
                 model.post_commit_status, model.post_commit_community_owned))
@@ -91,7 +117,7 @@ class InvalidPublicCommitStatusError(BaseAuditError):
 class InvalidPrivateCommitStatusError(BaseAuditError):
     """Error class for commit models with inconsistent private status values."""
 
-    def __init__(self, model):
+    def __init__(self, model: base_models.BaseCommitLogEntryModel) -> None:
         message = (
             'post_commit_status=%s but post_commit_is_private=%r' % (
                 model.post_commit_status, model.post_commit_is_private))
@@ -101,7 +127,7 @@ class InvalidPrivateCommitStatusError(BaseAuditError):
 class ModelMutatedDuringJobError(BaseAuditError):
     """Error class for models mutated during a job."""
 
-    def __init__(self, model):
+    def __init__(self, model: base_models.BaseModel) -> None:
         message = (
             'last_updated=%r is later than the audit job\'s start time' % (
                 model.last_updated))
@@ -111,7 +137,9 @@ class ModelMutatedDuringJobError(BaseAuditError):
 class ModelIdRegexError(BaseAuditError):
     """Error class for models with ids that fail to match a regex pattern."""
 
-    def __init__(self, model, regex_string):
+    def __init__(
+        self, model: base_models.BaseModel, regex_string: str
+    ) -> None:
         message = 'id does not match the expected regex=%s' % (
             utils.quoted(regex_string))
         super(ModelIdRegexError, self).__init__(message, model)
@@ -120,7 +148,9 @@ class ModelIdRegexError(BaseAuditError):
 class ModelDomainObjectValidateError(BaseAuditError):
     """Error class for domain object validation errors."""
 
-    def __init__(self, model, error_message):
+    def __init__(
+        self, model: base_models.BaseModel, error_message: str
+    ) -> None:
         message = 'Entity fails domain validation with the error: %s' % (
             error_message)
         super(ModelDomainObjectValidateError, self).__init__(message, model)
@@ -129,7 +159,7 @@ class ModelDomainObjectValidateError(BaseAuditError):
 class ModelExpiredError(BaseAuditError):
     """Error class for expired models."""
 
-    def __init__(self, model):
+    def __init__(self, model: base_models.BaseModel) -> None:
         message = 'deleted=True when older than %s days' % (
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
         super(ModelExpiredError, self).__init__(message, model)
@@ -138,7 +168,7 @@ class ModelExpiredError(BaseAuditError):
 class InvalidCommitTypeError(BaseAuditError):
     """Error class for commit_type validation errors."""
 
-    def __init__(self, model):
+    def __init__(self, model: base_models.BaseCommitLogEntryModel) -> None:
         message = 'Commit type %s is not allowed' % model.commit_type
         super(InvalidCommitTypeError, self).__init__(message, model)
 
@@ -146,7 +176,13 @@ class InvalidCommitTypeError(BaseAuditError):
 class ModelRelationshipError(BaseAuditError):
     """Error class for models with invalid relationships."""
 
-    def __init__(self, id_property, model_id, target_kind, target_id):
+    def __init__(
+        self,
+        id_property: model_property.ModelProperty,
+        model_id: bytes,
+        target_kind: str,
+        target_id: bytes
+    ) -> None:
         """Initializes a new ModelRelationshipError.
 
         Args:
@@ -170,7 +206,9 @@ class ModelRelationshipError(BaseAuditError):
 class CommitCmdsNoneError(BaseAuditError):
     """Error class for None Commit Cmds."""
 
-    def __init__(self, model):
+    def __init__(
+        self, model: base_models.BaseCommitLogEntryModel
+    ) -> None:
         message = (
             'No commit command domain object defined for entity with commands: '
             '%s' % model.commit_cmds)
@@ -180,7 +218,12 @@ class CommitCmdsNoneError(BaseAuditError):
 class CommitCmdsValidateError(BaseAuditError):
     """Error class for wrong commit cmmds."""
 
-    def __init__(self, model, commit_cmd_dict, e):
+    def __init__(
+        self,
+        model: base_models.BaseCommitLogEntryModel,
+        commit_cmd_dict: Dict[str, str],
+        e: str
+    ) -> None:
         message = (
             'Commit command domain validation for command: %s failed with '
             'error: %s' % (commit_cmd_dict, e))
