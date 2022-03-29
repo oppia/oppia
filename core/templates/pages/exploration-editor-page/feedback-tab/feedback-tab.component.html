@@ -15,8 +15,8 @@
       <em>No feedback has been given for this exploration yet.</em>
     </div>
 
-    <oppia-thread-table ng-if="$ctrl.threadData.feedbackThreads"
-                        [threads]="$ctrl.threadData.feedbackThreads"
+    <oppia-thread-table ng-if="$ctrl.threadData"
+                        [threads]="$ctrl.threadData"
                         (row-click)="$ctrl.setActiveThread($event)">
     </oppia-thread-table>
 
