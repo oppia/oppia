@@ -40,7 +40,7 @@ class CyclicStateTransitionsTracker {
   /** A path of visited states without any repeats. */
   private pathOfVisitedStates: string[];
   // This property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   /** The most recently discovered cycle of visited states. */
   private cycleOfVisitedStates!: string[];
@@ -117,8 +117,8 @@ class CyclicStateTransitionsTracker {
 }
 
 class EarlyQuitTracker {
-  // This property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private stateName!: string;
   private expDurationInSecs!: number;
@@ -179,7 +179,7 @@ class MultipleIncorrectAnswersTracker {
 })
 export class PlaythroughService {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private explorationId!: string;
   private explorationVersion!: number;
