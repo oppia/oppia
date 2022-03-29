@@ -32,7 +32,7 @@ import { ContributionOpportunitiesBackendApiService } from
 })
 export class TranslationTopicSelectorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activeTopicName!: string;
   @Output() setActiveTopicName: EventEmitter<string> = new EventEmitter();

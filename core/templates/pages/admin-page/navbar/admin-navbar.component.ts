@@ -31,7 +31,7 @@ import { AppConstants } from 'app.constants';
 })
 export class AdminNavbarComponent implements OnInit {
   // This property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   imagePath!: string;
   // Username is set to null if the user is not logged in.
