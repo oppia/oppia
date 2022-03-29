@@ -328,7 +328,7 @@ export class ConversationSkinComponent {
       response => {
         firstStateName = response.init_state_name;
       }
-    )
+    );
     let version: number;
     this.roebas.loadLatestExplorationAsync(this.explorationId).then(
       response => {
@@ -343,7 +343,6 @@ export class ConversationSkinComponent {
     ).then(() => {
       // Required for the post operation to deliver data to backend.
     });
-    console.log('both for 1');
   }
 
   // Returns a promise supplying the last saved version for the current
@@ -1120,7 +1119,8 @@ export class ConversationSkinComponent {
 
   showUpcomingCard(): void {
     let currentIndex = this.playerPositionService.getDisplayedCardIndex();
-    if (currentIndex > 0 && this.explorationEngineService.getState().cardIsCheckpoint) {
+    if (currentIndex > 0 &&
+      this.explorationEngineService.getState().cardIsCheckpoint) {
       // Update last_completed_checkpoint & latest_visited_checkpoint.
       let version: number;
       this.roebas.loadLatestExplorationAsync(this.explorationId).then(
@@ -1136,7 +1136,6 @@ export class ConversationSkinComponent {
       ).then(() => {
         // Required for the post operation to deliver data to backend.
       });
-      console.log('both');
     }
     let conceptCardIsBeingShown = (
       this.displayedCard.getStateName() === null &&
