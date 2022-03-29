@@ -1311,10 +1311,10 @@ class CheckpointCompletedEventHandler(base.BaseHandler):
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
-            'version': {
+            'last_completed_checkpoint_exp_version': {
                 'schema': editor.SCHEMA_FOR_VERSION
             },
-            'state_name': {
+            'last_completed_checkpoint_state_name': {
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
@@ -1338,11 +1338,11 @@ class CheckpointCompletedEventHandler(base.BaseHandler):
 
         user_id = self.user_id
         last_completed_checkpoint_state_name = self.normalized_payload.get(
-            'state_name')
+            'last_completed_checkpoint_state_name')
         last_completed_checkpoint_exp_version = self.normalized_payload.get(
-            'version')
+            'last_completed_checkpoint_exp_version')
 
-        user_services.set_last_completed_checkpoint(
+        user_services.update_learner_checkpoint_progress(
             user_id,
             exploration_id,
             last_completed_checkpoint_state_name,
@@ -1361,10 +1361,10 @@ class CheckpointVisitedEventHandler(base.BaseHandler):
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
-            'version': {
+            'last_completed_checkpoint_exp_version': {
                 'schema': editor.SCHEMA_FOR_VERSION
             },
-            'state_name': {
+            'latest_completed_checkpoint_state_name': {
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
@@ -1388,9 +1388,9 @@ class CheckpointVisitedEventHandler(base.BaseHandler):
 
         user_id = self.user_id
         latest_visited_checkpoint_state_name = self.normalized_payload.get(
-            'state_name')
+            'latest_completed_checkpoint_state_name')
         last_completed_checkpoint_exp_version = self.normalized_payload.get(
-            'version')
+            'last_completed_checkpoint_exp_version')
 
         user_services.set_latest_visited_checkpoint(
             user_id,

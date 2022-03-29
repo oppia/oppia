@@ -2658,7 +2658,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.get_contributor_usernames(
                 'invalid_category', language_code='hi')
 
-    def test_set_last_completed_checkpoint(self):
+    def test_update_learner_checkpoint_progress(self):
         auth_id = 'someUser'
         exploration_id = 'someExploration'
         username = 'username'
@@ -2671,7 +2671,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.user_models.ExplorationUserDataModel.get(
                 user_id, exploration_id))
         self.assertIsNone(exploration_user_model)
-        user_services.set_last_completed_checkpoint(
+        user_services.update_learner_checkpoint_progress(
             user_id, exploration_id, 'checkpoint1', 1)
 
         exploration_user_model = (
@@ -2701,12 +2701,15 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
                 user_id, exploration_id))
         self.assertIsNone(exploration_user_model)
 
-        user_services.set_last_completed_checkpoint(
+        user_services.update_learner_checkpoint_progress(
             user_id, exploration_id, 'checkpoint2', 1)
         exploration_user_model = (
             user_services.user_models.ExplorationUserDataModel.get(
                 user_id, exploration_id))
         self.assertIsNotNone(exploration_user_model)
+        self.assertEqual(
+            exploration_user_model.last_completed_checkpoint_state_name,
+            'checkpoint2')
         self.assertEqual(
             exploration_user_model.latest_visited_checkpoint_state_name,
             'checkpoint2')
@@ -2717,6 +2720,9 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.user_models.ExplorationUserDataModel.get(
                 user_id, exploration_id))
         self.assertIsNotNone(exploration_user_model)
+        self.assertEqual(
+            exploration_user_model.last_completed_checkpoint_state_name,
+            'checkpoint2')
         self.assertEqual(
             exploration_user_model.latest_visited_checkpoint_state_name,
             'checkpoint1')

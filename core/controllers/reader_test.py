@@ -2619,8 +2619,8 @@ class CheckpointCompletedEventHandlerTests(test_utils.GenericEmailTestBase):
         self.post_json(
             '/explorehandler/checkpoint_completed/%s' % exp_id,
             {
-                'version': 1,
-                'state_name': 'checkpoint1'
+                'last_completed_checkpoint_exp_version': 1,
+                'last_completed_checkpoint_state_name': 'checkpoint1'
             },
             csrf_token=csrf_token)
         exploration_user_data = exp_fetchers.get_exploration_user_data(
@@ -2657,8 +2657,8 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
         self.post_json(
             '/explorehandler/checkpoint_completed/%s' % exp_id,
             {
-                'version': 1,
-                'state_name': 'checkpoint1'
+                'last_completed_checkpoint_exp_version': 1,
+                'last_completed_checkpoint_state_name': 'checkpoint1'
             },
             csrf_token=csrf_token)
         exploration_user_data = exp_fetchers.get_exploration_user_data(
@@ -2677,8 +2677,8 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
         self.post_json(
             '/explorehandler/checkpoint_completed/%s' % exp_id,
             {
-                'version': 1,
-                'state_name': 'checkpoint2'
+                'last_completed_checkpoint_exp_version': 1,
+                'last_completed_checkpoint_state_name': 'checkpoint2'
             },
             csrf_token=csrf_token)
         exploration_user_data = exp_fetchers.get_exploration_user_data(
@@ -2697,8 +2697,8 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
         self.post_json(
             '/explorehandler/checkpoint_visited/%s' % exp_id,
             {
-                'version': 1,
-                'state_name': 'checkpoint1'
+                'last_completed_checkpoint_exp_version': 1,
+                'latest_completed_checkpoint_state_name': 'checkpoint1'
             },
             csrf_token=csrf_token)
         exploration_user_data = exp_fetchers.get_exploration_user_data(
