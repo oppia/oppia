@@ -32,7 +32,7 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
-import { ReadOnlyExplorationBackendApiService, ReadOnlyExplorationBackendDict } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 
 @Component({
@@ -71,6 +71,7 @@ export class ProgressNavComponent {
   lastDisplayedCard: StateCard;
   explorationId: string;
   newCardStateName: string;
+  currentCardIndex: number;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -149,15 +150,10 @@ export class ProgressNavComponent {
     this.helpCardHasContinueButton = false;
     this.newCardStateName = this.displayedCard.getStateName();
     this.explorationId = this.explorationEngineService.getExplorationId();
-    let firstStateName: string;
-    this.getLastSavedDataAsync().then(
-      response => {
-        firstStateName = response.init_state_name;
-      }
-    );
-    if (this.newCardStateName !== firstStateName &&
-      this.explorationEngineService.
-        getStateFromStateName(this.newCardStateName).cardIsCheckpoint) {
+    this.currentCardIndex = (
+      this.playerPositionService.getDisplayedCardIndex());
+    if (this.currentCardIndex > 0 && this.explorationEngineService.
+      getStateFromStateName(this.newCardStateName).cardIsCheckpoint) {
       // Update latest_visited_checkpoint when a checkpoint is encountered.
       let version: number;
       this.roebas.loadLatestExplorationAsync(this.explorationId).then(
@@ -173,13 +169,6 @@ export class ProgressNavComponent {
         // Required for the post operation to deliver data to backend.
       });
     }
-  }
-
-  async getLastSavedDataAsync(): Promise<ReadOnlyExplorationBackendDict> {
-    return this.roebas.loadLatestExplorationAsync(
-      this.explorationId).then(response => {
-      return response.exploration;
-    });
   }
 
   doesInteractionHaveNavSubmitButton(): boolean {
