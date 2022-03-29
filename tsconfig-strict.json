@@ -510,8 +510,6 @@
     "core/templates/pages/exploration-player-page/exploration-player-page.component.spec.ts",
     "core/templates/pages/exploration-player-page/exploration-player-page.constants.ts",
     "core/templates/pages/exploration-player-page/layout-directives/correctness-footer.component.ts",
-    "core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.ts",
-    "core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.spec.ts",
     "core/templates/pages/exploration-player-page/learner-experience/continue-button.component.ts",
     "core/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.ts",
     "core/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.spec.ts",

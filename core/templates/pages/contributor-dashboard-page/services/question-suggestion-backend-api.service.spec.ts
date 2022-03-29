@@ -18,7 +18,7 @@
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -26,6 +26,7 @@ import { Question } from 'domain/question/QuestionObjectFactory';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { QuestionSuggestionBackendApiService } from './question-suggestion-backend-api.service';
 
 const fakeImage = (): File => {
@@ -36,6 +37,7 @@ const fakeImage = (): File => {
 describe('Question Suggestion Backend Api Service', () => {
   let qsbas: QuestionSuggestionBackendApiService;
   let httpTestingController: HttpTestingController;
+  let imageLocalStorageService: ImageLocalStorageService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -51,9 +53,14 @@ describe('Question Suggestion Backend Api Service', () => {
   beforeEach(() => {
     qsbas = TestBed.inject(QuestionSuggestionBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
+    imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
   });
 
   it('should suggest questions', fakeAsync(() => {
+    spyOn(
+      imageLocalStorageService,
+      'getFilenameToBase64MappingAsync').and.returnValue(
+      Promise.resolve({}));
     let question = {
       toBackendDict: (isNewQuestion: boolean) => {
         return {};
@@ -85,6 +92,7 @@ describe('Question Suggestion Backend Api Service', () => {
         imageBlob: fakeImage()
       }])
       .then(successHandler, failHandler);
+    tick();
 
     let req = httpTestingController.expectOne('/suggestionhandler/');
     expect(req.request.method).toEqual('POST');
