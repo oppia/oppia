@@ -567,7 +567,7 @@ class UserInfoHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
-        'POST': {
+        'PUT': {
             'user_has_viewed_lesson_info_once': {
                 'schema': {
                     'type': 'bool'
@@ -612,8 +612,8 @@ class UserInfoHandler(base.BaseHandler):
             })
 
     @acl_decorators.open_access
-    def post(self):
-        """Handles POST requests."""
+    def put(self):
+        """Handles PUT requests."""
         user_has_viewed_lesson_info_once = self.normalized_payload.get(
             'user_has_viewed_lesson_info_once')
         if user_has_viewed_lesson_info_once:

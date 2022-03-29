@@ -2616,7 +2616,7 @@ class CheckpointCompletedEventHandlerTests(test_utils.GenericEmailTestBase):
             exploration_dict['last_completed_checkpoint_state_name'])
 
         csrf_token = self.get_new_csrf_token()
-        self.post_json(
+        self.put_json(
             '/explorehandler/checkpoint_completed/%s' % exp_id,
             {
                 'last_completed_checkpoint_exp_version': 1,
@@ -2654,7 +2654,7 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
 
         # First checkpoint completed.
         csrf_token = self.get_new_csrf_token()
-        self.post_json(
+        self.put_json(
             '/explorehandler/checkpoint_completed/%s' % exp_id,
             {
                 'last_completed_checkpoint_exp_version': 1,
@@ -2674,7 +2674,7 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
 
         # Second checkpoint completed.
         csrf_token = self.get_new_csrf_token()
-        self.post_json(
+        self.put_json(
             '/explorehandler/checkpoint_completed/%s' % exp_id,
             {
                 'last_completed_checkpoint_exp_version': 1,
@@ -2694,7 +2694,7 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
 
         # First checkpoint visited.
         csrf_token = self.get_new_csrf_token()
-        self.post_json(
+        self.put_json(
             '/explorehandler/checkpoint_visited/%s' % exp_id,
             {
                 'last_completed_checkpoint_exp_version': 1,

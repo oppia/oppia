@@ -1310,7 +1310,7 @@ class CheckpointCompletedEventHandler(base.BaseHandler):
         }
     }
     HANDLER_ARGS_SCHEMAS = {
-        'POST': {
+        'PUT': {
             'last_completed_checkpoint_exp_version': {
                 'schema': editor.SCHEMA_FOR_VERSION
             },
@@ -1329,8 +1329,8 @@ class CheckpointCompletedEventHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id):
-        """Handles POST requests.
+    def put(self, exploration_id):
+        """Handles PUT requests.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -1360,7 +1360,7 @@ class CheckpointVisitedEventHandler(base.BaseHandler):
         }
     }
     HANDLER_ARGS_SCHEMAS = {
-        'POST': {
+        'PUT': {
             'last_completed_checkpoint_exp_version': {
                 'schema': editor.SCHEMA_FOR_VERSION
             },
@@ -1379,8 +1379,8 @@ class CheckpointVisitedEventHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id):
-        """Handles POST requests.
+    def put(self, exploration_id):
+        """Handles PUT requests.
 
         Args:
             exploration_id: str. The ID of the exploration.
