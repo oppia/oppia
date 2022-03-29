@@ -64,7 +64,7 @@ class SendBatchMailchimpRequest(beam.DoFn):
     """DoFn to send batch mailchimp request for 500 users at a time."""
 
     def process(
-        self, emails: List[str], batch_index_dict: int
+        self, emails: List[str], batch_index_dict: int, test_run: bool
     ) -> result.Result[str]:
         """Add 500 users at a time, who have subscribed for newsletters,
             to the MailChimp DB.
@@ -73,6 +73,8 @@ class SendBatchMailchimpRequest(beam.DoFn):
             emails: list(str). List of emails of users subscribed to
                 newsletters.
             batch_index_dict: int. Current batch index.
+            test_run: bool. Whether to use mailchimp API or not. To be set to
+                TRUE only when run from a non-production server for testing.
 
         Raises:
             Exception. Exception thrown by the api is raised.
@@ -81,11 +83,17 @@ class SendBatchMailchimpRequest(beam.DoFn):
             JobRunResult. Job run result which is either 'Ok' or an error with
             corresponding error message.
         """
-        client = _get_mailchimp_class()
         emails = emails[
             batch_index_dict * 500: (batch_index_dict + 1) * 500]
+
+        if test_run:
+            # There is a max limit of 1500 bytes for job output. Hence, only
+            # returning first and last 5 emails in batch for testing.
+            yield result.Ok(','.join(emails[: 5] + emails[-5:]))
+            return
         mailchimp_data = []
 
+        client = _get_mailchimp_class()
         for email in emails:
             mailchimp_data.append({
                 'email_address': email,
@@ -163,7 +171,68 @@ class MailchimpPopulateJob(base_jobs.JobBase):
             | 'Combine into a list' >> beam.transforms.util.BatchElements(
                 min_batch_size=50000, max_batch_size=50000)
             | 'Send mailchimp request for current batch' >> beam.ParDo(
-                SendBatchMailchimpRequest(), batch_index_dict=batch_index_dict)
+                SendBatchMailchimpRequest(), batch_index_dict=batch_index_dict,
+                test_run=False)
+            | 'Get final result' >> beam.Map(
+                lambda result: job_run_result.JobRunResult.as_stdout(
+                    result.value))
+        )
+
+        return mailchimp_results
+
+
+class MockMailchimpPopulateJob(base_jobs.JobBase):
+    """Test one-off job for populating the mailchimp db."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        # Pcollection that returns the relevant config property with batch
+        # index.
+        config_property = (
+            self.pipeline
+            | 'Get all config properties' >> ndb_io.GetModels(
+                config_models.ConfigPropertyModel.get_all())
+            | 'Get the batch_index_for_mailchimp property value' >> beam.Filter(
+                lambda model: model.id == 'batch_index_for_mailchimp')
+            | 'Get value' >> beam.Map(lambda model: model.value)
+        )
+
+        batch_index_dict = beam.pvalue.AsSingleton(config_property)
+
+        # PCollection with all user ids that have opted in for email
+        # newsletters.
+        relevant_user_ids = (
+            self.pipeline
+            | 'Get all UserEmailPreferencesModel' >> ndb_io.GetModels(
+                user_models.UserEmailPreferencesModel.get_all().filter(
+                    user_models.UserEmailPreferencesModel.site_updates == True # pylint: disable=singleton-comparison
+                ).order('created_on'))
+            | 'Extract user ID' >> beam.Map(
+                lambda preferences_model: preferences_model.id)
+        )
+
+        valid_user_ids = beam.pvalue.AsIter(relevant_user_ids)
+
+        # PCollection of all user emails opted in for newsletters.
+        relevant_user_emails = (
+            self.pipeline
+            | 'Get all user settings models' >> ndb_io.GetModels(
+                user_models.UserSettingsModel.get_all().order(
+                    'created_on'))
+            | 'Filter user models' >> (
+                beam.Filter(
+                    lambda model, ids: model.id in ids, ids=valid_user_ids))
+            | 'Get email' >> (beam.Map(lambda model: model.email))
+        )
+
+        mailchimp_results = (
+            relevant_user_emails
+            # A large batch size is given so that all emails are included in a
+            # single list.
+            | 'Combine into a list' >> beam.transforms.util.BatchElements(
+                min_batch_size=50000, max_batch_size=50000)
+            | 'Send mailchimp request for current batch' >> beam.ParDo(
+                SendBatchMailchimpRequest(), batch_index_dict=batch_index_dict,
+                test_run=True)
             | 'Get final result' >> beam.Map(
                 lambda result: job_run_result.JobRunResult.as_stdout(
                     result.value))

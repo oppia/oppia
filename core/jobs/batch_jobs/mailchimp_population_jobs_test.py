@@ -38,7 +38,7 @@ if MYPY: # pragma: no cover
     [models.NAMES.config, models.NAMES.user])
 
 
-class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
+class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = mailchimp_population_jobs.MailchimpPopulateJob
 
@@ -242,3 +242,96 @@ class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
                 job_run_result.JobRunResult(
                     stdout='Server Issue')
             ])
+
+
+class MockMailchimpPopulateJobTests(job_test_utils.JobTestBase):
+
+    JOB_CLASS = mailchimp_population_jobs.MockMailchimpPopulateJob
+
+    USER_ID_PREFIX = 'user_id_'
+    DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.enabled_user_emails = []
+        for i in range(0, 1200):
+            user_id = '%s%d' % (self.USER_ID_PREFIX, i)
+            user_email = '%s@email.com' % user_id
+
+            if i % 2:
+                self.enabled_user_emails.append(user_email)
+
+            user_model = self.create_model(
+                user_models.UserSettingsModel,
+                id=user_id,
+                email=user_email
+            )
+            user_model.update_timestamps()
+            user_model.put()
+
+            # Half of the users have emails enabled.
+            preferences_model = self.create_model(
+                user_models.UserEmailPreferencesModel,
+                id=user_id,
+                site_updates=bool(i % 2)
+            )
+            preferences_model.update_timestamps()
+            preferences_model.put()
+
+        self.enabled_user_emails = sorted(self.enabled_user_emails)
+        self.first_batch_emails = self.enabled_user_emails[0:500]
+        self.second_batch_emails = self.enabled_user_emails[500:1000]
+
+        config_model = self.create_model(
+                config_models.ConfigPropertyModel,
+                id='batch_index_for_mailchimp',
+                value=0
+            )
+        config_model.update_timestamps()
+        config_model.commit('user_id_0', [])
+
+    def test_job_runs_correctly_for_first_batch(self) -> None:
+        expected_emails = [
+            'user_id_1@email.com',
+            'user_id_1001@email.com',
+            'user_id_1003@email.com',
+            'user_id_1005@email.com',
+            'user_id_1007@email.com',
+            'user_id_811@email.com',
+            'user_id_813@email.com',
+            'user_id_815@email.com',
+            'user_id_817@email.com',
+            'user_id_819@email.com',
+        ]
+
+        expected_output = ','.join(expected_emails)
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout=expected_output)
+        ])
+
+    def test_job_runs_correctly_for_second_batch(self) -> None:
+        config_model = self.create_model(
+                config_models.ConfigPropertyModel,
+                id='batch_index_for_mailchimp',
+                value=1
+            )
+        config_model.update_timestamps()
+        config_model.commit('user_id_0', [])
+
+        expected_emails = [
+            'user_id_821@email.com',
+            'user_id_823@email.com',
+            'user_id_825@email.com',
+            'user_id_827@email.com',
+            'user_id_829@email.com',
+            'user_id_991@email.com',
+            'user_id_993@email.com',
+            'user_id_995@email.com',
+            'user_id_997@email.com',
+            'user_id_999@email.com'
+        ]
+
+        expected_output = ','.join(expected_emails)
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout=expected_output)
+        ])
