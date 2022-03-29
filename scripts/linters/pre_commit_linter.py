@@ -83,9 +83,9 @@ OTHER_SHARD_NAME = 'other'
 # Shards are specified by a mapping from shard name to a list of the
 # paths in that shard. For exaple, `'1': ['core/domain/']` will create a
 # shard named `'1'` that contains all the files under core/domain/. A
-# shard value of `None` includes all files not under another shard.
-# Currently we are not sharding the lint checks, so the only shard is
-# the `other` shard that contains all files.
+# shard name matching OTHER_SHARD_NAME includes all files not under
+# another shard.  Currently we are not sharding the lint checks, so the
+# only shard is the `other` shard that contains all files.
 SHARDS = {
     'other': None,
 }
