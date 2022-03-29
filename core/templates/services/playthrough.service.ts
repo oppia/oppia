@@ -124,6 +124,7 @@ class EarlyQuitTracker {
   private expDurationInSecs!: number;
 
   foundAnIssue(): boolean {
+    // TODO(#15212): Remove the below check once codebase is strictly typed.
     return (
       this.expDurationInSecs !== undefined &&
       this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);

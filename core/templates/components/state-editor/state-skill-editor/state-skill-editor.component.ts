@@ -49,7 +49,7 @@ export class StateSkillEditorComponent implements OnInit {
   categorizedSkills!: SkillsCategorizedByTopics;
   untriagedSkillSummaries!: ShortSkillSummary[];
   skillEditorIsShown: boolean = true;
-  isSkillSelected = false;
+  skillIsSelected = false;
   skillName!: string;
   userCanEditSkills: boolean = false;
 
@@ -125,7 +125,7 @@ export class StateSkillEditorComponent implements OnInit {
       DeleteStateSkillModalComponent, {
         backdrop: true,
       }).result.then(() => {
-      this.isSkillSelected = false;
+      this.skillIsSelected = false;
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(this.stateLinkedSkillIdService.displayed);
     }, () => {
