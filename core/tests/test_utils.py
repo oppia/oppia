@@ -70,7 +70,7 @@ import elasticsearch
 import requests_mock
 import webtest
 
-from typing import Any, Dict, Optional # isort: skip
+from typing import Any, Dict, List, Optional # isort: skip
 
 (
     auth_models, base_models, exp_models,
@@ -2016,6 +2016,7 @@ title: Title
 
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
+            self.assertNotIn('<oppia-maintenance-page>', response)
 
             response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
                 'csrf_token': self.get_new_csrf_token(),
@@ -3576,7 +3577,7 @@ class GenericEmailTestBase(GenericTestBase):
             self.emails_dict[recipient_email].append(new_email)
         return True
 
-    def _get_sent_email_messages(self, to):
+    def _get_sent_email_messages(self, to: str) -> List[EmailMessageMock]:
         """Gets messages to a single recipient email.
 
         Args:
