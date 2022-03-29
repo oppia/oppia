@@ -1278,10 +1278,3 @@ def url_open(source_url: str) -> str:
     # The type ignore is needed, because typestubs define the return type
     # of 'urlopen' as 'Any' which is wrong.
     return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return]
-
-
-def generate_random_str_from_regex() -> str:
-    """Generate random string for a particular regex pattern."""
-    uppercase = 'ABCDEF'
-    lowercase = 'abcdef'
-    return ''.join(random.choices(uppercase + lowercase + string.digits, k=32))

@@ -203,7 +203,8 @@ class BuildTests(test_utils.GenericTestBase):
             build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
 
         # Generate a random hash dict for base.html.
-        file_hashes = {base_filename: utils.generate_random_str_from_regex()}
+        file_hashes = {base_filename: (
+            test_utils.generate_random_str_from_regex())}
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             ValueError, '%s is expected to contain MD5 hash' % base_filename):
             build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
@@ -218,7 +219,7 @@ class BuildTests(test_utils.GenericTestBase):
             build._verify_filepath_hash(bad_filepath, file_hashes)  # pylint: disable=protected-access
 
         hashed_base_filename = build._insert_hash(  # pylint: disable=protected-access
-            base_filename, utils.generate_random_str_from_regex())
+            base_filename, test_utils.generate_random_str_from_regex())
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             KeyError,
             'Hash from file named %s does not match hash dict values' %
