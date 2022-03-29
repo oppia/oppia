@@ -45,17 +45,17 @@
             </li>
           </ul>
           <schema-based-editor [schema]="getHtmlSchema.bind(this)"
-                               *ngIf="startedEditing && isHtmlContent"
+                               *ngIf="startedEditing && htmlIsContent"
                                [localValue]="editedContent.html"
                                (localValueChange)="updateHtml($event)">
           </schema-based-editor>
           <schema-based-editor [schema]="getUnicodeSchema.bind(this)"
-                               *ngIf="startedEditing && isUnicodeContent"
+                               *ngIf="startedEditing && unicodeIsContent"
                                [localValue]="editedContent.html"
                                (localValueChange)="updateHtml($event)">
           </schema-based-editor>
           <schema-based-editor [schema]="getSetOfStringsSchema.bind(this)"
-                               *ngIf="startedEditing && isSetOfStringsContent"
+                               *ngIf="startedEditing && setOfStringsIsContent"
                                [localValue]="editedContent.html"
                                (localValueChange)="updateHtml($event)">
           </schema-based-editor>

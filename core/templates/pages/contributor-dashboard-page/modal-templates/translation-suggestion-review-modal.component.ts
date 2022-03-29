@@ -72,6 +72,7 @@ interface ActiveSuggestionDict {
 }
 
 // Details are null if suggestion's corresponding opportunity is deleted.
+// See issue #14234.
 interface ActiveContributionDict {
   'details': ActiveContributionDetailsDict | null;
   'suggestion': ActiveSuggestionDict;
@@ -98,11 +99,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   errorMessage!: string;
   explorationContentHtml!: string | string[];
   finalCommitMessage!: string;
-  isCurriculumAdmin: boolean = false;
-  isHtmlContent: boolean = false;
+  curriculumIsAdmin: boolean = false;
+  htmlIsContent: boolean = false;
   initialSuggestionId!: string;
-  isSetOfStringsContent: boolean = false;
-  isUnicodeContent: boolean = false;
+  setOfStringsIsContent: boolean = false;
+  unicodeIsContent: boolean = false;
   languageCode!: string;
   languageDescription!: string;
   lastSuggestionToReview: boolean = false;
@@ -186,7 +187,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         throw new Error('Cannot fetch username.');
       }
       this.username = username;
-      this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
+      this.curriculumIsAdmin = userInfo.isCurriculumAdmin();
     });
     this.userService.getUserContributionRightsDataAsync().then(
       (userContributionRights) => {
@@ -214,13 +215,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.change.content_html);
     this.explorationContentHtml = (
       this.activeSuggestion.exploration_content_html);
-    this.isHtmlContent = (
+    this.htmlIsContent = (
       this.activeSuggestion.change.data_format === 'html'
     );
-    this.isUnicodeContent = (
+    this.unicodeIsContent = (
       this.activeSuggestion.change.data_format === 'unicode'
     );
-    this.isSetOfStringsContent = (
+    this.setOfStringsIsContent = (
       this.activeSuggestion.change.data_format ===
         'set_of_normalized_string' ||
       this.activeSuggestion.change.data_format ===
