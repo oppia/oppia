@@ -36,7 +36,9 @@ describe('Skill question tab directive', function() {
   let skillEditorStateService: SkillEditorStateService = null;
   let initEventEmitter = new EventEmitter();
   let fetchSkillSpy = null;
-  let sampleSkill = null;
+  const sampleSkill = new Skill(
+    null, 'Skill description loading',
+    [], [], null, 'en', 1, 0, null, false, []);
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -55,12 +57,6 @@ describe('Skill question tab directive', function() {
 
     spyOnProperty(skillEditorStateService, 'onSkillChange')
       .and.returnValue(initEventEmitter);
-    sampleSkill = new Skill(
-      null, 'Skill description loading',
-      [], [], null,
-      'en', 1, 0, null, false, []);
-    fetchSkillSpy = spyOn(skillEditorStateService, 'getSkill')
-      .and.returnValue(sampleSkill);
 
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
@@ -70,9 +66,39 @@ describe('Skill question tab directive', function() {
   }));
 
   it('should fetch skill when initialized', function() {
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
+    spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
     initEventEmitter.emit();
     $scope.$apply();
 
     expect(fetchSkillSpy).toHaveBeenCalled();
+    expect(
+      skillEditorStateService.getGroupedSkillSummaries).toHaveBeenCalled();
+  });
+
+  it('should not initialize when skill is not available', function() {
+    fetchSkillSpy = spyOn(
+      skillEditorStateService, 'getSkill').and.returnValue(undefined);
+    spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
+
+    ctrl.$onInit();
+    $scope.$apply();
+
+    expect(fetchSkillSpy).toHaveBeenCalled();
+    expect(
+      skillEditorStateService.getGroupedSkillSummaries).not.toHaveBeenCalled();
+  });
+
+  it('should initialize when skill is available', function() {
+    fetchSkillSpy = spyOn(
+      skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
+    spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
+
+    ctrl.$onInit();
+    $scope.$apply();
+
+    expect(fetchSkillSpy).toHaveBeenCalled();
+    expect(
+      skillEditorStateService.getGroupedSkillSummaries).toHaveBeenCalled();
   });
 });
