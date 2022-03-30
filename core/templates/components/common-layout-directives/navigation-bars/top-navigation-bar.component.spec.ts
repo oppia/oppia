@@ -554,7 +554,6 @@ describe('TopNavigationBarComponent', () => {
       spyOn(
         classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.resolveTo(classroomData);
-      spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
 
       component.ngOnInit();
 
@@ -563,8 +562,6 @@ describe('TopNavigationBarComponent', () => {
       expect(component.classroomData).toEqual(array);
       expect(component.topicTitlesTranslationKeys).toEqual(
         topicTitlesTranslationKeys);
-      expect(siteAnalyticsService.registerClassroomPageViewed)
-        .toHaveBeenCalled();
     }));
 
   it('should check whether hacky translations are displayed or not', () => {
