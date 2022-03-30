@@ -444,10 +444,14 @@ class BuildTests(test_utils.GenericTestBase):
     def test_execute_tasks(self):
         """Test _execute_tasks joins all threads after executing all tasks."""
         build_tasks = collections.deque()
+        build_thread_names = []
         task_count = 2
         count = task_count
         while count:
+            thread_name = 'Build-test-thread-%s' % count
+            build_thread_names.append(thread_name)
             task = threading.Thread(
+                name=thread_name,
                 target=build.minify_func,
                 args=(
                     INVALID_INPUT_FILEPATH,
@@ -456,19 +460,19 @@ class BuildTests(test_utils.GenericTestBase):
             build_tasks.append(task)
             count -= 1
 
-        self.assertEqual(
-            threading.active_count(), 1,
-            msg=(
-                'Found more than one thread: %s'
-                % ','.join([thread.name for thread in threading.enumerate()])
-            )
-        )
+        extra_build_threads = [
+            thread.name for thread in threading.enumerate()
+            if thread in build_thread_names]
+        self.assertEqual(len(extra_build_threads), 0)
         build._execute_tasks(build_tasks)  # pylint: disable=protected-access
         with self.assertRaisesRegex(
             OSError, 'threads can only be started once'):
             build._execute_tasks(build_tasks)  # pylint: disable=protected-access
         # Assert that all threads are joined.
-        self.assertEqual(threading.active_count(), 1)
+        extra_build_threads = [
+            thread.name for thread in threading.enumerate()
+            if thread in build_thread_names]
+        self.assertEqual(len(extra_build_threads), 0)
 
     def test_generate_build_tasks_to_build_all_files_in_directory(self):
         """Test generate_build_tasks_to_build_all_files_in_directory queues up
