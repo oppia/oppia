@@ -191,11 +191,13 @@ describe('Misconception Editor Component', () => {
     let updatesSpy = spyOn(
       skillUpdateService, 'updateMisconceptionMustBeAddressed')
       .and.returnValue(null);
+    spyOn(component.onMisconceptionChange, 'emit').and.callThrough();
 
     component.updateMustBeAddressed();
 
     expect(updatesSpy).toHaveBeenCalledWith(
       sampleSkill, 1, true, false);
+    expect(component.onMisconceptionChange.emit).toHaveBeenCalled();
   });
 
   it('should get schema for editing notes', () => {
