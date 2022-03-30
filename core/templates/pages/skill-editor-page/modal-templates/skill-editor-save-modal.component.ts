@@ -27,7 +27,7 @@ import { AppConstants } from 'app.constants';
 })
 export class SkillEditorSaveModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   commitMessage!: string;
   MAX_COMMIT_MESSAGE_LENGTH: number = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;

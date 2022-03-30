@@ -36,8 +36,9 @@ export class ExplorationRecommendationsService {
   isIframed: boolean = false;
   isInEditorPage: boolean = false;
   isInEditorPreviewMode: boolean = false;
-  // 'explorationId' is only used in 'getRecommendedSummaryDicts()' and is
-  // assigned a value before it is used, hence we need to do non-null assertion.
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
 
   constructor(
