@@ -19,14 +19,22 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
+import { PlayerPositionService } from '../services/player-position.service';
+import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 
 @Component({
   selector: 'oppia-exploration-footer',
@@ -34,7 +42,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 })
 export class ExplorationFooterComponent {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
   iframed!: boolean;
@@ -43,20 +51,32 @@ export class ExplorationFooterComponent {
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
 
+  // Stores the number of checkpoints in an exploration.
+  checkpointCount: number = 0;
+
+  // Used to update the number of checkpoints completed
+  // and decide the completed width of the progress bar.
+  checkpointArray: number[] = [0];
+  expInfo: LearnerExplorationSummaryBackendDict;
+  completedWidth: number = 0;
+  expStates: StateObjectsBackendDict;
+
   constructor(
     private contextService: ContextService,
     private explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private ngbModal: NgbModal,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private urlInterpolationService: UrlInterpolationService,
-    private questionPlayerStateService: QuestionPlayerStateService
+    private questionPlayerStateService: QuestionPlayerStateService,
+    private readOnlyExplorationBackendApiService:
+      ReadOnlyExplorationBackendApiService,
+    private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
+    private loggerService: LoggerService,
+    private playerPositionService: PlayerPositionService,
+    private explorationEngineService: ExplorationEngineService
   ) {}
-
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
 
   ngOnInit(): void {
     // TODO(#13494): Implement a different footer for practice-session-page.
@@ -97,6 +117,8 @@ export class ExplorationFooterComponent {
             }
           });
       }
+      // Fetching the number of checkpoints.
+      this.getCheckpointCount(this.explorationId);
     } catch (err) { }
 
     if (this.contextService.isInQuestionPlayerMode()) {
@@ -107,10 +129,89 @@ export class ExplorationFooterComponent {
     }
   }
 
+  openInformationCardModal(): void {
+    let modalRef = this.ngbModal.open(LessonInformationCardModalComponent, {
+      windowClass: 'oppia-modal-lesson-information-card'
+    });
+
+    let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
+
+    modalRef.componentInstance.checkpointCount = this.checkpointCount;
+    // Note to developers:
+    // The checkpointArray is used to track the number of
+    // completedCheckpoints. For the first card, 1 is pushed
+    // since the first card is always a checkpoint. For
+    // displayedCardindex > 1, 1 is pushed if the card is a
+    // checkpoint, else 0 is pushed.
+    let completedCheckpoints = 0;
+    for (let i = 0; i <= displayedCardIndex; i++) {
+      completedCheckpoints = completedCheckpoints + this.checkpointArray[i];
+    }
+    this.completedWidth = (
+      (100 / (this.checkpointCount)) * completedCheckpoints
+    );
+
+    if (displayedCardIndex > 0) {
+      let state = this.explorationEngineService.getState();
+      if (state.cardIsCheckpoint) {
+        this.checkpointArray.push(1);
+      } else {
+        this.checkpointArray.push(0);
+      }
+    } else {
+      this.checkpointArray.push(1);
+    }
+    modalRef.componentInstance.completedWidth = this.completedWidth;
+    modalRef.componentInstance.contributorNames = this.contributorNames;
+    modalRef.componentInstance.expInfo = this.expInfo;
+
+    modalRef.result.then(() => {}, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  showInformationCard(): void {
+    let stringifiedExpIds = JSON.stringify(
+      [this.explorationId]);
+    let includePrivateExplorations = JSON.stringify(true);
+    if (this.expInfo) {
+      this.openInformationCardModal();
+    } else {
+      this.learnerViewInfoBackendApiService.fetchLearnerInfoAsync(
+        stringifiedExpIds,
+        includePrivateExplorations
+      ).then((response) => {
+        this.expInfo = response.summaries[0];
+        this.openInformationCardModal();
+      }, () => {
+        this.loggerService.error(
+          'Information card failed to load for exploration ' +
+          this.explorationId);
+      });
+    }
+  }
+
   ngOnDestroy(): void {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
     }
+  }
+
+  async getCheckpointCount(explorationId: string): Promise<void> {
+    return this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(explorationId, null).then(
+        (response: FetchExplorationBackendResponse) => {
+          this.expStates = response.exploration.states;
+          let count = 0;
+          for (let [, value] of Object.entries(this.expStates)) {
+            if (value.card_is_checkpoint) {
+              count++;
+            }
+          }
+          this.checkpointCount = count;
+        });
   }
 
   isLanguageRTL(): boolean {
