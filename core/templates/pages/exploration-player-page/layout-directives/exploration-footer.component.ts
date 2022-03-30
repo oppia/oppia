@@ -34,6 +34,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
+import { PlayerPositionService } from '../services/player-position.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 
 @Component({
@@ -42,7 +43,7 @@ import { LessonInformationCardModalComponent } from '../templates/lesson-informa
 })
 export class ExplorationFooterComponent {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
   iframed!: boolean;
@@ -79,6 +80,7 @@ export class ExplorationFooterComponent {
     private roebas: ReadOnlyExplorationBackendApiService,
     private playerTranscriptService: PlayerTranscriptService,
     private explorationEngineService: ExplorationEngineService,
+    private playerPositionService: PlayerPositionService,
   ) {}
 
   ngOnInit(): void {

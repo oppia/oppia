@@ -120,7 +120,7 @@
     "I18N_COMING_SOON": "Coming Soon!",
     "I18N_COMMUNITY_LIBRARY_PAGE_COLLECTION": "COLLECTION",
     "I18N_COMPLETED_STORY": "Completed '<[story]>'",
-    "I18N_COMPLETE_STORY": "Complete a story in '<[topicName]>'",
+    "I18N_COMPLETE_CHAPTER": "Complete a chapter in '<[topicName]>'",
     "I18N_CONTACT_PAGE_BREADCRUMB": "Contact",
     "I18N_CONTACT_PAGE_HEADING": "Get Involved!",
     "I18N_CONTACT_PAGE_PARAGRAPH_1": "Thanks for your interest in helping out with the Oppia project!",
