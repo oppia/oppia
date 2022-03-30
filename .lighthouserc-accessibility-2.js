@@ -21,6 +21,9 @@ const baseConfig = require('./.lighthouserc-base.js')
 module.exports = {
   'ci': {
     'collect': {
+      'settings': {
+        'maxWaitForLoad': 60 * 1000,  // Allow pages to load for at most 60s.
+      },
       'numberOfRuns': baseConfig['numberOfRuns'],
       'puppeteerScript': baseConfig['puppeteerScript'],
       'url': baseConfig['urlShards'][2]
