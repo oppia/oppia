@@ -35,7 +35,7 @@ import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-langu
  })
 export class SideNavigationBarComponent {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() display!: boolean;
 
@@ -83,7 +83,6 @@ export class SideNavigationBarComponent {
               .then((classroomData) => {
                 this.classroomData = classroomData.getTopicSummaries();
                 this.classroomBackendApiService.onInitializeTranslation.emit();
-                this.siteAnalyticsService.registerClassroomPageViewed();
                 // Store hacky tranlation keys of topics.
                 for (let i = 0; i < this.classroomData.length; i++) {
                   let topicSummary = this.classroomData[i];
