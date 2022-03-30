@@ -1364,7 +1364,7 @@ class CheckpointVisitedEventHandler(base.BaseHandler):
             'last_completed_checkpoint_exp_version': {
                 'schema': editor.SCHEMA_FOR_VERSION
             },
-            'latest_completed_checkpoint_state_name': {
+            'latest_visited_checkpoint_state_name': {
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
@@ -1388,7 +1388,7 @@ class CheckpointVisitedEventHandler(base.BaseHandler):
 
         user_id = self.user_id
         latest_visited_checkpoint_state_name = self.normalized_payload.get(
-            'latest_completed_checkpoint_state_name')
+            'latest_visited_checkpoint_state_name')
         last_completed_checkpoint_exp_version = self.normalized_payload.get(
             'last_completed_checkpoint_exp_version')
 

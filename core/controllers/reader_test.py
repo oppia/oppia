@@ -2698,7 +2698,7 @@ class CheckpointVisitedEventHandlerTests(test_utils.GenericEmailTestBase):
             '/explorehandler/checkpoint_visited/%s' % exp_id,
             {
                 'last_completed_checkpoint_exp_version': 1,
-                'latest_completed_checkpoint_state_name': 'checkpoint1'
+                'latest_visited_checkpoint_state_name': 'checkpoint1'
             },
             csrf_token=csrf_token)
         exploration_user_data = exp_fetchers.get_exploration_user_data(
