@@ -859,6 +859,25 @@ describe('Exploration engine service ', () => {
     expect(currentState.name).toBe('End');
   });
 
+  it('should return current state from state name.', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    let lastStateNameSpy = spyOn(playerTranscriptService, 'getLastStateName');
+
+    expect(() => {
+      explorationEngineService.getStateFromStateName('Start');
+    }).toThrowError(
+      'Cannot read properties of undefined (reading \'getState\')');
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    // Check for the first state.
+    lastStateNameSpy.and.returnValue('Start');
+    let currentState = explorationEngineService.getStateFromStateName('Start');
+    expect(currentState.name).toBe('Start');
+  });
+
   it('should return language code when calling \'getLanguageCode\'', () => {
     let initSuccessCb = jasmine.createSpy('success');
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);

@@ -126,30 +126,30 @@ export class EditableExplorationBackendApiService {
 
   async recordLastCompletedCheckpointAsync(
       explorationId: string,
-      LastCompletedCheckpointExpVersion: number,
-      LastCompletedCheckpointStateName: string,
-      LatestVisitedCheckpointStateName: string,
+      lastCompletedCheckpointExpVersion: number,
+      lastCompletedCheckpointStateName: string,
+      latestVisitedCheckpointStateName: string,
   ): Promise<void> {
     const requestUrl =
       '/explorehandler/checkpoint_completed/' + explorationId;
     return this.httpClient.put<void>(requestUrl, {
       exploration_id: explorationId,
-      last_completed_checkpoint_exp_version: LastCompletedCheckpointExpVersion,
-      last_completed_checkpoint_state_name: LastCompletedCheckpointStateName,
-      latest_visited_checkpoint_state_name: LatestVisitedCheckpointStateName
+      last_completed_checkpoint_exp_version: lastCompletedCheckpointExpVersion,
+      last_completed_checkpoint_state_name: lastCompletedCheckpointStateName,
+      latest_visited_checkpoint_state_name: latestVisitedCheckpointStateName
     }).toPromise();
   }
 
   async recordLatestVisitedCheckpointAsync(
       explorationId: string,
-      LatestVisitedCheckpointStateName: string,
-      LastCompletedCheckpointExpVersion: number,
+      latestVisitedCheckpointStateName: string,
+      lastCompletedCheckpointExpVersion: number,
   ): Promise<void> {
     const requestUrl =
       '/explorehandler/checkpoint_visited/' + explorationId;
     return this.httpClient.put<void>(requestUrl, {
-      last_completed_checkpoint_exp_version: LastCompletedCheckpointExpVersion,
-      latest_visited_checkpoint_state_name: LatestVisitedCheckpointStateName,
+      last_completed_checkpoint_exp_version: lastCompletedCheckpointExpVersion,
+      latest_visited_checkpoint_state_name: latestVisitedCheckpointStateName,
     }).toPromise();
   }
 

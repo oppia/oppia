@@ -285,6 +285,76 @@ describe('Editable exploration backend API service', function() {
     expect(readOnlyExplorationBackendApiService.isCached('0')).toBe(false);
   }));
 
+  it('should update last completed and latest visited' +
+    'checkpoint state name fields.', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let explorationId = '0';
+    let lastCompletedCheckpointExpVersion = 1;
+    let lastCompletedCheckpointStateName = 'State B';
+    let latestVisitedCheckpointStateName = 'State A';
+
+    let payload = {
+      exploration_id: explorationId,
+      last_completed_checkpoint_exp_version: lastCompletedCheckpointExpVersion,
+      last_completed_checkpoint_state_name: lastCompletedCheckpointStateName,
+      latest_visited_checkpoint_state_name: latestVisitedCheckpointStateName
+    };
+
+    editableExplorationBackendApiService.recordLastCompletedCheckpointAsync(
+      explorationId,
+      lastCompletedCheckpointExpVersion,
+      lastCompletedCheckpointStateName,
+      latestVisitedCheckpointStateName,
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/explorehandler/checkpoint_completed/' + explorationId);
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should update latest visited checkpoint state name' +
+    'and last completed checkpoint exploration version.', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let explorationId = '0';
+    let lastCompletedCheckpointExpVersion = 1;
+    let latestVisitedCheckpointStateName = 'State A';
+
+    let payload = {
+      latest_visited_checkpoint_state_name: latestVisitedCheckpointStateName,
+      last_completed_checkpoint_exp_version: lastCompletedCheckpointExpVersion,
+    };
+
+    editableExplorationBackendApiService.recordLatestVisitedCheckpointAsync(
+      explorationId,
+      latestVisitedCheckpointStateName,
+      lastCompletedCheckpointExpVersion,
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/explorehandler/checkpoint_visited/' + explorationId);
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should use the rejection handler if the backend ' +
     'request failed', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
