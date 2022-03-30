@@ -16,7 +16,7 @@
  * @fileoverview Component for the misconception editor.
  */
 
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
@@ -41,6 +41,7 @@ interface Container {
   templateUrl: './misconception-editor.component.html'
 })
 export class MisconceptionEditorComponent implements OnInit {
+  @Output() onMisconceptionChange = new EventEmitter<void>();
   @Input() getIndex: string;
   @Input() isEditable: boolean;
   @Input() misconception;
@@ -173,6 +174,7 @@ export class MisconceptionEditorComponent implements OnInit {
       this.misconception.getId(),
       !this.container.misconceptionMustBeAddressed,
       this.container.misconceptionMustBeAddressed);
+    this.onMisconceptionChange.emit();
   }
 
   saveFeedback(): void {
