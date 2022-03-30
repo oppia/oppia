@@ -86,12 +86,6 @@ class ThreadListHandler(base.BaseHandler):
                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False
             )
         ]
-        suggestion_thread_dicts = [
-            thread.to_dict() for thread in feedback_services.get_all_threads(
-                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True
-            )
-        ]
-
         self.values.update({
             'feedback_thread_dicts': replace_user_id_with_username_in_dict(
                 feedback_thread_dicts, [
@@ -101,10 +95,6 @@ class ThreadListHandler(base.BaseHandler):
                         'last_nonempty_message_author'
                     )
                 ]
-            ),
-            'suggestion_thread_dicts': replace_user_id_with_username_in_dict(
-                suggestion_thread_dicts,
-                [('original_author_id', 'original_author_username')]
             )
         })
         self.render_json(self.values)
