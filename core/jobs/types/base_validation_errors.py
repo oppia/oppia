@@ -40,17 +40,17 @@ class BaseAuditError(job_run_result.JobRunResult):
     def __init__(
         self,
         message: str,
-        model_or_kind: Union[base_models.BaseModel, bytes],
-        model_id: Optional[Union[bytes, str]] = None
+        model_or_kind: Union[base_models.BaseModel, str],
+        model_id: Optional[str] = None
     ) -> None:
         """Initializes a new audit error.
 
         Args:
             message: str. The message describing the error.
-            model_or_kind: Model|bytes. If model_id is not provided, then this
+            model_or_kind: Model|str. If model_id is not provided, then this
                 is a model (type: BaseModel).
-                Otherwise, this is a model's kind (type: bytes).
-            model_id: bytes|None. The model's ID, or None when model_or_kind is
+                Otherwise, this is a model's kind (type: str).
+            model_id: str|None. The model's ID, or None when model_or_kind is
                 a model.
 
         Raises:
@@ -66,14 +66,14 @@ class BaseAuditError(job_run_result.JobRunResult):
         if model_id is None:
             # Here, get_model_id and get_model_kind can only accept argument
             # of type base_models.BaseModel but model_or_kind is defined as a
-            # type of Union[base_models.BaseModel, bytes]. So, to rule out the
-            # possibility of bytes of model_or_kind for mypy type checking.
+            # type of Union[base_models.BaseModel, str]. So, to rule out the
+            # possibility of str of model_or_kind for mypy type checking.
             # We asserted it as an Basemodel type.
             assert isinstance(model_or_kind, base_models.BaseModel)
             model_id = job_utils.get_model_id(model_or_kind)
             model_kind = job_utils.get_model_kind(model_or_kind)
         else:
-            # The type of model_or_kind is Union[base_models.BaseModel, bytes]
+            # The type of model_or_kind is Union[base_models.BaseModel, str]
             # and the type of model_kind is str, due to difference in type MyPy
             # throws an assignment error. Thus to silent an error, we added an
             # ignore here.
@@ -180,18 +180,18 @@ class ModelRelationshipError(BaseAuditError):
     def __init__(
         self,
         id_property: model_property.ModelProperty,
-        model_id: bytes,
+        model_id: str,
         target_kind: str,
-        target_id: bytes
+        target_id: str
     ) -> None:
         """Initializes a new ModelRelationshipError.
 
         Args:
             id_property: ModelProperty. The property referring to the ID of the
                 target model.
-            model_id: bytes. The ID of the model with problematic ID property.
+            model_id: str. The ID of the model with problematic ID property.
             target_kind: str. The kind of model the property refers to.
-            target_id: bytes. The ID of the specific model that the property
+            target_id: str. The ID of the specific model that the property
                 refers to. NOTE: This is the value of the ID property.
         """
         # NOTE: IDs are converted to bytes because that's how they're read from

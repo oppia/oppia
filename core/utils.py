@@ -1251,11 +1251,11 @@ def partition(
         (i for i, predicate_is_true in false_part if not predicate_is_true))
 
 
-def quoted(s: Union[str, bytes]) -> str:
+def quoted(s: str) -> str:
     """Returns a string enclosed in quotes, escaping any quotes within it.
 
     Args:
-        s: str or bytes. The string to quote.
+        s: str. The string to quote.
 
     Returns:
         str. The quoted string.

@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import base64
 import datetime
 import pickle
 
@@ -56,14 +55,14 @@ class BarModel(base_models.BaseModel):
 class FooError(base_validation_errors.BaseAuditError):
     """A simple test-only error."""
 
-    def __init__(self, model: Union[base_models.BaseModel, bytes]) -> None:
+    def __init__(self, model: Union[base_models.BaseModel, str]) -> None:
         super(FooError, self).__init__('foo', model)
 
 
 class BarError(base_validation_errors.BaseAuditError):
     """A simple test-only error."""
 
-    def __init__(self, model: Union[base_models.BaseModel, bytes]) -> None:
+    def __init__(self, model: Union[base_models.BaseModel, str]) -> None:
         super(BarError, self).__init__('bar', model)
 
 
@@ -103,7 +102,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             """Subclass that tries to assign an int value to self.stderr."""
 
             def __init__(
-                self, model: Union[base_models.BaseModel, bytes]
+                self, model: Union[base_models.BaseModel, str]
             ) -> None:
                 # Here, str type is expected but for test purpose we're
                 # assigning it an int type. Thus to avoid MyPy error, we
@@ -120,7 +119,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             """Subclass that tries to assign an empty value to self.stderr."""
 
             def __init__(
-                self, model: Union[base_models.BaseModel, bytes]
+                self, model: Union[base_models.BaseModel, str]
             ) -> None:
                 super(ErrorWithEmptyMessage, self).__init__('', model)
 
@@ -343,9 +342,7 @@ class ModelRelationshipErrorTests(AuditErrorsTestBase):
     def test_message(self) -> None:
         error = base_validation_errors.ModelRelationshipError(
             model_property.ModelProperty(FooModel, FooModel.bar_id),  # type: ignore[no-untyped-call]
-            base64.b64encode(b'123'),
-            'BarModel',
-            base64.b64encode(b'123'))
+            '123', 'BarModel', '123')
 
         self.assertEqual(
             error.stderr,
