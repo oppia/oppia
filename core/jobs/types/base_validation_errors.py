@@ -74,10 +74,11 @@ class BaseAuditError(job_run_result.JobRunResult):
             model_kind = job_utils.get_model_kind(model_or_kind)
         else:
             # The type of model_or_kind is Union[base_models.BaseModel, str]
-            # and the type of model_kind is str, due to difference in type MyPy
-            # throws an assignment error. Thus to silent an error, we added an
-            # ignore here.
-            model_kind = model_or_kind  # type: ignore[assignment]
+            # and the type of model_kind is str. So, to rule out the possibilty
+            # of Basemodel of model_or_kind for MyPy type checking. we asserted
+            # it as an str type.
+            assert isinstance(model_or_kind, str)
+            model_kind = model_or_kind
 
         # Ruling out the possibility of None for mypy type checking.
         assert model_id is not None
