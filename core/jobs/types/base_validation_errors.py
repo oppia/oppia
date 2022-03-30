@@ -68,9 +68,10 @@ class BaseAuditError(job_run_result.JobRunResult):
             # of type base_models.BaseModel but model_or_kind is defined as a
             # type of Union[base_models.BaseModel, bytes]. So, to rule out the
             # possibility of bytes of model_or_kind for mypy type checking.
-            # We added an [arg-type] ignore here.
-            model_id = job_utils.get_model_id(model_or_kind)  # type: ignore[arg-type]
-            model_kind = job_utils.get_model_kind(model_or_kind)  # type: ignore[arg-type]
+            # We asserted it as an Basemodel type.
+            assert isinstance(model_or_kind, base_models.BaseModel)
+            model_id = job_utils.get_model_id(model_or_kind)
+            model_kind = job_utils.get_model_kind(model_or_kind)
         else:
             # The type of model_or_kind is Union[base_models.BaseModel, bytes]
             # and the type of model_kind is str, due to difference in type MyPy
