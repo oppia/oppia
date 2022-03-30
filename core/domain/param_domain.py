@@ -177,7 +177,7 @@ class ParamChange:
             param_change_dict['customization_args']
         )
 
-    def _get_value(self, context_params):
+    def get_value(self, context_params):
         """Generates a single value for a parameter change."""
         return self.generator.generate_value(
             context_params, **self.customization_args)

@@ -102,7 +102,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             'generator_id': 'Copier',
             'customization_args': {'value': '3'}
         })
-        self.assertEqual(param_change._get_value({}), '3')   # pylint: disable=protected-access
+        self.assertEqual(param_change.get_value({}), '3')
 
     def test_param_change_from_dict(self):
         sample_dict = {

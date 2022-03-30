@@ -1046,7 +1046,7 @@ class TestBase(unittest.TestCase):
                 raise Exception(
                     'Parameter %s not found' % param_change.name) from e
 
-            raw_value = param_change._get_value(new_param_dict)  # pylint: disable=protected-access
+            raw_value = param_change.get_value(new_param_dict)
             new_param_dict[param_change.name] = (
                 object_registry.Registry.get_object_class_by_type(
                     obj_type).normalize(raw_value))
