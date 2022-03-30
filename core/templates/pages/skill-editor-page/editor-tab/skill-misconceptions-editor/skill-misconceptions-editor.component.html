@@ -42,7 +42,8 @@
                 <div class="oppia-editor-card-section">
                   <oppia-misconception-editor [misconception]="skill.findMisconceptionById(misconception.getId())"
                                               [getIndex]="i"
-                                              [isEditable]="isEditable">
+                                              [isEditable]="isEditable"
+                                              (onMisconceptionChange)="onMisconceptionChange()">
                   </oppia-misconception-editor>
                 </div>
               </div>
