@@ -440,7 +440,7 @@ def get_exploration_user_data(user_id, exp_id):
             exploration_user_data_model.draft_change_list_id,
             exploration_user_data_model.mute_suggestion_notifications,
             exploration_user_data_model.mute_feedback_notifications,
-            exploration_user_data_model.saved_checkpoints_progress_state_name,
+            exploration_user_data_model.saved_checkpoints_progress_exp_version,
             exploration_user_data_model.furthest_completed_checkpoint_state_name,
             exploration_user_data_model.most_recently_viewed_checkpoint_state_name
         )
