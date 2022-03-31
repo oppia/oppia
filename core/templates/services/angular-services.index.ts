@@ -63,6 +63,7 @@ import { CollectionRightsBackendApiService } from 'domain/collection/collection-
 import { CollectionUpdateService } from 'domain/collection/collection-update.service';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
 import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
+import { EndExplorationBackendApiService } from 'interactions/EndExploration/directives/end-exploration-backend-api.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
@@ -394,10 +395,15 @@ import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/serv
 import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
 import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
 import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
+import { NumberConversionService } from './number-conversion.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
 import { ContributionAndReviewService } from 'pages/contributor-dashboard-page/services/contribution-and-review.service';
 import { ContributionAndReviewBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-and-review-backend-api.service';
+import { FaviconService } from './favicon.service';
+import { StalenessDetectionService } from './staleness-detection.service';
+import { ExplorationImprovementsService } from './exploration-improvements.service';
+import { PlaythroughIssuesService } from './playthrough-issues.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -495,6 +501,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['EmailDashboardDataService', EmailDashboardDataService],
   ['EmailDashboardResultBackendApiService',
     EmailDashboardResultBackendApiService],
+  ['EndExplorationBackendApiService', EndExplorationBackendApiService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
   ['ExplorationCategoryService', ExplorationCategoryService],
@@ -520,6 +527,7 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationImprovementsBackendApiService],
   ['ExplorationImprovementsTaskRegistryService',
     ExplorationImprovementsTaskRegistryService],
+  ['ExplorationImprovementsService', ExplorationImprovementsService],
   ['ExplorationInitStateNameService', ExplorationInitStateNameService],
   ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
   ['ExplorationObjectiveService', ExplorationObjectiveService],
@@ -549,6 +557,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExtractImageFilenamesFromModelService',
     ExtractImageFilenamesFromModelService],
   ['EventBusService', EventBusService],
+  ['FaviconService', FaviconService],
   ['FatigueDetectionService',
     FatigueDetectionService],
   ['FeedbackPopupBackendApiService', FeedbackPopupBackendApiService],
@@ -658,6 +667,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['PlatformFeatureDummyBackendApiService',
     PlatformFeatureDummyBackendApiService],
   ['PlatformFeatureService', PlatformFeatureService],
+  ['PlaythroughIssuesService', PlaythroughIssuesService],
   ['PlayerCorrectnessFeedbackEnabledService',
     PlayerCorrectnessFeedbackEnabledService],
   ['PlayerPositionService', PlayerPositionService],
@@ -725,6 +735,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SolutionValidityService', SolutionValidityService],
   ['SolutionVerificationService', SolutionVerificationService],
   ['SpeechSynthesisChunkerService', SpeechSynthesisChunkerService],
+  ['StalenessDetectionService', StalenessDetectionService],
   ['StateCardIsCheckpointService', StateCardIsCheckpointService],
   ['StateClassifierMappingService', StateClassifierMappingService],
   ['StateContentService', StateContentService],
@@ -823,5 +834,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['UndoRedoService', UndoRedoService],
   ['QuestionValidationService', QuestionValidationService],
   ['CollectionEditorStateService', CollectionEditorStateService],
-  ['DeleteAccountBackendApiService', DeleteAccountBackendApiService]
+  ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
+  ['NumberConversionService', NumberConversionService]
 ];

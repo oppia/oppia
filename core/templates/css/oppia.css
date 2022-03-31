@@ -2543,6 +2543,14 @@ oppia-parameter {
   min-width: 200px;
   width: 400px;
 }
+
+.oppia-modal-lesson-information-card .modal-dialog {
+  margin: 100px auto;
+  max-width: 35%;
+  min-width: 270px;
+  width: 350px;
+}
+
 .skill-select-modal .modal-xl {
   width: 1000px;
 }
@@ -3133,6 +3141,11 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
+.oppia-modal-lesson-information-card .modal-dialog .modal-content {
+  border-radius: 4px;
+  min-width: 270px;
+}
+
 .oppia-improvement-task {
   background-color: #fff;
   margin-bottom: 30px;
@@ -3227,6 +3240,9 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 0.75em;
   list-style-type: none;
   text-align: center;
+}
+.oppia-navbar-nav.oppia-navbar-profile > li:hover {
+  background-color: #00645c
 }
 .oppia-activity-summary-tile.small-width .metrics li {
   display: block;
@@ -4785,7 +4801,7 @@ div.oppia-issues-learner-action {
   .oppia-profile-picture-container {
     float: left;
     height: auto;
-    width: 130px;
+    width: 100%;
   }
   .oppia-profile-user-card {
     float: none;

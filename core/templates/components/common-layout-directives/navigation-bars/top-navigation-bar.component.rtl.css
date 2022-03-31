@@ -47,10 +47,7 @@
   border-bottom: #333 solid 2px;
   transition: 50ms;
 }
-.nav-link:focus {
-  background-color: #fff;
-  color: #00645c;
-}
+
 .get-involved-dropdown {
   min-width: 574px;
   padding: 0;
@@ -461,5 +458,12 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%;
+  }
+  @media screen and (max-width: 600px) {
+    .oppia-logo {
+      right: 0;
+      margin-right: 60px;
+      position: absolute;
+    }
   }
 }
