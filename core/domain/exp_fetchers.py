@@ -28,7 +28,7 @@ import copy
 import logging
 
 from core import feconf
-from core.domain import caching_services
+from core.domain import caching_services, user_domain
 from core.domain import exp_domain
 from core.domain import subscription_services
 from core.platform import models
@@ -426,9 +426,23 @@ def get_exploration_user_data(user_id, exp_id):
         ExplorationUserData. The domain object corresponding to the given user
         and exploration.
     """
-    exploration_user_data = user_models.ExplorationUserDataModel.get(
+    exploration_user_data_model = user_models.ExplorationUserDataModel.get(
         user_id, exp_id)
-    if exploration_user_data:
-        return exploration_user_data
+    if exploration_user_data_model:
+        return user_domain.ExplorationUserData(
+            exploration_user_data_model.user_id,
+            exploration_user_data_model.exploration_id,
+            exploration_user_data_model.rating,
+            exploration_user_data_model.rated_on,
+            exploration_user_data_model.draft_change_list,
+            exploration_user_data_model.draft_change_list_last_updated,
+            exploration_user_data_model.draft_change_list_exp_version,
+            exploration_user_data_model.draft_change_list_id,
+            exploration_user_data_model.mute_suggestion_notifications,
+            exploration_user_data_model.mute_feedback_notifications,
+            exploration_user_data_model.saved_checkpoints_progress_state_name,
+            exploration_user_data_model.furthest_completed_checkpoint_state_name,
+            exploration_user_data_model.most_recently_viewed_checkpoint_state_name
+        )
     else:
         return None
