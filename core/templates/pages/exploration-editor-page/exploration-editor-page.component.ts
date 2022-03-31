@@ -252,10 +252,10 @@ angular.module('oppia').component('explorationEditorPage', {
           }),
           ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
             ContextService.getExplorationId()),
-          ThreadDataBackendApiService.getOpenThreadsCountAsync(),
+          ThreadDataBackendApiService.getFeedbackThreadsAsync(),
           UserService.getUserInfoAsync()
         ]).then(async(
-            [explorationData, featuresData, openThreadsCount, userInfo]) => {
+            [explorationData, featuresData, _, userInfo]) => {
           if (explorationData.exploration_is_linked_to_story) {
             ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
@@ -340,7 +340,7 @@ angular.module('oppia').component('explorationEditorPage', {
           if (!RouterService.isLocationSetToNonStateEditorTab() &&
               !explorationData.states.hasOwnProperty(
                 RouterService.getCurrentStateFromLocationPath('gui'))) {
-            if (openThreadsCount > 0) {
+            if (ThreadDataBackendApiService.getOpenThreadsCount() > 0) {
               RouterService.navigateToFeedbackTab();
             } else {
               RouterService.navigateToMainTab();

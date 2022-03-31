@@ -12,7 +12,7 @@
       </i>
     </div>
     <div class="oppia-mobile-collapsible-card-content" *ngIf="skillEditorCardIsShown">
-      <oppia-skill-description-editor></oppia-skill-description-editor>
+      <oppia-skill-description-editor (onSaveDescription)="onSaveDescription()"></oppia-skill-description-editor>
       <div class="oppia-editor-card-section review-material-container">
         <strong class="heading-text">Review Material</strong>
         <div class="concept-card-subtitle">
