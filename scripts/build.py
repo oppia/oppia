@@ -20,6 +20,7 @@ import argparse
 import collections
 import fnmatch
 import hashlib
+import io
 import json
 import os
 import re
@@ -31,7 +32,7 @@ from core import utils
 from scripts import common
 from scripts import servers
 
-from typing import IO, Deque, Dict, List, Optional, Sequence, Tuple
+from typing import Deque, Dict, List, Optional, Sequence, Tuple
 from typing_extensions import TypedDict
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
@@ -288,7 +289,7 @@ def _minify(source_path: str, target_path: str) -> None:
     subprocess.check_call(cmd, shell=True)
 
 
-def write_to_file_stream(file_stream: IO[str], content: str) -> None:
+def write_to_file_stream(file_stream: io.StringIO, content: str) -> None:
     """Write to a file object using provided content.
 
     Args:
@@ -298,7 +299,9 @@ def write_to_file_stream(file_stream: IO[str], content: str) -> None:
     file_stream.write(str(content))
 
 
-def _join_files(source_paths: List[str], target_file_stream: IO[str]) -> None:
+def _join_files(
+    source_paths: List[str], target_file_stream: io.StringIO
+) -> None:
     """Writes multiple files into one file.
 
     Args:
@@ -474,7 +477,7 @@ def _compare_file_count(
 
 
 def process_html(
-    source_file_stream: IO[str], target_file_stream: IO[str]
+    source_file_stream: io.StringIO, target_file_stream: io.StringIO
 ) -> None:
     """Remove whitespaces and add hashes to filepaths in the HTML file stream
     object.

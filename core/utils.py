@@ -22,6 +22,7 @@ import collections
 import datetime
 import hashlib
 import imghdr
+import io
 import itertools
 import json
 import os
@@ -32,6 +33,7 @@ import sys
 import time
 import unicodedata
 import urllib
+from urllib import request
 import zlib
 
 from core import feconf
@@ -100,7 +102,7 @@ def open_file(
     mode: TextModeTypes,
     encoding: str = 'utf-8',
     newline: Union[str, None] = None
-) -> IO[str]: ...
+) -> io.StringIO: ...
 
 
 @overload
@@ -109,7 +111,7 @@ def open_file(
     mode: BinaryModeTypes,
     encoding: Union[str, None] = 'utf-8',
     newline: Union[str, None] = None
-) -> IO[bytes]: ...
+) -> io.BytesIO: ...
 
 
 def open_file(
@@ -1277,4 +1279,4 @@ def url_open(source_url: str) -> str:
     context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
     # The type ignore is needed, because typestubs define the return type
     # of 'urlopen' as 'Any' which is wrong.
-    return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return]
+    return request.urlopen(source_url, context=context) # type: ignore[no-any-return]
