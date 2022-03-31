@@ -483,7 +483,7 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.require_valid_meta_tag_content(lengthy_meta_tag_content)
 
     def test_require_valid_page_title_fragment_for_web(self) -> None:
-        page_title_fragment_for_web = 'name'
+        page_title_fragment_for_web = 'title'
         utils.require_valid_page_title_fragment_for_web(
             page_title_fragment_for_web)
 
@@ -501,7 +501,8 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, max_length_error): # type: ignore[no-untyped-call]
             utils.require_valid_page_title_fragment_for_web(
                 lengthy_page_title_fragment_for_web)
-        small_page_title_fragment_for_web = 'a'
+
+        small_page_title_fragment_for_web = 'test'
         min_length_error = (
             'Page title fragment should not be shorter than %s characters.'
             % constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
