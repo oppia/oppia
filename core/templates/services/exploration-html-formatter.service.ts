@@ -192,8 +192,7 @@ export class ExplorationHtmlFormatterService {
     element.setAttribute('answer', this.htmlEscaper.objToEscapedJson(answer));
     // TODO(sll): Get rid of this special case for multiple choice.
     if ('choices' in interactionCustomizationArgs) {
-      let interactionChoices = interactionCustomizationArgs.choices.value.map(
-        choice => choice.html);
+      let interactionChoices = interactionCustomizationArgs.choices.value;
       element.setAttribute(
         'choices', this.htmlEscaper.objToEscapedJson(interactionChoices));
     }

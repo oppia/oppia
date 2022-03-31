@@ -36,6 +36,7 @@ import { UserService } from 'services/user.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { EventEmitter } from '@angular/core';
 // ^^^ This block is to be removed.
 
 describe('Feedback Tab Component', function() {
@@ -112,8 +113,9 @@ describe('Feedback Tab Component', function() {
     spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
       isLoggedIn: () => true
     }));
-    spyOn(threadDataBackendApiService, 'getThreadsAsync').and.returnValue(
-      $q.resolve({}));
+    spyOn(
+      threadDataBackendApiService,
+      'getFeedbackThreadsAsync').and.returnValue($q.resolve({}));
 
     $scope = $rootScope.$new();
     ctrl = $componentController('feedbackTab', {
@@ -123,6 +125,32 @@ describe('Feedback Tab Component', function() {
     ctrl.$onInit();
     $scope.$apply();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
+  it('should unsubscribe subscriptions on destroy', () => {
+    spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+    ctrl.$onDestroy();
+    expect(ctrl.directiveSubscriptions.unsubscribe)
+      .toHaveBeenCalled();
+  });
+
+  it('should get threads after feedback threads are available', () => {
+    let onFeedbackThreadsInitializedEmitter = new EventEmitter();
+    spyOnProperty(
+      threadDataBackendApiService, 'onFeedbackThreadsInitialized')
+      .and.returnValue(onFeedbackThreadsInitializedEmitter);
+    spyOn(ctrl, 'fetchUpdatedThreads');
+
+    ctrl.$onInit();
+
+    onFeedbackThreadsInitializedEmitter.emit();
+    $scope.$apply();
+
+    expect(ctrl.fetchUpdatedThreads).toHaveBeenCalled();
+  });
 
   it('should throw an error when trying to active a non-existent thread',
     function() {
