@@ -27,7 +27,7 @@ import constants from 'assets/constants';
 import { Subscription } from 'rxjs';
 
 type LoadOpportunities = Promise<{
-  opportunities: ExplorationOpportunity[];
+  opportunitiesDicts: ExplorationOpportunity[];
   more: boolean;
 }>;
 
@@ -109,11 +109,11 @@ export class OpportunitiesListComponent {
   ngOnInit(): void {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
-    this.loadOpportunities().then(({opportunities, more}) => {
+    this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.
       this.zone.run(() => {
-        this.opportunities = opportunities;
+        this.opportunities = opportunitiesDicts;
         this.more = more;
         this.visibleOpportunities = this.opportunities.slice(
           0, this.OPPORTUNITIES_PAGE_SIZE);
@@ -136,9 +136,9 @@ export class OpportunitiesListComponent {
       this.visibleOpportunities = [];
       this.loadingOpportunityData = true;
       this.loadMoreOpportunities().then(
-        ({opportunities, more}) => {
+        ({opportunitiesDicts, more}) => {
           this.more = more;
-          this.opportunities = this.opportunities.concat(opportunities);
+          this.opportunities = this.opportunities.concat(opportunitiesDicts);
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
           this.userIsOnLastPage = this.calculateUserIsOnLastPage(

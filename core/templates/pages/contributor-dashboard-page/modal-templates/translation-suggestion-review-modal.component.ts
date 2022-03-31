@@ -286,6 +286,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.activeSuggestionId = lastContribution;
     this.activeContribution = this.remainingContributions[
       lastContribution];
+    delete this.remainingContributions[this.activeSuggestionId];
     // Close modal instance if the suggestion's corresponding opportunity
     // is deleted. See issue #14234.
     if (!this.activeContribution.details) {
