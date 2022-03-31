@@ -837,7 +837,7 @@ class UtilsTests(test_utils.GenericTestBase):
         """ADD TEST ESCAPE SEQUENCE CHARACTERS CHECK."""
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
-            'The length of the exploration title should be between 1 and 50 ' 'characters; received '''):   # pylint: disable=line-too-long
+            'The length of the exploration title should be between 1 and 50 ' 'characters; received '):   # pylint: disable=line-too-long
             utils.require_valid_name('', 'the exploration title')
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
