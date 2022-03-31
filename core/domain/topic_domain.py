@@ -1169,7 +1169,7 @@ class Topic:
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
-            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, '')
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, 'web_title')
 
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(
