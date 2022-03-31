@@ -40,11 +40,11 @@ import { LoaderService } from 'services/loader.service';
 })
 export class PracticeTabComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() topicName!: string;
   @Input() subtopicsList!: Subtopic[];
-  @Input() startButtonIsDisabled: boolean = false;
+  @Input() previewMode: boolean = false;
   @Input() displayArea: string = 'topicViewer';
   @Input() topicUrlFragment: string = '';
   @Input() classroomUrlFragment: string = '';
@@ -89,7 +89,7 @@ export class PracticeTabComponent implements OnInit {
     this.selectedSubtopicIndices = Array(
       this.availableSubtopics.length).fill(false);
     this.clientWidth = window.innerWidth;
-    if (this.displayArea === 'topicViewer') {
+    if (this.displayArea === 'topicViewer' && !this.previewMode) {
       this.topicUrlFragment = (
         this.urlService.getTopicUrlFragmentFromLearnerUrl());
       this.classroomUrlFragment = (
@@ -102,7 +102,7 @@ export class PracticeTabComponent implements OnInit {
   }
 
   isStartButtonDisabled(): boolean {
-    if (this.startButtonIsDisabled) {
+    if (this.previewMode) {
       return true;
     }
     for (var idx in this.selectedSubtopicIndices) {
