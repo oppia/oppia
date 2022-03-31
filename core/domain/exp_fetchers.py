@@ -428,7 +428,7 @@ def get_exploration_user_data(user_id, exp_id):
     """
     exploration_user_data_model = user_models.ExplorationUserDataModel.get(
         user_id, exp_id)
-    if exploration_user_data_model:
+    if exploration_user_data_model is not None:
         return user_domain.ExplorationUserData(
             exploration_user_data_model.user_id,
             exploration_user_data_model.exploration_id,

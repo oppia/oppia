@@ -493,7 +493,7 @@ class UserSettings:
         self.banned = False
         self.roles = [default_role]
 
-    def set_viewed_lesson_info_once_to_true(self) -> None:
+    def mark_lesson_info_modal_viewed(self) -> None:
         """Sets user_has_viewed_lesson_info_modal_once to true."""
         self.user_has_viewed_lesson_info_modal_once = True
 

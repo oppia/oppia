@@ -2346,5 +2346,5 @@ def set_user_has_viewed_lesson_info_modal_once(user_id):
     """
 
     user_settings = get_user_settings(user_id)
-    user_settings.set_viewed_lesson_info_once_to_true()
+    user_settings.mark_lesson_info_modal_viewed()
     _save_user_settings(user_settings)
