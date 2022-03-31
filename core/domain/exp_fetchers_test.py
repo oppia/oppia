@@ -269,12 +269,12 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_user_data.user_id, user_id)
         self.assertEqual(exploration_user_data.exploration_id, self.EXP_1_ID)
         self.assertEqual(
-            exploration_user_data.last_completed_checkpoint_state_name,
+            exploration_user_data.furthest_completed_checkpoint_state_name,
             'checkpoint1')
         self.assertEqual(
-            exploration_user_data.last_completed_checkpoint_exp_version, 1)
+            exploration_user_data.saved_checkpoints_progress_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.latest_visited_checkpoint_state_name,
+            exploration_user_data.most_recently_viewed_checkpoint_state_name,
             'checkpoint1')
 
 

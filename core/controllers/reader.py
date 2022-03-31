@@ -279,27 +279,27 @@ class ExplorationHandler(base.BaseHandler):
 
         preferred_audio_language_code = None
         preferred_language_codes = None
-        user_has_viewed_lesson_info_once = None
+        user_has_viewed_lesson_info_modal_once = None
 
         if user_settings is not None:
             preferred_audio_language_code = (
                 user_settings.preferred_audio_language_code)
             preferred_language_codes = (
                 user_settings.preferred_language_codes)
-            user_has_viewed_lesson_info_once = (
-                user_settings.user_has_viewed_lesson_info_once)
+            user_has_viewed_lesson_info_modal_once = (
+                user_settings.user_has_viewed_lesson_info_modal_once)
 
-        last_completed_checkpoint_exp_version = None
-        last_completed_checkpoint_state_name = None
-        latest_visited_checkpoint_state_name = None
+        saved_checkpoints_progress_exp_version = None
+        furthest_completed_checkpoint_state_name = None
+        most_recently_viewed_checkpoint_state_name = None
 
         if exploration_user_data is not None:
-            last_completed_checkpoint_exp_version = (
-                exploration_user_data.last_completed_checkpoint_exp_version)
-            last_completed_checkpoint_state_name = (
-                exploration_user_data.last_completed_checkpoint_state_name)
-            latest_visited_checkpoint_state_name = (
-                exploration_user_data.latest_visited_checkpoint_state_name)
+            saved_checkpoints_progress_exp_version = (
+                exploration_user_data.saved_checkpoints_progress_exp_version)
+            furthest_completed_checkpoint_state_name = (
+                exploration_user_data.furthest_completed_checkpoint_state_name)
+            most_recently_viewed_checkpoint_state_name = (
+                exploration_user_data.most_recently_viewed_checkpoint_state_name)
 
         self.values.update({
             'can_edit': (
@@ -317,14 +317,14 @@ class ExplorationHandler(base.BaseHandler):
                 exploration.correctness_feedback_enabled),
             'record_playthrough_probability': (
                 config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value),
-            'user_has_viewed_lesson_info_once': (
-                user_has_viewed_lesson_info_once),
-            'last_completed_checkpoint_exp_version': (
-                last_completed_checkpoint_exp_version),
-            'last_completed_checkpoint_state_name': (
-                last_completed_checkpoint_state_name),
-            'latest_visited_checkpoint_state_name': (
-                latest_visited_checkpoint_state_name)
+            'user_has_viewed_lesson_info_modal_once': (
+                user_has_viewed_lesson_info_modal_once),
+            'saved_checkpoints_progress_exp_version': (
+                saved_checkpoints_progress_exp_version),
+            'furthest_completed_checkpoint_state_name': (
+                furthest_completed_checkpoint_state_name),
+            'most_recently_viewed_checkpoint_state_name': (
+                most_recently_viewed_checkpoint_state_name)
         })
         self.render_json(self.values)
 
@@ -1311,10 +1311,10 @@ class CheckpointCompletedEventHandler(base.BaseHandler):
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'last_completed_checkpoint_exp_version': {
+            'saved_checkpoints_progress_exp_version': {
                 'schema': editor.SCHEMA_FOR_VERSION
             },
-            'last_completed_checkpoint_state_name': {
+            'furthest_completed_checkpoint_state_name': {
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
@@ -1337,16 +1337,16 @@ class CheckpointCompletedEventHandler(base.BaseHandler):
         """
 
         user_id = self.user_id
-        last_completed_checkpoint_state_name = self.normalized_payload.get(
-            'last_completed_checkpoint_state_name')
-        last_completed_checkpoint_exp_version = self.normalized_payload.get(
-            'last_completed_checkpoint_exp_version')
+        furthest_completed_checkpoint_state_name = self.normalized_payload.get(
+            'furthest_completed_checkpoint_state_name')
+        saved_checkpoints_progress_exp_version = self.normalized_payload.get(
+            'saved_checkpoints_progress_exp_version')
 
         user_services.update_learner_checkpoint_progress(
             user_id,
             exploration_id,
-            last_completed_checkpoint_state_name,
-            last_completed_checkpoint_exp_version)
+            furthest_completed_checkpoint_state_name,
+            saved_checkpoints_progress_exp_version)
 
         self.render_json(self.values)
 
@@ -1361,10 +1361,10 @@ class CheckpointVisitedEventHandler(base.BaseHandler):
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'last_completed_checkpoint_exp_version': {
+            'saved_checkpoints_progress_exp_version': {
                 'schema': editor.SCHEMA_FOR_VERSION
             },
-            'latest_visited_checkpoint_state_name': {
+            'most_recently_viewed_checkpoint_state_name': {
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
@@ -1387,15 +1387,15 @@ class CheckpointVisitedEventHandler(base.BaseHandler):
         """
 
         user_id = self.user_id
-        latest_visited_checkpoint_state_name = self.normalized_payload.get(
-            'latest_visited_checkpoint_state_name')
-        last_completed_checkpoint_exp_version = self.normalized_payload.get(
-            'last_completed_checkpoint_exp_version')
+        most_recently_viewed_checkpoint_state_name = self.normalized_payload.get(
+            'most_recently_viewed_checkpoint_state_name')
+        saved_checkpoints_progress_exp_version = self.normalized_payload.get(
+            'saved_checkpoints_progress_exp_version')
 
         user_services.set_latest_visited_checkpoint(
             user_id,
             exploration_id,
-            latest_visited_checkpoint_state_name,
-            last_completed_checkpoint_exp_version)
+            most_recently_viewed_checkpoint_state_name,
+            saved_checkpoints_progress_exp_version)
 
         self.render_json(self.values)

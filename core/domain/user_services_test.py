@@ -2679,12 +2679,12 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
                 user_id, exploration_id))
         self.assertIsNotNone(exploration_user_model)
         self.assertEqual(
-            exploration_user_model.last_completed_checkpoint_state_name,
+            exploration_user_model.furthest_completed_checkpoint_state_name,
             'checkpoint1')
         self.assertEqual(
-            exploration_user_model.last_completed_checkpoint_exp_version, 1)
+            exploration_user_model.saved_checkpoints_progress_exp_version, 1)
         self.assertEqual(
-            exploration_user_model.latest_visited_checkpoint_state_name,
+            exploration_user_model.most_recently_viewed_checkpoint_state_name,
             'checkpoint1')
 
     def test_set_latest_visited_checkpoint(self):
@@ -2708,10 +2708,10 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
                 user_id, exploration_id))
         self.assertIsNotNone(exploration_user_model)
         self.assertEqual(
-            exploration_user_model.last_completed_checkpoint_state_name,
+            exploration_user_model.furthest_completed_checkpoint_state_name,
             'checkpoint2')
         self.assertEqual(
-            exploration_user_model.latest_visited_checkpoint_state_name,
+            exploration_user_model.most_recently_viewed_checkpoint_state_name,
             'checkpoint2')
 
         user_services.set_latest_visited_checkpoint(
@@ -2721,13 +2721,13 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
                 user_id, exploration_id))
         self.assertIsNotNone(exploration_user_model)
         self.assertEqual(
-            exploration_user_model.last_completed_checkpoint_state_name,
+            exploration_user_model.furthest_completed_checkpoint_state_name,
             'checkpoint2')
         self.assertEqual(
-            exploration_user_model.latest_visited_checkpoint_state_name,
+            exploration_user_model.most_recently_viewed_checkpoint_state_name,
             'checkpoint1')
 
-    def test_set_user_has_viewed_lesson_info_once(self):
+    def test_set_user_has_viewed_lesson_info_modal_once(self):
         auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
@@ -2735,9 +2735,9 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_services.set_username(user_id, username)
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-        self.assertFalse(user_settings_model.user_has_viewed_lesson_info_once)
+        self.assertFalse(user_settings_model.user_has_viewed_lesson_info_modal_once)
 
-        user_services.set_user_has_viewed_lesson_info_once(user_id)
+        user_services.set_user_has_viewed_lesson_info_modal_once(user_id)
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-        self.assertTrue(user_settings_model.user_has_viewed_lesson_info_once)
+        self.assertTrue(user_settings_model.user_has_viewed_lesson_info_modal_once)

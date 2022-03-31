@@ -37,7 +37,7 @@ class UserSettingsDict(TypedDict):
     email: str
     roles: List[str]
     banned: bool
-    user_has_viewed_lesson_info_once: bool
+    user_has_viewed_lesson_info_modal_once: bool
     username: Optional[str]
     normalized_username: Optional[str]
     last_agreed_to_terms: Optional[datetime.datetime]
@@ -68,7 +68,7 @@ class UserSettings:
         user_id: str. The unique ID of the user.
         email: str. The user email.
         roles: list(str). Roles of the user.
-        user_has_viewed_lesson_info_once. Flag to check whether the user has
+        user_has_viewed_lesson_info_modal_once. Flag to check whether the user has
             viewed lesson info once.
         username: str or None. Identifiable username to display in the UI.
         last_agreed_to_terms: datetime.datetime or None. When the user last
@@ -106,7 +106,7 @@ class UserSettings:
         email: str,
         roles: List[str],
         banned: bool,
-        user_has_viewed_lesson_info_once: bool,
+        user_has_viewed_lesson_info_modal_once: bool,
         username: Optional[str] = None,
         last_agreed_to_terms: Optional[datetime.datetime] = None,
         last_started_state_editor_tutorial: (
@@ -140,7 +140,7 @@ class UserSettings:
             email: str. The user email.
             roles: list(str). Roles of the user.
             banned: bool. Whether the uses is banned.
-            user_has_viewed_lesson_info_once: bool. Whether the user has viewed
+            user_has_viewed_lesson_info_modal_once: bool. Whether the user has viewed
                 lesson info once.
             username: str or None. Identifiable username to display in the UI.
             last_agreed_to_terms: datetime.datetime or None. When the user
@@ -207,7 +207,7 @@ class UserSettings:
         self.banned = banned
         self.deleted = deleted
         self.created_on = created_on
-        self.user_has_viewed_lesson_info_once = user_has_viewed_lesson_info_once
+        self.user_has_viewed_lesson_info_modal_once = user_has_viewed_lesson_info_modal_once
 
     def validate(self) -> None:
         """Checks that the user_id, email, roles, banned, pin and display_alias
@@ -391,8 +391,8 @@ class UserSettings:
             'display_alias': self.display_alias,
             'deleted': self.deleted,
             'created_on': self.created_on,
-            'user_has_viewed_lesson_info_once': (
-                self.user_has_viewed_lesson_info_once)
+            'user_has_viewed_lesson_info_modal_once': (
+                self.user_has_viewed_lesson_info_modal_once)
         }
 
     @property
@@ -493,8 +493,8 @@ class UserSettings:
         self.roles = [default_role]
 
     def set_viewed_lesson_info_once_to_true(self) -> None:
-        """Sets user_has_viewed_lesson_info_once to true."""
-        self.user_has_viewed_lesson_info_once = True
+        """Sets user_has_viewed_lesson_info_modal_once to true."""
+        self.user_has_viewed_lesson_info_modal_once = True
 
 
 class UserActionsInfo:

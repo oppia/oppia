@@ -427,7 +427,7 @@ def get_exploration_user_data(user_id, exp_id):
         and exploration.
     """
     exploration_user_data = user_models.ExplorationUserDataModel.get(
-            user_id, exp_id)
+        user_id, exp_id)
     if exploration_user_data:
         return exploration_user_data
     else:

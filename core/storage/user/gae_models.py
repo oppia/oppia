@@ -132,7 +132,7 @@ class UserSettingsModel(base_models.BaseModel):
     # Flag to indicate whether the user is banned.
     banned = datastore_services.BooleanProperty(indexed=True, default=False)
     # Flag to check whether the user has viewed lesson info once.
-    user_has_viewed_lesson_info_once = datastore_services.BooleanProperty(
+    user_has_viewed_lesson_info_modal_once = datastore_services.BooleanProperty(
         indexed=True, default=False)
 
     @staticmethod
@@ -199,7 +199,7 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'user_has_viewed_lesson_info_once':
+            'user_has_viewed_lesson_info_modal_once':
                 base_models.EXPORT_POLICY.EXPORTED,
             # Pin is not exported since this is an auth mechanism.
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -294,8 +294,8 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
             'display_alias': user.display_alias,
-            'user_has_viewed_lesson_info_once': (
-                user.user_has_viewed_lesson_info_once)
+            'user_has_viewed_lesson_info_modal_once': (
+                user.user_has_viewed_lesson_info_modal_once)
         }
 
     @classmethod
@@ -1483,13 +1483,13 @@ class ExplorationUserDataModel(base_models.BaseModel):
     mute_feedback_notifications = datastore_services.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
     # The exploration version of the last completed checkpoint.
-    last_completed_checkpoint_exp_version = datastore_services.IntegerProperty(
+    saved_checkpoints_progress_exp_version = datastore_services.IntegerProperty(
         default=None)
     # The state name of the last completed checkpoint.
-    last_completed_checkpoint_state_name = datastore_services.StringProperty(
+    furthest_completed_checkpoint_state_name = datastore_services.StringProperty(
         default=None)
     # The state name of the last visited checkpoint.
-    latest_visited_checkpoint_state_name = datastore_services.StringProperty(
+    most_recently_viewed_checkpoint_state_name = datastore_services.StringProperty(
         default=None)
 
     @staticmethod
@@ -1547,11 +1547,11 @@ class ExplorationUserDataModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'mute_feedback_notifications':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'last_completed_checkpoint_exp_version':
+            'saved_checkpoints_progress_exp_version':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'last_completed_checkpoint_state_name':
+            'furthest_completed_checkpoint_state_name':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'latest_visited_checkpoint_state_name':
+            'most_recently_viewed_checkpoint_state_name':
                 base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -1684,12 +1684,12 @@ class ExplorationUserDataModel(base_models.BaseModel):
                     user_model.mute_suggestion_notifications),
                 'mute_feedback_notifications': (
                     user_model.mute_feedback_notifications),
-                'last_completed_checkpoint_exp_version': (
-                    user_model.last_completed_checkpoint_exp_version),
-                'last_completed_checkpoint_state_name': (
-                    user_model.last_completed_checkpoint_state_name),
-                'latest_visited_checkpoint_state_name': (
-                    user_model.latest_visited_checkpoint_state_name)
+                'saved_checkpoints_progress_exp_version': (
+                    user_model.saved_checkpoints_progress_exp_version),
+                'furthest_completed_checkpoint_state_name': (
+                    user_model.furthest_completed_checkpoint_state_name),
+                'most_recently_viewed_checkpoint_state_name': (
+                    user_model.most_recently_viewed_checkpoint_state_name)
             }
 
         return user_data

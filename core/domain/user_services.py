@@ -177,7 +177,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
                 ],
                 banned=False,
                 username='admin',
-                user_has_viewed_lesson_info_once=False,
+                user_has_viewed_lesson_info_modal_once=False,
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:
@@ -661,8 +661,8 @@ def _get_user_settings_from_model(user_settings_model):
         display_alias=user_settings_model.display_alias,
         deleted=user_settings_model.deleted,
         created_on=user_settings_model.created_on,
-        user_has_viewed_lesson_info_once=(
-            user_settings_model.user_has_viewed_lesson_info_once)
+        user_has_viewed_lesson_info_modal_once=(
+            user_settings_model.user_has_viewed_lesson_info_modal_once)
     )
 
 
@@ -2310,11 +2310,11 @@ def update_learner_checkpoint_progress(
         exploration_user_model = user_models.ExplorationUserDataModel.create(
             user_id, exploration_id)
 
-    exploration_user_model.last_completed_checkpoint_exp_version = exp_version
+    exploration_user_model.saved_checkpoints_progress_exp_version = exp_version
     # On completing a checkpoint, we update both last_completed and
     # latest_visited checkpoint.
-    exploration_user_model.last_completed_checkpoint_state_name = state_name
-    exploration_user_model.latest_visited_checkpoint_state_name = state_name
+    exploration_user_model.furthest_completed_checkpoint_state_name = state_name
+    exploration_user_model.most_recently_viewed_checkpoint_state_name = state_name
     exploration_user_model.update_timestamps()
     exploration_user_model.put()
 
@@ -2331,14 +2331,14 @@ def set_latest_visited_checkpoint(user_id, exploration_id, state_name, version):
 
     exploration_user_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
-    exploration_user_model.latest_visited_checkpoint_state_name = state_name
-    exploration_user_model.last_completed_checkpoint_exp_version = version
+    exploration_user_model.most_recently_viewed_checkpoint_state_name = state_name
+    exploration_user_model.saved_checkpoints_progress_exp_version = version
     exploration_user_model.update_timestamps()
     exploration_user_model.put()
 
 
-def set_user_has_viewed_lesson_info_once(user_id):
-    """Set the 'user_has_viewed_lesson_info_once' to true.
+def set_user_has_viewed_lesson_info_modal_once(user_id):
+    """Set the 'user_has_viewed_lesson_info_modal_once' to true.
 
     Args:
         user_id: str. The Id of the user.
