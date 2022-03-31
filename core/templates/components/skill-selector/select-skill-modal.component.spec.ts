@@ -22,10 +22,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SelectSkillModalComponent } from './select-skill-modal.component';
+import { CategorizedSkills, SelectSkillModalComponent } from './select-skill-modal.component';
 import { SkillSelectorComponent } from './skill-selector.component';
-import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
-import { ShortSkillSummary, ShortSkillSummaryBackendDict } from 'domain/skill/short-skill-summary.model';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -35,17 +33,6 @@ describe('Select Skill Modal', () => {
   let componentInstance: SelectSkillModalComponent;
   let ngbActiveModal: NgbActiveModal;
   let allowSkillsFromOtherTopics: boolean;
-  let shortSkillSummaryBackendDict: ShortSkillSummaryBackendDict = {
-    skill_id: '1',
-    skill_description: 'description1'
-  };
-  let shortSkillSummary: ShortSkillSummary = (
-    ShortSkillSummary.createFromBackendDict(shortSkillSummaryBackendDict));
-  let categorizedSkills: SkillsCategorizedByTopics = {
-    'Dummy Topic': {
-      Subtopic1: [shortSkillSummary]
-    }
-  };
   let skillsInSameTopicCount: number = 3;
   let skillSummaryBackendDict: SkillSummaryBackendDict = {
     id: '3',
@@ -57,8 +44,14 @@ describe('Select Skill Modal', () => {
     skill_model_created_on: 2,
     skill_model_last_updated: 3
   };
-  let untriagedSkillSummaries: ShortSkillSummary[] = (
-    [ShortSkillSummary.createFromBackendDict(shortSkillSummaryBackendDict)]);
+  let shortSkillSummary: SkillSummaryBackendDict = skillSummaryBackendDict;
+  let categorizedSkills: CategorizedSkills = {
+    'Dummy Topic': {
+      Subtopic1: [shortSkillSummary]
+    }
+  };
+  let untriagedSkillSummaries: SkillSummaryBackendDict[] = (
+    [skillSummaryBackendDict]);
   let skillSummaries: SkillSummaryBackendDict[] = [skillSummaryBackendDict];
 
   beforeEach(waitForAsync(() => {
