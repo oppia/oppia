@@ -116,8 +116,10 @@ export class AudioPreloaderService {
     }
     const audioFilenamesInBfsOrder = [];
     for (const stateName of bfsTraversalOfStates) {
-      for (const voiceover of allVoiceovers[stateName]) {
-        audioFilenamesInBfsOrder.push(voiceover.filename);
+      if (allVoiceovers !== null) {
+        for (const voiceover of allVoiceovers[stateName]) {
+          audioFilenamesInBfsOrder.push(voiceover.filename);
+        }
       }
     }
     return audioFilenamesInBfsOrder;

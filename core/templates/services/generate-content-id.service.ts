@@ -70,7 +70,9 @@ export class GenerateContentIdService {
     // This function is used to generate content_ids for content that live in
     // the State domain. This includes hints, feedback, and customization args.
     const contentIdIndex = this.stateNextContentIdIndexService.displayed;
-    this.stateNextContentIdIndexService.displayed += 1;
+    if (this.stateNextContentIdIndexService.displayed !== null) {
+      this.stateNextContentIdIndexService.displayed += 1;
+    }
     return `${prefix}_${contentIdIndex}`;
   }
 

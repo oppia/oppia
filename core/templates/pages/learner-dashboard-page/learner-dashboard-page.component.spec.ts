@@ -1003,7 +1003,7 @@ describe('Learner dashboard page', () => {
         learnerDashboardBackendApiService,
         'fetchLearnerDashboardTopicsAndStoriesDataAsync')
         .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
       component.ngOnInit();
 
@@ -1022,7 +1022,7 @@ describe('Learner dashboard page', () => {
         learnerDashboardBackendApiService,
         'fetchLearnerDashboardCollectionsDataAsync')
         .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
       let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
       component.setActiveSubsection(newActiveSectionName);
@@ -1042,7 +1042,7 @@ describe('Learner dashboard page', () => {
         learnerDashboardBackendApiService,
         'fetchLearnerDashboardExplorationsDataAsync')
         .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
       let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
       component.setActiveSubsection(newActiveSectionName);
@@ -1128,7 +1128,7 @@ describe('Learner dashboard page', () => {
         learnerDashboardBackendApiService,
         'fetchLearnerDashboardCollectionsDataAsync')
         .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
       let newActiveSectionName = (
         'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
@@ -1149,7 +1149,7 @@ describe('Learner dashboard page', () => {
         learnerDashboardBackendApiService,
         'fetchLearnerDashboardExplorationsDataAsync')
         .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
       let newActiveSectionName = (
         'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
@@ -1236,7 +1236,7 @@ describe('Learner dashboard page', () => {
           learnerDashboardBackendApiService,
           'fetchLearnerDashboardFeedbackUpdatesDataAsync')
           .and.rejectWith(404);
-        const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+        const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
         component.ngOnInit();
 
