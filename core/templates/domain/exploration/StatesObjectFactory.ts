@@ -73,9 +73,9 @@ export class States {
     return this._states;
   }
 
-  addState(newStateName: string): void {
+  addState(newStateName: string, contentId): void {
     this._states[newStateName] = this._stateObject.createDefaultState(
-      newStateName);
+      newStateName, contentId);
   }
 
   setState(stateName: string, stateData: State): void {

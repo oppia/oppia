@@ -95,6 +95,9 @@ require(
   'pages/exploration-editor-page/services/' +
   'exploration-language-code.service.ts');
 require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-next-content-id-index.service.ts');
+require(
   'pages/exploration-editor-page/services/exploration-objective.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -165,6 +168,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
     'ExplorationFeaturesService', 'ExplorationImprovementsService',
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
+    'ExplorationNextContentIdIndexService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
     'ExplorationParamSpecsService', 'ExplorationPropertyService',
     'ExplorationRightsService', 'ExplorationSaveService',
@@ -190,6 +194,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationDataService, ExplorationFeaturesBackendApiService,
         ExplorationFeaturesService, ExplorationImprovementsService,
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
+        ExplorationNextContentIdIndexService,
         ExplorationObjectiveService, ExplorationParamChangesService,
         ExplorationParamSpecsService, ExplorationPropertyService,
         ExplorationRightsService, ExplorationSaveService,
@@ -280,7 +285,8 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.auto_tts_enabled);
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
-
+          ExplorationNextContentIdIndexService.init(
+            explorationData.next_content_id_index);
 
           ctrl.explorationTitleService = ExplorationTitleService;
           ctrl.explorationCategoryService = ExplorationCategoryService;

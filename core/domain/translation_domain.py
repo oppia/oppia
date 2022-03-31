@@ -152,6 +152,7 @@ class TranslatedContent:
     def __init__(
         self,
         content_value: feconf.ContentValueType,
+        content_format: TranslatableContentFormat,
         needs_update: bool
     ) -> None:
         self.content_value = content_value
@@ -173,6 +174,7 @@ class TranslatedContent:
         """
         return cls(
             translated_content_dict['content_value'],
+            translated_content_dict['content_format'],
             translated_content_dict['needs_update'])
 
     def to_dict(self) -> feconf.TranslatedContentDict:
@@ -185,6 +187,7 @@ class TranslatedContent:
         """
         return {
             'content_value': self.content_value,
+            'content_format': self.content_format,
             'needs_update': self.needs_update
         }
 

@@ -2882,7 +2882,11 @@ class State(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def create_default_state(
-            cls, default_dest_state_name, is_initial_state=False):
+        cls,
+        default_dest_state_name,
+        content_id_for_state_content,
+        is_initial_state=False
+    ):
         """Return a State domain object with default value.
 
         Args:
@@ -2895,9 +2899,8 @@ class State(translation_domain.BaseTranslatableObject):
         """
         content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
-        content_id = feconf.DEFAULT_NEW_STATE_CONTENT_ID
         return cls(
-            SubtitledHtml(content_id, content_html),
+            SubtitledHtml(content_id_for_state_content, content_html),
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),

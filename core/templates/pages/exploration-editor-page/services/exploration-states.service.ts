@@ -150,13 +150,11 @@ export class ExplorationStatesService {
     param_changes: ['paramChanges'],
     param_specs: ['paramSpecs'],
     hints: ['interaction', 'hints'],
-    next_content_id_index: ['nextContentIdIndex'],
     solicit_answer_details: ['solicitAnswerDetails'],
     card_is_checkpoint: ['cardIsCheckpoint'],
     solution: ['interaction', 'solution'],
     widget_id: ['interaction', 'id'],
-    widget_customization_args: ['interaction', 'customizationArgs'],
-    written_translations: ['writtenTranslations']
+    widget_customization_args: ['interaction', 'customizationArgs']
   };
 
   private _CONTENT_ID_EXTRACTORS = {
@@ -326,9 +324,6 @@ export class ExplorationStatesService {
       stateName: string, backendName: 'linked_skill_id', newValue: string
   ): void;
   saveStateProperty(
-      stateName: string, backendName: 'next_content_id_index', newValue: number
-  ): void;
-  saveStateProperty(
       stateName: string,
       backendName: StatePropertyNames,
       newValue: StatePropertyValues
@@ -361,11 +356,9 @@ export class ExplorationStatesService {
           newContentIds, oldContentIds);
         contentIdsToDelete.forEach((contentId) => {
           newStateData.recordedVoiceovers.deleteContentId(contentId);
-          newStateData.writtenTranslations.deleteContentId(contentId);
         });
         contentIdsToAdd.forEach((contentId) => {
           newStateData.recordedVoiceovers.addContentId(contentId);
-          newStateData.writtenTranslations.addContentId(contentId);
         });
       }
       let propertyRef = newStateData;
@@ -495,13 +488,6 @@ export class ExplorationStatesService {
     this.saveStateProperty(stateName, 'linked_skill_id', newLinkedSkillId);
   }
 
-  saveNextContentIdIndex(
-      stateName: string, newNextContentIdIndex: number
-  ): void {
-    this.saveStateProperty(
-      stateName, 'next_content_id_index', newNextContentIdIndex);
-  }
-
   getInteractionCustomizationArgsMemento(
       stateName: string
   ): InteractionCustomizationArgs {
@@ -601,58 +587,54 @@ export class ExplorationStatesService {
       stateName, 'card_is_checkpoint', newCardIsCheckpoint);
   }
 
-  getWrittenTranslationsMemento(stateName: string): WrittenTranslations {
-    return this._states.getState(stateName).writtenTranslations;
-  }
+  // saveWrittenTranslation(
+  //     contentId: string,
+  //     dataFormat: DataFormatToDefaultValuesKey,
+  //     languageCode: string,
+  //     stateName: string,
+  //     translationHtml: string
+  // ): void {
+  //   this.changeListService.addWrittenTranslation(
+  //     contentId, dataFormat, languageCode, stateName, translationHtml);
+  //   let stateData = this._states.getState(stateName);
+  //   if (
+  //     stateData.writtenTranslations.hasWrittenTranslation(
+  //       contentId, languageCode)
+  //   ) {
+  //     stateData.writtenTranslations.updateWrittenTranslation(
+  //       contentId, languageCode, translationHtml);
+  //   } else {
+  //     stateData.writtenTranslations.addWrittenTranslation(
+  //       contentId, languageCode, dataFormat, translationHtml);
+  //   }
+  //   this._states.setState(stateName, cloneDeep(stateData));
+  // }
 
-  saveWrittenTranslation(
-      contentId: string,
-      dataFormat: DataFormatToDefaultValuesKey,
-      languageCode: string,
-      stateName: string,
-      translationHtml: string
-  ): void {
-    this.changeListService.addWrittenTranslation(
-      contentId, dataFormat, languageCode, stateName, translationHtml);
-    let stateData = this._states.getState(stateName);
-    if (
-      stateData.writtenTranslations.hasWrittenTranslation(
-        contentId, languageCode)
-    ) {
-      stateData.writtenTranslations.updateWrittenTranslation(
-        contentId, languageCode, translationHtml);
-    } else {
-      stateData.writtenTranslations.addWrittenTranslation(
-        contentId, languageCode, dataFormat, translationHtml);
-    }
-    this._states.setState(stateName, cloneDeep(stateData));
-  }
+  // markWrittenTranslationAsNeedingUpdate(
+  //     contentId: string, languageCode: string, stateName: string
+  // ): void {
+  //   this.changeListService.markTranslationAsNeedingUpdate(
+  //     contentId, languageCode, stateName);
+  //   let stateData = this._states.getState(stateName);
+  //   stateData.writtenTranslations.translationsMapping[contentId][
+  //     languageCode].markAsNeedingUpdate();
+  //   this._states.setState(stateName, cloneDeep(stateData));
+  // }
 
-  markWrittenTranslationAsNeedingUpdate(
-      contentId: string, languageCode: string, stateName: string
-  ): void {
-    this.changeListService.markTranslationAsNeedingUpdate(
-      contentId, languageCode, stateName);
-    let stateData = this._states.getState(stateName);
-    stateData.writtenTranslations.translationsMapping[contentId][
-      languageCode].markAsNeedingUpdate();
-    this._states.setState(stateName, cloneDeep(stateData));
-  }
-
-  markWrittenTranslationsAsNeedingUpdate(
-      contentId: string, stateName: string
-  ): void {
-    this.changeListService.markTranslationsAsNeedingUpdate(
-      contentId, stateName);
-    let stateData = this._states.getState(stateName);
-    const translationMapping = (
-      stateData.writtenTranslations.translationsMapping[contentId]);
-    for (const languageCode in translationMapping) {
-      stateData.writtenTranslations.translationsMapping[contentId][
-        languageCode].markAsNeedingUpdate();
-    }
-    this._states.setState(stateName, cloneDeep(stateData));
-  }
+  // markWrittenTranslationsAsNeedingUpdate(
+  //     contentId: string, stateName: string
+  // ): void {
+  //   this.changeListService.markTranslationsAsNeedingUpdate(
+  //     contentId, stateName);
+  //   let stateData = this._states.getState(stateName);
+  //   const translationMapping = (
+  //     stateData.writtenTranslations.translationsMapping[contentId]);
+  //   for (const languageCode in translationMapping) {
+  //     stateData.writtenTranslations.translationsMapping[contentId][
+  //       languageCode].markAsNeedingUpdate();
+  //   }
+  //   this._states.setState(stateName, cloneDeep(stateData));
+  // }
 
   isInitialized(): boolean {
     return this._states !== null;
@@ -671,9 +653,11 @@ export class ExplorationStatesService {
     }
     this.alertsService.clearWarnings();
 
-    this._states.addState(newStateName);
+    let contentId = GenerateContentIdService.getNextStateId('content')
+    this._states.addState(newStateName, contentId);
 
-    this.changeListService.addState(newStateName);
+    this.changeListService.addState(newStateName, contentId);
+    ExplorationNextContentIdIndexService.saveDisplayedValue()
     this.stateAddedCallbacks.forEach((callback) => {
       callback(newStateName);
     });

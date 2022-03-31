@@ -144,9 +144,7 @@ export class StateHintsEditorComponent implements OnInit {
       this.stateHintsService.displayed.push(result.hint);
       this.stateHintsService.saveDisplayedValue();
       this.onSaveHints.emit(this.stateHintsService.displayed);
-      this.stateNextContentIdIndexService.saveDisplayedValue();
-      this.onSaveNextContentIdIndex.emit(
-        this.stateNextContentIdIndexService.displayed);
+      this.onSaveNextContentIdIndex.emit();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.

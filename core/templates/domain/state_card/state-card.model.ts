@@ -49,7 +49,6 @@ export class StateCard {
   _interaction: Interaction;
   _inputResponsePairs: InputResponsePair[];
   _recordedVoiceovers: RecordedVoiceovers;
-  _writtenTranslations: WrittenTranslations;
   _contentId: string;
   _completed: boolean;
   audioTranslationLanguageService: AudioTranslationLanguageService;
@@ -58,7 +57,6 @@ export class StateCard {
       interactionHtml: string, interaction: Interaction,
       inputResponsePairs: InputResponsePair[],
       recordedVoiceovers: RecordedVoiceovers,
-      writtenTranslations: WrittenTranslations,
       contentId: string,
       audioTranslationLanguageService: AudioTranslationLanguageService) {
     this._stateName = stateName;
@@ -67,7 +65,6 @@ export class StateCard {
     this._inputResponsePairs = inputResponsePairs;
     this._interaction = interaction;
     this._recordedVoiceovers = recordedVoiceovers;
-    this._writtenTranslations = writtenTranslations;
     this._contentId = contentId;
     this._completed = false;
     this.audioTranslationLanguageService = audioTranslationLanguageService;
@@ -259,10 +256,6 @@ export class StateCard {
     this._interactionHtml = interactionHtml;
   }
 
-  get writtenTranslations(): WrittenTranslations {
-    return cloneDeep(this._writtenTranslations);
-  }
-
   get contentHtml(): string {
     return this._contentHtml;
   }
@@ -290,13 +283,13 @@ export class StateCard {
   static createNewCard(
       stateName: string, contentHtml: string, interactionHtml: string,
       interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
-      writtenTranslations: WrittenTranslations, contentId: string,
+      contentId: string,
       audioTranslationLanguageService: AudioTranslationLanguageService
   ): StateCard {
     return new StateCard(
       stateName, contentHtml, interactionHtml,
       cloneDeep(interaction), [],
-      recordedVoiceovers, writtenTranslations, contentId,
+      recordedVoiceovers, contentId,
       audioTranslationLanguageService);
   }
 }

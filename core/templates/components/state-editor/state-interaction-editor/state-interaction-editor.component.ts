@@ -147,14 +147,7 @@ export class StateInteractionEditorComponent
   }
 
   onCustomizationModalSavePostHook(): void {
-    let nextContentIdIndexHasChanged = (
-      this.stateNextContentIdIndexService.displayed !==
-      this.stateNextContentIdIndexService.savedMemento);
-    if (nextContentIdIndexHasChanged) {
-      this.stateNextContentIdIndexService.saveDisplayedValue();
-      this.onSaveNextContentIdIndex.emit(
-        this.stateNextContentIdIndexService.displayed);
-    }
+    this.onSaveNextContentIdIndex.emit();
 
     let hasInteractionIdChanged = (
       this.stateInteractionIdService.displayed !==

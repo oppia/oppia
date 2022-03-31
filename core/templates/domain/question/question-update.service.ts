@@ -114,7 +114,6 @@ angular.module('oppia').factory('QuestionUpdateService', [
       });
       contentIdsToAdd.forEach(function(contentId) {
         newState.recordedVoiceovers.addContentId(contentId);
-        newState.writtenTranslations.addContentId(contentId);
       });
     };
 

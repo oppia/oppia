@@ -61,6 +61,7 @@ export interface ExplorationBackendDict {
   'language_code': string;
   'draft_change_list_id': number;
   'version'?: number;
+  'next_content_id_index': number;
 }
 
 export class Exploration {
@@ -72,11 +73,13 @@ export class Exploration {
   languageCode: string;
   logger: LoggerService;
   urlInterpolationService: UrlInterpolationService;
+  nextContentIdIndex: number;
 
   constructor(
       initStateName: string, paramChanges: ParamChange[],
       paramSpecs: ParamSpecs, states: States, title: string,
-      languageCode: string, loggerService: LoggerService,
+      nextContentIdIndex: number, languageCode: string,
+      loggerService: LoggerService,
       urlInterpolationService: UrlInterpolationService) {
     this.initStateName = initStateName;
     this.paramChanges = paramChanges;
@@ -86,6 +89,7 @@ export class Exploration {
     this.languageCode = languageCode;
     this.logger = loggerService;
     this.urlInterpolationService = urlInterpolationService;
+    this.nextContentIdIndex = nextContentIdIndex;
   }
 
   // ---- Instance methods ----
@@ -222,6 +226,7 @@ export class ExplorationObjectFactory {
       this.statesObjectFactory.createFromBackendDict(
         explorationBackendDict.states),
       explorationBackendDict.title,
+      explorationBackendDict.next_content_id_index,
       explorationBackendDict.language_code,
       this.logger, this.urlInterpolationService);
   }

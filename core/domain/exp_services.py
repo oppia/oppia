@@ -378,7 +378,10 @@ def apply_change_list(exploration_id, change_list):
         to_param_domain = param_domain.ParamChange.from_dict
         for change in change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
-                exploration.add_states([change.state_name])
+                exploration.add_state(
+                    change.state_name,
+                    change.content_id_for_state_content
+                )
             elif change.cmd == exp_domain.CMD_RENAME_STATE:
                 exploration.rename_state(
                     change.old_state_name, change.new_state_name)
@@ -1919,6 +1922,7 @@ def get_user_exploration_data(
         'is_version_of_draft_valid': is_valid_draft_version,
         'draft_changes': draft_changes,
         'email_preferences': exploration_email_preferences.to_dict(),
+        'next_content_id_index': exploration.next_content_id_index
     }
 
     return editor_dict

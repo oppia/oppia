@@ -123,24 +123,7 @@ angular.module('oppia').component('stateTranslation', {
             ExplorationLanguageCodeService.displayed));
       };
       $scope.getRequiredHtml = function(subtitledHtml) {
-        var html = null;
-        if (isTranslatedTextRequired()) {
-          var contentId = subtitledHtml.contentId;
-          var activeLanguageCode = (
-            TranslationLanguageService.getActiveLanguageCode());
-          var writtenTranslations = (
-            ExplorationStatesService.getWrittenTranslationsMemento(
-              $scope.stateName));
-          if (writtenTranslations.hasWrittenTranslation(
-            contentId, activeLanguageCode)) {
-            var writtenTranslation = (
-              writtenTranslations.getWrittenTranslation(
-                contentId, activeLanguageCode));
-            html = writtenTranslation.getTranslation();
-          }
-        } else {
-          html = subtitledHtml.html;
-        }
+        var html = subtitledHtml.html;
         return html;
       };
 

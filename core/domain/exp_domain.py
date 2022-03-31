@@ -675,7 +675,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             values.
         """
         init_state_dict = state_domain.State.create_default_state(
-            init_state_name, is_initial_state=True).to_dict()
+            init_state_name, 'content_0', is_initial_state=True).to_dict()
 
         states_dict = {
             init_state_name: init_state_dict
@@ -686,8 +686,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED,
-            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED,
-            feconf.DEFUALT_NEXT_CONTENT_ID_INDEX)
+            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED, 1)
+            # content_0 is the first index.
+
 
     @classmethod
     def from_dict(
@@ -738,11 +739,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'states_schema_version']
         init_state_name = exploration_dict['init_state_name']
         exploration.rename_state(exploration.init_state_name, init_state_name)
-        exploration.add_states([
-            state_name for state_name in exploration_dict['states']
-            if state_name != init_state_name])
 
         for (state_name, sdict) in exploration_dict['states'].items():
+            if state_name != init_state_name:
+                exploration.add_state(
+                    state_name,
+                    sdict['content']['content_id']
+                )
+
             state = exploration.states[state_name]
 
             state.content = state_domain.SubtitledHtml(
@@ -1481,23 +1485,29 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.next_content_id_index = next_content_id_index
 
     # Methods relating to states.
-    def add_states(self, state_names):
-        """Adds multiple states to the exploration.
+    # def add_states(self, state_names):
+    #     """Adds multiple states to the exploration.
 
-        Args:
-            state_names: list(str). List of state names to add.
+    #     Args:
+    #         state_names: list(str). List of state names to add.
 
-        Raises:
-            ValueError. At least one of the new state names already exists in
-                the states dict.
+    #     Raises:
+    #         ValueError. At least one of the new state names already exists in
+    #             the states dict.
+    #     """
+    #     for state_name in state_names:
+    #         if state_name in self.states:
+    #             raise ValueError('Duplicate state name %s' % state_name)
+
+    #     for state_name in state_names:
+    #         self.states[state_name] = state_domain.State.create_default_state(
+    #             state_name)
+
+    def add_state(self, state_name, content_id_for_state_content):
+        """TODO
         """
-        for state_name in state_names:
-            if state_name in self.states:
-                raise ValueError('Duplicate state name %s' % state_name)
-
-        for state_name in state_names:
-            self.states[state_name] = state_domain.State.create_default_state(
-                state_name)
+        self.states[state_name] = state_domain.State.create_default_state(
+                state_name, content_id_for_state_content)
 
     def rename_state(self, old_state_name, new_state_name):
         """Renames the given state.

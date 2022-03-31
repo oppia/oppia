@@ -324,9 +324,7 @@ angular.module('oppia').component('stateResponses', {
           windowClass: 'add-answer-group-modal',
           controller: 'AddAnswerGroupModalController'
         }).result.then(function(result) {
-          StateNextContentIdIndexService.saveDisplayedValue();
-          ctrl.onSaveNextContentIdIndex(
-            StateNextContentIdIndexService.displayed);
+          ctrl.onSaveNextContentIdIndex();
 
           // Create a new answer group.
           $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(

@@ -31,8 +31,8 @@ import { LoggerService } from 'services/contextual/logger.service';
   providedIn: 'root'
 })
 export class ExplorationPropertyService {
-  public displayed: string | boolean;
-  savedMemento: string | boolean;
+  public displayed: string | boolean | number;
+  savedMemento: string | boolean | number;
 
   // The backend name for this property. THIS MUST BE SPECIFIED BY
   // SUBCLASSES.

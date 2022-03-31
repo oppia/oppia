@@ -21,16 +21,16 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { StateNextContentIdIndexService } from
+import { ExplorationNextContentIdIndexService } from
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
+  'pages/exploration-editor-page/services/exploration-next-content-id-index.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GenerateContentIdService {
   constructor(
-      private stateNextContentIdIndexService: StateNextContentIdIndexService
+      private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService
   ) {}
 
   generateIdForComponent(
@@ -69,8 +69,8 @@ export class GenerateContentIdService {
   _getNextStateId(prefix: string): string {
     // This function is used to generate content_ids for content that live in
     // the State domain. This includes hints, feedback, and customization args.
-    const contentIdIndex = this.stateNextContentIdIndexService.displayed;
-    this.stateNextContentIdIndexService.displayed += 1;
+    const contentIdIndex = this.explorationNextContentIdIndexService.displayed;
+    this.explorationNextContentIdIndexService.displayed += 1;
     return `${prefix}_${contentIdIndex}`;
   }
 

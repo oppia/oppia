@@ -37,6 +37,7 @@ import { AnswerGroup, AnswerGroupBackendDict } from 'domain/exploration/AnswerGr
 import { Hint, HintBackendDict } from 'domain/exploration/HintObjectFactory';
 import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
 import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { StringNullableChain } from 'lodash';
 
 export type StatePropertyValues = (
   AnswerGroup[] |
@@ -68,7 +69,6 @@ export type StatePropertyNames = (
   'default_outcome' |
   'hints' |
   'linked_skill_id' |
-  'next_content_id_index' |
   'param_changes' |
   'param_specs' |
   'recorded_voiceovers' |
@@ -76,8 +76,7 @@ export type StatePropertyNames = (
   'solution' |
   'state_name' |
   'widget_customization_args' |
-  'widget_id' |
-  'written_translations'
+  'widget_id'
 );
 
 @Injectable({
@@ -107,7 +106,8 @@ export class ChangeListService {
     tags: true,
     title: true,
     auto_tts_enabled: true,
-    correctness_feedback_enabled: true
+    correctness_feedback_enabled: true,
+    next_content_id_index: true,
   };
 
   ALLOWED_STATE_BACKEND_NAMES: Record<StatePropertyNames, boolean> = {
@@ -118,7 +118,6 @@ export class ChangeListService {
     default_outcome: true,
     hints: true,
     linked_skill_id: true,
-    next_content_id_index: true,
     param_changes: true,
     param_specs: true,
     solicit_answer_details: true,
@@ -126,8 +125,7 @@ export class ChangeListService {
     solution: true,
     state_name: true,
     widget_customization_args: true,
-    widget_id: true,
-    written_translations: true
+    widget_id: true
   };
 
   changeListAddedTimeoutId = null;
@@ -220,10 +218,11 @@ export class ChangeListService {
    *
    * @param {string} stateName - The name of the newly-added state
    */
-  addState(stateName: string): void {
+  addState(stateName: string, contentId: string): void {
     this.addChange({
       cmd: 'add_state',
-      state_name: stateName
+      state_name: stateName,
+      content_id_for_state_content: contentId
     });
   }
 

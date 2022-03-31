@@ -250,7 +250,6 @@ export class ExplorationEngineService {
     let initialCard = StateCard.createNewCard(
       this.currentStateName, questionHtml, interactionHtml,
       interaction, initialState.recordedVoiceovers,
-      initialState.writtenTranslations,
       initialState.content.contentId, this.audioTranslationLanguageService);
     successCallback(initialCard, nextFocusLabel);
   }
@@ -536,7 +535,6 @@ export class ExplorationEngineService {
       this.nextStateName, questionHtml, nextInteractionHtml,
       this.exploration.getInteraction(this.nextStateName),
       this.exploration.getState(this.nextStateName).recordedVoiceovers,
-      this.exploration.getState(this.nextStateName).writtenTranslations,
       this.exploration.getState(this.nextStateName).content.contentId,
       this.audioTranslationLanguageService);
     successCallback(

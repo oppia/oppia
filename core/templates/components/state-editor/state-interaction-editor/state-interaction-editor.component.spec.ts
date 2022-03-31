@@ -181,7 +181,7 @@ describe('State Interaction component', () => {
     const state = new State(
       'shivam', 'id', 'some', null,
       new Interaction([], [], null, null, [], 'id', null),
-      null, null, true, true, null, 7);
+      null, null, true, true);
 
     component.ngOnInit();
     stateEditorService.onStateEditorInitialized.emit(state);
