@@ -28,14 +28,16 @@ require('services/ngb-modal.service.ts');
 angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
-    '$scope', 'EditabilityService',
+    '$scope', 'ContextService', 'EditabilityService',
+    'EntityTranslationBackendApiService', 'ExplorationDataService',
     'ExplorationStatesService', 'ExternalSaveService', 'NgbModal',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService',
     'WrittenTranslationObjectFactory',
     function(
-        $scope, EditabilityService,
+        $scope, ContextService, EditabilityService,
+        EntityTranslationBackendApiService, ExplorationDataService,
         ExplorationStatesService, ExternalSaveService, NgbModal,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
@@ -43,6 +45,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         WrittenTranslationObjectFactory) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
+      ctrl.entityTranslations = null;
       var showMarkAudioAsNeedingUpdateModalIfRequired = function(
           contentId, languageCode) {
         var stateName = StateEditorService.getActiveStateName();
@@ -78,7 +81,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         return EditabilityService.isEditable();
       };
 
-      var initEditor = function() {
+      var initEditor = async function(requiresFetchingNewTranslations) {
         $scope.activeWrittenTranslation = null;
         $scope.translationEditorIsOpen = false;
         contentId = (
@@ -94,11 +97,19 @@ angular.module('oppia').component('stateTranslationEditor', {
           }
         };
 
-        if (StateWrittenTranslationsService.displayed.hasWrittenTranslation(
-          contentId, languageCode)) {
-          $scope.activeWrittenTranslation = (
-            StateWrittenTranslationsService.displayed
-              .getWrittenTranslation(contentId, languageCode));
+        if (requiresFetchingNewTranslations) {
+          alert('hello');
+          ctrl.entityTranslations = await EntityTranslationBackendApiService.fetchEntityTranslationAsync(
+            ContextService.getEntityType(),
+            ExplorationDataService.explorationId,
+            ExplorationDataService.data.version,
+            TranslationLanguageService.getActiveLanguageCode()
+          )
+        }
+        // ctrl.entityTranslation = await backend-api-request.fetch(.....)
+
+        if (ctrl.entityTranslations != null) {
+          $scope.activeWrittenTranslation = ctrl.entityTranslations.getWrittenTranslation(contentId, languageCode)
         }
       };
       var saveTranslation = function() {
@@ -166,7 +177,7 @@ angular.module('oppia').component('stateTranslationEditor', {
 
       $scope.cancelEdit = function() {
         StateWrittenTranslationsService.restoreFromMemento();
-        initEditor();
+        initEditor(false);
       };
 
       ctrl.$onInit = function() {
@@ -192,16 +203,16 @@ angular.module('oppia').component('stateTranslationEditor', {
             subscribe(
               (dataFormat) => {
                 $scope.dataFormat = dataFormat;
-                initEditor();
+                initEditor(false);
               }
             )
         );
         ctrl.directiveSubscriptions.add(
           TranslationLanguageService.onActiveLanguageChanged.subscribe(
-            () => initEditor()
+            () => initEditor(true)
           )
         );
-        initEditor();
+        initEditor(false);
         ctrl.directiveSubscriptions.add(
           ExternalSaveService.onExternalSave.subscribe(()=> {
             if ($scope.translationEditorIsOpen) {

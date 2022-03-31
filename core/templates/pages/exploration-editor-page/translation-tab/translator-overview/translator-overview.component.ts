@@ -38,17 +38,17 @@ angular.module('oppia').component('translatorOverview', {
   },
   template: require('./translator-overview.component.html'),
   controller: [
-    '$scope', '$window', 'ExplorationLanguageCodeService',
+    '$scope', '$window', 'ContextService', 'ExplorationLanguageCodeService',
     'FocusManagerService', 'LanguageUtilService',
     'RouterService', 'StateEditorService', 'TranslationLanguageService',
     'TranslationStatusService', 'TranslationTabActiveModeService',
-    'DEFAULT_AUDIO_LANGUAGE',
+    'UrlService', 'DEFAULT_AUDIO_LANGUAGE',
     function(
-        $scope, $window, ExplorationLanguageCodeService,
+        $scope, $window, ContextService, ExplorationLanguageCodeService,
         FocusManagerService, LanguageUtilService,
         RouterService, StateEditorService, TranslationLanguageService,
         TranslationStatusService, TranslationTabActiveModeService,
-        DEFAULT_AUDIO_LANGUAGE) {
+        UrlService, DEFAULT_AUDIO_LANGUAGE) {
       var ctrl = this;
       var LAST_SELECTED_TRANSLATION_LANGUAGE = (
         'last_selected_translation_lang');

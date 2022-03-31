@@ -53,6 +53,8 @@ import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
 import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { ExplorationNextContentIdIndexService } from 'pages/exploration-editor-page/services/exploration-next-content-id-index.service';
 
 @Injectable({
   providedIn: 'root'
@@ -84,6 +86,9 @@ export class ExplorationStatesService {
     private stateEditorRefreshService: StateEditorRefreshService,
     private statesObjectFactory: StatesObjectFactory,
     private validatorsService: ValidatorsService,
+    private generateContentIdService: GenerateContentIdService,
+    private explorationNextContentIdIndexService: (
+      ExplorationNextContentIdIndexService)
   ) {}
 
   // Properties that have a different backend representation from the
@@ -587,6 +592,10 @@ export class ExplorationStatesService {
       stateName, 'card_is_checkpoint', newCardIsCheckpoint);
   }
 
+  // getWrittenTranslationsMemento(stateName: string): WrittenTranslations {
+  //   return this._states.getState(stateName).;
+  // }
+
   // saveWrittenTranslation(
   //     contentId: string,
   //     dataFormat: DataFormatToDefaultValuesKey,
@@ -653,11 +662,11 @@ export class ExplorationStatesService {
     }
     this.alertsService.clearWarnings();
 
-    let contentId = GenerateContentIdService.getNextStateId('content')
+    let contentId = this.generateContentIdService.getNextStateId('content')
     this._states.addState(newStateName, contentId);
 
     this.changeListService.addState(newStateName, contentId);
-    ExplorationNextContentIdIndexService.saveDisplayedValue()
+    this.explorationNextContentIdIndexService.saveDisplayedValue()
     this.stateAddedCallbacks.forEach((callback) => {
       callback(newStateName);
     });

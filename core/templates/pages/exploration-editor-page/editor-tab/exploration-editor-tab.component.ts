@@ -70,7 +70,6 @@ require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
 import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
-import { ExplorationNextContentIdIndexService } from '../services/exploration-next-content-id-index.service';
 
 angular.module('oppia').component('explorationEditorTab', {
   bindings: {

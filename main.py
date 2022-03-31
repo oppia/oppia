@@ -899,7 +899,11 @@ URLS = [
     get_redirect_route(
         r'/topics_and_skills_dashboard/categorized_and_untriaged_skills_data',
         topics_and_skills_dashboard
-            .CategorizedAndUntriagedSkillsDataHandler)
+            .CategorizedAndUntriagedSkillsDataHandler),
+
+    get_redirect_route(
+        ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE,
+        contributor_dashboard.EntityTranslationhandler)
 ]
 
 # Adding redirects for topic landing pages.

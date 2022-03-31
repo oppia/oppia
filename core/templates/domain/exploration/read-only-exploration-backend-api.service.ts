@@ -51,6 +51,7 @@ export interface FetchExplorationBackendResponse {
   'correctness_feedback_enabled': boolean;
   'record_playthrough_probability': number;
   'draft_change_list_id': number;
+  'next_content_id_index': number;
 }
 
 @Injectable({

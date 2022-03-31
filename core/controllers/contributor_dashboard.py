@@ -28,6 +28,7 @@ from core.domain import opportunity_services
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import translation_services
+from core.domain import translation_fetchers
 from core.domain import user_services
 
 
@@ -523,3 +524,54 @@ class AllTopicNamesHandler(base.BaseHandler):
             'topic_names': topic_names
         }
         self.render_json(self.values)
+
+
+class EntityTranslationhandler(EditorHandler):
+    URL_PATH_ARGS_SCHEMAS = {
+        'entity_type': {
+            'schema':{
+                'type': 'basestring',
+                'choices': [
+                    feconf.ENTITY_TYPE_EXPLORATION,
+                    feconf.ENTITY_TYPE_QUESTION
+                ]
+            }
+        },
+        'entity_id': {
+            'schema':{
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'entity_version': {
+            'schema':{
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    # Version must be greater than zero.
+                    'min_value': 1
+                }]
+            }
+        },
+        'language_code': {
+            'schema':{
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_supported_audio_language_code'
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_play_exploration
+    def get(self, entity_type, entity_id, entity_version, language_code):
+        entity_translations = translation_fetchers.get_entity_translation(
+            entity_type, entity_id, entity_version, language_code)
+
+        self.render_json(entity_translation.to_dict())

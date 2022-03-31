@@ -94,9 +94,6 @@ angular.module('oppia').component('translationTab', {
         StateRecordedVoiceoversService.init(
           stateName, ExplorationStatesService.getRecordedVoiceoversMemento(
             stateName));
-        // StateWrittenTranslationsService.init(
-        //   stateName, ExplorationStatesService.getWrittenTranslationsMemento(
-        //     stateName));
         $scope.showTranslationTabSubDirectives = true;
         TranslationTabActiveModeService.activateVoiceoverMode();
         LoaderService.hideLoadingScreen();

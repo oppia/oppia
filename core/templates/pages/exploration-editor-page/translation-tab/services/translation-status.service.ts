@@ -98,9 +98,9 @@ angular.module('oppia').factory('TranslationStatusService', [
     var _getContentAvailabilityStatus = function(stateName, contentId) {
       langCode = TranslationLanguageService.getActiveLanguageCode();
       if (TranslationTabActiveModeService.isTranslationModeActive()) {
-        var writtenTranslations = (
-          ExplorationStatesService.getWrittenTranslationsMemento(stateName));
-        return _getTranslationStatus(writtenTranslations, contentId);
+        // var writtenTranslations = (
+          // ExplorationStatesService.getWrittenTranslationsMemento(stateName));
+        return {'available': true, 'needsUpdate':true};
       } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
         var recordedVoiceovers = (
           ExplorationStatesService.getRecordedVoiceoversMemento(stateName));
