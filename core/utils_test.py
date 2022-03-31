@@ -501,6 +501,14 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, max_length_error): # type: ignore[no-untyped-call]
             utils.require_valid_page_title_fragment_for_web(
                 lengthy_page_title_fragment_for_web)
+        small_page_title_fragment_for_web = 'a'
+        min_length_error = (
+            'Page title fragment should not be shorter than %s characters.'
+            % constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+
+        with self.assertRaisesRegex(Exception, min_length_error): # type: ignore[no-untyped-call]
+            utils.require_valid_page_title_fragment_for_web(
+                small_page_title_fragment_for_web)
 
     def test_require_valid_url_fragment(self) -> None:
         name = 'name'

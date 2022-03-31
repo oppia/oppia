@@ -21,7 +21,9 @@ from __future__ import annotations
 from core.domain import email_manager
 
 
-def inform_subscribers(creator_id, exploration_id, exploration_title):
+def inform_subscribers(
+    creator_id: str, exploration_id: str, exploration_title: str
+) -> None:
     """Sends an email to all the subscribers of the creators when the creator
     publishes an exploration.
 
@@ -34,5 +36,5 @@ def inform_subscribers(creator_id, exploration_id, exploration_title):
             has published.
     """
 
-    email_manager.send_emails_to_subscribers(
+    email_manager.send_emails_to_subscribers(  # type: ignore[no-untyped-call]
         creator_id, exploration_id, exploration_title)
