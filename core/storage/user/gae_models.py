@@ -1482,13 +1482,13 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # The user's preference for receiving feedback emails for this exploration.
     mute_feedback_notifications = datastore_services.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
-    # The exploration version of the last completed checkpoint.
+    # The exploration version of checkpoint user last interacted with.
     saved_checkpoints_progress_exp_version = datastore_services.IntegerProperty(
         default=None)
-    # The state name of the last completed checkpoint.
+    # The state name of the furthest completed completed checkpoint.
     furthest_completed_checkpoint_state_name = datastore_services.StringProperty(
         default=None)
-    # The state name of the last visited checkpoint.
+    # The state name of the most recently viewed checkpoint.
     most_recently_viewed_checkpoint_state_name = datastore_services.StringProperty(
         default=None)
 

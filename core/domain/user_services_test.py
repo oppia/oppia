@@ -2687,7 +2687,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             exploration_user_model.most_recently_viewed_checkpoint_state_name,
             'checkpoint1')
 
-    def test_set_latest_visited_checkpoint(self):
+    def test_set_most_recently_viewed_checkpoint(self):
         auth_id = 'someUser'
         exploration_id = 'someExploration'
         username = 'username'
@@ -2714,7 +2714,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             exploration_user_model.most_recently_viewed_checkpoint_state_name,
             'checkpoint2')
 
-        user_services.set_latest_visited_checkpoint(
+        user_services.set_most_recently_viewed_checkpoint(
             user_id, exploration_id, 'checkpoint1', 1)
         exploration_user_model = (
             user_services.user_models.ExplorationUserDataModel.get(

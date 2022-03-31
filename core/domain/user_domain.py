@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import datetime
+from optparse import Option
 import re
 
 from core import feconf
@@ -355,7 +356,7 @@ class UserSettings:
         """Convert the UserSettings domain instance into a dictionary form
         with its keys as the attributes of this class.
 
-        Rerurns:
+        Returns:
             dict. A dictionary containing the UserSettings class information
             in a dictionary form.
         """
@@ -1327,3 +1328,140 @@ class ModifiableUserData:
             )
 
         return cls.from_dict(raw_user_data_dict)
+
+class ExplorationUserDataDict(TypedDict):
+    """Dictionary representing the ExplorationUserData object."""
+
+    rating: Optional[str]
+    rated_on: Optional[datetime.datetime]
+    draft_change_list: Optional[list(dict)]
+    draft_change_list_last_updated: Optional[datetime.datetime]
+    draft_change_list_exp_version: Optional[int]
+    draft_change_list_id: int
+    mute_suggestion_notifications: bool
+    mute_feedback_notifications: bool
+    saved_checkpoints_progress_exp_version: Optional[int]
+    furthest_completed_checkpoint_state_name: Optional[str]
+    most_recently_viewed_checkpoint_state_name: Optional[str]
+
+class ExplorationUserData:
+    """Value object representing a user's exploration data.
+
+    Attributes:
+        user_id: str. The user id.
+        exploration_id: str. The exploration id.
+        rating: int or None. The rating (1-5) the user assigned to the
+            exploration.
+        rated_on: datetime or None. When the most recent rating was awarded,
+            or None if not rated.
+        draft_change_list: list(dict) or None. List of uncommitted changes made by
+            the user to the exploration.
+        draft_change_list_last_updated: datetime or None. Timestamp of when the
+            change list was last updated.
+        draft_change_list_exp_version: int or None. The exploration version
+            that this change list applied to.
+        draft_change_list_id: int. The version of the draft change list which
+            was last saved by the user.
+        mute_suggestion_notifications: bool. The user's preference for
+            receiving suggestion emails for this exploration.
+        mute_feedback_notifications: bool. The user's preference for receiving
+            feedback emails for this exploration.
+        saved_checkpoints_progress_exp_version: int or None. The exploration
+            version of checkpoint user last interacted with.
+        furthest_completed_checkpoint_state_name: str or None. The state name
+            of the furthest completed completed checkpoint.
+        most_recently_viewed_checkpoint_state_name: str or None. The state
+            name of the most recently viewed checkpoint.
+    """
+
+    def __init__(
+        self,
+        user_id: str,
+        exploration_id: str,
+        rating: Optional[str] = None,
+        rated_on: Optional[datetime.datetime] = None,
+        draft_change_list: Optional[list(dict)] = None,
+        draft_change_list_last_updated: Optional[datetime.datetime] = None,
+        draft_change_list_exp_version: Optional[int] = None,
+        draft_change_list_id: int = 0,
+        mute_suggestion_notifications: bool = (
+            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+        mute_feedback_notifications: bool = (
+            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
+        saved_checkpoints_progress_exp_version: Optional[int] = None,
+        furthest_completed_checkpoint_state_name: Optional[str]= None,
+        most_recently_viewed_checkpoint_state_name: Optional[str] = None
+        ) -> None:
+            """Constructs a ExplorationUserData domain object.
+
+            Attributes:
+                user_id: str. The user id.
+                exploration_id: str. The exploration id.
+                rating: int or None. The rating (1-5) the user assigned to the
+                    exploration.
+                rated_on: datetime or None. When the most recent rating was
+                    awarded, or None if not rated.
+                draft_change_list: list(dict) or None. List of uncommitted
+                    changes made by the user to the exploration.
+                draft_change_list_last_updated: datetime or None. Timestamp of
+                    when the change list was last updated.
+                draft_change_list_exp_version: int or None. The exploration
+                    version that this change list applied to.
+                draft_change_list_id: int. The version of the draft change list
+                    which was last saved by the user.
+                mute_suggestion_notifications: bool. The user's preference for
+                    receiving suggestion emails for this exploration.
+                mute_feedback_notifications: bool. The user's preference for
+                    receiving feedback emails for this exploration.
+                saved_checkpoints_progress_exp_version: int or None. The
+                    exploration version of checkpoint user last interacted
+                    with.
+                furthest_completed_checkpoint_state_name: str or None. The
+                    state name of the furthest completed completed checkpoint.
+                most_recently_viewed_checkpoint_state_name: str or None. The
+                    state name of the most recently viewed checkpoint.
+            """
+            self.user_id = user_id
+            self.exploration_id = exploration_id
+            self.rating = rating
+            self.rated_on = rated_on
+            self.draft_change_list = draft_change_list
+            self.draft_change_list_last_updated = (
+                draft_change_list_last_updated)
+            self.draft_change_list_exp_version = draft_change_list_exp_version
+            self.draft_change_list_id = draft_change_list_id
+            self.mute_suggestion_notifications = mute_suggestion_notifications
+            self.mute_feedback_notifications = mute_feedback_notifications
+            self.saved_checkpoints_progress_exp_version = (
+                saved_checkpoints_progress_exp_version)
+            self.furthest_completed_checkpoint_state_name = (
+                furthest_completed_checkpoint_state_name)
+            self.most_recently_viewed_checkpoint_state_name = (
+                most_recently_viewed_checkpoint_state_name)
+
+    def to_dict(self) -> ExplorationUserDataDict:
+        """Convert the ExplorationUserData domain instance into a dictionary
+        form with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the UserSettings class information
+            in a dictionary form.
+        """
+
+        return {
+            'rating': self.rating,
+            'rated_on': self.rated_on,
+            'draft_change_list': self.draft_change_list,
+            'draft_change_list_last_updated': (
+                self.draft_change_list_last_updated),
+            'draft_change_list_exp_version': self.draft_change_list_exp_version,
+            'draft_change_list_id': self.draft_change_list_id,
+            'mute_suggestion_notifications': self.mute_suggestion_notifications,
+            'mute_feedback_notifications': self.mute_feedback_notifications,
+            'saved_checkpoints_progress_exp_version': (
+                self.saved_checkpoints_progress_exp_version),
+            'furthest_completed_checkpoint_state_name': (
+                self.furthest_completed_checkpoint_state_name),
+            'most_recently_viewed_checkpoint_state_name': (
+                self.most_recently_viewed_checkpoint_state_name)
+        }

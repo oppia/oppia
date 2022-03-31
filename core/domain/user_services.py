@@ -2294,14 +2294,14 @@ def get_dashboard_stats(user_id):
 
 def update_learner_checkpoint_progress(
     user_id, exploration_id, state_name, exp_version):
-    """Sets the last_completed and latest_visited checkpoint.
+    """Sets the furthest completed and most recently viewed checkpoint.
 
     Args:
         user_id: str. The Id of the user.
         exploration_id: str. The Id of the exploration.
-        state_name: str. The state name of the last_completed checkpoint.
-        exp_version: int. The exploration version of the last_completed
-            checkpoint.
+        state_name: str. The state name of the furthest_completed checkpoint.
+        exp_version: int. The exploration version of the checkpoint user has
+            last interacted with.
     """
 
     exploration_user_model = user_models.ExplorationUserDataModel.get(
@@ -2319,20 +2319,21 @@ def update_learner_checkpoint_progress(
     exploration_user_model.put()
 
 
-def set_latest_visited_checkpoint(user_id, exploration_id, state_name, version):
-    """Set the last visited checkpoint.
+def set_most_recently_viewed_checkpoint(user_id, exploration_id, state_name, exp_version):
+    """Set the most recently viewed checkpoint.
 
     Args:
         user_id: str. The Id of the user.
         exploration_id: str. The Id of the exploration.
-        state_name: str. The state name of the completed checkpoint.
-        version: int. The version of the exploration.
+        state_name: str. The state name of the most recently viewed checkpoint.
+        exp_version: int. The exploration version of the checkpoint user has
+            last interacted with.
     """
 
     exploration_user_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
     exploration_user_model.most_recently_viewed_checkpoint_state_name = state_name
-    exploration_user_model.saved_checkpoints_progress_exp_version = version
+    exploration_user_model.saved_checkpoints_progress_exp_version = exp_version
     exploration_user_model.update_timestamps()
     exploration_user_model.put()
 

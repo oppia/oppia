@@ -1392,7 +1392,7 @@ class CheckpointVisitedEventHandler(base.BaseHandler):
         saved_checkpoints_progress_exp_version = self.normalized_payload.get(
             'saved_checkpoints_progress_exp_version')
 
-        user_services.set_latest_visited_checkpoint(
+        user_services.set_most_recently_viewed_checkpoint(
             user_id,
             exploration_id,
             most_recently_viewed_checkpoint_state_name,
