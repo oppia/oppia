@@ -113,18 +113,15 @@ export class SpeechSynthesisChunkerService {
         );
       }
     }
-    Object.defineProperty(
-      newUtterance, 'onend', {
-        value: () => {
-          if (this.cancelRequested) {
-            this.cancelRequested = false;
-            return;
-          }
-          offset += chunk.length;
-          this._speechUtteranceChunker(utterance, offset, callback);
-        }
+    newUtterance.addEventListener('end', () => {
+      if (this.cancelRequested) {
+        this.cancelRequested = false;
+        return;
       }
-    );
+      offset += chunk.length;
+      this._speechUtteranceChunker(utterance, offset, callback);
+    });
+
 
     // IMPORTANT!! Do not remove: Logging the object out fixes some onend
     // firing issues. Placing the speak invocation inside a callback
