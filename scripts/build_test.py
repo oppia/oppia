@@ -31,7 +31,7 @@ import threading
 from core import utils
 from core.tests import test_utils
 
-from typing import Deque, Dict, Iterator, List, Tuple
+from typing import Deque, Dict, Iterator, List, Tuple, Union
 
 from . import build
 from . import common
@@ -445,8 +445,8 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_execute_tasks(self) -> None:
         """Test _execute_tasks joins all threads after executing all tasks."""
-        build_tasks = collections.deque()
-        build_thread_names = []
+        build_tasks: Deque[threading.Thread] = collections.deque()
+        build_thread_names: List[Union[threading.Thread, str]] = []
         task_count = 2
         count = task_count
         while count:
