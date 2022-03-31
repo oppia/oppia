@@ -152,25 +152,33 @@ describe('Speech Synthesis Chunker Service', () => {
     const MockSpeechSynthesisUtteranceConstructor = (
       SpeechSynthesisUtterance);
     const mockSpeechSynthesisUtteran = {
-      speak: () => {},
-      onend: () => {}
+      _callback: null,
+      speak: () => {
+        this._callback();
+      },
+      onend: () => {},
+      addEventListener: function(_, cb) {
+        this._callback = cb;
+        this.onend = cb;
+      }
     };
 
     beforeEach(() => {
-      spyOn(window, 'SpeechSynthesisUtterance').and.returnValue(
+      spyOn(window, 'SpeechSynthesisUtterance').and.returnValues(
         // This throws "Argument of type '{ speak: () => void; onend:
         // () => void; }' is not assignable to parameter of type
         // 'SpeechSynthesisUtterance'.". We need to suppress this error because
         // 'SpeechSynthesisUtterance' has around 10 more properties. We have
         // only defined the properties we need in 'mockSpeechSynthesisUtteran'.
         // @ts-expect-error
-        mockSpeechSynthesisUtteran);
+        Object.assign({}, mockSpeechSynthesisUtteran),
+        Object.assign({}, mockSpeechSynthesisUtteran));
     });
 
     it('should not speak when chunk is too short', () => {
       const speakSpy = spyOn(window.speechSynthesis, 'speak').and
-        .callFake(function() {
-          mockSpeechSynthesisUtteran.onend();
+        .callFake(function(utterance: SpeechSynthesisUtterance) {
+          utterance.onend(null);
         });
       const speechSynthesisUtterance = (
         new MockSpeechSynthesisUtteranceConstructor('a'));
@@ -184,8 +192,8 @@ describe('Speech Synthesis Chunker Service', () => {
 
     it('should not speak when chunk is a falsy value', () => {
       const speakSpy = spyOn(window.speechSynthesis, 'speak').and
-        .callFake(function() {
-          mockSpeechSynthesisUtteran.onend();
+        .callFake(function(utterance: SpeechSynthesisUtterance) {
+          utterance.onend(null);
         });
       const speechSynthesisUtterance = (
         new MockSpeechSynthesisUtteranceConstructor(''));
@@ -199,9 +207,10 @@ describe('Speech Synthesis Chunker Service', () => {
 
     it('should speak two phrases at a time', fakeAsync(() => {
       const speakSpy = spyOn(window.speechSynthesis, 'speak').and
-        .callFake(function() {
-          mockSpeechSynthesisUtteran.onend();
+        .callFake(function(utterance: SpeechSynthesisUtterance) {
+          utterance.onend(null);
         });
+
       const speechSynthesisUtterance = (
         new MockSpeechSynthesisUtteranceConstructor(
           'Value inside utterance for testing purposes.' +
@@ -221,7 +230,9 @@ describe('Speech Synthesis Chunker Service', () => {
     it('should speak only one phrase when cancel is requested',
       fakeAsync(() => {
         const speakSpy = spyOn(window.speechSynthesis, 'speak').and
-          .callFake(() => mockSpeechSynthesisUtteran.onend());
+          .callFake(function(utterance: SpeechSynthesisUtterance) {
+            utterance.onend(null);
+          });
         const speechSynthesisUtterance = (
           new MockSpeechSynthesisUtteranceConstructor(
 

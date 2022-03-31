@@ -105,7 +105,7 @@ export class SpeechSynthesisChunkerService {
     // excluding the text being spoken.
     for (var property in utterance) {
       const _property = property as keyof SpeechSynthesisUtterance;
-      if (_property !== 'text') {
+      if (_property !== 'text' && _property !== 'addEventListener') {
         Object.defineProperty(
           newUtterance, _property, {
             value: utterance[_property]
