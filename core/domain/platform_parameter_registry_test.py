@@ -86,7 +86,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         })
 
     def test_create_platform_parameter(self) -> None:
-        # ignore arg-type used because this is a test case
+        # Ignore arg-type used because this is a test case
         # and we need seperate test enum class to validate
         # the functions.
         # Same applies for all the ignore arg-type below.
