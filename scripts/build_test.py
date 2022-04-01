@@ -1000,8 +1000,7 @@ class BuildTests(test_utils.GenericTestBase):
             check_function_calls['modify_constants_gets_called'] = True
 
         def mock_compare_file_count(
-            unused_first_dir: str,
-            unused_second_dir: str
+            unused_first_dir: str, unused_second_dir: str
         ) -> None:
             check_function_calls['compare_file_count_gets_called'] = True
 
@@ -1091,8 +1090,7 @@ class BuildTests(test_utils.GenericTestBase):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
         def mock_modify_constants(
-            unused_prod_env: bool,
-            maintenance_mode: bool   # pylint: disable=unused-argument
+            unused_prod_env: bool, maintenance_mode: bool   # pylint: disable=unused-argument
         ) -> None:  # pylint: disable=unused-argument
             check_function_calls['ensure_modify_constants_gets_called'] = True
 
