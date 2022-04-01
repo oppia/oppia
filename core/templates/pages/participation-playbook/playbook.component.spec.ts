@@ -120,6 +120,6 @@ describe('Playbook Page', () => {
   it('should get RTL language status correctly', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
-    expect(component.isLanguageRTL()).toEqual(true);
+    expect(component.isLanguageRTL()).toBeTrue();
   });
 });
