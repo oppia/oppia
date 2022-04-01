@@ -42,6 +42,13 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
     def setUp(self):
         super().setUp()
 
+        self.valid_rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0],
+                ['<p> ' + 'Explanation' + ' </p>']
+            )
+        ]
+
         self.invalid_rubrics_1 = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0],
@@ -53,6 +60,10 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[1],
                 ['<p> Explanation </p>'] * 15
+            ),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2],
+                ['<p> Explanation </p>'] * 15
             )
         ]
 
@@ -62,7 +73,9 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
             description='description 1',
             language_code='en',
             misconceptions=[],
-            rubrics=[],
+            rubrics=[
+                rubric.to_dict() for rubric in self.valid_rubrics
+            ],
             next_misconception_id=0,
             misconceptions_schema_version=2,
             rubric_schema_version=2,
@@ -117,8 +130,8 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
             job_run_result.JobRunResult.as_stdout('SKILLS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The id of the skill is %s and number of '
-                'invalid rubrics are %s' % ('skill_id_2', 1))
+                'The id of the skill is %s and the difficulties of invalid '
+                'rubrics are %s' % ('skill_id_2', ['Easy']))
         ])
 
     def test_run_with_mixed_models(self) -> None:
@@ -128,9 +141,9 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
             job_run_result.JobRunResult.as_stdout('SKILLS SUCCESS: 3'),
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
             job_run_result.JobRunResult.as_stderr(
-                'The id of the skill is %s and number of '
-                'invalid rubrics are %s' % ('skill_id_2', 1)),
+                'The id of the skill is %s and the difficulties of invalid '
+                'rubrics are %s' % ('skill_id_2', ['Easy'])),
             job_run_result.JobRunResult.as_stderr(
-                'The id of the skill is %s and number of '
-                'invalid rubrics are %s' % ('skill_id_3', 1))
+                'The id of the skill is %s and the difficulties of invalid '
+                'rubrics are %s' % ('skill_id_3', ['Medium', 'Hard']))
         ])
