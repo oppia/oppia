@@ -114,7 +114,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_create_feature_flag(self) -> None:
         feature = registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'test feature', FeatureStages.DEV)
+            ParamNames.PARAMETER_A, 'test feature', FeatureStages.DEV) # type: ignore[arg-type]
         self.assertEqual(feature.data_type, DataTypes.BOOL.value)
         self.assertTrue(feature.is_feature)
         self.assertEqual(feature.feature_stage, FeatureStages.DEV.value)
@@ -251,7 +251,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             self) -> None:
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
+            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV) # type: ignore[arg-type]
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -278,7 +278,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             self) -> None:
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
+            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV) # type: ignore[arg-type]
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -305,7 +305,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             self) -> None:
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.TEST)
+            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.TEST) # type: ignore[arg-type]
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
