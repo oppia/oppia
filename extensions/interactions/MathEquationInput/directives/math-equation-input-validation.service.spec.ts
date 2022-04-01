@@ -140,7 +140,7 @@ describe('MathEquationInputValidationService', () => {
     let matchesExactlyWith1 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: 'x ^ 2 = 1',
+        x: 'x*x = 1',
         y: 'irrelevant'
       }
     }, 'MathEquationInput');

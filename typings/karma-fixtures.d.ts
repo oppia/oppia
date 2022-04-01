@@ -91,6 +91,7 @@ interface RuleDescription {
 interface RuleTemplates {
   AlgebraicExpressionInput: {
     MatchesExactlyWith: RuleDescription;
+    MatchesUpToTrivialManipulations: RuleDescription;
     IsEquivalentTo: RuleDescription;
     ContainsSomeOf: RuleDescription;
     OmitsSomeOf: RuleDescription;
@@ -143,6 +144,7 @@ interface RuleTemplates {
   };
   MathEquationInput: {
     MatchesExactlyWith: RuleDescription;
+    MatchesUpToTrivialManipulations: RuleDescription;
     IsEquivalentTo: RuleDescription;
     ContainsSomeOf: RuleDescription;
     OmitsSomeOf: RuleDescription;
@@ -164,6 +166,7 @@ interface RuleTemplates {
   };
   NumericExpressionInput: {
     MatchesExactlyWith: RuleDescription;
+    MatchesUpToTrivialManipulations: RuleDescription;
     IsEquivalentTo: RuleDescription;
     ContainsSomeOf: RuleDescription;
     OmitsSomeOf: RuleDescription;
