@@ -89,8 +89,8 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
             | 'Get all SkillModels' >> ndb_io.GetModels(
                 skill_models.SkillModel.get_all(include_deleted=False))
             | 'Combine skill ids and rubrics' >> beam.Map(
-                lambda skillModel: (
-                    skillModel.id, skillModel.rubrics))
+                lambda skill_model: (
+                    skill_model.id, skill_model.rubrics))
         )
 
         skills_having_rubrics_with_invalid_explanation = (
