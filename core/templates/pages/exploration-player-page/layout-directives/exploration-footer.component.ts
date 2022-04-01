@@ -61,7 +61,7 @@ export class ExplorationFooterComponent {
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth: number = 0;
   expStates: StateObjectsBackendDict;
-  lastCompletedCheckpointStateName: string;
+  mostRecentlyCompletedCheckpointStateName: string;
   completedCheckpoints: number = 0;
 
   constructor(
@@ -143,9 +143,9 @@ export class ExplorationFooterComponent {
 
     this.roebas.loadLatestExplorationAsync(this.explorationId).then(
       response => {
-        if (response.last_completed_checkpoint_state_name) {
-          this.lastCompletedCheckpointStateName = (
-            response.last_completed_checkpoint_state_name);
+        if (response.most_recently_completed_checkpoint_state_name) {
+          this.mostRecentlyCompletedCheckpointStateName = (
+            response.most_recently_completed_checkpoint_state_name);
         }
       }
     );
@@ -203,7 +203,7 @@ export class ExplorationFooterComponent {
         getStateFromStateName(stateName);
       if (correspondingState.cardIsCheckpoint) {
         checkpointIndex++;
-        if (stateName === this.lastCompletedCheckpointStateName) {
+        if (stateName === this.mostRecentlyCompletedCheckpointStateName) {
           return checkpointIndex;
         }
       }

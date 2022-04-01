@@ -149,26 +149,6 @@ export class ProgressNavComponent {
     }
     this.helpCardHasContinueButton = false;
     this.newCardStateName = this.displayedCard.getStateName();
-    this.explorationId = this.explorationEngineService.getExplorationId();
-    this.currentCardIndex = (
-      this.playerPositionService.getDisplayedCardIndex());
-    if (this.currentCardIndex > 0 && this.explorationEngineService.
-      getStateFromStateName(this.newCardStateName).cardIsCheckpoint) {
-      // Update latest_visited_checkpoint when a checkpoint is encountered.
-      let version: number;
-      this.roebas.loadLatestExplorationAsync(this.explorationId).then(
-        response => {
-          version = response.version;
-        }
-      );
-      this.eebas.recordLatestVisitedCheckpointAsync(
-        this.explorationId,
-        this.newCardStateName,
-        version,
-      ).then(() => {
-        // Required for the post operation to deliver data to backend.
-      });
-    }
   }
 
   doesInteractionHaveNavSubmitButton(): boolean {

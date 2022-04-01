@@ -335,10 +335,9 @@ export class ConversationSkinComponent {
         version = response.version;
       }
     );
-    this.eebas.recordLastCompletedCheckpointAsync(
+    this.eebas.recordMostRecentlyCompletedCheckpointAsync(
       this.explorationId,
       version,
-      firstStateName,
       firstStateName,
     ).then(() => {
       // Required for the post operation to deliver data to backend.
@@ -1128,10 +1127,9 @@ export class ConversationSkinComponent {
           version = response.version;
         }
       );
-      this.eebas.recordLastCompletedCheckpointAsync(
+      this.eebas.recordMostRecentlyCompletedCheckpointAsync(
         this.explorationId,
         version,
-        this.displayedCard.getStateName(),
         this.displayedCard.getStateName(),
       ).then(() => {
         // Required for the post operation to deliver data to backend.
