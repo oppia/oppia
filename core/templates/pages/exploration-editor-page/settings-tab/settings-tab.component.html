@@ -494,8 +494,8 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input span ng-if="$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" checked ng-click="$ctrl.unmuteFeedbackNotifications()">
-              <input span ng-if="!$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" ng-click="$ctrl.muteFeedbackNotifications()">
+              <input span ng-if="$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" ng-click="$ctrl.unmuteFeedbackNotifications()">
+              <input span ng-if="!$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" checked ng-click="$ctrl.muteFeedbackNotifications()">
               <label class="oppia-on-off-switch-label protractor-test-enable-fallbacks" for="feedback-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
@@ -518,21 +518,21 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input span ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox protractor-test-enable-fallbacks" id="suggestion-switch" checked ng-click="$ctrl.unmuteSuggestionNotifications()">
-              <input span ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox protractor-test-enable-fallbacks" id="suggestion-switch" ng-click="$ctrl.muteSuggestionNotifications()">
+              <input span ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox protractor-test-enable-fallbacks" id="suggestion-switch" ng-click="$ctrl.unmuteSuggestionNotifications()">
+              <input span ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox protractor-test-enable-fallbacks" id="suggestion-switch" checked ng-click="$ctrl.muteSuggestionNotifications()">
               <label class="oppia-on-off-switch-label" for="suggestion-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
               </label>
             </div>
           </div>
-          <span class="form-text secondary-info-text" ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
-            You are currently receiving notifications of new suggestions for this exploration.
-          </span>
-          <span class="form-text secondary-info-text" ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
-            You have muted suggestion notifications for this exploration. You will not receive an email when new suggestion is submitted.
-          </span>
         </div>
+        <span class="form-text secondary-info-text" ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
+          You are currently receiving notifications of new suggestions for this exploration.
+        </span>
+        <span class="form-text secondary-info-text" ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
+          You have muted suggestion notifications for this exploration. You will not receive an email when new suggestion is submitted.
+        </span>
       </div>
       <hr class="oppia-feature-separator">
     </div>
