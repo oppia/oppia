@@ -18,7 +18,7 @@
 
 import { HttpClient, HttpSentEvent } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { EntityTranslationBackendDict } from 'domain/translation/EntityTranslationObjectFactory';
+import { EntityTranslation, EntityTranslationBackendDict } from 'domain/translation/EntityTranslationObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AppConstants } from 'app.constants';
 
@@ -26,20 +26,11 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class EntityTranslationBackendApiService {
-    constructor(
-        private httpClient: HttpClient,
-        private urlInterpolationService: UrlInterpolationService
-    ) {}
+  constructor(
+      private httpClient: HttpClient,
+      private urlInterpolationService: UrlInterpolationService,
+  ) {}
 
-    private async _fetchEntityTranslationAsync(
-        entityId, entityType, entityVersion, languageCode
-    ): Promise<EntityTranslationBackendDict> {
-        return this.httpClient.get<EntityTranslationBackendDict>(
-            this._getUrl(
-            entityId, entityType, entityVersion, languageCode)).then((response) => {
-              // return domain Object.
-            });
-    }
   private _getUrl(
     entityId, entityType, entityVersion, languageCode
   ) {
@@ -53,13 +44,25 @@ export class EntityTranslationBackendApiService {
     );
   }
 
-
-    async fetchEntityTranslationAsync(
-        entityId, entityType, entityVersion, languageCode
-        ): Promise<EntityTranslationBackendDict> {
-        return this._fetchEntityTranslationAsync(
-            entityId, entityType, entityVersion, languageCode);
+  async fetchEntityTranslationAsync(
+    entityId, entityType, entityVersion, languageCode): Promise<EntityTranslation> {
+      return new Promise((resolve, reject) => {
+        this.httpClient.get<EntityTranslationBackendDict>(
+          this._getUrl(
+            entityId, entityType, entityVersion, languageCode
+          )).toPromise().then(response => {
+          resolve({
+            entityId: response.entity_id,
+            entityType: response.entity_type,
+            entityVersion: response.entity_version,
+            languageCode: response.language_code,
+            translationMapping: response.translations
+            // this mapping is wrong because this should convert backend dict to frontend .
+          });
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
+      });
     }
-
 
 }

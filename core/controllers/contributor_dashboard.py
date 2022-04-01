@@ -526,7 +526,7 @@ class AllTopicNamesHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class EntityTranslationhandler(EditorHandler):
+class EntityTranslationhandler():
     URL_PATH_ARGS_SCHEMAS = {
         'entity_type': {
             'schema':{

@@ -163,7 +163,8 @@ angular.module('oppia').component('explorationEditorPage', {
     '$q', '$rootScope', '$scope', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
     'ChangeListService', 'ContextService',
-    'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
+    'EditabilityService', 'EntityTranslationsService',
+    'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
     'ExplorationFeaturesService', 'ExplorationImprovementsService',
@@ -189,7 +190,8 @@ angular.module('oppia').component('explorationEditorPage', {
         $q, $rootScope, $scope, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
-        EditabilityService, ExplorationAutomaticTextToSpeechService,
+        EditabilityService, EntityTranslationsService,
+        ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesBackendApiService,
         ExplorationFeaturesService, ExplorationImprovementsService,
@@ -266,6 +268,8 @@ angular.module('oppia').component('explorationEditorPage', {
           StateClassifierMappingService.init(
             ContextService.getExplorationId(), explorationData.version);
           ExplorationStatesService.init(explorationData.states);
+          EntityTranslationsService.init(
+            'exploration', ctrl.explorationId, explorationData.version);
 
           ExplorationTitleService.init(explorationData.title);
           ExplorationCategoryService.init(explorationData.category);

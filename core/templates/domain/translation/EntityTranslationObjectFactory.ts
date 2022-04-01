@@ -105,19 +105,22 @@ export class EntityTranslation {
   providedIn: 'root'
 })
 export class EntityTranlationObjectFactory {
-  createFromBackendDict(
-    backendDict: EntityTranslationBackendDict
-  ): EntityTranslation {
+  createTranslationMappingFromBackendDict(backendDict): TranslationMapping {
     const translationsMapping: TranslationMapping = {};
     Object.keys(backendDict.translations).forEach(
       (contentId) => translationsMapping[contentId]);
 
+    return translationsMapping;
+  }
+  createFromBackendDict(
+    backendDict: EntityTranslationBackendDict
+  ): EntityTranslation {
     return new EntityTranslation(
       backendDict.entity_id,
       backendDict.entity_type,
       backendDict.entity_version,
       backendDict.language_code,
-      translationsMapping
+      this.createTranslationMappingFromBackendDict(backendDict.translations)
     );
   }
 }

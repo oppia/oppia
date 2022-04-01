@@ -875,7 +875,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         )
 
     @classmethod
-    def create_default_interaction(cls, default_dest_state_name):
+    def create_default_interaction(cls, default_dest_state_name, content_id_for_default_outcome):
         """Create a default InteractionInstance domain object:
             - customization_args: empty dictionary;
             - answer_groups: empty list;
@@ -893,7 +893,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         default_outcome = Outcome(
             default_dest_state_name,
             SubtitledHtml.create_default_subtitled_html(
-                feconf.DEFAULT_OUTCOME_CONTENT_ID), False, {}, None, None)
+                content_id_for_default_outcome), False, {}, None, None)
 
         return cls(
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], None)
@@ -2885,6 +2885,7 @@ class State(translation_domain.BaseTranslatableObject):
         cls,
         default_dest_state_name,
         content_id_for_state_content,
+        content_id_for_default_outcome,
         is_initial_state=False
     ):
         """Return a State domain object with default value.
@@ -2903,7 +2904,7 @@ class State(translation_domain.BaseTranslatableObject):
             SubtitledHtml(content_id_for_state_content, content_html),
             [],
             InteractionInstance.create_default_interaction(
-                default_dest_state_name),
+                default_dest_state_name, content_id_for_default_outcome),
             RecordedVoiceovers.from_dict(copy.deepcopy(
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             False, is_initial_state)

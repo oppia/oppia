@@ -902,7 +902,7 @@ URLS = [
             .CategorizedAndUntriagedSkillsDataHandler),
 
     get_redirect_route(
-        ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE,
+        feconf.ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE,
         contributor_dashboard.EntityTranslationhandler)
 ]
 

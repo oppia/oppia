@@ -662,10 +662,16 @@ export class ExplorationStatesService {
     }
     this.alertsService.clearWarnings();
 
-    let contentId = this.generateContentIdService.getNextStateId('content')
-    this._states.addState(newStateName, contentId);
+    let contentIdForContent = this.generateContentIdService
+      .getNextStateId('content')
+    let contentIdForDefaultOutcome = this.generateContentIdService
+      .getNextStateId('default_outcome')
 
-    this.changeListService.addState(newStateName, contentId);
+    this._states.addState(
+      newStateName, contentIdForContent, contentIdForDefaultOutcome);
+
+    this.changeListService.addState(
+      newStateName, contentIdForContent, contentIdForDefaultOutcome);
     this.explorationNextContentIdIndexService.saveDisplayedValue()
     this.stateAddedCallbacks.forEach((callback) => {
       callback(newStateName);

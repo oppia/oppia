@@ -38,13 +38,13 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('TranslationStatusService', [
-  'ExplorationStatesService', 'StateRecordedVoiceoversService',
-  'StateWrittenTranslationsService', 'TranslationLanguageService',
+  'EntityTranslationsService', 'ExplorationStatesService',
+  'StateRecordedVoiceoversService', 'TranslationLanguageService',
   'TranslationTabActiveModeService', 'COMPONENT_NAME_HINT',
   'COMPONENT_NAME_RULE_INPUT', 'INTERACTION_SPECS',
   function(
-      ExplorationStatesService, StateRecordedVoiceoversService,
-      StateWrittenTranslationsService, TranslationLanguageService,
+    EntityTranslationsService, ExplorationStatesService,
+    StateRecordedVoiceoversService, TranslationLanguageService,
       TranslationTabActiveModeService, COMPONENT_NAME_HINT,
       COMPONENT_NAME_RULE_INPUT, INTERACTION_SPECS) {
     var AUDIO_NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
@@ -110,7 +110,7 @@ angular.module('oppia').factory('TranslationStatusService', [
 
     var _getActiveStateContentAvailabilityStatus = function(contentId) {
       if (TranslationTabActiveModeService.isTranslationModeActive()) {
-        var writtenTranslations = StateWrittenTranslationsService.displayed;
+        var writtenTranslations = EntityTranslationsService.entityTranslations;
         return _getTranslationStatus(writtenTranslations, contentId);
       } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
         var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
@@ -252,7 +252,7 @@ angular.module('oppia').factory('TranslationStatusService', [
     var _getAvailableContentIds = function() {
       var availableContentIds = [];
       if (TranslationTabActiveModeService.isTranslationModeActive()) {
-        var writtenTranslations = StateWrittenTranslationsService.displayed;
+        var writtenTranslations = EntityTranslationsService.translations;
         availableContentIds = writtenTranslations.getAllContentIds();
       } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
         var recordedVoiceovers = StateRecordedVoiceoversService.displayed;

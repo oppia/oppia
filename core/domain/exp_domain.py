@@ -285,7 +285,11 @@ class ExplorationChange(change_domain.BaseChange):
         'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_STATE,
-        'required_attribute_names': ['state_name'],
+        'required_attribute_names': [
+            'state_name',
+            'content_id_for_state_content',
+            'content_id_for_default_outcome'
+        ],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
@@ -675,7 +679,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             values.
         """
         init_state_dict = state_domain.State.create_default_state(
-            init_state_name, 'content_0', is_initial_state=True).to_dict()
+            init_state_name, 'content_0', 'default_outcome_1',
+            is_initial_state=True).to_dict()
 
         states_dict = {
             init_state_name: init_state_dict
@@ -686,7 +691,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED,
-            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED, 1)
+            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED, 2)
             # content_0 is the first index.
 
 
@@ -1503,7 +1508,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     #         self.states[state_name] = state_domain.State.create_default_state(
     #             state_name)
 
-    def add_state(self, state_name, content_id_for_state_content):
+    def add_state(self, state_name, content_id_for_state_content, content_id_for_default_outcome):
         """TODO
         """
         self.states[state_name] = state_domain.State.create_default_state(

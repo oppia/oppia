@@ -162,7 +162,7 @@ export class StateObjectFactory {
   // created from start.
   // Create a default state until the actual state is saved.
   // Passes name as null before saving a state.
-  createDefaultState(newStateName: string | null, contentId: string): State {
+  createDefaultState(newStateName: string | null, contentIdForContent, contentIdForDefaultOutcome): State {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,
@@ -174,7 +174,8 @@ export class StateObjectFactory {
       solicit_answer_details: newStateTemplate.solicit_answer_details,
       card_is_checkpoint: newStateTemplate.card_is_checkpoint,
     });
-    newState.content.contentId = contentId
+    newState.content.contentId = contentIdForContent;
+    newState.interaction.defaultOutcome.feedback.contentId = contentIdForDefaultOutcome;
     if (
       newState.interaction.defaultOutcome !== null &&
       newStateName !== null

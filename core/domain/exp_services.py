@@ -380,7 +380,8 @@ def apply_change_list(exploration_id, change_list):
             if change.cmd == exp_domain.CMD_ADD_STATE:
                 exploration.add_state(
                     change.state_name,
-                    change.content_id_for_state_content
+                    change.content_id_for_state_content,
+                    change.content_id_for_default_outcome
                 )
             elif change.cmd == exp_domain.CMD_RENAME_STATE:
                 exploration.rename_state(

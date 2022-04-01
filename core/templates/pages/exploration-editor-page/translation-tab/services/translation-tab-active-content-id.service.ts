@@ -50,6 +50,7 @@ export class TranslationTabActiveContentIdService {
       this._stateRecordedVoiceoversService.displayed);
     if (displayStateRecordedVoiceovers !== null) {
       let allContentIds = displayStateRecordedVoiceovers.getAllContentIds();
+      alert(allContentIds + contentId);
       if (allContentIds.indexOf(contentId) === -1) {
         throw new Error('Invalid active content id: ' + contentId);
       }
