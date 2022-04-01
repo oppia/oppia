@@ -102,6 +102,7 @@ angular.module('oppia').component('practiceSessionPage', {
           ctrl.topicName = result.data.topic_name;
           PageTitleService.setDocumentTitle(
             'Practice Session: ' + ctrl.topicName + ' - Oppia');
+          LoaderService.hideLoadingScreen();
         });
       };
       ctrl.$onInit = function() {
@@ -109,7 +110,6 @@ angular.module('oppia').component('practiceSessionPage', {
         ctrl.stringifiedSubtopicIds = (
           UrlService.getSelectedSubtopicsFromUrl());
         _fetchSkillDetails();
-        LoaderService.hideLoadingScreen();
       };
     }
   ]
