@@ -75,6 +75,9 @@
   z-index: 2;
 }
 
+/* Hint box popup's position gets misaligned if right is set to 50%
+   in rtl css after convertion, hence we ignore this block.
+*/
 /*rtl:begin:ignore*/
 .hint-box::after,
 .hint-box::before {

@@ -116,7 +116,7 @@
 }
 
 .oppia-top-navigation-bar.navbar-header {
-  float: right !important;
+  float: right;
 }
 
 .navbar-header {
