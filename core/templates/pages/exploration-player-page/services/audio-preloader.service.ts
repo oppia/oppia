@@ -34,7 +34,7 @@ export class AudioPreloaderService {
   private filenamesOfAudioToBeDownloaded: string[] = [];
 
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private exploration!: Exploration;
   private audioLoadedCallback!: (_: string) => void;
@@ -116,8 +116,10 @@ export class AudioPreloaderService {
     }
     const audioFilenamesInBfsOrder = [];
     for (const stateName of bfsTraversalOfStates) {
-      for (const voiceover of allVoiceovers[stateName]) {
-        audioFilenamesInBfsOrder.push(voiceover.filename);
+      if (allVoiceovers !== null) {
+        for (const voiceover of allVoiceovers[stateName]) {
+          audioFilenamesInBfsOrder.push(voiceover.filename);
+        }
       }
     }
     return audioFilenamesInBfsOrder;
