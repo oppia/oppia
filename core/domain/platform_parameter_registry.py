@@ -22,12 +22,14 @@ from core import feconf
 from core.domain import caching_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry_test
 from core.platform import models
 from core.storage.config import gae_models
-from mypy_imports import config_models
 
 from typing import Any, Dict, List, Optional, Union
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import config_models
 
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
@@ -50,8 +52,7 @@ class Registry:
     @classmethod
     def create_platform_parameter(
             cls,
-            name: Union[platform_parameter_registry_test.ParamNames,
-            platform_parameter_list.PARAM_NAMES],
+            name: platform_parameter_list.PARAM_NAMES,
             description: str,
             data_type: platform_parameter_domain.DataTypes,
             is_feature: bool =False,
@@ -100,8 +101,7 @@ class Registry:
     @classmethod
     def create_feature_flag(
             cls,
-            name: Union[platform_parameter_registry_test.ParamNames,
-            platform_parameter_list.PARAM_NAMES],
+            name: platform_parameter_list.PARAM_NAMES,
             description: str,
             stage: platform_parameter_domain.FeatureStages) -> platform_parameter_domain.PlatformParameter: # pylint: disable=line-too-long
         """Creates, registers and returns a platform parameter that is also a

@@ -86,8 +86,12 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         })
 
     def test_create_platform_parameter(self) -> None:
+        # ignore arg-type used because this is a test case
+        # and we need seperate test enum class to validate
+        # the functions.
+        # Same applies for all the ignore arg-type below.
         parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', DataTypes.BOOL)
+            ParamNames.PARAMETER_A, 'test', DataTypes.BOOL)  # type: ignore[arg-type]
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
         parameter.validate() # type: ignore[no-untyped-call]
 
@@ -118,19 +122,19 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_default_value_of_bool_platform_parameter(self) -> None:
         parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test feature', DataTypes.BOOL)
+            ParamNames.PARAMETER_A, 'test feature', DataTypes.BOOL)  # type: ignore[arg-type]
         parameter.validate() # type: ignore[no-untyped-call]
         self.assertEqual(parameter.default_value, False)
 
     def test_default_value_of_string_platform_parameter(self) -> None:
         parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', DataTypes.STRING)
+            ParamNames.PARAMETER_A, 'test', DataTypes.STRING)  # type: ignore[arg-type]
         parameter.validate() # type: ignore[no-untyped-call]
         self.assertEqual(parameter.default_value, '')
 
     def test_default_value_of_number_platform_parameter(self) -> None:
         parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', DataTypes.NUMBER)
+            ParamNames.PARAMETER_A, 'test', DataTypes.NUMBER)  # type: ignore[arg-type]
         parameter.validate() # type: ignore[no-untyped-call]
         self.assertEqual(parameter.default_value, 0)
 
