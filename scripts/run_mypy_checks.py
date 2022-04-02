@@ -211,8 +211,6 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/check_if_pr_is_low_risk_test.py',
     'scripts/clean.py',
     'scripts/clean_test.py',
-    'scripts/common.py',
-    'scripts/common_test.py',
     'scripts/concurrent_task_utils.py',
     'scripts/concurrent_task_utils_test.py',
     'scripts/create_expression_parser.py',
