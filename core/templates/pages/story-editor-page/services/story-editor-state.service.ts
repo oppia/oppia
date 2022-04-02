@@ -42,17 +42,13 @@ export class StoryEditorStateService {
   _storyIsInitialized: boolean = false;
   _storyIsLoading: boolean = false;
   _storyIsBeingSaved: boolean = false;
+  _topicName: string = null;
   _storyIsPublished: boolean = false;
   _skillSummaries: SkillSummaryBackendDict[] = [];
   _expIdsChanged: boolean = false;
   _storyWithUrlFragmentExists: boolean = false;
-
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  _classroomUrlFragment!: string;
-  _topicName!: string;
-  _topicUrlFragment!: string;
+  _classroomUrlFragment: string = null;
+  _topicUrlFragment: string = null;
 
   _storyInitializedEventEmitter = new EventEmitter();
   _storyReinitializedEventEmitter = new EventEmitter();
@@ -200,11 +196,9 @@ export class StoryEditorStateService {
       commitMessage: string,
       successCallback: (value?: Object) => void,
       errorCallback: (value?: Object) => void): boolean {
-    const storyId = this._story.getId();
-    if (!storyId || !this._storyIsInitialized) {
+    if (!this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a story before one is loaded.');
-      return false;
     }
 
     // Don't attempt to save the story if there are no changes pending.
@@ -213,7 +207,7 @@ export class StoryEditorStateService {
     }
     this._storyIsBeingSaved = true;
     this.editableStoryBackendApiService.updateStoryAsync(
-      storyId, this._story.getVersion(), commitMessage,
+      this._story.getId(), this._story.getVersion(), commitMessage,
       this.undoRedoService.getCommittableChangeList() as StoryChange[]
     ).then(
       (storyBackendObject) => {
@@ -224,8 +218,7 @@ export class StoryEditorStateService {
           successCallback();
         }
       }, error => {
-        let errorMessage = error || (
-          'There was an error when saving the story.');
+        let errorMessage = error || 'There was an error when saving the story.';
         this.alertsService.addWarning(errorMessage);
         this._storyIsBeingSaved = false;
         if (errorCallback) {
@@ -246,14 +239,13 @@ export class StoryEditorStateService {
   changeStoryPublicationStatus(
       newStoryStatusIsPublic: boolean,
       successCallback: (value?: Object) => void): boolean {
-    const storyId = this._story.getId();
-    if (!storyId || !this._storyIsInitialized) {
+    if (!this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot publish a story before one is loaded.');
-      return false;
     }
+
     this.editableStoryBackendApiService.changeStoryPublicationStatusAsync(
-      storyId, newStoryStatusIsPublic).then(
+      this._story.getId(), newStoryStatusIsPublic).then(
       (storyBackendObject) => {
         this._setStoryPublicationStatus(newStoryStatusIsPublic);
         if (successCallback) {
