@@ -263,16 +263,11 @@ describe('Story editor state service', () => {
     expect(actualStory).not.toBe(expectedStory);
   });
 
-  it('should fail to save the story without first loading one',
-    fakeAsync(() => {
-      spyOn(alertsService, 'fatalWarning');
-      storyEditorStateService._storyIsInitialized = false;
-
+  it('should fail to save the story without first loading one', () => {
+    expect(() => {
       storyEditorStateService.saveStory('Commit message');
-
-      expect(alertsService.fatalWarning)
-        .toHaveBeenCalledWith('Cannot save a story before one is loaded.');
-    }));
+    }).toThrowError('Cannot save a story before one is loaded.');
+  });
 
   it('should not save the story if there are no pending changes',
     fakeAsync(() => {

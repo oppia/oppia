@@ -18,28 +18,21 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-
-export interface CategorizedSkills {
-  [topic: string]: {
-    [subtopic: string]: SkillSummaryBackendDict[];
-  };
-}
+import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 
 @Component({
   selector: 'oppia-select-skill',
   templateUrl: './select-skill-modal.component.html',
 })
 export class SelectSkillModalComponent extends ConfirmOrCancelModal {
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  categorizedSkills!: CategorizedSkills;
-  skillsInSameTopicCount!: number;
-  skillSummaries!: SkillSummaryBackendDict[];
-  untriagedSkillSummaries!: SkillSummaryBackendDict[];
-  selectedSkillId!: string;
-  allowSkillsFromOtherTopics: boolean = false;
+  categorizedSkills: SkillsCategorizedByTopics;
+  skillsInSameTopicCount: number;
+  skillSummaries: SkillSummaryBackendDict[];
+  untriagedSkillSummaries: ShortSkillSummary[];
+  allowSkillsFromOtherTopics: boolean;
+  selectedSkillId: string = null;
 
   constructor(
     private ngbActiveModal: NgbActiveModal
@@ -48,7 +41,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   }
 
   confirm(): void {
-    let totalSkills: SkillSummaryBackendDict[] = [];
+    let totalSkills = [];
     if (this.skillSummaries) {
       totalSkills = [...this.skillSummaries];
     }
