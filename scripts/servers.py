@@ -116,7 +116,9 @@ def managed_process(
                 'Failed to stop %s gracefully!' % get_proc_info(popen_proc))
 
         exit_code = popen_proc.returncode
-        if exit_code != 0:
+        # Note that negative values indicate termination by a signal:  SIGTERM,
+        # SIGINT, etc.
+        if exit_code > 0:
             raise Exception(
                 'Process %s exited unexpectedly with exit code %s' %
                 (proc_name, exit_code))
