@@ -27,7 +27,10 @@ import { UtilsService } from 'services/utils.service';
 @Injectable({
   providedIn: 'root'
 })
-export class StateLinkedSkillIdService extends StatePropertyService<string> {
+export class StateLinkedSkillIdService extends
+  // Until a skill is selected, the state attribute is null. Also used to
+  // avoid circular dependencies.
+  StatePropertyService<string | null> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveLinkedSkillId';

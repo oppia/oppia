@@ -264,11 +264,18 @@ describe('State Skill Editor Component', () => {
       urlInterpolationService, 'interpolateUrl')
       .and.returnValue('/skill_editor/skill_1');
 
-    componentInstance.skillIsSelected = true;
     stateLinkedSkillIdService.displayed = 'skill_1';
     componentInstance.getSkillEditorUrl();
     fixture.detectChanges();
     expect(urlSpy).toHaveBeenCalled();
+  });
+
+  it('should throw error on call getSkillEditorUrl when there is no skill' +
+    'is selected', () => {
+    stateLinkedSkillIdService.displayed = null;
+    expect(() => {
+      componentInstance.getSkillEditorUrl();
+    }).toThrowError('Expected a skill id to be displayed');
   });
 
   it('should toggle skillEditorIsShown', () => {

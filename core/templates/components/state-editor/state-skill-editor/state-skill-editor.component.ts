@@ -40,8 +40,8 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
   templateUrl: './state-skill-editor.component.html'
 })
 export class StateSkillEditorComponent implements OnInit {
-  @Output() onSaveLinkedSkillId: EventEmitter<string> = (
-    new EventEmitter<string>());
+  @Output() onSaveLinkedSkillId: EventEmitter<string | null> = (
+    new EventEmitter<string | null>());
 
   @Output() onSaveStateContent: EventEmitter<string> = (
     new EventEmitter<string>());
@@ -49,7 +49,6 @@ export class StateSkillEditorComponent implements OnInit {
   categorizedSkills!: SkillsCategorizedByTopics;
   untriagedSkillSummaries!: ShortSkillSummary[];
   skillEditorIsShown: boolean = true;
-  skillIsSelected = false;
   skillName!: string;
   userCanEditSkills: boolean = false;
 
@@ -125,7 +124,7 @@ export class StateSkillEditorComponent implements OnInit {
       DeleteStateSkillModalComponent, {
         backdrop: true,
       }).result.then(() => {
-      this.skillIsSelected = false;
+      this.stateLinkedSkillIdService.displayed = null;
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(this.stateLinkedSkillIdService.displayed);
     }, () => {
@@ -136,10 +135,13 @@ export class StateSkillEditorComponent implements OnInit {
   }
 
   getSkillEditorUrl(): string {
-    return this.urlInterpolationService.interpolateUrl(
-      '/skill_editor/<skill_id>', {
-        skill_id: this.stateLinkedSkillIdService.displayed
-      });
+    if (this.stateLinkedSkillIdService.displayed) {
+      return this.urlInterpolationService.interpolateUrl(
+        '/skill_editor/<skill_id>', {
+          skill_id: this.stateLinkedSkillIdService.displayed
+        });
+    }
+    throw new Error('Expected a skill id to be displayed');
   }
 
   toggleSkillEditor(): void {
