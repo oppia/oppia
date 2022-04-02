@@ -26,8 +26,8 @@ import { AppConstants } from 'app.constants';
   styleUrls: []
 })
 export class ProfileLinkTextComponent {
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() username!: string;
   profileUrl = (
