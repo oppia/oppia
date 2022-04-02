@@ -50,6 +50,7 @@ import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 import { ImageClickAnswer } from './answer-defs';
 import { ImageClickRuleInputs } from './rule-input-defs';
+import { MathInteractionsService } from 'services/math-interactions.service';
 // ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {
@@ -67,7 +68,10 @@ describe('Rule spec services', function() {
     $provide.value('SetInputRulesService', new SetInputRulesService());
     $provide.value(
       'AlgebraicExpressionInputRulesService',
-      new AlgebraicExpressionInputRulesService());
+      new AlgebraicExpressionInputRulesService(
+        new MathInteractionsService(),
+        new NumericExpressionInputRulesService()
+      ));
     $provide.value(
       'RatioExpressionInputRulesService',
       new RatioExpressionInputRulesService());
@@ -75,7 +79,11 @@ describe('Rule spec services', function() {
       'DragAndDropSortInputRulesService',
       new DragAndDropSortInputRulesService());
     $provide.value(
-      'MathEquationInputRulesService', new MathEquationInputRulesService());
+      'MathEquationInputRulesService', new MathEquationInputRulesService(
+        new AlgebraicExpressionInputRulesService(
+          new MathInteractionsService(),
+          new NumericExpressionInputRulesService()
+        )));
     $provide.value(
       'MultipleChoiceInputRulesService', new MultipleChoiceInputRulesService());
     $provide.value('NumericInputRulesService', new NumericInputRulesService());
