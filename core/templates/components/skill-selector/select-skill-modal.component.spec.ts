@@ -28,8 +28,6 @@ import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-pag
 import { ShortSkillSummary, ShortSkillSummaryBackendDict } from 'domain/skill/short-skill-summary.model';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-
 
 describe('Select Skill Modal', () => {
   let fixture: ComponentFixture<SelectSkillModalComponent>;
