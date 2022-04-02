@@ -294,7 +294,12 @@ const main = async function() {
   process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
   FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
   // Change headless to false to see the puppeteer actions.
-  const browser = await puppeteer.launch({headless: true});
+  // Use '--disable-dev-shm-usage' to try and prevent Chrome from crashing:
+  // https://developers.google.com/web/tools/puppeteer/troubleshooting#tips
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--disable-dev-shm-usage']
+  });
   const page = await browser.newPage();
   await page.setViewport({
     width: 1920,
