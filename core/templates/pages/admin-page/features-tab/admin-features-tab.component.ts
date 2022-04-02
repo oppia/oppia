@@ -43,6 +43,7 @@ import { PlatformParameter, FeatureStage } from
 import { PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule.model';
 import { HttpErrorResponse } from '@angular/common/http';
+import { assert } from 'console';
 
 type FilterType = keyof typeof PlatformParameterFilterType;
 
@@ -222,15 +223,14 @@ export class AdminFeaturesTabComponent implements OnInit {
       this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
 
       this.setStatusMessage.emit('Saved successfully.');
-    // The type of error 'e' is unknown because it could be anything.
-    // This gave the freedom to access any property of 'e' at any time.
+    // The type of error 'e' is unknown because anything can be throw
+    // in TypeScript. We need to make sure to check the type of 'e'.
     } catch (e: unknown) {
-      if (e instanceof HttpErrorResponse) {
-        if (e.error && e.error.error) {
-          this.setStatusMessage.emit(`Update failed: ${e.error.error}`);
-        } else {
-          this.setStatusMessage.emit('Update failed.');
-        }
+      assert(e instanceof HttpErrorResponse, 'Expected HttpErrorResponse');
+      if (e.error && e.error.error) {
+        this.setStatusMessage.emit(`Update failed: ${e.error.error}`);
+      } else {
+        this.setStatusMessage.emit('Update failed.');
       }
     } finally {
       this.adminTaskManager.finishTask();

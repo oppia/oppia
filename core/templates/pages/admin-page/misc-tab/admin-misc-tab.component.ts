@@ -39,7 +39,6 @@ export class AdminMiscTabComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  showDataExtractionQueryStatus: boolean = false;
   dataExtractionQueryStatusMessage!: string;
   oldUsername!: string;
   newUsername!: string;
@@ -56,6 +55,7 @@ export class AdminMiscTabComponent {
   blogPostId!: string;
   authorUsername!: string;
   publishedOn!: string;
+  showDataExtractionQueryStatus: boolean = false;
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
 
   constructor(

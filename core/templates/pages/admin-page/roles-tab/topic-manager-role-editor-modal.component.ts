@@ -34,9 +34,10 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   @Input() managedTopicIds!: string[];
   @Input() topicIdToName!: {[topicId: string]: string};
   @Input() username!: string;
-  // Set to null when there are no topics to add.
+  // Set to null when there is no topic left in the list of topics to be
+  // updated. Null is also used to determine whether the 'Add' button should be
+  // disabled.
   newTopicId: string | null = null;
-  // Set to null when there are no topics to remove.
   topicIdInUpdate: string | null = null;
   topicIdsForSelection: string[] = [];
 

@@ -33,8 +33,8 @@ export class BlogDashboardTileComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() blogPostSummary!: BlogPostSummary;
-  @Input() blogPostIsPublished: boolean = false;
   @Input() activeView!: string;
+  @Input() blogPostIsPublished: boolean = false;
   lastUpdatedDateString: string = '';
   @Output() unpublisedBlogPost: EventEmitter<void> = new EventEmitter();
   @Output() deletedBlogPost: EventEmitter<void> = new EventEmitter();
@@ -47,6 +47,8 @@ export class BlogDashboardTileComponent implements OnInit {
 
   ngOnInit(): void {
     const lastUpdated = this.blogPostSummary.lastUpdated;
+    // Last updated date is undefined if the blog post is published but not
+    // yet updated. In that case, we do not display the last updated date.
     if (lastUpdated === undefined) {
       throw new Error('Last updated date is undefined');
     }
