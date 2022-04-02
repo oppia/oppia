@@ -153,6 +153,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         TopicUpdateService.setSubtopicThumbnailFilename(
           ctrl.topic, ctrl.subtopic.getId(), newThumbnailFilename);
         ctrl.editableThumbnailFilename = newThumbnailFilename;
+        $rootScope.$applyAsync();
       };
 
       ctrl.updateSubtopicThumbnailBgColor = function(
@@ -164,6 +165,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         TopicUpdateService.setSubtopicThumbnailBgColor(
           ctrl.topic, ctrl.subtopic.getId(), newThumbnailBgColor);
         ctrl.editableThumbnailBgColor = newThumbnailBgColor;
+        $rootScope.$applyAsync();
       };
 
       ctrl.resetErrorMsg = function() {
