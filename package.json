@@ -87,7 +87,7 @@
     "karma-ng-html2js-preprocessor": "^1.0.0",
     "karma-webpack": "^4.0.0-rc.3",
     "loader-utils": "^2.0.0",
-    "mocha": "^8.1.1",
+    "mocha": "^9.0.0",
     "nyc": "^15.1.0",
     "postcss-html": "^1.3.0",
     "protoc-gen-ts": "^0.3.4",
