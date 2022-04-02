@@ -134,7 +134,7 @@ FIREBASE_EMULATOR_CACHE_DIR = (
 
 sys.path.insert(0, PY_GITHUB_PATH)
 MYPY = False
-if MYPY:
+if MYPY:  # pragma: no cover
     import github # isort:skip  pylint: disable=wrong-import-position
 
 ES_PATH = os.path.join(
