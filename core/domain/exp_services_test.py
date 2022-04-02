@@ -1752,7 +1752,7 @@ title: Title
             self.owner_id, self.SAMPLE_YAML_CONTENT, self.EXP_ID, [test_asset])
 
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
         self.assertEqual(
             fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
 
@@ -2431,7 +2431,7 @@ title: A title
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
         fs.commit('image/abc.png', raw_image)
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
         zf = zipfile.ZipFile(zip_file_output)
@@ -2521,7 +2521,7 @@ title: A title
         ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
         fs.commit('image/abc.png', raw_image)
         # Audio files should not be included in asset downloads.
         with utils.open_file(
@@ -2604,7 +2604,7 @@ title: A title
         ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
         fs.commit('image/abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')
@@ -2891,7 +2891,7 @@ written_translations:
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
         fs.commit('abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')

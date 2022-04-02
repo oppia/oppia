@@ -885,7 +885,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1')
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1')
         fs.commit('image/img1.svg', raw_image, mimetype='image/svg+xml')
         fs.commit('image/img2.svg', raw_image, mimetype='image/svg+xml')
         self.assertEqual(
@@ -912,7 +912,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1')
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1')
         fs.commit('image/img1.svg', raw_image, mimetype='image/svg+xml')
         self.assertEqual(
             html_validation_service.validate_svg_filenames_in_math_rich_text(
@@ -943,7 +943,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1')
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1')
         fs.commit('image/img1.svg', raw_image, mimetype='image/svg+xml')
         self.assertEqual(
             html_validation_service.validate_svg_filenames_in_math_rich_text(

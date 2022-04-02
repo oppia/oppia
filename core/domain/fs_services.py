@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core import utils
 from core.domain import image_services
-from core.platform import models   # pylint: disable=invalid-import-from # isort:skip
+from core.platform import models
 
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()

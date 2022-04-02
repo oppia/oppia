@@ -750,7 +750,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         )
 
         fs = fs_services.GcsFileSystem(
-                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS, exp_id)
+            feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS, exp_id)
 
         self.assertTrue(fs.isfile('image/img.png'))
         self.assertTrue(fs.isfile('image/img_compressed.png'))
@@ -776,7 +776,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
 
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         self.assertTrue(fs.isfile('image/img.png'))
         self.assertTrue(fs.isfile('image/translation_image.png'))
         self.assertTrue(fs.isfile('image/img_compressed.png'))

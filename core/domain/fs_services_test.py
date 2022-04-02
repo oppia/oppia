@@ -46,11 +46,13 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
     def test_validate_entity_parameters(self):
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid entity_id received: 1'):
+            utils.ValidationError, 'Invalid entity_id received: 1'
+        ):
             fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 1)
 
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Entity id cannot be empty'):
+            utils.ValidationError, 'Entity id cannot be empty'
+        ):
             fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, '')
 
         with self.assertRaisesRegex(
@@ -106,7 +108,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.listdir('fake_dir'), [])
 
         new_fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'eid2')
+            feconf.ENTITY_TYPE_EXPLORATION, 'eid2')
         self.assertEqual(new_fs.listdir('assets'), [])
 
     def test_copy(self):
@@ -130,7 +132,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
 
     def test_invalid_filepaths_are_caught(self):
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'eid')
+            feconf.ENTITY_TYPE_EXPLORATION, 'eid')
 
         invalid_filepaths = [
             '..', '../another_exploration', '../', '/..', '/abc']
@@ -189,7 +191,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         ) as f:
             original_image_content = f.read()
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID)
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID)
         self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
         self.assertFalse(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
         self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
@@ -208,7 +210,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
 
         with self.swap(constants, 'DEV_MODE', False):
             fs = fs_services.GcsFileSystem(
-                    feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID)
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID)
 
             self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
             self.assertFalse(
@@ -252,7 +254,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
 
         with self.swap(constants, 'DEV_MODE', False):
             fs = fs_services.GcsFileSystem(
-                    feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID)
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID)
 
             self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
             self.assertFalse(
@@ -288,7 +290,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             self.FILENAME, 'exploration', self.EXPLORATION_ID,
             original_image_content, 'image', True)
         destination_fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_QUESTION, 'question_id1')
+            feconf.ENTITY_TYPE_QUESTION, 'question_id1')
         self.assertFalse(destination_fs.isfile('image/%s' % self.FILENAME))
         self.assertFalse(
             destination_fs.isfile(
@@ -311,7 +313,7 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
     def setUp(self):
         super(FileSystemClassifierDataTests, self).setUp()
         self.fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
         self.classifier_data_proto = (
             text_classifier_pb2.TextClassifierFrozenModel())
         self.classifier_data_proto.model_json = json.dumps({

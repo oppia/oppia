@@ -307,7 +307,7 @@ def export_to_zip_file(exploration_id, version=None):
             zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         html_string_list = exploration.get_all_html_content_strings()
         image_filenames = (
             html_cleaner.get_image_filenames_from_html_strings(
@@ -1492,7 +1492,7 @@ def save_new_exploration_from_yaml_and_assets(
     # perform the migration.
     for (asset_filename, asset_content) in assets_list:
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         fs.commit(asset_filename, asset_content)
 
     exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)

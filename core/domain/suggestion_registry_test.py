@@ -2588,7 +2588,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         question = question_services.get_questions_by_skill_ids(
             1, ['skill1'], False)[0]
         destination_fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_QUESTION, question.id)
+            feconf.ENTITY_TYPE_QUESTION, question.id)
         self.assertTrue(destination_fs.isfile('image/%s' % 'image.png'))
         self.assertEqual(
             suggestion.status,

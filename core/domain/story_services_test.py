@@ -168,7 +168,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'rb', encoding=None) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_STORY, self.STORY_ID)
+            feconf.ENTITY_TYPE_STORY, self.STORY_ID)
         fs.commit(
             '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -274,7 +274,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'rb', encoding=None) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_STORY, self.STORY_ID)
+            feconf.ENTITY_TYPE_STORY, self.STORY_ID)
         fs.commit(
             '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')

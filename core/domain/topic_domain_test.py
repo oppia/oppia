@@ -748,7 +748,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'rb', encoding=None) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
-                feconf.ENTITY_TYPE_TOPIC, self.topic.id)
+            feconf.ENTITY_TYPE_TOPIC, self.topic.id)
         fs.commit(  # type: ignore[no-untyped-call]
             '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -801,7 +801,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
-                feconf.ENTITY_TYPE_TOPIC, self.topic_id)
+            feconf.ENTITY_TYPE_TOPIC, self.topic_id)
         fs.commit(  # type: ignore[no-untyped-call]
             'thumbnail/new_image.svg', raw_image, mimetype='image/svg+xml')
         self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')

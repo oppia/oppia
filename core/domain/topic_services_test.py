@@ -444,7 +444,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
+            feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
         fs.commit(
             '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -643,7 +643,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'rb', encoding=None) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
-                feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
+            feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
         fs.commit(
             '%s/thumbnail.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
