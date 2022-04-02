@@ -336,10 +336,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
         'Translation');
 
+      // In case of rejection, the suggestion is not applied, so there is no
+      // commit message. Because there is no commit to make.
       this.contributionAndReviewService.reviewExplorationSuggestion(
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
-        reviewMessage || this.reviewMessage, this.generateCommitMessage(),
+        reviewMessage || this.reviewMessage, null,
         this.showNextItemToReview.bind(this),
         (error) => {
           this.alertsService.clearWarnings();

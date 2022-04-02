@@ -226,11 +226,14 @@ export class AdminFeaturesTabComponent implements OnInit {
     // The type of error 'e' is unknown because anything can be throw
     // in TypeScript. We need to make sure to check the type of 'e'.
     } catch (e: unknown) {
-      assert(e instanceof HttpErrorResponse, 'Expected HttpErrorResponse');
-      if (e.error && e.error.error) {
-        this.setStatusMessage.emit(`Update failed: ${e.error.error}`);
+      if (e instanceof HttpErrorResponse) {
+        if (e.error && e.error.error) {
+          this.setStatusMessage.emit(`Update failed: ${e.error.error}`);
+        } else {
+          this.setStatusMessage.emit('Update failed.');
+        }
       } else {
-        this.setStatusMessage.emit('Update failed.');
+        throw new Error('Unexpected error response.');
       }
     } finally {
       this.adminTaskManager.finishTask();

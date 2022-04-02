@@ -195,17 +195,14 @@ export class ContributionAndReviewService {
 
   reviewExplorationSuggestion(
       targetId: string, suggestionId: string, action: string,
-      reviewMessage: string, commitMessage: string,
+      reviewMessage: string, commitMessage: string | null,
       onSuccess: (suggestionId: string) => void,
       onFailure: (error: Error) => void
   ): Promise<void> {
     const requestBody = {
       action: action,
       review_message: reviewMessage,
-      commit_message: (
-        action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
-        commitMessage : null
-      )
+      commit_message: commitMessage
     };
 
     return this.contributionAndReviewBackendApiService
