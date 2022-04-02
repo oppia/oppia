@@ -31,12 +31,12 @@ export interface CategorizedSkills {
   templateUrl: './select-skill-modal.component.html',
 })
 export class SelectSkillModalComponent extends ConfirmOrCancelModal {
-  categorizedSkills: SkillsCategorizedByTopics;
-  skillsInSameTopicCount: number;
-  skillSummaries: SkillSummaryBackendDict[];
-  untriagedSkillSummaries: ShortSkillSummary[];
-  allowSkillsFromOtherTopics: boolean;
-  selectedSkillId: string = null;
+  categorizedSkills!: SkillsCategorizedByTopics;
+  skillsInSameTopicCount!: number;
+  skillSummaries!: SkillSummaryBackendDict[];
+  untriagedSkillSummaries!: ShortSkillSummary[];
+  allowSkillsFromOtherTopics!: boolean;
+  selectedSkillId: string | null = null;
 
   constructor(
     private ngbActiveModal: NgbActiveModal
@@ -45,7 +45,8 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   }
 
   confirm(): void {
-    let totalSkills = [];
+    let totalSkills:
+    (ShortSkillSummary | SkillSummaryBackendDict)[] = [];
     if (this.skillSummaries) {
       totalSkills = [...this.skillSummaries];
     }
