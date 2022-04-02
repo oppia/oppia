@@ -34,7 +34,7 @@ from scripts import common
 @contextlib.contextmanager
 def managed_process(
         command_args, human_readable_name='Process', shell=False,
-        timeout_secs=60, **popen_kwargs):
+        timeout_secs=60, expected_exit_codes=None, **popen_kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -53,6 +53,9 @@ def managed_process(
         timeout_secs: int. The time allotted for the managed process and its
             descendants to terminate themselves. After the timeout, any
             remaining processes will be killed abruptly.
+        expected_exit_codes: list(int)|None. If provided, a list of return
+            codes that can be silently ignored. For other non-signal return
+            codes, an error will be thrown.
         **popen_kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
 
     Yields:
@@ -65,6 +68,9 @@ def managed_process(
     if common.PSUTIL_DIR not in sys.path:
         sys.path.insert(1, common.PSUTIL_DIR)
     import psutil
+
+    if expected_exit_codes is None:
+        expected_exit_codes = []
 
     get_proc_info = lambda p: (
         '%s(name="%s", pid=%d)' % (human_readable_name, p.name(), p.pid)
@@ -118,7 +124,8 @@ def managed_process(
         exit_code = popen_proc.returncode
         # Note that negative values indicate termination by a signal:  SIGTERM,
         # SIGINT, etc.
-        if exit_code > 0:
+        if exit_code is not None and exit_code > 0 and (
+                exit_code not in expected_exit_codes):
             raise Exception(
                 'Process %s exited unexpectedly with exit code %s' %
                 (proc_name, exit_code))
@@ -598,10 +605,16 @@ def managed_webdriver_server(chrome_version=None):
 
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
-        proc = exit_stack.enter_context(managed_process([
-            common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'start',
-            '--versions.chrome', chrome_version, '--quiet', '--standalone',
-        ], human_readable_name='Webdriver manager', shell=True))
+        # Additionally, we accept the exit code 143 because Webdriver-manager
+        # seems to emit that when terminated externally.
+        proc = exit_stack.enter_context(managed_process(
+            [
+                common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH,
+                'start', '--versions.chrome', chrome_version, '--quiet',
+                '--standalone',
+            ],
+            human_readable_name='Webdriver Manager', shell=True,
+            expected_exit_codes=[143]))
 
         common.wait_for_port_to_be_in_use(4444)
 
