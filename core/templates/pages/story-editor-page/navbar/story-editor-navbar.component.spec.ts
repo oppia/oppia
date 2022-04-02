@@ -397,7 +397,7 @@ describe('Story editor navbar component', () => {
 
     component.story = story;
     let clearChangesSpy = spyOn(
-      undoRedoService, 'clearChanges').and.callThrough();
+      undoRedoService, 'clearChanges').and.returnValue();
 
     component.discardChanges();
 
