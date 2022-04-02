@@ -1151,7 +1151,7 @@ class Topic:
     def create_default_topic(
         cls, topic_id: str, name: str, url_fragment: str, description: str
     ) -> Topic:
-        """Returns a topic domain object with default values. This is for
+        """Returns a topic domain object with  default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
 
@@ -1169,7 +1169,8 @@ class Topic:
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
-            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, 'web_title')
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False,
+            'web_title')
 
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(
