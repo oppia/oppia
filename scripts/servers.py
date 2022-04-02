@@ -84,7 +84,6 @@ def managed_process(
     finally:
         proc_name = get_proc_info(popen_proc)
         print('Stopping %s...' % proc_name)
-        exit_code = popen_proc.wait()
         procs_still_alive = [popen_proc]
 
         try:
@@ -116,6 +115,7 @@ def managed_process(
             logging.exception(
                 'Failed to stop %s gracefully!' % get_proc_info(popen_proc))
 
+        exit_code = popen_proc.returncode
         if exit_code != 0:
             raise Exception(
                 'Process %s exited unexpectedly with exit code %s' %
