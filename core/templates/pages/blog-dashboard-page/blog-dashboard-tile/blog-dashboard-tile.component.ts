@@ -47,12 +47,10 @@ export class BlogDashboardTileComponent implements OnInit {
 
   ngOnInit(): void {
     const lastUpdated = this.blogPostSummary.lastUpdated;
-    // Last updated date is undefined if the blog post is published but not
-    // yet updated. In that case, we do not display the last updated date.
-    if (lastUpdated === undefined) {
-      throw new Error('Last updated date is undefined');
+    // After TODO(#13637) is resolved, remove this check.
+    if (lastUpdated !== undefined) {
+      this.lastUpdatedDateString = this.getDateStringInWords(lastUpdated);
     }
-    this.lastUpdatedDateString = this.getDateStringInWords(lastUpdated);
   }
 
   getDateStringInWords(naiveDate: string): string {
