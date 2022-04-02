@@ -352,6 +352,14 @@ describe('SvgEditor', () => {
       expect(component.canvas.getObjects().length).toBe(1);
     })));
 
+  it('should discard SVG', () => {
+    spyOn(component.discardImage, 'emit');
+
+    component.discardSvgFile();
+
+    expect(component.discardImage.emit).toHaveBeenCalled();
+  });
+
   it(
     'should update diagram size when dom had loaded',
     waitForAsync(fakeAsync(() => {
