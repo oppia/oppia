@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import copy
 import datetime
+import enum
 import os
 
 from core.constants import constants
@@ -38,6 +39,18 @@ ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 # The values which a post_commit_status can have: public, private.
 POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
+
+
+class ValidCmdDict(TypedDict):
+    """Dictionary representing valid commands specs."""
+
+    name: str
+    required_attribute_names: List[str]
+    optional_attribute_names: List[str]
+    user_id_attribute_names: List[str]
+    allowed_values: Dict[str, List[str]]
+    deprecated_values: Dict[str, List[str]]
+
 
 # Whether to unconditionally log info messages.
 DEBUG = False
@@ -105,6 +118,43 @@ HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH = os.path.join(
     'interactions', 'html_field_types_to_rule_specs.json')
 LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
     'interactions', 'legacy_html_field_types_to_rule_specs_by_state_version')
+
+
+# Valid model names.
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class VALID_MODEL_NAMES(enum.Enum): # pylint: disable=invalid-name
+    """Enum for valid model names."""
+
+    activity = 'activity' # pylint: disable=invalid-name
+    app_feedback_report = 'app_feedback_report' # pylint: disable=invalid-name
+    audit = 'audit' # pylint: disable=invalid-name
+    base_model = 'base_model' # pylint: disable=invalid-name
+    beam_job = 'beam_job' # pylint: disable=invalid-name
+    blog = 'blog' # pylint: disable=invalid-name
+    classifier = 'classifier' # pylint: disable=invalid-name
+    collection = 'collection' # pylint: disable=invalid-name
+    config = 'config' # pylint: disable=invalid-name
+    email = 'email' # pylint: disable=invalid-name
+    exploration = 'exploration' # pylint: disable=invalid-name
+    feedback = 'feedback' # pylint: disable=invalid-name
+    improvements = 'improvements' # pylint: disable=invalid-name
+    job = 'job' # pylint: disable=invalid-name
+    opportunity = 'opportunity' # pylint: disable=invalid-name
+    question = 'question' # pylint: disable=invalid-name
+    recommendations = 'recommendations' # pylint: disable=invalid-name
+    skill = 'skill' # pylint: disable=invalid-name
+    statistics = 'statistics' # pylint: disable=invalid-name
+    auth = 'auth' # pylint: disable=invalid-name
+    story = 'story' # pylint: disable=invalid-name
+    subtopic = 'subtopic' # pylint: disable=invalid-name
+    suggestion = 'suggestion' # pylint: disable=invalid-name
+    topic = 'topic' # pylint: disable=invalid-name
+    translation = 'translation' # pylint: disable=invalid-name
+    user = 'user' # pylint: disable=invalid-name
+
 
 # A mapping of interaction ids to classifier properties.
 # TODO(#10217): As of now we support only one algorithm per interaction.
@@ -369,7 +419,10 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
-DEFAULT_AUTO_TTS_ENABLED = True
+DEFAULT_AUTO_TTS_ENABLED = False
+# Whether new explorations should have correctness-feedback enabled
+# by default.
+DEFAULT_CORRECTNESS_FEEDBACK_ENABLED = True
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''
@@ -510,7 +563,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.1'
+OPPIA_VERSION = '3.2.4'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -1494,6 +1547,10 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
+# This represents a literal constant for All and is used whereever
+# we need to compare a value with value All (for example, all topics)
+ALL_LITERAL_CONSTANT = 'All'
+
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is
 # '/access_validation_handler/<handler_name>'
@@ -1505,3 +1562,33 @@ COMMIT_TYPE_CREATE = 'create'
 COMMIT_TYPE_REVERT = 'revert'
 COMMIT_TYPE_EDIT = 'edit'
 COMMIT_TYPE_DELETE = 'delete'
+
+# Interaction IDs of math related interactions.
+MATH_INTERACTION_IDS = [
+    'NumericExpressionInput', 'AlgebraicExpressionInput', 'MathEquationInput']
+
+# The task entry ID template used by the task entry model.
+TASK_ENTRY_ID_TEMPLATE = '%s.%s.%d.%s.%s.%s'
+
+# The composite entity ID template used by the task entry model.
+COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
+
+# The data type for the translated or translatable content in any
+# BaseTranslatableObject.
+ContentValueType = Union[str, List[str]]
+
+
+class TranslatableEntityType(enum.Enum):
+    """Represents all possible entity types which support new translations
+    architecture.
+    """
+
+    EXPLORATION = 'exploration'
+    QUESTION = 'question'
+
+
+class TranslatedContentDict(TypedDict):
+    """Dictionary representing TranslatedContent object."""
+
+    content_value: ContentValueType
+    needs_update: bool

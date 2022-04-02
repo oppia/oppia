@@ -23,13 +23,15 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
+import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { StatsReportingService } from '../services/stats-reporting.service';
@@ -43,9 +45,11 @@ export class LearnerViewInfoComponent {
   explorationId: string;
   directiveSubscriptions: Subscription = new Subscription();
   explorationTitle: string;
+  explorationTitleTranslationKey: string;
   isLinkedToTopic: boolean;
   storyPlaythroughObject: StoryPlaythrough;
   topicName: string;
+  topicNameTranslationKey: string;
   expInfo: LearnerExplorationSummaryBackendDict;
 
   constructor(
@@ -59,7 +63,8 @@ export class LearnerViewInfoComponent {
     private statsReportingService: StatsReportingService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private storyViewerBackendApiService: StoryViewerBackendApiService
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private topicViewerBackendApiService: TopicViewerBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -85,6 +90,12 @@ export class LearnerViewInfoComponent {
       .then((response) => {
         this.explorationTitle = response.exploration.title;
       });
+    this.explorationTitleTranslationKey = (
+      this.i18nLanguageCodeService.getExplorationTranslationKey(
+        this.explorationId,
+        TranslationKeyType.TITLE
+      )
+    );
     // To check if the exploration is linked to the topic or not.
     this.isLinkedToTopic = this.getTopicUrl() ? true : false;
     // If linked to topic then print topic name in the lesson player.
@@ -93,19 +104,21 @@ export class LearnerViewInfoComponent {
         this.urlService.getTopicUrlFragmentFromLearnerUrl());
       let classroomUrlFragment = (
         this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-      let storyUrlFragment = (
-        this.urlService.getStoryUrlFragmentFromLearnerUrl());
-      this.storyViewerBackendApiService.fetchStoryDataAsync(
-        topicUrlFragment,
-        classroomUrlFragment,
-        storyUrlFragment).then((storyDataDict) => {
-        this.storyPlaythroughObject = storyDataDict;
-        let topicName = this.storyPlaythroughObject.topicName;
-        this.topicName = topicName;
-        this.statsReportingService.setTopicName(this.topicName);
-        this.siteAnalyticsService.registerCuratedLessonStarted(
-          this.topicName, this.explorationId);
-      });
+      this.topicViewerBackendApiService.fetchTopicDataAsync(
+        topicUrlFragment, classroomUrlFragment).then(
+        (readOnlyTopic: ReadOnlyTopic) => {
+          this.topicName = readOnlyTopic.getTopicName();
+          this.statsReportingService.setTopicName(this.topicName);
+          this.siteAnalyticsService.registerCuratedLessonStarted(
+            this.topicName, this.explorationId);
+          this.topicNameTranslationKey = (
+            this.i18nLanguageCodeService.getTopicTranslationKey(
+              readOnlyTopic.getTopicId(),
+              TranslationKeyType.TITLE
+            )
+          );
+        }
+      );
     }
   }
 
@@ -161,6 +174,22 @@ export class LearnerViewInfoComponent {
           this.explorationId);
       });
     }
+  }
+
+  isHackyTopicNameTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.topicNameTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyExpTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.explorationTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 
   ngOnDestory(): void {

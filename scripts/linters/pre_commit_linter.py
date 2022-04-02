@@ -63,7 +63,7 @@ import subprocess
 import sys
 import threading
 
-from core import python_utils
+from core import utils
 
 # Install third party dependencies before proceeding.
 from . import codeowner_linter
@@ -80,16 +80,13 @@ from .. import install_third_party_libs
 
 OTHER_SHARD_NAME = 'other'
 
+# Shards are specified by a mapping from shard name to a list of the
+# paths in that shard. For exaple, `'1': ['core/domain/']` will create a
+# shard named `'1'` that contains all the files under core/domain/. A
+# shard name matching OTHER_SHARD_NAME includes all files not under
+# another shard.  Currently we are not sharding the lint checks, so the
+# only shard is the `other` shard that contains all files.
 SHARDS = {
-    '1': [
-        'core/templates/',
-        'extensions/',
-        'core/tests/',
-        'core/storage/',
-        'core/controllers/',
-        'core/platform',
-        'core/jobs/',
-    ],
     'other': None,
 }
 
@@ -198,7 +195,7 @@ class FileCache:
         """
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
-            with python_utils.open_file(filepath, mode, newline='') as f:
+            with utils.open_file(filepath, mode, newline='') as f:
                 lines = f.readlines()
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return self._CACHE_DATA_DICT[key]
@@ -387,6 +384,10 @@ def _get_filepaths_from_non_other_shard(shard, namespace=None):
 
     Returns:
         list(str). Paths to lintable files.
+
+    Raises:
+        RuntimeError. Invalid shards because of a duplicate file.
+        AssertionError. A file duplicated across shards.
     """
     filepaths = []
     assert shard != OTHER_SHARD_NAME

@@ -30,7 +30,6 @@ import types
 
 from core import feconf
 from core import handler_schema_constants
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -518,7 +517,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
         response = self.get_html_response(
-            '/community-library', expected_status_int=503)
+            '/community-library', expected_status_int=200)
 
         self.assertIn(b'<oppia-maintenance-page>', response.body)
         self.assertNotIn(b'<oppia-library-page-root>', response.body)
@@ -548,32 +547,6 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.assertNotIn(b'<oppia-maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-    def test_json_response_is_rejected(self):
-        destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
-
-        response = self.get_json('/url_handler', expected_status_int=503)
-
-        self.assertIn('error', response)
-        self.assertEqual(
-            response['error'],
-            'Oppia is currently being upgraded, and the site should be up '
-            'and running again in a few hours. Thanks for your patience!')
-        self.assertNotIn('login_url', response)
-        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
-
-    def test_json_response_is_not_rejected_when_user_is_super_admin(self):
-        self.context_stack.enter_context(self.super_admin_context())
-        destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
-
-        response = self.get_json('/url_handler')
-
-        self.assertIn('login_url', response)
-        self.assertIsNone(response['login_url'])
-        self.assertNotIn('error', response)
-        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
-
     def test_csrfhandler_handler_is_not_rejected(self):
         response = self.get_json('/csrfhandler')
 
@@ -598,7 +571,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.assertEqual(call_counter.times_called, 1)
 
     def test_signup_fails(self):
-        with self.assertRaisesRegex(Exception, 'Bad response: 503'):
+        with self.assertRaisesRegex(
+            Exception, '\'<oppia-maintenance-page>\' unexpectedly found in'):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_maintenance_mode_is_disabled(self):
@@ -637,8 +611,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-        with self.assertRaisesRegex(Exception, 'Bad response: 503'):
-            self.get_json('/url_handler?current_url=/')
+        response = self.get_html_response('/url_handler?current_url=/')
+        self.assertIn(b'<oppia-maintenance-page>', response.body)
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
@@ -885,7 +859,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n'))
         for filename in filenames:
-            with python_utils.open_file(
+            with utils.open_file(
                 os.path.join(os.getcwd(), 'assets', 'i18n', filename),
                 mode='r') as f:
                 lines = f.readlines()
@@ -2110,7 +2084,7 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
         user_id = user_services.get_user_id_from_username('testlearneruser')
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:

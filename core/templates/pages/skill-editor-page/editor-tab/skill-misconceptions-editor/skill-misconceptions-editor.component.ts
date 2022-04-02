@@ -76,7 +76,7 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
   }
 
   openDeleteMisconceptionModal(index: number, evt: string): void {
-    let modalInstance: NgbModalRef = this.ngbModal.open(
+    const modalInstance: NgbModalRef = this.ngbModal.open(
       DeleteMisconceptionModalComponent, {
         backdrop: 'static',
       });
@@ -106,6 +106,10 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
     });
+  }
+
+  onMisconceptionChange(): void {
+    this.getMisconceptionsChange.emit();
   }
 
   toggleMisconceptionLists(): void {

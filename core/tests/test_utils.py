@@ -33,7 +33,6 @@ import re
 import unittest
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
@@ -71,7 +70,7 @@ import elasticsearch
 import requests_mock
 import webtest
 
-from typing import Any, Dict, Optional # isort: skip
+from typing import Any, Dict, List, Optional # isort: skip
 
 (
     auth_models, base_models, exp_models,
@@ -129,6 +128,9 @@ def get_filepath_from_filename(filename, rootdir):
     Returns:
         str | None. The path of the file if file is found otherwise
         None.
+
+    Raises:
+        Exception. Multiple files found with given file name.
     """
     # This is required since error files are served according to error status
     # code. The file served is error-page.mainpage.html but it is compiled and
@@ -161,7 +163,7 @@ def mock_load_template(filename):
     """
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'pages'))
-    with python_utils.open_file(filepath, 'r') as f:
+    with utils.open_file(filepath, 'r') as f:
         return f.read()
 
 
@@ -1325,6 +1327,9 @@ class TestBase(unittest.TestCase):
 
         Returns:
             bool. Whether the code raised exception in the expected format.
+
+        Raises:
+            Exception. No Regex given.
         """
         if not expected_regex:
             raise Exception(
@@ -1742,10 +1747,10 @@ class GenericTestBase(AppEngineTestBase):
 
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 init_state_name: %s
 language_code: en
 objective: ''
@@ -1927,6 +1932,9 @@ title: Title
 
         Yields:
             None. Empty yield statement.
+
+        Raises:
+            Exception. Given argument is not a datetime.
         """
         if not isinstance(mocked_now, datetime.datetime):
             raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
@@ -2008,6 +2016,7 @@ title: Title
 
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
+            self.assertNotIn('<oppia-maintenance-page>', response)
 
             response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
                 'csrf_token': self.get_new_csrf_token(),
@@ -2562,10 +2571,17 @@ title: Title
         state.update_next_content_id_index(next_content_id_index_dict['value'])
 
     def save_new_valid_exploration(
-            self, exploration_id, owner_id, title='A title',
-            category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE, end_state_name=None,
-            interaction_id='TextInput', correctness_feedback_enabled=False):
+        self,
+        exploration_id: str,
+        owner_id: str,
+        title: str = 'A title',
+        category: str = 'A category',
+        objective: str = 'An objective',
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        end_state_name: Optional[str] = None,
+        interaction_id: str = 'TextInput',
+        correctness_feedback_enabled: bool = False
+    ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration.
 
         Args:
@@ -2635,6 +2651,10 @@ title: Title
 
         Returns:
             Exploration. The exploration domain object.
+
+        Raises:
+            ValueError. Given list of state names is empty.
+            ValueError. Given list of interaction ids is empty.
         """
         if not state_names:
             raise ValueError('must provide at least one state name')
@@ -2744,11 +2764,16 @@ title: Title
         return collection
 
     def save_new_valid_collection(
-            self, collection_id, owner_id, title='A title',
-            category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            exploration_id='an_exploration_id',
-            end_state_name=DEFAULT_END_STATE_NAME):
+        self,
+        collection_id: str,
+        owner_id: str,
+        title: str = 'A title',
+        category: str = 'A category',
+        objective: str = 'An objective',
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        exploration_id: str = 'an_exploration_id',
+        end_state_name: str = DEFAULT_END_STATE_NAME
+    ) -> collection_domain.Collection:
         """Creates an Oppia collection and adds a node saving the exploration
         details.
 
@@ -3552,7 +3577,7 @@ class GenericEmailTestBase(GenericTestBase):
             self.emails_dict[recipient_email].append(new_email)
         return True
 
-    def _get_sent_email_messages(self, to):
+    def _get_sent_email_messages(self, to: str) -> List[EmailMessageMock]:
         """Gets messages to a single recipient email.
 
         Args:
@@ -3769,6 +3794,10 @@ class FailingFunction(FunctionWrapper):
                 exception, before a call succeeds. If this is 0, all calls will
                 succeed, if it is FailingFunction. INFINITY, all calls will
                 fail.
+
+        Raises:
+            ValueError. The number of times to raise an exception before a call
+                succeeds should be a non-negative interger or INFINITY.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception
