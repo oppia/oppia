@@ -351,11 +351,9 @@ describe('Story editor navbar component', () => {
 
   it('should not discard story if the story is undefined', () => {
     component.story = undefined;
-    spyOn(storyEditorStateService, 'loadStory');
 
     component.discardChanges();
 
-    expect(storyEditorStateService.loadStory()).not.toHaveBeenCalled();
     expect(component.forceValidateExplorations).toBeTrue();
   });
 
