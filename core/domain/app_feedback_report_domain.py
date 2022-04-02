@@ -335,14 +335,14 @@ class AppFeedbackReport:
 
     @classmethod
     def get_category_from_string(cls, category_name: str) -> (
-        app_feedback_report_constants.CATEGORY):
+        app_feedback_report_constants.Category):
         """Determines the category based on the JSON value.
 
         Args:
             category_name: str. The name of the report type.
 
         Returns:
-            CATEGORY. The enum representing this category.
+            Category. The enum representing this category.
         """
         for category_type in app_feedback_report_constants.ALLOWED_CATEGORIES:
             if category_name == category_type.name:
@@ -433,7 +433,7 @@ class UserSuppliedFeedback:
     def __init__(
         self,
         report_type: app_feedback_report_constants.REPORT_TYPE,
-        category: app_feedback_report_constants.CATEGORY,
+        category: app_feedback_report_constants.Category,
         user_feedback_selected_items: List[str],
         user_feedback_other_text_input: str
     ) -> None:
@@ -442,7 +442,7 @@ class UserSuppliedFeedback:
         Args:
             report_type: REPORT_TYPE. The type of feedback submitted by the user
                 as an enum.
-            category: CATEGORY. The category enum that this specific report_type
+            category: Category. The category enum that this specific report_type
                 is providing feedback on that correponds.
             user_feedback_selected_items: list(str). A list of strings that
                 represent any options selected by the user for the feedback
@@ -514,12 +514,12 @@ class UserSuppliedFeedback:
 
     @classmethod
     def require_valid_category(
-        cls, category: app_feedback_report_constants.CATEGORY
+        cls, category: app_feedback_report_constants.Category
     ) -> None:
         """Checks whether the category is valid.
 
         Args:
-            category: CATEGORY. The category enum to validate.
+            category: Category. The category enum to validate.
 
         Raises:
             ValidationError. No category supplied.
@@ -535,7 +535,7 @@ class UserSuppliedFeedback:
     @classmethod
     def require_valid_user_feedback_items_for_category(
         cls,
-        category: app_feedback_report_constants.CATEGORY,
+        category: app_feedback_report_constants.Category,
         selected_items: List[str],
         other_text_input: str
     ) -> None:

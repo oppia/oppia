@@ -55,8 +55,8 @@ TICKET_ID = '%s.%s.%s' % (
 REPORT_TYPE_SUGGESTION = app_feedback_report_constants.REPORT_TYPE.suggestion
 REPORT_TYPE_ISSUE = app_feedback_report_constants.REPORT_TYPE.issue
 CATEGORY_SUGGESTION_OTHER = (
-    app_feedback_report_constants.CATEGORY.other_suggestion)
-CATEGORY_ISSUE_TOPICS = app_feedback_report_constants.CATEGORY.topics_issue
+    app_feedback_report_constants.Category.OTHER_SUGGESTION)
+CATEGORY_ISSUE_TOPICS = app_feedback_report_constants.Category.TOPICS_ISSUE
 ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
 COUNTRY_LOCALE_CODE_INDIA = 'in'
 ANDROID_DEVICE_MODEL = 'Pixel 4a'
