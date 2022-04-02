@@ -22,7 +22,7 @@ module.exports = {
   'ci': {
     'collect': {
       'settings': {
-        'maxWaitForLoad': 120 * 1000,  // Allow pages to load for at most 120s.
+        'maxWaitForLoad': 600 * 1000,  // Allow pages to load for at most 10 min.
       },
       'numberOfRuns': baseConfig['numberOfRuns'],
       'puppeteerScript': baseConfig['puppeteerScript'],
