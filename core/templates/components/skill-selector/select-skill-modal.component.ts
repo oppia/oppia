@@ -20,16 +20,12 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-<<<<<<< HEAD
+import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 export interface CategorizedSkills {
   [topic: string]: {
     [subtopic: string]: SkillSummaryBackendDict[];
   };
 }
-=======
-import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
-
->>>>>>> f05d81f3f48bcd8dc2b2302835f59bb0703166f3
 @Component({
   selector: 'oppia-select-skill',
   templateUrl: './select-skill-modal.component.html',
