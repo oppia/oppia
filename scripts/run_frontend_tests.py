@@ -106,7 +106,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if not parsed_args.skip_install:
         install_third_party_libs.main()
 
-    common.print_each_string_after_two_new_lines([
+    common.print_each_string_after_two_new_lines([  # type: ignore[no-untyped-call]
         'View interactive frontend test coverage reports by navigating to',
         '../karma_coverage_reports',
         'on your filesystem.',
