@@ -18,8 +18,8 @@
 
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { TopicsAndSkillsDashboardBackendApiService, CategorizedAndUntriagedSkillsData } from
+import { NgbModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
@@ -31,9 +31,11 @@ import { StateSkillEditorComponent } from './state-skill-editor.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
+import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
@@ -49,10 +51,24 @@ describe('State Skill Editor Component', () => {
   let skillBackendApiService: SkillBackendApiService;
   let skillObjectFactory: SkillObjectFactory;
 
+  let skillSummaryBackendDict: SkillSummaryBackendDict = {
+    id: 'test_id',
+    description: 'description',
+    language_code: 'sadf',
+    version: 10,
+    misconception_count: 0,
+    worked_examples_count: 1,
+    skill_model_created_on: 2,
+    skill_model_last_updated: 3
+  };
+
+  let untriagedSkillSummariesData: SkillSummary[] = [
+    SkillSummary.createFromBackendDict(skillSummaryBackendDict)];
+
   class MockNgbModal {
-    modal: string;
+    modal!: string;
     success: boolean = true;
-    open(content, options) {
+    open(content: string, options: NgbModalOptions) {
       if (this.modal === 'add_skill') {
         return {
           componentInstance: {
@@ -64,7 +80,7 @@ describe('State Skill Editor Component', () => {
           },
           result: {
             then: (
-                successCallback: (result) => void,
+                successCallback: (result: {}) => void,
                 cancelCallback: () => void
             ) => {
               if (this.success) {
@@ -100,17 +116,43 @@ describe('State Skill Editor Component', () => {
     }
   }
 
-  const categorizedAndUntriagedSkillsData: CategorizedAndUntriagedSkillsData = {
-    untriagedSkillSummaries: null,
-    categorizedSkillsDict: null
+  const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
+    allClassroomNames: [
+      'math'
+    ],
+    canDeleteTopic: true,
+    canCreateTopic: true,
+    canDeleteSkill: true,
+    canCreateSkill: true,
+    untriagedSkillSummaries: untriagedSkillSummariesData,
+    mergeableSkillSummaries: [
+      {
+        id: 'ho60YBh7c3Sn',
+        description: 'terst',
+        languageCode: 'en',
+        version: 1,
+        misconceptionCount: 0,
+        workedExamplesCount: 0,
+        skillModelCreatedOn: 1622827020924.104,
+        skillModelLastUpdated: 1622827020924.109
+      }
+    ],
+    totalSkillCount: 1,
+    topicSummaries: [
+      new CreatorTopicSummary(
+        'dummy2', 'division', 2, 2, 3, 3, 0,
+        'es', 'dummy2', 1, 1, 1, 1, true,
+        true, 'math', 'public/img1.png', 'green', 'div')
+    ],
+    categorizedSkillsDict: {}
   };
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     success: boolean = true;
     fetchCategorizedAndUntriagedSkillsDataAsync() {
       return {
-        then: (callback: (resp) => void) => {
-          callback(categorizedAndUntriagedSkillsData);
+        then: (callback: (resp: TopicsAndSkillDashboardData) => void) => {
+          callback(topicsAndSkillsDashboardData);
         }
       };
     }
@@ -153,8 +195,6 @@ describe('State Skill Editor Component', () => {
     fixture = TestBed.createComponent(StateSkillEditorComponent);
     componentInstance = fixture.componentInstance;
     fixture.detectChanges();
-    componentInstance.categorizedSkills = null;
-    componentInstance.skillEditorIsShown = null;
     componentInstance.untriagedSkillSummaries = [];
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
@@ -180,7 +220,6 @@ describe('State Skill Editor Component', () => {
   it('should open add skill modal for adding skill', () => {
     mockNgbModal.modal = 'add_skill';
     const modalSpy = spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return (
         { componentInstance: MockNgbModal,
           result: Promise.resolve('success')
@@ -202,7 +241,6 @@ describe('State Skill Editor Component', () => {
   it('should open delete skill modal for deleting skill', () => {
     mockNgbModal.modal = 'delete_skill';
     const modalSpy = spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return (
         { componentInstance: MockNgbModal,
           result: Promise.resolve('success')
@@ -232,6 +270,14 @@ describe('State Skill Editor Component', () => {
     expect(urlSpy).toHaveBeenCalled();
   });
 
+  it('should throw error on call getSkillEditorUrl when there is no skill' +
+    'is selected', () => {
+    stateLinkedSkillIdService.displayed = null;
+    expect(() => {
+      componentInstance.getSkillEditorUrl();
+    }).toThrowError('Expected a skill id to be displayed');
+  });
+
   it('should toggle skillEditorIsShown', () => {
     componentInstance.skillEditorIsShown = true;
     componentInstance.toggleSkillEditor();
@@ -259,9 +305,9 @@ describe('State Skill Editor Component', () => {
         language_code: 'en',
         version: 3,
         prerequisite_skill_ids: [],
-        all_questions_merged: null,
-        next_misconception_id: null,
-        superseding_skill_id: null
+        all_questions_merged: false,
+        next_misconception_id: 0,
+        superseding_skill_id: '',
       };
       const fetchSkillResponse = {
         skill: skillObjectFactory.createFromBackendDict(skillBackendDict),
@@ -273,7 +319,7 @@ describe('State Skill Editor Component', () => {
       ).and.returnValue(Promise.resolve(fetchSkillResponse));
       stateLinkedSkillIdService.displayed = 'skill_1';
 
-      expect(componentInstance.skillName).toBeNull();
+      expect(componentInstance.skillName).toBeUndefined();
 
       componentInstance.ngOnInit();
       tick();
