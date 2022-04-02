@@ -59,6 +59,8 @@ def main() -> None:
     coverage_result = re.search(
         r'All files\s*\|\s*(?P<stmts>\S+)\s*\|\s*(?P<branch>\S+)\s*\|\s*'
         r'(?P<funcs>\S+)\s*\|\s*(?P<lines>\S+)\s*\|\s*', tests_stdout)
+    # Here coverage_result variable may contain None value which can give error
+    # while accessing methods from the variable. Hence added the below assert.
     assert coverage_result is not None
     if (coverage_result.group('stmts') != '100' or
             coverage_result.group('branch') != '100' or
