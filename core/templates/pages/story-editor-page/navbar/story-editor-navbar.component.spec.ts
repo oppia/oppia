@@ -349,44 +349,15 @@ describe('Story editor navbar component', () => {
     expect(component.storyIsPublished).toBe(false);
   }));
 
-  it('should not validate story if the story is undefined',
-    fakeAsync(() => {
-      let mockStoryInitializedEventEmitter = new EventEmitter();
+  it('should not discard story if the story is undefined', () => {
+    component.story = undefined;
+    spyOn(storyEditorStateService, 'loadStory');
 
-      spyOn(storyEditorStateService, 'getStory').and.returnValue(undefined);
-      spyOnProperty(storyEditorStateService, 'onStoryInitialized')
-        .and.returnValue(mockStoryInitializedEventEmitter);
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
-        return ({
-          result: Promise.resolve('success')
-        } as NgbModalRef);
-      });
+    component.discardChanges();
 
-      component.ngOnInit();
-      mockStoryInitializedEventEmitter.emit();
-      fixture.detectChanges();
-
-      expect(component.storyIsPublished).toBe(undefined);
-
-      storyEditorStateService.setStory(story);
-      fixture.detectChanges();
-      // This check will make sure that story is
-      // loaded correctly before publishing it.
-      expect(storyEditorStateService.hasLoadedStory()).toBe(true);
-
-      // Publishing story will acts as pre-check here.
-      component.publishStory();
-      tick(1000);
-      fixture.detectChanges();
-      expect(component.storyIsPublished).toBe(true);
-
-      component.unpublishStory();
-      tick(1000);
-      fixture.detectChanges();
-      expect(modalSpy).toHaveBeenCalled();
-      expect(component.storyIsPublished).toBe(false);
-    }));
+    expect(storyEditorStateService.loadStory()).not.toHaveBeenCalled();
+    expect(component.forceValidateExplorations).toBeTrue();
+  });
 
   it('should toggle warning text', () => {
     component.warningsAreShown = true;
