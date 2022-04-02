@@ -31,14 +31,14 @@ describe('Question update service', function() {
   let stateObjectFactory = null;
   let sampleQuestion = null;
   let sampleStateDict = null;
-  let sampleQuestion1 = null;
-  let sampleStateDict1 = null;
-  let expectedOutputStateDict1 = null;
-  let expectedOutputState1 = null;
+  let contentStateSampleQuestion = null;
+  let contentStateSampleStateDict = null;
+  let expectedContentOutputStateDict = null;
+  let expectedContentOutputState = null;
   let expectedOutputStateDict = null;
   let expectedOutputState = null;
   let sampleQuestionBackendObject = null;
-  let sampleQuestionBackendObject1 = null;
+  let sampleContentQuestionBackendObject = null;
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() =>{
@@ -47,7 +47,7 @@ describe('Question update service', function() {
     questionUndoRedoService = TestBed.inject(UndoRedoService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
 
-    sampleStateDict1 = {
+    contentStateSampleStateDict = {
       name: 'question',
       classifier_model_id: 0,
       content: {
@@ -109,7 +109,7 @@ describe('Question update service', function() {
       }
     };
 
-    expectedOutputStateDict1 = {
+    expectedContentOutputStateDict = {
       name: 'question',
       classifier_model_id: 0,
       content: {
@@ -324,12 +324,12 @@ describe('Question update service', function() {
     expectedOutputState = stateObjectFactory.createFromBackendDict(
       'question', expectedOutputStateDict);
 
-    expectedOutputState1 = stateObjectFactory.createFromBackendDict(
-      'question', expectedOutputStateDict1);
+    expectedContentOutputState = stateObjectFactory.createFromBackendDict(
+      'question', expectedContentOutputStateDict);
 
-    sampleQuestionBackendObject1 = {
+    sampleContentQuestionBackendObject = {
       id: '0',
-      question_state_data: sampleStateDict1,
+      question_state_data: contentStateSampleStateDict,
       language_code: 'en',
       version: 1
     };
@@ -343,8 +343,8 @@ describe('Question update service', function() {
     sampleQuestion = questionObjectFactory.createFromBackendDict(
       sampleQuestionBackendObject);
 
-    sampleQuestion1 = questionObjectFactory.createFromBackendDict(
-      sampleQuestionBackendObject1
+    contentStateSampleQuestion = questionObjectFactory.createFromBackendDict(
+      sampleContentQuestionBackendObject
     );
   });
 
@@ -371,17 +371,18 @@ describe('Question update service', function() {
   });
 
   it('should update the state data of the question', () =>{
-    let oldStateData = angular.copy(sampleQuestion1.getStateData());
+    let oldStateData = angular.copy(contentStateSampleQuestion.getStateData());
     let updateFunction = function() {
-      let stateData = sampleQuestion1.getStateData();
+      let stateData = contentStateSampleQuestion.getStateData();
       stateData.content = SubtitledHtml.createDefault(
         'test content', 'content');
     };
     questionUpdateService.setQuestionStateData(
-      sampleQuestion1, updateFunction);
-    expect(sampleQuestion1.getStateData()).toEqual(expectedOutputState1);
-    questionUndoRedoService.undoChange(sampleQuestion1);
-    expect(sampleQuestion1.getStateData()).toEqual(oldStateData);
+      contentStateSampleQuestion, updateFunction);
+    expect(contentStateSampleQuestion.getStateData()).toEqual(
+      expectedContentOutputState);
+    questionUndoRedoService.undoChange(contentStateSampleQuestion);
+    expect(contentStateSampleQuestion.getStateData()).toEqual(oldStateData);
   });
 
   it('should set question inapplicable skills misconception ids when ' +
