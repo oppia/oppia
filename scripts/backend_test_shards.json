@@ -230,6 +230,7 @@
         "core.jobs.batch_jobs.exp_search_indexing_jobs_test",
         "core.jobs.batch_jobs.suggestion_stats_computation_jobs_test",
         "core.jobs.batch_jobs.user_stats_computation_jobs_test",
+        "core.jobs.batch_jobs.math_interactions_audit_jobs_test",
         "core.jobs.batch_jobs.opportunity_management_jobs_test",
         "core.jobs.batch_jobs.collection_info_jobs_test",
         "core.domain.image_validation_services_test",
