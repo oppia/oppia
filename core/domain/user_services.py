@@ -2312,7 +2312,7 @@ def _get_checkpoints_in_order(init_state_name, states):
         current_state_name = queue.pop()
         if current_state_name not in visited_state_names:
             visited_state_names.append(current_state_name)
-            current_state = states.current_state_name
+            current_state = states[current_state_name]
             if (current_state.card_is_checkpoint and (
                 current_state_name not in checkpoint_state_names)):
                 checkpoint_state_names.append(current_state_name)
@@ -2343,7 +2343,7 @@ def update_learner_checkpoint_progress(
             user_id, exploration_id)
 
     latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    if latest_exploration.furthest_reached_checkpoint_state_name is not None:
+    if exploration_user_model.furthest_reached_checkpoint_state_name is not None:
 
         all_checkpoints = _get_checkpoints_in_order(
             latest_exploration.init_state_name, latest_exploration.states)
