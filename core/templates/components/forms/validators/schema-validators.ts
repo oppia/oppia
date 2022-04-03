@@ -27,7 +27,7 @@ export class SchemaValidators {
       const value = control.value;
       if (value === null || value === undefined) {
         return {
-          isAtLeast: {minValue: args.minValue, actual: control.value}
+          hasLengthAtLeast: {minValue: args.minValue, actual: control.value}
         };
       }
       if (!(typeof value === 'string' || Array.isArray(value))) {
@@ -38,7 +38,8 @@ export class SchemaValidators {
         return null;
       }
       return {
-        isAtLeast: {minValue: args.minValue, actual: control.value.length}
+        hasLengthAtLeast: {
+          minValue: args.minValue, actual: control.value.length}
       };
     };
   }
@@ -50,7 +51,7 @@ export class SchemaValidators {
       const value = control.value;
       if (value === null || value === undefined) {
         return {
-          isAtMost: {minValue: args.maxValue, actual: control.value}
+          hasLengthAtMost: {minValue: args.maxValue, actual: control.value}
         };
       }
       if (!(typeof value === 'string' || Array.isArray(value))) {
@@ -61,7 +62,7 @@ export class SchemaValidators {
         return null;
       }
       return {
-        isAtMost: {maxValue: args.maxValue, actual: control.value.length}
+        hasLengthAtMost: {maxValue: args.maxValue, actual: control.value.length}
       };
     };
   }
@@ -117,16 +118,15 @@ export class SchemaValidators {
         if (FLOAT_REGEXP.test(viewValue)) {
           if (viewValue.slice(-1) === '%') {
             // This is a percentage, so the input needs to be divided by 100.
-            if (!(parseFloat(
+            return isNaN(parseFloat(
               viewValue.substring(0, viewValue.length - 1).replace(',', '.')
-            ) / 100.0)) {
-              return {isFloat: 'Not float'};
-            }
+            ) / 100.0) ? {isFloat: 'Not float', actual: control.value} : null;
           } else {
-            if (!parseFloat(viewValue.replace(',', '.'))) {
-              return {isFloat: 'Not float'};
-            }
+            return isNaN(parseFloat(viewValue.replace(',', '.'))) ?
+               {isFloat: 'Not float', actual: control.value} : null;
           }
+        } else {
+          return {isFloat: 'Not float', actual: control.value};
         }
       }
       return null;
