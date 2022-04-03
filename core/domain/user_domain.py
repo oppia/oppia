@@ -25,7 +25,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import List, Optional
+from typing import List, Dict, Optional
 from typing_extensions import TypedDict
 
 
@@ -1333,9 +1333,9 @@ class ModifiableUserData:
 class ExplorationUserDataDict(TypedDict):
     """Dictionary representing the ExplorationUserData object."""
 
-    rating: Optional[str]
+    rating: Optional[int]
     rated_on: Optional[datetime.datetime]
-    draft_change_list: Optional[list[dict]]
+    draft_change_list: Optional[List[Dict[str, str]]]
     draft_change_list_last_updated: Optional[datetime.datetime]
     draft_change_list_exp_version: Optional[int]
     draft_change_list_id: int
@@ -1385,7 +1385,7 @@ class ExplorationUserData:
         exploration_id: str,
         rating: Optional[int] = None,
         rated_on: Optional[datetime.datetime] = None,
-        draft_change_list: Optional[list[dict]] = None,
+        draft_change_list: Optional[List[Dict[str, str]]] = None,
         draft_change_list_last_updated: Optional[datetime.datetime] = None,
         draft_change_list_exp_version: Optional[int] = None,
         draft_change_list_id: int = 0,
