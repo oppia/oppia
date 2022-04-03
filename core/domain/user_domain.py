@@ -1335,7 +1335,7 @@ class ExplorationUserDataDict(TypedDict):
 
     rating: Optional[str]
     rated_on: Optional[datetime.datetime]
-    draft_change_list: Optional[list(dict)]
+    draft_change_list: Optional[list[dict]]
     draft_change_list_last_updated: Optional[datetime.datetime]
     draft_change_list_exp_version: Optional[int]
     draft_change_list_id: int
@@ -1383,9 +1383,9 @@ class ExplorationUserData:
         self,
         user_id: str,
         exploration_id: str,
-        rating: Optional[str] = None,
+        rating: Optional[int] = None,
         rated_on: Optional[datetime.datetime] = None,
-        draft_change_list: Optional[list(dict)] = None,
+        draft_change_list: Optional[list[dict]] = None,
         draft_change_list_last_updated: Optional[datetime.datetime] = None,
         draft_change_list_exp_version: Optional[int] = None,
         draft_change_list_id: int = 0,
