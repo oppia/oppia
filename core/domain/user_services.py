@@ -2343,7 +2343,7 @@ def update_learner_checkpoint_progress(
             user_id, exploration_id)
 
     latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    if exploration_user_model.furthest_reached_checkpoint_state_name is not None:
+    if exploration_user_model.furthest_reached_checkpoint_state_name is not None: # pylint: disable=line-too-long
 
         all_checkpoints = _get_checkpoints_in_order(
             latest_exploration.init_state_name, latest_exploration.states)

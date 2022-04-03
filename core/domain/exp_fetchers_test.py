@@ -262,7 +262,6 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertIsNone(exp_fetchers.get_exploration_user_data(
             user_id, self.EXP_1_ID))
 
-        exploration_dict = exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
         user_services.update_learner_checkpoint_progress(
             user_id, self.EXP_1_ID, 'Introduction', 1)
         exploration_user_data = exp_fetchers.get_exploration_user_data(
