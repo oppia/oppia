@@ -25,7 +25,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 from typing_extensions import TypedDict
 
 
