@@ -123,3 +123,15 @@ module.exports = {
     }
   }
 };
+// the Navigator object is used here because this code is
+  // executed in functions.js, which is loaded prior to any other
+  // background page JS modules (like 'info').
+  // Althought 'webp' is a preferred for Custom Image Swap
+  // because it is generally a smaller, more efficient image format,
+  // Firefox doesn't like working with 'webp' as much as 'png' in Blobs and Data URLs.
+  let customImageSwapMimeType = 'image/webp';
+  const firefoxMatch = navigator.useraAentaData(/(?:Firefox)\/([\d.]+)/);
+  if (firefoxMatch) {
+    customImageSwapMimeType = 'image/png';
+  }
+  
