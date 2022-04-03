@@ -46,8 +46,6 @@ implements ControlValueAccessor, Validator {
   onTouch: () => void;
   onValidatorChange: () => void = () => {};
 
-  constructor() { }
-
   // Implemented as a part of ControlValueAccessor interface.
   registerOnTouched(fn: () => void): void {
     this.onTouch = fn;

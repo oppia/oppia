@@ -50,16 +50,19 @@ describe('Schema Based Int Editor Component', () => {
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
 
     component.labelForFocusTarget = {};
-    component.registerOnTouched();
-    component.registerOnChange(null);
-    component.onChange = (val: number) => {
-      return;
-    };
   });
 
-  it('should get empty object on validating', () => {
+  it('should set component properties on initialization', fakeAsync(() => {
+    let mockFunction = function(value: number) {
+      return value;
+    };
+    component.registerOnChange(mockFunction);
+    component.registerOnTouched();
+
+    expect(component).toBeDefined();
     expect(component.validate(null)).toEqual({});
-  });
+    expect(component.onChange).toEqual(mockFunction);
+  }));
 
   it('should set local value on initialization and set focus' +
     ' on the input field', fakeAsync(() => {
@@ -73,11 +76,13 @@ describe('Schema Based Int Editor Component', () => {
     expect(focusManagerService.setFocusWithoutScroll).toHaveBeenCalled();
   }));
 
-  it('should overwrite local value', () => {
-    expect(component.localValue).toBe(undefined);
+  it('should write value', () => {
+    component.localValue = null;
+    component.writeValue(null);
+
+    expect(component.localValue).toEqual(null);
 
     component.writeValue(1);
-
     expect(component.localValue).toBe(1);
   });
 
@@ -87,6 +92,26 @@ describe('Schema Based Int Editor Component', () => {
     component.updateValue(2);
 
     expect(component.localValue).toBe(2);
+
+    component.updateValue(1);
+
+    expect(component.localValue).toBe(1);
+  });
+
+  it('should update value when local value change', () => {
+    component.localValue = 1;
+
+    expect(component.localValue).toBe(1);
+
+    component.updateValue(2);
+
+    expect(component.localValue).toBe(2);
+  });
+
+  it('should not update value when local value not change', () => {
+    component.localValue = 1;
+
+    expect(component.localValue).toBe(1);
 
     component.updateValue(1);
 

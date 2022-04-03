@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Schema Based List Editor Component
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { SchemaBasedListEditorComponent } from './schema-based-list-editor.component';
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -70,19 +70,22 @@ describe('Schema Based List Editor Component', () => {
       }
     ];
     component.localValue = ['item1'];
-    component.registerOnChange(null);
-    component.registerOnTouched(null);
-    component.onChange = (val: boolean) => {
-      return;
-    };
 
     spyOn(schemaDefaultValueService, 'getDefaultValue')
       .and.returnValue('default');
   });
 
-  it('should get empty object on validating', () => {
+  it('should set component properties on initialization', fakeAsync(() => {
+    let mockFunction = function(value: number) {
+      return value;
+    };
+    component.registerOnChange(mockFunction);
+    component.registerOnTouched(null);
+
+    expect(component).toBeDefined();
     expect(component.validate(null)).toEqual({});
-  });
+    expect(component.onChange).toEqual(mockFunction);
+  }));
 
   it('should overwrite local value', () => {
     component.localValue = ['item1', 'item2'];

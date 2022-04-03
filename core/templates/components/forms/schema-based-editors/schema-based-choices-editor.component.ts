@@ -45,7 +45,6 @@ implements ControlValueAccessor, OnInit, Validator {
   // TODO(sll): Validate each choice against the schema.
   @Input() schema;
   onChange: (val: unknown) => void = () => {};
-  constructor() { }
 
   // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: unknown): void {
@@ -66,7 +65,7 @@ implements ControlValueAccessor, OnInit, Validator {
     return {};
   }
 
-  updateValue(val: boolean): void {
+  updateValue(val: unknown[]): void {
     if (this.localValue === val) {
       return;
     }

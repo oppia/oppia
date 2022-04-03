@@ -46,23 +46,28 @@ describe('Schema Based Expression Editor Component', () => {
     fixture = TestBed.createComponent(SchemaBasedExpressionEditorComponent);
     component = fixture.componentInstance;
     focusManagerService = TestBed.inject(FocusManagerService);
+  });
 
-    component.registerOnTouched();
-    component.registerOnChange(null);
-    component.onChange = (val: boolean) => {
-      return;
+  it('should set component properties on initialization', fakeAsync(() => {
+    let mockFunction = function(value: number) {
+      return value;
     };
-  });
+    component.registerOnChange(mockFunction);
+    component.registerOnTouched();
 
-  it('should get empty object on validating', () => {
+    expect(component).toBeDefined();
     expect(component.validate(null)).toEqual({});
-  });
+    expect(component.onChange).toEqual(mockFunction);
+    expect(component.onChange(true)).toEqual(true);
+  }));
 
-  it('should overwrite local value', () => {
-    expect(component.localValue).toBe(undefined);
+  it('should write value', () => {
+    component.localValue = null;
+    component.writeValue(null);
+
+    expect(component.localValue).toEqual(null);
 
     component.writeValue(true);
-
     expect(component.localValue).toBeTrue();
   });
 
@@ -75,15 +80,24 @@ describe('Schema Based Expression Editor Component', () => {
     expect(focusManagerService.setFocusWithoutScroll).toHaveBeenCalled();
   }));
 
-  it('should update local value', () => {
-    component.localValue = false;
+  it('should update value when local value change', () => {
+    component.localValue = ['item1'];
 
-    component.localValueChange(false);
+    expect(component.localValue).toEqual(['item1']);
 
-    expect(component.localValue).toBeFalse();
+    component.localValueChange(['item2']);
 
-    component.localValueChange(true);
+    expect(component.localValue).toEqual(['item2']);
+  });
 
-    expect(component.localValue).toBeTrue();
+  it('should not update value when local value not change', () => {
+    let value = ['item1'];
+    component.localValue = value;
+
+    expect(component.localValue).toEqual(value);
+
+    component.localValueChange(value);
+
+    expect(component.localValue).toEqual(value);
   });
 });

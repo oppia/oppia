@@ -18,7 +18,7 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { SchemaBasedBoolEditorComponent } from './schema-based-bool-editor.component';
 
 describe('Schema Based Bool Editor Component', () => {
@@ -38,33 +38,49 @@ describe('Schema Based Bool Editor Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SchemaBasedBoolEditorComponent);
     component = fixture.componentInstance;
-
-    component.ngOnInit();
-    component.registerOnTouched();
-    component.registerOnChange(null);
-    component.onChange = (val: boolean) => {
-      return;
-    };
   });
+
+  it('should set component properties on initialization', fakeAsync(() => {
+    let mockFunction = function(value: number) {
+      return value;
+    };
+    component.registerOnChange(mockFunction);
+    component.registerOnTouched();
+
+    expect(component).toBeDefined();
+    expect(component.validate(null)).toEqual({});
+    expect(component.onChange).toEqual(mockFunction);
+    expect(component.onChange(true)).toEqual(true);
+  }));
 
   it('should get empty object on validating', () => {
     expect(component.validate(null)).toEqual({});
   });
 
-  it('should overwrite local value', () => {
-    expect(component.localValue).toBe(undefined);
+  it('should write value', () => {
+    component.localValue = null;
+    component.writeValue(null);
+
+    expect(component.localValue).toEqual(null);
 
     component.writeValue(true);
-
     expect(component.localValue).toBeTrue();
   });
 
-  it('should update local value', () => {
-    component.localValue = false;
+  it('should update value when local value change', () => {
+    component.localValue = true;
+
+    expect(component.localValue).toBeTrue();
 
     component.updateValue(false);
 
     expect(component.localValue).toBeFalse();
+  });
+
+  it('should not update value when local value not change', () => {
+    component.localValue = true;
+
+    expect(component.localValue).toBeTrue();
 
     component.updateValue(true);
 
