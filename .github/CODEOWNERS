@@ -521,7 +521,7 @@
 /core/templates/domain/utilities/ @oppia/lace-frontend-reviewers
 /core/templates/Polyfills.ts @srijanreddy98
 /extensions/extensions.module.ts @vojtechjelinek
-/core/schema_utils*.py @DubeySandeep
+/core/schema_utils*.py @oppia/data-and-stability-reviewers
 /core/utils*.py @aks681
 
 
