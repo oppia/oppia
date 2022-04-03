@@ -1486,14 +1486,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
     furthest_reached_checkpoint_state_name = datastore_services.StringProperty(
         default=None)
     # The exploration version of the furthest reached checkpoint.
-    furthest_reached_checkpoint_exp_version = datastore_services.IntegerProperty(
-        default=None)
+    furthest_reached_checkpoint_exp_version = (
+        datastore_services.IntegerProperty(default=None))
     # The state name of the most recently reached checkpoint.
-    most_recently_reached_checkpoint_state_name = datastore_services.StringProperty(
-        default=None)
+    most_recently_reached_checkpoint_state_name = (
+        datastore_services.StringProperty(default=None))
     # The exploration version of the most recently reached checkpoint.
-    most_recently_reached_checkpoint_exp_version = datastore_services.IntegerProperty(
-        default=None)
+    most_recently_reached_checkpoint_exp_version = (
+        datastore_services.IntegerProperty(default=None))
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

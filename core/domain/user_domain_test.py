@@ -1444,13 +1444,14 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
         self.assertEqual(modifiable_user_data.fake_field, 'default_value')
         self.assertEqual(modifiable_user_data.user_id, None)
 
+
 class ExplorationUserDataTests(test_utils.GenericTestBase):
     """Tests for ExplorationUserData domain object."""
 
     def test_initialization(self) -> None:
         exploration_user_data = user_domain.ExplorationUserData(
             'user1', 'exp1')
-        
+
         expected_exploration_user_data_dict = {
             'rating': None,
             'rated_on': None,

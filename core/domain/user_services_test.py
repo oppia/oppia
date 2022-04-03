@@ -2666,9 +2666,11 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_services.set_username(user_id, username)
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-        self.assertFalse(user_settings_model.user_has_viewed_lesson_info_modal_once)
+        self.assertFalse(
+            user_settings_model.user_has_viewed_lesson_info_modal_once)
 
         user_services.set_user_has_viewed_lesson_info_modal_once(user_id)
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-        self.assertTrue(user_settings_model.user_has_viewed_lesson_info_modal_once)
+        self.assertTrue(
+            user_settings_model.user_has_viewed_lesson_info_modal_once)
