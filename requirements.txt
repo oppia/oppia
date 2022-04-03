@@ -8,7 +8,7 @@
 #
 #    pip-compile --no-emit-index-url
 #
-apache-beam[gcp]==2.36.0
+apache-beam[gcp]==2.37.0
     # via -r requirements.in
 attrs==20.3.0
     # via pytest
@@ -220,7 +220,7 @@ mutagen==1.45.1
     # via -r requirements.in
 mypy-extensions==0.4.3
     # via typing-inspect
-numpy==1.20.2
+numpy==1.21.5
     # via
     #   apache-beam
     #   pyarrow
@@ -240,7 +240,7 @@ packaging==20.4
     #   google-api-core
     #   google-cloud-appengine-logging
     #   pytest
-pillow==9.0.0
+pillow==9.0.1
     # via -r requirements.in
 pluggy==0.13.1
     # via pytest

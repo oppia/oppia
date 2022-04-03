@@ -88,7 +88,8 @@ export class ContributionAndReviewBackendApiService {
   async fetchSuggestionsAsync(
       fetchType: string,
       limit: number,
-      offset: number
+      offset: number,
+      topicName: string
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
@@ -100,11 +101,11 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'skill', 'add_question', limit, offset);
+        'skill', 'add_question', limit, offset, topicName);
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'exploration', 'translate_content', limit, offset);
+        'exploration', 'translate_content', limit, offset, topicName);
     }
   }
 
@@ -131,7 +132,8 @@ export class ContributionAndReviewBackendApiService {
       targetType: string,
       suggestionType: string,
       limit: number,
-      offset: number
+      offset: number,
+      topicName: string
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
@@ -141,7 +143,8 @@ export class ContributionAndReviewBackendApiService {
     );
     const params = {
       limit: limit.toString(),
-      offset: offset.toString()
+      offset: offset.toString(),
+      topic_name: topicName
     };
     return this.http.get<FetchSuggestionsResponse>(url, { params }).toPromise();
   }
