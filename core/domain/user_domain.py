@@ -1340,9 +1340,10 @@ class ExplorationUserDataDict(TypedDict):
     draft_change_list_id: int
     mute_suggestion_notifications: bool
     mute_feedback_notifications: bool
-    saved_checkpoints_progress_exp_version: Optional[int]
-    furthest_completed_checkpoint_state_name: Optional[str]
-    most_recently_viewed_checkpoint_state_name: Optional[str]
+    furthest_reached_checkpoint_exp_version: Optional[int]
+    furthest_reached_checkpoint_state_name: Optional[str]
+    most_recently_reached_checkpoint_exp_version: Optional[int]
+    most_recently_reached_checkpoint_state_name: Optional[str]
 
 class ExplorationUserData:
     """Value object representing a user's exploration data.
@@ -1366,12 +1367,14 @@ class ExplorationUserData:
             receiving suggestion emails for this exploration.
         mute_feedback_notifications: bool. The user's preference for receiving
             feedback emails for this exploration.
-        saved_checkpoints_progress_exp_version: int or None. The exploration
-            version of checkpoint user last interacted with.
-        furthest_completed_checkpoint_state_name: str or None. The state name
-            of the furthest completed completed checkpoint.
-        most_recently_viewed_checkpoint_state_name: str or None. The state
-            name of the most recently viewed checkpoint.
+        furthest_reached_checkpoint_exp_version: int or None. The exploration
+            version of furthest reached checkpoint.
+        furthest_reached_checkpoint_state_name: str or None. The state name
+            of the furthest reached checkpoint.
+        most_recently_reached_checkpoint_exp_version: int or None. The
+            exploration version of the most recently reached checkpoint.
+        most_recently_reached_checkpoint_state_name: str or None. The state
+            name of the most recently reached checkpoint.
     """
 
     def __init__(
@@ -1388,9 +1391,10 @@ class ExplorationUserData:
             feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
         mute_feedback_notifications: bool = (
             feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
-        saved_checkpoints_progress_exp_version: Optional[int] = None,
-        furthest_completed_checkpoint_state_name: Optional[str]= None,
-        most_recently_viewed_checkpoint_state_name: Optional[str] = None
+        furthest_reached_checkpoint_exp_version: Optional[int] = None,
+        furthest_reached_checkpoint_state_name: Optional[str]= None,
+        most_recently_reached_checkpoint_exp_version: Optional[int] = None,
+        most_recently_reached_checkpoint_state_name: Optional[str] = None
         ) -> None:
             """Constructs a ExplorationUserData domain object.
 
@@ -1413,13 +1417,15 @@ class ExplorationUserData:
                     receiving suggestion emails for this exploration.
                 mute_feedback_notifications: bool. The user's preference for
                     receiving feedback emails for this exploration.
-                saved_checkpoints_progress_exp_version: int or None. The
-                    exploration version of checkpoint user last interacted
-                    with.
-                furthest_completed_checkpoint_state_name: str or None. The
-                    state name of the furthest completed completed checkpoint.
-                most_recently_viewed_checkpoint_state_name: str or None. The
-                    state name of the most recently viewed checkpoint.
+                furthest_reached_checkpoint_exp_version: int or None. The
+                    exploration version of furthest reached checkpoint.
+                furthest_reached_checkpoint_state_name: str or None. The
+                    state name of the furthest reached checkpoint.
+                most_recently_reached_checkpoint_exp_version: int or None. The
+                    exploration version of the most recently reached
+                    checkpoint.
+                most_recently_reached_checkpoint_state_name: str or None. The
+                    state name of the most recently reached checkpoint.
             """
             self.user_id = user_id
             self.exploration_id = exploration_id
@@ -1432,12 +1438,14 @@ class ExplorationUserData:
             self.draft_change_list_id = draft_change_list_id
             self.mute_suggestion_notifications = mute_suggestion_notifications
             self.mute_feedback_notifications = mute_feedback_notifications
-            self.saved_checkpoints_progress_exp_version = (
-                saved_checkpoints_progress_exp_version)
-            self.furthest_completed_checkpoint_state_name = (
-                furthest_completed_checkpoint_state_name)
-            self.most_recently_viewed_checkpoint_state_name = (
-                most_recently_viewed_checkpoint_state_name)
+            self.furthest_reached_checkpoint_exp_version = (
+                furthest_reached_checkpoint_exp_version)
+            self.furthest_reached_checkpoint_state_name = (
+                furthest_reached_checkpoint_state_name)
+            self.most_recently_reached_checkpoint_exp_version = (
+                most_recently_reached_checkpoint_exp_version)
+            self.most_recently_reached_checkpoint_state_name = (
+                most_recently_reached_checkpoint_state_name)
 
     def to_dict(self) -> ExplorationUserDataDict:
         """Convert the ExplorationUserData domain instance into a dictionary
@@ -1458,10 +1466,12 @@ class ExplorationUserData:
             'draft_change_list_id': self.draft_change_list_id,
             'mute_suggestion_notifications': self.mute_suggestion_notifications,
             'mute_feedback_notifications': self.mute_feedback_notifications,
-            'saved_checkpoints_progress_exp_version': (
-                self.saved_checkpoints_progress_exp_version),
-            'furthest_completed_checkpoint_state_name': (
-                self.furthest_completed_checkpoint_state_name),
-            'most_recently_viewed_checkpoint_state_name': (
-                self.most_recently_viewed_checkpoint_state_name)
+            'furthest_reached_checkpoint_exp_version': (
+                self.furthest_reached_checkpoint_exp_version),
+            'furthest_reached_checkpoint_state_name': (
+                self.furthest_reached_checkpoint_state_name),
+            'most_recently_reached_checkpoint_exp_version': (
+                self.most_recently_reached_checkpoint_exp_version),
+            'most_recently_reached_checkpoint_state_name': (
+                self.most_recently_reached_checkpoint_state_name)
         }

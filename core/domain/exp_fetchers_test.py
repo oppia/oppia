@@ -253,30 +253,6 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             exp_fetchers.get_multiple_explorations_by_id(
                 exp_ids + ['doesnt_exist'])
 
-    def test_get_exploration_user_data(self):
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_services.set_username(user_id, username)
-        self.assertIsNone(exp_fetchers.get_exploration_user_data(
-            user_id, self.EXP_1_ID))
-        user_services.update_learner_checkpoint_progress(
-            user_id, self.EXP_1_ID, 'checkpoint1', 1)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
-            user_id, self.EXP_1_ID)
-        self.assertIsNotNone(exploration_user_data)
-        self.assertEqual(exploration_user_data.user_id, user_id)
-        self.assertEqual(exploration_user_data.exploration_id, self.EXP_1_ID)
-        self.assertEqual(
-            exploration_user_data.furthest_completed_checkpoint_state_name,
-            'checkpoint1')
-        self.assertEqual(
-            exploration_user_data.saved_checkpoints_progress_exp_version, 1)
-        self.assertEqual(
-            exploration_user_data.most_recently_viewed_checkpoint_state_name,
-            'checkpoint1')
-
 
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     """Tests the exploration model -> exploration conversion pipeline."""

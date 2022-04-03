@@ -1482,14 +1482,17 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # The user's preference for receiving feedback emails for this exploration.
     mute_feedback_notifications = datastore_services.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
-    # The exploration version of checkpoint user last interacted with.
-    saved_checkpoints_progress_exp_version = datastore_services.IntegerProperty(
+    # The state name of the furthest reached checkpoint.
+    furthest_reached_checkpoint_state_name = datastore_services.StringProperty(
         default=None)
-    # The state name of the furthest completed completed checkpoint.
-    furthest_completed_checkpoint_state_name = datastore_services.StringProperty(
+    # The exploration version of the furthest reached checkpoint.
+    furthest_reached_checkpoint_exp_version = datastore_services.IntegerProperty(
         default=None)
-    # The state name of the most recently viewed checkpoint.
-    most_recently_viewed_checkpoint_state_name = datastore_services.StringProperty(
+    # The state name of the most recently reached checkpoint.
+    most_recently_reached_checkpoint_state_name = datastore_services.StringProperty(
+        default=None)
+    # The exploration version of the most recently reached checkpoint.
+    most_recently_reached_checkpoint_exp_version = datastore_services.IntegerProperty(
         default=None)
 
     @staticmethod
@@ -1547,11 +1550,13 @@ class ExplorationUserDataModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'mute_feedback_notifications':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'saved_checkpoints_progress_exp_version':
+            'furthest_reached_checkpoint_state_name':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'furthest_completed_checkpoint_state_name':
+            'furthest_reached_checkpoint_exp_version':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'most_recently_viewed_checkpoint_state_name':
+            'most_recently_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'most_recently_reached_checkpoint_exp_version':
                 base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -1684,12 +1689,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
                     user_model.mute_suggestion_notifications),
                 'mute_feedback_notifications': (
                     user_model.mute_feedback_notifications),
-                'saved_checkpoints_progress_exp_version': (
-                    user_model.saved_checkpoints_progress_exp_version),
-                'furthest_completed_checkpoint_state_name': (
-                    user_model.furthest_completed_checkpoint_state_name),
-                'most_recently_viewed_checkpoint_state_name': (
-                    user_model.most_recently_viewed_checkpoint_state_name)
+                'furthest_reached_checkpoint_exp_version': (
+                    user_model.furthest_reached_checkpoint_exp_version),
+                'furthest_reached_checkpoint_state_name': (
+                    user_model.furthest_reached_checkpoint_state_name),
+                'most_recently_completed_checkpoint_exp_version': (
+                    user_model.most_recently_completed_checkpoint_exp_version),
+                'most_recently_reached_checkpoint_state_name': (
+                    user_model.most_recently_reached_checkpoint_state_name)
             }
 
         return user_data

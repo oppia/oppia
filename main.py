@@ -544,10 +544,7 @@ URLS = [
         reader.AnswerSubmittedEventHandler),
     get_redirect_route(
         r'/explorehandler/checkpoint_completed/<exploration_id>',
-        reader.CheckpointCompletedEventHandler),
-    get_redirect_route(
-        r'/explorehandler/checkpoint_visited/<exploration_id>',
-        reader.CheckpointVisitedEventHandler),
+        reader.CheckpointReachedEventHandler),
     get_redirect_route(
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler),

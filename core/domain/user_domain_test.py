@@ -1462,9 +1462,10 @@ class ExplorationUserDataTests(test_utils.GenericTestBase):
                 feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
             'mute_feedback_notifications': (
                 feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
-            'saved_checkpoints_progress_exp_version': None,
-            'furthest_completed_checkpoint_state_name': None,
-            'most_recently_viewed_checkpoint_state_name': None
+            'furthest_reached_checkpoint_exp_version': None,
+            'furthest_reached_checkpoint_state_name': None,
+            'most_recently_reached_checkpoint_state_name': None,
+            'most_recently_reached_checkpoint_exp_version': None
         }
 
         self.assertEqual(exploration_user_data.user_id, 'user1')
@@ -1477,7 +1478,7 @@ class ExplorationUserDataTests(test_utils.GenericTestBase):
         exploration_user_data = user_domain.ExplorationUserData(
             'user1', 'exp1', 4,
             datetime.datetime(2022, 4, 1, 0, 0, 0, 0), None,
-            None, None, 0, False, False, 1, 'checkpoint2', 'checkpoint1'
+            None, None, 0, False, False, 1, 'checkpoint2', 2, 'checkpoint1'
         )
         expected_exploration_user_data_dict = {
             'rating': 4,
@@ -1488,9 +1489,10 @@ class ExplorationUserDataTests(test_utils.GenericTestBase):
             'draft_change_list_id': 0,
             'mute_suggestion_notifications': False,
             'mute_feedback_notifications': False,
-            'saved_checkpoints_progress_exp_version': 1,
-            'furthest_completed_checkpoint_state_name': 'checkpoint2',
-            'most_recently_viewed_checkpoint_state_name': 'checkpoint1'
+            'furthest_reached_checkpoint_exp_version': 1,
+            'furthest_reached_checkpoint_state_name': 'checkpoint2',
+            'most_recently_reached_checkpoint_exp_version': 2,
+            'most_recently_reached_checkpoint_state_name': 'checkpoint1'
         }
 
         self.assertEqual(exploration_user_data.user_id, 'user1')

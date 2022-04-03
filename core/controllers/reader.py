@@ -289,17 +289,22 @@ class ExplorationHandler(base.BaseHandler):
             user_has_viewed_lesson_info_modal_once = (
                 user_settings.user_has_viewed_lesson_info_modal_once)
 
-        saved_checkpoints_progress_exp_version = None
-        furthest_completed_checkpoint_state_name = None
-        most_recently_viewed_checkpoint_state_name = None
+        furthest_reached_checkpoint_exp_version = None
+        furthest_reached_checkpoint_state_name = None
+        most_recently_reached_checkpoint_exp_version = None
+        most_recently_reached_checkpoint_state_name = None
 
         if exploration_user_data is not None:
-            saved_checkpoints_progress_exp_version = (
-                exploration_user_data.saved_checkpoints_progress_exp_version)
-            furthest_completed_checkpoint_state_name = (
-                exploration_user_data.furthest_completed_checkpoint_state_name)
-            most_recently_viewed_checkpoint_state_name = (
-                exploration_user_data.most_recently_viewed_checkpoint_state_name)
+            furthest_reached_checkpoint_exp_version = (
+                exploration_user_data.furthest_reached_checkpoint_exp_version)
+            furthest_reached_checkpoint_state_name = (
+                exploration_user_data.furthest_reached_checkpoint_state_name)
+            most_recently_reached_checkpoint_exp_version = (
+                exploration_user_data
+                    .most_recently_reached_checkpoint_exp_version)
+            most_recently_reached_checkpoint_state_name = (
+                exploration_user_data
+                    .most_recently_reached_checkpoint_state_name)
 
         self.values.update({
             'can_edit': (
@@ -319,12 +324,14 @@ class ExplorationHandler(base.BaseHandler):
                 config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value),
             'user_has_viewed_lesson_info_modal_once': (
                 user_has_viewed_lesson_info_modal_once),
-            'saved_checkpoints_progress_exp_version': (
-                saved_checkpoints_progress_exp_version),
-            'furthest_completed_checkpoint_state_name': (
-                furthest_completed_checkpoint_state_name),
-            'most_recently_viewed_checkpoint_state_name': (
-                most_recently_viewed_checkpoint_state_name)
+            'furthest_reached_checkpoint_exp_version': (
+                furthest_reached_checkpoint_exp_version),
+            'furthest_reached_checkpoint_state_name': (
+                furthest_reached_checkpoint_state_name),
+            'most_recently_reached_checkpoint_exp_version': (
+                most_recently_reached_checkpoint_exp_version),
+            'most_recently_reached_checkpoint_state_name': (
+                most_recently_reached_checkpoint_state_name)
         })
         self.render_json(self.values)
 
@@ -1301,8 +1308,8 @@ class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
         self.render_json({})
 
 
-class CheckpointCompletedEventHandler(base.BaseHandler):
-    """Tracks a learner completing a checkpoint."""
+class CheckpointReachedEventHandler(base.BaseHandler):
+    """Tracks a learner reaching a checkpoint."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
@@ -1311,10 +1318,10 @@ class CheckpointCompletedEventHandler(base.BaseHandler):
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'saved_checkpoints_progress_exp_version': {
+            'most_recently_reached_checkpoint_exp_version': {
                 'schema': editor.SCHEMA_FOR_VERSION
             },
-            'furthest_completed_checkpoint_state_name': {
+            'most_recently_reached_checkpoint_state_name': {
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
@@ -1337,65 +1344,15 @@ class CheckpointCompletedEventHandler(base.BaseHandler):
         """
 
         user_id = self.user_id
-        furthest_completed_checkpoint_state_name = self.normalized_payload.get(
-            'furthest_completed_checkpoint_state_name')
-        saved_checkpoints_progress_exp_version = self.normalized_payload.get(
-            'saved_checkpoints_progress_exp_version')
+        most_recently_reached_checkpoint_state_name = self.normalized_payload.get(
+            'most_recently_reached_checkpoint_state_name')
+        most_recently_reached_checkpoint_exp_version = self.normalized_payload.get(
+            'most_recently_reached_checkpoint_exp_version')
 
         user_services.update_learner_checkpoint_progress(
             user_id,
             exploration_id,
-            furthest_completed_checkpoint_state_name,
-            saved_checkpoints_progress_exp_version)
-
-        self.render_json(self.values)
-
-
-class CheckpointVisitedEventHandler(base.BaseHandler):
-    """Tracks a learner visiting a previously completed checkpoint."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-        }
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'PUT': {
-            'saved_checkpoints_progress_exp_version': {
-                'schema': editor.SCHEMA_FOR_VERSION
-            },
-            'most_recently_viewed_checkpoint_state_name': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
-                }
-            },
-        }
-    }
-
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
-
-    @acl_decorators.can_play_exploration
-    def put(self, exploration_id):
-        """Handles PUT requests.
-
-        Args:
-            exploration_id: str. The ID of the exploration.
-        """
-
-        user_id = self.user_id
-        most_recently_viewed_checkpoint_state_name = self.normalized_payload.get(
-            'most_recently_viewed_checkpoint_state_name')
-        saved_checkpoints_progress_exp_version = self.normalized_payload.get(
-            'saved_checkpoints_progress_exp_version')
-
-        user_services.set_most_recently_viewed_checkpoint(
-            user_id,
-            exploration_id,
-            most_recently_viewed_checkpoint_state_name,
-            saved_checkpoints_progress_exp_version)
+            most_recently_reached_checkpoint_state_name,
+            most_recently_reached_checkpoint_exp_version)
 
         self.render_json(self.values)
