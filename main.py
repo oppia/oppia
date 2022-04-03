@@ -546,6 +546,9 @@ URLS = [
         r'/explorehandler/checkpoint_completed/<exploration_id>',
         reader.CheckpointReachedEventHandler),
     get_redirect_route(
+        r'/explorehandler/restart/<exploration_id>',
+        reader.ExplorationRestartEventHandler),
+    get_redirect_route(
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler),
     get_redirect_route(

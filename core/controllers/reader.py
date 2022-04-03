@@ -1356,3 +1356,45 @@ class CheckpointReachedEventHandler(base.BaseHandler):
             most_recently_reached_checkpoint_exp_version)
 
         self.render_json(self.values)
+
+class ExplorationRestartEventHandler(base.BaseHandler):
+    """Tracks a learner restarting an exploration."""
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'most_recently_reached_checkpoint_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                },
+                'default_value': None
+            },
+        }
+    }
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def put(self, exploration_id):
+        """Handles PUT requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+
+        user_id = self.user_id
+        most_recently_reached_checkpoint_state_name = self.normalized_payload.get(
+            'most_recently_reached_checkpoint_state_name')
+
+        if most_recently_reached_checkpoint_state_name is None:
+            user_services.update_learner_checkpoint_progress_on_restart(
+                user_id, exploration_id)
+
+        self.render_json(self.values)

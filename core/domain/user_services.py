@@ -2331,15 +2331,23 @@ def update_learner_checkpoint_progress(
 
         all_checkpoints = _getCheckpointsInOrder(
             latest_exploration.init_state_name, latest_exploration.states)
-        if(all_checkpoints.index(latest_exploration.furthest_reached_checkpoint_state_name) < all_checkpoints.index(state_name)):
-            exploration_user_model.furthest_reached_checkpoint_exp_version = exp_version
-            exploration_user_model.furthest_reached_checkpoint_state_name = state_name
+        if(all_checkpoints.index(latest_exploration
+            .furthest_reached_checkpoint_state_name) < all_checkpoints.index(
+                state_name)):
+            exploration_user_model.furthest_reached_checkpoint_exp_version = (
+                exp_version)
+            exploration_user_model.furthest_reached_checkpoint_state_name = (
+                state_name)
     else:
-        exploration_user_model.furthest_reached_checkpoint_exp_version = exp_version
-        exploration_user_model.furthest_reached_checkpoint_state_name = state_name
+        exploration_user_model.furthest_reached_checkpoint_exp_version = (
+            exp_version)
+        exploration_user_model.furthest_reached_checkpoint_state_name = (
+            state_name)
         
-    exploration_user_model.most_recently_reached_checkpoint_exp_version = exp_version
-    exploration_user_model.most_recently_reached_checkpoint_state_name = state_name
+    exploration_user_model.most_recently_reached_checkpoint_exp_version = (
+        exp_version)
+    exploration_user_model.most_recently_reached_checkpoint_state_name = (
+        state_name)
     exploration_user_model.update_timestamps()
     exploration_user_model.put()
 
@@ -2353,3 +2361,20 @@ def set_user_has_viewed_lesson_info_modal_once(user_id):
     user_settings = get_user_settings(user_id)
     user_settings.mark_lesson_info_modal_viewed()
     _save_user_settings(user_settings)
+
+def update_learner_checkpoint_progress_on_restart(user_id, exploration_id):
+    """Sets the most recently reached checkpoint on restart event.
+
+    Args:
+        user_id: str. The Id of the user.
+        exploration_id: str. The Id of the exploration.
+    """
+    exploration_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    if exploration_user_model is None:
+        exploration_user_model = user_models.ExplorationUserDataModel.create(
+            user_id, exploration_id)
+    exploration_user_model.most_recently_reached_checkpoint_exp_version = None
+    exploration_user_model.most_recently_reached_checkpoint_state_name = None
+    exploration_user_model.update_timestamps()
+    exploration_user_model.put()
