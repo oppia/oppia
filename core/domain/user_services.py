@@ -28,8 +28,9 @@ import urllib
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import auth_domain, exp_fetchers
+from core.domain import auth_domain
 from core.domain import auth_services
+from core.domain import exp_fetchers
 from core.domain import role_services
 from core.domain import user_domain
 from core.platform import models
@@ -2291,22 +2292,36 @@ def get_dashboard_stats(user_id):
         'average_ratings': average_ratings
     }
 
-def _getCheckpointsInOrder(initStateName, states):
+
+def _get_checkpoints_in_order(init_state_name, states):
+    """Returns the checkpoints of an exploration in sequential order.
+
+    Args:
+        init_state_name: str. The name of the first state of an exploration.
+        states: dict(state). All states of an exploration.
+
+    Returns:
+        list(str). The list of all checkpoints of an exploration in
+            sequential order.
+    """
+
     queue = []
-    queue.append(initStateName)
-    checkpointStateNames = []
-    visitedStateNames = []
-    while(len(queue) > 0):
+    queue.append(init_state_name)
+    checkpoint_state_names = []
+    visited_state_names = []
+    while len(queue) > 0:
         current_state_name = queue.pop()
-        if current_state_name not in visitedStateNames:
-            visitedStateNames.append(current_state_name)
+        if current_state_name not in visited_state_names:
+            visited_state_names.append(current_state_name)
             current_state = states.current_state_name
-            if(current_state.card_is_checkpoint and current_state_name not in checkpointStateNames):
-                checkpointStateNames.append(current_state_name)
+            if (current_state.card_is_checkpoint and (
+                current_state_name not in checkpoint_state_names)):
+                checkpoint_state_names.append(current_state_name)
             for answer_group in current_state.interaction:
                 queue.append(answer_group.outcome.dest)
 
-    return checkpointStateNames
+    return checkpoint_state_names
+
 
 def update_learner_checkpoint_progress(
     user_id, exploration_id, state_name, exp_version):
@@ -2329,11 +2344,12 @@ def update_learner_checkpoint_progress(
     latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     if latest_exploration.furthest_reached_checkpoint_state_name is not None:
 
-        all_checkpoints = _getCheckpointsInOrder(
+        all_checkpoints = _get_checkpoints_in_order(
             latest_exploration.init_state_name, latest_exploration.states)
-        if(all_checkpoints.index(latest_exploration
-            .furthest_reached_checkpoint_state_name) < all_checkpoints.index(
-                state_name)):
+        if (
+            all_checkpoints.index(
+                latest_exploration.furthest_reached_checkpoint_state_name) < (
+                    all_checkpoints.index(state_name))):
             exploration_user_model.furthest_reached_checkpoint_exp_version = (
                 exp_version)
             exploration_user_model.furthest_reached_checkpoint_state_name = (
@@ -2343,13 +2359,14 @@ def update_learner_checkpoint_progress(
             exp_version)
         exploration_user_model.furthest_reached_checkpoint_state_name = (
             state_name)
-        
+
     exploration_user_model.most_recently_reached_checkpoint_exp_version = (
         exp_version)
     exploration_user_model.most_recently_reached_checkpoint_state_name = (
         state_name)
     exploration_user_model.update_timestamps()
     exploration_user_model.put()
+
 
 def set_user_has_viewed_lesson_info_modal_once(user_id):
     """Set the 'user_has_viewed_lesson_info_modal_once' to true.
@@ -2361,6 +2378,7 @@ def set_user_has_viewed_lesson_info_modal_once(user_id):
     user_settings = get_user_settings(user_id)
     user_settings.mark_lesson_info_modal_viewed()
     _save_user_settings(user_settings)
+
 
 def update_learner_checkpoint_progress_on_restart(user_id, exploration_id):
     """Sets the most recently reached checkpoint on restart event.

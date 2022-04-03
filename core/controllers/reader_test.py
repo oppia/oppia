@@ -2594,4 +2594,3 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                     'answer': 'This is an answer.',
                     'answer_details': 'This is an answer details.',
                 }, csrf_token=csrf_token, expected_status_int=500)
-

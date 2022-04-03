@@ -28,9 +28,10 @@ import copy
 import logging
 
 from core import feconf
-from core.domain import caching_services, user_domain
+from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import subscription_services
+from core.domain import user_domain
 from core.platform import models
 
 (exp_models, user_models) = models.Registry.import_models([
@@ -442,8 +443,14 @@ def get_exploration_user_data(user_id, exp_id):
             exploration_user_data_model.mute_feedback_notifications,
             exploration_user_data_model.furthest_reached_checkpoint_exp_version,
             exploration_user_data_model.furthest_reached_checkpoint_state_name,
-            exploration_user_data_model.most_recently_reached_checkpoint_exp_version,
-            exploration_user_data_model.most_recently_reached_checkpoint_state_name
+            (
+                exploration_user_data_model
+                    .most_recently_reached_checkpoint_exp_version
+            ),
+            (
+                exploration_user_data_model
+                    .most_recently_reached_checkpoint_state_name
+            )
         )
     else:
         return None

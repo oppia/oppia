@@ -23,7 +23,6 @@ from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 

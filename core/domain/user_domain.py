@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import datetime
-from optparse import Option
 import re
 
 from core import feconf
@@ -69,8 +68,8 @@ class UserSettings:
         user_id: str. The unique ID of the user.
         email: str. The user email.
         roles: list(str). Roles of the user.
-        user_has_viewed_lesson_info_modal_once. Flag to check whether the user has
-            viewed lesson info once.
+        user_has_viewed_lesson_info_modal_once. Flag to check whether the user
+            has viewed lesson info once.
         username: str or None. Identifiable username to display in the UI.
         last_agreed_to_terms: datetime.datetime or None. When the user last
             agreed to the terms of the site.
@@ -141,8 +140,8 @@ class UserSettings:
             email: str. The user email.
             roles: list(str). Roles of the user.
             banned: bool. Whether the uses is banned.
-            user_has_viewed_lesson_info_modal_once: bool. Whether the user has viewed
-                lesson info once.
+            user_has_viewed_lesson_info_modal_once: bool. Whether the user has
+                viewed lesson info once.
             username: str or None. Identifiable username to display in the UI.
             last_agreed_to_terms: datetime.datetime or None. When the user
                 last agreed to the terms of the site.
@@ -208,7 +207,8 @@ class UserSettings:
         self.banned = banned
         self.deleted = deleted
         self.created_on = created_on
-        self.user_has_viewed_lesson_info_modal_once = user_has_viewed_lesson_info_modal_once
+        self.user_has_viewed_lesson_info_modal_once = (
+            user_has_viewed_lesson_info_modal_once)
 
     def validate(self) -> None:
         """Checks that the user_id, email, roles, banned, pin and display_alias
@@ -1329,6 +1329,7 @@ class ModifiableUserData:
 
         return cls.from_dict(raw_user_data_dict)
 
+
 class ExplorationUserDataDict(TypedDict):
     """Dictionary representing the ExplorationUserData object."""
 
@@ -1345,6 +1346,7 @@ class ExplorationUserDataDict(TypedDict):
     most_recently_reached_checkpoint_exp_version: Optional[int]
     most_recently_reached_checkpoint_state_name: Optional[str]
 
+
 class ExplorationUserData:
     """Value object representing a user's exploration data.
 
@@ -1355,8 +1357,8 @@ class ExplorationUserData:
             exploration.
         rated_on: datetime or None. When the most recent rating was awarded,
             or None if not rated.
-        draft_change_list: list(dict) or None. List of uncommitted changes made by
-            the user to the exploration.
+        draft_change_list: list(dict) or None. List of uncommitted changes made
+            by the user to the exploration.
         draft_change_list_last_updated: datetime or None. Timestamp of when the
             change list was last updated.
         draft_change_list_exp_version: int or None. The exploration version
@@ -1396,56 +1398,56 @@ class ExplorationUserData:
         most_recently_reached_checkpoint_exp_version: Optional[int] = None,
         most_recently_reached_checkpoint_state_name: Optional[str] = None
         ) -> None:
-            """Constructs a ExplorationUserData domain object.
+        """Constructs a ExplorationUserData domain object.
 
-            Attributes:
-                user_id: str. The user id.
-                exploration_id: str. The exploration id.
-                rating: int or None. The rating (1-5) the user assigned to the
-                    exploration.
-                rated_on: datetime or None. When the most recent rating was
-                    awarded, or None if not rated.
-                draft_change_list: list(dict) or None. List of uncommitted
-                    changes made by the user to the exploration.
-                draft_change_list_last_updated: datetime or None. Timestamp of
-                    when the change list was last updated.
-                draft_change_list_exp_version: int or None. The exploration
-                    version that this change list applied to.
-                draft_change_list_id: int. The version of the draft change list
-                    which was last saved by the user.
-                mute_suggestion_notifications: bool. The user's preference for
-                    receiving suggestion emails for this exploration.
-                mute_feedback_notifications: bool. The user's preference for
-                    receiving feedback emails for this exploration.
-                furthest_reached_checkpoint_exp_version: int or None. The
-                    exploration version of furthest reached checkpoint.
-                furthest_reached_checkpoint_state_name: str or None. The
-                    state name of the furthest reached checkpoint.
-                most_recently_reached_checkpoint_exp_version: int or None. The
-                    exploration version of the most recently reached
-                    checkpoint.
-                most_recently_reached_checkpoint_state_name: str or None. The
-                    state name of the most recently reached checkpoint.
-            """
-            self.user_id = user_id
-            self.exploration_id = exploration_id
-            self.rating = rating
-            self.rated_on = rated_on
-            self.draft_change_list = draft_change_list
-            self.draft_change_list_last_updated = (
-                draft_change_list_last_updated)
-            self.draft_change_list_exp_version = draft_change_list_exp_version
-            self.draft_change_list_id = draft_change_list_id
-            self.mute_suggestion_notifications = mute_suggestion_notifications
-            self.mute_feedback_notifications = mute_feedback_notifications
-            self.furthest_reached_checkpoint_exp_version = (
-                furthest_reached_checkpoint_exp_version)
-            self.furthest_reached_checkpoint_state_name = (
-                furthest_reached_checkpoint_state_name)
-            self.most_recently_reached_checkpoint_exp_version = (
-                most_recently_reached_checkpoint_exp_version)
-            self.most_recently_reached_checkpoint_state_name = (
-                most_recently_reached_checkpoint_state_name)
+        Attributes:
+            user_id: str. The user id.
+            exploration_id: str. The exploration id.
+            rating: int or None. The rating (1-5) the user assigned to the
+                exploration.
+            rated_on: datetime or None. When the most recent rating was
+                awarded, or None if not rated.
+            draft_change_list: list(dict) or None. List of uncommitted
+                changes made by the user to the exploration.
+            draft_change_list_last_updated: datetime or None. Timestamp of
+                when the change list was last updated.
+            draft_change_list_exp_version: int or None. The exploration
+                version that this change list applied to.
+            draft_change_list_id: int. The version of the draft change list
+                which was last saved by the user.
+            mute_suggestion_notifications: bool. The user's preference for
+                receiving suggestion emails for this exploration.
+            mute_feedback_notifications: bool. The user's preference for
+                receiving feedback emails for this exploration.
+            furthest_reached_checkpoint_exp_version: int or None. The
+                exploration version of furthest reached checkpoint.
+            furthest_reached_checkpoint_state_name: str or None. The
+                state name of the furthest reached checkpoint.
+            most_recently_reached_checkpoint_exp_version: int or None. The
+                exploration version of the most recently reached
+                checkpoint.
+            most_recently_reached_checkpoint_state_name: str or None. The
+                state name of the most recently reached checkpoint.
+        """
+        self.user_id = user_id
+        self.exploration_id = exploration_id
+        self.rating = rating
+        self.rated_on = rated_on
+        self.draft_change_list = draft_change_list
+        self.draft_change_list_last_updated = (
+            draft_change_list_last_updated)
+        self.draft_change_list_exp_version = draft_change_list_exp_version
+        self.draft_change_list_id = draft_change_list_id
+        self.mute_suggestion_notifications = mute_suggestion_notifications
+        self.mute_feedback_notifications = mute_feedback_notifications
+        self.furthest_reached_checkpoint_exp_version = (
+            furthest_reached_checkpoint_exp_version)
+        self.furthest_reached_checkpoint_state_name = (
+            furthest_reached_checkpoint_state_name)
+        self.most_recently_reached_checkpoint_exp_version = (
+            most_recently_reached_checkpoint_exp_version)
+        self.most_recently_reached_checkpoint_state_name = (
+            most_recently_reached_checkpoint_state_name)
 
     def to_dict(self) -> ExplorationUserDataDict:
         """Convert the ExplorationUserData domain instance into a dictionary

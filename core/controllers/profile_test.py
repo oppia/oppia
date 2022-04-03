@@ -1314,7 +1314,8 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         user_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         user_settings = user_services.get_user_settings(user_id)
-        self.assertEqual(user_settings.user_has_viewed_lesson_info_modal_once, False)
+        self.assertEqual(
+            user_settings.user_has_viewed_lesson_info_modal_once, False)
 
         csrf_token = self.get_new_csrf_token()
         self.put_json('/userinfohandler/data', {
@@ -1322,7 +1323,8 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         }, csrf_token=csrf_token)
 
         user_settings = user_services.get_user_settings(user_id)
-        self.assertEqual(user_settings.user_has_viewed_lesson_info_modal_once, True)
+        self.assertEqual(
+            user_settings.user_has_viewed_lesson_info_modal_once, True)
 
 
 class UrlHandlerTests(test_utils.GenericTestBase):

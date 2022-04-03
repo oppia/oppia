@@ -1344,10 +1344,12 @@ class CheckpointReachedEventHandler(base.BaseHandler):
         """
 
         user_id = self.user_id
-        most_recently_reached_checkpoint_state_name = self.normalized_payload.get(
-            'most_recently_reached_checkpoint_state_name')
-        most_recently_reached_checkpoint_exp_version = self.normalized_payload.get(
-            'most_recently_reached_checkpoint_exp_version')
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'))
+        most_recently_reached_checkpoint_exp_version = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_exp_version'))
 
         user_services.update_learner_checkpoint_progress(
             user_id,
@@ -1357,8 +1359,10 @@ class CheckpointReachedEventHandler(base.BaseHandler):
 
         self.render_json(self.values)
 
+
 class ExplorationRestartEventHandler(base.BaseHandler):
     """Tracks a learner restarting an exploration."""
+
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': editor.SCHEMA_FOR_EXPLORATION_ID
@@ -1390,8 +1394,9 @@ class ExplorationRestartEventHandler(base.BaseHandler):
         """
 
         user_id = self.user_id
-        most_recently_reached_checkpoint_state_name = self.normalized_payload.get(
-            'most_recently_reached_checkpoint_state_name')
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'))
 
         if most_recently_reached_checkpoint_state_name is None:
             user_services.update_learner_checkpoint_progress_on_restart(
