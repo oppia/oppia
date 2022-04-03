@@ -2323,8 +2323,10 @@ def _get_checkpoints_in_order(init_state_name, states):
 
 
 def update_learner_checkpoint_progress(
-    user_id, exploration_id, state_name, exp_version):
-    """Sets the furthest reached and most recently reached checkpoint.
+    user_id, exploration_id, state_name, exp_version
+):
+    """Sets the furthest reached and most recently reached checkpoint in
+    an exploration by the user.
 
     Args:
         user_id: str. The Id of the user.
@@ -2368,7 +2370,7 @@ def update_learner_checkpoint_progress(
 
 
 def set_user_has_viewed_lesson_info_modal_once(user_id):
-    """Set the 'user_has_viewed_lesson_info_modal_once' to true.
+    """Updates the user's settings once he has viewed the lesson info modal.
 
     Args:
         user_id: str. The Id of the user.
@@ -2380,7 +2382,7 @@ def set_user_has_viewed_lesson_info_modal_once(user_id):
 
 
 def update_learner_checkpoint_progress_on_restart(user_id, exploration_id):
-    """Sets the most recently reached checkpoint on restart event.
+    """Sets the most recently reached checkpoint on restart exploration event.
 
     Args:
         user_id: str. The Id of the user.
