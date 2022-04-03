@@ -28,18 +28,30 @@ import { DragAndDropAnswer } from 'interactions/answer-defs';
 })
 export class ShortResponseDragAndDropSortInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: string;
+  @Input() choices!: string;
   isAnswerLengthGreaterThanZero: boolean;
   responseList: DragAndDropAnswer;
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    this.responseList = this.htmlEscaperService.escapedJsonToObj(
+    // Obtain the contentIds of the options in the correct order.
+    const _answer = this.htmlEscaperService.escapedJsonToObj(
       this.answer) as DragAndDropAnswer;
-    this.isAnswerLengthGreaterThanZero = this.responseList.length > 0;
+    this.isAnswerLengthGreaterThanZero = _answer.length > 0;
+    const _choices = this.htmlEscaperService.escapedJsonToObj(
+      this.choices) as { _html: string; _contentId: string }[];
+
+    const choicesContentIds = _choices.map(choice => choice._contentId);
+
+    // Obtain the answer html (in the correct order) using the contentIds.
+    this.responseList = _answer.map(optionListAtPosition => {
+      return optionListAtPosition.map(
+        contentId => _choices[choicesContentIds.indexOf(contentId)]._html);
+    });
   }
 
   chooseItemType(index: number): string {

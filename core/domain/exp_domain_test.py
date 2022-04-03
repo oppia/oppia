@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import copy
+import datetime
 import os
 import re
 
@@ -26,7 +27,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import exp_domain
-from core.domain.exp_domain import clean_math_expression
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import exp_services_test
@@ -36,7 +36,7 @@ from core.domain import state_domain
 from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
-from datetime import datetime, date, time, timezone
+
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -1018,10 +1018,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.title = 'Hello #'
         self._assert_validation_error(exploration, 'Invalid character #')
-        
+
         exploration.title = 2
-        self._assert_validation_error(exploration, 'Expected title to be a string, received 2')
-        
+        self._assert_validation_error(
+           exploration, 'Expected title to be a string, received 2')
+
         exploration.title = 'Title'
         exploration.category = 'Category'
 
@@ -1545,7 +1546,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.objective = 'An objective'
 
         exploration.validate(strict=True)
-        
+
     def test_get_trainable_states_dict_with_changed_answer_group(self):
         exp_id = 'exp_id1'
         test_exp_filepath = os.path.join(
@@ -1560,7 +1561,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         old_states = exp_fetchers.get_exploration_from_model(
             exploration_model).states
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        
+
         exploration.rename_state('Home', 'Renamed state')
         old_states['Home'].update_interaction_id(42)
         change_list = [exp_domain.ExplorationChange({
@@ -1568,8 +1569,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'old_state_name': 'Home',
             'new_state_name': 'Renamed state'
         })]
-       
-        
+
         expected_dict = {
             'state_names_with_changed_answer_groups': ['Renamed state'],
             'state_names_with_unchanged_answer_groups': []
@@ -1578,7 +1578,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         actual_dict = exploration.get_trainable_states_dict(
             old_states, exp_versions_diff)
         self.assertEqual(actual_dict, expected_dict)
-        
+
     def test_get_trainable_states_dict(self):
         """Test the get_trainable_states_dict() method."""
         exp_id = 'exp_id1'
@@ -2122,7 +2122,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Expected states to be a dict, received 1'):
             exploration.validate()
-            
+
     def test_validate_exploration_state_param_changes_invalid_name(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2137,9 +2137,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'generator_id': 'RandomSelector'
         })]
         with self.assertRaisesRegex(
-            Exception, 'The parameter name \'all\' is reserved. Please choose a different name for the parameter being set in state \'state1\'.'):
+            Exception, 'The parameter name \'all\''
+            ' is reserved. Please choose a different name for the'
+            ' parameter being set in state \'state1\'.'):
             exploration.validate()
-            
+
     def test_validate_exploration_state_param_changes_not_in_param_specs(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2154,9 +2156,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'generator_id': 'RandomSelector'
         })]
         with self.assertRaisesRegex(
-            Exception, 'The parameter with name \'invalid\' was set in state \'state1\', but it does not exist in the list of parameter specifications for this exploration.'):
+            Exception, 'The parameter with name \'invalid\''
+            ' was set in state \'state1\', but it does not exist'
+            ' in the list of parameter specifications for this exploration.'):
             exploration.validate()
-            
+
     def test_validate_exploration_outcome_dest(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2504,8 +2508,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 '<p>This is solution for state1</p>',
                 '<p>state content html</p>'
             ])
-            
-        self.assertEqual(2, len(exploration.get_translatable_text(exploration.language_code)))
+
+        self.assertEqual(
+            2,
+            len(exploration.get_translatable_text(exploration.language_code)))
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
@@ -2806,22 +2812,23 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, self.exp_summary.contributors_summary)
         self.assertNotIn(
             feconf.SYSTEM_COMMITTER_ID, self.exp_summary.contributor_ids)
-    
+
     def test_metadata_dict(self):
         self.exp_summary.id = 0
-        self.exp_summary.title = "title"
-        self.exp_summary.objective = "ob"
-        myDict = self.exp_summary.to_metadata_dict()
-        self.assertEqual(myDict, {
+        self.exp_summary.title = 'title'
+        self.exp_summary.objective = 'ob'
+        mydict = self.exp_summary.to_metadata_dict()
+        self.assertEqual(mydict, {
             'id': 0,
-            'title': "title",
-            'objective': "ob"
+            'title': 'title',
+            'objective': 'ob'
         })
-        
+
     def test_does_user_have_any_role(self):
         self.exp_summary.owner_ids = ['0', '1']
         self.assertEqual(self.exp_summary.does_user_have_any_role('2'), False)
         self.assertEqual(self.exp_summary.does_user_have_any_role('0'), True)
+
 
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
@@ -5070,12 +5077,13 @@ title: Title
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
-        
+
     def test_yaml_v48_to_49_interaction_id_special_case(self):
         exp_domain.Exploration.from_yaml(1, self.YAML_CONTENT_V53)
-        
+
     def test_yaml_v42_to_43_interaction_id_special_case(self):
         exp_domain.Exploration.from_yaml(1, self.YAML_CONTENT_V47)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
@@ -5170,18 +5178,23 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(ValueError, 'fake state does not exist'):
             exploration.delete_state('fake state')
-            
+
     def test_no_duplicate_states(self):
-        exploration = exp_domain.Exploration.create_default_exploration('eid')
-        exploration.add_states(['first state'])
-        with self.assertRaisesRegex(ValueError, 'Duplicate state name first state'):
-            exploration.add_states(['first state'])
-            
+        exp = exp_domain.Exploration.create_default_exploration('eid')
+        exp.add_states(['first state'])
+        with self.assertRaisesRegex(
+            ValueError,
+            'Duplicate state name first state'):
+            exp.add_states(['first state'])
+
     def test_no_duplicate_renamed_states(self):
-        exploration = exp_domain.Exploration.create_default_exploration('eid')
-        exploration.add_states(['first state', 'second state'])
-        with self.assertRaisesRegex(ValueError, 'Duplicate state name: first state'):
-            exploration.rename_state('second state', 'first state')
+        exp = exp_domain.Exploration.create_default_exploration(
+            'eid')
+        exp.add_states(['first state', 'second state'])
+        with self.assertRaisesRegex(
+            ValueError,
+            'Duplicate state name: first state'):
+            exp.rename_state('second state', 'first state')
 
 
 class HtmlCollectionTests(test_utils.GenericTestBase):
@@ -9175,7 +9188,7 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Added some translations.')
-            
+
         # Adding one translation to the first state.
         change_list_7 = [exp_domain.ExplorationChange({
             'language_code': 'de',
@@ -11088,52 +11101,55 @@ class ExplorationChangesMergeabilityUnitTests(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 2)
             self.assertEqual(expected_email_html_body_2, messages[1].html)
-    
+
+
 class TestExplorationBasicUpdateFunctions(test_utils.GenericTestBase):
+    """Tests various update functions"""
+
     def test_explortation_update_language_code(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
-        exploration.update_language_code("en")
-        self.assertEqual("en", exploration.language_code)
-        exploration.update_language_code("f")
-        self.assertEqual("f", exploration.language_code)
-        
+        exploration.update_language_code('en')
+        self.assertEqual('en', exploration.language_code)
+        exploration.update_language_code('f')
+        self.assertEqual('f', exploration.language_code)
+
     def test_explortation_update_blurb(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
-        exploration.update_blurb("hi")
-        self.assertEqual("hi", exploration.blurb)
-        exploration.update_blurb("blurb")
-        self.assertEqual("blurb", exploration.blurb)
-    
+        exploration.update_blurb('hi')
+        self.assertEqual('hi', exploration.blurb)
+        exploration.update_blurb('blurb')
+        self.assertEqual('blurb', exploration.blurb)
+
     def test_explortation_update_author_notes(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
-        exploration.update_author_notes("note 1")
-        self.assertEqual("note 1", exploration.author_notes)
-        exploration.update_author_notes("note 2")
-        self.assertEqual("note 2", exploration.author_notes)
-    
+        exploration.update_author_notes('note 1')
+        self.assertEqual('note 1', exploration.author_notes)
+        exploration.update_author_notes('note 2')
+        self.assertEqual('note 2', exploration.author_notes)
+
     def test_explortation_update_param_specs(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         self.assertEqual(0, len(exploration.param_specs))
         params = {
-          "param1": {"obj_type" : ""}
+          'param1': {'obj_type': ''}
         }
         exploration.update_param_specs(params)
         self.assertEqual(1, len(exploration.param_specs))
         params = {
-          "param1": {"obj_type" : ""},
-          "param2": {"obj_type" : ""}
+          'param1': {'obj_type': ''},
+          'param2': {'obj_type': ''}
         }
         exploration.update_param_specs(params)
         self.assertEqual(2, len(exploration.param_specs))
-    
+
     def test_explortation_update_param_changes(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -11144,7 +11160,7 @@ class TestExplorationBasicUpdateFunctions(test_utils.GenericTestBase):
         params2 = [0, 1, 2]
         exploration.update_param_changes(params2)
         self.assertEqual(params2, exploration.param_changes)
-        
+
     def test_explortation_update_correctness_feedback_enabled(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -11153,68 +11169,65 @@ class TestExplorationBasicUpdateFunctions(test_utils.GenericTestBase):
         self.assertEqual(True, exploration.correctness_feedback_enabled)
         exploration.update_correctness_feedback_enabled(False)
         self.assertEqual(False, exploration.correctness_feedback_enabled)
-        
+
     def test_update_states_from_model_with_schema_43(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
-        myDict = {'states_schema_version' : 43, 'states' : {'state1': {}}}
-        exploration.update_states_from_model(myDict, 43, 'init')
-        self.assertEqual(myDict['states_schema_version'], 44)
-    
+        mydict = {'states_schema_version': 43, 'states': {'state1': {}}}
+        exploration.update_states_from_model(mydict, 43, 'init')
+        self.assertEqual(mydict['states_schema_version'], 44)
+
     def test_update_states_from_model_with_not_schema_43(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
-        myDict = {'states_schema_version' : 44, 'states' : {'state1': {}}}
-        exploration.update_states_from_model(myDict, 44, 'init')
-        self.assertEqual(myDict['states_schema_version'], 45)
-   
+        mydict = {'states_schema_version': 44, 'states': {'state1': {}}}
+        exploration.update_states_from_model(mydict, 44, 'init')
+        self.assertEqual(mydict['states_schema_version'], 45)
+
+
 class TestExplorationCommitLogEntry(test_utils.GenericTestBase):
+    """Tests exploration commit log entry init function"""
+
     def test_ecle_init(self):
-        ecle = exp_domain.ExplorationCommitLogEntry(datetime.now(), datetime.now(), 1, 2,
-            "new", "msg", "-f", "2.0",
-            "good","yes",
-            "no")
-        myDict = ecle.to_dict()
-        self.assertEqual(myDict['version'], "2.0")
-        self.assertEqual(myDict['exploration_id'], 2)
-        
+        ecle = exp_domain.ExplorationCommitLogEntry(
+                datetime.datetime.now(), datetime.datetime.now(), 1, 2,
+                'new', 'msg', '-f', '2.0',
+                'good', 'yes',
+                'no')
+        mydict = ecle.to_dict()
+        self.assertEqual(mydict['version'], '2.0')
+        self.assertEqual(mydict['exploration_id'], 2)
+
+
 class TestVersionedExplorationInteractionIdsMapping(test_utils.GenericTestBase):
+    """Tests versioned exploration interaction ids mapping init function"""
+
     def test_veiim_init(self):
-        veiim = exp_domain.VersionedExplorationInteractionIdsMapping("2.0", {})
-        self.assertEqual(veiim.version, "2.0")
+        veiim = exp_domain.VersionedExplorationInteractionIdsMapping('2.0', {})
+        self.assertEqual(veiim.version, '2.0')
 
-            
+
 class UnitTestExpUtil(test_utils.GenericTestBase):
+    """Tests clean_math_expression for converting math strings"""
+
     def test_clean_math_expression_with_trig(self):
-        res = clean_math_expression("cos^2(x)")
-        self.assertEqual(res, "(cos(x))^2")
-        
-        res = clean_math_expression("cosx + 1")
-        self.assertEqual(res, "cos(x) + 1")
-        
-        res = clean_math_expression("cos(x)^2")
-        self.assertEqual(res, "cos(x)^2")
-        
-        res = clean_math_expression("sin^2(x)")
-        self.assertEqual(res, "(sin(x))^2")
-        
+        res = exp_domain.clean_math_expression('cos^2(x)')
+        self.assertEqual(res, '(cos(x))^2')
+        res = exp_domain.clean_math_expression('cosx + 1')
+        self.assertEqual(res, 'cos(x) + 1')
+        res = exp_domain.clean_math_expression('cos(x)^2')
+        self.assertEqual(res, 'cos(x)^2')
+        res = exp_domain.clean_math_expression('sin^2(x)')
+        self.assertEqual(res, '(sin(x))^2')
+
     def test_clean_math_expression_without_trig(self):
-        res = clean_math_expression("\u03bb")
-        self.assertEqual(res, "lambda")
-        
-        res = clean_math_expression("\u03c9")
-        self.assertEqual(res, "omega")
-        
-        res = clean_math_expression("2 \\cdot 2")
-        self.assertEqual(res, "2 * 2")
-        
-        res = clean_math_expression("1,2")
-        self.assertEqual(res, "1.2")
-        
-        
-
-
-        
- 
+        res = exp_domain.clean_math_expression('\u03bb')
+        self.assertEqual(res, 'lambda')
+        res = exp_domain.clean_math_expression('\u03c9')
+        self.assertEqual(res, 'omega')
+        res = exp_domain.clean_math_expression('2 \\cdot 2')
+        self.assertEqual(res, '2 * 2')
+        res = exp_domain.clean_math_expression('1,2')
+        self.assertEqual(res, '1.2')

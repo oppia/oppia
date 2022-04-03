@@ -120,19 +120,29 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             ['No files to check'], self.linter_stdout)
 
     def test_main_with_non_other_shard(self):
+        mock_shards = {
+            '1': [
+                'a/',
+                'b/',
+            ],
+        }
+
         def mock_get_filepaths_from_path(path, namespace):  # pylint: disable=unused-argument
-            if path == pre_commit_linter.SHARDS['1'][0]:
+            if path == mock_shards['1'][0]:
                 return [VALID_PY_FILEPATH]
             return []
+
+        shards_swap = self.swap(
+            pre_commit_linter, 'SHARDS', mock_shards)
 
         get_filenames_from_path_swap = self.swap_with_checks(
             pre_commit_linter, '_get_filepaths_from_path',
             mock_get_filepaths_from_path, expected_args=[
                 (prefix,)
-                for prefix in pre_commit_linter.SHARDS['1']
+                for prefix in mock_shards['1']
             ])
 
-        with self.print_swap, self.sys_swap:
+        with self.print_swap, self.sys_swap, shards_swap:
             with self.install_swap:
                 with get_filenames_from_path_swap:
                     pre_commit_linter.main(args=['--shard', '1'])
@@ -146,17 +156,27 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             raise AssertionError(
                 'Third party libs should not be installed.')
 
+        mock_shards = {
+            '1': [
+                'a/',
+            ],
+        }
+
+        shards_swap = self.swap(
+            pre_commit_linter, 'SHARDS', mock_shards)
+
         get_filenames_from_path_swap = self.swap_with_checks(
             pre_commit_linter, '_get_filepaths_from_path',
-            mock_get_filepaths_from_path, expected_args=[
+            mock_get_filepaths_from_path,
+            expected_args=[
                 (prefix,)
-                for prefix in pre_commit_linter.SHARDS['1']
+                for prefix in mock_shards['1']
             ])
         install_swap = self.swap(
             install_third_party_libs, 'main',
             mock_install_third_party_main)
 
-        with self.print_swap, self.sys_swap, install_swap:
+        with self.print_swap, self.sys_swap, install_swap, shards_swap:
             with get_filenames_from_path_swap:
                 with self.assertRaisesRegex(
                     RuntimeError, 'mock_file in multiple shards'
@@ -172,9 +192,21 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             else:
                 return []
 
+        mock_shards = {
+            '1': [
+                'a/',
+            ],
+            'other': [
+                'b/',
+            ],
+        }
+
+        shards_swap = self.swap(
+            pre_commit_linter, 'SHARDS', mock_shards)
+
         filenames_from_path_expected_args = [(os.getcwd(),)] + [
             (prefix,)
-            for prefix in pre_commit_linter.SHARDS['1']
+            for prefix in mock_shards['1']
         ]
 
         get_filenames_from_path_swap = self.swap_with_checks(
@@ -182,7 +214,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             mock_get_filepaths_from_path,
             expected_args=filenames_from_path_expected_args)
 
-        with self.print_swap, self.sys_swap:
+        with self.print_swap, self.sys_swap, shards_swap:
             with self.install_swap:
                 with get_filenames_from_path_swap:
                     pre_commit_linter.main(

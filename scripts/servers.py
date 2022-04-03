@@ -57,6 +57,9 @@ def managed_process(
 
     Yields:
         psutil.Process. The process managed by the context manager.
+
+    Raises:
+        Exception. The process exited unexpectedly.
     """
     # TODO(#11549): Move this to top of the file.
     if common.PSUTIL_DIR not in sys.path:
@@ -79,8 +82,10 @@ def managed_process(
     try:
         yield popen_proc
     finally:
-        print('Stopping %s...' % get_proc_info(popen_proc))
+        proc_name = get_proc_info(popen_proc)
+        print('Stopping %s...' % proc_name)
         procs_still_alive = [popen_proc]
+
         try:
             if popen_proc.is_running():
                 # Children must be terminated before the parent, otherwise they
@@ -109,6 +114,15 @@ def managed_process(
             # practice, so we log and suppress exceptions instead.
             logging.exception(
                 'Failed to stop %s gracefully!' % get_proc_info(popen_proc))
+
+        exit_code = popen_proc.returncode
+        # Note that negative values indicate termination by a signal: SIGTERM,
+        # SIGINT, etc. Also, exit code 143 indicates that the process received
+        # a SIGTERM from the OS, and it succeeded in gracefully terminating.
+        if exit_code is not None and exit_code > 0 and exit_code != 143:
+            raise Exception(
+                'Process %s exited unexpectedly with exit code %s' %
+                (proc_name, exit_code))
 
 
 @contextlib.contextmanager
