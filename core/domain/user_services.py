@@ -2294,17 +2294,16 @@ def get_dashboard_stats(user_id):
 
 
 def _get_checkpoints_in_order(init_state_name, states):
-    """Returns the checkpoints of an exploration in sequential order.
+    """Returns the checkpoints of an exoloration in sequential order.
 
     Args:
-        init_state_name: str. The name of the first state of an exploration.
-        states: dict(state). All states of an exploration.
+        init_state_name: str. The name of the first state of the exploration.
+        states: dict(state). All states of the exploration.
 
     Returns:
-        list(str). The list of all checkpoints of an exploration in
-            sequential order.
+        list(str). List of all checkpoints of the exploration in sequential
+        order.
     """
-
     queue = []
     queue.append(init_state_name)
     checkpoint_state_names = []
