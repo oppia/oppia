@@ -79,7 +79,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'version': 0,
             'practice_tab_is_displayed': False,
             'meta_tag_content': '',
-            'page_title_fragment_for_web': ''
+            'page_title_fragment_for_web': 'web_title'
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
