@@ -64,17 +64,24 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
                     if rubric['difficulty'] == 'Easy':
                         easy_explanations_exceeding_max_len.append(explanation)
                     elif rubric['difficulty'] == 'Medium':
-                        medium_explanations_exceeding_max_len.append(explanation)
+                        medium_explanations_exceeding_max_len.append(
+                            explanation)
                     elif rubric['difficulty'] == 'Hard':
                         hard_explanations_exceeding_max_len.append(explanation)
 
         return {
-            'len_of_easy_rubric_explanations': len_of_easy_rubric_explanations,
-            'len_of_medium_rubric_explanations': len_of_medium_rubric_explanations,
-            'len_of_hard_rubric_explanations': len_of_hard_rubric_explanations,
-            'easy_explanations_exceeding_max_len': easy_explanations_exceeding_max_len,
-            'medium_explanations_exceeding_max_len': medium_explanations_exceeding_max_len,
-            'hard_explanations_exceeding_max_len': hard_explanations_exceeding_max_len
+            'len_of_easy_rubric_explanations': (
+                len_of_easy_rubric_explanations),
+            'len_of_medium_rubric_explanations': (
+                len_of_medium_rubric_explanations),
+            'len_of_hard_rubric_explanations': (
+                len_of_hard_rubric_explanations),
+            'easy_explanations_exceeding_max_len': (
+                easy_explanations_exceeding_max_len),
+            'medium_explanations_exceeding_max_len': (
+                medium_explanations_exceeding_max_len),
+            'hard_explanations_exceeding_max_len': (
+                hard_explanations_exceeding_max_len)
         }
 
     def rubric_explanations_are_invalid(self, explanations):

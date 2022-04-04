@@ -63,7 +63,7 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
             ),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2],
-                ['<p> ' +'Explanation' * 30 + ' </p>'] * 3
+                ['<p> ' + 'Explanation' * 30 + ' </p>'] * 3
             )
         ]
 
@@ -167,7 +167,7 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
                 'Hard rubrics have %d explanations and %s explanations '
                 'exceed 300 characters.' % (
                     'skill_id_3', 0, [],
-                    15, [], 3, ['<p> ' +'Explanation' * 30 + ' </p>'] * 3
+                    15, [], 3, ['<p> ' + 'Explanation' * 30 + ' </p>'] * 3
                 )
             )
         ])
