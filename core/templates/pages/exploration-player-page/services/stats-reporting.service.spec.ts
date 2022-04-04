@@ -60,20 +60,20 @@ describe('Stats reporting service ', () => {
   });
 
   beforeEach(() => {
-    spyOn(messengerService, 'sendMessage').and.callThrough();
-    spyOn(siteAnalyticsService, 'registerNewCard').and.callThrough();
+    spyOn(messengerService, 'sendMessage').and.returnValue(null);
+    spyOn(siteAnalyticsService, 'registerNewCard').and.returnValue(null);
     spyOn(siteAnalyticsService, 'registerStartExploration')
-      .and.callThrough();
+      .and.returnValue(null);
     spyOn(siteAnalyticsService, 'registerFinishExploration')
-      .and.callThrough();
+      .and.returnValue(null);
     spyOn(siteAnalyticsService, 'registerCuratedLessonCompleted')
-      .and.callThrough();
+      .and.returnValue(null);
     spyOn(playthroughService, 'recordExplorationStartAction')
-      .and.callThrough();
+      .and.returnValue(null);
     spyOn(playthroughService, 'recordExplorationQuitAction')
-      .and.callThrough();
+      .and.returnValue(null);
     spyOn(playthroughService, 'storePlaythrough')
-      .and.callThrough();
+      .and.returnValue(null);
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     spyOn(urlService, 'getUrlParams')
@@ -94,6 +94,14 @@ describe('Stats reporting service ', () => {
 
   it('should set session properties when calling ' +
     '\'initSession\'', fakeAsync(() => {
+    // Prechecks.
+    expect(statsReportingService.explorationId).toEqual(null);
+    expect(statsReportingService.explorationTitle).toEqual(null);
+    expect(statsReportingService.explorationVersion)
+      .toEqual(null);
+    expect(statsReportingService.sessionId).toEqual(null);
+    expect(statsReportingService.optionalCollectionId).toEqual(null);
+
     statsReportingService.initSession(
       explorationId, explorationTitle, explorationVersion,
       sessionId, collectionId);
@@ -156,6 +164,7 @@ describe('Stats reporting service ', () => {
     let recordExplorationActuallyStartedSpy = spyOn(
       statsReportingBackendApiService, 'recordExplorationActuallyStartedAsync')
       .and.returnValue(Promise.resolve({}));
+    expect(statsReportingService.currentStateName).toBe(null);
     expect(statsReportingService.explorationActuallyStarted).toBe(false);
 
     statsReportingService.recordExplorationActuallyStarted('firstState');
@@ -189,6 +198,7 @@ describe('Stats reporting service ', () => {
     let recordLeaveForRefresherExpSpy = spyOn(
       statsReportingBackendApiService, 'recordLeaveForRefresherExpAsync')
       .and.returnValue(Promise.resolve({}));
+    expect(statsReportingService.nextExpId).toBe(null);
     statsReportingService.recordLeaveForRefresherExp(
       'firstState', 'refresherExp');
 
@@ -221,6 +231,7 @@ describe('Stats reporting service ', () => {
     let recordStateCompletedSpy = spyOn(
       statsReportingBackendApiService, 'recordStateCompletedAsync')
       .and.returnValue(Promise.resolve({}));
+    expect(statsReportingService.currentStateName).toBe(null);
     statsReportingService.recordStateCompleted('firstState');
 
     expect(recordStateCompletedSpy).toHaveBeenCalled();
@@ -250,7 +261,7 @@ describe('Stats reporting service ', () => {
   it('should record stats when an answer submit button is clicked', () => {
     let recordAnswerSubmitActionSpy = spyOn(
       playthroughService, 'recordAnswerSubmitAction')
-      .and.callThrough();
+      .and.returnValue(null);
     statsReportingService.recordAnswerSubmitAction(
       'oldState', 'newState', 'expId', 'answer', 'feedback');
 
@@ -268,6 +279,7 @@ describe('Stats reporting service ', () => {
   });
 
   it('should set topic name', () => {
+    expect(statsReportingService.topicName).toBe(null);
     statsReportingService.setTopicName('newTopic');
 
     expect(statsReportingService.topicName).toBe('newTopic');
