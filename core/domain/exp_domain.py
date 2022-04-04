@@ -37,7 +37,6 @@ from core.domain import change_domain
 from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
-
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
