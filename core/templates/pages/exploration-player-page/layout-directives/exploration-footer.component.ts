@@ -61,7 +61,7 @@ export class ExplorationFooterComponent {
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth: number = 0;
   expStates: StateObjectsBackendDict;
-  mostRecentlyReachedCheckpointStateName: string = 'correct but why';
+  mostRecentlyReachedCheckpointStateName: string;
   completedCheckpoints: number = 0;
   isLastCheckpointReached: boolean = false;
 
@@ -150,8 +150,6 @@ export class ExplorationFooterComponent {
         }
       }
     );
-
-    this.mostRecentlyReachedCheckpointStateName = 'correct but why';
 
     let checkpointIndexFromStateName = this.getCheckpointIndexFromStateName();
     this.completedCheckpoints = checkpointIndexFromStateName - 1;
