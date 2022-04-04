@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core.platform.storage import cloud_storage_emulator
 
-from typing import List, Union
+from typing import List, Optional, Union
 
 CLIENT = cloud_storage_emulator.CloudStorageEmulator()
 
@@ -58,7 +58,7 @@ def commit(
         unused_bucket_name: str,
         filepath: str,
         raw_bytes: Union[bytes, str],
-        mimetype: str
+        mimetype: Optional[str]
 ) -> None:
     """Commits bytes to the relevant file.
 
@@ -66,7 +66,7 @@ def commit(
         unused_bucket_name: str. Unused name of the GCS bucket.
         filepath: str. The path to the relevant file.
         raw_bytes: bytes|str. The content to be stored in the file.
-        mimetype: str. The content-type of the file.
+        mimetype: str|None. The content-type of the file.
     """
     # TODO(#13500): Refactor this method that only bytes are passed
     # into raw_bytes.

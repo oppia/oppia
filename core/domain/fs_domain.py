@@ -183,7 +183,10 @@ class GcsFileSystem(GeneralFileSystem):
             return None
 
     def commit(
-        self, filepath: str, raw_bytes: Union[bytes, str], mimetype: str
+        self,
+        filepath: str,
+        raw_bytes: Union[bytes, str],
+        mimetype: Optional[str]
     ) -> None:
         """Commit raw_bytes to the relevant file in the entity's assets folder.
 
@@ -191,7 +194,7 @@ class GcsFileSystem(GeneralFileSystem):
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: bytes|str. The content to be stored in the file.
-            mimetype: str. The content-type of the cloud file.
+            mimetype: str|None. The content-type of the cloud file.
         """
         storage_services.commit(
             self._bucket_name,
@@ -362,8 +365,8 @@ class AbstractFileSystem():
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: bytes|str. The content to be stored in the file.
-            mimetype: str. The content-type of the file. If mimetype is set to
-                'application/octet-stream' then raw_bytes is expected to
+            mimetype: str|None. The content-type of the file. If mimetype is
+                set to 'application/octet-stream' then raw_bytes is expected to
                 contain binary data. In all other cases, raw_bytes is expected
                 to be textual data.
         """
@@ -377,8 +380,6 @@ class AbstractFileSystem():
         file_content = (
             raw_bytes if mimetype != 'application/octet-stream' else raw_bytes)
         self._check_filepath(filepath)
-        # Ruling out the possibility of None for mypy type checking.
-        assert mimetype is not None
         self._impl.commit(filepath, file_content, mimetype)
 
     def delete(self, filepath: str) -> None:
