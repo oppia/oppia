@@ -108,6 +108,10 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
     });
   }
 
+  onMisconceptionChange(): void {
+    this.getMisconceptionsChange.emit();
+  }
+
   toggleMisconceptionLists(): void {
     if (this.windowDimensionsService.isWindowNarrow()) {
       this.misconceptionsListIsShown = (
