@@ -23,11 +23,14 @@ in mypy checks not during runtime.
 
 from __future__ import annotations
 
+from core.platform.app_identity import (
+    gae_app_identity_services as app_identity_services)
 from core.platform.cache import redis_cache_services as memory_cache_services
 from core.platform.datastore import (
     cloud_datastore_services as datastore_services)
 from core.platform.email import dev_mode_email_services as email_services
 from core.platform.search import elastic_search_services as search_services
+from core.platform.storage import dev_mode_storage_services as storage_services
 from core.platform.transactions import (
     cloud_transaction_services as transaction_services)
 from core.platform.translate import (
@@ -63,6 +66,7 @@ from core.storage.user import gae_models as user_models
 __all__ = [
     'activity_models',
     'app_feedback_report_models',
+    'app_identity_services',
     'audit_models',
     'auth_models',
     'base_models',
@@ -86,6 +90,7 @@ __all__ = [
     'skill_models',
     'stats_models',
     'story_models',
+    'storage_services',
     'subtopic_models',
     'suggestion_models',
     'topic_models',

@@ -20,22 +20,31 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
+
+from typing import Dict, List, Optional, Union
+
 from core.platform import models   # pylint: disable=invalid-import-from # isort:skip
+
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_identity_services
+    from mypy_imports import storage_services
+
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
 
-CHANGE_LIST_SAVE = [{'cmd': 'save'}]
+CHANGE_LIST_SAVE: List[Dict[str, str]] = [{'cmd': 'save'}]
 
-ALLOWED_ENTITY_NAMES = [
+ALLOWED_ENTITY_NAMES: List[str] = [
     feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_BLOG_POST,
     feconf.ENTITY_TYPE_TOPIC, feconf.ENTITY_TYPE_SKILL,
     feconf.ENTITY_TYPE_STORY, feconf.ENTITY_TYPE_QUESTION,
     feconf.ENTITY_TYPE_VOICEOVER_APPLICATION]
-ALLOWED_SUGGESTION_IMAGE_CONTEXTS = [
+ALLOWED_SUGGESTION_IMAGE_CONTEXTS: List[str] = [
     feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
     feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS]
 
@@ -44,22 +53,22 @@ class FileStream:
     """A class that wraps a file stream, but adds extra attributes to it.
 
     Attributes:
-        content: str. The content of the file snapshot.
+        content: bytes|str. The content of the file snapshot.
     """
 
-    def __init__(self, content):
+    def __init__(self, content: Union[bytes, str]) -> None:
         """Constructs a FileStream object.
 
         Args:
-            content: str. The content of the file snapshots.
+            content: bytes|str. The content of the file snapshots.
         """
         self._content = content
 
-    def read(self):
+    def read(self) -> Union[bytes, str]:
         """Emulates stream.read(). Returns all bytes and emulates EOF.
 
         Returns:
-            content: str. The content of the file snapshot.
+            content: bytes|str. The content of the file snapshot.
         """
         content = self._content
         self._content = ''
@@ -74,7 +83,7 @@ class GeneralFileSystem:
         entity_id: str. The ID of the corresponding entity.
     """
 
-    def __init__(self, entity_name, entity_id):
+    def __init__(self, entity_name: str, entity_id: str) -> None:
         """Constructs a GeneralFileSystem object.
 
         Args:
@@ -85,7 +94,9 @@ class GeneralFileSystem:
         self._validate_entity_parameters(entity_name, entity_id)
         self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
 
-    def _validate_entity_parameters(self, entity_name, entity_id):
+    def _validate_entity_parameters(
+        self, entity_name: str, entity_id: str
+    ) -> None:
         """Checks whether the entity_id and entity_name passed in are valid.
 
         Args:
@@ -107,7 +118,7 @@ class GeneralFileSystem:
             raise utils.ValidationError('Entity id cannot be empty')
 
     @property
-    def assets_path(self):
+    def assets_path(self) -> str:
         """Returns the path of the parent folder of assets.
 
         Returns:
@@ -122,11 +133,11 @@ class GcsFileSystem(GeneralFileSystem):
     This implementation ignores versioning.
     """
 
-    def __init__(self, entity_name, entity_id):
+    def __init__(self, entity_name: str, entity_id: str) -> None:
         self._bucket_name = app_identity_services.get_gcs_resource_bucket_name()
         super(GcsFileSystem, self).__init__(entity_name, entity_id)
 
-    def _get_gcs_file_url(self, filepath):
+    def _get_gcs_file_url(self, filepath: str) -> str:
         """Returns the constructed GCS file URL.
 
         Args:
@@ -141,7 +152,7 @@ class GcsFileSystem(GeneralFileSystem):
         gcs_file_url = '%s/%s' % (self._assets_path, filepath)
         return gcs_file_url
 
-    def isfile(self, filepath):
+    def isfile(self, filepath: str) -> bool:
         """Checks if the file with the given filepath exists in the GCS.
 
         Args:
@@ -154,7 +165,7 @@ class GcsFileSystem(GeneralFileSystem):
         return storage_services.isfile(
             self._bucket_name, self._get_gcs_file_url(filepath))
 
-    def get(self, filepath):
+    def get(self, filepath: str) -> Optional[FileStream]:
         """Gets a file as an unencoded stream of raw bytes.
 
         Args:
@@ -171,13 +182,15 @@ class GcsFileSystem(GeneralFileSystem):
         else:
             return None
 
-    def commit(self, filepath, raw_bytes, mimetype):
+    def commit(
+        self, filepath: str, raw_bytes: Union[bytes, str], mimetype: str
+    ) -> None:
         """Commit raw_bytes to the relevant file in the entity's assets folder.
 
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
-            raw_bytes: str. The content to be stored in the file.
+            raw_bytes: bytes|str. The content to be stored in the file.
             mimetype: str. The content-type of the cloud file.
         """
         storage_services.commit(
@@ -187,7 +200,7 @@ class GcsFileSystem(GeneralFileSystem):
             mimetype
         )
 
-    def delete(self, filepath):
+    def delete(self, filepath: str) -> None:
         """Deletes a file and the metadata associated with it.
 
         Args:
@@ -203,7 +216,7 @@ class GcsFileSystem(GeneralFileSystem):
         else:
             raise IOError('File does not exist: %s' % filepath)
 
-    def copy(self, source_assets_path, filepath):
+    def copy(self, source_assets_path: str, filepath: str) -> None:
         """Copy images from source_path.
 
         Args:
@@ -219,7 +232,7 @@ class GcsFileSystem(GeneralFileSystem):
             self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
         )
 
-    def listdir(self, dir_name):
+    def listdir(self, dir_name: str) -> List[str]:
         """Lists all files in a directory.
 
         Args:
@@ -251,23 +264,26 @@ class GcsFileSystem(GeneralFileSystem):
             blob.name.replace(assets_path, '') for blob in blobs_in_dir]
 
 
-class AbstractFileSystem:
+class AbstractFileSystem():
     """Interface for a file system."""
 
-    def __init__(self, impl):
+    def __init__(self, impl: GcsFileSystem) -> None:
         """Constructs a AbstractFileSystem object."""
         self._impl = impl
 
     @property
-    def impl(self):
+    def impl(self) -> AbstractFileSystem:
         """Returns a AbstractFileSystem object.
 
         Returns:
             AbstractFileSystem. The AbstractFileSystem object.
         """
-        return self._impl
+        # Here, self._impl is an object of GcsFileSystem. But impl method
+        # returns this object as an object of AbstractFileSystem class.
+        # Thus to void MyPy error, ignore is added here.
+        return self._impl  # type: ignore[return-value]
 
-    def _check_filepath(self, filepath):
+    def _check_filepath(self, filepath: str) -> None:
         """Raises an error if a filepath is invalid.
 
         Args:
@@ -286,7 +302,7 @@ class AbstractFileSystem:
         if not normalized_path.startswith(base_dir):
             raise IOError('Invalid filepath: %s' % filepath)
 
-    def isfile(self, filepath):
+    def isfile(self, filepath: str) -> bool:
         """Checks if a file exists. Similar to os.path.isfile(...).
 
         Args:
@@ -299,7 +315,7 @@ class AbstractFileSystem:
         self._check_filepath(filepath)
         return self._impl.isfile(filepath)
 
-    def open(self, filepath):
+    def open(self, filepath: str) -> FileStream:
         """Returns a stream with the file content. Similar to open(...).
 
         Args:
@@ -310,9 +326,13 @@ class AbstractFileSystem:
             FileStream. The file stream domain object.
         """
         self._check_filepath(filepath)
-        return self._impl.get(filepath)
+        # Here, _impl is an object of GcsFileSystem class. So, get() method
+        # of this object returns Optional[Filestream] but here function's
+        # expected return value is Filestream. So, to avoid MyPy error,
+        # ignore is added here.
+        return self._impl.get(filepath)  # type: ignore[return-value]
 
-    def get(self, filepath):
+    def get(self, filepath: str) -> Union[bytes, str]:
         """Returns a bytestring with the file content, but no metadata.
 
         Args:
@@ -320,7 +340,7 @@ class AbstractFileSystem:
                 assets folder.
 
         Returns:
-            FileStream. The file stream domain object.
+            bytes|str. The bytestring with the file content, but no metadata.
 
         Raises:
             OSError. The given file stream does not exist.
@@ -330,13 +350,18 @@ class AbstractFileSystem:
             raise IOError('File %s not found.' % (filepath))
         return file_stream.read()
 
-    def commit(self, filepath, raw_bytes, mimetype=None):
+    def commit(
+        self,
+        filepath: str,
+        raw_bytes: Union[bytes, str],
+        mimetype: Optional[str] = None
+    ) -> None:
         """Replaces the contents of the file with the given by test string.
 
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
-            raw_bytes: str. The content to be stored in the file.
+            raw_bytes: bytes|str. The content to be stored in the file.
             mimetype: str. The content-type of the file. If mimetype is set to
                 'application/octet-stream' then raw_bytes is expected to
                 contain binary data. In all other cases, raw_bytes is expected
@@ -352,9 +377,11 @@ class AbstractFileSystem:
         file_content = (
             raw_bytes if mimetype != 'application/octet-stream' else raw_bytes)
         self._check_filepath(filepath)
+        # Ruling out the possibility of None for mypy type checking.
+        assert mimetype is not None
         self._impl.commit(filepath, file_content, mimetype)
 
-    def delete(self, filepath):
+    def delete(self, filepath: str) -> None:
         """Deletes a file and the metadata associated with it.
 
         Args:
@@ -364,7 +391,7 @@ class AbstractFileSystem:
         self._check_filepath(filepath)
         self._impl.delete(filepath)
 
-    def listdir(self, dir_name):
+    def listdir(self, dir_name: str) -> List[str]:
         """Lists all the files in a directory. Similar to os.listdir(...).
 
         Args:
@@ -378,7 +405,7 @@ class AbstractFileSystem:
         self._check_filepath(dir_name)
         return self._impl.listdir(dir_name)
 
-    def copy(self, source_assets_path, filepath):
+    def copy(self, source_assets_path: str, filepath: str) -> None:
         """Copy images from source.
 
         Args:
@@ -388,3 +415,12 @@ class AbstractFileSystem:
                 assets folder.
         """
         self._impl.copy(source_assets_path, filepath)
+
+    @property
+    def assets_path(self) -> str:
+        """Returns the path of the parent folder of assets.
+
+        Returns:
+            str. The path.
+        """
+        return self._impl.assets_path
