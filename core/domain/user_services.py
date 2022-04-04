@@ -2333,7 +2333,7 @@ def _get_furthest_reached_checkpoint_in_current_exploration(
     Args:
         checkpoints_in_current_exploration: list(str). The checkpoints of
             current exploration in sequential order.
-        checkpoints_in_furthest_reached_exploration: list(str): The checkpoints
+        checkpoints_in_furthest_reached_exploration: list(str). The checkpoints
             of furthest reached exploration in sequential order.
         furthest_reached_checkpoint_state_name: str. The state name of the
             furthest reached checkpoint in the furthest reached exploration.
@@ -2348,16 +2348,16 @@ def _get_furthest_reached_checkpoint_in_current_exploration(
     frc_index = (
         checkpoints_in_furthest_reached_exploration.index(
             furthest_reached_checkpoint_state_name))
-    
+
     # Loop through checkpoints of furthest_reached_exploration until
     # a checkpoint is found that exists in current_exploration too.
-    while(frc_index >= 0):
-        if(checkpoints_in_furthest_reached_exploration[frc_index] in checkpoints_in_current_exploration):
+    while frc_index >= 0:
+        if checkpoints_in_furthest_reached_exploration[frc_index] in checkpoints_in_current_exploration: # pylint: disable=line-too-long
             return checkpoints_in_furthest_reached_exploration[frc_index]
         frc_index = frc_index - 1
-    
+
     return None
-    
+
 
 def update_learner_checkpoint_progress(
     user_id, exploration_id, state_name, exp_version
@@ -2399,13 +2399,7 @@ def update_learner_checkpoint_progress(
             furthest_reached_exploration.init_state_name,
             furthest_reached_exploration.states)
 
-        print('\n\n$$$$$$$$$$$$$$$$$\n\n')
-        print(checkpoints_in_current_exploration)
-        print('\n\n$$$$$$$$$$$$$$$$$\n\n')
-        print(checkpoints_in_furthest_reached_exploration)
-        print('\n\n$$$$$$$$$$$$$$$$$\n\n')
-
-        furthest_reached_checkpoint_in_current_exploration = _get_furthest_reached_checkpoint_in_current_exploration(
+        furthest_reached_checkpoint_in_current_exploration = _get_furthest_reached_checkpoint_in_current_exploration( # pylint: disable=line-too-long
             checkpoints_in_current_exploration,
             checkpoints_in_furthest_reached_exploration,
             exploration_user_model.furthest_reached_checkpoint_state_name
@@ -2413,18 +2407,22 @@ def update_learner_checkpoint_progress(
 
         # If furthest reached checkpoint doesn't exist in current exploration.
         if furthest_reached_checkpoint_in_current_exploration is None:
-            exploration_user_model.furthest_reached_checkpoint_exp_version = exp_version
-            exploration_user_model.furthest_reached_checkpoint_state_name = state_name
+            exploration_user_model.furthest_reached_checkpoint_exp_version = (
+                exp_version)
+            exploration_user_model.furthest_reached_checkpoint_state_name = (
+                state_name)
         else:
             # If furthest reached checkpoint is behind most recently reached checkpoint.
             if (checkpoints_in_current_exploration.index(
                 furthest_reached_checkpoint_in_current_exploration) < (
                     checkpoints_in_current_exploration.index(state_name))):
-                exploration_user_model.furthest_reached_checkpoint_exp_version = (
+                (exploration_user_model
+                    .furthest_reached_checkpoint_exp_version) = (
                     exp_version)
-                exploration_user_model.furthest_reached_checkpoint_state_name = (
+                (exploration_user_model
+                    .furthest_reached_checkpoint_state_name) = (
                     state_name)
-        
+
     exploration_user_model.most_recently_reached_checkpoint_exp_version = (
         exp_version)
     exploration_user_model.most_recently_reached_checkpoint_state_name = (
