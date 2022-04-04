@@ -161,9 +161,9 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
                         'The id of the skill is %s. '
                         'Easy rubrics have %d explanations and %s explanations '
                         'exceed 300 characters. Medium rubrics have %d '
-                        'explanations and %s explanations exceed 300 characters. '
-                        'Hard rubrics have %d explanations and %s explanations '
-                        'exceed 300 characters.' % (
+                        'explanations and %s explanations exceed 300 '
+                        'characters. Hard rubrics have %d explanations and %s '
+                        'explanations exceed 300 characters.' % (
                             id,
                             invalid_rubrics[
                                 'len_of_easy_rubric_explanations'],
