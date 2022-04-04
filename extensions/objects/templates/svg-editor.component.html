@@ -290,8 +290,14 @@
       <img [src]="data.savedSvgUrl" [ngStyle]="svgContainerStyle">
     </div>
   </div>
-  <div *ngIf="isDiagramCreated()" class="diagram-editor-save-box">
-    <button class="btn btn-success float-right protractor-test-save-diagram"
+  <div *ngIf="isDiagramCreated()" class="diagram-editor-save-box mt-4 d-flex justify-content-end">
+    <button type="button"
+            class="btn btn-secondary mr-3"
+            (click)="discardSvgFile()"
+            [disabled]="isUserDrawing()">
+      Discard
+    </button>
+    <button class="btn btn-success protractor-test-save-diagram"
             (click)="saveSvgFile()"
             [disabled]="isUserDrawing() || loadingIndicatorIsShown">
       <span *ngIf="!loadingIndicatorIsShown">Use This Image</span>
