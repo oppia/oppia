@@ -63,7 +63,7 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
             ),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2],
-                ['<p> Explanation </p>'] * 15
+                ['<p> ' +'Explanation' * 30 + ' </p>'] * 3
             )
         ]
 
@@ -130,8 +130,16 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
             job_run_result.JobRunResult.as_stdout('SKILLS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The id of the skill is %s and the difficulties of invalid '
-                'rubrics are %s' % ('skill_id_2', ['Easy']))
+                'The id of the skill is %s. '
+                'Easy rubrics have %d explanations and %s explanations '
+                'exceed 300 characters. Medium rubrics have %d '
+                'explanations and %s explanations exceed 300 characters. '
+                'Hard rubrics have %d explanations and %s explanations '
+                'exceed 300 characters.' % (
+                    'skill_id_2', 1, ['<p> ' + 'a' * 350 + ' </p>'],
+                    0, [], 0, []
+                )
+            )
         ])
 
     def test_run_with_mixed_models(self) -> None:
@@ -141,9 +149,25 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJobTests(
             job_run_result.JobRunResult.as_stdout('SKILLS SUCCESS: 3'),
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
             job_run_result.JobRunResult.as_stderr(
-                'The id of the skill is %s and the difficulties of invalid '
-                'rubrics are %s' % ('skill_id_2', ['Easy'])),
+                'The id of the skill is %s. '
+                'Easy rubrics have %d explanations and %s explanations '
+                'exceed 300 characters. Medium rubrics have %d '
+                'explanations and %s explanations exceed 300 characters. '
+                'Hard rubrics have %d explanations and %s explanations '
+                'exceed 300 characters.' % (
+                    'skill_id_2', 1, ['<p> ' + 'a' * 350 + ' </p>'],
+                    0, [], 0, []
+                )
+            ),
             job_run_result.JobRunResult.as_stderr(
-                'The id of the skill is %s and the difficulties of invalid '
-                'rubrics are %s' % ('skill_id_3', ['Medium', 'Hard']))
+                'The id of the skill is %s. '
+                'Easy rubrics have %d explanations and %s explanations '
+                'exceed 300 characters. Medium rubrics have %d '
+                'explanations and %s explanations exceed 300 characters. '
+                'Hard rubrics have %d explanations and %s explanations '
+                'exceed 300 characters.' % (
+                    'skill_id_3', 0, [],
+                    15, [], 3, ['<p> ' +'Explanation' * 30 + ' </p>'] * 3
+                )
+            )
         ])

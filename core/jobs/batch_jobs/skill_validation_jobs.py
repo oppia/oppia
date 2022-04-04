@@ -36,6 +36,47 @@ if MYPY: # pragma: no cover
 class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
     """Job that returns skills with invalid rubric explanations."""
 
+    def get_rubrics_with_invalid_explanations(self, skill):
+        """Returns the count of rubrics with invalid explanations in a skill.
+
+        Returns: list[str]. The count of rubrics with invalid explanations.
+        """
+        rubrics = skill[1]
+
+        len_of_easy_rubric_explanations = 0
+        len_of_medium_rubric_explanations = 0
+        len_of_hard_rubric_explanations = 0
+
+        easy_explanations_exceeding_max_len = []
+        medium_explanations_exceeding_max_len = []
+        hard_explanations_exceeding_max_len = []
+
+        for rubric in rubrics:
+            if rubric['difficulty'] == 'Easy':
+                len_of_easy_rubric_explanations = len(rubric['explanations'])
+            elif rubric['difficulty'] == 'Medium':
+                len_of_medium_rubric_explanations = len(rubric['explanations'])
+            elif rubric['difficulty'] == 'Hard':
+                len_of_hard_rubric_explanations = len(rubric['explanations'])
+
+            for explanation in rubric['explanations']:
+                if len(explanation) > 300:
+                    if rubric['difficulty'] == 'Easy':
+                        easy_explanations_exceeding_max_len.append(explanation)
+                    elif rubric['difficulty'] == 'Medium':
+                        medium_explanations_exceeding_max_len.append(explanation)
+                    elif rubric['difficulty'] == 'Hard':
+                        hard_explanations_exceeding_max_len.append(explanation)
+
+        return {
+            'len_of_easy_rubric_explanations': len_of_easy_rubric_explanations,
+            'len_of_medium_rubric_explanations': len_of_medium_rubric_explanations,
+            'len_of_hard_rubric_explanations': len_of_hard_rubric_explanations,
+            'easy_explanations_exceeding_max_len': easy_explanations_exceeding_max_len,
+            'medium_explanations_exceeding_max_len': medium_explanations_exceeding_max_len,
+            'hard_explanations_exceeding_max_len': hard_explanations_exceeding_max_len
+        }
+
     def rubric_explanations_are_invalid(self, explanations):
         """Returns true if the length of rubric explanations list is > 10
         or at least one explanation exceeds 300 characters.
@@ -99,6 +140,14 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
                 self.filter_skills_having_rubrics_with_invalid_explanations)
         )
 
+        rubrics_with_invalid_explanations = (
+            skills_having_rubrics_with_invalid_explanation
+            | 'Get rubrics with invalid explanation' >> beam.Map(
+                lambda skill: (
+                    skill[0],
+                    self.get_rubrics_with_invalid_explanations(skill)))
+        )
+
         report_number_of_skills_queried = (
             total_skills
             | 'Report count of skill models' >> (
@@ -106,22 +155,31 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
         )
 
         report_number_of_skills_with_invalid_rubric_explanations = (
-            skills_having_rubrics_with_invalid_explanation
+            rubrics_with_invalid_explanations
             | 'Report count of skills with invalid rubric explanations' >> (
                 job_result_transforms.CountObjectsToJobRunResult('INVALID'))
         )
 
         report_invalid_skill_ids_and_rubrics = (
-            skills_having_rubrics_with_invalid_explanation
+            rubrics_with_invalid_explanations
             | 'Report invalid skill ids and rubrics' >> (
               beam.Map(
                 lambda skill: job_run_result.JobRunResult.as_stderr(
-                    'The id of the skill is %s and the difficulties of invalid '
-                    'rubrics are %s' % (
+                    'The id of the skill is %s. '
+                    'Easy rubrics have %d explanations and %s explanations '
+                    'exceed 300 characters. Medium rubrics have %d '
+                    'explanations and %s explanations exceed 300 characters. '
+                    'Hard rubrics have %d explanations and %s explanations '
+                    'exceed 300 characters.' % (
                         skill[0],
-                        self.get_rubrics_difficulties_with_invalid_explanations(
-                            skill
-                        )))
+                        skill[1]['len_of_easy_rubric_explanations'],
+                        skill[1]['easy_explanations_exceeding_max_len'],
+                        skill[1]['len_of_medium_rubric_explanations'],
+                        skill[1]['medium_explanations_exceeding_max_len'],
+                        skill[1]['len_of_hard_rubric_explanations'],
+                        skill[1]['hard_explanations_exceeding_max_len'],
+                    )
+                )
               )
             )
         )
