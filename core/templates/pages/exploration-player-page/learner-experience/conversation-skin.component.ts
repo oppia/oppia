@@ -137,6 +137,7 @@ export class ConversationSkinComponent {
   questionSessionCompleted: boolean;
   moveToExploration: boolean;
   upcomingInteractionInstructions;
+  visitedStateNames = [];
 
   constructor(
     private windowRef: WindowRef,
@@ -320,28 +321,6 @@ export class ConversationSkinComponent {
           }
         );
     }
-
-    // Since first state is always a checkpoint, recording both
-    // last_completed_checkpoint & latest_visited_checkpoint.
-    let firstStateName: string;
-    this.getLastSavedDataAsync().then(
-      response => {
-        firstStateName = response.init_state_name;
-      }
-    );
-    let version: number;
-    this.roebas.loadLatestExplorationAsync(this.explorationId).then(
-      response => {
-        version = response.version;
-      }
-    );
-    this.eebas.recordMostRecentlyCompletedCheckpointAsync(
-      this.explorationId,
-      version,
-      firstStateName,
-    ).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
   }
 
   // Returns a promise supplying the last saved version for the current
@@ -604,6 +583,27 @@ export class ConversationSkinComponent {
   private _navigateToDisplayedCard(): void {
     let index = this.playerPositionService.getDisplayedCardIndex();
     this.displayedCard = this.playerTranscriptService.getCard(index);
+    let currentStateName = this.displayedCard.getStateName();
+    let currentState = this.explorationEngineService.
+      getStateFromStateName(currentStateName);
+    if (currentState.cardIsCheckpoint &&
+         !this.visitedStateNames.includes(currentStateName)) {
+      let version: number;
+      this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+        response => {
+          version = response.version;
+        }
+      );
+      this.eebas.recordMostRecentlyReachedCheckpointAsync(
+        this.explorationId,
+        version,
+        currentStateName,
+      ).then(() => {
+        // Required for the put operation to deliver data to backend.
+      });
+      this.visitedStateNames.push(currentStateName);
+    }
+
 
     this.playerPositionService.onActiveCardChanged.emit();
 
@@ -1118,23 +1118,6 @@ export class ConversationSkinComponent {
 
   showUpcomingCard(): void {
     let currentIndex = this.playerPositionService.getDisplayedCardIndex();
-    if (currentIndex > 0 &&
-      this.explorationEngineService.getState().cardIsCheckpoint) {
-      // Update last_completed_checkpoint & latest_visited_checkpoint.
-      let version: number;
-      this.roebas.loadLatestExplorationAsync(this.explorationId).then(
-        response => {
-          version = response.version;
-        }
-      );
-      this.eebas.recordMostRecentlyCompletedCheckpointAsync(
-        this.explorationId,
-        version,
-        this.displayedCard.getStateName(),
-      ).then(() => {
-        // Required for the post operation to deliver data to backend.
-      });
-    }
     let conceptCardIsBeingShown = (
       this.displayedCard.getStateName() === null &&
       !this.explorationPlayerStateService.isInQuestionMode());

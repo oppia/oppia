@@ -124,17 +124,26 @@ export class EditableExplorationBackendApiService {
       explorationId, explorationVersion, commitMessage, changeList);
   }
 
-  async recordMostRecentlyCompletedCheckpointAsync(
+  async recordMostRecentlyReachedCheckpointAsync(
       explorationId: string,
-      mostRecentlyCompletedCheckpointExpVersion: number,
-      mostRecentlyCompletedCheckpointStateName: string,
+      mostRecentlyReachedCheckpointExpVersion: number,
+      mostRecentlyReachedCheckpointStateName: string,
   ): Promise<void> {
     const requestUrl =
-      '/explorehandler/checkpoint_completed/' + explorationId;
+      '/explorehandler/checkpoint_reached/' + explorationId;
     return this.httpClient.put<void>(requestUrl, {
-      exploration_id: explorationId,
-      most_recently_completed_checkpoint_exp_version: mostRecentlyCompletedCheckpointExpVersion,
-      most_recently_completed_checkpoint_state_name: mostRecentlyCompletedCheckpointStateName
+      most_recently_reached_checkpoint_exp_version:
+       mostRecentlyReachedCheckpointExpVersion,
+      most_recently_reached_checkpoint_state_name:
+       mostRecentlyReachedCheckpointStateName
+    }).toPromise();
+  }
+
+  async resetExplorationProgressAsync(explorationId: string): Promise<void> {
+    const requestUrl =
+      '/explorehandler/restart/' + explorationId;
+    return this.httpClient.put<void>(requestUrl, {
+      most_recently_reached_checkpoint_state_name: null
     }).toPromise();
   }
 

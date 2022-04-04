@@ -61,8 +61,9 @@ export class ExplorationFooterComponent {
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth: number = 0;
   expStates: StateObjectsBackendDict;
-  mostRecentlyCompletedCheckpointStateName: string;
+  mostRecentlyReachedCheckpointStateName: string = 'correct but why';
   completedCheckpoints: number = 0;
+  isLastCheckpointReached: boolean = false;
 
   constructor(
     private contextService: ContextService,
@@ -143,18 +144,32 @@ export class ExplorationFooterComponent {
 
     this.roebas.loadLatestExplorationAsync(this.explorationId).then(
       response => {
-        if (response.most_recently_completed_checkpoint_state_name) {
-          this.mostRecentlyCompletedCheckpointStateName = (
-            response.most_recently_completed_checkpoint_state_name);
+        if (response.most_recently_reached_checkpoint_state_name) {
+          this.mostRecentlyReachedCheckpointStateName = (
+            response.most_recently_reached_checkpoint_state_name);
         }
       }
     );
 
-    this.completedCheckpoints = this.getCheckpointIndexFromStateName();
+    this.mostRecentlyReachedCheckpointStateName = 'correct but why';
+
+    let checkpointIndexFromStateName = this.getCheckpointIndexFromStateName();
+    this.completedCheckpoints = checkpointIndexFromStateName - 1;
+
+    if (checkpointIndexFromStateName === this.checkpointCount) {
+      var lastCheckpointCardStateName = (
+        this.mostRecentlyReachedCheckpointStateName);
+      this.isLastCheckpointReached = true;
+    }
 
     this.completedWidth = (
       (100 / (this.checkpointCount)) * this.completedCheckpoints
     );
+
+    if (this.explorationEngineService.getState().name !==
+     lastCheckpointCardStateName && this.isLastCheckpointReached) {
+      this.completedWidth = 100;
+    }
 
     modalRef.componentInstance.completedWidth = this.completedWidth;
     modalRef.componentInstance.contributorNames = this.contributorNames;
@@ -203,7 +218,7 @@ export class ExplorationFooterComponent {
         getStateFromStateName(stateName);
       if (correspondingState.cardIsCheckpoint) {
         checkpointIndex++;
-        if (stateName === this.mostRecentlyCompletedCheckpointStateName) {
+        if (stateName === this.mostRecentlyReachedCheckpointStateName) {
           return checkpointIndex;
         }
       }

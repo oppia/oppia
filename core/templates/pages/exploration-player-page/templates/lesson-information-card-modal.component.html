@@ -42,6 +42,11 @@
            [style.width.%]="0">
       </div>
     </div>
+    <button type="button"
+            class="btn btn-secondary restart-lesson-btn"
+            (click)="restartExploration()">
+        Restart lesson!
+    </button>
   </div>
 </mat-card>
 <button type="button" class="oppia-close-popover-button" (click)="cancel()">
@@ -130,6 +135,13 @@
     padding: 0;
     right: 0;
     top: 0;
+  }
+
+  .restart-lesson-btn {
+    background-color: #00645c;
+    color: white;
+    cursor: pointer;
+    margin-top: 20px;
   }
 
   .lesson-progress-bar {

@@ -54,8 +54,8 @@ export interface FetchExplorationBackendResponse {
   'user_has_viewed_lesson_info_modal_once': boolean;
   'furthest_completed_checkpoint_exp_version': number;
   'furthest_completed_checkpoint_state_name': string;
-  'most_recently_completed_checkpoint_state_name': string;
-  'most_recently_completed_checkpoint_exp_version': number;
+  'most_recently_reached_checkpoint_state_name': string;
+  'most_recently_reached_checkpoint_exp_version': number;
 }
 
 @Injectable({

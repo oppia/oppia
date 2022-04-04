@@ -19,12 +19,14 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary.model';
 import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
 
@@ -66,6 +68,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
+    private windowRef: WindowRef,
+    private eebas: EditableExplorationBackendApiService,
   ) {
     super(ngbActiveModal);
   }
@@ -114,6 +118,17 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     // the number of separators.The purpose of separatorArray
     // is to provide the number of checkpoints in the template file.
     this.separatorArray = new Array(this.checkpointCount);
+  }
+
+  restartExploration(): void {
+    this.eebas.resetExplorationProgressAsync(
+      this.explorationId
+    ).then(() => {
+      // Required for the put operation to deliver data to backend.
+    });
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.reload();
+    }, 2000);
   }
 
   isHackyStoryTitleTranslationDisplayed(): boolean {

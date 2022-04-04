@@ -82,10 +82,11 @@ describe('Read only exploration backend API service', () => {
     auto_tts_enabled: true,
     correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
-    user_has_viewed_lesson_info_once: false,
-    last_completed_checkpoint_exp_version: 1,
-    last_completed_checkpoint_state_name: 'Intro',
-    latest_visited_checkpoint_state_name: 'Intro',
+    user_has_viewed_lesson_info_modal_once: false,
+    furthest_completed_checkpoint_exp_version: 1,
+    furthest_completed_checkpoint_state_name: 'State B',
+    most_recently_reached_checkpoint_state_name: 'State A',
+    most_recently_reached_checkpoint_exp_version: 1
   };
 
   beforeEach(() => {
@@ -132,6 +133,22 @@ describe('Read only exploration backend API service', () => {
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
     expect(failHandler).not.toHaveBeenCalled();
   }));
+
+  it('should load an existing exploration from the backend',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      roebas.loadExplorationAsync('0', null).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/explorehandler/init/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
 
   it('should use the rejection handler if the backend request failed',
     fakeAsync(() => {
@@ -215,10 +232,11 @@ describe('Read only exploration backend API service', () => {
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       preferred_language_codes: [],
-      user_has_viewed_lesson_info_once: false,
-      last_completed_checkpoint_exp_version: 1,
-      last_completed_checkpoint_state_name: 'Intro',
-      latest_visited_checkpoint_state_name: 'Intro',
+      user_has_viewed_lesson_info_modal_once: false,
+      furthest_completed_checkpoint_exp_version: 1,
+      furthest_completed_checkpoint_state_name: 'State B',
+      most_recently_reached_checkpoint_state_name: 'State A',
+      most_recently_reached_checkpoint_exp_version: 1
     });
 
     // It should now be cached.
@@ -242,10 +260,11 @@ describe('Read only exploration backend API service', () => {
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       preferred_language_codes: [],
-      user_has_viewed_lesson_info_once: false,
-      last_completed_checkpoint_exp_version: 1,
-      last_completed_checkpoint_state_name: 'Intro',
-      latest_visited_checkpoint_state_name: 'Intro',
+      user_has_viewed_lesson_info_modal_once: false,
+      furthest_completed_checkpoint_exp_version: 1,
+      furthest_completed_checkpoint_state_name: 'State B',
+      most_recently_reached_checkpoint_state_name: 'State A',
+      most_recently_reached_checkpoint_exp_version: 1
     });
     expect(failHandler).not.toHaveBeenCalled();
   }));
@@ -266,10 +285,11 @@ describe('Read only exploration backend API service', () => {
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       preferred_language_codes: [],
-      user_has_viewed_lesson_info_once: false,
-      last_completed_checkpoint_exp_version: 1,
-      last_completed_checkpoint_state_name: 'Intro',
-      latest_visited_checkpoint_state_name: 'Intro',
+      user_has_viewed_lesson_info_modal_once: false,
+      furthest_completed_checkpoint_exp_version: 1,
+      furthest_completed_checkpoint_state_name: 'State B',
+      most_recently_reached_checkpoint_state_name: 'State A',
+      most_recently_reached_checkpoint_exp_version: 1
     });
     expect(roebas.isCached('0')).toBe(true);
 

@@ -285,6 +285,70 @@ describe('Editable exploration backend API service', function() {
     expect(readOnlyExplorationBackendApiService.isCached('0')).toBe(false);
   }));
 
+  it('should update most recently reached checkpoint state name and most' +
+    ' recently reached checkpoint exploration version', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let explorationId = '0';
+    let mostRecentlyReachedCheckpointExpVersion = 1;
+    let mostRecentlyReachedCheckpointStateName = 'State A';
+
+    let payload = {
+      most_recently_reached_checkpoint_exp_version:
+        mostRecentlyReachedCheckpointExpVersion,
+      most_recently_reached_checkpoint_state_name:
+        mostRecentlyReachedCheckpointStateName
+    };
+
+    editableExplorationBackendApiService.
+      recordMostRecentlyReachedCheckpointAsync(
+        explorationId,
+        mostRecentlyReachedCheckpointExpVersion,
+        mostRecentlyReachedCheckpointStateName,
+      ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/explorehandler/checkpoint_reached/' + explorationId);
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should reset the progress and direct the learner to the' +
+    ' first card', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let explorationId = '0';
+
+    let payload = {
+      most_recently_reached_checkpoint_state_name: null
+    };
+
+    editableExplorationBackendApiService.resetExplorationProgressAsync(
+      explorationId,
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/explorehandler/restart/' + explorationId);
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should use the rejection handler if the backend ' +
     'request failed', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
