@@ -36,13 +36,11 @@ if MYPY: # pragma: no cover
 class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
     """Job that returns skills with invalid rubric explanations."""
 
-    def get_rubrics_with_invalid_explanations(self, skill):
-        """Returns the count of rubrics with invalid explanations in a skill.
+    def get_rubrics_with_invalid_explanations(self, rubrics):
+        """Returns the details about rubrics with invalid explanations.
 
-        Returns: list[str]. The count of rubrics with invalid explanations.
+        Returns: dict. The details about rubrics with invalid explanations.
         """
-        rubrics = skill[1]
-
         len_of_easy_rubric_explanations = 0
         len_of_medium_rubric_explanations = 0
         len_of_hard_rubric_explanations = 0
@@ -101,18 +99,6 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
 
         return False
 
-    def get_rubrics_difficulties_with_invalid_explanations(self, skill):
-        """Returns the count of rubrics with invalid explanations in a skill.
-
-        Returns: list[str]. The count of rubrics with invalid explanations.
-        """
-        rubrics = skill[1]
-        difficulties = []
-        for rubric in rubrics:
-            if self.rubric_explanations_are_invalid(rubric['explanations']):
-                difficulties.append(rubric['difficulty'])
-        return difficulties
-
     def filter_skills_having_rubrics_with_invalid_explanations(self, skill):
         """Returns True if skill has rubrics with invalid explanation.
 
@@ -149,10 +135,9 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
 
         rubrics_with_invalid_explanations = (
             skills_having_rubrics_with_invalid_explanation
-            | 'Get rubrics with invalid explanation' >> beam.Map(
-                lambda skill: (
-                    skill[0],
-                    self.get_rubrics_with_invalid_explanations(skill)))
+            | 'Get rubrics with invalid explanation' >> beam.MapTuple(
+                lambda id, rubrics: (
+                    id, self.get_rubrics_with_invalid_explanations(rubrics)))
         )
 
         report_number_of_skills_queried = (
@@ -170,21 +155,22 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
         report_invalid_skill_ids_and_rubrics = (
             rubrics_with_invalid_explanations
             | 'Report invalid skill ids and rubrics' >> (
-              beam.Map(
-                lambda skill: job_run_result.JobRunResult.as_stderr(
+              beam.MapTuple(
+                lambda id, invalid_rubrics: job_run_result.JobRunResult.as_stderr(
                     'The id of the skill is %s. '
                     'Easy rubrics have %d explanations and %s explanations '
                     'exceed 300 characters. Medium rubrics have %d '
                     'explanations and %s explanations exceed 300 characters. '
                     'Hard rubrics have %d explanations and %s explanations '
                     'exceed 300 characters.' % (
-                        skill[0],
-                        skill[1]['len_of_easy_rubric_explanations'],
-                        skill[1]['easy_explanations_exceeding_max_len'],
-                        skill[1]['len_of_medium_rubric_explanations'],
-                        skill[1]['medium_explanations_exceeding_max_len'],
-                        skill[1]['len_of_hard_rubric_explanations'],
-                        skill[1]['hard_explanations_exceeding_max_len'],
+                        id,
+                        invalid_rubrics['len_of_easy_rubric_explanations'],
+                        invalid_rubrics['easy_explanations_exceeding_max_len'],
+                        invalid_rubrics['len_of_medium_rubric_explanations'],
+                        invalid_rubrics[
+                            'medium_explanations_exceeding_max_len'],
+                        invalid_rubrics['len_of_hard_rubric_explanations'],
+                        invalid_rubrics['hard_explanations_exceeding_max_len'],
                     )
                 )
               )
