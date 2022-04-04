@@ -77,13 +77,16 @@ export class StateSkillEditorComponent implements OnInit {
       .then((canUserAccessTopicsAndSkillsDashboard) => {
         this.userCanEditSkills = canUserAccessTopicsAndSkillsDashboard;
       });
-    if (this.stateLinkedSkillIdService.displayed) {
-      this.skillBackendApiService.fetchSkillAsync(
-        this.stateLinkedSkillIdService.displayed
-      ).then((skill) => {
-        this.skillName = skill.skill.getDescription();
+    this.stateLinkedSkillIdService.onStateLinkedSkillIdInitialized.subscribe(
+      () => {
+        if (this.stateLinkedSkillIdService.displayed) {
+          this.skillBackendApiService.fetchSkillAsync(
+            this.stateLinkedSkillIdService.displayed
+          ).then((skill) => {
+            this.skillName = skill.skill.getDescription();
+          });
+        }
       });
-    }
   }
 
   addSkill(): void {

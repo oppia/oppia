@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
@@ -31,6 +31,10 @@ export class StateLinkedSkillIdService extends StatePropertyService<string> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveLinkedSkillId';
+  }
+
+  get onStateLinkedSkillIdInitialized(): EventEmitter<string> {
+    return this.statePropertyInitializedEmitter;
   }
 }
 
