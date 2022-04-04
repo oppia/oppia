@@ -83,7 +83,7 @@ describe('File path editor', () => {
       { empty: false });
   });
 
-  it('should reset the editor', () => {
+  it('should reset the editor when discard button is clicked', () => {
     spyOn(component.validityChange, 'emit');
 
     component.resetEditor();

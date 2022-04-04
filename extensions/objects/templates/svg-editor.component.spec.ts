@@ -352,7 +352,7 @@ describe('SvgEditor', () => {
       expect(component.canvas.getObjects().length).toBe(1);
     })));
 
-  it('should discard SVG', () => {
+  it('should discard SVG when discard button is clicked', () => {
     spyOn(component.discardImage, 'emit');
 
     component.discardSvgFile();
