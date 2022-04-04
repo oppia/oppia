@@ -1693,8 +1693,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
                     user_model.furthest_reached_checkpoint_exp_version),
                 'furthest_reached_checkpoint_state_name': (
                     user_model.furthest_reached_checkpoint_state_name),
-                'most_recently_completed_checkpoint_exp_version': (
-                    user_model.most_recently_completed_checkpoint_exp_version),
+                'most_recently_reached_checkpoint_exp_version': (
+                    user_model.most_recently_reached_checkpoint_exp_version),
                 'most_recently_reached_checkpoint_state_name': (
                     user_model.most_recently_reached_checkpoint_state_name)
             }
