@@ -156,21 +156,28 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
             rubrics_with_invalid_explanations
             | 'Report invalid skill ids and rubrics' >> (
               beam.MapTuple(
-                lambda id, invalid_rubrics: job_run_result.JobRunResult.as_stderr(
-                    'The id of the skill is %s. '
-                    'Easy rubrics have %d explanations and %s explanations '
-                    'exceed 300 characters. Medium rubrics have %d '
-                    'explanations and %s explanations exceed 300 characters. '
-                    'Hard rubrics have %d explanations and %s explanations '
-                    'exceed 300 characters.' % (
-                        id,
-                        invalid_rubrics['len_of_easy_rubric_explanations'],
-                        invalid_rubrics['easy_explanations_exceeding_max_len'],
-                        invalid_rubrics['len_of_medium_rubric_explanations'],
-                        invalid_rubrics[
-                            'medium_explanations_exceeding_max_len'],
-                        invalid_rubrics['len_of_hard_rubric_explanations'],
-                        invalid_rubrics['hard_explanations_exceeding_max_len'],
+                lambda id, invalid_rubrics: (
+                    job_run_result.JobRunResult.as_stderr(
+                        'The id of the skill is %s. '
+                        'Easy rubrics have %d explanations and %s explanations '
+                        'exceed 300 characters. Medium rubrics have %d '
+                        'explanations and %s explanations exceed 300 characters. '
+                        'Hard rubrics have %d explanations and %s explanations '
+                        'exceed 300 characters.' % (
+                            id,
+                            invalid_rubrics[
+                                'len_of_easy_rubric_explanations'],
+                            invalid_rubrics[
+                                'easy_explanations_exceeding_max_len'],
+                            invalid_rubrics[
+                                'len_of_medium_rubric_explanations'],
+                            invalid_rubrics[
+                                'medium_explanations_exceeding_max_len'],
+                            invalid_rubrics[
+                                'len_of_hard_rubric_explanations'],
+                            invalid_rubrics[
+                                'hard_explanations_exceeding_max_len'],
+                        )
                     )
                 )
               )
