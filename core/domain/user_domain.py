@@ -141,9 +141,9 @@ class UserSettings:
             email: str. The user email.
             roles: list(str). Roles of the user.
             banned: bool. Whether the uses is banned.
-            user_has_viewed_lesson_info_modal_once. Flag to check whether the user 
-                has viewed lesson info modal once which shows the progress of the
-                user through exploration checkpoints.
+            user_has_viewed_lesson_info_modal_once: bool. Flag to check whether
+                the user has viewed lesson info modal once which shows the
+                progress of the user through exploration checkpoints.
             username: str or None. Identifiable username to display in the UI.
             last_agreed_to_terms: datetime.datetime or None. When the user
                 last agreed to the terms of the site.
@@ -498,8 +498,8 @@ class UserSettings:
     def mark_lesson_info_modal_viewed(self) -> None:
         """Sets user_has_viewed_lesson_info_modal_once to true which shows
         the user has viewed their progress through exploration in the lesson
-        info modal at least once in their lifetime journey."""
-
+        info modal at least once in their lifetime journey.
+        """
         self.user_has_viewed_lesson_info_modal_once = True
 
 
