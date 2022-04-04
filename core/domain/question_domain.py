@@ -1271,7 +1271,8 @@ class Question(translation_domain.BaseTranslatableObject):
                 'Expected schema version to be an integer, received %s' %
                 self.question_state_data_schema_version)
 
-        if self.question_state_data_schema_version != feconf.CURRENT_STATE_SCHEMA_VERSION:
+        if self.question_state_data_schema_version != (
+            feconf.CURRENT_STATE_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Expected question state schema version to be %s, received '
                 '%s' % (
