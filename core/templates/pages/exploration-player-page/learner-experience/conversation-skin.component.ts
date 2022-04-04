@@ -321,6 +321,28 @@ export class ConversationSkinComponent {
           }
         );
     }
+
+    // For the first state which is always a checkpoint.
+    let firstStateName: string;
+    this.getLastSavedDataAsync().then(
+      response => {
+        firstStateName = response.init_state_name;
+      }
+    );
+    let version: number;
+    this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+      response => {
+        version = response.version;
+      }
+    );
+    this.eebas.recordMostRecentlyReachedCheckpointAsync(
+      this.explorationId,
+      version,
+      firstStateName
+    ).then(() => {
+      // Required for the put operation to deliver data to backend.
+    });
+    this.visitedStateNames.push(firstStateName);
   }
 
   // Returns a promise supplying the last saved version for the current
@@ -583,27 +605,27 @@ export class ConversationSkinComponent {
   private _navigateToDisplayedCard(): void {
     let index = this.playerPositionService.getDisplayedCardIndex();
     this.displayedCard = this.playerTranscriptService.getCard(index);
-    let currentStateName = this.displayedCard.getStateName();
-    let currentState = this.explorationEngineService.
-      getStateFromStateName(currentStateName);
-    if (currentState.cardIsCheckpoint &&
-         !this.visitedStateNames.includes(currentStateName)) {
-      let version: number;
-      this.roebas.loadLatestExplorationAsync(this.explorationId).then(
-        response => {
-          version = response.version;
-        }
-      );
-      this.eebas.recordMostRecentlyReachedCheckpointAsync(
-        this.explorationId,
-        version,
-        currentStateName,
-      ).then(() => {
-        // Required for the put operation to deliver data to backend.
-      });
-      this.visitedStateNames.push(currentStateName);
+    if (index > 0) {
+      let currentState = this.explorationEngineService.getState();
+      let currentStateName = currentState.name;
+      if (currentState.cardIsCheckpoint &&
+          !this.visitedStateNames.includes(currentStateName)) {
+        let version: number;
+        this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+          response => {
+            version = response.version;
+          }
+        );
+        this.eebas.recordMostRecentlyReachedCheckpointAsync(
+          this.explorationId,
+          version,
+          currentStateName,
+        ).then(() => {
+          // Required for the put operation to deliver data to backend.
+        });
+        this.visitedStateNames.push(currentStateName);
+      }
     }
-
 
     this.playerPositionService.onActiveCardChanged.emit();
 
