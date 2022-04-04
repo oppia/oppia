@@ -383,6 +383,8 @@
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT": "Sugerencia",
 	"I18N_LEARNER_DASHBOARD_TOOLTIP": "Colecciones son varias exploraciones relacionadas que se tiene la intención de completar en una secuencia.",
 	"I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION": "Ver sugerencia",
+	"I18N_LESSON_AUTHORS_DROPDOWN_TITLE": "Autores de la lección",
+	"I18N_LESSON_INFO_HEADER": "Información sobre la lección",
 	"I18N_LIBRARY_ACTIVITY_COMPLETED_ICON": "Has completado esto",
 	"I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST": "Ya añadido a la lista de reproducción",
 	"I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST": "Añadir a la lista de «Jugar más tarde»",
