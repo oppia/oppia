@@ -198,12 +198,12 @@ describe('Story node model', () => {
   });
 
   it('should correctly validate story nodes', () => {
-    _sampleStoryNode.addPrerequisiteSkillId('skill_2');
+    _sampleStoryNode.addAcquiredSkillId('skill_1');
     _sampleStoryNode.addDestinationNodeId('node_1');
     _sampleStoryNode.setExplorationId('');
 
     expect(_sampleStoryNode.validate()).toEqual([
-      'The skill with id skill_2 is common to both the acquired and' +
+      'The skill with id skill_1 is common to both the acquired and' +
       ' prerequisite skill id list in node with id node_1',
       'The destination node id of node with id node_1 points to itself.'
     ]);

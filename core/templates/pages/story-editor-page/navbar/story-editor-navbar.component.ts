@@ -102,6 +102,7 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   private _validateStory(): void {
+    this.story = this.storyEditorStateService.getStory();
     this.validationIssues = this.story.validate();
     let nodes = this.story.getStoryContents().getNodes();
     let skillIdsInTopic = (
