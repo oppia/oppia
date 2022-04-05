@@ -1965,7 +1965,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
 
+        print('\n' * 5)
+        print('~' * 50)
+
         for state_dict in states_dict.values():
+            print(state_dict)
             if state_dict['interaction']['id'] in MATH_INTERACTION_TYPES:
                 filtered_answer_groups = []
                 for answer_group_dict in state_dict[
@@ -1979,9 +1983,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     answer_group_dict['rule_specs'] = filtered_rule_specs
                     if len(filtered_rule_specs) > 0:
                         filtered_answer_groups.append(
-                            copy.deepcopy(rule_spec_dict))
+                            copy.deepcopy(answer_group_dict))
                 state_dict[
                     'interaction']['answer_groups'] = filtered_answer_groups
+
+            print('AFTER')
+            print('AFTER')
+            print('AFTER')
+            print('AFTER')
+            print(state_dict)
+        print('~' * 50)
+        print('\n' * 5)
 
         return states_dict
 
