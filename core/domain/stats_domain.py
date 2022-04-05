@@ -73,8 +73,10 @@ class SubmittedAnswerDict(TypedDict, total=False):
     interaction_id: str
     answer_group_index: int
     rule_spec_index: int
-    classification_categorization: Literal[Union['explicit',
-    'training_data_match', 'statistical_classifier', 'default_outcome']]
+    classification_categorization: Literal[Union[
+        'explicit',
+    'training_data_match', 'statistical_classifier',
+    'default_outcome']]
     params: Dict[str, Any]
     session_id: str
     time_spent_in_sec: float
@@ -328,8 +330,9 @@ class ExplorationStats:
                     self.exp_version))
 
         exploration_stats_dict = self.to_dict()
-        # Ignore[misc] is used here because mypy does not recognize that key is
-        # a string.
+        # Ignore[misc] is used here because mypy expects TypedDict key to be s
+        # string literal, but because the key is being accessed by a variable 
+        # instead of a string, mypy does not recognize that the key is a string.
         for stat_property in exploration_stats_properties:
             if not isinstance(exploration_stats_dict[stat_property], int): # type: ignore[misc]
                 raise utils.ValidationError(
@@ -1235,8 +1238,8 @@ class StateAnswers:
             self, exploration_id: str, exploration_version: int,
             state_name: str, interaction_id: str,
             submitted_answer_list: List[SubmittedAnswer],
-            schema_version: int=
-            feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION) -> None:
+            schema_version: int=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION
+        ) -> None:
         """Constructs a StateAnswers domain object.
 
         Args:
