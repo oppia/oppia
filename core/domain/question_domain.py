@@ -1206,6 +1206,7 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         if question_state_dict[
                 'interaction']['id'] in exp_domain.MATH_INTERACTION_TYPES:
+            filtered_answer_groups = []
             for answer_group_dict in question_state_dict[
                     'interaction']['answer_groups']:
                 filtered_rule_specs = []
@@ -1216,6 +1217,11 @@ class Question(translation_domain.BaseTranslatableObject):
                         filtered_rule_specs.append(
                             copy.deepcopy(rule_spec_dict))
                 answer_group_dict['rule_specs'] = filtered_rule_specs
+                if len(filtered_rule_specs) > 0:
+                    filtered_answer_groups.append(
+                        copy.deepcopy(answer_group_dict))
+            question_state_dict[
+                'interaction']['answer_groups'] = filtered_answer_groups
 
         return question_state_dict
 

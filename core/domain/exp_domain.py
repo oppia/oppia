@@ -144,6 +144,85 @@ MATH_INTERACTION_DEPRECATED_RULES = [
     'ContainsSomeOf', 'OmitsSomeOf', 'MatchesWithGeneralForm']
 
 
+def clean_math_expression(math_expression):
+    """Cleans a given math expression and formats it so that it is compatible
+    with the new interactions' validators.
+    Args:
+        math_expression: str. The string representing the math expression.
+    Returns:
+        str. The correctly formatted string representing the math expression.
+    """
+    unicode_to_text = {
+        u'\u221a': 'sqrt',
+        u'\xb7': '*',
+        u'\u03b1': 'alpha',
+        u'\u03b2': 'beta',
+        u'\u03b3': 'gamma',
+        u'\u03b4': 'delta',
+        u'\u03b5': 'epsilon',
+        u'\u03b6': 'zeta',
+        u'\u03b7': 'eta',
+        u'\u03b8': 'theta',
+        u'\u03b9': 'iota',
+        u'\u03ba': 'kappa',
+        u'\u03bb': 'lambda',
+        u'\u03bc': 'mu',
+        u'\u03bd': 'nu',
+        u'\u03be': 'xi',
+        u'\u03c0': 'pi',
+        u'\u03c1': 'rho',
+        u'\u03c3': 'sigma',
+        u'\u03c4': 'tau',
+        u'\u03c5': 'upsilon',
+        u'\u03c6': 'phi',
+        u'\u03c7': 'chi',
+        u'\u03c8': 'psi',
+        u'\u03c9': 'omega',
+    }
+    inverse_trig_fns_mapping = {
+        'asin': 'arcsin',
+        'acos': 'arccos',
+        'atan': 'arctan'
+    }
+    trig_fns = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
+
+    # Shifting powers in trig functions to the end.
+    # For eg. 'sin^2(x)' -> '(sin(x))^2'.
+    for trig_fn in trig_fns:
+        math_expression = re.sub(
+            r'%s(\^\d)\((.)\)' % trig_fn,
+            r'(%s(\2))\1' % trig_fn, math_expression)
+
+    # Adding parens to trig functions that don't have
+    # any. For eg. 'cosA' -> 'cos(A)'.
+    for trig_fn in trig_fns:
+        math_expression = re.sub(
+            r'%s(?!\()(.)' % trig_fn, r'%s(\1)' % trig_fn, math_expression)
+
+    # The pylatexenc lib outputs the unicode values of special characters like
+    # sqrt and pi, which is why they need to be replaced with their
+    # corresponding text values before performing validation. Other unicode
+    # characters will be left in the string as-is, and will be rejected by the
+    # expression parser.
+    for unicode_char, text in unicode_to_text.items():
+        math_expression = math_expression.replace(unicode_char, text)
+
+    # Replacing trig functions that have format which is
+    # incompatible with the validations.
+    for invalid_trig_fn, valid_trig_fn in inverse_trig_fns_mapping.items():
+        math_expression = math_expression.replace(
+            invalid_trig_fn, valid_trig_fn)
+
+    # Replacing comma used in place of a decimal point with a decimal point.
+    if re.match(r'\d+,\d+', math_expression):
+        math_expression = math_expression.replace(',', '.')
+
+    # Replacing \cdot with *.
+    math_expression = re.sub(r'\\cdot', '*', math_expression)
+
+    return math_expression
+
+
 class ExplorationChange(change_domain.BaseChange):
     """Domain object class for an exploration change.
 
@@ -1964,12 +2043,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted states_dict.
         """
-
-        print('\n' * 5)
-        print('~' * 50)
-
         for state_dict in states_dict.values():
-            print(state_dict)
             if state_dict['interaction']['id'] in MATH_INTERACTION_TYPES:
                 filtered_answer_groups = []
                 for answer_group_dict in state_dict[
@@ -1986,14 +2060,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             copy.deepcopy(answer_group_dict))
                 state_dict[
                     'interaction']['answer_groups'] = filtered_answer_groups
-
-            print('AFTER')
-            print('AFTER')
-            print('AFTER')
-            print('AFTER')
-            print(state_dict)
-        print('~' * 50)
-        print('\n' * 5)
 
         return states_dict
 

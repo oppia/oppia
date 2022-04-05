@@ -3240,7 +3240,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             cust_args['requireNonnegativeInput'].value, False)
 
     def test_migrate_question_state_from_v45_to_latest(self):
-        answer_group = {
+        answer_group1 = {
             'outcome': {
                 'dest': 'abc',
                 'feedback': {
@@ -3277,6 +3277,33 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
+        answer_group2 = {
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'ContainsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b',
+                    'y': []
+                },
+                'rule_type': 'MatchesWithGeneralForm'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
         question_state_dict = {
             'content': {
                 'content_id': 'content_1',
@@ -3291,9 +3318,16 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 }
             },
             'interaction': {
-                'answer_groups': [answer_group],
+                'answer_groups': [answer_group1, answer_group2],
                 'confirmed_unclassified_answers': [],
-                'customization_args': {},
+                'customization_args': {
+                    'customOskLetters': {
+                        'value': ['a', 'b']
+                    },
+                    'useFractionForDivision': {
+                        'value': False
+                    }
+                },
                 'default_outcome': {
                     'dest': None,
                     'feedback': {
@@ -3336,6 +3370,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         answer_groups = question.question_state_data.interaction.answer_groups
+        self.assertEqual(len(answer_groups), 1)
         rule_specs = answer_groups[0].rule_specs
         self.assertEqual(len(rule_specs), 1)
         self.assertEqual(rule_specs[0].rule_type, 'MatchesExactlyWith')
