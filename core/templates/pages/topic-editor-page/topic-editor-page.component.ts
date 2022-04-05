@@ -350,11 +350,13 @@ angular.module('oppia').directive('topicEditorPage', [
                 () => setDocumentTitle()
               )
             );
+
             WindowRef.nativeWindow.addEventListener('beforeunload', (event) => {
               onClosingTopicEditorBrowserTab();
             });
             LocalStorageService.registerNewStorageEventListener(
               onCreateOrUpdateTopicEditorBrowserTabsInfo);
+
             ctrl.directiveSubscriptions.add(
               staleTabEventEmitter.subscribe(() => {
                 NgbModal.dismissAll();
@@ -367,6 +369,8 @@ angular.module('oppia').directive('topicEditorPage', [
                 }, () => {});
               })
             );
+
+            let unsavedChangesWarningModalRef: NgbModalRef = null;
             ctrl.directiveSubscriptions.add(
               presenceOfUnsavedChangesEventEmitter.subscribe(() => {
                 if (
@@ -377,11 +381,15 @@ angular.module('oppia').directive('topicEditorPage', [
                       TopicEditorStateService.getTopic().getId())
                 ) {
                   NgbModal.dismissAll();
-                  const modalRef: NgbModalRef = NgbModal.open(
+                  unsavedChangesWarningModalRef = NgbModal.open(
                     UnsavedChangesStatusInfoModalComponent, {
                       backdrop: 'static',
                     });
-                  modalRef.result.then(() => {}, () => {});
+                  unsavedChangesWarningModalRef.result.then(() => {}, () => {});
+                } else {
+                  if (unsavedChangesWarningModalRef) {
+                    unsavedChangesWarningModalRef.dismiss();
+                  }
                 }
               })
             );
