@@ -2390,11 +2390,13 @@ def update_learner_checkpoint_progress(
         exploration_user_model.furthest_reached_checkpoint_state_name = (
             state_name)
     else:
-        furthest_reached_checkpoint_exploration = exp_fetchers.get_exploration_by_id(
-            exploration_id,
-            True,
-            exploration_user_model.furthest_reached_checkpoint_exp_version)
-
+        furthest_reached_checkpoint_exploration = (
+            exp_fetchers.get_exploration_by_id(
+                exploration_id,
+                True,
+                exploration_user_model.furthest_reached_checkpoint_exp_version
+            )
+        )
         checkpoints_in_current_exploration = _get_checkpoints_in_order(
             current_exploration.init_state_name, current_exploration.states)
         checkpoints_in_furthest_reached_exploration = _get_checkpoints_in_order(
