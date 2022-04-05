@@ -96,18 +96,13 @@ export class StoryEditorNavbarComponent implements OnInit {
 
   discardChanges(): void {
     this.undoRedoService.clearChanges();
-    if (this.story !== undefined) {
-      this.storyEditorStateService.loadStory(this.story.getId());
-    }
+    this.storyEditorStateService.loadStory(this.story.getId());
     this._validateStory();
     this.forceValidateExplorations = true;
   }
 
   private _validateStory(): void {
     this.story = this.storyEditorStateService.getStory();
-    if (this.story === undefined) {
-      return;
-    }
     this.validationIssues = this.story.validate();
     let nodes = this.story.getStoryContents().getNodes();
     let skillIdsInTopic = (

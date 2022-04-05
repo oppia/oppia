@@ -349,14 +349,6 @@ describe('Story editor navbar component', () => {
     expect(component.storyIsPublished).toBe(false);
   }));
 
-  it('should not discard story if the story is undefined', () => {
-    spyOn(storyEditorStateService, 'getStory').and.returnValue(undefined);
-
-    component.discardChanges();
-
-    expect(component.forceValidateExplorations).toBeTrue();
-  });
-
   it('should toggle warning text', () => {
     component.warningsAreShown = true;
 
