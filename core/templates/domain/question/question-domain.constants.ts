@@ -35,7 +35,7 @@ export const QuestionDomainConstants = {
     '/questions_list_handler/<comma_separated_skill_ids>?offset=<offset>',
 
   QUESTION_COUNT_URL_TEMPLATE:
-    '/question_count_handler/<comma_separated_skill_ids>',
+    '/question_count_handler/<skill_ids>',
 
   QUESTION_PROPERTY_LANGUAGE_CODE: 'language_code',
   QUESTION_PROPERTY_QUESTION_STATE_DATA: 'question_state_data',
