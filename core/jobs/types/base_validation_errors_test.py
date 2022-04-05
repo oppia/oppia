@@ -104,9 +104,9 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             def __init__(
                 self, model: Union[base_models.BaseModel, str]
             ) -> None:
-                # Here, str type is expected but for test purpose we're
-                # assigning it an int type. Thus to avoid MyPy error, we
-                # added an ignore here.
+                # TODO(#13059): After we fully type the codebase we plan to get
+                # rid of the tests that intentionally test wrong inputs that we
+                # can normally catch by typing.
                 super(ErrorWithIntMessage, self).__init__(123, model)  # type: ignore[arg-type]
 
         with self.assertRaisesRegex(TypeError, 'must be a string'):  # type: ignore[no-untyped-call]
@@ -342,7 +342,10 @@ class ModelRelationshipErrorTests(AuditErrorsTestBase):
     def test_message(self) -> None:
         error = base_validation_errors.ModelRelationshipError(
             model_property.ModelProperty(FooModel, FooModel.bar_id),  # type: ignore[no-untyped-call]
-            '123', 'BarModel', '123')
+            '123',
+            'BarModel',
+            '123'
+        )
 
         self.assertEqual(
             error.stderr,
