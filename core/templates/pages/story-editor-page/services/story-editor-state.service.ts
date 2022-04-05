@@ -127,7 +127,6 @@ export class StoryEditorStateService {
         this._setClassroomUrlFragment(
           newBackendStoryObject.classroomUrlFragment);
         this._setTopicUrlFragment(newBackendStoryObject.topicUrlFragment);
-        this._storyInitializedEventEmitter.emit();
         this.loaderService.hideLoadingScreen();
       }, error => {
         this.alertsService.addWarning(
