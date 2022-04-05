@@ -1191,6 +1191,35 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v49_dict_to_v50_dict(cls, question_state_dict):
+        """Converts from version 49 to 50. Version 50 removes rules from
+        explorations that use one of the following rules:
+        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm].
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict[
+                'interaction']['id'] in exp_domain.MATH_INTERACTION_TYPES:
+            for answer_group_dict in question_state_dict[
+                    'interaction']['answer_groups']:
+                filtered_rule_specs = []
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    rule_type = rule_spec_dict['rule_type']
+                    if rule_type not in (
+                            exp_domain.MATH_INTERACTION_DEPRECATED_RULES):
+                        filtered_rule_specs.append(
+                            copy.deepcopy(rule_spec_dict))
+                answer_group_dict['rule_specs'] = filtered_rule_specs
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given

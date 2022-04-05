@@ -208,6 +208,21 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
+    def _convert_states_v49_dict_to_v50_dict(cls, draft_change_list):
+        """Converts draft change list from state version 49 to 50. State
+        version 50 removes rules from explorations that use one of the following
+        rules: [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm].
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v48_dict_to_v49_dict(cls, draft_change_list):
         """Converts draft change list from state version 48 to 49. State
         version 49 adds requireNonnegativeInput customization_arg to
