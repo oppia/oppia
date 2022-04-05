@@ -175,7 +175,7 @@ class GetNumberOfInvalidExpsJobTests(job_test_utils.JobTestBase):
                 job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
                 job_run_result.JobRunResult.as_stderr(
                     f'The id of exp is {self.EXPLORATION_ID_1} and the invalid'
-                    + f' links are {invalid_links}'
+                    f' links are {invalid_links}'
                 ),
             ]
         )
