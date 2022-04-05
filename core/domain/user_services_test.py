@@ -45,14 +45,6 @@ auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 bulk_email_services = models.Registry.import_bulk_email_services()
 
-def _get_change_list(state_name, property_name, new_value):
-    """Generates a change list for a single state change."""
-    return [exp_domain.ExplorationChange({
-        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-        'state_name': state_name,
-        'property_name': property_name,
-        'new_value': new_value
-    })]
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
@@ -1528,11 +1520,14 @@ title: Title
         self.assertEqual(
             exploration_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name, 'Introduction')
+            exploration_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version, 1)
+            exploration_user_data.most_recently_reached_checkpoint_exp_version,
+            1)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name, 'Introduction')
+            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            'Introduction')
 
         # Make 'New state' a checkpoint.
         # Now version of the exploration becomes 2.
@@ -1551,11 +1546,14 @@ title: Title
         self.assertEqual(
             exploration_user_data.furthest_reached_checkpoint_exp_version, 2)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name, 'New state')
+            exploration_user_data.furthest_reached_checkpoint_state_name,
+            'New state')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version, 2)
+            exploration_user_data.most_recently_reached_checkpoint_exp_version,
+            2)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name, 'New state')
+            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            'New state')
 
         # Restart the exploration.
         user_services.update_learner_checkpoint_progress_on_restart(
@@ -1565,11 +1563,14 @@ title: Title
         self.assertEqual(
             exploration_user_data.furthest_reached_checkpoint_exp_version, 2)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name, 'New state')
+            exploration_user_data.furthest_reached_checkpoint_state_name,
+            'New state')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version, None)
+            exploration_user_data.most_recently_reached_checkpoint_exp_version,
+            None)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name, None)
+            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            None)
 
         # Unmark 'New state' as a checkpoint.
         # Now version of the exploration becomes 3.
@@ -1590,13 +1591,17 @@ title: Title
         exploration_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version, 3)
+            exploration_user_data.furthest_reached_checkpoint_exp_version,
+            3)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name, 'Introduction')
+            exploration_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version, 3)
+            exploration_user_data.most_recently_reached_checkpoint_exp_version,
+            3)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name, 'Introduction')
+            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            'Introduction')
 
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
