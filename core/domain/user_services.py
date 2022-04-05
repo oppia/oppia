@@ -2350,7 +2350,7 @@ def _get_most_distant_reached_checkpoint_in_current_exploration(
         checkpoints_in_older_exploration.index(
             most_distant_reached_checkpoint_state_name_in_older_exploration))
 
-    # Loop through checkpoints of furthest_reached_exploration until
+    # Loop through checkpoints of furthest_reached_exploration backwards until
     # a checkpoint is found that exists in current_exploration too.
     while mdrc_index >= 0:
         if checkpoints_in_older_exploration[mdrc_index] in checkpoints_in_current_exploration: # pylint: disable=line-too-long
@@ -2383,6 +2383,7 @@ def update_learner_checkpoint_progress(
     current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, True, exp_version)
 
+    # If the exploration is being visited the first time.
     if exploration_user_model.furthest_reached_checkpoint_state_name is None:
         exploration_user_model.furthest_reached_checkpoint_exp_version = (
             exp_version)
@@ -2400,13 +2401,15 @@ def update_learner_checkpoint_progress(
             furthest_reached_exploration.init_state_name,
             furthest_reached_exploration.states)
 
+        # Get the furthest reached checkpoint in current exploration.
         furthest_reached_checkpoint_in_current_exploration = _get_most_distant_reached_checkpoint_in_current_exploration( # pylint: disable=line-too-long
             checkpoints_in_current_exploration,
             checkpoints_in_furthest_reached_exploration,
             exploration_user_model.furthest_reached_checkpoint_state_name
         )
 
-        # If furthest reached checkpoint doesn't exist in current exploration.
+        # If the furthest reached checkpoint doesn't exist in current
+        # exploration.
         if furthest_reached_checkpoint_in_current_exploration is None:
             exploration_user_model.furthest_reached_checkpoint_exp_version = (
                 exp_version)
@@ -2515,6 +2518,8 @@ def synchronize_learner_checkpoint_progress_with_current_exp_version(
                 furthest_reached_exploration.states),
             exploration_user_model.furthest_reached_checkpoint_state_name)
 
+        # If the most recently reached checkpoint doesn't exist in current
+        # exploration.
         if most_recently_reached_checkpoint_in_current_exploration != (
             exploration_user_model.most_recently_reached_checkpoint_state_name):
             (
@@ -2528,7 +2533,9 @@ def synchronize_learner_checkpoint_progress_with_current_exp_version(
             exploration_user_model.update_timestamps()
             exploration_user_model.put()
 
-        if most_recently_reached_checkpoint_in_current_exploration != (
+        # If the furthest reached checkpoint doesn't exist in current
+        # exploration.
+        if furthest_reached_checkpoint_in_current_exploration != (
             exploration_user_model.furthest_reached_checkpoint_state_name):
             (
                 exploration_user_model
