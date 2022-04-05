@@ -200,43 +200,6 @@ export class MathEquationInputRulesService {
     return false;
   }
 
-  ContainsSomeOf(
-      answer: MathEquationAnswer,
-      inputs: MathEquationRuleInputsWithSide): boolean {
-    let positionOfTerms = inputs.y;
-
-    let splitAnswer = answer.split('=');
-    let lhsAnswer = splitAnswer[0];
-    let rhsAnswer = splitAnswer[1];
-
-    let splitInput = inputs.x.split('=');
-    let lhsInput = splitInput[0];
-    let rhsInput = splitInput[1];
-
-    if (positionOfTerms === 'lhs') {
-      return this.algebraicRulesService.ContainsSomeOf(
-        lhsAnswer, {x: lhsInput});
-    } else if (positionOfTerms === 'rhs') {
-      return this.algebraicRulesService.ContainsSomeOf(
-        rhsAnswer, {x: rhsInput});
-    } else if (positionOfTerms === 'both') {
-      return (
-        this.algebraicRulesService.ContainsSomeOf(lhsAnswer, {x: lhsInput}) && (
-          this.algebraicRulesService.ContainsSomeOf(rhsAnswer, {x: rhsInput})));
-    } else {
-      // Position of terms is irrelevant. So, we bring all terms on one side
-      // and perform an exact match.
-      let rhsAnswerModified = nerdamer(rhsAnswer).multiply('-1').text();
-      let expressionAnswer = nerdamer(rhsAnswerModified).add(lhsAnswer).text();
-
-      let rhsInputModified = nerdamer(rhsInput).multiply('-1').text();
-      let expressionInput = nerdamer(rhsInputModified).add(lhsInput).text();
-
-      return this.algebraicRulesService.ContainsSomeOf(
-        expressionAnswer, {x: expressionInput});
-    }
-  }
-
   OmitsSomeOf(
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide): boolean {

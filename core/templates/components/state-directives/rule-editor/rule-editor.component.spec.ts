@@ -53,8 +53,6 @@ describe('RuleEditorComponent', () => {
       rule_descriptions: {
         MatchesExactlyWith: 'matches exactly with {{x|AlgebraicExpression}}',
         IsEquivalentTo: 'is equivalent to {{x|AlgebraicExpression}}',
-        ContainsSomeOf: 'contains at least one of the terms present in' +
-          ' {{x|AlgebraicExpression}}',
         OmitsSomeOf: 'omits at least one of the terms present in' +
           ' {{x|AlgebraicExpression}}',
         MatchesWithGeneralForm: 'matches the form of {{x|Algebraic' +

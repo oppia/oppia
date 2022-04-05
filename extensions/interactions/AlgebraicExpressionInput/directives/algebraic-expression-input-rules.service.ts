@@ -95,28 +95,6 @@ export class AlgebraicExpressionInputRulesService {
     ).eq(simplifiedCreatorAnswer);
   }
 
-  ContainsSomeOf(
-      answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
-    // At least one term should match between answer and input.
-    // Inserting '*' signs between variables if not present.
-    answer = this.mathInteractionsService.insertMultiplicationSigns(answer);
-    inputs.x = this.mathInteractionsService.insertMultiplicationSigns(inputs.x);
-
-    // The expression is first split into terms by addition and subtraction.
-    let answerTerms = this.mathInteractionsService.getTerms(answer);
-    let inputTerms = this.mathInteractionsService.getTerms(inputs.x);
-
-    for (let answerTerm of answerTerms) {
-      for (let inputTerm of inputTerms) {
-        if (this.mathInteractionsService.doTermsMatch(answerTerm, inputTerm)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   OmitsSomeOf(
       answer: AlgebraicExpressionAnswer,
       inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {

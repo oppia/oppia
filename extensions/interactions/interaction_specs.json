@@ -99,7 +99,6 @@
       "MatchesExactlyWith": "matches exactly with {{x|NumericExpression}}",
       "MatchesUpToTrivialManipulations": "matches {{x|NumericExpression}}, taking into account commutativity and associativity",
       "IsEquivalentTo": "is equivalent to {{x|NumericExpression}}",
-      "ContainsSomeOf": "contains at least one of the terms present in {{x|NumericExpression}}",
       "OmitsSomeOf": "omits at least one of the terms present in {{x|NumericExpression}}"
     }
   },
@@ -608,7 +607,6 @@
       "MatchesExactlyWith": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}",
       "MatchesUpToTrivialManipulations": "matches {{x|MathEquation}} {{y|PositionOfTerms}}, taking into account commutativity and associativity",
       "IsEquivalentTo": "is equivalent to {{x|MathEquation}}",
-      "ContainsSomeOf": "contains at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
       "OmitsSomeOf": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
       "MatchesWithGeneralForm": "matches the form of {{x|MathEquation}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
     }
@@ -911,7 +909,6 @@
       "MatchesExactlyWith": "matches exactly with {{x|AlgebraicExpression}}",
       "MatchesUpToTrivialManipulations": "matches {{x|AlgebraicExpression}}, taking into account commutativity and associativity",
       "IsEquivalentTo": "is equivalent to {{x|AlgebraicExpression}}",
-      "ContainsSomeOf": "contains at least one of the terms present in {{x|AlgebraicExpression}}",
       "OmitsSomeOf": "omits at least one of the terms present in {{x|AlgebraicExpression}}",
       "MatchesWithGeneralForm": "matches the form of {{x|AlgebraicExpression}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
     }

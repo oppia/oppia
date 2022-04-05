@@ -9,9 +9,6 @@
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|AlgebraicExpression}}"
     },
-    "ContainsSomeOf": {
-      "description": "contains at least one of the terms present in {{x|AlgebraicExpression}}"
-    },
     "OmitsSomeOf": {
       "description": "omits at least one of the terms present in {{x|AlgebraicExpression}}"
     },
@@ -132,9 +129,6 @@
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|MathEquation}}"
     },
-    "ContainsSomeOf": {
-      "description": "contains at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}"
-    },
     "OmitsSomeOf": {
       "description": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}"
     },
@@ -184,9 +178,6 @@
     },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|NumericExpression}}"
-    },
-    "ContainsSomeOf": {
-      "description": "contains at least one of the terms present in {{x|NumericExpression}}"
     },
     "OmitsSomeOf": {
       "description": "omits at least one of the terms present in {{x|NumericExpression}}"

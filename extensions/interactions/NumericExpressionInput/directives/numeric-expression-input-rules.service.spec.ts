@@ -203,50 +203,6 @@ describe('Numeric expression input rules service', () => {
     expect(neirs.IsEquivalentTo('2*3*3*3', {x: inputString})).toBeFalse();
   });
 
-  it('should have a correct ContainsSomeOf rule', () => {
-    inputString = '6-(-4)';
-
-    expect(neirs.ContainsSomeOf('6+4', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf('4', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf('6-(-4)', {x: inputString})).toBeTrue();
-
-    expect(neirs.ContainsSomeOf('-4', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('-4+(-6)', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('10', {x: inputString})).toBeFalse();
-
-
-    inputString = '3*10^(-5)';
-
-    expect(neirs.ContainsSomeOf('3*10^(-5)', {x: inputString})).toBeTrue();
-
-    expect(neirs.ContainsSomeOf('3*10^5', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('3', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('10^(-5)', {x: inputString})).toBeFalse();
-
-
-    inputString = '1000 + 200 + 30 + 4 + 0.5 + 0.06';
-
-    expect(neirs.ContainsSomeOf(
-      '1000 + 200 + 30 + 4 + 0.5 + 0.06', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf(
-      '1000 + 200 + 4 + 0.5', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf('1000 + 234.56', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf('0.06', {x: inputString})).toBeTrue();
-
-    expect(neirs.ContainsSomeOf('1234.56', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('123456/100', {x: inputString})).toBeFalse();
-
-
-    inputString = '2*2*3*3';
-
-    expect(neirs.ContainsSomeOf('2*2*3*3', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf('2*3*3*2', {x: inputString})).toBeTrue();
-
-    expect(neirs.ContainsSomeOf('2*2*3', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('36', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('72/2', {x: inputString})).toBeFalse();
-  });
-
   it('should have a correct OmitsSomeOf rule', () => {
     inputString = '6-(-4)';
 
