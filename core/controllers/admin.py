@@ -755,8 +755,8 @@ class AdminRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self):
-        username = self.payload.get('username')
-        role = self.payload.get('role')
+        username = self.normalized_payload.get('username')
+        role = self.normalized_payload.get('role')
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
@@ -775,8 +775,8 @@ class AdminRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def delete(self):
-        username = self.request.get('username')
-        role = self.request.get('role')
+        username = self.normalized_request.get('username')
+        role = self.normalized_request.get('role')
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:

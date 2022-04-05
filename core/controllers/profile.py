@@ -554,7 +554,7 @@ class SiteLanguageHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
-        site_language_code = self.payload.get('site_language_code')
+        site_language_code = self.normalized_payload.get('site_language_code')
         user_services.update_preferred_site_language_code(
             self.user_id, site_language_code)
         self.render_json({})
