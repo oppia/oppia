@@ -24,8 +24,7 @@ import nerdamer from 'nerdamer';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { AlgebraicExpressionAnswer } from 'interactions/answer-defs';
 import {
-  AlgebraicExpressionRuleInputsWithPlaceholder,
-  AlgebraicExpressionRuleInputsWithoutPlaceholder
+  AlgebraicExpressionRuleInputs
 } from 'interactions/rule-input-defs';
 import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 
@@ -39,7 +38,7 @@ export class AlgebraicExpressionInputRulesService {
 
   MatchesExactlyWith(
       answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
+      inputs: AlgebraicExpressionRuleInputs): boolean {
     // If the answer and the inputs are both purely numeric, we use the numeric
     // expression input's rule functions.
     if (
@@ -58,7 +57,7 @@ export class AlgebraicExpressionInputRulesService {
 
   MatchesUpToTrivialManipulations(
       answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder
+      inputs: AlgebraicExpressionRuleInputs
   ): boolean {
     // Inserting '*' signs between variables if not present.
     answer = this.mathInteractionsService.insertMultiplicationSigns(answer);
@@ -69,7 +68,7 @@ export class AlgebraicExpressionInputRulesService {
 
   IsEquivalentTo(
       answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
+      inputs: AlgebraicExpressionRuleInputs): boolean {
     // If the answer and the inputs are both purely numeric, we use the numeric
     // expression input's rule functions.
     if (

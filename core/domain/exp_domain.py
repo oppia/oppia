@@ -147,8 +147,10 @@ MATH_INTERACTION_DEPRECATED_RULES = [
 def clean_math_expression(math_expression):
     """Cleans a given math expression and formats it so that it is compatible
     with the new interactions' validators.
+
     Args:
         math_expression: str. The string representing the math expression.
+
     Returns:
         str. The correctly formatted string representing the math expression.
     """

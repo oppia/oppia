@@ -27,8 +27,7 @@ import { AlgebraicExpressionInputRulesService } from
 import { MathEquationAnswer } from 'interactions/answer-defs';
 import {
   MathEquationRuleInputsWithSide,
-  MathEquationRuleInputsWithoutSide,
-  MathEquationRuleInputsWithPlaceholder
+  MathEquationRuleInputsWithoutSide
 } from 'interactions/rule-input-defs';
 import { MathInteractionsService } from 'services/math-interactions.service';
 
