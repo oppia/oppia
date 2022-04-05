@@ -53,25 +53,25 @@ class FileStream:
     """A class that wraps a file stream, but adds extra attributes to it.
 
     Attributes:
-        content: bytes|str. The content of the file snapshot.
+        content: bytes. The content of the file snapshot.
     """
 
-    def __init__(self, content: Union[bytes, str]) -> None:
+    def __init__(self, content: bytes) -> None:
         """Constructs a FileStream object.
 
         Args:
-            content: bytes|str. The content of the file snapshots.
+            content: bytes. The content of the file snapshots.
         """
         self._content = content
 
-    def read(self) -> Union[bytes, str]:
+    def read(self) -> bytes:
         """Emulates stream.read(). Returns all bytes and emulates EOF.
 
         Returns:
-            content: bytes|str. The content of the file snapshot.
+            content: bytes. The content of the file snapshot.
         """
         content = self._content
-        self._content = ''
+        self._content = b''
         return content
 
 
@@ -335,7 +335,7 @@ class AbstractFileSystem():
         # ignore is added here.
         return self._impl.get(filepath)  # type: ignore[return-value]
 
-    def get(self, filepath: str) -> Union[bytes, str]:
+    def get(self, filepath: str) -> bytes:
         """Returns a bytestring with the file content, but no metadata.
 
         Args:
@@ -343,7 +343,7 @@ class AbstractFileSystem():
                 assets folder.
 
         Returns:
-            bytes|str. The bytestring with the file content, but no metadata.
+            bytes. The bytestring with the file content, but no metadata.
 
         Raises:
             OSError. The given file stream does not exist.

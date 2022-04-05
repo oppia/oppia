@@ -29,18 +29,20 @@ from core.domain import user_services
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
 
+from typing_extensions import Final
+
 
 class FileSystemServicesTests(test_utils.GenericTestBase):
     """Tests for File System services."""
 
-    def test_get_exploration_file_system_with_dev_mode_enabled(self):
+    def test_get_exploration_file_system_with_dev_mode_enabled(self) -> None:
         with self.swap(constants, 'DEV_MODE', True):
             file_system = fs_services.get_entity_file_system_class()
             self.assertIsInstance(
                 file_system(feconf.ENTITY_TYPE_EXPLORATION, 'entity_id'),
                 fs_domain.GcsFileSystem)
 
-    def test_get_exploration_file_system_with_dev_mode_disabled(self):
+    def test_get_exploration_file_system_with_dev_mode_disabled(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
             file_system = fs_services.get_entity_file_system_class()
             self.assertIsInstance(
@@ -51,21 +53,21 @@ class FileSystemServicesTests(test_utils.GenericTestBase):
 class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
     """Test for saving the three versions of the image file."""
 
-    EXPLORATION_ID = 'exp_id'
-    FILENAME = 'image.png'
-    COMPRESSED_IMAGE_FILENAME = 'image_compressed.png'
-    MICRO_IMAGE_FILENAME = 'image_micro.png'
-    USER = 'ADMIN'
+    EXPLORATION_ID: Final = 'exp_id'
+    FILENAME: Final = 'image.png'
+    COMPRESSED_IMAGE_FILENAME: Final = 'image_compressed.png'
+    MICRO_IMAGE_FILENAME: Final = 'image_micro.png'
+    USER: Final = 'ADMIN'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(SaveOriginalAndCompressedVersionsOfImageTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
-        self.admin = user_services.get_user_actions_info(self.user_id_admin)
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
+        self.admin = user_services.get_user_actions_info(self.user_id_admin)  # type: ignore[no-untyped-call]
 
-    def test_save_original_and_compressed_versions_of_image(self):
+    def test_save_original_and_compressed_versions_of_image(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
@@ -83,7 +85,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.assertTrue(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
         self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
-    def test_compress_image_on_prod_mode_with_small_image_size(self):
+    def test_compress_image_on_prod_mode_with_small_image_size(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
@@ -128,7 +130,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
                     micro_image_content),
                 (22, 22))
 
-    def test_save_original_and_compressed_versions_of_svg_image(self):
+    def test_save_original_and_compressed_versions_of_svg_image(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
@@ -164,7 +166,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             self.assertEqual(compressed_image_content, image_content)
             self.assertEqual(micro_image_content, image_content)
 
-    def test_copy_images(self):
+    def test_copy_images(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
@@ -194,7 +196,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
 class FileSystemClassifierDataTests(test_utils.GenericTestBase):
     """Unit tests for storing, reading and deleting classifier data."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(FileSystemClassifierDataTests, self).setUp()
         self.fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
@@ -209,7 +211,7 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
             }
         })
 
-    def test_save_and_get_classifier_data(self):
+    def test_save_and_get_classifier_data(self) -> None:
         """Test that classifier data is stored and retrieved correctly."""
         fs_services.save_classifier_data(
             'exp_id', 'job_id', self.classifier_data_proto)
@@ -224,7 +226,7 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
             classifier_data_proto.model_json,
             self.classifier_data_proto.model_json)
 
-    def test_remove_classifier_data(self):
+    def test_remove_classifier_data(self) -> None:
         """Test that classifier data is removed upon deletion."""
         fs_services.save_classifier_data(
             'exp_id', 'job_id', self.classifier_data_proto)

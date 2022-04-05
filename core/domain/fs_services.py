@@ -23,17 +23,24 @@ from core import utils
 from core.domain import fs_domain
 from core.domain import image_services
 
+from typing import List, Type
+
 
 def save_original_and_compressed_versions_of_image(
-        filename, entity_type, entity_id, original_image_content,
-        filename_prefix, image_is_compressible):
+    filename: str,
+    entity_type: str,
+    entity_id: str,
+    original_image_content: bytes,
+    filename_prefix: str,
+    image_is_compressible: bool
+) -> None:
     """Saves the three versions of the image file.
 
     Args:
         filename: str. The name of the image file.
         entity_type: str. The type of the entity.
         entity_id: str. The id of the entity.
-        original_image_content: str. The content of the original image.
+        original_image_content: bytes. The content of the original image.
         filename_prefix: str. The string to prefix to the filename.
         image_is_compressible: bool. Whether the image can be compressed or
             not.
@@ -87,7 +94,13 @@ def save_original_and_compressed_versions_of_image(
             micro_image_filepath, micro_image_content, mimetype=mimetype)
 
 
-def save_classifier_data(exp_id, job_id, classifier_data_proto):
+# The classifier_data_proto argument is an object of FrozenModel. But since,
+# we excluded proto_files/ from the static type annotations. This argument is
+# annotated as general object type.
+def save_classifier_data(
+    exp_id: str, job_id: str,
+    classifier_data_proto: object
+) -> None:
     """Store classifier model data in a file.
 
     Args:
@@ -101,12 +114,15 @@ def save_classifier_data(exp_id, job_id, classifier_data_proto):
     fs = fs_domain.AbstractFileSystem(file_system_class(
         feconf.ENTITY_TYPE_EXPLORATION, exp_id))
     content = utils.compress_to_zlib(
-        classifier_data_proto.SerializeToString())
+        # Here, classifier_data_proto is of general object type and general
+        # objects do not contain any extra methods and properties. Thus avoid
+        # MyPy error, we added an [attr-defined] ignore statement.
+        classifier_data_proto.SerializeToString())  # type: ignore[attr-defined]
     fs.commit(
         filepath, content, mimetype='application/octet-stream')
 
 
-def delete_classifier_data(exp_id, job_id):
+def delete_classifier_data(exp_id: str, job_id: str) -> None:
     """Delete the classifier data from file.
 
     Args:
@@ -121,7 +137,7 @@ def delete_classifier_data(exp_id, job_id):
         fs.delete(filepath)
 
 
-def get_entity_file_system_class():
+def get_entity_file_system_class() -> Type[fs_domain.GcsFileSystem]:
     """Returns GcsFileSystem class to the client.
 
     Returns:
@@ -131,8 +147,12 @@ def get_entity_file_system_class():
 
 
 def copy_images(
-        source_entity_type, source_entity_id, destination_entity_type,
-        destination_entity_id, filenames):
+    source_entity_type: str,
+    source_entity_id: str,
+    destination_entity_type: str,
+    destination_entity_id: str,
+    filenames: List[str]
+) -> None:
     """Copy images from source to destination.
 
     Args:

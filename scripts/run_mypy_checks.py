@@ -69,8 +69,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/expression_parser_test.py',
     'core/domain/feedback_services.py',
     'core/domain/feedback_services_test.py',
-    'core/domain/fs_services.py',
-    'core/domain/fs_services_test.py',
     'core/domain/html_cleaner.py',
     'core/domain/html_cleaner_test.py',
     'core/domain/html_validation_service.py',
