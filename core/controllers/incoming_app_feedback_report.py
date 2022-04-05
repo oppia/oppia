@@ -47,10 +47,7 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
         Verifies that the incoming message is from Oppia Android based on the
         request header and stores the feedback report.
         """
-        report_dict = self.payload.get('report')
-        report_obj = (
-            app_feedback_report_services.create_report_from_json(
-                report_dict))
+        report_obj = self.normalized_payload.get('report')
         app_feedback_report_services.save_feedback_report_to_storage(
             report_obj, new_incoming_report=True)
         app_feedback_report_services.store_incoming_report_stats(report_obj)

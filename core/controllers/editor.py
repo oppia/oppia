@@ -443,7 +443,7 @@ class ExplorationStatusHandler(EditorHandler):
 
     @acl_decorators.can_publish_exploration
     def put(self, exploration_id):
-        make_public = self.payload.get('make_public')
+        make_public = self.normalized_payload.get('make_public')
 
         if make_public:
             self._publish_exploration(exploration_id)
