@@ -97,7 +97,7 @@ class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
             output_string[:last_comma_index] + '.'
             + output_string[last_comma_index + 1:])
 
-        return output_string.rstrip()
+        return output_string.strip()
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid explorations with their id and
@@ -139,7 +139,7 @@ class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
             exp_ids_with_invalid_tags
             | 'Save info on invalid exps' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The exp of id %s contains%s'
+                    'The exp of id %s contains %s'
                     % (
                         objects[0],
                         self._get_description_of_wrong_exp(objects[1])
