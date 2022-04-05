@@ -81,7 +81,9 @@ angular.module('oppia').directive('storyEditor', [
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
-            $scope.storyContents = $scope.story.getStoryContents();
+            if ($scope.story) {
+              $scope.storyContents = $scope.story.getStoryContents();
+            }
             if ($scope.storyContents) {
               $scope.setNodeToEdit($scope.storyContents.getInitialNodeId());
             }
@@ -90,32 +92,34 @@ angular.module('oppia').directive('storyEditor', [
 
           var _initEditor = function() {
             $scope.story = StoryEditorStateService.getStory();
-            $scope.storyContents = $scope.story.getStoryContents();
-            $scope.disconnectedNodes = [];
-            $scope.linearNodesList = [];
-            $scope.nodes = [];
-            $scope.allowedBgColors = (
-              storyConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
-            if ($scope.storyContents &&
-                $scope.storyContents.getNodes().length > 0) {
-              $scope.nodes = $scope.storyContents.getNodes();
-              $scope.initialNodeId = $scope.storyContents.getInitialNodeId();
-              $scope.linearNodesList =
-                $scope.storyContents.getLinearNodesList();
+            if ($scope.story) {
+              $scope.storyContents = $scope.story.getStoryContents();
+              $scope.disconnectedNodes = [];
+              $scope.linearNodesList = [];
+              $scope.nodes = [];
+              $scope.allowedBgColors = (
+                storyConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
+              if ($scope.storyContents &&
+                  $scope.storyContents.getNodes().length > 0) {
+                $scope.nodes = $scope.storyContents.getNodes();
+                $scope.initialNodeId = $scope.storyContents.getInitialNodeId();
+                $scope.linearNodesList =
+                  $scope.storyContents.getLinearNodesList();
+              }
+              $scope.notesEditorIsShown = false;
+              $scope.storyTitleEditorIsShown = false;
+              $scope.editableTitle = $scope.story.getTitle();
+              $scope.editableUrlFragment = $scope.story.getUrlFragment();
+              $scope.editableMetaTagContent = $scope.story.getMetaTagContent();
+              $scope.initialStoryUrlFragment = $scope.story.getUrlFragment();
+              $scope.editableNotes = $scope.story.getNotes();
+              $scope.editableDescription = $scope.story.getDescription();
+              $scope.editableDescriptionIsEmpty = (
+                $scope.editableDescription === '');
+              $scope.storyDescriptionChanged = false;
+              $scope.storyUrlFragmentExists = false;
+              $scope.$applyAsync();
             }
-            $scope.notesEditorIsShown = false;
-            $scope.storyTitleEditorIsShown = false;
-            $scope.editableTitle = $scope.story.getTitle();
-            $scope.editableUrlFragment = $scope.story.getUrlFragment();
-            $scope.editableMetaTagContent = $scope.story.getMetaTagContent();
-            $scope.initialStoryUrlFragment = $scope.story.getUrlFragment();
-            $scope.editableNotes = $scope.story.getNotes();
-            $scope.editableDescription = $scope.story.getDescription();
-            $scope.editableDescriptionIsEmpty = (
-              $scope.editableDescription === '');
-            $scope.storyDescriptionChanged = false;
-            $scope.storyUrlFragmentExists = false;
-            $scope.$applyAsync();
           };
 
           $scope.setNodeToEdit = function(nodeId) {

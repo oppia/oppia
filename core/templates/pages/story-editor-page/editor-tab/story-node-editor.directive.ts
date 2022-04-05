@@ -289,9 +289,15 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.skillIdToSummaryMap[summary.id] = summary.description;
                 StoryUpdateService.addPrerequisiteSkillIdToNode(
                   $scope.story, $scope.getId(), summary.id);
-              } catch (err) {
-                AlertsService.addInfoMessage(
-                  'Given skill is already a prerequisite skill', 5000);
+                // The catch parameter type can only be any or unknown. The type
+                // 'unknown' is safer than type 'any' because it reminds us
+                // that we need to performsome sorts of type-checks before
+                // operating on our values.
+              } catch (err: unknown) {
+                if (err instanceof Error) {
+                  AlertsService.addInfoMessage(
+                    err.message, 5000);
+                }
               }
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.

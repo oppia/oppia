@@ -394,6 +394,7 @@ describe('Story editor navbar component', () => {
 
   it('should discard changes', () => {
     story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+    spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
 
     component.story = story;
     let clearChangesSpy = spyOn(
