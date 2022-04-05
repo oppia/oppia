@@ -176,7 +176,7 @@ _PARSER.add_argument(
 
 
 class DependencyBundleDict(TypedDict):
-    """Dictionary that represents dependency_bundle."""
+    """Dictionary that represents dependency bundle."""
 
     js: List[str]
     css: List[str]
