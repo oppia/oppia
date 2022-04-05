@@ -23,13 +23,19 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require('pages/topic-editor-page/topic-editor-page.component.ts');
 
+import { TestBed } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EventEmitter } from '@angular/core';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
-describe('Topic editor page', function() {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Topic editor page', function() {
   var ctrl = null;
   var $scope = null;
+  var ngbModal: NgbModal = null;
   var ContextService = null;
   var PageTitleService = null;
   var PreventPageUnloadEventService = null;
@@ -40,6 +46,8 @@ describe('Topic editor page', function() {
   var TopicObjectFactory = null;
   var StoryReferenceObjectFactory = null;
   var topic = null;
+  var LocalStorageService = null;
+  var WindowRef = null;
 
   importAllAngularServices();
 
@@ -55,6 +63,9 @@ describe('Topic editor page', function() {
     UrlService = $injector.get('UrlService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
+    LocalStorageService = $injector.get('LocalStorageService');
+    WindowRef = $injector.get('WindowRef');
+    ngbModal = TestBed.inject(NgbModal);
 
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._thumbnailFilename = 'b.svg';
@@ -65,6 +76,7 @@ describe('Topic editor page', function() {
     topic._subtopics = [subtopic];
     topic._thumbnailFilename = 'a.svg';
     topic._metaTagContent = 'topic';
+    topic._id = 'topic_1';
     var story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
     var story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
     topic._canonicalStoryReferences = [story1, story2];
@@ -75,7 +87,8 @@ describe('Topic editor page', function() {
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     $scope = $rootScope.$new();
     ctrl = $componentController('topicEditorPage', {
-      $scope: $scope
+      $scope: $scope,
+      NgbModal: ngbModal
     });
   }));
 
@@ -241,5 +254,44 @@ describe('Topic editor page', function() {
     expect(ctrl.topic).toEqual(topic);
 
     ctrl.$onDestroy();
+  });
+
+  it('should create or update topic editor browser tabs info on ' +
+  'local storage when a new tab opens', () => {
+    let topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'topic', 'topic_1', 1, 1, false);
+    spyOn(topicEditorBrowserTabsInfo, 'setLatestVersion').and.callThrough();
+    spyOn(
+      LocalStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(topicEditorBrowserTabsInfo);
+    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
+    ctrl.$onInit();
+    TopicEditorStateService.onTopicInitialized.emit();
+
+    expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+    expect(topicEditorBrowserTabsInfo.setLatestVersion).toHaveBeenCalled();
+  });
+
+  it('should decrement number of opened topic editor tabs when ' +
+  'a tab is closed', () => {
+    let topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'topic', 'topic_1', 1, 1, true);
+    spyOn(
+      LocalStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(topicEditorBrowserTabsInfo);
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
+
+    expect(
+      topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeTrue();
+    expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+
+    WindowRef.nativeWindow.dispatchEvent(new Event('beforeunload'));
+
+    expect(
+      topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeFalse();
+    expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(0);
   });
 });
