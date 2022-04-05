@@ -33,13 +33,13 @@ from typing import List
 
 
 class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
-    """Job that returns exploration having tags list length more than 10"""
+    """Job that returns invalid exploration tags"""
 
     def _check_tags_validity(self, tags: List[str]) -> bool:
         """checks whether tags list is valid or not.
 
         Args:
-            tags: List[str]. The list of all tag in exlporation.
+            tags: List[str]. The list of all tags in exploration.
 
         Returns:
             bool. If the list containing tags have length more than 10 or
