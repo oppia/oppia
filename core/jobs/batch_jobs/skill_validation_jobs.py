@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validation jobs for story models."""
+"""Validation jobs for Skill models."""
 
 from __future__ import annotations
 
@@ -38,6 +38,9 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
 
     def get_rubrics_with_invalid_explanations(self, rubrics):
         """Returns the details about rubrics with invalid explanations.
+        
+        Args:
+            rubrics: list(dict). List of rubric dicts.
 
         Returns: dict. The details about rubrics with invalid explanations.
         """
@@ -86,6 +89,9 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
         """Returns true if the length of rubric explanations list is > 10
         or at least one explanation exceeds 300 characters.
 
+        Args:
+            explanations: list(str). List of rubric explanations.
+
         Returns:
             bool. Returns true if the length of rubric explanations list is > 10
             or at least one explanation exceeds 300 characters.
@@ -101,6 +107,9 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
 
     def filter_skills_having_rubrics_with_invalid_explanations(self, skill):
         """Returns True if skill has rubrics with invalid explanation.
+
+        Args:
+            skill: tuple(str, dict). The skill id and the skill rubrics dict.
 
         Returns:
             bool. Returns True if skill has rubrics with invalid explanation.
