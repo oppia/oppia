@@ -238,8 +238,7 @@ describe('RuleEditorComponent', () => {
         x: 'AlgebraicExpression'
       },
       inputs: {
-        x: {contentId: null, normalizedStrSet: []},
-        y: []
+        x: {contentId: null, normalizedStrSet: []}
       }
     });
   });
