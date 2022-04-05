@@ -124,7 +124,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     const answerIsValid = (
       this.mathInteractionsService.validateAlgebraicExpression(
         this.currentValue,
-        this.guppyInitializationService.getCustomOskLetters()));
+        this.guppyInitializationService.getAllowedVariables()));
     if (this.guppyInitializationService.findActiveGuppyObject() === undefined) {
       // The warnings should only be displayed when the editor is inactive
       // focus, i.e., the user is done typing.

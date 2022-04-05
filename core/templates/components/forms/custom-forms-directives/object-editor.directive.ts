@@ -57,7 +57,7 @@ angular.module('oppia').directive('objectEditor', [
           'boolean',
           'code-string',
           'coord-two-dim',
-          'custom-osk-letters',
+          'allowed-variables',
           'drag-and-drop-positive-int',
           'filepath',
           'fraction',

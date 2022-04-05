@@ -35,7 +35,7 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        customOskLetters:
+        allowedVariables:
           value:
           - r
           - "\u03C0"
@@ -962,7 +962,7 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        customOskLetters:
+        allowedVariables:
           value:
           - c
           - m

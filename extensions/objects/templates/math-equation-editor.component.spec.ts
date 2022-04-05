@@ -130,7 +130,7 @@ describe('MathEquationEditor', () => {
       component.warningText).toBe('Please enter an answer before submitting.');
 
     component.currentValue = 'x=y';
-    spyOn(guppyInitializationService, 'getCustomOskLetters').and.returnValue(
+    spyOn(guppyInitializationService, 'getAllowedVariables').and.returnValue(
       ['x', 'y']);
     expect(component.isCurrentAnswerValid()).toBeTrue();
     expect(component.warningText).toBe('');

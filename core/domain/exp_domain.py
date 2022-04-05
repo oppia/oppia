@@ -2033,7 +2033,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _convert_states_v49_dict_to_v50_dict(cls, states_dict):
         """Converts from version 49 to 50. Version 50 removes rules from
         explorations that use one of the following rules:
-        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm].
+        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
+        `customOskLetters` cust arg to `allowedVariables`.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2060,6 +2061,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             copy.deepcopy(answer_group_dict))
                 state_dict[
                     'interaction']['answer_groups'] = filtered_answer_groups
+
+                # Renaming cust arg.
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args['allowedVariables'] = copy.deepcopy(
+                    customization_args['customOskLetters'])
+                del customization_args['customOskLetters']
 
         return states_dict
 
@@ -2287,7 +2295,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
         """Converts a v54 exploration dict into a v55 exploration dict.
         Removes rules from explorations that use one of the following rules:
-        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm].
+        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
+        `customOskLetters` cust arg to `allowedVariables`.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration

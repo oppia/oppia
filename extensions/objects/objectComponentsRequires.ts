@@ -20,7 +20,7 @@ require('objects/templates/algebraic-expression-editor.component.ts');
 require('objects/templates/boolean-editor.component.ts');
 require('objects/templates/code-string-editor.component.ts');
 require('objects/templates/coord-two-dim-editor.component.ts');
-require('objects/templates/custom-osk-letters-editor.component.ts');
+require('objects/templates/allowed-variables-editor.component.ts');
 require('objects/templates/drag-and-drop-positive-int-editor.component.ts');
 require('objects/templates/filepath-editor.component.ts');
 require('objects/templates/fraction-editor.component.ts');

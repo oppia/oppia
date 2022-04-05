@@ -124,7 +124,7 @@ describe('MathEquationInputInteractive', () => {
     // Invalid answer.
     component.value = 'x + y = 3';
 
-    spyOn(guppyInitializationService, 'getCustomOskLetters').and.returnValue(
+    spyOn(guppyInitializationService, 'getAllowedVariables').and.returnValue(
       ['x', 'y']);
     spyOn(mockCurrentInteractionService, 'onSubmit');
     component.submitAnswer();

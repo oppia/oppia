@@ -211,7 +211,8 @@ class DraftUpgradeUtil:
     def _convert_states_v49_dict_to_v50_dict(cls, draft_change_list):
         """Converts draft change list from state version 49 to 50. State
         version 50 removes rules from explorations that use one of the following
-        rules: [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm].
+        rules: [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also
+        renames `customOskLetters` cust arg to `allowedVariables`.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of

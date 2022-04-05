@@ -263,7 +263,7 @@ describe('State Interaction component', () => {
     stateContentService.savedMemento = new SubtitledHtml('html', 'contentID');
     stateCustomizationArgsService.savedMemento = {
       useFractionForDivision: false,
-      customOskLetters: {
+      allowedVariables: {
         value: ['wrok', 'done']
       }
     };

@@ -1194,7 +1194,8 @@ class Question(translation_domain.BaseTranslatableObject):
     def _convert_state_v49_dict_to_v50_dict(cls, question_state_dict):
         """Converts from version 49 to 50. Version 50 removes rules from
         explorations that use one of the following rules:
-        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm].
+        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
+        `customOskLetters` cust arg to `allowedVariables`.
 
         Args:
             question_state_dict: dict. A dict where each key-value pair
@@ -1222,6 +1223,13 @@ class Question(translation_domain.BaseTranslatableObject):
                         copy.deepcopy(answer_group_dict))
             question_state_dict[
                 'interaction']['answer_groups'] = filtered_answer_groups
+
+            # Renaming cust arg.
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args['allowedVariables'] = copy.deepcopy(
+                customization_args['customOskLetters'])
+            del customization_args['customOskLetters']
 
         return question_state_dict
 

@@ -48,7 +48,7 @@ export class AlgebraicExpressionInputValidationService {
     let warningsList = [];
 
     let allowedLettersLimit = AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK;
-    if (customizationArgs.customOskLetters.value.length > allowedLettersLimit) {
+    if (customizationArgs.allowedVariables.value.length > allowedLettersLimit) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
@@ -147,7 +147,7 @@ export class AlgebraicExpressionInputValidationService {
       if (variable.length > 1) {
         variable = greekSymbols[greekLetters.indexOf(variable)];
       }
-      if (customizationArgs.customOskLetters.value.indexOf(variable) === -1) {
+      if (customizationArgs.allowedVariables.value.indexOf(variable) === -1) {
         if (missingVariables.indexOf(variable) === -1) {
           missingVariables.push(variable);
         }

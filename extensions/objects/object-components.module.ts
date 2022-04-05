@@ -27,7 +27,7 @@ import { AlgebraicExpressionEditorComponent } from './templates/algebraic-expres
 import { BooleanEditorComponent } from './templates/boolean-editor.component';
 import { CodeStringEditorComponent } from './templates/code-string-editor.component';
 import { CoordTwoDimEditorComponent } from './templates/coord-two-dim-editor.component';
-import { CustomOskLettersEditorComponent } from './templates/custom-osk-letters-editor.component';
+import { AllowedVariablesEditorComponent } from './templates/allowed-variables-editor.component';
 import { DragAndDropPositiveIntEditorComponent } from './templates/drag-and-drop-positive-int-editor.component';
 import { FractionEditorComponent } from './templates/fraction-editor.component';
 import { FormsModule } from '@angular/forms';
@@ -97,7 +97,7 @@ import { TranslateModule } from '@ngx-translate/core';
     BooleanEditorComponent,
     CodeStringEditorComponent,
     CoordTwoDimEditorComponent,
-    CustomOskLettersEditorComponent,
+    AllowedVariablesEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
     ImageEditorComponent,
@@ -139,7 +139,7 @@ import { TranslateModule } from '@ngx-translate/core';
     BooleanEditorComponent,
     CodeStringEditorComponent,
     CoordTwoDimEditorComponent,
-    CustomOskLettersEditorComponent,
+    AllowedVariablesEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
     ImageEditorComponent,
@@ -181,7 +181,7 @@ import { TranslateModule } from '@ngx-translate/core';
     BooleanEditorComponent,
     CodeStringEditorComponent,
     CoordTwoDimEditorComponent,
-    CustomOskLettersEditorComponent,
+    AllowedVariablesEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
     ImageEditorComponent,
