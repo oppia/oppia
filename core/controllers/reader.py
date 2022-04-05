@@ -297,7 +297,7 @@ class ExplorationHandler(base.BaseHandler):
         if exploration_user_data is not None:
             # If the most recently reached checkpoint is not present in the
             # current exploration.
-            if exploration_user_data.most_recently_reached_checkpoint_state_name not in exploration.states.keys(): # pylint: disable=line-too-long
+            if exploration_user_data.most_recently_reached_checkpoint_exp_version < exploration.version: # pylint: disable=line-too-long
                 exploration_user_data = (
                     user_services.synchronize_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
                         self.user_id, exploration_id))

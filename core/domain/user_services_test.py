@@ -1353,7 +1353,8 @@ class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id0'
 
     SAMPLE_EXPLORATION_YAML = (
-        """author_notes: ''
+"""
+author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category

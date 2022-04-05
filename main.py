@@ -543,7 +543,7 @@ URLS = [
         r'/explorehandler/answer_submitted_event/<exploration_id>',
         reader.AnswerSubmittedEventHandler),
     get_redirect_route(
-        r'/explorehandler/checkpoint_completed/<exploration_id>',
+        r'/explorehandler/checkpoint_reached/<exploration_id>',
         reader.CheckpointReachedEventHandler),
     get_redirect_route(
         r'/explorehandler/restart/<exploration_id>',
