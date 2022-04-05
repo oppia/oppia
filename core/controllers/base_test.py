@@ -2189,10 +2189,10 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
         ], debug=feconf.DEBUG))
 
     def test_object_which_raises_error_on_get(self):
-        err_message = 'err_message'
-        error = base.RaiseErrorOnGet(err_message)
-        with self.assertRaisesRegex(ValueError, err_message):
-            error.get('key')
+        error_message = 'error_message'
+        object_that_raises_error_on_get = base.RaiseErrorOnGet(error_message)
+        with self.assertRaisesRegex(ValueError, error_message):
+            object_that_raises_error_on_get.get('key')
 
     def test_request_with_schema_using_payload_or_request_attr_raise_error(
             self):
