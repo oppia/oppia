@@ -18,25 +18,6 @@
   position: relative;
 }
 
-/*rtl:raw:
-.hint-box-add-ons {
-  left: 5px;
-}
-
-.hint-box-add-ons .close {
-  left: -5px;
-}
-
-.hint-box-add-ons::after {
-  margin-left: -173px;
-}
-
-.hint-box-add-ons::before {
-  margin-left: -175px;
-}
-*/
-
-/*rtl:begin:remove*/
 .hint-box-add-ons {
   left: -5.5px;
 }
@@ -52,7 +33,6 @@
 .hint-box-add-ons::before {
   margin-left: 161px;
 }
-/*rtl:end:remove*/
 
 .hint-box {
   -webkit-animation: bounce 4s infinite;
@@ -75,10 +55,6 @@
   z-index: 2;
 }
 
-/* Hint box popup's position gets misaligned if right is set to 50%
-   in rtl css after convertion, hence we ignore this block.
-*/
-/*rtl:begin:ignore*/
 .hint-box::after,
 .hint-box::before {
   border: solid transparent;
@@ -87,7 +63,6 @@
   position: absolute;
   top: 100%;
 }
-/*rtl:end:ignore*/
 
 .hint-box::after {
   border-left: 5px solid transparent;
@@ -132,29 +107,6 @@
 }
 
 @media screen and (max-width: 768px) {
-  /*rtl:raw:
-  .hint-box-add-ons .close {
-    bottom: 10px;
-    font-size: 22px;
-    left: -5px;
-    margin: 0 10px;
-    position: fixed;
-  }
-
-  .hint-box-add-ons {
-    left: -58px;
-  }
-
-  .hint-box-add-ons::before {
-    margin-left: -142px;
-  }
-
-  .hint-box-add-ons::after {
-    margin-left: -140px;
-  }
-  */
-
-  /*rtl:begin:remove*/
   .hint-box-add-ons .close {
     bottom: 10px;
     font-size: 22px;
@@ -174,7 +126,6 @@
   .hint-box-add-ons::after {
     margin-left: 127px;
   }
-  /*rtl:end:remove*/
 
   .hint-box {
     font-size: 14px;

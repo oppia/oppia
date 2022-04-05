@@ -8,7 +8,6 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-/*rtl:begin:ignore*/
 .arrow-forward {
   color: #00645c;
   font-size: 14px;
@@ -19,7 +18,6 @@
   margin-left: 90px;
 }
 
-/*rtl:end:ignore*/
 .underline:hover,
 .underline:focus {
   border-bottom: 2px solid #333;
@@ -79,8 +77,6 @@
 .get-involved-dropdown .fav {
   color: #eb5757;
 }
-
-/*rtl:begin:ignore*/
 .get-involved-dropdown .des {
   color: #767676;
   font-family: 'Roboto', sans-serif;
@@ -94,7 +90,6 @@
 .item-border {
   border-right: 1px solid rgba(33, 33, 33, 0.102);
 }
-/*rtl:end:ignore*/
 
 .top-section {
   border-bottom: 1px solid rgba(33, 33, 33, 0.102);
@@ -123,18 +118,9 @@
   float: left;
 }
 
-/*rtl:raw:
-.navbar-header {
-  display: flex;
-  margin-left: -10px;
-}
-*/
-
-/*rtl:begin:ignore*/
 .dropdown-toggle::after {
   margin-right: 0.255em;
 }
-/*rtl:end:ignore*/
 
 .learn-dropdown-menu {
   border-radius: 3px;
@@ -179,13 +165,11 @@
   text-transform: capitalize;
 }
 
-/*rtl:begin:ignore*/
 .learn-dropdown-menu .nav-item-left {
   border-right: 1px solid rgba(0, 0, 0, 0.051);
   padding: 32px;
   width: 388px;
 }
-/*rtl:end:ignore*/
 
 .learn-dropdown-menu .nav-item-right {
   min-width: 300px;
@@ -238,25 +222,19 @@
   line-height: 16.41px;
   padding: 0;
 }
-.dropdown-menu {
+.oppia-navbar-nav .dropdown-menu {
   border-radius: 3px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+  left: auto;
+  right: 0;
+  text-align: left;
 }
-
-/*rtl:raw:
-.navbar-header .dropdown-menu {
-  left: 0 !important;
-  right: auto !important;
-  text-align: right;
-}
-*/
 
 .language-icon {
   margin-top: -3px;
 }
 
-/*rtl:begin:ignore*/
 .language-padding-left {
   padding-left: 26px;
 }
@@ -275,7 +253,6 @@
   vertical-align: middle;
   white-space: nowrap;
 }
-/*rtl:end:ignore*/
 
 .oppia-navbar-brand-name:focus {
   outline: 1px dotted #fff;
@@ -292,12 +269,10 @@
 .language-element-selected {
   background-color: rgb(52, 102, 92, 0.1);
 }
-/*rtl:begin:ignore*/
 .oppia-nav-right-dropdown:focus,
 .oppia-nav-right-dropdown:hover {
   box-shadow: 1px 4px 5px 1px rgba(0,0,0,0.1);
 }
-/*rtl:end:ignore*/
 .oppia-nav-right-dropdown:active {
   background-color: #e5e5e5;
   box-shadow: none;
@@ -306,8 +281,11 @@
 .oppia-navbar-button-container.dropdown.oppia-navbar-button-container-extra-info {
   margin-left: 10px;
 }
+.oppia-navbar-button-container .btn.oppia-navbar-button {
+  margin-left: 5px;
+  margin-right: 0;
+}
 
-/*rtl:begin:ignore*/
 .oppia-signin-g-icon {
   float: left;
   padding: 10px 15px 10px 0;
@@ -388,7 +366,6 @@
   margin-left: 10px;
   text-align: right;
 }
-/*rtl:end:ignore*/
 
 .oppia-navbar-dropdown .nav-link {
   color: #009688;
@@ -438,13 +415,6 @@
   padding: 0;
 }
 
-/*rtl:raw:
-.navbar-header .oppia-navbar-tab-content-heading:after {
-  right: 28px;
-}
-*/
-
-/*rtl:begin:ignore*/
 .oppia-navbar-tab-content-heading:after {
   border-style: solid;
   border-width: 0 0 1.59px;
@@ -472,33 +442,21 @@
   padding: 0;
   right: auto;
 }
-/*rtl:end:ignore*/
 
-.oppia-navbar-profile .profile-dropdown:hover {
+.oppia-navbar-nav.oppia-navbar-profile .profile-dropdown:hover {
   background-color: #fff;
 }
 
 @media screen and (max-width: 880px) {
-  /*rtl:begin:ignore*/
   .oppia-logo-wide {
     margin-left: 0;
   }
-  /*rtl:end:ignore*/
 }
 
 @media screen and (max-width: 840px) {
   .desktop-view-language-code {
     display: none;
   }
-}
-
-@media (min-width: 768px) {
-  /*rtl:raw:
-  .oppia-top-navigation-bar.navbar-header {
-    float: right !important;
-    margin-right: -15px;
-  }
-  */
 }
 
 @media screen and (max-width: 768px) {

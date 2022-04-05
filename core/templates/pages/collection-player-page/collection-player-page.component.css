@@ -91,7 +91,6 @@
   top: 228px;
 }
 
-/*rtl:begin:remove*/
 .oppia-card-preview-panel {
   background: #fff;
   border-radius: 4px;
@@ -101,31 +100,8 @@
   pointer-events: none;
   position: fixed;
   text-align: left;
+  top: 244px;
   transform: translateX(29%);
-}
-/*rtl:end:remove*/
-
-/*rtl:raw:
-.oppia-card-preview-panel {
-  background: #fff;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
-  left: 24%;
-  padding: 30px 85px 70px 85px;
-  pointer-events: none;
-  position: fixed;
-  text-align: right;
-  transform: translateX(-29%);
-  width: max-content;
-}
-*/
-
-@media screen and (max-width: 1280px) {
-  /*rtl:raw:
-  .oppia-card-preview-panel {
-    left: 20%;
-  }
-  */
 }
 
 @media screen and (max-width: 942px) {

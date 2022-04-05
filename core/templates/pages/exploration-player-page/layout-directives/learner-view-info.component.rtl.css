@@ -32,7 +32,7 @@
   display: flex;
   font-size: 12px;
   font-weight: 200;
-  padding-left: 26px;
+  padding-right: 26px;
 }
 
 .oppia-topic-title:hover {

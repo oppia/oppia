@@ -7,9 +7,10 @@
   Some additional rules that can be added to the CSS files can be found here:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
+
 .oppia-learner-view-card-content .oppia-learner-confirm-button {
   margin-bottom: 10px;
-  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .oppia-learner-view-card-top-section {
@@ -75,12 +76,13 @@
 .conversation-skin-audio-highlight {
   border: 3px solid #f3d140;
 }
+
 .conversation-skin-future-tutor-card {
   background: #fff;
   border-radius: 2px;
-  margin-left: 87px;
+  margin-right: 87px;
   padding-top: 20px;
-  text-align: left;
+  text-align: right;
 }
 
 .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
@@ -95,9 +97,10 @@
 .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content::before {
   display: none;
 }
+
 .oppia-learner-view-card.ng-hide {
   opacity: 0;
-  transform: translateX(-1000px);
+  transform: translateX(1000px);
 }
 
 .conversation-skin-responses-dropdown-container {
@@ -123,24 +126,25 @@
   -webkit-transition: all 0.2s;
   transition: all 0.2s;
 }
+
 .conversation-skin-responses-dropdown-icon-rotated {
   margin-bottom: -2px;
-  -moz-transform: rotate(90deg);
-  -o-transform: rotate(90deg);
-  -webkit-transform: rotate(90deg);
-  transform: rotate(90deg);
+  -moz-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  transform: rotate(-90deg);
   transition: transform 0.2s ease-in-out;
 }
 
 .conversation-skin-inline-interaction {
-  border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 2px;
   padding: 8px 20px 25px;
   position: relative;
 }
 
 .conversation-skin-inline-interaction .conversation-skin-user-avatar {
-  left: -20px;
+  right: -20px;
   top: 14px;
 }
 
@@ -177,10 +181,11 @@
   .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:hover {
     background-color: #115fd4;
   }
+
   .oppia-learner-view-card {
-    margin-left: 0;
+    margin-right: 0;
     padding-bottom: 0;
-    padding-left: 0;
+    padding-right: 0;
   }
 }
 

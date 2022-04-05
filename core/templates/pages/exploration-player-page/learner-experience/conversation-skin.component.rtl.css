@@ -24,15 +24,16 @@ otherwise they will interfere with the iframed conversation skin directive. */
 .supplemental-card-parent-container {
   min-width: 50%;
 }
+
 .conversation-skin-next-lesson-wrapper {
   align-items: center;
   background-color: white;
   bottom: 0;
   display: flex;
-  margin: 0 6px 6px 0;
+  margin: 0 0 6px 6px;
   position: absolute;
-  right: 0;
-  text-align: right;
+  left: 0;
+  text-align: left;
   vertical-align: middle;
 }
 
@@ -78,12 +79,13 @@ otherwise they will interfere with the iframed conversation skin directive. */
     min-width: 100vw;
   }
 }
+
 .conversation-skin-supplemental-card-container {
   background-color: white;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
   flex-shrink: 1;
   margin-bottom: 200px;
-  margin-left: 12px;
+  margin-right: 12px;
   position: relative;
   width: 650px;
   z-index: 2;
@@ -91,9 +93,9 @@ otherwise they will interfere with the iframed conversation skin directive. */
 
 .conversation-skin-supplemental-nav-submit-button,
 .conversation-skin-supplemental-nav-submit-button.mat-button {
-  margin-right: 10px;
+  margin-left: 10px;
   position: absolute;
-  right: 8px;
+  left: 8px;
   top: -10px;
 }
 
@@ -131,11 +133,12 @@ otherwise they will interfere with the iframed conversation skin directive. */
     position: relative;
     width: 100%;
   }
+
   .conversation-skin-tutor-card-container {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
-    left: 0;
-    margin: 0 auto;
     right: 0;
+    margin: 0 auto;
+    left: 0;
     top: 40px;
     width: 100%;
     z-index: 15;
@@ -149,13 +152,14 @@ otherwise they will interfere with the iframed conversation skin directive. */
   .supplemental-card-parent-container {
     position: unset;
   }
+
   .conversation-skin-supplemental-card-container {
-    left: 50%;
+    right: 50%;
     margin: 0 auto;
     max-width: 959px;
     min-width: 360px;
     position: absolute;
-    transform: translateX(-50%);
+    transform: translateX(50%);
   }
 
   .conversation-skin-oppia-avatar.show-tutor-card {
@@ -163,9 +167,9 @@ otherwise they will interfere with the iframed conversation skin directive. */
     box-shadow: 0 3px 3px grey, 0 5px 3px grey;
     display: block;
     height: 40px;
-    left: 100%;
+    right: 100%;
     position: absolute;
-    transform: translate(-100%, -100%);
+    transform: translate(100%, -100%);
     width: 40px;
     z-index: 16;
   }

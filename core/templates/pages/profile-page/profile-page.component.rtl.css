@@ -7,17 +7,19 @@
   Some additional rules that can be added to the CSS files can be found here:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
+
 .oppia-profile-picture-edit-prompt {
   background-color: #333;
   border-radius: 5px;
   color: white;
-  left: 50%;
+  right: 50%;
   min-width: 120px;
   padding: 5px;
   position: absolute;
   top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(50%, -50%);
 }
+
 .oppia-profile-container .oppia-profile-portfolio-pages .oppia-navigation-mouse-pointer:hover {
   background-color: #808080;
   border-radius: 50%;
@@ -53,10 +55,11 @@
   font-size: 1em;
   font-weight: normal;
 }
+
 .oppia-profile-user-card {
   background-color: #fff;
-  float: left;
-  margin-right: 28px;
+  float: right;
+  margin-left: 28px;
   padding: 24px;
   position: relative;
   width: 220px;

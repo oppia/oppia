@@ -8,9 +8,10 @@
   margin-top: 30px;
   width: 100%;
 }
+
 .oppia-exploration-footer .exploration-footer-img {
   height: 60px;
-  margin: -25px 0 0 10px;
+  margin: -25px 10px 0 0;
   width: 60px;
 }
 
@@ -18,8 +19,8 @@
   color: #fff;
   display: flex;
   list-style-type: none;
-  padding-left: 0;
   padding-right: 0;
+  padding-left: 0;
 }
 
 .oppia-exploration-footer .author-profile-dropdown-menu li > a {
@@ -30,8 +31,9 @@
 .oppia-exploration-footer .author-profile a:hover {
   text-decoration: none;
 }
+
 .oppia-exploration-footer .author-profile li {
-  float: left;
+  float: right;
 }
 
 .oppia-exploration-footer .author-profile .hover-link {
@@ -48,12 +50,13 @@
   background-color: #fff;
   color: #094142;
 }
+
 .oppia-exploration-footer .author-profile-dropdown-menu {
   border: none;
-  border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
   box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.176);
-  float: left;
+  float: right;
   list-style-type: none;
   /** ngbDropdownMenu adds inline styles which conflicts with our own.
   *  The usage of !important is unavoidable here to override inline styles.
@@ -84,7 +87,7 @@
   font-size: 13px;
   line-height: 1.5;
   margin: 12px 0 17px 0;
-  padding-left: 6px;
+  padding-right: 6px;
   text-align: right;
   text-overflow: clip;
   white-space: nowrap;
@@ -101,17 +104,18 @@
   text-decoration: none;
   text-transform: uppercase;
 }
+
 .oppia-exploration-footer .oppia-share-exploration-footer {
   line-height: 0.6;
-  padding-right: 20px;
+  padding-left: 20px;
   text-transform: uppercase;
 }
 
 .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
   display: block;
-  float: right;
+  float: left;
   margin: -8px;
-  padding-right: 20px;
+  padding-left: 20px;
 }
 
 @media (max-width: 650px) {
@@ -121,7 +125,7 @@
 }
 
 .oppia-exploration-footer .oppia-exploration-footer-sharing-links li {
-  float: left;
+  float: right;
 }
 
 .oppia-exploration-footer .oppia-exploration-footer-container {

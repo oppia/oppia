@@ -7,15 +7,17 @@
   Some additional rules that can be added to the CSS files can be found here:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
+
 .arrow-forward {
   color: #00645c;
   font-size: 14px;
-  margin-left: 4px;
+  margin-right: 4px;
 }
 .launch {
   font-size: 15px;
-  margin-left: 90px;
+  margin-right: 90px;
 }
+
 .underline:hover,
 .underline:focus {
   border-bottom: 2px solid #333;
@@ -82,11 +84,11 @@
   font-weight: 400;
   line-height: 20px;
   padding: 0;
-  padding-left: 28px;
+  padding-right: 28px;
   text-overflow: clip;
 }
 .item-border {
-  border-right: 1px solid rgba(33, 33, 33, 0.102);
+  border-left: 1px solid rgba(33, 33, 33, 0.102);
 }
 
 .top-section {
@@ -116,12 +118,8 @@
   float: right;
 }
 
-.navbar-header {
-  display: flex;
-  margin-left: -10px;
-}
 .dropdown-toggle::after {
-  margin-right: 0.255em;
+  margin-left: 0.255em;
 }
 
 .learn-dropdown-menu {
@@ -166,8 +164,9 @@
   padding-top: 16px;
   text-transform: capitalize;
 }
+
 .learn-dropdown-menu .nav-item-left {
-  border-right: 1px solid rgba(0, 0, 0, 0.051);
+  border-left: 1px solid rgba(0, 0, 0, 0.051);
   padding: 32px;
   width: 388px;
 }
@@ -223,36 +222,34 @@
   line-height: 16.41px;
   padding: 0;
 }
-.dropdown-menu {
+.oppia-navbar-nav .dropdown-menu {
   border-radius: 3px;
   border-top-right-radius: 0;
   border-top-left-radius: 0;
-}
-
-.navbar-header .dropdown-menu {
-  left: 0 !important;
-  right: auto !important;
+  right: auto;
+  left: 0;
   text-align: right;
 }
 
 .language-icon {
   margin-top: -3px;
 }
+
 .language-padding-left {
-  padding-left: 26px;
+  padding-right: 26px;
 }
 .oppia-nav-right-dropdown {
   background-color: #fff;
   border-radius: 5px;
   border-width: 0;
-  box-shadow: 1px 1px 0 1px rgba(0,0,0,0.05);
+  box-shadow: -1px 1px 0 1px rgba(0,0,0,0.05);
   color: #737373;
   font-family: Roboto, arial, sans-serif;
   font-size: 14px;
   font-weight: bold;
   height: 40px;
-  padding-left: 8px;
   padding-right: 8px;
+  padding-left: 8px;
   vertical-align: middle;
   white-space: nowrap;
 }
@@ -274,7 +271,7 @@
 }
 .oppia-nav-right-dropdown:focus,
 .oppia-nav-right-dropdown:hover {
-  box-shadow: 1px 4px 5px 1px rgba(0,0,0,0.1);
+  box-shadow: -1px 4px 5px 1px rgba(0,0,0,0.1);
 }
 .oppia-nav-right-dropdown:active {
   background-color: #e5e5e5;
@@ -284,9 +281,14 @@
 .oppia-navbar-button-container.dropdown.oppia-navbar-button-container-extra-info {
   margin-right: 10px;
 }
+.oppia-navbar-button-container .btn.oppia-navbar-button {
+  margin-right: 5px;
+  margin-left: 0;
+}
+
 .oppia-signin-g-icon {
-  float: left;
-  padding: 10px 15px 10px 0;
+  float: right;
+  padding: 10px 0 10px 15px;
 }
 .oppia-navbar-dashboard-indicator-text {
   bottom: 0;
@@ -294,7 +296,7 @@
   font-size: 1.12rem;
   font-weight: bold;
   position: absolute;
-  right: 4px;
+  left: 4px;
 }
 .oppia-navbar-role-text {
   bottom: 0;
@@ -302,25 +304,25 @@
   font-size: 11px;
   font-weight: bold;
   position: absolute;
-  right: 3px;
+  left: 3px;
 }
 .oppia-navbar-dashboard-indicator {
   background-color: #f7a541;
   border-radius: 20px;
   height: 15px;
   position: absolute;
-  right: 25px;
+  left: 25px;
   top: 8px;
   width: 15px;
 }
 .oppia-navbar-menu {
-  margin-left: 10px;
+  margin-right: 10px;
   opacity: 0.9;
   outline-color: transparent;
   padding-top: 20px;
 }
 .oppia-navbar-profile {
-  float: right;
+  float: left;
 }
 .oppia-navbar-role-indicator {
   background-color: #f7a541;
@@ -328,41 +330,41 @@
   bottom: 10px;
   height: 15px;
   position: absolute;
-  right: 25px;
+  left: 25px;
   width: 15px;
 }
 .oppia-navbar-close-icon {
   color: #fff;
-  margin-right: 4px;
+  margin-left: 4px;
   margin-top: -10px;
 }
 .oppia-user-avatar-icon {
   margin-top: -1px;
 }
 .oppia-admin-text {
-  right: 4px;
+  left: 4px;
 }
 .oppia-navbar-button-container-extra-info {
-  margin-right: 10px;
+  margin-left: 10px;
 }
 .oppia-navbar-dropdown-menu {
-  margin-right: 15px;
+  margin-left: 15px;
   padding: 0;
 }
 .oppia-navbar-dropdown {
   border: 0;
-  border-top-left-radius: 0;
   border-top-right-radius: 0;
+  border-top-left-radius: 0;
   margin-top: 0;
 }
 
 .oppia-navbar-profile-picture-container .caret {
   margin: 4px;
-  margin-left: 10px;
+  margin-right: 10px;
 }
 .oppia-navbar-profile-picture-container {
-  margin-left: 10px;
-  text-align: right;
+  margin-right: 10px;
+  text-align: left;
 }
 
 .oppia-navbar-dropdown .nav-link {
@@ -413,15 +415,12 @@
   padding: 0;
 }
 
-.navbar-header .oppia-navbar-tab-content-heading:after {
-  right: 28px;
-}
 .oppia-navbar-tab-content-heading:after {
   border-style: solid;
   border-width: 0 0 1.59px;
   bottom: 1px;
   content: '';
-  left: 28px;
+  right: 28px;
   position: absolute;
   width: 50.5px;
 }
@@ -429,41 +428,34 @@
 .oppia-navbar-dropdown-heart-icon {
   color: #eb5757;
   font-size: 22px;
-  padding-right: 6px;
+  padding-left: 6px;
 }
 .oppia-navbar-tab-content-desc {
   color: #767676;
   line-height: 20px;
-  margin-left: 28px;
+  margin-right: 28px;
   opacity: 0.9;
 }
 .oppia-navbar-dropdown-right {
-  left: 0;
+  right: 0;
   min-width: 285px;
   padding: 0;
-  right: auto;
+  left: auto;
 }
 
-.oppia-navbar-profile .profile-dropdown:hover {
+.oppia-navbar-nav.oppia-navbar-profile .profile-dropdown:hover {
   background-color: #fff;
 }
 
 @media screen and (max-width: 880px) {
   .oppia-logo-wide {
-    margin-left: 0;
+    margin-right: 0;
   }
 }
 
 @media screen and (max-width: 840px) {
   .desktop-view-language-code {
     display: none;
-  }
-}
-
-@media (min-width: 768px) {
-  .oppia-top-navigation-bar.navbar-header {
-    float: right !important;
-    margin-right: -15px;
   }
 }
 

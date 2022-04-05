@@ -8,7 +8,6 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-/*rtl:begin:ignore*/
 .oppia-profile-picture-edit-prompt {
   background-color: #333;
   border-radius: 5px;
@@ -20,7 +19,7 @@
   top: 50%;
   transform: translate(-50%, -50%);
 }
-/*rtl:end:ignore*/
+
 .oppia-profile-container .oppia-profile-portfolio-pages .oppia-navigation-mouse-pointer:hover {
   background-color: #808080;
   border-radius: 50%;
@@ -57,7 +56,6 @@
   font-weight: normal;
 }
 
-/*rtl:begin:ignore*/
 .oppia-profile-user-card {
   background-color: #fff;
   float: left;
@@ -75,7 +73,6 @@
   position: relative;
   width: 90%;
 }
-/*rtl:end:ignore*/
 
 .oppia-subscription-button,
 .oppia-subscription-button:focus,

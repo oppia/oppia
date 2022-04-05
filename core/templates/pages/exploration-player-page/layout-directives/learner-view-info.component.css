@@ -27,7 +27,6 @@
   font-weight: normal;
   margin-bottom: 1px;
 }
-/*rtl:begin:ignore*/
 .oppia-topic-title {
   color: #fff;
   display: flex;
@@ -35,7 +34,6 @@
   font-weight: 200;
   padding-left: 26px;
 }
-/*rtl:end:ignore*/
 
 .oppia-topic-title:hover {
   color: #fff;
@@ -53,10 +51,8 @@
 .oppia-navbar-info-icon {
   font-size: 20px;
 }
-/*rtl:begin:ignore*/
 .oppia-navbar-breadcrumb-icon {
   height: 20px;
   margin: 0 12px 4px 12px;
   width: 20px;
 }
-/*rtl:end:ignore*/

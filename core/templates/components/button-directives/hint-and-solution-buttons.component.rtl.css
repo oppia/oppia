@@ -19,19 +19,19 @@
 }
 
 .hint-box-add-ons {
-  left: 5px;
+  right: -5.5px;
 }
 
 .hint-box-add-ons .close {
-  left: -5px;
+  right: 0;
 }
 
 .hint-box-add-ons::after {
-  margin-left: -173px;
+  margin-right: 163px;
 }
 
 .hint-box-add-ons::before {
-  margin-left: -175px;
+  margin-right: 161px;
 }
 
 .hint-box {
@@ -55,14 +55,11 @@
   z-index: 2;
 }
 
-/* Hint box popup's position gets misaligned if right is set to 50%
-   in rtl css after convertion, hence we ignore this block.
-*/
 .hint-box::after,
 .hint-box::before {
   border: solid transparent;
   content: " ";
-  left: 50%;
+  right: 50%;
   position: absolute;
   top: 100%;
 }
@@ -113,21 +110,21 @@
   .hint-box-add-ons .close {
     bottom: 10px;
     font-size: 22px;
-    left: -5px;
+    right: 295px;
     margin: 0 10px;
     position: fixed;
   }
 
   .hint-box-add-ons {
-    left: -58px;
+    right: -18px;
   }
 
   .hint-box-add-ons::before {
-    margin-left: -142px;
+    margin-right: 125px;
   }
 
   .hint-box-add-ons::after {
-    margin-left: -140px;
+    margin-right: 127px;
   }
 
   .hint-box {

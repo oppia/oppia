@@ -8,12 +8,10 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-/*rtl:begin:ignore*/
 .oppia-learner-view-card-content .oppia-learner-confirm-button {
   margin-bottom: 10px;
   margin-left: 10px;
 }
-/*rtl:end:ignore*/
 
 .oppia-learner-view-card-top-section {
   padding: 0 20px;
@@ -79,7 +77,6 @@
   border: 3px solid #f3d140;
 }
 
-/*rtl:begin:ignore*/
 .conversation-skin-future-tutor-card {
   background: #fff;
   border-radius: 2px;
@@ -87,7 +84,6 @@
   padding-top: 20px;
   text-align: left;
 }
-/*rtl:end:ignore*/
 
 .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
   background-color: rgba(236,239,241,0.4);
@@ -102,12 +98,10 @@
   display: none;
 }
 
-/*rtl:begin:ignore*/
 .oppia-learner-view-card.ng-hide {
   opacity: 0;
   transform: translateX(-1000px);
 }
-/*rtl:end:ignore*/
 
 .conversation-skin-responses-dropdown-container {
   border-bottom: 1px solid #ccc;
@@ -133,7 +127,6 @@
   transition: all 0.2s;
 }
 
-/*rtl:begin:ignore*/
 .conversation-skin-responses-dropdown-icon-rotated {
   margin-bottom: -2px;
   -moz-transform: rotate(90deg);
@@ -154,7 +147,6 @@
   left: -20px;
   top: 14px;
 }
-/*rtl:end:ignore*/
 
 .oppia-conversation-skin-inline-interaction {
   opacity: 0.8;
@@ -190,13 +182,11 @@
     background-color: #115fd4;
   }
 
-  /*rtl:begin:ignore*/
   .oppia-learner-view-card {
     margin-left: 0;
     padding-bottom: 0;
     padding-left: 0;
   }
-  /*rtl:end:ignore*/
 }
 
 @media screen and (max-width: 768px) {
