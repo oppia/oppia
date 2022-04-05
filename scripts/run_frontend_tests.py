@@ -23,7 +23,6 @@ import sys
 
 from typing import Optional, Sequence
 
-
 from . import build
 from . import check_frontend_test_coverage
 from . import common
