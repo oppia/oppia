@@ -23,6 +23,7 @@ import copy
 import datetime
 import os
 import sys
+import time
 import urllib
 
 from core import feconf
@@ -826,15 +827,11 @@ class UtilsTests(test_utils.GenericTestBase):
         test_string = utils.generate_new_session_id()
         self.assertEqual(24, len(test_string))
         self.assertIsInstance(test_string, str)
-        test_string_utf8 = test_string.encode('utf-8')
-        test_string_utf16 = test_string.encode('utf-16')
-        self.assertEqual(
-            len(test_string), len(test_string_utf8))
-        self.assertNotEqual(
-            len(test_string), len(test_string_utf16))
+        list_not_allowed = ['+', '/']
+        for i in list_not_allowed:
+            self.assertNotIn(i, test_string)
 
     def test_require_valid_name_with_incorrect_input(self) -> None:
-        """ADD TEST ESCAPE SEQUENCE CHARACTERS CHECK."""
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The length of the exploration title should be between 1 and 50 ' 'characters; received '):   # pylint: disable=line-too-long
@@ -929,8 +926,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_get_current_time_in_millisecs_with_current_time(self) -> None:
         time_instance1 = utils.get_current_time_in_millisecs()
-        if isinstance(time_instance1, float):
-            pass
+        time.sleep(2)
         time_instance2 = utils.get_current_time_in_millisecs()
         self.assertLess(time_instance1, time_instance2)
 
