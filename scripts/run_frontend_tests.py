@@ -20,7 +20,9 @@ import argparse
 import os
 import subprocess
 import sys
+
 from typing import Optional, Sequence
+
 
 from . import build
 from . import check_frontend_test_coverage
@@ -80,6 +82,9 @@ def run_dtslint_type_tests() -> None:
            TYPESCRIPT_DIR_RELATIVE_PATH]
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
+    # Here stdout method of an instance 'task' may contain None value which can
+    # give error while accessing other methods from here. Hence added
+    # an ignore.
     assert task.stdout is not None
     # Reads and prints realtime output from the subprocess until it terminates.
     while True:
@@ -130,6 +135,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
+    # Here stdout method of an instance 'task' may contain None value which can
+    # give error while accessing other methods from here. Hence added
+    # an ignore.
     assert task.stdout is not None
     # Reads and prints realtime output from the subprocess until it terminates.
     while True:
