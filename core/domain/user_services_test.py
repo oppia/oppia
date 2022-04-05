@@ -46,6 +46,16 @@ auth_models, user_models = (
 bulk_email_services = models.Registry.import_bulk_email_services()
 
 
+def _get_change_list(state_name, property_name, new_value):
+    """Generates a change list for a single state change."""
+    return [exp_domain.ExplorationChange({
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'state_name': state_name,
+        'property_name': property_name,
+        'new_value': new_value
+    })]
+
+
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
 
