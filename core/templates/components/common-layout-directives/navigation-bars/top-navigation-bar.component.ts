@@ -50,7 +50,7 @@ interface LanguageInfo {
   templateUrl: './top-navigation-bar.component.html',
 })
 export class TopNavigationBarComponent implements OnInit, OnDestroy {
-  // The properties below are initialized in Angular lifecycle hooks
+  // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() headerText!: string;
@@ -198,7 +198,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
               .then((classroomData) => {
                 this.classroomData = classroomData.getTopicSummaries();
                 this.classroomBackendApiService.onInitializeTranslation.emit();
-                this.siteAnalyticsService.registerClassroomPageViewed();
                 // Store hacky tranlation keys of topics.
                 for (let i = 0; i < this.classroomData.length; i++) {
                   let topicSummary = this.classroomData[i];
@@ -428,6 +427,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   toggleSidebar(event: Event): void {
     this.sidebarStatusService.toggleSidebar();
     this.sidebarStatusService.toggleHamburgerIconStatus(event);
+    if (this.isSidebarShown()) {
+      this.windowRef.nativeWindow.document.body.style.overflowY = 'hidden';
+    } else {
+      this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
+    }
   }
 
   navigateToClassroomPage(classroomUrl: string): void {
@@ -435,10 +439,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = classroomUrl;
     }, 150);
-  }
-
-  navigateToPage(url: string): void {
-    this.windowRef.nativeWindow.location.href = url;
   }
 
   /**

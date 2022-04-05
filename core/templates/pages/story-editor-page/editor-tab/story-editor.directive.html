@@ -103,12 +103,11 @@
               <div class="oppia-editor-card-body">
                 <label class="form-heading">Notes</label>
                 <div ng-if="!notesEditorIsShown">
-                  <div ng-class="oppia-editable-section" ng-click="openNotesEditor()" class="protractor-test-open-story-notes-editor-button">
+                  <div ng-click="openNotesEditor()" class="oppia-editable-section protractor-test-open-story-notes-editor-button">
                     <i class="material-icons oppia-editor-edit-icon float-right"
                        title="Edit Story Notes">&#xE254;
                     </i>
-                    <div class="oppia-state-content-display oppia-transition-200"
-                         ng-class="oppia-prevent-selection"
+                    <div class="oppia-state-content-display oppia-transition-200 oppia-prevent-selection"
                          title="Story notes">
                       <span class="oppia-placeholder" ng-show="editableNotes === ''">
                           Add notes about the story to help other contributors.
