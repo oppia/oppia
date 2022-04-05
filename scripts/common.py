@@ -32,6 +32,9 @@ import time
 from core import constants
 from core import utils
 
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
+
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
 CURRENT_PYTHON_BIN = sys.executable
