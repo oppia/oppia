@@ -498,6 +498,7 @@ import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { QuestionValidationService } from './question-validation.service';
+import { MathInteractionsService } from './math-interactions.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -521,7 +522,9 @@ export class UpgradedServices {
     upgradedServices['AdminRouterService'] = new AdminRouterService();
     upgradedServices['AdminTaskManagerService'] = new AdminTaskManagerService();
     upgradedServices['AlgebraicExpressionInputRulesService'] =
-      new AlgebraicExpressionInputRulesService();
+      new AlgebraicExpressionInputRulesService(
+        new MathInteractionsService(),
+        new NumericExpressionInputRulesService());
     upgradedServices['AngularNameService'] = new AngularNameService();
     upgradedServices['AppService'] = new AppService();
     upgradedServices['AudioBarStatusService'] = new AudioBarStatusService();
@@ -577,7 +580,9 @@ export class UpgradedServices {
     upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
       new UtilsService);
     upgradedServices['MathEquationInputRulesService'] =
-      new MathEquationInputRulesService();
+      new MathEquationInputRulesService(
+        upgradedServices['AlgebraicExpressionInputRulesService']
+      );
     upgradedServices['Meta'] = new Meta({});
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();

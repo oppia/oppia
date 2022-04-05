@@ -39,15 +39,13 @@ import { Stopwatch } from 'domain/utilities/stopwatch.model';
 class CyclicStateTransitionsTracker {
   /** A path of visited states without any repeats. */
   private pathOfVisitedStates: string[];
-  // This property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   /** The most recently discovered cycle of visited states. */
-  private cycleOfVisitedStates!: string[];
+  private cycleOfVisitedStates: string[];
   private numLoops: number;
 
   constructor(initStateName: string) {
     this.pathOfVisitedStates = [initStateName];
+    this.cycleOfVisitedStates = null;
     this.numLoops = 0;
   }
 
@@ -98,8 +96,7 @@ class CyclicStateTransitionsTracker {
     this.pathOfVisitedStates.push(destStateName);
   }
 
-  generateIssueCustomizationArgs():
-    CyclicStateTransitionsCustomizationArgs {
+  generateIssueCustomizationArgs(): CyclicStateTransitionsCustomizationArgs {
     return {
       state_names: {value: this.cycleOfVisitedStates}
     };
@@ -117,16 +114,12 @@ class CyclicStateTransitionsTracker {
 }
 
 class EarlyQuitTracker {
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  private stateName!: string;
-  private expDurationInSecs!: number;
+  private stateName: string = null;
+  private expDurationInSecs: number = null;
 
   foundAnIssue(): boolean {
-    // TODO(#15212): Remove the below check once codebase is strictly typed.
     return (
-      this.expDurationInSecs !== undefined &&
+      this.expDurationInSecs !== null &&
       this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
   }
 
@@ -178,19 +171,16 @@ class MultipleIncorrectAnswersTracker {
   providedIn: 'root'
 })
 export class PlaythroughService {
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  private explorationId!: string;
-  private explorationVersion!: number;
-  private learnerIsInSamplePopulation: boolean = false;
+  private explorationId: string = null;
+  private explorationVersion: number = null;
+  private learnerIsInSamplePopulation: boolean = null;
 
-  private eqTracker!: EarlyQuitTracker;
-  private cstTracker!: CyclicStateTransitionsTracker;
-  private misTracker!: MultipleIncorrectAnswersTracker;
-  private recordedLearnerActions!: LearnerAction[];
-  private playthroughStopwatch!: Stopwatch;
-  private playthroughDurationInSecs!: number;
+  private eqTracker: EarlyQuitTracker = null;
+  private cstTracker: CyclicStateTransitionsTracker = null;
+  private misTracker: MultipleIncorrectAnswersTracker = null;
+  private recordedLearnerActions: LearnerAction[] = null;
+  private playthroughStopwatch: Stopwatch = null;
+  private playthroughDurationInSecs: number = null;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
@@ -234,25 +224,18 @@ export class PlaythroughService {
       return;
     }
 
-    // TODO(#15212): Remove the below check once codebase is strictly typed.
-    if (
-      this.recordedLearnerActions &&
-      this.misTracker &&
-      this.cstTracker
-    ) {
-      this.recordedLearnerActions.push(
-        this.learnerActionObjectFactory.createNewAnswerSubmitAction({
-          state_name: {value: stateName},
-          dest_state_name: {value: destStateName},
-          interaction_id: {value: interactionId},
-          submitted_answer: {value: answer},
-          feedback: {value: feedback},
-          time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
-        }));
+    this.recordedLearnerActions.push(
+      this.learnerActionObjectFactory.createNewAnswerSubmitAction({
+        state_name: {value: stateName},
+        dest_state_name: {value: destStateName},
+        interaction_id: {value: interactionId},
+        submitted_answer: {value: answer},
+        feedback: {value: feedback},
+        time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
+      }));
 
-      this.misTracker.recordStateTransition(destStateName);
-      this.cstTracker.recordStateTransition(destStateName);
-    }
+    this.misTracker.recordStateTransition(destStateName);
+    this.cstTracker.recordStateTransition(destStateName);
   }
 
   recordExplorationQuitAction(
@@ -261,23 +244,15 @@ export class PlaythroughService {
       return;
     }
 
-    // TODO(#15212): Remove the below check once codebase is strictly typed.
-    if (
-      this.recordedLearnerActions &&
-      this.playthroughStopwatch &&
-      this.eqTracker
-    ) {
-      this.recordedLearnerActions.push(
-        this.learnerActionObjectFactory.createNewExplorationQuitAction({
-          state_name: {value: stateName},
-          time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
-        }));
+    this.recordedLearnerActions.push(
+      this.learnerActionObjectFactory.createNewExplorationQuitAction({
+        state_name: {value: stateName},
+        time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
+      }));
 
-      this.playthroughDurationInSecs = (
-        this.playthroughStopwatch.getTimeInSecs());
-      this.eqTracker.recordExplorationQuit(
-        stateName, this.playthroughDurationInSecs);
-    }
+    this.playthroughDurationInSecs = this.playthroughStopwatch.getTimeInSecs();
+    this.eqTracker.recordExplorationQuit(
+      stateName, this.playthroughDurationInSecs);
   }
 
   storePlaythrough(): void {
@@ -299,39 +274,24 @@ export class PlaythroughService {
    * If none of the issue types have been discovered, returns null instead.
    */
   private createNewPlaythrough(): Playthrough | null {
-    // TODO(#15212): Remove the below check once codebase is strictly typed.
-    if (
-      this.explorationId &&
-      this.explorationVersion &&
-      this.recordedLearnerActions
-    ) {
-      if (this.misTracker && this.misTracker.foundAnIssue()) {
-        return this.playthroughObjectFactory
-          .createNewMultipleIncorrectSubmissionsPlaythrough(
-            this.explorationId, this.explorationVersion,
-            this.misTracker.generateIssueCustomizationArgs(),
-            this.recordedLearnerActions);
-      } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
-        const cstTrackerIssueCustomizationArgs = (
-          this.cstTracker.generateIssueCustomizationArgs());
-        if (cstTrackerIssueCustomizationArgs !== undefined) {
-          return this.playthroughObjectFactory
-            .createNewCyclicStateTransitionsPlaythrough(
-              this.explorationId, this.explorationVersion,
-              cstTrackerIssueCustomizationArgs,
-              this.recordedLearnerActions);
-        }
-      } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
-        const eqTrackerIssueCustomizationArgs = (
-          this.eqTracker.generateIssueCustomizationArgs());
-        if (eqTrackerIssueCustomizationArgs !== undefined) {
-          return this.playthroughObjectFactory
-            .createNewEarlyQuitPlaythrough(
-              this.explorationId, this.explorationVersion,
-              eqTrackerIssueCustomizationArgs,
-              this.recordedLearnerActions);
-        }
-      }
+    if (this.misTracker && this.misTracker.foundAnIssue()) {
+      return this.playthroughObjectFactory
+        .createNewMultipleIncorrectSubmissionsPlaythrough(
+          this.explorationId, this.explorationVersion,
+          this.misTracker.generateIssueCustomizationArgs(),
+          this.recordedLearnerActions);
+    } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
+      return this.playthroughObjectFactory
+        .createNewCyclicStateTransitionsPlaythrough(
+          this.explorationId, this.explorationVersion,
+          this.cstTracker.generateIssueCustomizationArgs(),
+          this.recordedLearnerActions);
+    } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
+      return this.playthroughObjectFactory
+        .createNewEarlyQuitPlaythrough(
+          this.explorationId, this.explorationVersion,
+          this.eqTracker.generateIssueCustomizationArgs(),
+          this.recordedLearnerActions);
     }
     return null;
   }
@@ -344,18 +304,12 @@ export class PlaythroughService {
 
   private hasRecordingBegun(): boolean {
     return (
-      // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
-      // codebase is strictly typed.
-      this.recordedLearnerActions &&
-      this.isPlaythroughRecordingEnabled()
-    );
+      this.isPlaythroughRecordingEnabled() &&
+      this.recordedLearnerActions !== null);
   }
 
   private hasRecordingFinished(): boolean {
     return (
-      // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
-      // codebase is strictly typed.
-      this.recordedLearnerActions &&
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
       this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
@@ -364,9 +318,6 @@ export class PlaythroughService {
 
   private isRecordedPlaythroughHelpful(): boolean {
     return (
-      // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
-      // codebase is strictly typed.
-      this.recordedLearnerActions &&
       // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.
