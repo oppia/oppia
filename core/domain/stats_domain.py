@@ -331,7 +331,7 @@ class ExplorationStats:
 
         exploration_stats_dict = self.to_dict()
         # Ignore[misc] is used here because mypy expects TypedDict key to be s
-        # string literal, but because the key is being accessed by a variable 
+        # string literal, but because the key is being accessed by a variable
         # instead of a string, mypy does not recognize that the key is a string.
         for stat_property in exploration_stats_properties:
             if not isinstance(exploration_stats_dict[stat_property], int): # type: ignore[misc]
