@@ -36,9 +36,9 @@ from typing import Iterator
 def recursive_items(dictionary: dict) -> Iterator[tuple]:
     """Yields an iterator containing tuples of key, value pairs
 
-        Yields:
-            tuple. Yields tuples of key, value pairs.
-        """
+    Yields:
+        tuple. Yields tuples of key, value pairs.
+    """
     for key, value in dictionary.items():
         if isinstance(value, dict):
             yield from recursive_items(value)
