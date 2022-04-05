@@ -1369,7 +1369,7 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
 def generate_python_package() -> None:
     """Generates Python package using setup.py."""
     print('Building Oppia package...')
-    subprocess.check_call('python setup.py sdist -d build', shell=True)
+    subprocess.check_call('python setup.py -q sdist -d build', shell=True)
     print('Oppia package build completed.')
 
 
