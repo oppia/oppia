@@ -38,11 +38,12 @@ class GetNumberOfSkillsWithInvalidRubricExplanationsJob(base_jobs.JobBase):
 
     def get_rubrics_with_invalid_explanations(self, rubrics):
         """Returns the details about rubrics with invalid explanations.
-        
+
         Args:
             rubrics: list(dict). List of rubric dicts.
 
-        Returns: dict. The details about rubrics with invalid explanations.
+        Returns:
+            dict. The details about rubrics with invalid explanations.
         """
         len_of_easy_rubric_explanations = 0
         len_of_medium_rubric_explanations = 0
