@@ -183,6 +183,11 @@ indexes:
 
 - kind: GeneralSuggestionModel
   properties:
+  - name: target_id
+  - name: author_id
+
+- kind: GeneralSuggestionModel
+  properties:
   - name: author_id
   - name: deleted
   - name: suggestion_type
