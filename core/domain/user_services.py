@@ -2294,7 +2294,8 @@ def get_dashboard_stats(user_id):
 
 
 def _get_checkpoints_in_order(init_state_name, states):
-    """Returns the checkpoints of an exoloration in sequential order.
+    """Returns the checkpoints of an exploration in sequential order by a
+    BFS traversal.
 
     Args:
         init_state_name: str. The name of the first state of the exploration.
