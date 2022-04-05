@@ -1,4 +1,3 @@
-
 # coding: utf-8
 #
 # Copyright 2022 The Oppia Authors. All Rights Reserved.
@@ -15,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validation Jobs for exploration model"""
+"""Validation Jobs for exploration models"""
 
 from __future__ import annotations
 
+from core.domain import exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -32,7 +32,7 @@ from typing import Iterator
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 
-# https://stackoverflow.com/questions/39233973/get-all-keys-of-a-nested-dictionary  # pylint: disable=line-too-long
+# https://stackoverflow.com/questions/39233973/get-all-keys-of-a-nested-dictionary
 def recursive_items(dictionary: dict) -> Iterator[tuple]:
     """Yields an iterator containing tuples of key, value pairs
 
@@ -64,7 +64,7 @@ def get_invalid_links(dictionary: dict) -> list:
     cleaned_links = []
     for link in links:
         # Remove &quot; from the links.
-        cleaned_links.append(link.get('url-with-value')[6:-6])
+        cleaned_links.append(link.get('url-with-value').replace('&quot;', ''))
 
     invalid_links = []
     # Extract scheme.
@@ -78,7 +78,7 @@ def get_invalid_links(dictionary: dict) -> list:
     return invalid_links
 
 
-class GetNumberOfInvalidExpJob(base_jobs.JobBase):
+class GetExpsWithInvalidURLJob(base_jobs.JobBase):
     """Job that returns invalid exploration models."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -129,6 +129,65 @@ class GetNumberOfInvalidExpJob(base_jobs.JobBase):
                 report_number_of_exps_queried,
                 report_number_of_invalid_exps,
                 report_invalid_ids
+            )
+            | 'Combine results' >> beam.Flatten()
+        )
+
+
+# TODO(#14943): Remove this job after we fix the exploration titles length.
+class GetNumberOfExpExceedsMaxTitleLengthJob(base_jobs.JobBase):
+    """Job that returns exploration having title length more than 36."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns PCollection of invalid explorations with their id and
+        actual length.
+
+        Returns:
+            PCollection. Returns PCollection of invalid explorations with
+            their id and actual length.
+        """
+        total_explorations = (
+            self.pipeline
+            | 'Get all ExplorationModels' >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all(include_deleted=False))
+            | 'Get exploration from model' >> beam.Map(
+                exp_fetchers.get_exploration_from_model)
+        )
+
+        exp_ids_with_exceeding_max_title_len = (
+            total_explorations
+            | 'Combine exploration title and ids' >> beam.Map(
+                lambda exp: (exp.id, exp.title))
+            | 'Filter exploraton with title length greater than 36' >>
+                beam.Filter(lambda exp: len(exp[1]) > 36)
+        )
+
+        report_number_of_exps_queried = (
+            total_explorations
+            | 'Report count of exp models' >> (
+                job_result_transforms.CountObjectsToJobRunResult('EXPS'))
+        )
+
+        report_number_of_invalid_exps = (
+            exp_ids_with_exceeding_max_title_len
+            | 'Report count of invalid exp models' >> (
+                job_result_transforms.CountObjectsToJobRunResult('INVALID'))
+        )
+
+        report_invalid_ids_and_their_actual_len = (
+            exp_ids_with_exceeding_max_title_len
+            | 'Save info on invalid exps' >> beam.Map(
+                lambda objects: job_run_result.JobRunResult.as_stderr(
+                    'The id of exp is %s and its actual len is %s'
+                    % (objects[0], len(objects[1]))
+                ))
+        )
+
+        return (
+            (
+                report_number_of_exps_queried,
+                report_number_of_invalid_exps,
+                report_invalid_ids_and_their_actual_len
             )
             | 'Combine results' >> beam.Flatten()
         )
