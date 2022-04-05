@@ -1482,7 +1482,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
                     feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
                 'furthest_reached_checkpoint_exp_version': None,
                 'furthest_reached_checkpoint_state_name': None,
-                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_exp_version': None,
                 'most_recently_reached_checkpoint_state_name': None
             },
             self.EXP_ID_THREE: {

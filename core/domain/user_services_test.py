@@ -30,6 +30,7 @@ from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import suggestion_services
@@ -44,6 +45,14 @@ auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 bulk_email_services = models.Registry.import_bulk_email_services()
 
+def _get_change_list(state_name, property_name, new_value):
+    """Generates a change list for a single state change."""
+    return [exp_domain.ExplorationChange({
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'state_name': state_name,
+        'property_name': property_name,
+        'new_value': new_value
+    })]
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
@@ -1317,6 +1326,277 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             datetime.datetime)
         self.assertTrue(
             user_settings.last_started_state_translation_tutorial is not None)
+
+    def test_set_user_has_viewed_lesson_info_modal_once(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        self.assertFalse(
+            user_settings_model.user_has_viewed_lesson_info_modal_once)
+
+        user_services.set_user_has_viewed_lesson_info_modal_once(user_id)
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        self.assertTrue(
+            user_settings_model.user_has_viewed_lesson_info_modal_once)
+
+
+class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
+    """Tests whether user checkpoint progress is updated correctly"""
+
+    EXP_ID = 'exp_id0'
+
+    SAMPLE_EXPLORATION_YAML = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  Introduction:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: New state
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Introduction
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint_1
+          html: <p>hint one,</p>
+      id: TextInput
+      solution:
+        answer_is_exclusive: false
+        correct_answer: helloworld!
+        explanation:
+          content_id: solution
+          html: <p>hello_world is a string</p>
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: introduction_state.mp3
+            needs_update: false
+        default_outcome:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: unknown_answer_feedback.mp3
+            needs_update: false
+        feedback_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: correct_answer_feedback.mp3
+            needs_update: false
+        hint_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: answer_hint.mp3
+            needs_update: false
+        rule_input_3: {}
+        solution:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: answer_solution.mp3
+            needs_update: false
+    solicit_answer_details: false
+    card_is_checkpoint: true
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
+        rule_input_3: {}
+        solution: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: New state
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    card_is_checkpoint: true
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
+tags: []
+title: Title
+""")
+
+    def setUp(self):
+        super(UserCheckpointProgressUpdateTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.SAMPLE_EXPLORATION_YAML, self.EXP_ID, [])
+        self.exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+
+    def test_user_checkpoint_progress_is_updated_correctly(self):
+        self.login(self.VIEWER_EMAIL)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertIsNone(exploration_user_data)
+
+        # First checkpoint reached.
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Introduction', 1)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_state_name, 'Introduction')
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_state_name, 'Introduction')
+
+        # Make 'New state' a checkpoint.
+        # Now version of the exploration becomes 2.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, _get_change_list(
+                'New state',
+                exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                True),
+            '')
+
+        # Second checkpoint reached.
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'New state', 2)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_state_name, 'New state')
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_state_name, 'New state')
+
+        # Restart the exploration.
+        user_services.update_learner_checkpoint_progress_on_restart(
+            self.viewer_id, self.EXP_ID)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_state_name, 'New state')
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_exp_version, None)
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_state_name, None)
+
+        # Unmark 'New state' as a checkpoint.
+        # Now version of the exploration becomes 3.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, _get_change_list(
+                'New state',
+                exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                False),
+            '')
+
+        # First checkpoint reached again.
+        # Since the previously furthest reached checkpoint 'New state' doesn't
+        # exist in the current exploration, the first checkpoint behind
+        # 'New state' that exists in current exploration ('Introduction'
+        # state in this case) becomes the new furthest reached checkpoint.
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Introduction', 3)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_exp_version, 3)
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_state_name, 'Introduction')
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_exp_version, 3)
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_state_name, 'Introduction')
 
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
@@ -2657,20 +2937,3 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             Exception, 'Invalid category: invalid_category'):
             user_services.get_contributor_usernames(
                 'invalid_category', language_code='hi')
-
-    def test_set_user_has_viewed_lesson_info_modal_once(self):
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_services.set_username(user_id, username)
-
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-        self.assertFalse(
-            user_settings_model.user_has_viewed_lesson_info_modal_once)
-
-        user_services.set_user_has_viewed_lesson_info_modal_once(user_id)
-
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-        self.assertTrue(
-            user_settings_model.user_has_viewed_lesson_info_modal_once)

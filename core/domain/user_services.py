@@ -2415,7 +2415,7 @@ def update_learner_checkpoint_progress(
             # If furthest reached checkpoint is behind most recently
             # reached checkpoint.
             if (checkpoints_in_current_exploration.index(
-                furthest_reached_checkpoint_in_current_exploration) < (
+                furthest_reached_checkpoint_in_current_exploration) <= (
                     checkpoints_in_current_exploration.index(state_name))):
                 (
                     exploration_user_model
