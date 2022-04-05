@@ -131,7 +131,8 @@ class UserSettingsModel(base_models.BaseModel):
         repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES)
     # Flag to indicate whether the user is banned.
     banned = datastore_services.BooleanProperty(indexed=True, default=False)
-    # Flag to check whether the user has viewed lesson info once.
+    # Flag to check whether the user has viewed lesson info modal once which
+    # shows the progress of the user through exploration checkpoints.
     user_has_viewed_lesson_info_modal_once = datastore_services.BooleanProperty(
         indexed=True, default=False)
 
