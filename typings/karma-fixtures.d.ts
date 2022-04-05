@@ -93,8 +93,6 @@ interface RuleTemplates {
     MatchesExactlyWith: RuleDescription;
     MatchesUpToTrivialManipulations: RuleDescription;
     IsEquivalentTo: RuleDescription;
-    OmitsSomeOf: RuleDescription;
-    MatchesWithGeneralForm: RuleDescription;
   };
   CodeRepl: {
     CodeEquals: RuleDescription;
@@ -145,7 +143,6 @@ interface RuleTemplates {
     MatchesExactlyWith: RuleDescription;
     MatchesUpToTrivialManipulations: RuleDescription;
     IsEquivalentTo: RuleDescription;
-    OmitsSomeOf: RuleDescription;
   };
   MultipleChoiceInput: {
     Equals: RuleDescription;
@@ -166,7 +163,6 @@ interface RuleTemplates {
     MatchesExactlyWith: RuleDescription;
     MatchesUpToTrivialManipulations: RuleDescription;
     IsEquivalentTo: RuleDescription;
-    OmitsSomeOf: RuleDescription;
   };
   NumericInput: {
     Equals: RuleDescription;

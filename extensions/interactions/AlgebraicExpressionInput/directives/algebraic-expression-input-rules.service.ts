@@ -94,47 +94,6 @@ export class AlgebraicExpressionInputRulesService {
       simplifiedLearnerAnswer
     ).eq(simplifiedCreatorAnswer);
   }
-
-  OmitsSomeOf(
-      answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
-    // There must be at least one term in the input that is not present in the
-    // answer.
-    // Inserting '*' signs between variables if not present.
-    answer = this.mathInteractionsService.insertMultiplicationSigns(answer);
-    inputs.x = this.mathInteractionsService.insertMultiplicationSigns(inputs.x);
-
-    // The expression is first split into terms by addition and subtraction.
-    let answerTerms = this.mathInteractionsService.getTerms(answer);
-    let inputTerms = this.mathInteractionsService.getTerms(inputs.x);
-
-    for (let inputTerm of inputTerms) {
-      let matched = false;
-      for (let answerTerm of answerTerms) {
-        if (this.mathInteractionsService.doTermsMatch(answerTerm, inputTerm)) {
-          matched = true;
-          break;
-        }
-      }
-      if (!matched) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  MatchesWithGeneralForm(
-      answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithPlaceholder): boolean {
-    // Inserting '*' signs between variables if not present.
-    answer = this.mathInteractionsService.insertMultiplicationSigns(answer);
-    inputs.x = this.mathInteractionsService.insertMultiplicationSigns(inputs.x);
-
-    let placeholders = inputs.y;
-
-    return this.mathInteractionsService.expressionMatchWithPlaceholders(
-      inputs.x, answer, placeholders);
-  }
 }
 
 angular.module('oppia').factory(

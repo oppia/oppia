@@ -581,8 +581,7 @@
       "MatchesExactlyWith": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}",
       "IsEquivalentTo": "is equivalent to {{x|MathEquation}}",
       "ContainsSomeOf": "contains at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
-      "OmitsSomeOf": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
-      "MatchesWithGeneralForm": "matches the form of {{x|MathEquation}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
+      "OmitsSomeOf": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}"
     }
   },
   "MultipleChoiceInput": {
@@ -875,8 +874,7 @@
       "MatchesExactlyWith": "matches exactly with {{x|AlgebraicExpression}}",
       "IsEquivalentTo": "is equivalent to {{x|AlgebraicExpression}}",
       "ContainsSomeOf": "contains at least one of the terms present in {{x|AlgebraicExpression}}",
-      "OmitsSomeOf": "omits at least one of the terms present in {{x|AlgebraicExpression}}",
-      "MatchesWithGeneralForm": "matches the form of {{x|AlgebraicExpression}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
+      "OmitsSomeOf": "omits at least one of the terms present in {{x|AlgebraicExpression}}"
     }
   },
   "FractionInput": {

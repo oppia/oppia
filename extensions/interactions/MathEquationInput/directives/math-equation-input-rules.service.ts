@@ -199,60 +199,6 @@ export class MathEquationInputRulesService {
     // If none of the checks pass, the answer is not equivalent.
     return false;
   }
-
-  OmitsSomeOf(
-      answer: MathEquationAnswer,
-      inputs: MathEquationRuleInputsWithSide): boolean {
-    let positionOfTerms = inputs.y;
-
-    let splitAnswer = answer.split('=');
-    let lhsAnswer = splitAnswer[0];
-    let rhsAnswer = splitAnswer[1];
-
-    let splitInput = inputs.x.split('=');
-    let lhsInput = splitInput[0];
-    let rhsInput = splitInput[1];
-
-    if (positionOfTerms === 'lhs') {
-      return this.algebraicRulesService.OmitsSomeOf(lhsAnswer, {x: lhsInput});
-    } else if (positionOfTerms === 'rhs') {
-      return this.algebraicRulesService.OmitsSomeOf(rhsAnswer, {x: rhsInput});
-    } else if (positionOfTerms === 'both') {
-      return (
-        this.algebraicRulesService.OmitsSomeOf(lhsAnswer, {x: lhsInput}) && (
-          this.algebraicRulesService.OmitsSomeOf(rhsAnswer, {x: rhsInput})));
-    } else {
-      // Position of terms is irrelevant. So, we bring all terms on one side
-      // and perform an exact match.
-      let rhsAnswerModified = nerdamer(rhsAnswer).multiply('-1').text();
-      let expressionAnswer = nerdamer(rhsAnswerModified).add(lhsAnswer).text();
-
-      let rhsInputModified = nerdamer(rhsInput).multiply('-1').text();
-      let expressionInput = nerdamer(rhsInputModified).add(lhsInput).text();
-
-      return this.algebraicRulesService.OmitsSomeOf(
-        expressionAnswer, {x: expressionInput});
-    }
-  }
-
-  MatchesWithGeneralForm(
-      answer: MathEquationAnswer,
-      inputs: MathEquationRuleInputsWithPlaceholder): boolean {
-    let splitAnswer = answer.split('=');
-    let lhsAnswer = splitAnswer[0];
-    let rhsAnswer = splitAnswer[1];
-
-    let splitInput = inputs.x.split('=');
-    let lhsInput = splitInput[0];
-    let rhsInput = splitInput[1];
-
-    let placeholders = inputs.y;
-
-    return this.algebraicRulesService.MatchesWithGeneralForm(
-      lhsAnswer, {x: lhsInput, y: placeholders}) && (
-      this.algebraicRulesService.MatchesWithGeneralForm(
-        rhsAnswer, {x: rhsInput, y: placeholders}));
-  }
 }
 
 angular.module('oppia').factory(

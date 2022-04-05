@@ -8,12 +8,6 @@
     },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|AlgebraicExpression}}"
-    },
-    "OmitsSomeOf": {
-      "description": "omits at least one of the terms present in {{x|AlgebraicExpression}}"
-    },
-    "MatchesWithGeneralForm": {
-      "description": "matches the form of {{x|AlgebraicExpression}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
     }
   },
   "CodeRepl": {
@@ -128,12 +122,6 @@
     },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|MathEquation}}"
-    },
-    "OmitsSomeOf": {
-      "description": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}"
-    },
-    "MatchesWithGeneralForm": {
-      "description": "matches the form of {{x|MathEquation}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
     }
   },
   "MultipleChoiceInput": {
@@ -178,9 +166,6 @@
     },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|NumericExpression}}"
-    },
-    "OmitsSomeOf": {
-      "description": "omits at least one of the terms present in {{x|NumericExpression}}"
     }
   },
   "NumericInput": {
