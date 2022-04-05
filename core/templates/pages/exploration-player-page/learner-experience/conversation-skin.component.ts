@@ -58,7 +58,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
-import { State } from 'domain/state/StateObjectFactory';
+import { State, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { InteractionRulesService } from '../services/answer-classification.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -72,6 +72,7 @@ import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ReadOnlyExplorationBackendApiService, ReadOnlyExplorationBackendDict } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -189,9 +190,11 @@ export class ConversationSkinComponent {
     private windowDimensionsService: WindowDimensionsService,
     private eebas: EditableExplorationBackendApiService,
     private roebas: ReadOnlyExplorationBackendApiService,
+    private stateObjectFactory: StateObjectFactory,
   ) {}
 
   ngOnInit(): void {
+    console.log("--------- testing load --------", this.displayedCard);
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.isLoggedIn = userInfo.isLoggedIn();
@@ -343,6 +346,8 @@ export class ConversationSkinComponent {
       // Required for the put operation to deliver data to backend.
     });
     this.visitedStateNames.push(firstStateName);
+    // this.changeCard(1);
+    this._navigateToMostRecentlyReachedCheckpoint()
   }
 
   // Returns a promise supplying the last saved version for the current
@@ -381,6 +386,7 @@ export class ConversationSkinComponent {
   }
 
   changeCard(index: number): void {
+    console.log("changing card", index);
     this.playerPositionService.recordNavigationButtonClick();
     this.playerPositionService.setDisplayedCardIndex(index);
     this.explorationEngineService.onUpdateActiveStateIfInEditor.emit(
@@ -600,11 +606,39 @@ export class ConversationSkinComponent {
     }
   }
 
+  private _navigateToMostRecentlyReachedCheckpoint(){
+    let version: number;
+    let states: StateObjectsBackendDict;
+    this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+      response => {
+        version = response.version;
+        states = response.exploration.states;
+
+        console.log(states, "states testing");
+        for (var key of Object.keys(states)) {
+          let state = this.stateObjectFactory.createFromBackendDict(
+            key, states[key]
+          )
+          this._addNewCard(
+            StateCard.createNewCard(
+              key, state.content.html, null, state.interaction,
+              state.recordedVoiceovers, state.writtenTranslations,
+              state.content.contentId,
+              this.audioTranslationLanguageService
+            )
+          );
+        }
+      }
+    );
+  }
+
   // Navigates to the currently-active card, and resets the
   // 'show previous responses' setting.
   private _navigateToDisplayedCard(): void {
     let index = this.playerPositionService.getDisplayedCardIndex();
+    console.log("testing index of the displayed card----------", index);
     this.displayedCard = this.playerTranscriptService.getCard(index);
+    console.log(this.displayedCard, "displayed card");
     if (index > 0) {
       let currentState = this.explorationEngineService.getState();
       let currentStateName = currentState.name;
@@ -616,6 +650,7 @@ export class ConversationSkinComponent {
             version = response.version;
           }
         );
+
         this.eebas.recordMostRecentlyReachedCheckpointAsync(
           this.explorationId,
           version,
@@ -820,8 +855,19 @@ export class ConversationSkinComponent {
   }
 
   private _initializeDirectiveComponents(initialCard, focusLabel): void {
+    console.log("came here as well")
     this._addNewCard(initialCard);
+
+    let transcriptLength = this.playerTranscriptService.getNumCards();
+    console.log(this.displayedCard, "displayedCard");
+    console.log(transcriptLength, "transcriptLength");
+
+    this.displayedCard.markAsCompleted();
+    this.playerPositionService.onNewCardAvailable.emit();
+    
+
     this.nextCard = initialCard;
+    console.log(this.nextCard, "next card");
     this.explorationPlayerStateService.onPlayerStateChange.emit(
       this.nextCard.getStateName());
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
