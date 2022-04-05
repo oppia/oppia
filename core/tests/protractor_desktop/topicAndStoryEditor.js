@@ -411,8 +411,13 @@ describe('Chapter editor functionality', function() {
   it('should fail to add one prerequisite skill which is already added as' +
     ' acquired skill', async function() {
     await storyEditorPage.navigateToChapterWithName('Chapter 1');
-    await storyEditorPage.addPrerequisiteSkill(dummySkills[0]);
+    await storyEditorPage.addAcquiredSkill(dummySkills[1]);
     await storyEditorPage.expectSaveStoryDisabled();
+    var warningRegex = new RegExp(
+      'The skill with id [a-zA-Z0-9]+ is common to both the acquired and ' +
+      'prerequisite skill id ' +
+      'list in .*');
+    await storyEditorPage.expectWarningInIndicator(warningRegex);
     await storyEditorPage.discardStoryChanges();
   });
 

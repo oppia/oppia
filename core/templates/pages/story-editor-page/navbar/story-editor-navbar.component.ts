@@ -104,6 +104,7 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   private _validateStory(): void {
+    this.story = this.storyEditorStateService.getStory();
     if (this.story === undefined) {
       return;
     }

@@ -220,9 +220,6 @@ describe('Story node model', () => {
       expect(() => {
         _sampleStoryNode.addAcquiredSkillId('skill_2');
       }).toThrowError('The given skill is already an acquired skill.');
-      expect(() => {
-        _sampleStoryNode.addPrerequisiteSkillId('skill_2');
-      }).toThrowError('The given skill is an acquired skill.');
     });
 
   it('should correctly throw error when invalid values are deleted from arrays',
