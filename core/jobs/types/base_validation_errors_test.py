@@ -387,8 +387,10 @@ class CommitCmdsValidateErrorTests(AuditErrorsTestBase):
             commit_cmds=[{'cmd-invalid': 'invalid_test_command'}])
         error_message = 'Missing cmd key in change dict'
         error = base_validation_errors.CommitCmdsValidateError(
-            model, {'cmd-invalid': 'invalid_test_command'},
-            error_message)
+            model,
+            {'cmd-invalid': 'invalid_test_command'},
+            error_message
+        )
 
         self.assertEqual(
             error.stderr,
