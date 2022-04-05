@@ -267,12 +267,13 @@ class GcsFileSystem(GeneralFileSystem):
             blob.name.replace(assets_path, '') for blob in blobs_in_dir]
 
 
-class AbstractFileSystem():
+class AbstractFileSystem:
     """Interface for a file system."""
 
     def __init__(self, impl: GcsFileSystem) -> None:
         """Constructs a AbstractFileSystem object."""
         self._impl = impl
+        self.assets_path = self._impl.assets_path
 
     @property
     def impl(self) -> AbstractFileSystem:
@@ -416,12 +417,3 @@ class AbstractFileSystem():
                 assets folder.
         """
         self._impl.copy(source_assets_path, filepath)
-
-    @property
-    def assets_path(self) -> str:
-        """Returns the path of the parent folder of assets.
-
-        Returns:
-            str. The path.
-        """
-        return self._impl.assets_path
