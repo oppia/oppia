@@ -865,14 +865,14 @@ class UtilsTests(test_utils.GenericTestBase):
             '/El Niño/')
 
     def test_compress_and_decompress_zlib(self) -> None:
-        string_instance = b'a' * 26
-        string_compressed = utils.compress_to_zlib(string_instance)
-        self.assertNotEqual(
-            sys.getsizeof(string_compressed),
-            sys.getsizeof(string_instance))
+        byte_instance = b'a' * 26
+        byte_compressed = utils.compress_to_zlib(byte_instance)
+        self.assertLess(
+            sys.getsizeof(byte_compressed),
+            sys.getsizeof(byte_instance))
         self.assertEqual(
-            utils.decompress_from_zlib(string_compressed),
-            string_instance)
+            utils.decompress_from_zlib(byte_compressed),
+            byte_instance)
 
     def test_compute_list_difference(self) -> None:
         self.assertEqual(utils.compute_list_difference(
