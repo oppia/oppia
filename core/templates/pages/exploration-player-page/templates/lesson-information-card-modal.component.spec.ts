@@ -65,7 +65,7 @@ describe('Lesson Information card modal component', () => {
         NgbActiveModal,
         PlayerTranscriptService,
         ExplorationEngineService,
-        StoryViewerBackendApiService
+        StoryViewerBackendApiService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();

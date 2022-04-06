@@ -20,7 +20,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ExplorationFooterComponent } from './exploration-footer.component';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { LimitToPipe } from 'filters/limit-to.pipe';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -34,6 +34,14 @@ import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exp
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { PlayerPositionService } from '../services/player-position.service';
+import { PlayerTranscriptService } from '../services/player-transcript.service';
+import { StateCard } from 'domain/state_card/state-card.model';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 
 describe('ExplorationFooterComponent', () => {
   let component: ExplorationFooterComponent;
@@ -47,6 +55,13 @@ describe('ExplorationFooterComponent', () => {
   let questionPlayerStateService: QuestionPlayerStateService;
   let mockResizeEventEmitter = new EventEmitter();
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
+  let stateObjectFactory: StateObjectFactory;
+  let explorationEngineService: ExplorationEngineService;
+  let playerPositionService: PlayerPositionService;
+  let playerTranscriptService: PlayerTranscriptService;
+  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
+
   let mockResultsLoadedEventEmitter = new EventEmitter<boolean>();
 
   beforeEach(async(() => {
@@ -78,6 +93,14 @@ describe('ExplorationFooterComponent', () => {
       ExplorationSummaryBackendApiService);
     questionPlayerStateService = TestBed.inject(
       QuestionPlayerStateService);
+    explorationEngineService = TestBed.inject(ExplorationEngineService);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    writtenTranslationsObjectFactory = TestBed.inject(
+      WrittenTranslationsObjectFactory);
+    audioTranslationLanguageService = TestBed.inject(
+      AudioTranslationLanguageService);
     fixture = TestBed.createComponent(ExplorationFooterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -156,6 +179,158 @@ describe('ExplorationFooterComponent', () => {
     expect(component.hintsAndSolutionsAreSupported).toBeFalse();
   });
 
+  it('should open the lesson information card', fakeAsync(() => {
+    let ngbModal = TestBed.inject(NgbModal);
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        numberofCheckpoints: 0,
+        completedWidth: 0,
+        contributorNames: [],
+        expInfo: null
+      },
+      result: {
+        then: (successCallback: () => void, errorCallback: () => void) => {
+          successCallback();
+          errorCallback();
+        }
+      }
+    } as NgbModalRef);
+
+    let sampleDataResults: FetchExplorationBackendResponse = {
+      exploration_id: '0',
+      is_logged_in: true,
+      session_id: 'KERH',
+      draft_change_list_id: 0,
+      exploration: {
+        init_state_name: 'Introduction',
+        param_changes: [],
+        param_specs: null,
+        title: 'Exploration',
+        language_code: 'en',
+        correctness_feedback_enabled: true,
+        objective: 'To learn',
+        states: {
+          Introduction: {
+            param_changes: [],
+            classifier_model_id: null,
+            recorded_voiceovers: null,
+            solicit_answer_details: true,
+            card_is_checkpoint: true,
+            written_translations: null,
+            linked_skill_id: null,
+            next_content_id_index: null,
+            content: {
+              html: '',
+              content_id: 'content'
+            },
+            interaction: {
+              customization_args: {},
+              answer_groups: [],
+              solution: null,
+              hints: [],
+              default_outcome: {
+                param_changes: [],
+                dest: 'Introduction',
+                feedback: {
+                  html: '',
+                  content_id: 'content'
+                },
+                labelled_as_correct: true,
+                refresher_exploration_id: 'exp',
+                missing_prerequisite_skill_id: null
+              },
+              confirmed_unclassified_answers: [],
+              id: null
+            }
+          }
+        }
+      },
+      version: 1,
+      can_edit: true,
+      preferred_audio_language_code: 'en',
+      preferred_language_codes: [],
+      auto_tts_enabled: true,
+      correctness_feedback_enabled: true,
+      record_playthrough_probability: 1,
+      user_has_viewed_lesson_info_modal_once: false,
+      furthest_completed_checkpoint_exp_version: 1,
+      furthest_completed_checkpoint_state_name: 'State B',
+      most_recently_reached_checkpoint_state_name: 'State A',
+      most_recently_reached_checkpoint_exp_version: 1
+    };
+
+    spyOn(roebas, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(sampleDataResults));
+
+    component.checkpointCount = 1;
+
+    spyOn(component, 'getCheckpointIndexFromStateName').and.returnValue(1);
+    spyOn(explorationEngineService, 'getState')
+      .and.returnValue(stateObjectFactory.createFromBackendDict(
+        'State B', {
+          classifier_model_id: null,
+          content: {
+            html: '',
+            content_id: 'content'
+          },
+          interaction: {
+            id: 'FractionInput',
+            customization_args: {
+              requireSimplestForm: { value: false },
+              allowImproperFraction: { value: true },
+              allowNonzeroIntegerPart: { value: true },
+              customPlaceholder: { value: {
+                content_id: '',
+                unicode_str: ''
+              } },
+            },
+            answer_groups: [],
+            default_outcome: {
+              dest: 'Introduction',
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            confirmed_unclassified_answers: [],
+            hints: [],
+            solution: null
+          },
+          linked_skill_id: null,
+          next_content_id_index: 0,
+          param_changes: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
+          solicit_answer_details: false,
+          card_is_checkpoint: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          }
+        }
+      ));
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+    component.openInformationCardModal();
+    tick();
+    fixture.detectChanges();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.mostRecentlyReachedCheckpointStateName).toEqual('State A');
+    expect(component.isLastCheckpointReached).toEqual(true);
+    expect(component.completedWidth).toEqual(100);
+  }));
+
   it('should display lesson information card', fakeAsync(() => {
     let explorationId = 'expId';
     component.explorationId = explorationId;
@@ -176,6 +351,78 @@ describe('ExplorationFooterComponent', () => {
 
     expect(learnerViewInfoBackendApiService.fetchLearnerInfoAsync)
       .toHaveBeenCalled();
+  }));
+
+  it('should get checkpoint index from state name', fakeAsync(() => {
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(1);
+    const card = StateCard.createNewCard(
+      'State A', '<p>Content</p>', '<interaction></interaction>',
+      null,
+      RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
+    component.mostRecentlyReachedCheckpointStateName = 'State A';
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
+    spyOn(explorationEngineService, 'getStateFromStateName')
+      .and.returnValue(stateObjectFactory.createFromBackendDict(
+        'State A', {
+          classifier_model_id: null,
+          content: {
+            html: '',
+            content_id: 'content'
+          },
+          interaction: {
+            id: 'FractionInput',
+            customization_args: {
+              requireSimplestForm: { value: false },
+              allowImproperFraction: { value: true },
+              allowNonzeroIntegerPart: { value: true },
+              customPlaceholder: { value: {
+                content_id: '',
+                unicode_str: ''
+              } },
+            },
+            answer_groups: [],
+            default_outcome: {
+              dest: 'Introduction',
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            confirmed_unclassified_answers: [],
+            hints: [],
+            solution: null
+          },
+          linked_skill_id: null,
+          next_content_id_index: 0,
+          param_changes: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
+          solicit_answer_details: false,
+          card_is_checkpoint: true,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          }
+        }
+
+      ));
+
+    let checkpointIndex = component.getCheckpointIndexFromStateName();
+    tick();
+    fixture.detectChanges();
+    expect(checkpointIndex).toEqual(1);
   }));
 
   it('should handle error if backend call' +

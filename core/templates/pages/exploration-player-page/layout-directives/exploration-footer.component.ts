@@ -144,10 +144,8 @@ export class ExplorationFooterComponent {
 
     this.roebas.loadLatestExplorationAsync(this.explorationId).then(
       response => {
-        if (response.most_recently_reached_checkpoint_state_name) {
-          this.mostRecentlyReachedCheckpointStateName = (
-            response.most_recently_reached_checkpoint_state_name);
-        }
+        this.mostRecentlyReachedCheckpointStateName = (
+          response.most_recently_reached_checkpoint_state_name);
       }
     );
 
@@ -164,7 +162,9 @@ export class ExplorationFooterComponent {
       (100 / (this.checkpointCount)) * this.completedCheckpoints
     );
 
-    if (this.explorationEngineService.getState().name !==
+    let index = this.playerPositionService.getDisplayedCardIndex();
+
+    if (index > 0 && this.explorationEngineService.getState().name !==
      lastCheckpointCardStateName && this.isLastCheckpointReached) {
       this.completedWidth = 100;
     }
