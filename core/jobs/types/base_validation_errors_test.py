@@ -76,7 +76,7 @@ class AuditErrorsTestBase(core_test_utils.TestBase):
 
 class ErrorMessageTests(core_test_utils.TestBase):
 
-    def test_error_message_with_wrong_input(self):
+    def test_error_message_with_wrong_input(self) -> None:
         error = base_validation_errors.BaseAuditError(
             'testing string',
             'non-existing model',
