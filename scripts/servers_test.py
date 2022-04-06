@@ -227,7 +227,10 @@ class ManagedProcessTests(test_utils.TestBase):
 
         proc = self.exit_stack.enter_context(servers.managed_process(
             ['a'], timeout_secs=10))
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception,
+                'Process .* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(
             logs, proc.pid,
@@ -255,7 +258,9 @@ class ManagedProcessTests(test_utils.TestBase):
         proc = self.exit_stack.enter_context(servers.managed_process(
             ['a'], timeout_secs=10))
         pids = [c.pid for c in proc.children()] + [proc.pid]
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception, 'Process .* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assertEqual(len(set(pids)), 4)
         for pid in pids:
@@ -273,7 +278,9 @@ class ManagedProcessTests(test_utils.TestBase):
         time.sleep(1)
         proc.kill()
         proc.wait()
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception, 'Process .* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(
             logs, proc.pid,
@@ -304,7 +311,7 @@ class ManagedProcessTests(test_utils.TestBase):
             manager_should_have_sent_terminate_signal=True,
             manager_should_have_sent_kill_signal=False)
 
-    def test_does_not_raise_when_exit_fails(self):
+    def test_raise_when_process_errors(self):
         self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap_to_always_raise(
             psutil, 'wait_procs', error=Exception('uh-oh')))
@@ -312,8 +319,9 @@ class ManagedProcessTests(test_utils.TestBase):
             min_level=logging.ERROR))
 
         self.exit_stack.enter_context(servers.managed_process(['a', 'bc']))
-        # Should not raise.
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception, 'Process .* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assert_matches_regexps(logs, [
             r'Failed to stop Process\(pid=1\) gracefully!\n'
@@ -612,7 +620,10 @@ class ManagedProcessTests(test_utils.TestBase):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
         proc = self.exit_stack.enter_context(servers.managed_portserver())
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception,
+                'Process Portserver.* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
@@ -647,7 +658,10 @@ class ManagedProcessTests(test_utils.TestBase):
             os, 'remove', mock_os_remove))
 
         proc = self.exit_stack.enter_context(servers.managed_portserver())
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception,
+                'Process Portserver.* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
@@ -682,7 +696,10 @@ class ManagedProcessTests(test_utils.TestBase):
 
         proc = self.exit_stack.enter_context(servers.managed_portserver())
         proc.unresponsive = True
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception,
+                'Process Portserver.* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
