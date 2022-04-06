@@ -300,7 +300,7 @@ class ExplorationHandler(base.BaseHandler):
             if (exploration_user_data.most_recently_reached_checkpoint_exp_version is not None and ( # pylint: disable=line-too-long
                     exploration_user_data.most_recently_reached_checkpoint_exp_version < exploration.version)): # pylint: disable=line-too-long
                 exploration_user_data = (
-                    user_services.synchronize_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                    user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
                         self.user_id, exploration_id))
 
             furthest_reached_checkpoint_exp_version = (

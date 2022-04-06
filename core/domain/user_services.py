@@ -2472,7 +2472,7 @@ def update_learner_checkpoint_progress_on_restart(user_id, exploration_id):
     exploration_user_model.put()
 
 
-def synchronize_learner_checkpoint_progress_with_current_exp_version(
+def sync_learner_checkpoint_progress_with_current_exp_version(
     user_id,
     exploration_id):
     """Synchronizes the most recently reached checkpoint and the furthest
