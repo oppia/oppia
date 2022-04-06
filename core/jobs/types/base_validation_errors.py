@@ -72,12 +72,19 @@ class BaseAuditError(job_run_result.JobRunResult):
         elif isinstance(model_or_kind, str):
             model_kind = model_or_kind
 
-        error_message = '%s in %s(id=%s): %s' % (
-            self.__class__.__name__,
-            model_kind,
-            utils.quoted(model_id) if model_id else ' ',
-            message
-        )
+        if model_id:
+            error_message = '%s in %s(id=%s): %s' % (
+                self.__class__.__name__,
+                model_kind,
+                utils.quoted(model_id),
+                message
+            )
+        else:
+            error_message = '%s in %s: %s' % (
+                self.__class__.__name__,
+                model_kind,
+                message
+            )
         super(BaseAuditError, self).__init__(stderr=error_message)
 
 

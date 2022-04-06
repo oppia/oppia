@@ -74,6 +74,20 @@ class AuditErrorsTestBase(core_test_utils.TestBase):
     YEAR_LATER: datetime.datetime = NOW + datetime.timedelta(weeks=52)
 
 
+class ErrorMessageTests(core_test_utils.TestBase):
+
+    def test_error_message_with_wrong_input(self):
+        error = base_validation_errors.BaseAuditError(
+            'testing string',
+            'non-existing model',
+            None
+        )
+        self.assertEqual(
+            error.stderr,
+            'BaseAuditError in non-existing model: testing string'
+        )
+
+
 class BaseAuditErrorTests(AuditErrorsTestBase):
 
     def setUp(self) -> None:
