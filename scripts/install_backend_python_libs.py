@@ -652,6 +652,7 @@ def main():
     mismatches, regenerate the 'requirements.txt' file and correct the
     mismatches.
     """
+    print('path of install backend python libs before regenerate in github ci output    \n\n\n\n\n\n\n\n\n\n ', sys.path)
     verify_pip_is_installed()
     print('Regenerating "requirements.txt" file...')
     # Calls the script to regenerate requirements. The reason we cannot call the
@@ -693,7 +694,7 @@ def main():
     else:
         print(
             'All third-party Python libraries are already installed correctly.')
-
+    print('path of install backend python libs after regenerate in github ci output    \n\n\n\n\n\n\n\n\n\n ', sys.path)
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when install_third_party_libs.py is used as a script.

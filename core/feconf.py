@@ -22,10 +22,13 @@ import copy
 import datetime
 import enum
 import os
+import sys
 
 from core.constants import constants
 
 from typing import Dict, List, Union
+
+print('path of feconf.py in github ci output    \n\n\n\n\n\n\n\n\n\n ', sys.path)
 
 from typing_extensions import TypedDict # isort:skip  # pylint: disable=wrong-import-position
 
