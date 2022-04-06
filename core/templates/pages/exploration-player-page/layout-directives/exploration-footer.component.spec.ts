@@ -50,7 +50,8 @@ describe('ExplorationFooterComponent', () => {
   let urlService: UrlService;
   let learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService;
   let loggerService: LoggerService;
-  let roebas: ReadOnlyExplorationBackendApiService;
+  let readOnlyExplorationBackendApiService:
+   ReadOnlyExplorationBackendApiService;
   let windowDimensionsService: WindowDimensionsService;
   let questionPlayerStateService: QuestionPlayerStateService;
   let mockResizeEventEmitter = new EventEmitter();
@@ -88,7 +89,8 @@ describe('ExplorationFooterComponent', () => {
     learnerViewInfoBackendApiService = TestBed.inject(
       LearnerViewInfoBackendApiService);
     loggerService = TestBed.inject(LoggerService);
-    roebas = TestBed.inject(ReadOnlyExplorationBackendApiService);
+    readOnlyExplorationBackendApiService = TestBed.inject(
+      ReadOnlyExplorationBackendApiService);
     explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService);
     questionPlayerStateService = TestBed.inject(
@@ -260,7 +262,7 @@ describe('ExplorationFooterComponent', () => {
       most_recently_reached_checkpoint_exp_version: 1
     };
 
-    spyOn(roebas, 'loadLatestExplorationAsync')
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
       .and.returnValue(Promise.resolve(sampleDataResults));
 
     component.checkpointCount = 1;
@@ -505,7 +507,7 @@ describe('ExplorationFooterComponent', () => {
       most_recently_reached_checkpoint_exp_version: 1
     };
 
-    spyOn(roebas, 'fetchExplorationAsync')
+    spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
       .and.returnValue(Promise.resolve(sampleDataResults));
     expect(component.checkpointCount).toEqual(0);
 

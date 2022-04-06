@@ -78,7 +78,6 @@ export class ExplorationFooterComponent {
       ReadOnlyExplorationBackendApiService,
     private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
     private loggerService: LoggerService,
-    private roebas: ReadOnlyExplorationBackendApiService,
     private playerTranscriptService: PlayerTranscriptService,
     private explorationEngineService: ExplorationEngineService,
     private playerPositionService: PlayerPositionService,
@@ -142,12 +141,13 @@ export class ExplorationFooterComponent {
 
     modalRef.componentInstance.checkpointCount = this.checkpointCount;
 
-    this.roebas.loadLatestExplorationAsync(this.explorationId).then(
-      response => {
-        this.mostRecentlyReachedCheckpointStateName = (
-          response.most_recently_reached_checkpoint_state_name);
-      }
-    );
+    this.readOnlyExplorationBackendApiService.
+      loadLatestExplorationAsync(this.explorationId).then(
+        response => {
+          this.mostRecentlyReachedCheckpointStateName = (
+            response.most_recently_reached_checkpoint_state_name);
+        }
+      );
 
     let checkpointIndexFromStateName = this.getCheckpointIndexFromStateName();
     this.completedCheckpoints = checkpointIndexFromStateName - 1;

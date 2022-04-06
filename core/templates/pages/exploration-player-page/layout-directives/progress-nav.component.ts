@@ -31,9 +31,6 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 
 @Component({
   selector: 'oppia-progress-nav',
@@ -83,9 +80,6 @@ export class ProgressNavComponent {
     private urlService: UrlService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private windowDimensionsService: WindowDimensionsService,
-    private explorationEngineService: ExplorationEngineService,
-    private roebas: ReadOnlyExplorationBackendApiService,
-    private eebas: EditableExplorationBackendApiService,
   ) {}
 
   ngOnChanges(): void {

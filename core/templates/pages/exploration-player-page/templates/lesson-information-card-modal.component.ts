@@ -125,10 +125,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       this.explorationId
     ).then(() => {
       // Required for the put operation to deliver data to backend.
-    });
-    setTimeout(() => {
       this.windowRef.nativeWindow.location.reload();
-    }, 2000);
+    });
   }
 
   isHackyStoryTitleTranslationDisplayed(): boolean {

@@ -187,8 +187,10 @@ export class ConversationSkinComponent {
     private urlService: UrlService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
-    private eebas: EditableExplorationBackendApiService,
-    private roebas: ReadOnlyExplorationBackendApiService,
+    private editableExplorationBackendApiService:
+     EditableExplorationBackendApiService,
+    private readOnlyExplorationBackendApiService:
+     ReadOnlyExplorationBackendApiService,
   ) {}
 
   ngOnInit(): void {
@@ -330,28 +332,31 @@ export class ConversationSkinComponent {
       }
     );
     let version: number;
-    this.roebas.loadLatestExplorationAsync(this.explorationId).then(
-      response => {
-        version = response.version;
-      }
-    );
-    this.eebas.recordMostRecentlyReachedCheckpointAsync(
-      this.explorationId,
-      version,
-      firstStateName
-    ).then(() => {
+    this.readOnlyExplorationBackendApiService.
+      loadLatestExplorationAsync(this.explorationId).then(
+        response => {
+          version = response.version;
+        }
+      );
+    this.editableExplorationBackendApiService.
+      recordMostRecentlyReachedCheckpointAsync(
+        this.explorationId,
+        version,
+        firstStateName
+      ).then(() => {
       // Required for the put operation to deliver data to backend.
-    });
+      });
     this.visitedStateNames.push(firstStateName);
   }
 
   // Returns a promise supplying the last saved version for the current
   // exploration.
   async getLastSavedDataAsync(): Promise<ReadOnlyExplorationBackendDict> {
-    return this.roebas.loadLatestExplorationAsync(
-      this.explorationId).then(response => {
-      return response.exploration;
-    });
+    return this.readOnlyExplorationBackendApiService.
+      loadLatestExplorationAsync(
+        this.explorationId).then(response => {
+        return response.exploration;
+      });
   }
 
   doesCollectionAllowsGuestProgress(collectionId: string): boolean {
@@ -611,18 +616,20 @@ export class ConversationSkinComponent {
       if (currentState.cardIsCheckpoint &&
           !this.visitedStateNames.includes(currentStateName)) {
         let version: number;
-        this.roebas.loadLatestExplorationAsync(this.explorationId).then(
-          response => {
-            version = response.version;
-          }
-        );
-        this.eebas.recordMostRecentlyReachedCheckpointAsync(
-          this.explorationId,
-          version,
-          currentStateName,
-        ).then(() => {
+        this.readOnlyExplorationBackendApiService.
+          loadLatestExplorationAsync(this.explorationId).then(
+            response => {
+              version = response.version;
+            }
+          );
+        this.editableExplorationBackendApiService.
+          recordMostRecentlyReachedCheckpointAsync(
+            this.explorationId,
+            version,
+            currentStateName,
+          ).then(() => {
           // Required for the put operation to deliver data to backend.
-        });
+          });
         this.visitedStateNames.push(currentStateName);
       }
     }
