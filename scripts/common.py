@@ -32,6 +32,11 @@ import time
 from core import constants
 from core import utils
 
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+# if not in path, then please add it to path here
+if _THIRD_PARTY_PATH not in sys.path:
+    print('the path does not exist ')
+    sys.path.insert(0, _THIRD_PARTY_PATH)
 print('path of common.py in github ci output    \n\n\n\n\n\n\n\n\n\n ', sys.path)
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
