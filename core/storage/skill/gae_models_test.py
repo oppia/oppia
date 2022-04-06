@@ -67,7 +67,12 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             skill_models.SkillCommitLogEntryModel
             .has_reference_to_user_id('x_id'))
-
+    
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            skill_models.SkillCommitLogEntryModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
 
 class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillSummaryModel class."""
@@ -75,7 +80,8 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             skill_models.SkillSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE
+        )
 
     def test_fetch_page(self) -> None:
         skill_models.SkillSummaryModel(
