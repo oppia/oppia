@@ -94,7 +94,8 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
         self.job.run.assert_called() # type: ignore[attr-defined]
 
     def test_put_multi(self) -> None:
-        model_list = [self.create_model(base_models.BaseModel) for _ in range(3)]
+        model_list = [
+            self.create_model(base_models.BaseModel) for _ in range(3)]
         self.put_multi(model_list)
 
         model_ids = [model.id for model in model_list]
