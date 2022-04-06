@@ -53,6 +53,7 @@ def main():
     # we need to write our own script and manually add our local pip-tools
     # directory to the python system path in order to import the required
     # libraries correctly.
+    print('\n\n\n\n\n\n regenerate pip file seems to be failing ', sys.path)
     compile.cli() # pylint: disable=no-value-for-parameter
 
 
