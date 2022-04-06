@@ -63,26 +63,21 @@ class BaseAuditError(job_run_result.JobRunResult):
         if not message:
             raise ValueError('message must be a non-empty string')
 
-        if (model_id is None) and (
-            isinstance(model_or_kind, base_models.BaseModel)):
+        if (
+            model_id is None and (
+            isinstance(model_or_kind, base_models.BaseModel))
+        ):
             model_id = job_utils.get_model_id(model_or_kind)
             model_kind = job_utils.get_model_kind(model_or_kind)
-        else:
-            # The type of model_or_kind is Union[base_models.BaseModel, str]
-            # and the type of model_kind is str. So, to rule out the possibilty
-            # of Basemodel of model_or_kind for MyPy type checking. we asserted
-            # it as an str type.
-            assert isinstance(model_or_kind, str)
+        elif isinstance(model_or_kind, str):
             model_kind = model_or_kind
 
-        # Here, model_id can be a string value or None but the function
-        # utils.quoted() expecting a string value. Due to extra None
-        # value MyPy throws an error and to silent this error we added
-        # an ignore here.
         error_message = '%s in %s(id=%s): %s' % (
             self.__class__.__name__,
-            model_kind, utils.quoted(model_id), message)  # type: ignore[arg-type]
-
+            model_kind,
+            utils.quoted(model_id) if model_id else ' ',
+            message
+        )
         super(BaseAuditError, self).__init__(stderr=error_message)
 
 
