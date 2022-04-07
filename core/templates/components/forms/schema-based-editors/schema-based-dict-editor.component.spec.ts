@@ -124,14 +124,18 @@ describe('Schema Based Dict Editor Component', () => {
   });
 
   it('should get schema', () => {
+    const HTML_SCHEMA = {
+      type: 'html'
+    };
+
     component.propertySchemas = [
       {
         name: 'id1',
-        schema: 'schema'
+        schema: HTML_SCHEMA
       }
     ];
 
-    expect(component.getSchema(0)).toBe('schema');
+    expect(component.getSchema(0)).toBe(HTML_SCHEMA);
   });
 
   it('should get label for focus target', () => {

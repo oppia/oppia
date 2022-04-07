@@ -38,11 +38,11 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class SchemaBasedCustomEditorComponent
 implements ControlValueAccessor, Validator {
-  @Input() localValue: string;
+  @Input() localValue: unknown;
   @Output() localValueChange = new EventEmitter();
   @Input() schema;
   @Input() form;
-  onChange: (_: string) => void = () => {};
+  onChange: (_: unknown) => void = () => {};
   onTouch: () => void;
   onValidatorChange: () => void = () => {};
 
@@ -57,7 +57,7 @@ implements ControlValueAccessor, Validator {
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  writeValue(obj: string): void {
+  writeValue(obj: unknown): void {
     if (this.localValue === obj) {
       return;
     }
@@ -69,7 +69,7 @@ implements ControlValueAccessor, Validator {
     return {};
   }
 
-  updateValue(value: string): void {
+  updateValue(value: unknown): void {
     this.localValueChange.emit(value);
     this.localValue = value;
     this.onChange(value);

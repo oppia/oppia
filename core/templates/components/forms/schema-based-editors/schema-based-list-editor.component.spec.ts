@@ -53,7 +53,8 @@ describe('Schema Based List Editor Component', () => {
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
 
     component.itemSchema = {
-      type: 'bool',
+      type: 'list',
+      items: [],
       ui_config: {
         coding_mode: true,
         rows: 3
@@ -188,7 +189,7 @@ describe('Schema Based List Editor Component', () => {
     expect(component.localValue).toEqual(value);
   });
 
-  it('should show dublicate warning if list is unique', () => {
+  it('should show duplicate warning if list is unique', () => {
     component.showDuplicatesWarning = false;
     component.validators = [
       {

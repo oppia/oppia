@@ -119,7 +119,7 @@ describe('Schema based float editor component', function() {
     expect(component.inputFocus.emit).toHaveBeenCalled();
   });
 
-  it('should call input blur user deselects the input field', () => {
+  it('should call input blur when user deselects the input field', () => {
     spyOn(component.inputBlur, 'emit');
 
     component.onBlur();
@@ -200,7 +200,7 @@ describe('Schema based float editor component', function() {
       .toEqual({error: 'invalid'});
   });
 
-  it('should get current decimal separator', ()=>{
+  it('should get current decimal separator', () => {
     spyOn(numberConversionService, 'currentDecimalSeparator')
       .and.returnValues('.', ',');
 

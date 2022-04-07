@@ -29,7 +29,7 @@ import { Validator } from 'interactions/TextInput/directives/text-input-validati
 })
 class MockCompA {}
 
-describe('Focus on component', () => {
+describe('Apply validation directive', () => {
   let fixture: ComponentFixture<MockCompA>;
   let directiveInstance: ApplyValidationDirective;
 
