@@ -67,6 +67,18 @@ def create_report_from_json(
     Returns:
         AppFeedbackReport. The domain object for an Android feedback report.
     """
+    if report_json['platform_type'] == (
+            app_feedback_report_constants.PLATFORM_CHOICE_ANDROID):
+
+            import datetime
+            report_datetime = datetime.datetime.fromtimestamp(
+            report_json['report_submission_timestamp_sec'])
+            report_id = (
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                report_json['platform_type'], report_datetime)) 
+            report_json['report_datetime'] = report_datetime
+            report_json['report_id'] = report_id
+
     return app_feedback_report_domain.AppFeedbackReport.from_dict(report_json)
 
 

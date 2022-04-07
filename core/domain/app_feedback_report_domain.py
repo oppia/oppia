@@ -298,11 +298,8 @@ class AppFeedbackReport:
             app_context_json['account_is_profile_admin'],
             app_context_json['event_logs'], app_context_json['logcat_logs'])
 
-        report_datetime = datetime.datetime.fromtimestamp(
-            report_dict['report_submission_timestamp_sec'])
-        report_id = (
-            app_feedback_report_models.AppFeedbackReportModel.generate_id(
-                report_dict['platform_type'], report_datetime))
+        report_datetime = report_dict['report_datetime']
+        report_id = report_dict['report_id']
         report_obj = AppFeedbackReport(
             report_id, report_dict['android_report_info_schema_version'],
             report_dict['platform_type'], report_datetime,
@@ -1509,8 +1506,8 @@ class AppFeedbackReportTicket:
                 'The reports list should be a list, received: %r' % (
                     report_ids))
         for report_id in report_ids:
-            if app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                    report_id) is None:
+            # [platform].[submitted_on_msec].[random hash]
+            if report_id.count('.') != 2:
                 raise utils.ValidationError(
                     'The report with id %s is invalid.' % report_id)
 
