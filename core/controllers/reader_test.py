@@ -2159,7 +2159,7 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
                 'exp_version': exp_version,
                 'time_spent_in_state_secs': 2.0,
                 'session_id': 'session_id',
-                'refresher_exp_id': 'refresher_exp_id'
+                'refresher_exp_id': 'ref_exp_id'
             }
         )
 
