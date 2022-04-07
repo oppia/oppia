@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from urllib.parse import urlparse   # pylint: disable-msg=C0003
+
 from core.domain import exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -73,13 +75,10 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
         invalid_links = []
         for link in cleaned_links:
             # Separate protocol from the link.
-            link_info = link.split(':')
-            # If protocol is present, we check to see if it is valid or not.
-            if len(link_info) >= 2:
-                if link_info[0] != 'https':
-                    # Protocols other than 'https' are invalid.
-                    invalid_links.append(link)
-            # If the protocol isn't present, it is assumed to be 'https'.
+            link_info = urlparse(link)
+            # Protocols other than 'https' are invalid.
+            if link_info.scheme not in ('https', ''):
+                invalid_links.append(link)
 
         return invalid_links
 
