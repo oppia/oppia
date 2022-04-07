@@ -34,6 +34,7 @@ import { LibraryPageConstants } from './library-page.constants';
 import { ActivityDict,
   LibraryPageBackendApiService,
   SummaryDict } from './services/library-page-backend-api.service';
+import { TranslateService } from '@ngx-translate/core';
 
 interface MobileLibraryGroupProperties {
   inCollapsedState: boolean;
@@ -66,7 +67,7 @@ export class LibraryPageComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-
+  translateSubscription!: Subscription;
   resizeSubscription!: Subscription;
   // The following property will be assigned null when user
   // has not selected any active group index.
@@ -94,7 +95,8 @@ export class LibraryPageComponent {
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
     private classroomBackendApiService: ClassroomBackendApiService,
-    private pageTitleService: PageTitleService
+    private pageTitleService: PageTitleService,
+    private translateService: TranslateService
   ) {}
 
   setActiveGroup(groupIndex: number): void {
@@ -258,6 +260,17 @@ export class LibraryPageComponent {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
+  setPageTitle(): void {
+    let titleKey = 'I18N_LIBRARY_PAGE_TITLE';
+    if (this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP ||
+      this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH) {
+      titleKey = 'I18N_LIBRARY_PAGE_BROWSE_MODE_TITLE';
+    }
+
+    this.pageTitleService.setDocumentTitle(
+      this.translateService.instant(titleKey));
+  }
+
   ngOnInit(): void {
     let libraryWindowCutoffPx = 536;
     this.libraryWindowIsNarrow = (
@@ -286,13 +299,10 @@ export class LibraryPageComponent {
     this.pageMode = libraryContants[currentPath];
     this.LIBRARY_PAGE_MODES = LibraryPageConstants.LIBRARY_PAGE_MODES;
 
-    let title = 'Community Library Lessons | Oppia';
-    if (this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP ||
-      this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH) {
-      title = 'Find explorations to learn from - Oppia';
-    }
-
-    this.pageTitleService.setDocumentTitle(title);
+    this.translateSubscription = this.translateService.onLangChange.subscribe(
+      () => {
+        this.setPageTitle();
+      });
 
     // Keeps track of the index of the left-most visible card of each
     // group.
@@ -422,6 +432,9 @@ export class LibraryPageComponent {
   }
 
   ngOnDestroy(): void {
+    if (this.translateSubscription) {
+      this.translateSubscription.unsubscribe();
+    }
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
     }

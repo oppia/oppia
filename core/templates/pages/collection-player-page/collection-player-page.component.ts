@@ -16,7 +16,7 @@
  * @fileoverview Component for the learner's view of a collection.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -31,6 +31,8 @@ import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 export interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -66,7 +68,8 @@ export interface CollectionHandler {
   selector: 'oppia-collection-player-page',
   templateUrl: './collection-player-page.component.html'
 })
-export class CollectionPlayerPageComponent implements OnInit {
+export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
   collection!: Collection;
   collectionPlaythrough;
   currentExplorationId!: string;
@@ -102,7 +105,8 @@ export class CollectionPlayerPageComponent implements OnInit {
     private pageTitleService: PageTitleService,
     private userService: UserService,
     private collectionPlayerBackendApiService:
-      CollectionPlayerBackendApiService
+      CollectionPlayerBackendApiService,
+    private translateService: TranslateService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -302,6 +306,14 @@ export class CollectionPlayerPageComponent implements OnInit {
     }
   }
 
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_COLLECTION_PLAYER_PAGE_TITLE', {
+        collectionTitle: this.collection.getTitle()
+      });
+    this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
     this.collection = null;
@@ -331,8 +343,16 @@ export class CollectionPlayerPageComponent implements OnInit {
       this.collectionId).then(
       (collection) => {
         this.updateCollection(collection);
-        this.pageTitleService.setDocumentTitle(
-          this.collection.getTitle() + ' - Oppia');
+        // The onLangChange event is initially fired before the collection is
+        // loaded. Hence the first setpageTitle() call needs to made
+        // manually, and the onLangChange subscription is added after
+        // the collection is loaded.
+        this.setPageTitle();
+        this.directiveSubscriptions.add(
+          this.translateService.onLangChange.subscribe(() => {
+            this.setPageTitle();
+          })
+        );
 
         // Load the user's current progress in the collection. If the
         // user is a guest, then either the defaults from the server
@@ -355,6 +375,10 @@ export class CollectionPlayerPageComponent implements OnInit {
           'There was an error loading the collection.');
       }
     );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 

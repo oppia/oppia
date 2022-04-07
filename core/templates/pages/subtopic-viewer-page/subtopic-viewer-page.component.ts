@@ -29,6 +29,8 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page',
@@ -36,6 +38,7 @@ import { PageTitleService } from 'services/page-title.service';
   styleUrls: []
 })
 export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
   subtopicSummaryIsShown: boolean = false;
   topicUrlFragment: string;
   classroomUrlFragment: string;
@@ -55,7 +58,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private urlService: UrlService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private translateService: TranslateService
   ) {}
 
   checkMobileView(): boolean {
@@ -64,6 +68,14 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_SUBTOPIC_VIEWER_PAGE_TITLE', {
+        subtopicTitle: this.subtopicTitle
+      });
+    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   ngOnInit(): void {
@@ -84,8 +96,17 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       this.parentTopicId = subtopicDataObject.getParentTopicId();
       this.contextService.setCustomEntityContext(
         AppConstants.ENTITY_TYPE.TOPIC, this.parentTopicId);
-      this.pageTitleService.setDocumentTitle(
-        `Review ${this.subtopicTitle} | Oppia`);
+
+      // The onLangChange event is initially fired before the subtopic is
+      // loaded. Hence the first setpageTitle() call needs to made
+      // manually, and the onLangChange subscription is added after
+      // the subtopic is loaded.
+      this.setPageTitle();
+      this.directiveSubscriptions.add(
+        this.translateService.onLangChange.subscribe(() => {
+          this.setPageTitle();
+        })
+      );
       this.pageTitleService.updateMetaTag(
         `Review the skill of ${this.subtopicTitle.toLowerCase()}.`);
 
@@ -118,6 +139,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
     this.contextService.removeCustomEntityContext();
   }
 

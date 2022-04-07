@@ -23,6 +23,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { PageTitleService } from 'services/page-title.service';
 import { CollectionEditorRoutingService } from './services/collection-editor-routing.service';
 import { CollectionEditorStateService } from './services/collection-editor-state.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'oppia-collection-editor-page',
@@ -35,13 +36,21 @@ export class CollectionEditorPageComponent implements OnInit, OnDestroy {
     private collectionEditorRoutingService: CollectionEditorRoutingService,
     private collectionEditorStateService: CollectionEditorStateService,
     private pageTitleService: PageTitleService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.collectionEditorStateService.onCollectionInitialized.subscribe(
-        () => this.setTitle()
+        () => {
+          // The onLangChange event is initially fired before the collection is
+          // initialized. Hence the first setTitle() call needs to made
+          // manually, and the onLangChange subscription is added after
+          // the collection is initialized.
+          this.setTitle();
+          this.subscribeToOnLangChange();
+        }
       )
     );
     // Load the collection to be edited.
@@ -53,15 +62,28 @@ export class CollectionEditorPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setTitle();
+      })
+    );
+  }
+
   setTitle(): void {
     var title = (
       this.collectionEditorStateService.getCollection().getTitle());
+    let translatedTitle: string;
     if (title) {
-      this.pageTitleService.setDocumentTitle(title + ' - Oppia Editor');
+      translatedTitle = this.translateService.instant(
+        'I18N_COLLECTION_EDITOR_PAGE_TITLE', {
+          collectionTitle: title
+        });
     } else {
-      this.pageTitleService.setDocumentTitle(
-        'Untitled Collection - Oppia Editor');
+      translatedTitle = this.translateService.instant(
+        'I18N_COLLECTION_EDITOR_UNTITLED_COLLECTION_PAGE_TITLE');
     }
+    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   getActiveTabName(): string {

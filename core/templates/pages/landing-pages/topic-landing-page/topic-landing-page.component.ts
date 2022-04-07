@@ -18,7 +18,7 @@
 
 require('base-components/base-content.component.ts');
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { UrlInterpolationService } from
@@ -29,6 +29,8 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { PageTitleService } from 'services/page-title.service';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 import constants from 'assets/constants';
 
@@ -52,7 +54,8 @@ interface TopicData {
   templateUrl: './topic-landing-page.component.html',
   styleUrls: []
 })
-export class TopicLandingPageComponent implements OnInit {
+export class TopicLandingPageComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
   backgroundBannerUrl: string = null;
   lessonInDevicesPngImageSrc: string = null;
   lessonInDevicesWebpImageSrc: string = null;
@@ -65,7 +68,9 @@ export class TopicLandingPageComponent implements OnInit {
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private urlService: UrlService) {}
+    private urlService: UrlService,
+    private translateService: TranslateService
+  ) {}
 
   getLessonQualities(): LessonsQuality[] {
     return [{
@@ -131,14 +136,26 @@ export class TopicLandingPageComponent implements OnInit {
             topic: topicName,
             filename: 'lesson_in_devices.webp'
           })));
-    this.pageTitleService.setDocumentTitle(
-      [this.topicTitle, this.topicData.topicTagline, 'Oppia'].join(' | '));
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
   }
 
   getLessonQualityImageSrc(filename: string): string {
     return this.urlInterpolationService.getStaticImageUrl(
       this.urlInterpolationService.interpolateUrl(
         '/landing/<filename>', {filename: filename}));
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_TOPIC_LANDING_PAGE_TITLE', {
+        topicTitle: this.topicTitle,
+        topicTagline: this.topicData.topicTagline
+      });
+    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   onClickGetStartedButton(): void {
@@ -156,6 +173,10 @@ export class TopicLandingPageComponent implements OnInit {
       this.windowRef.nativeWindow.location.href = (
         `/learn/${constants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
     }, 150);
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 
