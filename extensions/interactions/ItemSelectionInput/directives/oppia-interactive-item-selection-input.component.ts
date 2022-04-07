@@ -67,8 +67,8 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     private itemSelectionInputRulesService: ItemSelectionInputRulesService,
     private audioTranslationManagerService: AudioTranslationManagerService,
     private playerPositionService: PlayerPositionService,
-    private playerTranscriptService: PlayerTranscriptService,
-    private audioPlayerService: AudioPlayerService) {}
+    private playerTranscriptService: PlayerTranscriptService
+  ) {}
 
   ngOnInit(): void {
     const {
