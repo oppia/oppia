@@ -73,10 +73,7 @@ class SubmittedAnswerDict(TypedDict, total=False):
     interaction_id: str
     answer_group_index: int
     rule_spec_index: int
-    classification_categorization: Literal[Union[
-        'explicit',
-    'training_data_match', 'statistical_classifier',
-    'default_outcome']]
+    classification_categorization: str
     params: Dict[str, Any]
     session_id: str
     time_spent_in_sec: float
@@ -177,11 +174,17 @@ class ExplorationStats:
     """Domain object representing analytics data for an exploration."""
 
     def __init__(
-            self, exp_id: str, exp_version: int, num_starts_v1: int,
-            num_starts_v2: int, num_actual_starts_v1: int,
-            num_actual_starts_v2: int, num_completions_v1: int,
-            num_completions_v2: int, state_stats_mapping:
-            Dict[str, StateStats]) -> None:
+        self,
+        exp_id: str,
+        exp_version: int,
+        num_starts_v1: int,
+        num_starts_v2: int,
+        num_actual_starts_v1: int,
+        num_actual_starts_v2: int,
+        num_completions_v1: int,
+        num_completions_v2: int,
+        state_stats_mapping: Dict[str, StateStats]
+    ) -> None:
         """Constructs an ExplorationStats domain object.
 
         Args:
@@ -280,8 +283,11 @@ class ExplorationStats:
 
     @classmethod
     def create_default(
-        cls, exp_id: str, exp_version: int,
-        state_stats_mapping: Dict[str, StateStats]) -> ExplorationStats:
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_stats_mapping: Dict[str, StateStats]
+    ) -> ExplorationStats:
         """Creates a ExplorationStats domain object and sets all properties to
         0.
 
@@ -311,7 +317,12 @@ class ExplorationStats:
     def validate(self) -> None:
         """Validates the ExplorationStats domain object."""
 
-        exploration_stats_properties = [
+        exploration_stats_properties: List[Literal['num_starts_v1',
+            'num_starts_v2',
+            'num_actual_starts_v1',
+            'num_actual_starts_v2',
+            'num_completions_v1',
+            'num_completions_v2']] = [
             'num_starts_v1',
             'num_starts_v2',
             'num_actual_starts_v1',
@@ -330,15 +341,12 @@ class ExplorationStats:
                     self.exp_version))
 
         exploration_stats_dict = self.to_dict()
-        # Ignore[misc] is used here because mypy expects TypedDict key to be s
-        # string literal, but because the key is being accessed by a variable
-        # instead of a string, mypy does not recognize that the key is a string.
         for stat_property in exploration_stats_properties:
-            if not isinstance(exploration_stats_dict[stat_property], int): # type: ignore[misc]
+            if not isinstance(exploration_stats_dict[stat_property], int):
                 raise utils.ValidationError(
                     'Expected %s to be an int, received %s' % (
-                        stat_property, exploration_stats_dict[stat_property])) # type: ignore[misc]
-            if exploration_stats_dict[stat_property] < 0: # type: ignore[misc]
+                        stat_property, exploration_stats_dict[stat_property]))
+            if exploration_stats_dict[stat_property] < 0:
                 raise utils.ValidationError(
                     '%s cannot have negative values' % (stat_property))
 
@@ -367,12 +375,19 @@ class StateStats:
     """
 
     def __init__(
-            self, total_answers_count_v1: int, total_answers_count_v2: int,
-            useful_feedback_count_v1: int, useful_feedback_count_v2: int,
-            total_hit_count_v1: int, total_hit_count_v2: int,
-            first_hit_count_v1: int, first_hit_count_v2: int,
-            num_times_solution_viewed_v2: int, num_completions_v1: int,
-            num_completions_v2: int) -> None:
+        self,
+        total_answers_count_v1: int,
+        total_answers_count_v2: int,
+        useful_feedback_count_v1: int,
+        useful_feedback_count_v2: int,
+        total_hit_count_v1: int,
+        total_hit_count_v2: int,
+        first_hit_count_v1: int,
+        first_hit_count_v2: int,
+        num_times_solution_viewed_v2: int,
+        num_completions_v1: int,
+        num_completions_v2: int
+    ) -> None:
         """Constructs a StateStats domain object.
 
         Args:
@@ -573,7 +588,7 @@ class StateStats:
             self.__class__.__name__,
             ', '.join('%s=%r' % (prop, getattr(self, prop)) for prop in props))
 
-    def __eq__(self, other: StateStats) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Implements == comparison between two StateStats instances, returning
         whether they both hold the same values.
 
@@ -583,6 +598,8 @@ class StateStats:
         Returns:
             bool. Whether the two instances have the same values.
         """
+        if not isinstance(other, StateStats):
+            return NotImplemented
         if other.__class__ is self.__class__:
             return (
                 self.total_answers_count_v1,
@@ -726,7 +743,7 @@ class SessionStateStats:
         }
         return session_state_stats_dict
 
-    def __eq__(self, other: SessionStateStats) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Implements == comparison between two SessionStateStats instances,
         returning whether they hold the same values.
 
@@ -736,6 +753,8 @@ class SessionStateStats:
         Returns:
             bool. Whether the two instances have the same values.
         """
+        if not isinstance(other, SessionStateStats):
+            return NotImplemented
         if other.__class__ is self.__class__:
             return (
                 self.total_answers_count,
@@ -986,9 +1005,12 @@ class ExplorationIssue:
     """Domain object representing an exploration issue."""
 
     def __init__(
-            self, issue_type: str, issue_customization_args:
-            Dict[str, Dict[str, Any]], playthrough_ids: List[str],
-            schema_version: int, is_valid: bool):
+            self,
+            issue_type: str,
+            issue_customization_args: Dict[str, Dict[str, Any]],
+            playthrough_ids: List[str],
+            schema_version: int,
+            is_valid: bool):
         """Constructs an ExplorationIssue domain object.
 
         Args:
@@ -1008,7 +1030,9 @@ class ExplorationIssue:
         self.schema_version = schema_version
         self.is_valid = is_valid
 
-    def __eq__(self, other: ExplorationIssue) -> bool:
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, ExplorationIssue):
+            return NotImplemented
         return (
             self.issue_type == other.issue_type and
             self.issue_customization_args == other.issue_customization_args and
@@ -1131,8 +1155,10 @@ class LearnerAction:
     """Domain object representing a learner action."""
 
     def __init__(
-        self, action_type: str, action_customization_args:
-        Dict[str, Dict[str, Any]], schema_version: int):
+        self,
+        action_type: str,
+        action_customization_args: Dict[str, Dict[str, Any]],
+        schema_version: int):
         """Constructs a LearnerAction domain object.
 
         Args:
@@ -1188,18 +1214,16 @@ class LearnerAction:
         current_action_schema_version = action_dict['schema_version']
         action_dict['schema_version'] += 1
 
-        conversion_fn = getattr(
-            cls, '_convert_action_v%s_dict_to_v%s_dict' % (
+        conversion_fn = getattr(cls, '_convert_action_v%s_dict_to_v%s_dict' % (
             current_action_schema_version, current_action_schema_version + 1))
         action_dict = conversion_fn(action_dict)
 
     @classmethod
     def _convert_action_v1_dict_to_v2_dict(
         cls, action_dict: Dict[str, Dict[str, Any]]) -> None:
-        """Converts a v1 action dict to a v2 action dict.
-        This function is now implemented only for testing
-        purposes and must be rewritten when an actual schema
-        migration from v1 to v2 takes place.
+        """Converts a v1 action dict to a v2 action dict. This function is now
+        implemented only for testing purposes and must be rewritten when an
+        actual schema migration from v1 to v2 takes place.
         """
         raise NotImplementedError(
             'The _convert_action_v1_dict_to_v2_dict() method is missing from '
@@ -1218,12 +1242,12 @@ class LearnerAction:
                     type(self.schema_version)))
 
         try:
-            action = action_registry.Registry.get_action_by_type( # type: ignore[no-untyped-call]
+            action = action_registry.Registry.get_action_by_type(
                 self.action_type)
         except KeyError as e:
             raise utils.ValidationError(
                 'Invalid action type: %s' % self.action_type) from e
-        customization_args_util.validate_customization_args_and_values(
+        customization_args_util.validate_customization_args_and_values( # type: ignore[no-untyped-call]
             'action', self.action_type, self.action_customization_args,
             action.customization_arg_specs)
 
@@ -1238,7 +1262,7 @@ class StateAnswers:
             self, exploration_id: str, exploration_version: int,
             state_name: str, interaction_id: str,
             submitted_answer_list: List[SubmittedAnswer],
-            schema_version: int=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION
+            schema_version: int = feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION
         ) -> None:
         """Constructs a StateAnswers domain object.
 
@@ -1521,7 +1545,7 @@ class AnswerCalculationOutput:
     calculation.
     """
 
-    def __init__(self, calculation_output_type: AnswerCalculationOutput):
+    def __init__(self, calculation_output_type: object):
         self.calculation_output_type = calculation_output_type
 
 
@@ -1531,9 +1555,8 @@ class AnswerFrequencyList(AnswerCalculationOutput):
     def __init__(
         self, answer_occurrences:
         Optional[List[AnswerOccurrence]]=None) -> None:
-        """Initialize domain object for answer frequency
-        list for a given list of AnswerOccurrence objects
-        (default is empty list).
+        """Initialize domain object for answer frequency list for a given list 
+        of AnswerOccurrence objects (default is empty list).
         """
         super(AnswerFrequencyList, self).__init__(
             CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
@@ -1725,7 +1748,7 @@ class LearnerAnswerDetails:
             self, state_reference: str, entity_type: str, interaction_id: str,
             learner_answer_info_list: List[LearnerAnswerInfo],
             accumulated_answer_info_json_size_bytes: int,
-            learner_answer_info_schema_version: int=(
+            learner_answer_info_schema_version: int = (
                 feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)) -> None:
         """Constructs a LearnerAnswerDetail domain object.
 

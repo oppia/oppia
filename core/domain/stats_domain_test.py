@@ -77,10 +77,11 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             self.exploration_stats_dict)
 
     def _get_exploration_stats_from_dict(
-        self, exploration_stats_dict: stats_domain.ExplorationStatsDict) -> (
-            stats_domain.ExplorationStats):
-        """Converts and returns the ExplorationStats
-        object from the given exploration stats dict.
+        self,
+        exploration_stats_dict: stats_domain.ExplorationStatsDict
+    ) -> stats_domain.ExplorationStats:
+        """Converts and returns the ExplorationStats object from the given
+        exploration stats dict.
         """
         state_stats_mapping = {}
         for state_name in exploration_stats_dict['state_stats_mapping']:
@@ -850,6 +851,9 @@ class PlaythroughTests(test_utils.GenericTestBase):
     def test_from_dict_raises_exception_when_miss_exp_id(self) -> None:
         """Test the from_dict() method."""
         # Test that a playthrough dict without 'exp_id' key raises exception.
+         # TODO(#13528): Remove this test after the backend is fully
+        # type-annotated. Here ignore[typeddict-item] is used to test
+        # that playthrough dict contains 'exp_id' key.
         playthrough_dict: stats_domain.PlaythroughDict = { # type: ignore[typeddict-item]
             'exp_version': 1,
             'issue_type': 'EarlyQuit',
@@ -1240,8 +1244,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
             }, 1)
 
     def _dummy_convert_action_v1_dict_to_v2_dict(
-        self, action_dict:
-        stats_domain.LearnerActionDict) -> stats_domain.LearnerActionDict:
+        self,
+        action_dict: stats_domain.LearnerActionDict
+    ) -> stats_domain.LearnerActionDict:
         """A test implementation of schema conversion function."""
         action_dict['schema_version'] = 2
         if action_dict['action_type'] == 'ExplorationStart':
@@ -1428,7 +1433,7 @@ class StateAnswersTests(test_utils.GenericTestBase):
     def test_can_retrieve_properly_constructed_submitted_answer_dict_list(
         self) -> None:
         state_answers = stats_domain.StateAnswers(
-            'exp_id', '1', 'initial_state', 'TextInput', [
+            'exp_id', 1, 'initial_state', 'TextInput', [
                 stats_domain.SubmittedAnswer(
                     'Text', 'TextInput', 0, 1,
                     exp_domain.EXPLICIT_CLASSIFICATION, {}, 'sess', 10.5,
@@ -1473,7 +1478,7 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(StateAnswersValidationTests, self).setUp()
         self.state_answers = stats_domain.StateAnswers(
-            'exp_id', '1', 'initial_state', 'TextInput', [])
+            'exp_id', 1, 'initial_state', 'TextInput', [])
 
         # The canonical object should have no validation problems.
         self.state_answers.validate()
@@ -1522,27 +1527,27 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             self.state_answers, 'Expected submitted_answer_list to be a list')
 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[assignment] is used to test the
+    # type of schema_version.
     def test_schema_version_must_be_integer(self) -> None:
-        self.state_answers.schema_version = '1'
+        self.state_answers.schema_version = '1' # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             self.state_answers, 'Expected schema_version to be an integer')
 
-    # TODO(#13528): Remove this test after the backend is fully
-    # type-annotated. Here ignore[assignment] is used to test that
-    # schema_version is between one and current version.
     def test_schema_version_must_be_between_one_and_current_version(
         self) -> None:
-        self.state_answers.schema_version = 0 # type: ignore[assignment]
+        self.state_answers.schema_version = 0
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             self.state_answers, 'schema_version < 1: 0')
 
         self.state_answers.schema_version = (
-            feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION + 1) # type: ignore[assignment]
+            feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION + 1)
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             self.state_answers,
             'schema_version > feconf\\.CURRENT_STATE_ANSWERS_SCHEMA_VERSION')
 
-        self.state_answers.schema_version = 1 # type: ignore[assignment]
+        self.state_answers.schema_version = 1
         self.state_answers.validate()
 
 
@@ -1763,12 +1768,9 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
         # The canonical object should have no validation problems.
         self.submitted_answer.validate()
 
-    # TODO(#13528): Remove this test after the backend is fully
-    # type-annotated. Here ignore[assignment] is used to test
-    # the type of answer.
     def test_answer_may_be_none_only_for_linear_interaction(self) -> None:
         # It's valid for answer to be None if the interaction type is Continue.
-        self.submitted_answer.answer = None # type: ignore[assignment]
+        self.submitted_answer.answer = None
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             self.submitted_answer,
             'SubmittedAnswers must have a provided answer except for linear '
@@ -2042,7 +2044,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(StateAnswersCalcOutputValidationTests, self).setUp()
         self.state_answers_calc_output = stats_domain.StateAnswersCalcOutput(
-            'exp_id', '1', 'initial_state', 'TextInput', 'AnswerFrequencies',
+            'exp_id', 1, 'initial_state', 'TextInput', 'AnswerFrequencies',
             stats_domain.AnswerFrequencyList.from_raw_type([]))
 
         # The canonical object should have no validation problems.
