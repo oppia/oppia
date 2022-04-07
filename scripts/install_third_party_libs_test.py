@@ -59,7 +59,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 def __init__(self):
                     self.returncode = 0
                 def communicate(self):
-                    """Return required meathod."""
+                    """Return required method."""
                     return '', ''
             return Ret()
         def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
@@ -70,7 +70,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                     self.returncode = 1
                 def communicate(self):
                     """Return user-prefix error as stderr."""
-                    return '', 'can\'t combine user with prefix'
+                    return b'', b'can\'t combine user with prefix'
             return Ret()
         def mock_print(msg, end=''):  # pylint: disable=unused-argument
             self.print_arr.append(msg)
@@ -88,6 +88,24 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         self.dir_exists_swap = self.swap(
             common, 'ensure_directory_exists', mock_ensure_directory_exists)
+
+    def test_install_prereqs(self):
+        # Need happy and sad path tests
+        prereqs = install_third_party_libs.PREREQUISITES
+        install_third_party_libs.install_prereqs(prereqs)
+        #invalid_install = (
+            #('invalidname', '6.0', os.path.join('third_party', 'invalidname')),
+        #)
+        #print("testing with invalid lib")
+        #install_third_party_libs.install_prereqs(invalid_install)
+        with self.Popen_error_swap:
+            with self.check_call_swap:
+                install_third_party_libs.install_prereqs(prereqs)
+                self.assertTrue(
+                    self.check_function_calls['check_call_is_called'])
+            #with self.assertRaisesRegex(
+                #Exception, 'Error installing prerequisites'):
+                #install_third_party_libs.install_prereqs(invalid_install)
 
     def test_tweak_yarn_executable(self):
         def mock_is_file(unused_filename):
