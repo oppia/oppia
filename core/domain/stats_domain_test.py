@@ -851,7 +851,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
     def test_from_dict_raises_exception_when_miss_exp_id(self) -> None:
         """Test the from_dict() method."""
         # Test that a playthrough dict without 'exp_id' key raises exception.
-         # TODO(#13528): Remove this test after the backend is fully
+        # TODO(#13528): Remove this test after the backend is fully
         # type-annotated. Here ignore[typeddict-item] is used to test
         # that playthrough dict contains 'exp_id' key.
         playthrough_dict: stats_domain.PlaythroughDict = { # type: ignore[typeddict-item]
