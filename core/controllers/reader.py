@@ -646,7 +646,11 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
             },
             'refresher_exp_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
                 }
             }
         }
