@@ -1651,7 +1651,7 @@ title: Title
             'Intro')
 
         self.logout()
-    
+
     def test_restart_event_creates_exploration_user_data_if_not_existing(self):
         self.login(self.VIEWER_EMAIL)
         exploration_user_data = exp_fetchers.get_exploration_user_data(
