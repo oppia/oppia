@@ -1614,6 +1614,63 @@ title: Title
             exploration_user_data.most_recently_reached_checkpoint_state_name,
             'Introduction')
 
+        # Change state name of 'Introduction' state.
+        # Now version of exploration becomes 4.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'Introduction',
+                'new_state_name': 'Intro',
+            })], 'Change state name'
+        )
+
+        # First checkpoint reached again.
+        # Working - First the furthest reached checkpoint
+        # ('Introduction' in this case) is searched in current exploration.
+        # It will not be found since its state name is changed to 'Intro'.
+        # It will then search for an checkpoint that had been reached in
+        # previous exploration and also exists in current exploration. If such
+        # checkpoint is not found, it will make the most recently reached
+        # checkpoint as the furthest reached checkpoint.
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Intro', 4)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_exp_version,
+            4)
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_state_name,
+            'Intro')
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_exp_version,
+            4)
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            'Intro')
+
+        self.logout()
+    
+    def test_restart_event_creates_exploration_user_data_if_not_existing(self):
+        self.login(self.VIEWER_EMAIL)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertIsNone(exploration_user_data)
+        user_services.update_learner_checkpoint_progress_on_restart(
+            self.viewer_id, self.EXP_ID)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertIsNotNone(exploration_user_data)
+        self.assertIsNone(
+            exploration_user_data.furthest_reached_checkpoint_exp_version)
+        self.assertIsNone(
+            exploration_user_data.furthest_reached_checkpoint_state_name)
+        self.assertIsNone(
+            exploration_user_data.most_recently_reached_checkpoint_exp_version)
+        self.assertIsNone(
+            exploration_user_data.most_recently_reached_checkpoint_state_name)
+
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
     """Test whether contribution date changes with publication of

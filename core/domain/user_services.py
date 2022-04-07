@@ -2464,6 +2464,11 @@ def update_learner_checkpoint_progress_on_restart(user_id, exploration_id):
     exploration_user_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
     if exploration_user_model is None:
+        # This case normally won't arise since as soon as the exploration
+        # starts most_recently_reached_checkpoint is updated (First state of
+        # an exploration is always a checkpoint). This is just a double check
+        # in case learner hits the restart button while the other content of
+        # the page is loading.
         exploration_user_model = user_models.ExplorationUserDataModel.create(
             user_id, exploration_id)
     exploration_user_model.most_recently_reached_checkpoint_exp_version = None
