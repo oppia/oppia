@@ -388,3 +388,36 @@
   position: fixed;
   transform: translateY(-100%);
 }
+
+.oppia-learnerdashboard-pagination-container {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+  width: 100%;
+}
+.oppia-pagination-button {
+  background-color: transparent;
+  border: none;
+  box-sizing: border-box;
+  color: #009688;
+  font-size: 18px;
+  font-weight: bold;
+  min-height: 40px;
+  min-width: 100px;
+  text-align: center;
+}
+
+.oppia-pagination-button:hover {
+  border: 2px solid #009688;
+  border-radius: 5px;
+}
+.oppia-pagination-button[disabled] {
+  color: #a9e5df;
+}
+.oppia-pagination-button[disabled]:hover {
+  border: none;
+}
+
+.oppia-diagram-spinning-button {
+  margin: 0 auto;
+}

@@ -140,7 +140,7 @@
         </div>
 
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK"
-             class="oppia-learner-dashboard-feedback-section oppia-feedback-section-top-margin"
+             class="oppia-learner-dashboard-feedback-section oppia-feedback-section-top-margin w-100"
              [ngStyle]="threadSummaries.length !== 0 && {'cursor': 'pointer'}">
           <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
                     *ngIf="threadSummaries.length === 0">
@@ -333,6 +333,17 @@
                *ngIf="feedbackThreadActive">
             <i class="material-icons">&#xE88F;</i>
             <span [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING' | translate"></span>
+          </div>
+          <div class="oppia-learnerdashboard-pagination-container" *ngIf="more.length > 0">
+            <button class="oppia-pagination-button" type="button" (click)="fetchMoreFeedbackUpdates()">
+              <span *ngIf="!loadingIndicatorIsShown">Show more</span>
+              <span *ngIf="loadingIndicatorIsShown">
+                <mat-progress-spinner [diameter]="25"
+                                      [mode]="indeterminate"
+                                      class="oppia-diagram-spinning-button">
+                </mat-progress-spinner>
+              </span>
+            </button>
           </div>
         </div>
       </div>

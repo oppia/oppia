@@ -715,8 +715,12 @@ class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
     def test_get_threads_after_updating_thread_summaries(self):
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json(
-            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
+            {'more': []},
+            csrf_token=csrf_token,
+            expected_status_int=200)
         thread_summaries = response['thread_summaries']
         self.assertEqual(thread_summaries, [])
 
@@ -726,12 +730,16 @@ class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
             'exploration', self.EXP_ID_1, self.owner_id, 'a subject',
             'some text')
 
-        response = self.get_json(
-            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL)
+        response = self.post_json(
+            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
+            {'more': []},
+            csrf_token=csrf_token,
+            expected_status_int=200)
         thread_summaries = response['thread_summaries']
         thread_id = thread_summaries[0]['thread_id']
         thread = feedback_services.get_thread(thread_id)
 
+        self.assertEqual(len(response['more']), 0)
         self.assertEqual(len(thread_summaries), 1)
         self.assertEqual(thread_summaries[0]['total_message_count'], 1)
         self.assertEqual(
@@ -741,6 +749,65 @@ class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             thread_summaries[0]['original_author_id'], self.owner_id)
         self.assertEqual(thread.subject, 'a subject')
+        self.assertEqual(thread.entity_type, 'exploration')
+        self.logout()
+
+    def test_get_more_threads_on_request(self):
+        self.login(self.OWNER_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        for i in range(190):
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, self.owner_id, 'a subject %s' % i,
+                'some text %s' % i)
+
+        response = self.post_json(
+            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
+            {'more': []},
+            csrf_token=csrf_token,
+            expected_status_int=200)
+        thread_summaries = response['thread_summaries']
+        thread_id = thread_summaries[0]['thread_id']
+        thread = feedback_services.get_thread(thread_id)
+        more = response['more']
+
+        self.assertEqual(len(more), 1)
+        self.assertEqual(len(more[0]), 90)
+        self.assertEqual(len(thread_summaries), 100)
+        self.assertEqual(thread_summaries[0]['total_message_count'], 1)
+        self.assertEqual(
+            thread_summaries[0]['exploration_title'], self.EXP_TITLE_1)
+        self.assertEqual(thread_summaries[0]['exploration_id'], self.EXP_ID_1)
+        self.assertEqual(
+            thread_summaries[0]['last_message_text'], 'some text 0')
+        self.assertEqual(
+            thread_summaries[0]['original_author_id'], self.owner_id)
+        self.assertEqual(thread.subject, 'a subject 0')
+        self.assertEqual(thread.entity_type, 'exploration')
+
+        response = self.post_json(
+            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
+            {'more': more},
+            csrf_token=csrf_token,
+            expected_status_int=200)
+        thread_summaries = response['thread_summaries']
+        thread_id = thread_summaries[0]['thread_id']
+        thread = feedback_services.get_thread(thread_id)
+        more = response['more']
+
+        self.assertEqual(len(response['more']), 0)
+        self.assertEqual(len(thread_summaries), 90)
+        self.assertEqual(thread_summaries[0]['total_message_count'], 1)
+        self.assertEqual(
+            thread_summaries[0]['exploration_title'], self.EXP_TITLE_1)
+        self.assertEqual(thread_summaries[0]['exploration_id'], self.EXP_ID_1)
+        self.assertEqual(
+            thread_summaries[0]['last_message_text'], 'some text 100')
+        self.assertEqual(
+            thread_summaries[0]['original_author_id'], self.owner_id)
+        self.assertEqual(thread.subject, 'a subject 100')
         self.assertEqual(thread.entity_type, 'exploration')
         self.logout()
 
