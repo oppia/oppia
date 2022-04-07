@@ -205,7 +205,7 @@ class MockMailchimpPopulateJob(base_jobs.JobBase):
             | 'Get all UserEmailPreferencesModel' >> ndb_io.GetModels(
                 user_models.UserEmailPreferencesModel.get_all().filter(
                     user_models.UserEmailPreferencesModel.site_updates == True # pylint: disable=singleton-comparison
-                ).order('created_on'))
+                ))
             | 'Extract user ID' >> beam.Map(
                 lambda preferences_model: preferences_model.id)
         )
@@ -216,8 +216,7 @@ class MockMailchimpPopulateJob(base_jobs.JobBase):
         relevant_user_emails = (
             self.pipeline
             | 'Get all user settings models' >> ndb_io.GetModels(
-                user_models.UserSettingsModel.get_all().order(
-                    'created_on'))
+                user_models.UserSettingsModel.get_all())
             | 'Filter user models' >> (
                 beam.Filter(
                     lambda model, ids: model.id in ids, ids=valid_user_ids))
