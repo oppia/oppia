@@ -1507,7 +1507,8 @@ class AppFeedbackReportTicket:
                     report_ids))
         for report_id in report_ids:
             # [platform].[submitted_on_msec].[random hash]
-            if report_id.count('.') != 2:
+            report_id_copy = report_id[::].split('.')
+            if len(report_id_copy) != 3 or report_id_copy[0] != self.platform:
                 raise utils.ValidationError(
                     'The report with id %s is invalid.' % report_id)
 
