@@ -39,9 +39,9 @@ def get_classroom_url_fragment_for_topic_id(topic_id: str) -> str:
             # As config_property in config domain is set to Any, we need type
             # casting to return a string value.
             return str(classroom_dict['url_fragment'])
-            # As it is described in 'core/constants/parse_json_from_ts', we are
-            # casting the type to change it from Any to string to return
-            # string type value.
+        # As it is described in 'core/constants/parse_json_from_ts', we are
+        # casting the type to change it from Any to string to return
+        # string type value.
     return str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
 
 
