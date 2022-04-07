@@ -2190,10 +2190,10 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
         exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
-        
+
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(
+        self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id),
             {'v': 5},
             expected_status_int=404)
@@ -2610,8 +2610,10 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                     'answer_details': 'This is an answer details.',
                 }, csrf_token=csrf_token, expected_status_int=500)
 
+
 class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
     """Tests for checkpoint reached event handler."""
+
     def test_user_checkpoint_progress_is_updated_correctly(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -2620,7 +2622,6 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
         exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
-        
 
         self.login(self.VIEWER_EMAIL)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -2712,8 +2713,10 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+
 class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
     """Tests for exploration restart event handler."""
+
     def test_user_checkpoint_progress_is_updated_correctly_on_restart(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -2722,7 +2725,6 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
         exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
-        
 
         self.login(self.VIEWER_EMAIL)
         viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
