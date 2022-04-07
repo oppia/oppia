@@ -101,7 +101,7 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
       this.playerPositionService.getDisplayedCardIndex());
     this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
 
-
+    // Combine labels for voiceover.
     let combinedChoceLabels = '';
     for (const choiceLabel of this.choices) {
       // If the labels are in html format, remove the tags and leave the
@@ -110,17 +110,12 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
 
       combinedChoceLabels += cleanChoiceLabel + '. ';
     }
-    // Say the options aloud if autoplay is enabled.
+    // Say the choices aloud if autoplay is enabled.
     this.audioTranslationManagerService.setSequentialAudioTranslations(
       this.recordedVoiceovers.getBindableVoiceovers(
         this.choicesValue[0]._contentId),
       combinedChoceLabels, this.COMPONENT_NAME_RULE_INPUT
     );
-
-    this.audioPlayerService.onAutoplayAudio.subscribe(
-      (params: AutoPlayAudioEvent) => {
-        this.audioPlayerService.onAutoplayAudio.emit();
-      });
 
     this.displayCheckboxes = this.maxAllowableSelectionCount > 1;
 
