@@ -42,16 +42,16 @@ def install_chrome(version: str) -> None:
             of the versions available from
             github.com/webnicer/chrome-downloads.
     """
-    _ = common.run_cmd(['sudo', 'apt-get', 'update'])  # type: ignore[no-untyped-call]
-    _ = common.run_cmd(['sudo', 'apt-get', 'install', 'libappindicator3-1'])  # type: ignore[no-untyped-call]
-    _ = common.run_cmd([  # type: ignore[no-untyped-call]
+    _ = common.run_cmd(['sudo', 'apt-get', 'update'])
+    _ = common.run_cmd(['sudo', 'apt-get', 'install', 'libappindicator3-1'])
+    _ = common.run_cmd([
         'curl', '-L', '-o', CHROME_DEB_FILE,
         URL_TEMPLATE.format(version)])
-    _ = common.run_cmd([  # type: ignore[no-untyped-call]
+    _ = common.run_cmd([
         'sudo', 'sed', '-i',
         's|HERE/chrome\\"|HERE/chrome\\" --disable-setuid-sandbox|g',
         '/opt/google/chrome/google-chrome'])
-    _ = common.run_cmd(['sudo', 'dpkg', '-i', CHROME_DEB_FILE])  # type: ignore[no-untyped-call]
+    _ = common.run_cmd(['sudo', 'dpkg', '-i', CHROME_DEB_FILE])
 
 
 def get_chrome_version() -> str:
@@ -63,7 +63,7 @@ def get_chrome_version() -> str:
     Returns:
         str. The version of Chrome we found.
     """
-    output = str(common.run_cmd(['google-chrome', '--version']))  # type: ignore[no-untyped-call]
+    output = str(common.run_cmd(['google-chrome', '--version']))
     chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
     return chrome_version
 
