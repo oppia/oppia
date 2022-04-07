@@ -20,10 +20,12 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
@@ -37,10 +39,41 @@ class MockTruncteAndCapitalizePipe {
   }
 }
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      pathname: '/learn/math',
+      href: '',
+      reload: () => {},
+      toString: () => {
+        return 'http://localhost:8181/?lang=es';
+      }
+    },
+    localStorage: {
+      last_uploaded_audio_lang: 'en',
+      removeItem: (name: string) => {}
+    },
+    gtag: () => {},
+    history: {
+      pushState(data: object, title: string, url?: string | null) {}
+    },
+    document: {
+      body: {
+        style: {
+          overflowY: 'auto',
+        }
+      }
+    }
+  };
+}
+
 describe('Lesson Information card modal component', () => {
   let fixture: ComponentFixture<LessonInformationCardModalComponent>;
   let componentInstance: LessonInformationCardModalComponent;
   let urlService: UrlService;
+  let mockWindowRef: MockWindowRef;
+  let editableExplorationBackendApiService:
+   EditableExplorationBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
 
@@ -52,6 +85,7 @@ describe('Lesson Information card modal component', () => {
   let nodeId = 'nodeId';
 
   beforeEach(waitForAsync(() => {
+    mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule
@@ -66,6 +100,11 @@ describe('Lesson Information card modal component', () => {
         PlayerTranscriptService,
         ExplorationEngineService,
         StoryViewerBackendApiService,
+        EditableExplorationBackendApiService,
+        {
+          provide: WindowRef,
+          useValue: mockWindowRef
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -104,6 +143,8 @@ describe('Lesson Information card modal component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     urlService = TestBed.inject(UrlService);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
+    editableExplorationBackendApiService = TestBed.inject(
+      EditableExplorationBackendApiService);
 
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValues(true, true, false);
@@ -111,33 +152,8 @@ describe('Lesson Information card modal component', () => {
       .and.returnValues(false, false, true);
   });
 
-  it('should initialize the component and set values', fakeAsync(() => {
-    componentInstance.ngOnInit();
-    expect(componentInstance.explorationId).toEqual(expId);
-    expect(componentInstance.expTitle).toEqual(expTitle);
-    expect(componentInstance.expDesc).toEqual(expDesc);
-
-    expect(componentInstance.expTitleTranslationKey).toEqual(
-      'I18N_EXPLORATION_expId_TITLE');
-    expect(componentInstance.expDescTranslationKey).toEqual(
-      'I18N_EXPLORATION_expId_DESCRIPTION');
-
-    // Translation is only displayed if the language is not English
-    // and it's hacky translation is available.
-    let hackyExpTitleTranslationIsDisplayed = (
-      componentInstance.isHackyExpTitleTranslationDisplayed());
-    expect(hackyExpTitleTranslationIsDisplayed).toBe(true);
-    let hackyStoryTitleTranslationIsDisplayed = (
-      componentInstance.isHackyStoryTitleTranslationDisplayed());
-    expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
-    let hackyExpDescTranslationIsDisplayed = (
-      componentInstance.isHackyExpDescTranslationDisplayed());
-    expect(hackyExpDescTranslationIsDisplayed).toBe(false);
-  }));
-
-  it('should correctly set story title' +
-      ' when storyId is present',
-  fakeAsync(() => {
+  it('should initialize the component and set values' +
+    ' when storyId is present', fakeAsync(() => {
     spyOn(urlService, 'getUrlParams').and.returnValue({
       story_id: storyId,
       node_id: nodeId
@@ -171,6 +187,27 @@ describe('Lesson Information card modal component', () => {
     expect(storyViewerBackendApiService.fetchStoryDataAsync).toHaveBeenCalled();
     expect(componentInstance.storyTitleTranslationKey).toEqual(
       'I18N_STORY_storyId_TITLE');
+
+    expect(componentInstance.explorationId).toEqual(expId);
+    expect(componentInstance.expTitle).toEqual(expTitle);
+    expect(componentInstance.expDesc).toEqual(expDesc);
+
+    expect(componentInstance.expTitleTranslationKey).toEqual(
+      'I18N_EXPLORATION_expId_TITLE');
+    expect(componentInstance.expDescTranslationKey).toEqual(
+      'I18N_EXPLORATION_expId_DESCRIPTION');
+
+    // Translation is only displayed if the language is not English
+    // and it's hacky translation is available.
+    let hackyExpTitleTranslationIsDisplayed = (
+      componentInstance.isHackyExpTitleTranslationDisplayed());
+    expect(hackyExpTitleTranslationIsDisplayed).toBe(true);
+    let hackyStoryTitleTranslationIsDisplayed = (
+      componentInstance.isHackyStoryTitleTranslationDisplayed());
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+    let hackyExpDescTranslationIsDisplayed = (
+      componentInstance.isHackyExpDescTranslationDisplayed());
+    expect(hackyExpDescTranslationIsDisplayed).toBe(false);
   }));
 
   it('should correctly set story title' +
@@ -187,5 +224,19 @@ describe('Lesson Information card modal component', () => {
 
     expect(componentInstance.storyId).toEqual(undefined);
     expect(componentInstance.storyTitleIsPresent).toBe(false);
+  }));
+
+  it('should restart the exploration and reset the progress', fakeAsync(() => {
+    let resetSpy = spyOn(
+      editableExplorationBackendApiService, 'resetExplorationProgressAsync')
+      .and.returnValue(Promise.resolve());
+    spyOn(mockWindowRef.nativeWindow.location, 'reload');
+
+    componentInstance.restartExploration();
+
+    fixture.whenStable().then(() => {
+      expect(resetSpy).toHaveBeenCalled();
+      expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
+    });
   }));
 });

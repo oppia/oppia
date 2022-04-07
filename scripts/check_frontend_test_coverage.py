@@ -48,7 +48,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'expression-interpolation.service.ts',
     'google-analytics.initializer.ts',
     'learner-answer-info.service.ts',
-    'lesson-information-card-modal.component.ts',
     'mathjax-bind.directive.ts',
     'object-editor.directive.ts',
     'oppia-interactive-music-notes-input.component.ts',
