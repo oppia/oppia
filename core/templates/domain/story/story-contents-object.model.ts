@@ -166,7 +166,7 @@ export class StoryContents {
     return issues;
   }
 
-  setInitialNodeId(nodeId: string): void {
+  setInitialNodeId(nodeId: string | null): void {
     if (this.getNodeIndex(nodeId) === -1) {
       throw new Error('The node with given id doesn\'t exist');
     }
@@ -226,7 +226,7 @@ export class StoryContents {
     this._nodes[index].setDescription(description);
   }
 
-  setNodeExplorationId(nodeId: string, explorationId: string): void {
+  setNodeExplorationId(nodeId: string, explorationId: string | null): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
