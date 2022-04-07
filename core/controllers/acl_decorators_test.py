@@ -6499,9 +6499,9 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
                 tuple(str). Message at index 0, vm_id at index 1 and signature
                 at index 2.
             """
-            signature = self.payload.get('signature')
-            vm_id = self.payload.get('vm_id')
-            message = self.payload.get('message')
+            signature = self.normalized_payload.get('signature')
+            vm_id = self.normalized_payload.get('vm_id')
+            message = self.normalized_payload.get('message')
             return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
 
         @acl_decorators.is_from_oppia_ml
