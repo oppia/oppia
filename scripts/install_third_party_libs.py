@@ -46,9 +46,9 @@ PREREQUISITES = (
     ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs'))
 )
 
-def install_prereqs(prereqs):
+def install_prerequisites(prerequisites):
     """Install prerequisites."""
-    for package_name, version_number, target_path in prereqs:
+    for package_name, version_number, target_path in prerequisites:
         command_text = [
             sys.executable, '-m', 'pip', 'install', '%s==%s'
             % (package_name, version_number), '--target', target_path]
@@ -64,7 +64,7 @@ def install_prereqs(prereqs):
             except subprocess.CalledProcessError as e:
                 raise Exception('Error installing prerequisites') from e
 
-install_prereqs(PREREQUISITES)
+install_prerequisites(PREREQUISITES)
 
 _PARSER = argparse.ArgumentParser(
     description="""

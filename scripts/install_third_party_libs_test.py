@@ -89,23 +89,25 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.dir_exists_swap = self.swap(
             common, 'ensure_directory_exists', mock_ensure_directory_exists)
 
-    def test_install_prereqs(self):
+    def test_install_prerequisites(self):
         # Need happy and sad path tests
-        prereqs = install_third_party_libs.PREREQUISITES
-        install_third_party_libs.install_prereqs(prereqs)
+        prerequisites = install_third_party_libs.PREREQUISITES
+        install_third_party_libs.test_install_prerequisites(prerequisites)
         #invalid_install = (
             #('invalidname', '6.0', os.path.join('third_party', 'invalidname')),
         #)
         #print("testing with invalid lib")
-        #install_third_party_libs.install_prereqs(invalid_install)
+        #install_third_party_libs.test_install_prerequisites(invalid_install)
         with self.Popen_error_swap:
             with self.check_call_swap:
-                install_third_party_libs.install_prereqs(prereqs)
+                install_third_party_libs.test_install_prerequisites(
+                    prerequisites)
                 self.assertTrue(
                     self.check_function_calls['check_call_is_called'])
             #with self.assertRaisesRegex(
                 #Exception, 'Error installing prerequisites'):
-                #install_third_party_libs.install_prereqs(invalid_install)
+                #install_third_party_libs.test_install_prerequisites(
+                    #invalid_install)
 
     def test_tweak_yarn_executable(self):
         def mock_is_file(unused_filename):
