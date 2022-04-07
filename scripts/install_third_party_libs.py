@@ -47,13 +47,20 @@ PREREQUISITES = (
 )
 
 def install_prerequisites(prerequisites):
-    """Install prerequisites."""
+    """Install prerequisites.
+
+    Args:
+        prerequisites: tuple. Group of arguments to pip install.
+
+    Raises:
+        Exception. If any of the packages fail to install.
+    """
     for package_name, version_number, target_path in prerequisites:
         command_text = [
             sys.executable, '-m', 'pip', 'install', '%s==%s'
             % (package_name, version_number), '--target', target_path]
-        uextention_text = ['--user', '--prefix=', '--system']
-        #uextention_text = ['--user', '--prefix=']
+        #uextention_text = ['--user', '--prefix=', '--system']
+        uextention_text = ['--user', '--prefix=']
         current_process = subprocess.Popen(
             command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output_stderr = current_process.communicate()[1]  # pylint: disable=invalid-name
@@ -62,7 +69,8 @@ def install_prerequisites(prerequisites):
                 #return subprocess.check_call(command_text + uextention_text)
                 subprocess.check_call(command_text + uextention_text)
             except subprocess.CalledProcessError as e:
-                raise Exception('Error installing prerequisites') from e
+                raise Exception('Error installing prerequisite %s' %
+                    package_name) from e
 
 install_prerequisites(PREREQUISITES)
 
