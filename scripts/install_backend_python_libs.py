@@ -694,6 +694,7 @@ def main():
         print(
             'All third-party Python libraries are already installed correctly.')
 
+
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when install_third_party_libs.py is used as a script.
 if __name__ == '__main__': # pragma: no cover

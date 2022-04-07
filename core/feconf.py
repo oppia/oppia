@@ -22,7 +22,6 @@ import copy
 import datetime
 import enum
 import os
-import sys
 
 from core.constants import constants
 
