@@ -35,6 +35,10 @@ from apache_beam import runners
 from google.cloud import dataflow
 from typing import Iterator, Optional, Type
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
+
 datastore_services = models.Registry.import_datastore_services()
 
 # This is a mapping from the Google Cloud Dataflow JobState enum to our enum.

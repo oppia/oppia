@@ -26,52 +26,52 @@ from core.tests import test_utils
 
 class JobRunResultTests(test_utils.TestBase):
 
-    def test_usage(self):
+    def test_usage(self) -> None:
         run_result = job_run_result.JobRunResult(stdout='abc', stderr='123')
         self.assertEqual(run_result.stdout, 'abc')
         self.assertEqual(run_result.stderr, '123')
 
-    def test_as_stdout(self):
+    def test_as_stdout(self) -> None:
         run_result = job_run_result.JobRunResult.as_stdout(123)
         self.assertEqual(run_result.stdout, '123')
         self.assertEqual(run_result.stderr, '')
 
-    def test_as_stderr(self):
+    def test_as_stderr(self) -> None:
         run_result = job_run_result.JobRunResult.as_stderr(123)
         self.assertEqual(run_result.stderr, '123')
         self.assertEqual(run_result.stdout, '')
 
-    def test_as_stdout_using_repr(self):
+    def test_as_stdout_using_repr(self) -> None:
         run_result = job_run_result.JobRunResult.as_stdout('abc', use_repr=True)
         self.assertEqual(run_result.stdout, '\'abc\'')
         self.assertEqual(run_result.stderr, '')
 
-    def test_as_stderr_using_repr(self):
+    def test_as_stderr_using_repr(self) -> None:
         run_result = job_run_result.JobRunResult.as_stderr('abc', use_repr=True)
         self.assertEqual(run_result.stderr, '\'abc\'')
         self.assertEqual(run_result.stdout, '')
 
-    def test_empty_result_raises_value_error(self):
-        with self.assertRaisesRegex(ValueError, 'must not be empty'):
+    def test_empty_result_raises_value_error(self) -> None:
+        with self.assertRaisesRegex(ValueError, 'must not be empty'):  # type: ignore[no-untyped-call]
             job_run_result.JobRunResult()
 
-    def test_enormous_result_raises_value_error(self):
-        with self.assertRaisesRegex(ValueError, r'must not exceed \d+ bytes'):
+    def test_enormous_result_raises_value_error(self) -> None:
+        with self.assertRaisesRegex(ValueError, r'must not exceed \d+ bytes'):  # type: ignore[no-untyped-call]
             job_run_result.JobRunResult(stdout='a' * 1501)
 
-    def test_accumulate(self):
+    def test_accumulate(self) -> None:
         single_job_run_result = job_run_result.JobRunResult.accumulate([
             job_run_result.JobRunResult(stdout='abc', stderr=''),
             job_run_result.JobRunResult(stdout='', stderr='123'),
             job_run_result.JobRunResult(stdout='def', stderr='456'),
         ])[0]
 
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             single_job_run_result.stdout.split('\n'), ['abc', 'def'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             single_job_run_result.stderr.split('\n'), ['123', '456'])
 
-    def test_accumulate_with_enormous_outputs(self):
+    def test_accumulate_with_enormous_outputs(self) -> None:
         accumulated_results = job_run_result.JobRunResult.accumulate([
             job_run_result.JobRunResult(
                 stdout='a' * 750, stderr='b' * 750),
@@ -89,18 +89,18 @@ class JobRunResultTests(test_utils.TestBase):
         # each need their own result.
         self.assertEqual(len(accumulated_results), 3)
 
-    def test_accumulate_with_empty_list(self):
+    def test_accumulate_with_empty_list(self) -> None:
         self.assertEqual(job_run_result.JobRunResult.accumulate([]), [])
 
-    def test_len_in_bytes(self):
+    def test_len_in_bytes(self) -> None:
         result = job_run_result.JobRunResult(stdout='123', stderr='123')
         self.assertEqual(result.len_in_bytes(), 6)
 
-    def test_len_in_bytes_of_unicode(self):
+    def test_len_in_bytes_of_unicode(self) -> None:
         result = job_run_result.JobRunResult(stdout='😀', stderr='😀')
         self.assertEqual(result.len_in_bytes(), 8)
 
-    def test_equality(self):
+    def test_equality(self) -> None:
         a_result = job_run_result.JobRunResult(stdout='abc', stderr='123')
         b_result = job_run_result.JobRunResult(stdout='def', stderr='456')
 
@@ -108,20 +108,20 @@ class JobRunResultTests(test_utils.TestBase):
         self.assertEqual(b_result, b_result)
         self.assertNotEqual(a_result, b_result)
 
-    def test_hash(self):
+    def test_hash(self) -> None:
         a_result = job_run_result.JobRunResult(stdout='abc', stderr='123')
         b_result = job_run_result.JobRunResult(stdout='def', stderr='456')
 
         self.assertIn(a_result, {a_result})
         self.assertNotIn(b_result, {a_result})
 
-    def test_pickle(self):
+    def test_pickle(self) -> None:
         run_result = job_run_result.JobRunResult(stdout='abc', stderr='123')
         pickle_result = pickle.loads(pickle.dumps(run_result))
 
         self.assertEqual(run_result, pickle_result)
 
-    def test_repr(self):
+    def test_repr(self) -> None:
         run_result = job_run_result.JobRunResult(stdout='abc', stderr='123')
 
         self.assertEqual(
