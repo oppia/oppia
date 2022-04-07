@@ -27,10 +27,7 @@ import sys
 from core.constants import constants
 
 from typing import Dict, List, Union
-
-print('path of feconf.py in github ci output    \n\n\n\n\n\n\n\n\n\n ', sys.path)
-
-from typing_extensions import TypedDict # isort:skip  # pylint: disable=wrong-import-position
+from typing_extensions import TypedDict
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])

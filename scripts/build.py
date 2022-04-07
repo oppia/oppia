@@ -25,11 +25,16 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import threading
 
-from core import utils
-from scripts import common
-from scripts import servers
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+if _THIRD_PARTY_PATH not in sys.path:
+    sys.path.insert(0, _THIRD_PARTY_PATH)
+
+from core import utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from scripts import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from scripts import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')

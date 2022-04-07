@@ -25,9 +25,14 @@ import fnmatch
 import os
 import sys
 
-from core import utils
+_THIRD_PARTY_PYTHON_LIBS_PATH = os.path.join(
+    os.getcwd(), 'third_party', 'python_libs')
+if _THIRD_PARTY_PYTHON_LIBS_PATH not in sys.path:
+    sys.path.insert(0, _THIRD_PARTY_PYTHON_LIBS_PATH)
 
-from typing import List
+from core import utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+from typing import List # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 15000

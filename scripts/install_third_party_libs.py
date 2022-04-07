@@ -52,10 +52,8 @@ for package_name, version_number, target_path in PREREQUISITES:
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
-print('path of install_third_party_libs.py before utils import in github ci output    \n\n\n\n\n\n\n\n\n\n ', sys.path)
 from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
-print('path of install_third_party_libs.py after utils import in github ci output    \n\n\n\n\n\n\n\n\n\n ', sys.path)
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
