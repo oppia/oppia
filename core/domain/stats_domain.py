@@ -1555,7 +1555,7 @@ class AnswerFrequencyList(AnswerCalculationOutput):
     def __init__(
         self, answer_occurrences:
         Optional[List[AnswerOccurrence]]=None) -> None:
-        """Initialize domain object for answer frequency list for a given list 
+        """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
         """
         super(AnswerFrequencyList, self).__init__(
