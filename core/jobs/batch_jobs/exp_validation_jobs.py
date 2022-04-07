@@ -32,54 +32,56 @@ from typing import Iterator
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 
-# https://stackoverflow.com/questions/39233973/get-all-keys-of-a-nested-dictionary
-def recursive_items(dictionary: dict) -> Iterator[tuple]:
-    """Yields an iterator containing tuples of key, value pairs
-
-    Yields:
-        tuple. Yields tuples of key, value pairs.
-    """
-    for key, value in dictionary.items():
-        if isinstance(value, dict):
-            yield from recursive_items(value)
-        else:
-            yield (key, value)
-
-
-def get_invalid_links(dictionary: dict) -> list:
-    """Returns list of invalid links
-
-        Returns:
-            list. Returns list of invalid links.
-        """
-    string = ''
-    for key, value in recursive_items(dictionary):
-        if key == 'html':
-            string += value
-
-    soup = bs4.BeautifulSoup(string, 'html.parser')
-
-    # Extract links.
-    links = soup.find_all('oppia-noninteractive-link')
-    cleaned_links = []
-    for link in links:
-        # Remove &quot; from the links.
-        cleaned_links.append(link.get('url-with-value').replace('&quot;', ''))
-
-    invalid_links = []
-    # Extract scheme.
-    for link in cleaned_links:
-        link_info = link.split(':')
-        if len(link_info) >= 2:
-            # Scheme is present.
-            if link_info[0] != 'https':
-                invalid_links.append(link)
-
-    return invalid_links
-
-
 class GetExpsWithInvalidURLJob(base_jobs.JobBase):
     """Job that returns invalid exploration models."""
+
+    # The following function has been adapted from
+    # https://stackoverflow.com/questions/39233973/get-all-keys-of-a-nested-dictionary
+    def recursive_items(self, dictionary: dict) -> Iterator[tuple]:
+        """Yields an iterator containing tuples of key, value pairs
+
+        Yields:
+            tuple. Yields tuples of key, value pairs.
+        """
+        for key, value in dictionary.items():
+            if isinstance(value, dict):
+                yield from self.recursive_items(value)
+            else:
+                yield (key, value)
+
+
+    def get_invalid_links(self, dictionary: dict) -> list:
+        """Returns list of invalid links
+
+            Returns:
+                list. Returns list of invalid links.
+            """
+        string = ''
+        for key, value in self.recursive_items(dictionary):
+            if key == 'html':
+                string += value
+
+        soup = bs4.BeautifulSoup(string, 'html.parser')
+
+        # Extract links.
+        links = soup.find_all('oppia-noninteractive-link')
+        cleaned_links = []
+        for link in links:
+            # Remove &quot; from the links.
+            cleaned_links.append(link.get('url-with-value').replace('&quot;', ''))
+
+        invalid_links = []
+        for link in cleaned_links:
+            # Separate protocol from the link.
+            link_info = link.split(':')
+            # If protocol is present, we check to see if it is valid or not.
+            if len(link_info) >= 2:
+                if link_info[0] != 'https':
+                    # If the protocol is not 'https', we consider it to be invalid.
+                    invalid_links.append(link)
+                # If the protocol isn't present in the link, we asssume it to be 'https' (default).
+
+        return invalid_links
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid explorations
@@ -98,7 +100,7 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
             | 'Combine exploration title and states' >> beam.Map(
                 lambda exp: (exp.id, exp.states))
             | 'Combine exp ids and the invalid links' >>
-                beam.Map(lambda exp: (exp[0], get_invalid_links(exp[1])))
+                beam.Map(lambda exp: (exp[0], self.get_invalid_links(exp[1])))
             | 'Filter exps with invalid links' >>
                 beam.Filter(lambda exp: len(exp[1]) > 0)
         )
