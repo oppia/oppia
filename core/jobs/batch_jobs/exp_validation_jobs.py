@@ -49,7 +49,6 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
             else:
                 yield (key, value)
 
-
     def get_invalid_links(self, dictionary: dict) -> list:
         """Returns list of invalid links
 
@@ -68,7 +67,8 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
         cleaned_links = []
         for link in links:
             # Remove &quot; from the links.
-            cleaned_links.append(link.get('url-with-value').replace('&quot;', ''))
+            cleaned_links.append(
+                link.get('url-with-value').replace('&quot;', ''))
 
         invalid_links = []
         for link in cleaned_links:
@@ -77,9 +77,9 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
             # If protocol is present, we check to see if it is valid or not.
             if len(link_info) >= 2:
                 if link_info[0] != 'https':
-                    # If the protocol is not 'https', we consider it to be invalid.
+                    # Protocols other than 'https' are invalid.
                     invalid_links.append(link)
-                # If the protocol isn't present in the link, we asssume it to be 'https' (default).
+            # If the protocol isn't present, it is assumed to be 'https'.
 
         return invalid_links
 
