@@ -591,9 +591,10 @@ class StateCompleteEventHandler(base.BaseHandler):
     def post(self, exploration_id):
         """Handles POST requests."""
         event_services.StateCompleteEventHandler.record(
-            exploration_id, self.payload.get('exp_version'),
-            self.payload.get('state_name'), self.payload.get('session_id'),
-            self.payload.get('time_spent_in_state_secs'))
+            exploration_id, self.normalized_payload.get('exp_version'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'),
+            self.normalized_payload.get('time_spent_in_state_secs'))
         self.render_json({})
 
 
@@ -655,10 +656,11 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
     def post(self, exploration_id):
         """Handles POST requests."""
         event_services.LeaveForRefresherExpEventHandler.record(
-            exploration_id, self.payload.get('refresher_exp_id'),
-            self.payload.get('exp_version'), self.payload.get('state_name'),
-            self.payload.get('session_id'),
-            self.payload.get('time_spent_in_state_secs'))
+            exploration_id, self.normalized_payload.get('refresher_exp_id'),
+            self.normalized_payload.get('exp_version'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'),
+            self.normalized_payload.get('time_spent_in_state_secs'))
         self.render_json({})
 
 
