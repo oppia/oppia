@@ -95,6 +95,10 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     // choice was selected by the user (default is false).
     this.userSelections = {};
 
+    for (let i = 0; i < this.choices.length; i++) {
+      this.userSelections[this.choices[i]] = false;
+    }
+
     // Setup voiceover.
     this.displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
