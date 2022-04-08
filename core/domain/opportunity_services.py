@@ -21,6 +21,7 @@ from __future__ import annotations
 import collections
 import logging
 
+from core import feconf
 from core.constants import constants
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
@@ -595,6 +596,50 @@ def get_exploration_opportunity_summaries_by_topic_id(topic_id):
                 exp_opportunity_summary_model))
         opportunity_summaries.append(opportunity_summary)
     return opportunity_summaries
+
+
+def get_reviewable_exploration_opportunity_summaries(user_id, topic_name):
+    """Returns a list of all exploration opportunity summaries
+    with the given topic ID.
+
+    Args:
+        topic_id: str. The topic for which opportunity summaries
+            are fetched.
+
+    Returns:
+        list(ExplorationOpportunitySummary). A list of all
+        exploration opportunity summaries with the given topic ID.
+    """
+    # Get all exploration opportunity summaries with in review suggestions for
+    # user's reviewable languages.
+    # Get all reviewable translation suggestions.
+    # Group by target_id.
+    # Fetch exploration opportunity summaries by target_ids.
+    # Map explorations to stories and relative order within each story?
+    topics = []
+    if topic_name == feconf.ALL_LITERAL_CONSTANT:
+        topics = topic_fetchers.get_all_topics()
+    else:
+        topic = topic_fetchers.get_topic_by_name(topic_name)
+        if topic is None:
+            raise Exception(
+                'The supplied input topic: %s is not valid' % topic_name)
+        topics = [topic]
+    exp_ids = []
+    for topic in topics:
+        stories = story_fetchers.get_stories_by_ids([
+            reference.story_id
+            for reference in topic.get_all_story_references()
+            if reference.story_is_published])
+        in_review_suggestion_target_ids = (
+            suggestion_services
+            .get_reviewable_translation_suggestion_target_ids(user_id))
+        exp_ids = [
+            node.exploration_id
+            for story in stories
+            for node in story.story_contents.get_ordered_nodes()
+            if node.exploration_id in in_review_suggestion_target_ids]
+    return get_exploration_opportunity_summaries_by_ids(exp_ids).values()
 
 
 def update_opportunities_with_new_topic_name(topic_id, topic_name):

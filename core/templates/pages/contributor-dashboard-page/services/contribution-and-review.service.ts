@@ -114,7 +114,10 @@ export class ContributionAndReviewService {
    * @returns {Promise<FetchSuggestionsResponse>}
    */
   private async fetchSuggestionsAsync(
-      fetcher: SuggestionFetcher, shouldResetOffset: boolean, topicName: string
+      fetcher: SuggestionFetcher,
+      shouldResetOffset: boolean,
+      topicName: string,
+      explorationId: string
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
       // Handle the case where we need to fetch starting from the beginning.
@@ -130,7 +133,9 @@ export class ContributionAndReviewService {
         // The first page of results is returned to the caller and the second
         // page is cached.
         (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
-        fetcher.offset, topicName
+        fetcher.offset,
+        topicName,
+        explorationId
       ).then((responseBody) => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
         fetcher.suggestionIdToDetails = {};
@@ -163,34 +168,50 @@ export class ContributionAndReviewService {
 
   async getUserCreatedQuestionSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      topicName: string = 'All'):
+      topicName: string = 'All',
+      explorationId: string = null):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this.userCreatedQuestionFetcher, shouldResetOffset, topicName);
+      this.userCreatedQuestionFetcher,
+      shouldResetOffset,
+      topicName,
+      explorationId);
   }
 
   async getReviewableQuestionSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      topicName: string = 'All'):
+      topicName: string = 'All',
+      explorationId: string = null):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this.reviewableQuestionFetcher, shouldResetOffset, topicName);
+      this.reviewableQuestionFetcher,
+      shouldResetOffset,
+      topicName,
+      explorationId);
   }
 
   async getUserCreatedTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      topicName: string = 'All'):
+      topicName: string = 'All',
+      explorationId: string = null):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this.userCreatedTranslationFetcher, shouldResetOffset, topicName);
+      this.userCreatedTranslationFetcher,
+      shouldResetOffset,
+      topicName,
+      explorationId);
   }
 
   async getReviewableTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      topicName: string = 'All'):
+      topicName: string = 'All',
+      explorationId: string = null):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this.reviewableTranslationFetcher, shouldResetOffset, topicName);
+      this.reviewableTranslationFetcher,
+      shouldResetOffset,
+      topicName,
+      explorationId);
   }
 
   reviewExplorationSuggestion(

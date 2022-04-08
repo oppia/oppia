@@ -54,6 +54,10 @@ interface VoiceoverContributionOpportunitiesBackendDict {
   'more': boolean;
 }
 
+interface ReviewableTranslationOpportunitiesBackendDict {
+  'opportunities': ExplorationOpportunitySummaryBackendDict[];
+}
+
 interface SkillContributionOpportunities {
   opportunities: SkillOpportunity[];
   nextCursor: string;
@@ -70,6 +74,10 @@ interface VoiceoverContributionOpportunities {
   opportunities: ExplorationOpportunitySummary[];
   nextCursor: string;
   more: boolean;
+}
+
+interface FetchReviewableTranslationOpportunitiesResponse {
+  opportunities: ExplorationOpportunitySummary[];
 }
 
 interface FeaturedTranslationLanguagesBackendDict {
@@ -182,6 +190,25 @@ export class ContributionOpportunitiesBackendApiService {
         opportunities: opportunities,
         nextCursor: data.next_cursor,
         more: data.more
+      };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
+  }
+
+  async fetchReviewableTranslationOpportunitiesAsync(
+      topicName: string
+  ): Promise<FetchReviewableTranslationOpportunitiesResponse> {
+    return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(
+      '/getreviewableopportunitieshandler', {
+        params: {
+          topic_name: topicName
+        }
+      }).toPromise().then(data => {
+      const opportunities = data.opportunities.map(
+        dict => this._getExplorationOpportunityFromDict(dict));
+      return {
+        opportunities: opportunities
       };
     }, errorResponse => {
       throw new Error(errorResponse.error.error);

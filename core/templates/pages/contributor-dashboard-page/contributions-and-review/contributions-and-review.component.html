@@ -62,12 +62,25 @@
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" ng-if="ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
-      <oppia-opportunities-list [load-opportunities]="$ctrl.loadOpportunities"
-                                [load-more-opportunities]="$ctrl.loadMoreOpportunities"
-                                (click-action-button)="$ctrl.onClickViewSuggestion($event)"
-                                [label-required]="!$ctrl.activeReviewTab"
-                                [opportunity-heading-truncation-length]="30">
+      <oppia-opportunities-list ng-if="$ctrl.activeExplorationId == null && $ctrl.isReviewTranslationsTab()"
+                                [load-opportunities]="$ctrl.loadReviewableTranslationOpportunities"
+                                (click-action-button)="$ctrl.onClickReviewableTranslations($event)"
+                                [label-required]="!$ctrl.activeReviewTab">
       </oppia-opportunities-list>
+      <div ng-if="$ctrl.activeExplorationId != null || !$ctrl.isReviewTranslationsTab()">
+        <md-button ng-if="$ctrl.isReviewTranslationsTab()"
+                   aria-label="Back to reviewable lessons"
+                   ng-click="$ctrl.onClickBackToReviewableLessons()"
+                   class="oppia-contributions-back-button md-raised">
+          <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
+        </md-button>
+        <oppia-opportunities-list [load-opportunities]="$ctrl.loadOpportunities"
+                                  [load-more-opportunities]="$ctrl.loadMoreOpportunities"
+                                  (click-action-button)="$ctrl.onClickViewSuggestion($event)"
+                                  [label-required]="!$ctrl.activeReviewTab"
+                                  [opportunity-heading-truncation-length]="30">
+        </oppia-opportunities-list>
+      </div>
     </div>
   </div>
 </div>
@@ -169,6 +182,13 @@
   }
   contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar-thumb:hover {
     background: black;
+  }
+
+  contributions-and-review .oppia-contributions-back-button {
+    height: 36px;
+    margin: 12px 0 0 12px;
+    min-width: 36px;
+    padding: 6px;
   }
 
   contributions-and-review .oppia-contributions-side-navbar-part {

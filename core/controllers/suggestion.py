@@ -360,6 +360,12 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
                     'type': 'basestring'
                 },
                 'default_value': None
+            },
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
             }
         }
     }
@@ -377,10 +383,14 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
         limit = self.normalized_request.get('limit')
         offset = self.normalized_request.get('offset')
         topic_name = self.normalized_request.get('topic_name')
+        exploration_id = self.normalized_request.get('exploration_id')
 
-        opportunity_summary_exp_ids_specific_to_topic = None
-        if (topic_name is not None) and (
-                topic_name != feconf.ALL_LITERAL_CONSTANT):
+        opportunity_summary_exp_ids_specific_to_topic = [exploration_id]
+        if (
+                exploration_id is None
+                and topic_name is not None
+                and topic_name != feconf.ALL_LITERAL_CONSTANT
+        ):
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if topic is None:
                 raise self.InvalidInputException(

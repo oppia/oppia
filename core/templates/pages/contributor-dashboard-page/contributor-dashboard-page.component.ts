@@ -68,7 +68,6 @@ angular.module('oppia').component('contributorDashboardPage', {
         OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
 
-
       var getLanguageDescriptions = function(languageCodes) {
         var languageDescriptions = [];
         languageCodes.forEach(function(languageCode) {

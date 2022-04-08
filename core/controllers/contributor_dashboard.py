@@ -240,6 +240,38 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         return opportunity_dicts, next_cursor, more
 
 
+class ReviewableOpportunitiesHandler(base.BaseHandler):
+    """Provides data for opportunities available in different categories."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'topic_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
+
+    # TODO: add new decorator, or move to suggestion.py.
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        topic_name = self.normalized_request.get('topic_name')
+        opportunity_dicts = [
+            opp.to_dict()
+            for opp in opportunity_services
+                .get_reviewable_exploration_opportunity_summaries(
+                    self.user_id, topic_name)]
+        self.values = {
+            'opportunities': opportunity_dicts,
+        }
+        self.render_json(self.values)
+
+
 class TranslatableTextHandler(base.BaseHandler):
     """Provides lessons content which can be translated in a given language."""
 
