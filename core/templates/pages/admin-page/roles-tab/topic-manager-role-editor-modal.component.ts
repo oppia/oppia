@@ -54,8 +54,8 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   }
 
   addTopic(): void {
-    if (this.newTopicId === null || this.topicIdInUpdate === null) {
-      throw new Error('Topic id is null.');
+    if (this.newTopicId === null) {
+      throw new Error('Expected newTopicId to be non-null.');
     }
     this.managedTopicIds.push(this.newTopicId);
     this.topicIdInUpdate = this.newTopicId;
@@ -65,9 +65,9 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
       this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();
     }, errorMessage => {
-      if (this.newTopicId !== null) {
+      if (this.topicIdInUpdate !== null) {
         let topicIdIndex = this.managedTopicIds.indexOf(
-          this.newTopicId);
+          this.topicIdInUpdate);
         this.managedTopicIds.splice(topicIdIndex, 1);
       }
       this.alertsService.addWarning(

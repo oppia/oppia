@@ -177,8 +177,6 @@ export class CollectionEditorStateService {
       !this._collectionIsInitialized ||
       !collectionVersion
     ) {
-      this.alertsService.fatalWarning(
-        'Cannot save a collection before one is loaded.');
       return false;
     }
 

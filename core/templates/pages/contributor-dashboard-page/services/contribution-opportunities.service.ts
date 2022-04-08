@@ -101,29 +101,20 @@ export class ContributionOpportunitiesService {
   async getTranslationOpportunitiesAsync(
       languageCode: string, topicName: string):
   Promise<ExplorationOpportunitiesDict> {
-    if (this._moreVoiceoverOpportunitiesAvailable) {
-      return this._getTranslationOpportunitiesAsync(
-        languageCode, topicName, '');
-    }
-    throw new Error('No more translation opportunities available.');
+    return this._getTranslationOpportunitiesAsync(
+      languageCode, topicName, '');
   }
 
   async getMoreSkillOpportunitiesAsync():
       Promise<SkillOpportunitiesDict> {
-    if (this._moreSkillOpportunitiesAvailable) {
-      return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
-    }
-    throw new Error('No more skill opportunities available.');
+    return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
   }
 
   async getMoreTranslationOpportunitiesAsync(
       languageCode: string, topicName: string):
   Promise<ExplorationOpportunitiesDict> {
-    if (this._moreTranslationOpportunitiesAvailable) {
-      return this._getTranslationOpportunitiesAsync(
-        languageCode, topicName, this._translationOpportunitiesCursor);
-    }
-    throw new Error('No more translation opportunities available.');
+    return this._getTranslationOpportunitiesAsync(
+      languageCode, topicName, this._translationOpportunitiesCursor);
   }
 
   async getAllTopicNamesAsync(): Promise<string[]> {

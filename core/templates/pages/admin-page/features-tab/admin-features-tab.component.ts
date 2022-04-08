@@ -43,7 +43,6 @@ import { PlatformParameter, FeatureStage } from
 import { PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule.model';
 import { HttpErrorResponse } from '@angular/common/http';
-import { assert } from 'console';
 
 type FilterType = keyof typeof PlatformParameterFilterType;
 
@@ -249,10 +248,9 @@ export class AdminFeaturesTabComponent implements OnInit {
       featureFlag.name
     );
 
-    if (backup === undefined) {
-      throw new Error('Backup not found for feature flag: ' + featureFlag.name);
+    if (backup) {
+      featureFlag.rules = cloneDeep(backup.rules);
     }
-    featureFlag.rules = cloneDeep(backup.rules);
   }
 
   clearFilterConditions(filter: PlatformParameterFilter): void {

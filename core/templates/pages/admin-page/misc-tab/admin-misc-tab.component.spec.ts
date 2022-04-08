@@ -98,9 +98,9 @@ describe('Admin misc tab component ', () => {
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
 
     statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
-      .and.callThrough();
-    spyOn(adminTaskManagerService, 'startTask').and.callThrough();
-    spyOn(adminTaskManagerService, 'finishTask').and.callThrough();
+      .and.returnValue();
+    spyOn(adminTaskManagerService, 'startTask').and.returnValue();
+    spyOn(adminTaskManagerService, 'finishTask').and.returnValue();
     confirmSpy = spyOn(mockWindowRef.nativeWindow, 'confirm');
     // This throws "Argument of type 'mockReaderObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". We need to suppress this
@@ -115,14 +115,14 @@ describe('Admin misc tab component ', () => {
       confirmSpy.and.returnValue(true);
       let clearSearchIndexSpy = spyOn(
         adminBackendApiService, 'clearSearchIndexAsync')
-        .and.callThrough();
+        .and.resolveTo();
 
       component.clearSearchIndex();
       tick();
 
       expect(clearSearchIndexSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Clearing search index...');
+        'Index successfully cleared.');
     }));
 
     it('should not clear search index in case of backend ' +
@@ -296,12 +296,12 @@ describe('Admin misc tab component ', () => {
     'on clicking submit query button', () => {
     let message = 'message';
     // Pre-checks.
-    expect(component.showDataExtractionQueryStatus).toBeUndefined();
+    expect(component.showDataExtractionQueryStatus).toBeFalse();
     expect(component.dataExtractionQueryStatusMessage).toBeUndefined();
 
     component.setDataExtractionQueryStatusMessage(message);
 
-    expect(component.showDataExtractionQueryStatus).toBe(true);
+    expect(component.showDataExtractionQueryStatus).toBeTrue();
     expect(component.dataExtractionQueryStatusMessage).toBe(message);
   });
 

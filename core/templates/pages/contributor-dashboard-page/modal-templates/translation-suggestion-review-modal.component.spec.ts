@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { TranslationSuggestionReviewModalComponent } from './translation-suggestion-review-modal.component';
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -189,6 +189,20 @@ describe('Translation Suggestion Review Modal Component', function() {
         expect(contributionRightsDataSpy).toHaveBeenCalled();
       });
 
+    it('should throw error if username is invalid',
+      fakeAsync(() => {
+        const defaultUserInfo = new UserInfo(
+          ['GUEST'], false, false, false, false, false,
+          null, null, null, false);
+        spyOn(userService, 'getUserInfoAsync').and
+          .returnValue(Promise.resolve(defaultUserInfo));
+
+        expect(() => {
+          component.ngOnInit();
+          tick();
+        }).toThrowError();
+      }));
+
     it('should initialize $scope properties after controller is initialized',
       function() {
         component.ngOnInit();
@@ -315,7 +329,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'reject', 'Review message example',
-          'hint section of "StateName" card', jasmine.any(Function),
+          null, jasmine.any(Function),
           jasmine.any(Function));
 
       component.reviewMessage = 'Review message example 2';
@@ -325,11 +339,6 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
-      expect(contributionAndReviewService.reviewExplorationSuggestion)
-        .toHaveBeenCalledWith(
-          '2', 'suggestion_2', 'reject', 'Review message example 2',
-          'hint section of "StateName" card', jasmine.any(Function),
-          jasmine.any(Function));
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
     });
@@ -655,7 +664,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'reject', 'Review message example',
-          'hint section of "StateName" card', jasmine.any(Function),
+          null, jasmine.any(Function),
           jasmine.any(Function));
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1']);

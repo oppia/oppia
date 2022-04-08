@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, async, TestBed, flushMicrotasks } from
+import { ComponentFixture, fakeAsync, async, TestBed, flushMicrotasks, tick } from
   '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 
@@ -38,6 +38,7 @@ import { PlatformParameterFilterType, ServerMode } from
   'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 let dummyFeatureStatus = false;
@@ -357,7 +358,12 @@ describe('Admin page feature tab', function() {
 
     it('should not update feature backup if update fails', fakeAsync(() => {
       mockPromptResult('mock msg');
-      updateApiSpy.and.rejectWith('error');
+      const errorResponse = new HttpErrorResponse({
+        error: 'Error loading exploration 1.',
+        status: 500,
+        statusText: 'Internal Server Error'
+      });
+      updateApiSpy.and.rejectWith(errorResponse);
 
       const featureFlag = component.featureFlags[0];
       const originalFeatureFlag = cloneDeep(featureFlag);
@@ -428,7 +434,12 @@ describe('Admin page feature tab', function() {
     it('should show error if the update fails', fakeAsync(() => {
       mockPromptResult('mock msg');
 
-      updateApiSpy.and.rejectWith('unknown error');
+      const errorResponse = new HttpErrorResponse({
+        error: 'Error loading exploration 1.',
+        status: 500,
+        statusText: 'Internal Server Error'
+      });
+      updateApiSpy.and.rejectWith(errorResponse);
       const featureFlag = component.featureFlags[0];
 
       component.addNewRuleToTop(featureFlag);
@@ -443,11 +454,14 @@ describe('Admin page feature tab', function() {
     it('should show error if the update fails', fakeAsync(() => {
       mockPromptResult('mock msg');
 
-      updateApiSpy.and.rejectWith({
+      const errorResponse = new HttpErrorResponse({
         error: {
           error: 'validation error.'
-        }
+        },
+        status: 500,
+        statusText: 'Internal Server Error'
       });
+      updateApiSpy.and.rejectWith(errorResponse);
       const featureFlag = component.featureFlags[0];
 
       component.addNewRuleToTop(featureFlag);
@@ -458,6 +472,18 @@ describe('Admin page feature tab', function() {
       expect(updateApiSpy).toHaveBeenCalled();
       expect(setStatusSpy).toHaveBeenCalledWith(
         'Update failed: validation error.');
+    }));
+
+    it('should throw error if error resonse is unexpected', fakeAsync(() => {
+      mockPromptResult('mock msg');
+
+      updateApiSpy.and.rejectWith('Error');
+      const featureFlag = component.featureFlags[0];
+
+      expect(() => {
+        component.updateFeatureRulesAsync(featureFlag);
+        tick();
+      }).toThrowError();
     }));
   });
 
@@ -536,6 +562,41 @@ describe('Admin page feature tab', function() {
           .toBeTrue();
       }
     );
+
+    it('should throw error if the feature username is not found', () => {
+      const featureFlag = PlatformParameter.createFromBackendDict({
+        data_type: 'bool',
+        default_value: false,
+        description: 'This is a dummy feature flag.',
+        feature_stage: FeatureStage.DEV,
+        is_feature: true,
+        name: null,
+        rule_schema_version: 1,
+        rules: [
+          {
+            filters: [
+              {
+                type: PlatformParameterFilterType.ServerMode,
+                conditions: [['=', ServerMode.Dev], ['=', ServerMode.Test]]
+              },
+              {
+                type: PlatformParameterFilterType.ServerMode,
+                conditions: [['=', ServerMode.Prod]]
+              }
+            ],
+            value_when_matched: true,
+          },
+          {
+            filters: [],
+            value_when_matched: true
+          }
+        ],
+      });
+
+      expect(() => {
+        component.isFeatureFlagRulesChanged(featureFlag);
+      }).toThrowError();
+    });
   });
 
   describe('.validateFeatureFlag', () => {

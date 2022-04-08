@@ -58,13 +58,8 @@ export class BlogCardPreviewModalComponent
       dateString = this.blogPostData.lastUpdated;
     }
 
-    const blogPostId = this.blogPostData.id;
-    // After TODO(#13637) is resolved, remove this check.
-    if (blogPostId === null) {
-      throw new Error('Blog post does not exist.');
-    }
     this.blogPostSummary = new BlogPostSummary (
-      blogPostId,
+      this.blogPostData.id as string,
       this.blogPostData.authorUsername,
       this.blogPostData.title,
       this.summaryContent,

@@ -47,10 +47,7 @@ export class BlogDashboardTileComponent implements OnInit {
 
   ngOnInit(): void {
     const lastUpdated = this.blogPostSummary.lastUpdated;
-    // After TODO(#13637) is resolved, remove this check.
-    if (lastUpdated !== undefined) {
-      this.lastUpdatedDateString = this.getDateStringInWords(lastUpdated);
-    }
+    this.lastUpdatedDateString = this.getDateStringInWords(lastUpdated);
   }
 
   getDateStringInWords(naiveDate: string): string {

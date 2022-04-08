@@ -33,7 +33,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  uploadedImage!: SafeResourceUrl;
+  uploadedImage!: SafeResourceUrl | null;
   croppedFilename!: string;
   cropper!: Cropper;
   windowIsNarrow: boolean = false;
@@ -84,9 +84,9 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
       let imageData = (e.target as FileReader).result as string;
       this.invalidTagsAndAttributes = this.svgSanitizerService
         .getInvalidSvgTagsAndAttrsFromDataUri(imageData);
-      const uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
+      this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
         imageData);
-      if (!uploadedImage) {
+      if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
           (e.target as FileReader).result as string);
       }

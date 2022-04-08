@@ -68,6 +68,7 @@ describe('Translation language selector', () => {
     fixture = TestBed.createComponent(TranslationLanguageSelectorComponent);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     component = fixture.componentInstance;
+    component.activeLanguageCode = 'en';
     spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
       .returnValue(activeLanguageChangedEmitter);
     fixture.detectChanges();
@@ -88,8 +89,6 @@ describe('Translation language selector', () => {
   });
 
   it('should correctly initialize languageIdToDescription map', () => {
-    component.activeLanguageCode = 'en';
-
     expect(component.languageIdToDescription.en).toBe('English');
     expect(component.languageIdToDescription.fr).toBe('français (French)');
   });
@@ -166,10 +165,12 @@ describe('Translation language selector', () => {
 
   it('should ask user to select a language when the language is not selected'
     , () => {
+      component.activeLanguageCode = null;
+
       component.ngOnInit();
 
       expect(component.languageSelection).toBe('Select a language...');
-      expect(component.activeLanguageCode).toBeUndefined();
+      expect(component.activeLanguageCode).toBe(null);
     });
 
   it('should display the selected language when the language is already' +
@@ -184,10 +185,7 @@ describe('Translation language selector', () => {
 
   it('should show the correct language when the language is changed'
     , () => {
-      component.activeLanguageCode = 'en';
-
       expect(component.languageSelection).toBe('English');
-
       component.ngOnInit();
       spyOn(
         translationLanguageService, 'getActiveLanguageCode').and.returnValue(

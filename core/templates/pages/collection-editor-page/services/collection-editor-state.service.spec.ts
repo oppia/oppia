@@ -275,13 +275,12 @@ describe('Collection editor state service', () => {
   }));
 
   it('should fail to save the collection without first loading one',
-    () => {
-      expect(() => {
-        collectionEditorStateService.saveCollection(
-          'Commit message');
-      }).toThrowError('Cannot save a collection before one is loaded.');
-    }
-  );
+    fakeAsync(() => {
+      let savedChanges = collectionEditorStateService.saveCollection(
+        'Commit message');
+      tick();
+      expect(savedChanges).toBe(false);
+    }));
 
   it('should check whether a collection is being saved', () => {
     let result = collectionEditorStateService.isSavingCollection();
