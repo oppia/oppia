@@ -52,8 +52,10 @@
 .oppia-profile-h1 {
   color: #fff;
   display: inline;
+  float: right;
   font-size: 1em;
   font-weight: normal;
+  line-height: unset;
 }
 
 .oppia-profile-user-card {

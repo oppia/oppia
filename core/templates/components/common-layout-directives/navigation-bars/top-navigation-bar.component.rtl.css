@@ -118,7 +118,12 @@
   float: right;
 }
 
+.oppia-top-navigation-bar .oppia-logo-wide {
+  margin-right: 25px;
+}
+
 .dropdown-toggle::after {
+  margin-right: 0.255em;
   margin-left: 0.255em;
 }
 

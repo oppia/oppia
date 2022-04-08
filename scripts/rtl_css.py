@@ -83,6 +83,7 @@ css_files_list = [
     'core/templates/pages/library-page/library-page.component.css',
     'core/templates/pages/library-page/search-bar/search-bar.component.css',
     'core/templates/pages/profile-page/profile-page.component.css',
+    'core/templates/pages/profile-page/profile-page-navbar.component.css',
     'core/templates/pages/participation-playbook/playbook.component.css',
     'core/templates/pages/splash-page/splash-page.component.css',
     'core/templates/pages/story-viewer-page/story-viewer-page.component.css',
