@@ -1992,7 +1992,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
-           'Schema validation for \'answer\' failed: ' +
+            'Schema validation for \'answer\' failed: ' +
             'Type of [] is not present in options'
         )
 
