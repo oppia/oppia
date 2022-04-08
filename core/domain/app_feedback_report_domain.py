@@ -1179,7 +1179,8 @@ class EntryPoint:
                 'Exploration id should be a string, received: %r' % (
                     exploration_id))
         
-        if re.match(constants.ENTITY_ID_REGEX, story_id) == None:
+        if (re.match(constants.ENTITY_ID_REGEX, story_id) == None or
+            re.match(constants.ENTITY_ID_REGEX, exploration_id) == None):
             raise utils.ValidationError(
                 'Exploration with id %s is not part of story with id of %s' % (
                     exploration_id, story_id))
