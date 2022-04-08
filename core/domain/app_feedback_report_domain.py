@@ -30,11 +30,6 @@ from core.domain import topic_domain
 
 from typing import Any, Dict, List, Match, Optional
 
-from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
-
 
 class AppFeedbackReport:
     """Domain object for a single feedback report."""
@@ -1178,9 +1173,9 @@ class EntryPoint:
             raise utils.ValidationError(
                 'Exploration id should be a string, received: %r' % (
                     exploration_id))
-        
-        if (re.match(constants.ENTITY_ID_REGEX, story_id) == None or
-            re.match(constants.ENTITY_ID_REGEX, exploration_id) == None):
+
+        if (re.match(constants.ENTITY_ID_REGEX, story_id) is None or
+            re.match(constants.ENTITY_ID_REGEX, exploration_id) is None):
             raise utils.ValidationError(
                 'Exploration with id %s is not part of story with id of %s' % (
                     exploration_id, story_id))
