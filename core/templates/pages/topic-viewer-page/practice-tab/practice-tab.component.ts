@@ -37,7 +37,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 })
 export class PracticeTabComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() topicName!: string;
   @Input() subtopicsList!: Subtopic[];
