@@ -449,6 +449,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected schema version to be an integer')
 
+        self.question.question_state_data_schema_version = 45
+        self._assert_validation_error(
+            'Expected question state schema version to be %s, received '
+                '%s' % (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION,
+                    self.question.question_state_data_schema_version))
+
         self.question.linked_skill_ids = 'Test'
         self._assert_validation_error(
             'Expected linked_skill_ids to be a list of strings')
