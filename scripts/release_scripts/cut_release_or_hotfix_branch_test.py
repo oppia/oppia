@@ -420,7 +420,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                 with self.verify_target_branch_swap, self.run_cmd_swap:
                     with self.verify_target_version_swap, self.open_tab_swap:
                         with self.verify_hotfix_number_swap, self.input_swap:
-                            with self.ask_user_swap, get_branch_name_swap:
+                            with get_branch_name_swap:
                                 cut_release_or_hotfix_branch.execute_branch_cut(
                                     '1.2.3', 3)
         self.expected_check_function_calls[
@@ -448,7 +448,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                 with self.verify_target_branch_swap, self.run_cmd_swap:
                     with self.verify_target_version_swap, self.open_tab_swap:
                         with self.verify_hotfix_number_swap, self.input_swap:
-                            with self.ask_user_swap, get_branch_name_swap:
+                            with get_branch_name_swap:
                                 cut_release_or_hotfix_branch.execute_branch_cut(
                                     '1.2.3', 1)
         self.expected_check_function_calls[
