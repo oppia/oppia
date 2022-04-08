@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from urllib.parse import urlparse   # pylint: disable-msg=C0003
+from urllib.parse import urlparse  # pylint: disable-msg=C0003
 
 from core.domain import exp_fetchers
 from core.jobs import base_jobs
@@ -29,7 +29,7 @@ from core.platform import models
 
 import apache_beam as beam
 import bs4
-from typing import Iterator
+from typing import Dict, Iterator, List, Tuple
 
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -39,7 +39,9 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
 
     # The following function has been adapted from
     # https://stackoverflow.com/questions/39233973/get-all-keys-of-a-nested-dictionary
-    def recursive_items(self, dictionary: dict) -> Iterator[tuple]:
+    def recursive_items(
+        self, dictionary: Dict[str, str]
+        ) -> Iterator[Tuple[str, str]]:
         """Yields an iterator containing tuples of key, value pairs
 
         Yields:
@@ -51,7 +53,7 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
             else:
                 yield (key, value)
 
-    def get_invalid_links(self, dictionary: dict) -> list:
+    def get_invalid_links(self, dictionary: Dict[str, str]) -> List[str]:
         """Returns list of invalid links
 
             Returns:
@@ -74,9 +76,9 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
 
         invalid_links = []
         for link in cleaned_links:
-            # Separate protocol from the link.
             link_info = urlparse(link)
             # Protocols other than 'https' are invalid.
+            # If a protocol isn't present, it is assumed to be https (default).
             if link_info.scheme not in ('https', ''):
                 invalid_links.append(link)
 
@@ -99,7 +101,8 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
             | 'Combine exploration title and states' >> beam.Map(
                 lambda exp: (exp.id, exp.states))
             | 'Combine exp ids and the invalid links' >>
-                beam.Map(lambda exp: (exp[0], self.get_invalid_links(exp[1])))
+                beam.MapTuple(lambda exp_id, exp_states: (
+                    exp_id, self.get_invalid_links(exp_states)))
             | 'Filter exps with invalid links' >>
                 beam.Filter(lambda exp: len(exp[1]) > 0)
         )
@@ -118,10 +121,10 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
 
         report_invalid_ids = (
             exp_ids_invalid_links
-            | 'Save info on invalid exps' >> beam.Map(
-                lambda objects: job_run_result.JobRunResult.as_stderr(
+            | 'Save info on invalid exps' >> beam.MapTuple(
+                lambda exp_id, exp_link: job_run_result.JobRunResult.as_stderr(
                     'The id of exp is %s and the invalid links are %s'
-                    % (objects[0], objects[1])
+                    % (exp_id, exp_link)
                 ))
         )
 
