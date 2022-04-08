@@ -2171,7 +2171,7 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
         model = all_models.get()
 
         self.assertEqual(model.exp_id, exp_id)
-        self.assertEqual(model.refresher_exp_id, 'refresher_exp_id')
+        self.assertEqual(model.refresher_exp_id, 'ref_exp_id')
         self.assertEqual(model.state_name, 'state_name')
         self.assertEqual(model.session_id, 'session_id')
         self.assertEqual(model.exp_version, exp_version)
