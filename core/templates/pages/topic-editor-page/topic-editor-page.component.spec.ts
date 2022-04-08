@@ -24,15 +24,14 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 require('pages/topic-editor-page/topic-editor-page.component.ts');
 
 import { TestBed } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventEmitter } from '@angular/core';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoDict } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Topic editor page', function() {
+describe('Topic editor page', function() {
   var ctrl = null;
   var $scope = null;
   var ngbModal: NgbModal = null;
@@ -47,7 +46,7 @@ fdescribe('Topic editor page', function() {
   var StoryReferenceObjectFactory = null;
   var topic = null;
   var LocalStorageService = null;
-  var WindowRef = null;
+  var FaviconService = null;
 
   importAllAngularServices();
 
@@ -64,7 +63,7 @@ fdescribe('Topic editor page', function() {
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     LocalStorageService = $injector.get('LocalStorageService');
-    WindowRef = $injector.get('WindowRef');
+    FaviconService = $injector.get('FaviconService');
     ngbModal = TestBed.inject(NgbModal);
 
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
@@ -287,11 +286,75 @@ fdescribe('Topic editor page', function() {
     ).toBeTrue();
     expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
 
-    WindowRef.nativeWindow.dispatchEvent(new Event('beforeunload'));
+    ctrl.onClosingTopicEditorBrowserTab();
 
     expect(
       topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
     ).toBeFalse();
     expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(0);
+  });
+
+  it('should check if a tab is stale and emit the corresponding event', () => {
+    spyOn(FaviconService, 'setFavicon').and.callThrough();
+    spyOn(ctrl.staleTabEventEmitter, 'emit').and.callThrough();
+    var oldValue: EntityEditorBrowserTabsInfoDict = {
+      topic_1: {
+        entityType: 'topic',
+        latestVersion: 1,
+        numberOfOpenedTabs: 2,
+        someTabHasUnsavedChanges: false
+      }
+    };
+    var newValue: EntityEditorBrowserTabsInfoDict = {
+      topic_1: {
+        entityType: 'topic',
+        latestVersion: 2,
+        numberOfOpenedTabs: 2,
+        someTabHasUnsavedChanges: true
+      }
+    };
+    var storageEvent = new StorageEvent('storage', {
+      key: EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_TOPIC_EDITOR_BROWSER_TABS,
+      oldValue: JSON.stringify(oldValue),
+      newValue: JSON.stringify(newValue)
+    });
+
+    ctrl.onCreateOrUpdateTopicEditorBrowserTabsInfo(storageEvent);
+
+    expect(ctrl.staleTabEventEmitter.emit).toHaveBeenCalled();
+    expect(FaviconService.setFavicon).toHaveBeenCalledWith(
+      '/assets/images/favicon_alert/favicon_alert.ico');
+  });
+
+  it('should check if there is unsaved changes on another tab ' +
+  'and emit the corresponding event', () => {
+    spyOn(ctrl.presenceOfUnsavedChangesEventEmitter, 'emit').and.callThrough();
+    var oldValue: EntityEditorBrowserTabsInfoDict = {
+      topic_1: {
+        entityType: 'topic',
+        latestVersion: 1,
+        numberOfOpenedTabs: 2,
+        someTabHasUnsavedChanges: false
+      }
+    };
+    var newValue: EntityEditorBrowserTabsInfoDict = {
+      topic_1: {
+        entityType: 'topic',
+        latestVersion: 2,
+        numberOfOpenedTabs: 2,
+        someTabHasUnsavedChanges: true
+      }
+    };
+    var storageEvent = new StorageEvent('storage', {
+      key: EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_TOPIC_EDITOR_BROWSER_TABS,
+      oldValue: JSON.stringify(oldValue),
+      newValue: JSON.stringify(newValue)
+    });
+
+    ctrl.onCreateOrUpdateTopicEditorBrowserTabsInfo(storageEvent);
+
+    expect(ctrl.presenceOfUnsavedChangesEventEmitter.emit).toHaveBeenCalled();
   });
 });

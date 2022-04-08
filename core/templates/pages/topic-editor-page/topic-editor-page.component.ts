@@ -89,8 +89,8 @@ angular.module('oppia').directive('topicEditorPage', [
             return ContextService.getEntityType();
           };
 
-          var staleTabEventEmitter = new EventEmitter();
-          var presenceOfUnsavedChangesEventEmitter = new EventEmitter();
+          ctrl.staleTabEventEmitter = new EventEmitter();
+          ctrl.presenceOfUnsavedChangesEventEmitter = new EventEmitter();
 
           var setDocumentTitle = function() {
             let topicName = TopicEditorStateService.getTopic().getName();
@@ -195,7 +195,7 @@ angular.module('oppia').directive('topicEditorPage', [
             return validationIssuesCount + prepublishValidationIssuesCount;
           };
 
-          var createTopicEditorBrowserTabsInfo = function() {
+          ctrl.createTopicEditorBrowserTabsInfo = function() {
             var topic = TopicEditorStateService.getTopic();
 
             var topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
@@ -218,7 +218,7 @@ angular.module('oppia').directive('topicEditorPage', [
                 .OPENED_TOPIC_EDITOR_BROWSER_TABS);
           };
 
-          var updateTopicEditorBrowserTabsInfo = function() {
+          ctrl.updateTopicEditorBrowserTabsInfo = function() {
             const topic = TopicEditorStateService.getTopic();
 
             const topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
@@ -235,7 +235,7 @@ angular.module('oppia').directive('topicEditorPage', [
                 .OPENED_TOPIC_EDITOR_BROWSER_TABS);
           };
 
-          var onClosingTopicEditorBrowserTab = function() {
+          ctrl.onClosingTopicEditorBrowserTab = function() {
             const topic = TopicEditorStateService.getTopic();
 
             const topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
@@ -255,7 +255,7 @@ angular.module('oppia').directive('topicEditorPage', [
                 .OPENED_TOPIC_EDITOR_BROWSER_TABS);
           };
 
-          var onCreateOrUpdateTopicEditorBrowserTabsInfo = function(event) {
+          ctrl.onCreateOrUpdateTopicEditorBrowserTabsInfo = function(event) {
             var topic = TopicEditorStateService.getTopic();
             if (event.key === (
               EntityEditorBrowserTabsInfoDomainConstants
@@ -293,7 +293,7 @@ angular.module('oppia').directive('topicEditorPage', [
                 newTopicEditorBrowserTabInfo
                   .getLatestVersion() !== topic.getVersion()
               ) {
-                staleTabEventEmitter.emit();
+                ctrl.staleTabEventEmitter.emit();
                 FaviconService.setFavicon(
                   '/assets/images/favicon_alert/favicon_alert.ico');
                 $rootScope.$applyAsync();
@@ -304,7 +304,7 @@ angular.module('oppia').directive('topicEditorPage', [
                         newTopicEditorBrowserTabInfo
                           .doesSomeTabHaveUnsavedChanges()
               ) {
-                presenceOfUnsavedChangesEventEmitter.emit();
+                ctrl.presenceOfUnsavedChangesEventEmitter.emit();
                 $rootScope.$applyAsync();
               }
             }
@@ -317,7 +317,7 @@ angular.module('oppia').directive('topicEditorPage', [
                 () => {
                   LoaderService.hideLoadingScreen();
                   setDocumentTitle();
-                  createTopicEditorBrowserTabsInfo();
+                  ctrl.createTopicEditorBrowserTabsInfo();
                   $rootScope.$applyAsync();
                 }
               ));
@@ -325,7 +325,7 @@ angular.module('oppia').directive('topicEditorPage', [
               TopicEditorStateService.onTopicReinitialized.subscribe(
                 () => {
                   setDocumentTitle();
-                  updateTopicEditorBrowserTabsInfo();
+                  ctrl.updateTopicEditorBrowserTabsInfo();
                   $rootScope.$applyAsync();
                 }
               ));
@@ -351,14 +351,13 @@ angular.module('oppia').directive('topicEditorPage', [
               )
             );
 
-            WindowRef.nativeWindow.addEventListener('beforeunload', (event) => {
-              onClosingTopicEditorBrowserTab();
-            });
+            WindowRef.nativeWindow.addEventListener(
+              'beforeunload', ctrl.onClosingTopicEditorBrowserTab);
             LocalStorageService.registerNewStorageEventListener(
-              onCreateOrUpdateTopicEditorBrowserTabsInfo);
+              ctrl.onCreateOrUpdateTopicEditorBrowserTabsInfo);
 
             ctrl.directiveSubscriptions.add(
-              staleTabEventEmitter.subscribe(() => {
+              ctrl.staleTabEventEmitter.subscribe(() => {
                 NgbModal.dismissAll();
                 const modalRef: NgbModalRef = NgbModal.open(
                   StaleTabInfoModalComponent, {
@@ -372,7 +371,7 @@ angular.module('oppia').directive('topicEditorPage', [
 
             let unsavedChangesWarningModalRef: NgbModalRef = null;
             ctrl.directiveSubscriptions.add(
-              presenceOfUnsavedChangesEventEmitter.subscribe(() => {
+              ctrl.presenceOfUnsavedChangesEventEmitter.subscribe(() => {
                 if (
                   StalenessDetectionService
                     .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
