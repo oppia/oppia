@@ -1488,8 +1488,7 @@ class AppFeedbackReportTicket:
                     len(ticket_name),
                     app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH))
 
-    @classmethod
-    def require_valid_report_ids(cls, report_ids: List[str]) -> None:
+    def require_valid_report_ids(self, report_ids: List[str]) -> None:
         """Checks whether the reports in this ticket are valid.
 
         Args:
@@ -1506,7 +1505,6 @@ class AppFeedbackReportTicket:
                 'The reports list should be a list, received: %r' % (
                     report_ids))
         for report_id in report_ids:
-            # [platform].[submitted_on_msec].[random hash]
             report_id_copy = report_id[::].split('.')
             if len(report_id_copy) != 3 or report_id_copy[0] != self.platform:
                 raise utils.ValidationError(
