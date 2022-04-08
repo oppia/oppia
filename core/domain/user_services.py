@@ -2390,7 +2390,8 @@ def update_learner_checkpoint_progress(
             exp_version)
         exploration_user_model.furthest_reached_checkpoint_state_name = (
             state_name)
-    elif exploration_user_model.furthest_reached_checkpoint_exp_version < exp_version:
+    elif (exploration_user_model.furthest_reached_checkpoint_exp_version) < (
+        exp_version):
         furthest_reached_checkpoint_exploration = (
             exp_fetchers.get_exploration_by_id(
                 exploration_id,
