@@ -23,24 +23,17 @@ import re
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import app_feedback_report_constants
 from core.domain import story_domain
 from core.domain import topic_domain
 
 from typing import Any, Dict, List, Match, Optional
 
-from core.domain import exp_services  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
-
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import app_feedback_report_models
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-
-(app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
 
 
 class AppFeedbackReport:
@@ -1185,13 +1178,11 @@ class EntryPoint:
             raise utils.ValidationError(
                 'Exploration id should be a string, received: %r' % (
                     exploration_id))
-        expected_story_id = exp_services.get_story_id_linked_to_exploration( # type: ignore[no-untyped-call]
-            exploration_id)
-        if expected_story_id != story_id:
+        
+        if re.match(constants.ENTITY_ID_REGEX, story_id) == None:
             raise utils.ValidationError(
-                'Exploration with id %s is not part of story with id of %s, '
-                'should be found in story with id of %s' % (
-                    exploration_id, story_id, expected_story_id))
+                'Exploration with id %s is not part of story with id of %s' % (
+                    exploration_id, story_id))
 
 
 class NavigationDrawerEntryPoint(EntryPoint):
