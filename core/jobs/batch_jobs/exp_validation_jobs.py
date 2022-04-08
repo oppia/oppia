@@ -41,7 +41,7 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
     # https://stackoverflow.com/questions/39233973/get-all-keys-of-a-nested-dictionary
     def recursive_items(
         self, dictionary: Dict[str, str]
-        ) -> Iterator[Tuple[str, str]]:
+    ) -> Iterator[Tuple[str, str]]:
         """Yields an iterator containing tuples of key, value pairs
 
         Yields:
