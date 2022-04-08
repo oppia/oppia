@@ -20,15 +20,15 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
-import { EditableStoryBackendApiService } from
+import { EditableStoryBackendApiService, FetchStoryBackendResponse } from
   'domain/story/editable-story-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Editable story backend API service', () => {
-  let editableStoryBackendApiService: EditableStoryBackendApiService = null;
-  let sampleDataResults = null;
+  let editableStoryBackendApiService: EditableStoryBackendApiService;
+  let sampleDataResults: FetchStoryBackendResponse;
   let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
+  let csrfService: CsrfTokenService;
   // Sample story object returnable from the backend.
 
   beforeEach(() => {
@@ -36,11 +36,11 @@ describe('Editable story backend API service', () => {
       imports: [HttpClientTestingModule],
       providers: [EditableStoryBackendApiService]
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    editableStoryBackendApiService = TestBed.get(
+    httpTestingController = TestBed.inject(HttpTestingController);
+    editableStoryBackendApiService = TestBed.inject(
       EditableStoryBackendApiService
     );
-    csrfService = TestBed.get(CsrfTokenService);
+    csrfService = TestBed.inject(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
@@ -59,22 +59,37 @@ describe('Editable story backend API service', () => {
           initial_node_id: 'node_1',
           nodes: [{
             id: 'node_1',
+            title: 'node 1',
+            description: '',
             prerequisite_skill_ids: [],
             acquired_skill_ids: [],
             destination_node_ids: [],
             outline: 'Outline',
-            exploration_id: null,
-            outline_is_finalized: false
+            exploration_id: 'exp_id',
+            outline_is_finalized: false,
+            thumbnail_bg_color: '#a33f40',
+            thumbnail_filename: 'img.png',
           }],
           next_node_id: 'node_3'
         },
-        language_code: 'en'
+        language_code: 'en',
+        corresponding_topic_id: 'topic_id',
+        thumbnail_filename: 'img.png',
+        thumbnail_bg_color: '#a33f40',
+        url_fragment: 'story-title',
+        meta_tag_content: 'story meta tag content'
       },
       topic_name: 'Topic Name',
       story_is_published: true,
       skill_summaries: [{
         id: 'skill_1',
-        description: 'Skill Description'
+        description: 'Skill Description',
+        language_code: 'en',
+        version: 1,
+        misconception_count: 1,
+        worked_examples_count: 1,
+        skill_model_created_on: 1,
+        skill_model_last_updated: 1,
       }],
       topic_url_fragment: 'topic-frag',
       classroom_url_fragment: 'math'
@@ -171,7 +186,11 @@ describe('Editable story backend API service', () => {
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      var story = null;
+      var story: {id: string; title: string; version: number} = {
+        id: '',
+        title: '',
+        version: 0
+      };
 
       // Loading a story the first time should fetch it from the backend.
       editableStoryBackendApiService.fetchStoryAsync('storyId').then(
@@ -187,7 +206,7 @@ describe('Editable story backend API service', () => {
       flushMicrotasks();
 
       story.title = 'New Title';
-      story.version = '2';
+      story.version = 2;
       var storyWrapper = {
         story: story
       };
