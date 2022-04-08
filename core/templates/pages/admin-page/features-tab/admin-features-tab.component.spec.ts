@@ -570,7 +570,7 @@ describe('Admin page feature tab', function() {
         description: 'This is a dummy feature flag.',
         feature_stage: FeatureStage.DEV,
         is_feature: true,
-        name: null,
+        name: 'invalid',
         rule_schema_version: 1,
         rules: [
           {
