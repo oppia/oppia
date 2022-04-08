@@ -25,6 +25,8 @@ import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { Hint } from 'domain/exploration/HintObjectFactory';
+import {string} from "mathjs";
+import {HtmlEscaperService} from "services/html-escaper.service";
 
 interface HintFormSchema {
   type: string;
@@ -54,6 +56,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
     private contextService: ContextService,
     private editabilityService: EditabilityService,
     private externalSaveService: ExternalSaveService,
+    private htmlEscaperService: HtmlEscaperService
   ) {}
 
   getSchema(): HintFormSchema {
@@ -77,6 +80,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
   }
 
   saveThisHint(): void {
+    console.log('SaveThisHint triggered')
     this.hintEditorIsOpen = false;
     const contentHasChanged = (
       this.hintMemento.hintContent.html !== this.hint.hintContent.html);
@@ -84,10 +88,28 @@ export class HintEditorComponent implements OnInit, OnDestroy {
 
     if (contentHasChanged) {
       const hintContentId = this.hint.hintContent.contentId;
+
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(this.hint.hintContent.html, 'text/html');
+      var imageFilenameList: string[] = [];
+      console.log(doc);
+      var elements = doc.getElementsByTagName('oppia-noninteractive-image');
+      console.log('elements', elements)
+      for (let i = 0; i < elements.length; i++) {
+        console.log('element', elements[i]);
+        console.log('element-getattribute', elements[i].getAttribute('filepath-with-value'))
+        imageFilenameList.push(
+          String(this.htmlEscaperService.escapedStrToUnescapedStr(
+            elements[i].getAttribute('filepath-with-value'))
+          ).replace('"', ''))
+        // replaces only first ", need to fix for second "
+      }
+      this.hint.hintContent._image_list = imageFilenameList;
+      console.log('hintContent', this.hint.hintContent);
       this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
         [hintContentId]);
     }
-
+    console.log('Before emitting hintContent', this.hint.hintContent);
     this.saveHint.emit();
   }
 

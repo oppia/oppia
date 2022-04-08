@@ -2240,7 +2240,7 @@ class RuleSpec:
 class SubtitledHtml:
     """Value object representing subtitled HTML."""
 
-    def __init__(self, content_id, html):
+    def __init__(self, content_id, html, image_list = []):
         """Initializes a SubtitledHtml domain object. Note that initializing
         the SubtitledHtml object does not clean the html. This is because we
         sometimes need to initialize SubtitledHtml and migrate the contained
@@ -2260,6 +2260,7 @@ class SubtitledHtml:
         """
         self.content_id = content_id
         self.html = html
+        self.image_list = image_list
 
     def to_dict(self):
         """Returns a dict representing this SubtitledHtml domain object.

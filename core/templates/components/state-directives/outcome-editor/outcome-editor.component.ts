@@ -17,6 +17,8 @@
  * @fileoverview Directives for the outcome editor.
  */
 
+import {SubtitledHtml} from "domain/exploration/subtitled-html.model";
+
 require(
   'components/state-directives/outcome-editor/' +
   'outcome-destination-editor.component.ts');
@@ -38,6 +40,8 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
+import {string} from "mathjs";
+import {HtmlEscaperService} from "services/html-escaper.service";
 
 angular.module('oppia').component('outcomeEditor', {
   bindings: {
@@ -54,11 +58,11 @@ angular.module('oppia').component('outcomeEditor', {
   template: require('./outcome-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    'ExternalSaveService', 'StateEditorService',
+    'ExternalSaveService', 'HtmlEscaperService', 'StateEditorService',
     'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
     'INTERACTION_SPECS',
     function(
-        ExternalSaveService, StateEditorService,
+        ExternalSaveService, HtmlEscaperService, StateEditorService,
         StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
         INTERACTION_SPECS) {
       var ctrl = this;
@@ -175,6 +179,21 @@ angular.module('oppia').component('outcomeEditor', {
         }
         if (fromClickSaveFeedbackButton && contentHasChanged) {
           var contentId = ctrl.savedOutcome.feedback.contentId;
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(ctrl.savedOutcome.feedback.html, 'text/html');
+          var imageFilenameList: string[] = [];
+          var elements = doc.getElementsByTagName('oppia-noninteractive-image');
+          for (let i = 0; i < elements.length; i++) {
+            console.log('element', elements[i]);
+            console.log('element-getattribute', elements[i].getAttribute('filepath-with-value'))
+            imageFilenameList.push(
+              String(HtmlEscaperService.escapedStrToUnescapedStr(
+                elements[i].getAttribute('filepath-with-value'))
+              ).replace('"', ''))
+            // replaces only first ", need to fix for second "
+          }
+          ctrl.savedOutcome.feedback._image_list = imageFilenameList
+          console.log(ctrl.savedOutcome.feedback)
           ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
         }
         ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);

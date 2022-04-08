@@ -58,6 +58,8 @@ import { RatioExpressionInputValidationService } from 'interactions/RatioExpress
 import { Warning } from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { ImageWithRegions } from 'interactions/customization-args-defs';
+import {string} from "mathjs";
+import {HtmlEscaperService} from "services/html-escaper.service";
 
 interface DefaultValueHtml {
   content_id: string;
@@ -117,6 +119,7 @@ const INTERACTION_SERVICE_MAPPING = {
   EndExplorationValidationService: EndExplorationValidationService,
   FractionInputValidationService: FractionInputValidationService,
   GraphInputValidationService: GraphInputValidationService,
+  HtmlEscaperService: HtmlEscaperService,
   ImageClickInputValidationService: ImageClickInputValidationService,
   InteractiveMapValidationService: InteractiveMapValidationService,
   ItemSelectionInputValidationService: ItemSelectionInputValidationService,
@@ -154,6 +157,7 @@ export class CustomizeInteractionModalComponent
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
+    private htmlEscaperService: HtmlEscaperService,
     private injector: Injector,
     private interactionDetailsCacheService: InteractionDetailsCacheService,
     private interactionObjectFactory: InteractionObjectFactory,
@@ -352,6 +356,70 @@ export class CustomizeInteractionModalComponent
     }
   }
 
+  populateImageList(): void {
+
+    let traverseSchemaAndAssignImageIds = (
+        value: Object | Object[],
+        schema: Schema,
+    ): void => {
+      console.log('Inside traverseSchemaAndAssignImageIds')
+      const schemaIsSubtitledHtml = (
+        schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+        schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
+      const schemaIsSubtitledUnicode = (
+        schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+        schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+      );
+
+      if (schemaIsSubtitledHtml) {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString((value as SubtitledHtml)._html, 'text/html');
+        var imageFilenameList: string[] = [];
+        console.log(doc);
+        var elements = doc.getElementsByTagName('oppia-noninteractive-image');
+        console.log('elements', elements)
+        for (let i = 0; i < elements.length; i++) {
+          console.log('element', elements[i]);
+          console.log('element-getattribute', elements[i].getAttribute('filepath-with-value'))
+          imageFilenameList.push(
+            String(this.htmlEscaperService.escapedStrToUnescapedStr(
+              elements[i].getAttribute('filepath-with-value'))
+            ).replace('"', ''))
+          // replaces only first ", need to fix for second "
+        }
+        console.log('imagelist', imageFilenameList);
+        (value as SubtitledHtml)._image_list = imageFilenameList;
+      } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
+        for (
+          let i = 0;
+          i < (value as Object[]).length;
+          i++
+        ) {
+          traverseSchemaAndAssignImageIds(
+            value[i],
+            schema.items as Schema)
+        }
+      }
+    };
+
+    console.log('*** Inside populate image list ***')
+    const interactionId = this.stateInteractionIdService.displayed;
+
+    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
+    const caValues = this.stateCustomizationArgsService.displayed;
+
+    for (const caSpec of caSpecs) {
+      const name = caSpec.name;
+      if (caValues.hasOwnProperty(name)) {
+        traverseSchemaAndAssignImageIds(
+          caValues[name].value,
+          caSpec.schema
+        )
+      }
+    }
+    console.log(this.stateCustomizationArgsService.displayed['choices']['value'])
+  }
+
   /**
      * Extracts a mapping of content ids to the html or unicode content found
      * in the customization arguments.
@@ -420,6 +488,9 @@ export class CustomizeInteractionModalComponent
     this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
       contentIdsWithModifiedContent);
 
+    console.log('***** Save method called ****')
+    console.log(this.stateCustomizationArgsService.displayed)
+    this.populateImageList();
     this.populateNullContentIds();
     this.editorFirstTimeEventsService.registerFirstSaveInteractionEvent();
     this.ngbActiveModal.close();

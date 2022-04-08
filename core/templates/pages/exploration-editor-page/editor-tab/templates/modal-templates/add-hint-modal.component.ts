@@ -25,6 +25,9 @@ import { StateHintsService } from 'components/state-editor/state-editor-properti
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ContextService } from 'services/context.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
+import {SubtitledHtml} from "domain/exploration/subtitled-html.model";
+import {HtmlEscaperService} from "services/html-escaper.service";
+import {string} from "mathjs";
 
 interface HintFormSchema {
   type: string;
@@ -54,7 +57,8 @@ export class AddHintModalComponent
     private generateContentIdService: GenerateContentIdService,
     private hintObjectFactory: HintObjectFactory,
     private ngbActiveModal: NgbActiveModal,
-    private stateHintsService: StateHintsService
+    private stateHintsService: StateHintsService,
+    private htmlEscaperService: HtmlEscaperService,
   ) {
     super(ngbActiveModal);
   }
@@ -84,9 +88,25 @@ export class AddHintModalComponent
     let contentId = this.generateContentIdService.getNextStateId(
       this.COMPONENT_NAME_HINT);
     // Close the modal and save it afterwards.
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(this.tmpHint, 'text/html');
+    var imageFilenameList: string[] = [];
+    console.log(doc);
+    var elements = doc.getElementsByTagName('oppia-noninteractive-image');
+    console.log('elements', elements)
+    for (let i = 0; i < elements.length; i++) {
+      console.log('element', elements[i]);
+      console.log('element-getattribute', elements[i].getAttribute('filepath-with-value'))
+      imageFilenameList.push(
+        String(this.htmlEscaperService.escapedStrToUnescapedStr(
+          elements[i].getAttribute('filepath-with-value'))
+        ).replace('"', ''))
+      // replaces only first ", need to fix for second "
+    }
+    console.log('imagelist', imageFilenameList);
     this.ngbActiveModal.close({
       hint: cloneDeep(
-        this.hintObjectFactory.createNew(contentId, this.tmpHint)),
+        this.hintObjectFactory.createNew(contentId, this.tmpHint, imageFilenameList)),
       contentId: contentId
     });
   }

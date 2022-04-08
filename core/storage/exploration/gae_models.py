@@ -209,6 +209,9 @@ class ExplorationModel(base_models.VersionedModel):
     # The name of the initial state of this exploration.
     init_state_name = (
         datastore_services.StringProperty(required=True, indexed=True))
+    # A dict representing the rich text images present within the exploration
+    # with the count and size of the image (in bytes).
+    image_size_counts = datastore_services.JsonProperty(default={})
     # A dict representing the states of this exploration. This dict should
     # not be empty.
     states = datastore_services.JsonProperty(default={}, indexed=False)

@@ -54,10 +54,10 @@ export class HintObjectFactory {
         hintBackendDict.hint_content));
   }
 
-  createNew(hintContentId: string, hintContent: string): Hint {
+  createNew(hintContentId: string, hintContent: string, imageList: string[]): Hint {
     return new Hint(
       SubtitledHtml.createDefault(
-        hintContent, hintContentId));
+        hintContent, hintContentId, imageList));
   }
 }
 

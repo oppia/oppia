@@ -558,7 +558,7 @@ class Exploration:
             language_code, tags, blurb, author_notes,
             states_schema_version, init_state_name, states_dict,
             param_specs_dict, param_changes_list, version,
-            auto_tts_enabled, correctness_feedback_enabled,
+            auto_tts_enabled, correctness_feedback_enabled, image_size_counts=None,
             created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
@@ -592,6 +592,8 @@ class Exploration:
             last_updated: datetime.datetime. Date and time when the exploration
                 was last updated.
         """
+        if image_size_counts is None:
+            image_size_counts = {}
         self.id = exploration_id
         self.title = title
         self.category = category
@@ -602,6 +604,7 @@ class Exploration:
         self.author_notes = author_notes
         self.states_schema_version = states_schema_version
         self.init_state_name = init_state_name
+        self.image_size_counts = image_size_counts
 
         self.states = {}
         for (state_name, state_dict) in states_dict.items():
