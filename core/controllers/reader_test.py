@@ -2185,7 +2185,7 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
         super(ExplorationStartEventHandlerTests, self).setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-    def test_cannot_fetch_exploration_with_incorrect_version(self):
+    def test_cannot_fetch_exploration_with_invalid_version(self):
         # Load demo exploration.
         exp_id = '0'
         exp_services.delete_demo('0')

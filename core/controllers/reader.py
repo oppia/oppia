@@ -295,8 +295,8 @@ class ExplorationHandler(base.BaseHandler):
         most_recently_reached_checkpoint_state_name = None
 
         if exploration_user_data is not None:
-            # If the most recently reached checkpoint is not present in the
-            # current exploration.
+            # If the latest exploration version is ahead of the most recently
+            # interacted exploration version.
             if (exploration_user_data.most_recently_reached_checkpoint_exp_version is not None and ( # pylint: disable=line-too-long
                     exploration_user_data.most_recently_reached_checkpoint_exp_version < exploration.version)): # pylint: disable=line-too-long
                 exploration_user_data = (

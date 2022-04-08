@@ -2353,7 +2353,8 @@ def _get_most_distant_reached_checkpoint_in_current_exploration(
     # Loop through checkpoints of furthest_reached_exploration backwards until
     # a checkpoint is found that exists in current_exploration too.
     while mdrc_index >= 0:
-        if checkpoints_in_older_exploration[mdrc_index] in checkpoints_in_current_exploration: # pylint: disable=line-too-long
+        if checkpoints_in_older_exploration[mdrc_index] in (
+            checkpoints_in_current_exploration):
             return checkpoints_in_older_exploration[mdrc_index]
         mdrc_index = mdrc_index - 1
 
@@ -2389,7 +2390,7 @@ def update_learner_checkpoint_progress(
             exp_version)
         exploration_user_model.furthest_reached_checkpoint_state_name = (
             state_name)
-    else:
+    elif exploration_user_model.furthest_reached_checkpoint_exp_version < exp_version:
         furthest_reached_checkpoint_exploration = (
             exp_fetchers.get_exploration_by_id(
                 exploration_id,
@@ -2399,7 +2400,7 @@ def update_learner_checkpoint_progress(
         )
         checkpoints_in_current_exploration = _get_checkpoints_in_order(
             current_exploration.init_state_name, current_exploration.states)
-        checkpoints_in_furthest_reached_exploration = _get_checkpoints_in_order(
+        checkpoints_in_older_exploration = _get_checkpoints_in_order(
             furthest_reached_checkpoint_exploration.init_state_name,
             furthest_reached_checkpoint_exploration.states)
 
@@ -2407,7 +2408,7 @@ def update_learner_checkpoint_progress(
         furthest_reached_checkpoint_in_current_exploration = (
             _get_most_distant_reached_checkpoint_in_current_exploration(
                 checkpoints_in_current_exploration,
-                checkpoints_in_furthest_reached_exploration,
+                checkpoints_in_older_exploration,
                 exploration_user_model.furthest_reached_checkpoint_state_name
             )
         )
@@ -2511,21 +2512,35 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
                 exploration_user_model.furthest_reached_checkpoint_exp_version
             ))
 
-        most_recently_reached_checkpoint_in_current_exploration = _get_most_distant_reached_checkpoint_in_current_exploration( # pylint: disable=line-too-long
-            _get_checkpoints_in_order(
-                latest_exploration.init_state_name, latest_exploration.states),
-            _get_checkpoints_in_order(
-                most_recently_interacted_exploration.init_state_name,
-                most_recently_interacted_exploration.states),
-            exploration_user_model.most_recently_reached_checkpoint_state_name)
+        most_recently_reached_checkpoint_in_current_exploration = (
+            _get_most_distant_reached_checkpoint_in_current_exploration(
+                _get_checkpoints_in_order(
+                    latest_exploration.init_state_name,
+                    latest_exploration.states),
+                _get_checkpoints_in_order(
+                    most_recently_interacted_exploration.init_state_name,
+                    most_recently_interacted_exploration.states),
+                (
+                    exploration_user_model
+                        .most_recently_reached_checkpoint_state_name
+                )
+            )
+        )
 
-        furthest_reached_checkpoint_in_current_exploration = _get_most_distant_reached_checkpoint_in_current_exploration( # pylint: disable=line-too-long
-            _get_checkpoints_in_order(
-                latest_exploration.init_state_name, latest_exploration.states),
-            _get_checkpoints_in_order(
-                furthest_reached_exploration.init_state_name,
-                furthest_reached_exploration.states),
-            exploration_user_model.furthest_reached_checkpoint_state_name)
+        furthest_reached_checkpoint_in_current_exploration = (
+            _get_most_distant_reached_checkpoint_in_current_exploration(
+                _get_checkpoints_in_order(
+                    latest_exploration.init_state_name,
+                    latest_exploration.states),
+                _get_checkpoints_in_order(
+                    furthest_reached_exploration.init_state_name,
+                    furthest_reached_exploration.states),
+                (
+                    exploration_user_model
+                        .furthest_reached_checkpoint_state_name
+                )
+            )
+        )
 
         # If the most recently reached checkpoint doesn't exist in current
         # exploration.
