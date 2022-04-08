@@ -318,13 +318,8 @@ def execute_branch_cut(target_version, hotfix_number):
             'branch protection rule and doing all the cherrypicks.')
 
     common.ask_user_to_confirm(
-        'Ask Sean (or Ben, if Sean isn\'t available) to create '
-        'a new branch protection rule by:\n'
-        '1. Going to this page: https://github.com/oppia/oppia/'
-        'settings/branch_protection_rules/new.\n'
-        '2. Typing in the full branch name %s.\n'
-        '3. Checking the box: Restrict who can push to matching '
-        'branches (then add the oppia/release-coordinators team)\n' % (
+        'Confirm with Sean (or Ben, if Sean isn\'t available) that '
+        'a new branch protection rule is created for %s' % (
             new_branch_name))
 
     print('')
