@@ -317,11 +317,6 @@ def execute_branch_cut(target_version, hotfix_number):
             'Note: It is fine to push the branch only after creating the '
             'branch protection rule and doing all the cherrypicks.')
 
-    common.ask_user_to_confirm(
-        'Confirm with Sean (or Ben, if Sean isn\'t available) that '
-        'a new branch protection rule is created for %s' % (
-            new_branch_name))
-
     print('')
     print(
         'New %s branch successfully cut. You are now on branch %s' % (
