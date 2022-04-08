@@ -23,6 +23,8 @@ import datetime
 from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
+from core import feconf
+
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -40,6 +42,29 @@ class SkillSnapshotContentModelTests(test_utils.GenericTestBase):
             skill_models.SkillSnapshotContentModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_is_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+
+        self.assertEqual(
+            skill_models.SkillCommitLogEntryModel
+                .get_export_policy(),
+            expected_export_policy_dict
+        )
 
 class SkillModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillModel class."""
@@ -74,6 +99,101 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_is_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            skill_models.SkillCommitLogEntryModel
+                .get_export_policy(),
+            expected_export_policy_dict
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'all_questions_merged': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconceptions': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconceptions_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_misconception_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'prerequisite_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rubric_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rubrics': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_contents_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'superseding_skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+        }
+        self.assertEqual(
+            skill_models.SkillModel
+                .get_export_policy(),
+            expected_export_policy_dict
+        )
+
+
+class SkillModelUnitTest(test_utils.GenericTestBase):
+    """Test the SkillModel class."""
+   
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            skill_models.SkillModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            skill_models.SkillModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+    def test_get_by_description(self) -> None:
+        committer_id = 'test_committer_id'
+        commit_message = 'test_commit_message'
+        commit_cmds = [{'cmd': 'test_command'}]
+
+        skill_instance = skill_models.SkillModel(
+            id = 'id',
+            description = 'description',
+            # misconceptions_schema_version = (feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION ),
+            # rubric_schema_version = (feconf.CURRENT_RUBRIC_SCHEMA_VERSION),
+            language_code = 'language_code')
+            # skill_contents_schema_version = (feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
+            # next_misconception_id = 0)
+            # all_questions_merged = 'all_questions_merged')
+
+        skill_instance.commit(committer_id, commit_message, commit_cmds)
+        skill_by_description = skill_models.SkillModel.test_get_by_description('description')
+        
+        assert skill_by_description is not None
+        self.assertEqual(skill_by_description.id, 'id')
+        # self.assertEqual(skill_by_description.misconceptions_schema_version, (feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION ))
+        # self.assertEqual(skill_by_description.rubric_schema_version, (feconf.CURRENT_RUBRIC_SCHEMA_VERSION))
+        self.assertEqual(skill_by_description.language_code, 'language_code')
+        # self.assertEqual(skill_by_description.skill_contents_schema_version, (feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION))
+        # self.assertEqual(skill_by_description.next_misconception_id , 'next_misconception_id')
+        # self.assertEqual(skill_by_description.all_questions_merged, 'all_questions_merged')
+
+
+
+        
+
 class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillSummaryModel class."""
 
@@ -81,6 +201,31 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             skill_models.SkillSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
+        )
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            skill_models.SkillSummaryModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+    
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconception_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'worked_examples_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_model_last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+
+        self.assertEqual(
+            skill_models.SkillSummaryModel
+                .get_export_policy(),
+            expected_export_policy_dict
         )
 
     def test_fetch_page(self) -> None:
@@ -137,3 +282,6 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(skill_summaries[0].id, 'skill_id1')
         self.assertEqual(skill_summaries[1].id, 'skill_id2')
         self.assertFalse(more)
+
+
+    
