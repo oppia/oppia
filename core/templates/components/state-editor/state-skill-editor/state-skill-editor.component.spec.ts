@@ -159,9 +159,6 @@ describe('State Skill Editor Component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
     stateLinkedSkillIdService = TestBed.inject(StateLinkedSkillIdService);
-    stateLinkedSkillIdService = (
-      stateLinkedSkillIdService as unknown) as
-      jasmine.SpyObj<StateLinkedSkillIdService>;
     userService = TestBed.inject(UserService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
@@ -276,6 +273,7 @@ describe('State Skill Editor Component', () => {
       expect(componentInstance.skillName).toBeNull();
 
       componentInstance.ngOnInit();
+      stateLinkedSkillIdService.onStateLinkedSkillIdInitialized.emit();
       tick();
 
       expect(componentInstance.skillName).toEqual('skill 1');

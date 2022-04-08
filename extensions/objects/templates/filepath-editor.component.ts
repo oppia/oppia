@@ -47,6 +47,14 @@ export class FilepathEditorComponent implements OnInit {
     }
   }
 
+  resetEditor(): void {
+    this.svgEditorIsShown = false;
+    this.imageEditorIsShown = false;
+    this.value = '';
+    this.validityChange.emit({ empty: false });
+    return;
+  }
+
   valueHasChanged(event: string): void {
     this.valueChanged.emit(event);
   }

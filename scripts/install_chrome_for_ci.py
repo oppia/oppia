@@ -34,7 +34,7 @@ URL_TEMPLATE = (
 CHROME_DEB_FILE = 'google-chrome.deb'
 
 
-def install_chrome(version):
+def install_chrome(version: str) -> None:
     """Install Chrome from the URL in URL_TEMPLATE.
 
     Args:
@@ -42,19 +42,19 @@ def install_chrome(version):
             of the versions available from
             github.com/webnicer/chrome-downloads.
     """
-    _ = common.run_cmd(['sudo', 'apt-get', 'update'])
-    _ = common.run_cmd(['sudo', 'apt-get', 'install', 'libappindicator3-1'])
-    _ = common.run_cmd([
+    _ = common.run_cmd(['sudo', 'apt-get', 'update'])  # type: ignore[no-untyped-call]
+    _ = common.run_cmd(['sudo', 'apt-get', 'install', 'libappindicator3-1'])  # type: ignore[no-untyped-call]
+    _ = common.run_cmd([  # type: ignore[no-untyped-call]
         'curl', '-L', '-o', CHROME_DEB_FILE,
         URL_TEMPLATE.format(version)])
-    _ = common.run_cmd([
+    _ = common.run_cmd([  # type: ignore[no-untyped-call]
         'sudo', 'sed', '-i',
         's|HERE/chrome\\"|HERE/chrome\\" --disable-setuid-sandbox|g',
         '/opt/google/chrome/google-chrome'])
-    _ = common.run_cmd(['sudo', 'dpkg', '-i', CHROME_DEB_FILE])
+    _ = common.run_cmd(['sudo', 'dpkg', '-i', CHROME_DEB_FILE])  # type: ignore[no-untyped-call]
 
 
-def get_chrome_version():
+def get_chrome_version() -> str:
     """Get the current version of Chrome.
 
     Note that this only works on Linux systems. On macOS, for example,
@@ -63,12 +63,12 @@ def get_chrome_version():
     Returns:
         str. The version of Chrome we found.
     """
-    output = str(common.run_cmd(['google-chrome', '--version']))
+    output = str(common.run_cmd(['google-chrome', '--version']))  # type: ignore[no-untyped-call]
     chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
     return chrome_version
 
 
-def main():
+def main() -> None:
     """Install Chrome and check the correct version was installed."""
     install_chrome(CHROME_VERSION)
     found_version = get_chrome_version()
