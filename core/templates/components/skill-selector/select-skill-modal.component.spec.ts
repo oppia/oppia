@@ -51,8 +51,8 @@ describe('Select Skill Modal', () => {
     description: 'description3',
     language_code: 'language_code',
     version: 1,
-    misconception_count: null,
-    worked_examples_count: null,
+    misconception_count: 4,
+    worked_examples_count: 4,
     skill_model_created_on: 2,
     skill_model_last_updated: 3
   };
