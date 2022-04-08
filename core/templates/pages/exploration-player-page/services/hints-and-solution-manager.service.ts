@@ -30,7 +30,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 })
 export class HintsAndSolutionManagerService {
   // This in initialized using the the class methods
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   solutionForLatestCard!: Solution;
   // The following are set to null when the timeouts are cleared
