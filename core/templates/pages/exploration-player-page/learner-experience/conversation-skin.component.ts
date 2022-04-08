@@ -138,7 +138,10 @@ export class ConversationSkinComponent {
   questionSessionCompleted: boolean;
   moveToExploration: boolean;
   upcomingInteractionInstructions;
-  visitedStateNames = [];
+  visitedStateNames: string[] = [];
+  completedStateNames: string[] = [];
+  previousSessionStatesProgress: string[] = [];
+  mostRecentlyReachedCheckpoint: string;
 
   constructor(
     private windowRef: WindowRef,
@@ -326,28 +329,26 @@ export class ConversationSkinComponent {
     }
 
     // For the first state which is always a checkpoint.
-    let firstStateName: string;
-    this.getLastSavedDataAsync().then(
-      response => {
-        firstStateName = response.init_state_name;
-      }
-    );
-    let version: number;
-    this.roebas.loadLatestExplorationAsync(this.explorationId).then(
-      response => {
-        version = response.version;
-      }
-    );
-    this.eebas.recordMostRecentlyReachedCheckpointAsync(
-      this.explorationId,
-      version,
-      firstStateName
-    ).then(() => {
-      // Required for the put operation to deliver data to backend.
-    });
-    this.visitedStateNames.push(firstStateName);
-    // this.changeCard(1);
-    this._navigateToMostRecentlyReachedCheckpoint()
+    // let firstStateName: string;
+    // this.getLastSavedDataAsync().then(
+    //   response => {
+    //     firstStateName = response.init_state_name;
+    //   }
+    // );
+    // let version: number;
+    // this.roebas.loadLatestExplorationAsync(this.explorationId).then(
+    //   response => {
+    //     version = response.version;
+    //   }
+    // );
+    // this.eebas.recordMostRecentlyReachedCheckpointAsync(
+    //   this.explorationId,
+    //   version,
+    //   firstStateName
+    // ).then((response) => {
+    //   // Required for the put operation to deliver data to backend.
+    // });
+    // this.visitedStateNames.push(firstStateName);
   }
 
   // Returns a promise supplying the last saved version for the current
@@ -607,27 +608,45 @@ export class ConversationSkinComponent {
   }
 
   private _navigateToMostRecentlyReachedCheckpoint(){
-    let version: number;
     let states: StateObjectsBackendDict;
     this.roebas.loadLatestExplorationAsync(this.explorationId).then(
       response => {
-        version = response.version;
         states = response.exploration.states;
-
-        console.log(states, "states testing");
-        for (var key of Object.keys(states)) {
-          let state = this.stateObjectFactory.createFromBackendDict(
-            key, states[key]
+        // this.mostRecentlyReachedCheckpoint = (
+        //   response.exploration.most_recently_reached_checkpoint_state_name
+        // );
+        this.mostRecentlyReachedCheckpoint = "test2";
+        this.previousSessionStatesProgress = (
+          this.explorationEngineService.getShortestPathToState(
+            states, this.mostRecentlyReachedCheckpoint
           )
-          this._addNewCard(
-            StateCard.createNewCard(
-              key, state.content.html, null, state.interaction,
-              state.recordedVoiceovers, state.writtenTranslations,
-              state.content.contentId,
-              this.audioTranslationLanguageService
-            )
-          );
+        );
+        let indexToRedirectTo = 0;
+        for (let i = 0; i < this.previousSessionStatesProgress.length; i++) {
+
+          let stateName = this.previousSessionStatesProgress[i];
+          // Skip the card if it has already been added to transcript
+          if (!this.playerTranscriptService.hasEncounteredStateBefore(
+            stateName)
+          ) {
+            let stateCard = (
+              this.explorationEngineService.getStateCardByName(stateName)
+            );
+            this._addNewCard(stateCard);
+          }
+
+          if (this.mostRecentlyReachedCheckpoint === stateName) break;
+
+          this.visitedStateNames.push(stateName)
+          indexToRedirectTo += 1;
         }
+
+        // Remove the last card from progress as it is not completed
+        // yet and is only most recently reached
+        this.previousSessionStatesProgress.pop();
+
+        // Move to most recently reached checkpoint card
+        this.changeCard(indexToRedirectTo);
       }
     );
   }
@@ -636,12 +655,11 @@ export class ConversationSkinComponent {
   // 'show previous responses' setting.
   private _navigateToDisplayedCard(): void {
     let index = this.playerPositionService.getDisplayedCardIndex();
-    console.log("testing index of the displayed card----------", index);
     this.displayedCard = this.playerTranscriptService.getCard(index);
-    console.log(this.displayedCard, "displayed card");
+    let currentState = this.explorationEngineService.getState();
+    let currentStateName = currentState.name;
+
     if (index > 0) {
-      let currentState = this.explorationEngineService.getState();
-      let currentStateName = currentState.name;
       if (currentState.cardIsCheckpoint &&
           !this.visitedStateNames.includes(currentStateName)) {
         let version: number;
@@ -862,9 +880,7 @@ export class ConversationSkinComponent {
     console.log(this.displayedCard, "displayedCard");
     console.log(transcriptLength, "transcriptLength");
 
-    this.displayedCard.markAsCompleted();
     this.playerPositionService.onNewCardAvailable.emit();
-    
 
     this.nextCard = initialCard;
     console.log(this.nextCard, "next card");
@@ -892,6 +908,9 @@ export class ConversationSkinComponent {
     }
     this.adjustPageHeight(false, null);
     this.windowRef.nativeWindow.scrollTo(0, 0);
+
+    // Navigate the learner to the most recently reached checkpoint state
+    this._navigateToMostRecentlyReachedCheckpoint();
 
     // The timeout is needed in order to give the recipient of the
     // broadcast sufficient time to load.

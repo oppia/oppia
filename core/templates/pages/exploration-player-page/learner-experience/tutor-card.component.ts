@@ -78,6 +78,7 @@ import { animate, keyframes, state, style, transition, trigger } from '@angular/
 })
 export class TutorCardComponent {
   @Input() displayedCard: StateCard;
+  @Input() previousSessionStatesProgress: string[];
   @Input() startCardChangeAnimation: boolean;
   @Input() avatarImageIsShown: boolean;
   directiveSubscriptions = new Subscription();
@@ -168,6 +169,7 @@ export class TutorCardComponent {
         changes.displayedCard.currentValue)) {
       this.updateDisplayedCard();
     }
+    console.log("value of the displayed card is: ", this.displayedCard);
   }
 
   isAudioBarExpandedOnMobileDevice(): boolean {
@@ -276,6 +278,14 @@ export class TutorCardComponent {
 
   getInputResponsePairId(index: number): string {
     return 'input-response-pair-' + index;
+  }
+
+  isDisplayedCardCompletedInPreviousSession(): boolean {
+    return (
+      this.displayedCard.getInteraction()
+      && (this.previousSessionStatesProgress.indexOf(
+        this.displayedCard.getStateName()) !== -1)
+    );
   }
 }
 

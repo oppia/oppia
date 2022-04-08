@@ -75,7 +75,7 @@
       In addition, if the exploration is iframed, the terminal card will
       have no learner input section, so we do not show it.
     -->
-    <div *ngIf="isInteractionInline() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
+    <div *ngIf="!isDisplayedCardCompletedInPreviousSession() && isInteractionInline() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
     ((displayedCard.getInteractionHtml() && !displayedCard.isCompleted()) || displayedCard.isCompleted()) &&
     (!isOnTerminalCard() || !isIframed || displayedCard.isCompleted())">
       <div class="conversation-skin-inline-interaction">
@@ -108,6 +108,14 @@
             <strong>Error</strong>: No interaction specified for '{{ displayedCard.getStateName() }}'.
           </span>
         </div>
+      </div>
+    </div>
+
+    <div *ngIf="isDisplayedCardCompletedInPreviousSession() && !conceptCardIsBeingShown">
+      <div class="conversation-skin-inline-interaction">
+        <angular-html-bind-wrapper classStr="protractor-test-conversation-input"
+                                   htmlData="You have already answered this question in a previous session !">
+        </angular-html-bind-wrapper>
       </div>
     </div>
   </div>

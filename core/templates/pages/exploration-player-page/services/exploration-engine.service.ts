@@ -272,13 +272,15 @@ export class ExplorationEngineService {
     this.learnerParamsService.init(startingParams);
   }
 
-  private _getNextInteractionHtml(labelForFocusTarget: string): string {
+  private _getInteractionHtmlByStateName(
+    labelForFocusTarget: string, stateName: string
+  ): string {
     let interactionId: string = this.exploration.getInteractionId(
-      this.nextStateName);
+      stateName);
 
     return this.explorationHtmlFormatterService.getInteractionHtml(
       interactionId,
-      this.exploration.getInteractionCustomizationArgs(this.nextStateName),
+      this.exploration.getInteractionCustomizationArgs(stateName),
       true,
       labelForFocusTarget, null);
   }
@@ -527,7 +529,9 @@ export class ExplorationEngineService {
     let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let nextInteractionHtml = null;
     if (this.exploration.getInteraction(this.nextStateName).id) {
-      nextInteractionHtml = this._getNextInteractionHtml(_nextFocusLabel);
+      nextInteractionHtml = (
+        this._getInteractionHtmlByStateName(_nextFocusLabel, this.nextStateName)
+      );
     }
     if (newParams) {
       this.learnerParamsService.init(newParams);
@@ -562,6 +566,98 @@ export class ExplorationEngineService {
 
   get onUpdateActiveStateIfInEditor(): EventEmitter<string> {
     return this._updateActiveStateIfInEditorEventEmitter;
+  }
+
+  getStateCardByName(stateName: string): StateCard {
+    let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
+    let interactionHtml = null;
+    if (this.exploration.getInteraction(stateName).id) {
+      interactionHtml = (
+        this._getInteractionHtmlByStateName(
+          _nextFocusLabel, stateName
+        )
+      );
+    }
+    let contentHtml = (
+      this.exploration.getState(stateName).content.html
+    );
+    contentHtml = contentHtml + this._getRandomSuffix();
+    interactionHtml = interactionHtml + this._getRandomSuffix();
+
+    let stateCard = StateCard.createNewCard(
+      stateName, contentHtml, interactionHtml,
+      this.exploration.getInteraction(stateName),
+      this.exploration.getState(stateName).recordedVoiceovers,
+      this.exploration.getState(stateName).writtenTranslations,
+      this.exploration.getState(stateName).content.contentId,
+      this.audioTranslationLanguageService);
+
+    return stateCard;
+  }
+
+  getShortestPathToState(allStates, destStateName): string[] {
+    let stateGraphLinks: { source: string; target: string }[] = [];
+
+    // Create a list of all possible links between states.
+    for (var stateName of Object.keys(allStates)) {
+      let interaction = this.exploration.getState(stateName).interaction;
+      if (interaction.id) {
+        let groups = interaction.answerGroups;
+        for (let h = 0; h < groups.length; h++) {
+          stateGraphLinks.push({
+            source: stateName,
+            target: groups[h].outcome.dest,
+          });
+        }
+
+        if (interaction.defaultOutcome) {
+          stateGraphLinks.push({
+            source: stateName,
+            target: interaction.defaultOutcome.dest,
+          });
+        }
+      }
+    }
+
+    let shortestPathToState: string[] = [];
+    let queue: string[] = [];
+    let seen: Record<string, boolean> = {};
+    let parent: Record<string, string> = {};
+    console.log('initStateName: ', this.exploration.initStateName);
+    seen[this.exploration.initStateName] = true;
+    queue.push(this.exploration.initStateName);
+    // 1st state does not have a parent
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    parent[this.exploration.initStateName] = null;
+    while (queue.length > 0) {
+      // '.shift()' here can return an undefined value, but we're already
+      // checking for queue.length > 0, so this is safe.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      let currStateName = queue.shift()!;
+
+      if(currStateName === destStateName) break;
+
+      for (let e = 0; e < stateGraphLinks.length; e++) {
+        let edge = stateGraphLinks[e];
+        let dest = edge.target;
+        if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
+          seen[dest] = true;
+          parent[dest] = currStateName;
+          queue.push(dest);
+        }
+      }
+    }
+
+    // Reconstruct the shortest path from the parent map.
+    let currStateName = destStateName;
+    while (currStateName !== null) {
+      shortestPathToState.push(currStateName);
+      currStateName = parent[currStateName];
+    }
+    // Reverse the path to go initStateName to destStateName.
+    shortestPathToState = shortestPathToState.reverse();
+    console.log(shortestPathToState, "shortestPathToState");
+    return shortestPathToState;
   }
 }
 
