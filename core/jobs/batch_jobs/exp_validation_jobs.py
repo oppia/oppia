@@ -78,7 +78,7 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
         for link in cleaned_links:
             link_info = urlparse(link)
             # Protocols other than 'https' are invalid.
-            # If a protocol isn't present, it is assumed to be https (default).
+            # If a protocol is an empty string, it is assumed to be HTTPS.
             if link_info.scheme not in ('https', ''):
                 invalid_links.append(link)
 
