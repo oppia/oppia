@@ -86,7 +86,8 @@ describe('Select Skill Modal', () => {
     componentInstance.categorizedSkills = categorizedSkills;
     componentInstance.skillsInSameTopicCount = skillsInSameTopicCount;
     componentInstance.skillSummaries = skillSummaries;
-    componentInstance.untriagedSkillSummaries = untriagedSkillSummaries;
+    componentInstance.untriagedSkillSummaries =
+    (untriagedSkillSummaries as unknown) as SkillSummaryBackendDict[];
     ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
