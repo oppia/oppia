@@ -35,6 +35,7 @@ export class BlogAdminNavbarComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   profilePictureDataUrl!: string;
   profileUrl!: string;
+  username!: string | null;
   logoWebpImageSrc!: string;
   logoPngImageSrc!: string;
   PAGES_REGISTERED_WITH_FRONTEND = (
@@ -62,15 +63,15 @@ export class BlogAdminNavbarComponent implements OnInit {
 
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
-    const username = userInfo.getUsername();
+    this.username = userInfo.getUsername();
 
-    if (username === null) {
+    if (this.username === null) {
       throw new Error('Cannot fetch username.');
     }
     this.profileUrl = (
       this.urlInterpolationService.interpolateUrl(
         '/profile/<username>', {
-          username: username
+          username: this.username
         }));
   }
 
