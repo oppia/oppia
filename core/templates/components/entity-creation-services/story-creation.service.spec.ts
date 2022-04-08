@@ -31,7 +31,11 @@ describe('Story Creation Service', () => {
   let $q = null;
   let imageBlob = null;
   let mockWindow = {
-    location: ''
+    location: {
+      href: '',
+      reload: () => {}
+    },
+    open: () => {}
   };
 
   beforeEach(angular.mock.module('oppia'));
@@ -85,8 +89,8 @@ describe('Story Creation Service', () => {
     expect(StoryCreationService.createNewCanonicalStory()).toBe(undefined);
   });
 
-  it('should post story data to server and change window location' +
-    ' on success', () => {
+  it('should post story data to server and open the story ' +
+  'editor on a new tab on success', () => {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({
         isValid: () => true,
@@ -95,19 +99,19 @@ describe('Story Creation Service', () => {
         urlFragment: 'url'
       })
     });
+    spyOn(mockWindow, 'open');
+    spyOn(mockWindow.location, 'reload');
 
     $httpBackend.expectPOST('/topic_editor_story_handler/id')
       .respond(200, {storyId: 'id'});
-
-    expect(mockWindow.location).toBe('');
-
 
     StoryCreationService.createNewCanonicalStory();
     $scope.$apply();
 
     $httpBackend.flush();
 
-    expect(mockWindow.location).toBe('/story_editor/id');
+    expect(mockWindow.open).toHaveBeenCalledWith('/story_editor/id');
+    expect(mockWindow.location.reload).toHaveBeenCalled();
   });
 
   it('should throw error if the newly created story is not valid', () => {
