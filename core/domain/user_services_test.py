@@ -1625,19 +1625,6 @@ title: Title
             })], 'Change state name'
         )
 
-        # This method is called when exploration data is fetched since now
-        # latest exploration version > most recently interacted exploration
-        # version.
-        # Working - First the furthest reached checkpoint ('Introduction' in
-        # this case) is searched in current exploration. It will not be found
-        # since its state name is changed to 'Intro'. It will then search for
-        # an checkpoint that had been reached in older exploration and also
-        # exists in current exploration. If such checkpoint is not found,
-        # furthest reached checkpoint is set to None. Similar workflow is
-        # carried out for most recently reached checkpoint.
-        user_services.sync_learner_checkpoint_progress_with_current_exp_version(
-            self.viewer_id, self.EXP_ID)
-
         # First checkpoint reached again.
         user_services.update_learner_checkpoint_progress(
             self.viewer_id, self.EXP_ID, 'Intro', 4)
@@ -1674,6 +1661,62 @@ title: Title
             exploration_user_data.furthest_reached_checkpoint_state_name)
         self.assertIsNone(
             exploration_user_data.most_recently_reached_checkpoint_exp_version)
+        self.assertIsNone(
+            exploration_user_data.most_recently_reached_checkpoint_state_name)
+
+    def test_sync_learner_checkpoint_progress_with_current_exp_version(self):
+        self.login(self.VIEWER_EMAIL)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertIsNone(exploration_user_data)
+
+        # First checkpoint reached.
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Introduction', 1)
+        exploration_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction')
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_exp_version,
+            1)
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            'Introduction')
+
+        # Change state name of 'Introduction' state.
+        # Now version of exploration becomes 2.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'Introduction',
+                'new_state_name': 'Intro',
+            })], 'Change state name'
+        )
+
+        # This method is called when exploration data is fetched since now
+        # latest exploration version > most recently interacted exploration
+        # version.
+        # Working - First the furthest reached checkpoint ('Introduction' in
+        # this case) is searched in current exploration. It will not be found
+        # since its state name is changed to 'Intro'. It will then search for
+        # an checkpoint that had been reached in older exploration and also
+        # exists in current exploration. If such checkpoint is not found,
+        # furthest reached checkpoint is set to None. Similar workflow is
+        # carried out for most recently reached checkpoint.
+        exploration_user_data = (
+            user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                self.viewer_id, self.EXP_ID))
+        self.assertEqual(
+            exploration_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertIsNone(
+            exploration_user_data.furthest_reached_checkpoint_state_name)
+        self.assertEqual(
+            exploration_user_data.most_recently_reached_checkpoint_exp_version, 2)
         self.assertIsNone(
             exploration_user_data.most_recently_reached_checkpoint_state_name)
 
