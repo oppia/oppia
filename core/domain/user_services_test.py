@@ -1716,7 +1716,8 @@ title: Title
         self.assertIsNone(
             exploration_user_data.furthest_reached_checkpoint_state_name)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version, 2)
+            exploration_user_data.most_recently_reached_checkpoint_exp_version,
+            2)
         self.assertIsNone(
             exploration_user_data.most_recently_reached_checkpoint_state_name)
 
