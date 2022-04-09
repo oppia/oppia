@@ -35,9 +35,11 @@ export class CollectionFooterComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService) {
   }
+
   ngOnInit(): void {
     this.collectionId = this.urlService.getCollectionIdFromUrl();
   }
+
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }

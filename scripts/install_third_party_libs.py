@@ -50,7 +50,7 @@ for package_name, version_number, target_path in PREREQUISITES:
         subprocess.check_call(command_text + uextention_text)
 
 
-from core import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -137,8 +137,8 @@ def install_buf_and_protoc():
         with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:
             zfile.extractall(path=PROTOC_DIR)
         os.remove(os.path.join(BUF_DIR, protoc_file))
-    except Exception:
-        raise Exception('Error installing protoc binary')
+    except Exception as e:
+        raise Exception('Error installing protoc binary') from e
     common.recursive_chmod(buf_path, 0o744)
     common.recursive_chmod(protoc_path, 0o744)
 
@@ -240,7 +240,11 @@ def main() -> None:
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
         ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
         ('Pillow', common.PILLOW_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', common.PYLINT_QUOTES_VERSION, common.OPPIA_TOOLS_DIR),
+        (
+            'git+https://github.com/oppia/pylint-quotes.git',
+            common.PYLINT_QUOTES_VERSION,
+            common.OPPIA_TOOLS_DIR
+        ),
         ('webtest', common.WEBTEST_VERSION, common.OPPIA_TOOLS_DIR),
         ('isort', common.ISORT_VERSION, common.OPPIA_TOOLS_DIR),
         ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
@@ -248,11 +252,7 @@ def main() -> None:
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
         ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
-        (
-            'git+https://github.com/oppia/pip-tools.git',
-            common.PIP_TOOLS_VERSION,
-            common.OPPIA_TOOLS_DIR
-        ),
+        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
         ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
@@ -308,7 +308,7 @@ def main() -> None:
     for path_list in os.walk(correct_google_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
-            with python_utils.open_file(
+            with utils.open_file(
                 os.path.join(root_path, '__init__.py'), 'a'):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.

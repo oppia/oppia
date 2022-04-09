@@ -115,7 +115,8 @@ def get_exploration_titles_and_categories(exp_ids):
     """
     explorations = [
         (exp_fetchers.get_exploration_from_model(e) if e else None)
-        for e in exp_models.ExplorationModel.get_multi(exp_ids)]
+        for e in exp_models.ExplorationModel.get_multi(
+            exp_ids, include_deleted=True)]
 
     result = {}
     for exploration in explorations:
@@ -1037,14 +1038,15 @@ def validate_exploration_for_story(exp, strict):
             android_validation_constants.SUPPORTED_LANGUAGES):
         error_string = (
             'Invalid language %s found for exploration '
-            'with ID %s.' % (exp.language_code, exp.id))
+            'with ID %s. This language is not supported for explorations '
+            'in a story on the mobile app.' % (exp.language_code, exp.id))
         if strict:
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
 
     if exp.param_specs or exp.param_changes:
         error_string = (
-            'Expected no exploration to have parameter '
+            'Expected no exploration in a story to have parameter '
             'values in it. Invalid exploration: %s' % exp.id)
         if strict:
             raise utils.ValidationError(error_string)
@@ -1052,7 +1054,8 @@ def validate_exploration_for_story(exp, strict):
 
     if not exp.correctness_feedback_enabled:
         error_string = (
-            'Expected all explorations to have correctness feedback '
+            'Expected all explorations in a story to '
+            'have correctness feedback '
             'enabled. Invalid exploration: %s' % exp.id)
         if strict:
             raise utils.ValidationError(error_string)
@@ -1063,7 +1066,9 @@ def validate_exploration_for_story(exp, strict):
         if not state.interaction.is_supported_on_android_app():
             error_string = (
                 'Invalid interaction %s in exploration '
-                'with ID: %s.' % (state.interaction.id, exp.id))
+                'with ID: %s. This interaction is not supported for '
+                'explorations in a story on the '
+                'mobile app.' % (state.interaction.id, exp.id))
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
@@ -1071,8 +1076,8 @@ def validate_exploration_for_story(exp, strict):
         if not state.is_rte_content_supported_on_android():
             error_string = (
                 'RTE content in state %s of exploration '
-                'with ID %s is not supported on mobile.'
-                % (state_name, exp.id))
+                'with ID %s is not supported on mobile for explorations '
+                'in a story.' % (state_name, exp.id))
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
@@ -1083,9 +1088,10 @@ def validate_exploration_for_story(exp, strict):
                     'recommendedExplorationIds'].value)
             if len(recommended_exploration_ids) != 0:
                 error_string = (
-                    'Exploration with ID: %s contains exploration '
-                    'recommendations in its EndExploration interaction.'
-                    % (exp.id))
+                    'Explorations in a story are not expected to contain '
+                    'exploration recommendations. Exploration with ID: '
+                    '%s contains exploration recommendations in its '
+                    'EndExploration interaction.' % (exp.id))
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
@@ -1185,10 +1191,14 @@ def regenerate_exploration_summary_with_new_contributor(
         contributor_id: str. ID of the contributor to be added to
             the exploration summary.
     """
-    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = _compute_summary_of_exploration(exploration)
-    exp_summary.add_contribution_by_user(contributor_id)
-    save_exploration_summary(exp_summary)
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=False)
+    if exploration is not None:
+        exp_summary = _compute_summary_of_exploration(exploration)
+        exp_summary.add_contribution_by_user(contributor_id)
+        save_exploration_summary(exp_summary)
+    else:
+        logging.error('Could not find exploration with ID %s', exploration_id)
 
 
 def regenerate_exploration_and_contributors_summaries(exploration_id):
@@ -1739,6 +1749,9 @@ def get_composite_change_list(exp_id, from_version, to_version):
     Returns:
         list(ExplorationChange). List of ExplorationChange domain objects
         consisting of changes from from_version to to_version.
+
+    Raises:
+        Exception. From version is higher than to version.
     """
     if from_version > to_version:
         raise Exception(
@@ -1946,8 +1959,12 @@ def get_exp_with_draft_applied(exp_id, user_id):
         Exploration or None. Returns the exploration domain object with draft
         applied, or None if draft can not be applied.
     """
+    # TODO(#15075): Refactor this function.
+
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    draft_change_list = None
+    draft_change_list_exp_version = None
     if exp_user_data:
         if exp_user_data.draft_change_list:
             draft_change_list_exp_version = (

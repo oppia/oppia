@@ -42,6 +42,7 @@ export class OpportunitiesListItemComponent {
   @Input() opportunity: ExplorationOpportunity;
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter());
+
   @Input() labelRequired: boolean;
   @Input() progressBarRequired: boolean;
   @Input() opportunityHeadingTruncationLength: number;

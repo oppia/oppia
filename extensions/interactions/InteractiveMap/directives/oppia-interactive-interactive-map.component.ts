@@ -30,7 +30,6 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { Subscription } from 'rxjs';
 import { InteractiveMapRulesService } from './interactive-map-rules.service';
 import { icon, LatLng, latLng, LeafletMouseEvent, marker, TileLayer, tileLayer } from 'leaflet';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -48,6 +47,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
+
   directiveSubscriptions = new Subscription();
   coords: [number, number];
   zoomLevel: number;
@@ -56,6 +56,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     opacity?: number;
     'z-index'?: number;
   };
+
   zoom: number;
   interactionIsActive: boolean;
   mapMarkers;
@@ -152,8 +153,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
       const newLng = e.latlng.lng;
       this._changeMarkerPosition(newLat, newLng);
       this.currentInteractionService.onSubmit(
-        [newLat, newLng] as unknown as string,
-        this.interactiveMapRulesService as unknown as InteractionRulesService
+        [newLat, newLng], this.interactiveMapRulesService
       );
     }
   }

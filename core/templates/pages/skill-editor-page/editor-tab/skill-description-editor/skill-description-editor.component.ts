@@ -17,7 +17,7 @@
  */
 
 import { Subscription } from 'rxjs';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
@@ -30,10 +30,12 @@ import { SkillRights } from 'domain/skill/skill-rights.model';
   templateUrl: './skill-description-editor.component.html'
 })
 export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
+  @Output() onSaveDescription = new EventEmitter<void>();
   errorMsg: string = '';
   directiveSubscriptions = new Subscription();
   MAX_CHARS_IN_SKILL_DESCRIPTION = (
     AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION);
+
   skillRights: SkillRights = null;
   skill: Skill = null;
   skillDescriptionEditorIsShown: boolean = null;
@@ -62,6 +64,7 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
       this.skillUpdateService.setSkillDescription(
         this.skill,
         newSkillDescription);
+      this.onSaveDescription.emit();
     } else {
       this.errorMsg = (
         'Please use a non-empty description consisting of ' +

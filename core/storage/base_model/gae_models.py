@@ -1339,7 +1339,7 @@ class VersionedModel(BaseModel):
             VersionedModel. Model instance representing given version.
 
         Raises:
-            Exception. This model instance has been deleted.
+            EntityNotFoundError. This model instance has been deleted.
         """
         current_version_model = cls.get(entity_id, strict=strict)
 

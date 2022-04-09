@@ -184,6 +184,7 @@ describe('SvgEditor', () => {
         return 'Fake onload executed';
       };
     }
+
     readAsDataURL(file) {
       this.onload();
       return 'The file is loaded';
@@ -198,6 +199,7 @@ describe('SvgEditor', () => {
         return 'Fake onload executed';
       };
     }
+
     set src(url) {
       this.onload();
     }
@@ -294,6 +296,69 @@ describe('SvgEditor', () => {
       component.onHeightInputBlur();
       expect(component.currentDiagramHeight).toBe(HEIGHT);
     })));
+
+  it('should add tags to canvas regardless of ids specified',
+    waitForAsync(fakeAsync(() => {
+      spyOnProperty(document, 'readyState').and.returnValue('loaded');
+      let sampleSVGWithoutId = (
+        '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
+        'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 ' +
+        '494 367"><desc>Created with Fabric.js 3.6.3</desc><path d="M 15.0000' +
+        '00000000004 -25.980762113533157 A 30 30 0 0 1 15.000000000000004 25.' +
+        '980762113533157" style="stroke: rgb(255,0,0); stroke-width: 1; strok' +
+        'e-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; strok' +
+        'e-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-ru' +
+        'le: nonzero; opacity: 1; vector-effect: non-scaling-stroke' +
+        '"/></svg>');
+
+      component.savedSvgDiagram = 'saved';
+      component.savedSvgDiagram = sampleSVGWithoutId;
+      component.continueDiagramEditing();
+      tick();
+      expect(component.canvas.getObjects().length).toBe(1);
+
+      let sampleSVGWithGroup = (
+        '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
+        'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 ' +
+        '494 367"><desc>Created with Fabric.js 3.6.3</desc><path d="M 15.0000' +
+        '00000000004 -25.980762113533157 A 30 30 0 0 1 15.000000000000004 25.' +
+        '980762113533157" style="stroke: rgb(255,0,0); stroke-width: 1; strok' +
+        'e-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; strok' +
+        'e-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-ru' +
+        'le: nonzero; opacity: 1; vector-effect: non-scaling-stroke' +
+        '" id="group0"/></svg>');
+
+      component.savedSvgDiagram = 'saved';
+      component.savedSvgDiagram = sampleSVGWithGroup;
+      component.continueDiagramEditing();
+      tick();
+      expect(component.canvas.getObjects().length).toBe(1);
+
+      let sampleSVGWithRandomId = (
+        '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
+        'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 ' +
+        '494 367"><desc>Created with Fabric.js 3.6.3</desc><path d="M 15.0000' +
+        '00000000004 -25.980762113533157 A 30 30 0 0 1 15.000000000000004 25.' +
+        '980762113533157" style="stroke: rgb(255,0,0); stroke-width: 1; strok' +
+        'e-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; strok' +
+        'e-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-ru' +
+        'le: nonzero; opacity: 1; vector-effect: non-scaling-stroke' +
+        '" id="randomId"/></svg>');
+
+      component.savedSvgDiagram = 'saved';
+      component.savedSvgDiagram = sampleSVGWithRandomId;
+      component.continueDiagramEditing();
+      tick();
+      expect(component.canvas.getObjects().length).toBe(1);
+    })));
+
+  it('should discard SVG when discard button is clicked', () => {
+    spyOn(component.discardImage, 'emit');
+
+    component.discardSvgFile();
+
+    expect(component.discardImage.emit).toHaveBeenCalled();
+  });
 
   it(
     'should update diagram size when dom had loaded',
@@ -855,6 +920,7 @@ describe(
           return 'Fake onload executed';
         };
       }
+
       readAsDataURL(file) {
         this.onload();
         return 'The file is loaded';
@@ -869,6 +935,7 @@ describe(
           return 'Fake onload executed';
         };
       }
+
       set src(url) {
         this.onload();
       }

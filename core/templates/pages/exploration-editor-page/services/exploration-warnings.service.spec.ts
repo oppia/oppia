@@ -31,10 +31,11 @@ require(
   'pages/exploration-editor-page/services/exploration-init-state-name.service');
 
 describe('Exploration Warnings Service', function() {
-  var ExplorationWarningsService = null;
-  var ExplorationStatesService = null;
-  var StateTopAnswersStatsService = null;
-  var StateTopAnswersStatsBackendApiService = null;
+  let ExplorationInitStateNameService;
+  let ExplorationWarningsService;
+  let ExplorationStatesService;
+  let StateTopAnswersStatsService;
+  let StateTopAnswersStatsBackendApiService;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
@@ -49,10 +50,6 @@ describe('Exploration Warnings Service', function() {
   importAllAngularServices();
   describe('when exploration param changes has jinja values', function() {
     beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('ExplorationInitStateNameService', {
-        savedMemento: 'Hola',
-        displayed: 'Hola'
-      });
       $provide.value('ExplorationParamChangesService', {
         savedMemento: [{
           customizationArgs: {
@@ -78,12 +75,15 @@ describe('Exploration Warnings Service', function() {
       });
     }));
     beforeEach(angular.mock.inject(function($injector) {
+      ExplorationInitStateNameService = $injector.get(
+        'ExplorationInitStateNameService');
       ExplorationWarningsService = $injector.get('ExplorationWarningsService');
       ExplorationStatesService = $injector.get('ExplorationStatesService');
       StateTopAnswersStatsBackendApiService = $injector.get(
         'StateTopAnswersStatsBackendApiService');
       StateTopAnswersStatsService = $injector.get(
         'StateTopAnswersStatsService');
+      ExplorationInitStateNameService.init('Hola');
     }));
 
     it('should update warnings with TextInput as interaction id', function() {
@@ -155,8 +155,7 @@ describe('Exploration Warnings Service', function() {
         message: 'In \'Hola\', the following answer group has a classifier' +
         ' with no training data: 0'
       }]);
-      expect(ExplorationWarningsService.hasCriticalWarnings())
-        .toBe(true);
+      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
       expect(ExplorationWarningsService.countWarnings()).toBe(4);
       expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [

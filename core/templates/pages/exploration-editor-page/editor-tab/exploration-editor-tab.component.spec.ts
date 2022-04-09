@@ -389,7 +389,7 @@ describe('Exploration editor tab component', function() {
   });
 
   it('should add state in exploration states', function() {
-    spyOn(explorationStatesService, 'addState');
+    spyOn(explorationStatesService, 'addState').and.callThrough();
 
     ctrl.addState('Fourth State');
 

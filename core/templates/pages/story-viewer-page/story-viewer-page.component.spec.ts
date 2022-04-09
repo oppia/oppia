@@ -80,6 +80,7 @@ describe('Story Viewer Page component', () => {
     pageTitleService = TestBed.get(PageTitleService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
     urlService = TestBed.get(UrlService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     userService = TestBed.get(UserService);
     alertsService = TestBed.get(AlertsService);
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
@@ -87,6 +88,8 @@ describe('Story Viewer Page component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     let fixture = TestBed.createComponent(StoryViewerPageComponent);
     component = fixture.componentInstance;
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
         reload: ()=>{},
@@ -199,6 +202,9 @@ describe('Story Viewer Page component', () => {
     httpTestingController.verify();
   });
 
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
+  });
 
   it('should get complete exploration url when clicking on svg element',
     () => {

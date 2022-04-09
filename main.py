@@ -580,7 +580,8 @@ URLS = [
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),
     get_redirect_route(
-        r'/createhandler/imageupload/<entity_type>/<entity_id>',
+        r'%s/<entity_type>/<entity_id>' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX),
         editor.ImageUploadHandler),
     get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',
@@ -894,6 +895,11 @@ URLS = [
     get_redirect_route(
         r'/voice_artist_management_handler/<entity_type>/<entity_id>',
         voice_artist.VoiceArtistManagementHandler),
+
+    get_redirect_route(
+        r'/topics_and_skills_dashboard/categorized_and_untriaged_skills_data',
+        topics_and_skills_dashboard
+            .CategorizedAndUntriagedSkillsDataHandler)
 ]
 
 # Adding redirects for topic landing pages.

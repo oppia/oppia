@@ -55,6 +55,7 @@ export class StateSolutionEditorComponent implements OnInit {
   @Output() getSolutionChange: EventEmitter<void> = new EventEmitter();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
   EventEmitter<Solution> = (new EventEmitter());
+
   correctAnswer: string;
   inlineSolutionEditorIsActive: boolean;
   solutionCardIsShown: boolean;
@@ -62,6 +63,7 @@ export class StateSolutionEditorComponent implements OnInit {
   correctAnswerEditorHtml: string;
   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION: string = (
     StateEditorConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION);
+
   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION: string = (
     AppConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION);
 

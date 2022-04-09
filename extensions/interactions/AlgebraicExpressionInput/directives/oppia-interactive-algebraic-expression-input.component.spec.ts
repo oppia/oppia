@@ -51,10 +51,12 @@ describe('AlgebraicExpressionInputInteractive', () => {
     asciimath() {
       return 'Dummy value';
     }
+
     configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
       handler({focused: true});
     }
+
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}
     static 'add_global_symbol'(name: string, symbol: Object): void {}
@@ -102,6 +104,14 @@ describe('AlgebraicExpressionInputInteractive', () => {
       mockGuppyObject as GuppyObject);
     component.ngOnInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
+  });
+
+  it('should determine when the component is destroyed', () => {
+    component.ngOnInit();
+    expect(component.viewIsDestroyed).toBe(false);
+
+    component.ngOnDestroy();
+    expect(component.viewIsDestroyed).toBe(true);
   });
 
   it('should not submit the answer if invalid', () => {

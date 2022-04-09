@@ -33,7 +33,9 @@ module.exports = {
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/about$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.98}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/admin$',
@@ -41,28 +43,38 @@ module.exports = {
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/blog-dashboard$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.98}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/community-library$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.98}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/contact$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.98}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/contributor-dashboard$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.98}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/creator-dashboard$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.98}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/delete-account$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.99}]
+            'categories:accessibility': ['error', {'minScore': 0.98}]
           }
         },
         {
@@ -77,15 +89,21 @@ module.exports = {
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/get-started$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.98}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/learner-dashboard$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.98}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/moderator$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.98}]
+          }
         }
       ]
     },

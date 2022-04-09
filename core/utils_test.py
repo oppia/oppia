@@ -28,12 +28,41 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.tests import test_utils
+from core.tests.data import unicode_and_str_handler
 
 from typing import Any, Dict, List
 
 
 class UtilsTests(test_utils.GenericTestBase):
     """Test the core utility methods."""
+
+    def test_open_file(self) -> None:
+        with utils.open_file(
+            os.path.join('core', 'python_utils.py'), 'r'
+        ) as f:
+            file_content = f.readlines()
+            self.assertIsNotNone(file_content)
+
+    def test_can_not_open_file(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            FileNotFoundError,
+            'No such file or directory: \'invalid_file.py\''
+        ):
+            with utils.open_file('invalid_file.py', 'r') as f:
+                f.readlines()
+
+    def test_unicode_and_str_chars_in_file(self) -> None:
+        self.assertIsInstance(unicode_and_str_handler.SOME_STR_TEXT, str)
+        self.assertIsInstance(
+            unicode_and_str_handler.SOME_UNICODE_TEXT, str)
+        self.assertIsInstance(
+            unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
+
+        with utils.open_file(
+            'core/tests/data/unicode_and_str_handler.py', 'r'
+        ) as f:
+            file_content = f.read()
+            self.assertIsInstance(file_content, str)
 
     def test_get_comma_sep_string_from_list(self) -> None:
         """Test get_comma_sep_string_from_list method."""

@@ -25,6 +25,10 @@ describe('Testing filters', function() {
     truncateAndCapitalizePipe = new TruncateAndCapitalizePipe();
   });
 
+  it('should return empty string if input is empty string', () => {
+    expect(truncateAndCapitalizePipe.transform('', 4)).toEqual('');
+  });
+
   it('should have all expected filters', () => {
     expect(truncateAndCapitalizePipe).not.toEqual(null);
   });

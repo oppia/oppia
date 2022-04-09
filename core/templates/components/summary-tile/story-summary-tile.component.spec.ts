@@ -49,6 +49,13 @@ describe('StorySummaryTileComponent', () => {
     wds = TestBed.inject(WindowDimensionsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should set properties on initialization', () => {

@@ -823,15 +823,6 @@ textarea {
 }
 
 
-
-.input-group-addon.oppia-search-bar-icon {
-  border-radius: 4px 0 0 4px;
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 1;
-  padding: 7px 12px;
-  text-align: center;
-}
 .oppia-help-dropdown .uib-popover {
   color: white;
   font-size: 14px;
@@ -936,7 +927,7 @@ textarea {
   box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
   font-size: 14px;
   margin: 2px 0 0;
-  max-width: 220px;
+  max-width: 245px;
   min-width: 160px;
   padding: 5px 0;
 }
@@ -1039,6 +1030,13 @@ textarea {
 }
 .oppia-navbar-breadcrumb-separator:after {
   content: ">";
+}
+
+.oppia-navbar-breadcrumb-rtl-separator {
+  margin-left: 8px;
+}
+.oppia-navbar-breadcrumb-rtl-separator:after {
+  content: "<";
 }
 
 .oppia-navbar-breadcrumb-icon {
@@ -2545,6 +2543,14 @@ oppia-parameter {
   min-width: 200px;
   width: 400px;
 }
+
+.oppia-modal-lesson-information-card .modal-dialog {
+  margin: 100px auto;
+  max-width: 35%;
+  min-width: 270px;
+  width: 350px;
+}
+
 .skill-select-modal .modal-xl {
   width: 1000px;
 }
@@ -3135,6 +3141,11 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
+.oppia-modal-lesson-information-card .modal-dialog .modal-content {
+  border-radius: 4px;
+  min-width: 270px;
+}
+
 .oppia-improvement-task {
   background-color: #fff;
   margin-bottom: 30px;
@@ -3178,6 +3189,14 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-improvement-task-footer {
   padding: 24px 0 0 0;
   text-align: right;
+}
+
+/*
+  The following class is to be used for forcing right align in RTL languages,
+  hence the !important tag.
+*/
+.oppia-force-right-align {
+  text-align: right !important;
 }
 
 .oppia-lost-changes > li {
@@ -4782,7 +4801,7 @@ div.oppia-issues-learner-action {
   .oppia-profile-picture-container {
     float: left;
     height: auto;
-    width: 130px;
+    width: 100%;
   }
   .oppia-profile-user-card {
     float: none;

@@ -99,6 +99,10 @@ def subscribe_to_creator(user_id, creator_id):
     Args:
         user_id: str. The user ID of the new subscriber.
         creator_id: str. The user ID of the creator.
+
+    Raises:
+        Exception. The user ID of the new subscriber is same as the
+            user ID of the creator.
     """
     if user_id == creator_id:
         raise Exception('User %s is not allowed to self subscribe.' % user_id)

@@ -26,9 +26,12 @@ from __future__ import annotations
 from core.platform.cache import redis_cache_services as memory_cache_services
 from core.platform.datastore import (
     cloud_datastore_services as datastore_services)
+from core.platform.email import dev_mode_email_services as email_services
 from core.platform.search import elastic_search_services as search_services
 from core.platform.transactions import (
     cloud_transaction_services as transaction_services)
+from core.platform.translate import (
+    dev_mode_translate_services as translate_services)
 from core.storage.activity import gae_models as activity_models
 from core.storage.app_feedback_report import (
     gae_models as app_feedback_report_models)
@@ -70,6 +73,7 @@ __all__ = [
     'config_models',
     'datastore_services',
     'email_models',
+    'email_services',
     'exp_models',
     'feedback_models',
     'improvements_models',
@@ -86,6 +90,7 @@ __all__ = [
     'suggestion_models',
     'topic_models',
     'translation_models',
+    'translate_services',
     'transaction_services',
     'user_models'
 ]

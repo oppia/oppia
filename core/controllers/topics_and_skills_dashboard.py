@@ -98,43 +98,18 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             topic_summary_dict['classroom'] = topic_classroom_dict.get(
                 topic_summary_dict['id'], None)
 
-        untriaged_skill_summary_dicts = []
         mergeable_skill_summary_dicts = []
-        categorized_skills_dict = {}
-        topics = topic_fetchers.get_all_topics()
-        for topic in topics:
-            subtopics = topic.subtopics
-            categorized_skills_dict[topic.name] = {}
-            uncategorized_skills = (
-                skill_services.get_descriptions_of_skills(
-                    topic.uncategorized_skill_ids)[0])
-            skills_list = []
-            for skill_id in topic.uncategorized_skill_ids:
-                skill_dict = {
-                    'skill_id': skill_id,
-                    'skill_description': uncategorized_skills[skill_id]
-                }
-                skills_list.append(skill_dict)
-            categorized_skills_dict[topic.name]['uncategorized'] = (
-                skills_list)
-            for subtopic in subtopics:
-                skills = (skill_services.get_descriptions_of_skills(
-                    subtopic.skill_ids))[0]
-                skills_list = []
-                for skill_id in subtopic.skill_ids:
-                    skill_dict = {
-                        'skill_id': skill_id,
-                        'skill_description': skills[skill_id]
-                    }
-                    skills_list.append(skill_dict)
-                categorized_skills_dict[topic.name][
-                    subtopic.title] = skills_list
+
+        untriaged_skill_summaries = (
+            skill_services.get_untriaged_skill_summaries(
+                skill_summaries, skill_ids_assigned_to_some_topic,
+                merged_skill_ids))
+
+        categorized_skills = (
+            skill_services.get_categorized_skill_ids_and_descriptions())
 
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
-            if (skill_id not in skill_ids_assigned_to_some_topic) and (
-                    skill_id not in merged_skill_ids):
-                untriaged_skill_summary_dicts.append(skill_summary_dict)
             if (skill_id in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
@@ -152,7 +127,10 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
         self.values.update({
-            'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
+            'untriaged_skill_summary_dicts': [
+                skill_summary.to_dict()
+                for skill_summary in untriaged_skill_summaries
+            ],
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
             'total_skill_count': len(skill_summary_dicts),
@@ -161,7 +139,46 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'can_create_topic': can_create_topic,
             'can_delete_skill': can_delete_skill,
             'can_create_skill': can_create_skill,
-            'categorized_skills_dict': categorized_skills_dict
+            'categorized_skills_dict': categorized_skills.to_dict()
+        })
+        self.render_json(self.values)
+
+
+class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
+    """Provides information about categorized skills and untriaged skill
+    summaries for the exploration editor page's skill editor component."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        skill_summaries = skill_services.get_all_skill_summaries()
+        skill_ids_assigned_to_some_topic = (
+            topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
+        merged_skill_ids = skill_services.get_merged_skill_ids()
+
+        untriaged_skill_summaries = (
+            skill_services.get_untriaged_skill_summaries(
+                skill_summaries, skill_ids_assigned_to_some_topic,
+                merged_skill_ids))
+        untriaged_short_skill_summaries = [
+            skill_domain.ShortSkillSummary.from_skill_summary(skill_summary)
+            for skill_summary in untriaged_skill_summaries]
+
+        categorized_skills = (
+            skill_services.get_categorized_skill_ids_and_descriptions())
+
+        self.values.update({
+            'untriaged_skill_summary_dicts': [
+                short_skill_summary.to_dict()
+                for short_skill_summary in untriaged_short_skill_summaries
+            ],
+            'categorized_skills_dict': categorized_skills.to_dict()
         })
         self.render_json(self.values)
 
@@ -289,9 +306,9 @@ class NewTopicHandler(base.BaseHandler):
 
         try:
             topic_domain.Topic.require_valid_name(name)
-        except:
+        except Exception as e:
             raise self.InvalidInputException(
-                'Invalid topic name, received %s.' % name)
+                'Invalid topic name, received %s.' % name) from e
         new_topic_id = topic_fetchers.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, url_fragment, description)
@@ -351,9 +368,10 @@ class NewSkillHandler(base.BaseHandler):
             subtitled_html = (
                 state_domain.SubtitledHtml.from_dict(explanation_dict))
             subtitled_html.validate()
-        except:
+        except Exception as e:
             raise self.InvalidInputException(
-                'Explanation should be a valid SubtitledHtml dict.')
+                'Explanation should be a valid SubtitledHtml dict.'
+            ) from e
 
         rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()

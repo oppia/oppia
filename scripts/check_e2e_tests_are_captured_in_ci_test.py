@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 import re
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 from . import check_e2e_tests_are_captured_in_ci
@@ -76,7 +76,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
     def test_get_e2e_suite_names_from_protractor_file(self):
         def mock_read_protractor_conf_file():
-            protractor_config_file = python_utils.open_file(
+            protractor_config_file = utils.open_file(
                 os.path.join(
                     DUMMY_CONF_FILES, 'dummy_protractor.conf.js'), 'r').read()
             return protractor_config_file
@@ -192,7 +192,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
     def test_main_with_invalid_protractor_test_suite_length(self):
         def mock_read_protractor_conf_file():
-            protractor_config_file = python_utils.open_file(
+            protractor_config_file = utils.open_file(
                 os.path.join(
                     DUMMY_CONF_FILES, 'dummy_protractor.conf.js'), 'r').read()
             return protractor_config_file
@@ -249,7 +249,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             return ['oneword.js', 'twoWords.js']
 
         def mock_read_protractor_conf_file():
-            protractor_config_file = python_utils.open_file(
+            protractor_config_file = utils.open_file(
                 os.path.join(
                     DUMMY_CONF_FILES, 'dummy_protractor.conf.js'), 'r').read()
             return protractor_config_file

@@ -594,6 +594,9 @@ class StoryContents:
         Returns:
             StoryNode or None. The StoryNode object of the corresponding
             exploration id if exist else None.
+
+        Raises:
+            Exception. Unable to find the exploration in any node.
         """
         for node in self.nodes:
             if node.exploration_id == exp_id:
@@ -695,6 +698,31 @@ class Story:
         self.meta_tag_content = meta_tag_content
 
     @classmethod
+    def require_valid_description(cls, description):
+        """Checks whether the description is a valid string.
+
+        Args:
+            description: str. The description to be checked.
+
+        Raises:
+            ValidationError. The description is not a valid string.
+        """
+        if not isinstance(description, str):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % description)
+        if description == '':
+            raise utils.ValidationError(
+                'Expected description field not to be empty')
+
+        description_length_limit = (
+            android_validation_constants.MAX_CHARS_IN_STORY_DESCRIPTION)
+        if len(description) > description_length_limit:
+            raise utils.ValidationError(
+                'Expected description to be less than %d chars, received %s'
+                % (description_length_limit, len(description)))
+
+    @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
         """Checks whether the thumbnail filename of the story is a valid
             one.
@@ -726,11 +754,7 @@ class Story:
             ValidationError. One or more attributes of story are invalid.
         """
         self.require_valid_title(self.title)
-
-        if not isinstance(self.description, str):
-            raise utils.ValidationError(
-                'Expected description to be a string, received %s'
-                % self.description)
+        self.require_valid_description(self.description)
 
         if self.url_fragment is not None:
             utils.require_valid_url_fragment(
@@ -1127,6 +1151,9 @@ class Story:
         Args:
             new_thumbnail_filename: str|None. The new thumbnail filename of the
                 story.
+
+        Raises:
+            Exception. The subtopic with the given id doesn't exist.
         """
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
@@ -1315,6 +1342,7 @@ class Story:
 
         Raises:
             ValueError. The node is not part of the story.
+            Exception. The node with the given id doesn't exist.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:

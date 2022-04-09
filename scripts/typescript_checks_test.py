@@ -20,7 +20,7 @@ import json
 import os
 import subprocess
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 from . import typescript_checks
@@ -49,7 +49,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             typescript_checks.compile_and_check_typescript(
                 typescript_checks.TSCONFIG_FILEPATH)
             out_dir = ''
-            with python_utils.open_file(
+            with utils.open_file(
                 typescript_checks.TSCONFIG_FILEPATH, 'r') as f:
                 config_data = json.load(f)
                 out_dir = os.path.join(

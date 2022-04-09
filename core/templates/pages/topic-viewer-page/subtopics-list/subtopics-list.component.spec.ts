@@ -48,6 +48,13 @@ describe('Subtopics List Component', () => {
     component.topicUrlFragment = 'topic';
     component.topicName = 'Topic Name';
     component.topicId = 'topicId';
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+  });
+
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should create', () => {

@@ -50,16 +50,20 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   constructor(
     private alertsService: AlertsService,
     private contextService: ContextService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private urlService: UrlService,
-    private windowDimensionsService: WindowDimensionsService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   checkMobileView(): boolean {
     return (this.windowDimensionsService.getWidth() < 500);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnInit(): void {

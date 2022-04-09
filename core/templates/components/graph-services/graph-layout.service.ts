@@ -150,6 +150,7 @@ export class StateGraphLayoutService {
     indentLongestShortcut(0, trunkNodeIds.length - 1);
     return indentationLevels;
   }
+
   // Returns an object representing the nodes of the graph. The keys of the
   // object are the node labels. The corresponding values are objects with
   // the following keys:

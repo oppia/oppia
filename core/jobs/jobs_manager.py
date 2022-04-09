@@ -35,6 +35,10 @@ from apache_beam import runners
 from google.cloud import dataflow
 from typing import Iterator, Optional, Type
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
+
 datastore_services = models.Registry.import_datastore_services()
 
 # This is a mapping from the Google Cloud Dataflow JobState enum to our enum.
@@ -112,6 +116,9 @@ def run_job(
     Returns:
         BeamJobRun. Contains metadata related to the execution status of the
         job.
+
+    Raises:
+        RuntimeError. Failed to deploy given job to the Dataflow service.
     """
     if pipeline is None:
         pipeline = beam.Pipeline(
@@ -204,6 +211,9 @@ def cancel_job(beam_job_run_model: beam_job_models.BeamJobRunModel) -> None:
 
     Args:
         beam_job_run_model: BeamJobRunModel. The model to update.
+
+    Raises:
+        ValueError. The given model has no job ID.
     """
     job_id = beam_job_run_model.dataflow_job_id
     if job_id is None:

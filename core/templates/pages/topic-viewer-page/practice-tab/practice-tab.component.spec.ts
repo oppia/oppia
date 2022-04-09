@@ -46,6 +46,7 @@ class MockWindowRef {
       reload: (val: boolean) => val
     },
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -140,7 +141,7 @@ describe('Practice tab component', function() {
 
   it('should have start button disabled when the disable boolean is set',
     function() {
-      component.startButtonIsDisabled = true;
+      component.previewMode = true;
       expect(component.isStartButtonDisabled()).toBe(true);
     });
 

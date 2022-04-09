@@ -20,15 +20,34 @@ import inspect
 
 from extensions.objects.models import objects
 
+from typing import Dict, List, Type, Union, overload
+from typing_extensions import Literal
+
+TranslatableObjectNames = Literal[
+    'TranslatableHtml',
+    'TranslatableUnicodeString',
+    'TranslatableSetOfUnicodeString',
+    'TranslatableSetOfNormalizedString',
+]
+
+TranslatableObjectClasses = Union[
+    Type[objects.TranslatableHtml],
+    Type[objects.TranslatableUnicodeString],
+    Type[objects.TranslatableSetOfUnicodeString],
+    Type[objects.TranslatableSetOfNormalizedString],
+]
+
 
 class Registry:
     """Registry of all translatable objects."""
 
     # Dict mapping object class names to their classes.
-    _translatable_objects_dict = {}
+    _translatable_objects_dict: Dict[
+        TranslatableObjectNames, TranslatableObjectClasses
+    ] = {}
 
     @classmethod
-    def _refresh_registry(cls):
+    def _refresh_registry(cls) -> None:
         """Refreshes the registry by adding new translatable object classes
         to the registry.
         """
@@ -50,7 +69,7 @@ class Registry:
                 cls._translatable_objects_dict[clazz.__name__] = clazz
 
     @classmethod
-    def get_all_class_names(cls):
+    def get_all_class_names(cls) -> List[TranslatableObjectNames]:
         """Gets a list of all translatable object class names.
 
         Returns:
@@ -59,8 +78,34 @@ class Registry:
         cls._refresh_registry()
         return sorted(cls._translatable_objects_dict.keys())
 
+    @overload
     @classmethod
-    def get_object_class(cls, obj_type):
+    def get_object_class(
+        cls, obj_type: Literal['TranslatableHtml']
+    ) -> Type[objects.TranslatableHtml]: ...
+
+    @overload
+    @classmethod
+    def get_object_class(
+        cls, obj_type: Literal['TranslatableUnicodeString']
+    ) -> Type[objects.TranslatableUnicodeString]: ...
+
+    @overload
+    @classmethod
+    def get_object_class(
+        cls, obj_type: Literal['TranslatableSetOfUnicodeString']
+    ) -> Type[objects.TranslatableSetOfUnicodeString]: ...
+
+    @overload
+    @classmethod
+    def get_object_class(
+        cls, obj_type: Literal['TranslatableSetOfNormalizedString']
+    ) -> Type[objects.TranslatableSetOfNormalizedString]: ...
+
+    @classmethod
+    def get_object_class(
+        cls, obj_type: TranslatableObjectNames
+    ) -> TranslatableObjectClasses:
         """Gets a translatable object class by its type.
 
         Refreshes once if the class is not found; subsequently, throws an

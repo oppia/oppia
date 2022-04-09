@@ -98,7 +98,7 @@ def normalize_against_schema(
         *. The normalized object.
 
     Raises:
-        AssertionError. The object fails to validate against the schema.
+        Exception. The object fails to validate against the schema.
     """
     normalized_obj: Any = None
 
@@ -154,18 +154,18 @@ def normalize_against_schema(
             raise Exception('Expected float, received %s' % obj)
         try:
             obj = float(obj)
-        except Exception:
+        except Exception as e:
             raise Exception('Could not convert %s to float: %s' % (
-                type(obj).__name__, obj))
+                type(obj).__name__, obj)) from e
         assert isinstance(obj, numbers.Real), (
             'Expected float, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_INT:
         try:
             obj = int(obj)
-        except Exception:
+        except Exception as e:
             raise Exception('Could not convert %s to int: %s' % (
-                type(obj).__name__, obj))
+                type(obj).__name__, obj)) from e
         assert isinstance(obj, numbers.Integral), (
             'Expected int, received %s' % obj)
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
@@ -401,6 +401,9 @@ class _Validators:
         Returns:
             function. The validator method corresponding to the specified
             validator_id.
+
+        Raises:
+            Exception. Given validator method is invalid.
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)

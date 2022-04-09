@@ -12,9 +12,7 @@
           {{ choice.text }}
         </ng-container>
       </ng-container>
-      <mat-icon matChipRemove *ngIf="removable" class="px-2 w-auto">
-        {{ 'I18N_PREFERENCES_CANCEL_BUTTON' | translate }}
-      </mat-icon>
+      <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
     </mat-chip>
     <input placeholder="{{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_SELECT' | translate }}"
            #languageInput

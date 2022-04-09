@@ -293,8 +293,9 @@ class SkillDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.PageNotFoundException('Invalid skill id.')
+        except utils.ValidationError as e:
+            raise self.PageNotFoundException(
+                'Invalid skill id.') from e
         try:
             skills = skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:

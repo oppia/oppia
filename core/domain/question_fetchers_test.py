@@ -137,3 +137,36 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             'Sorry, we can only process v25-v%d state schemas at present.' %
             feconf.CURRENT_STATE_SCHEMA_VERSION):
             question_fetchers.get_question_from_model(question_model)
+
+    def test_get_question_from_model_with_current_valid_schema_version(self):
+        # Delete all question models.
+        all_question_models = question_models.QuestionModel.get_all()
+        question_models.QuestionModel.delete_multi(
+            [question_model.id for question_model in all_question_models],
+            feconf.SYSTEM_COMMITTER_ID, '', force_deletion=True)
+
+        all_question_models = question_models.QuestionModel.get_all()
+        self.assertEqual(all_question_models.count(), 0)
+
+        question_id = question_services.get_new_question_id()
+
+        question_model = question_models.QuestionModel(
+            id=question_id,
+            question_state_data=(
+                self._create_valid_question_data('ABC').to_dict()),
+            language_code='en',
+            version=0,
+            question_state_data_schema_version=48)
+
+        question_model.commit(
+            self.editor_id, 'question model created',
+            [{'cmd': question_domain.CMD_CREATE_NEW}])
+
+        all_question_models = question_models.QuestionModel.get_all()
+        self.assertEqual(all_question_models.count(), 1)
+        question_model = all_question_models.get()
+        updated_question_model = question_fetchers.get_question_from_model(
+            question_model)
+        self.assertEqual(
+            updated_question_model.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)

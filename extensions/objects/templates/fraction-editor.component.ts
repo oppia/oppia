@@ -31,12 +31,12 @@ import { FractionAnswer } from 'interactions/answer-defs';
 })
 export class FractionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: FractionAnswer;
   @Output() valueChanged = new EventEmitter();
-  errorMessage: string = '';
+  errorMessageI18nKey: string = '';
   fractionString: string = '0';
   currentFractionValueIsValid = false;
   eventBus: EventBusGroup;
@@ -54,7 +54,7 @@ export class FractionEditorComponent implements OnInit {
 
   validateFraction(newFraction: string): void {
     if (newFraction.length === 0) {
-      this.errorMessage = 'Please enter a non-empty fraction value.';
+      this.errorMessageI18nKey = 'I18N_INTERACTIONS_FRACTIONS_NON_EMPTY';
       this.currentFractionValueIsValid = false;
       return;
     }
@@ -64,11 +64,11 @@ export class FractionEditorComponent implements OnInit {
         this.value = Fraction.fromRawInputString(newFraction);
         this.valueChanged.emit(this.value);
       }
-      this.errorMessage = '';
+      this.errorMessageI18nKey = '';
       this.currentFractionValueIsValid = true;
     } catch (parsingError: unknown) {
       if (parsingError instanceof Error) {
-        this.errorMessage = parsingError.message;
+        this.errorMessageI18nKey = parsingError.message;
       }
       this.currentFractionValueIsValid = false;
     } finally {

@@ -28,6 +28,7 @@ import { PracticeSessionPageConstants } from
   'pages/practice-session-page/practice-session-page.constants';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'practice-tab',
@@ -36,11 +37,11 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class PracticeTabComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() topicName!: string;
   @Input() subtopicsList!: Subtopic[];
-  @Input() startButtonIsDisabled: boolean = false;
+  @Input() previewMode: boolean = false;
   @Input() displayArea: string = 'topicViewer';
   @Input() topicUrlFragment: string = '';
   @Input() classroomUrlFragment: string = '';
@@ -55,6 +56,7 @@ export class PracticeTabComponent implements OnInit {
   questionsStatusCallIsComplete: boolean = true;
 
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private questionBackendApiService: QuestionBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
@@ -82,7 +84,7 @@ export class PracticeTabComponent implements OnInit {
     this.selectedSubtopicIndices = Array(
       this.availableSubtopics.length).fill(false);
     this.clientWidth = window.innerWidth;
-    if (this.displayArea === 'topicViewer') {
+    if (this.displayArea === 'topicViewer' && !this.previewMode) {
       this.topicUrlFragment = (
         this.urlService.getTopicUrlFragmentFromLearnerUrl());
       this.classroomUrlFragment = (
@@ -90,8 +92,12 @@ export class PracticeTabComponent implements OnInit {
     }
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   isStartButtonDisabled(): boolean {
-    if (this.startButtonIsDisabled) {
+    if (this.previewMode) {
       return true;
     }
     for (var idx in this.selectedSubtopicIndices) {

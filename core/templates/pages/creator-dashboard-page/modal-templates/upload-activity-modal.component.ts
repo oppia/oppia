@@ -33,6 +33,7 @@ export class UploadActivityModalComponent {
      private alertsService: AlertsService,
      private activeModal: NgbActiveModal
   ) {}
+
   save(): void {
     let returnObj: ExplorationObj = {
       yamlFile: null

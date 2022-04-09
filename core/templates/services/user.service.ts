@@ -40,6 +40,7 @@ export class UserService {
   // enough rights to review translations, voiceover and questions.
   private userContributionRightsInfo:
     UserContributionRightsDataBackendDict | null = null;
+
   // This property will be null when the user is not logged in.
   private userInfo: UserInfo | null = null;
   private returnUrl = '';
@@ -105,6 +106,15 @@ export class UserService {
   async getUserPreferredDashboardAsync(): Promise<string> {
     return this.userBackendApiService.getPreferencesAsync().then((data) => {
       return data.default_dashboard;
+    });
+  }
+
+  async canUserAccessTopicsAndSkillsDashboard(): Promise<boolean> {
+    return this.getUserInfoAsync().then((userInfo) => {
+      return (
+        userInfo.isLoggedIn() &&
+        (userInfo.isCurriculumAdmin() || userInfo.isTopicManager())
+      );
     });
   }
 }

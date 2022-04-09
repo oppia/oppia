@@ -35,8 +35,7 @@ import { StoryNode } from 'domain/story/story-node.model';
 })
 export class StorySummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and component interactions, therefore we need to do non-null assertion,
-  // for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() classroomUrlFragment!: string;
   @Input() storySummary!: StorySummary;
@@ -62,11 +61,11 @@ export class StorySummaryTileComponent implements OnInit {
   EXPLORE_PAGE_PREFIX = '/explore/';
 
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private assetsBackendApiService: AssetsBackendApiService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
   checkTabletView(): boolean {
@@ -103,6 +102,10 @@ export class StorySummaryTileComponent implements OnInit {
 
   isChapterCompleted(title: string): boolean {
     return this.storySummary.isNodeCompleted(title);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   isPreviousChapterCompleted(index: number): boolean {

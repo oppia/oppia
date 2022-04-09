@@ -58,6 +58,7 @@ export class BrowserCheckerService {
   supportsSpeechSynthesis(): boolean {
     return this._supportsSpeechSynthesis();
   }
+
   isMobileDevice(): boolean {
     return this._isMobileDevice();
   }

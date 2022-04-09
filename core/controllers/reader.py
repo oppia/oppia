@@ -329,7 +329,7 @@ class PretestHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET request."""
-        story_url_fragment = self.request.get('story_url_fragment')
+        story_url_fragment = self.normalized_request.get('story_url_fragment')
         story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
         if story is None:
             raise self.InvalidInputException
@@ -1117,8 +1117,8 @@ class RecommendationsHandler(base.BaseHandler):
         try:
             author_recommended_exp_ids = json.loads(self.request.get(
                 'stringified_author_recommended_ids'))
-        except Exception:
-            raise self.PageNotFoundException
+        except Exception as e:
+            raise self.PageNotFoundException from e
 
         system_recommended_exp_ids = []
         next_exp_id = None

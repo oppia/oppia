@@ -260,7 +260,7 @@ def execute_branch_cut(target_version, hotfix_number):
 
     # Update the local repo.
     remote_alias = common.get_remote_alias(
-        constants.release_constants.REMOTE_URL)
+        constants.release_constants.REMOTE_URLS)
     subprocess.check_call(['git', 'pull', remote_alias, 'develop'])
 
     verify_target_branch_does_not_already_exist(remote_alias, new_branch_name)
@@ -296,6 +296,8 @@ def execute_branch_cut(target_version, hotfix_number):
             branch_to_cut_from = 'release-%s-hotfix-%s' % (
                 target_version, hotfix_number - 1)
         print('Cutting a new hotfix branch: %s' % new_branch_name)
+        subprocess.check_call(['git', 'checkout', branch_to_cut_from])
+        common.update_branch_with_upstream()
         subprocess.check_call([
             'git', 'checkout', '-b', new_branch_name, branch_to_cut_from])
     else:
