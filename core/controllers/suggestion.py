@@ -476,6 +476,65 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'suggestion_type': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'target_type': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'target_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'status': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'choices': constants.SKILL_STATUS_OPTIONS,
+                'default_value': None
+            },
+            'author_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'final_reviewer_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'score_category': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
+                'default_value': None
+            },
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
