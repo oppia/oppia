@@ -32,9 +32,9 @@ describe('Question update service', function() {
   let sampleQuestion = null;
   let sampleStateDict = null;
   let contentStateSampleQuestion = null;
-  let contentStateSampleStateDict = null;
-  let expectedContentOutputStateDict = null;
-  let expectedContentOutputState = null;
+  let contentStateSampleDict = null;
+  let expectedChangedContentOutputStateDict = null;
+  let expectedChangedContentOutputState = null;
   let expectedOutputStateDict = null;
   let expectedOutputState = null;
   let sampleQuestionBackendObject = null;
@@ -47,7 +47,7 @@ describe('Question update service', function() {
     questionUndoRedoService = TestBed.inject(UndoRedoService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
 
-    contentStateSampleStateDict = {
+    contentStateSampleDict = {
       name: 'question',
       classifier_model_id: 0,
       content: {
@@ -109,7 +109,7 @@ describe('Question update service', function() {
       }
     };
 
-    expectedContentOutputStateDict = {
+    expectedChangedContentOutputStateDict = {
       name: 'question',
       classifier_model_id: 0,
       content: {
@@ -324,12 +324,13 @@ describe('Question update service', function() {
     expectedOutputState = stateObjectFactory.createFromBackendDict(
       'question', expectedOutputStateDict);
 
-    expectedContentOutputState = stateObjectFactory.createFromBackendDict(
-      'question', expectedContentOutputStateDict);
+    expectedChangedContentOutputState = (
+      stateObjectFactory.createFromBackendDict(
+        'question', expectedChangedContentOutputStateDict));
 
     sampleContentQuestionBackendObject = {
       id: '0',
-      question_state_data: contentStateSampleStateDict,
+      question_state_data: contentStateSampleDict,
       language_code: 'en',
       version: 1
     };
@@ -380,7 +381,7 @@ describe('Question update service', function() {
     questionUpdateService.setQuestionStateData(
       contentStateSampleQuestion, updateFunction);
     expect(contentStateSampleQuestion.getStateData()).toEqual(
-      expectedContentOutputState);
+      expectedChangedContentOutputState);
     questionUndoRedoService.undoChange(contentStateSampleQuestion);
     expect(contentStateSampleQuestion.getStateData()).toEqual(oldStateData);
   });

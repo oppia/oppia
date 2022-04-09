@@ -49,7 +49,7 @@ export class QuestionUpdateService {
     );
   }
 
-  private applyChange(
+  private _applyChange(
       question: Question, command, params,
       apply: (
        backendChangeObject:
@@ -63,25 +63,25 @@ export class QuestionUpdateService {
     this.QuestionUndoRedoService.applyChange(changeObj, question);
   }
 
-  private applyPropertyChange(
+  private _applyPropertyChange(
       question: Question, propertyName, newValue, oldValue, apply, reverse
   ): void {
-    this.applyChange(question, this.CMD_UPDATE_QUESTION_PROPERTY, {
+    this._applyChange(question, this.CMD_UPDATE_QUESTION_PROPERTY, {
       property_name: propertyName,
       new_value: angular.copy(newValue),
       old_value: angular.copy(oldValue),
     }, apply, reverse);
   }
 
-  private getParameterFromChangeDict(changeDict, paramName) {
+  private _getParameterFromChangeDict(changeDict, paramName) {
     return changeDict[paramName];
   }
 
-  private getNewPropertyValueFromChangeDict(changeDict) {
-    return this.getParameterFromChangeDict(changeDict, 'new_value');
+  private _getNewPropertyValueFromChangeDict(changeDict) {
+    return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
-  private getAllContentIds(state) {
+  private _getAllContentIds(state) {
     let allContentIdsSet = new Set();
     allContentIdsSet.add(state.content.contentId);
     state.interaction.answerGroups.forEach((answerGroup) => {
@@ -115,19 +115,19 @@ export class QuestionUpdateService {
     return allContentIdsSet;
   }
 
-  private getElementsInFirstSetButNotInSecond(setA, setB) {
+  private _getElementsInFirstSetButNotInSecond(setA, setB) {
     let diffList = Array.from(setA).filter((element) => {
       return !setB.has(element);
     });
     return diffList;
   }
 
-  private updateContentIdsInAssets(newState, oldState) {
-    let newContentIds = this.getAllContentIds(newState);
-    let oldContentIds = this.getAllContentIds(oldState);
-    let contentIdsToDelete = this.getElementsInFirstSetButNotInSecond(
+  private _updateContentIdsInAssets(newState, oldState) {
+    let newContentIds = this._getAllContentIds(newState);
+    let oldContentIds = this._getAllContentIds(oldState);
+    let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
       oldContentIds, newContentIds);
-    let contentIdsToAdd = this.getElementsInFirstSetButNotInSecond(
+    let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
       newContentIds, oldContentIds);
     contentIdsToDelete.forEach((contentId) => {
       newState.recordedVoiceovers.deleteContentId(contentId);
@@ -142,11 +142,11 @@ export class QuestionUpdateService {
   public setQuestionLanguageCode(
       question: Question, newLanguageCode: string): void {
     let oldLanguageCode = angular.copy(question.getLanguageCode());
-    this.applyPropertyChange(
+    this._applyPropertyChange(
       question, this.QUESTION_PROPERTY_LANGUAGE_CODE,
       newLanguageCode, oldLanguageCode,
       (changeDict, question) => {
-        let languageCode = this.getNewPropertyValueFromChangeDict(changeDict);
+        let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
         question.setLanguageCode(languageCode);
       }, (changeDict, question) => {
         question.setLanguageCode(oldLanguageCode);
@@ -158,12 +158,12 @@ export class QuestionUpdateService {
       newInapplicableSkillMisconceptionIds: string[]): void {
     let oldInapplicableSkillMisconceptionIds = angular.copy(
       question.getInapplicableSkillMisconceptionIds());
-    this.applyPropertyChange(
+    this._applyPropertyChange(
       question, this.QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
       newInapplicableSkillMisconceptionIds,
       oldInapplicableSkillMisconceptionIds,
       (changeDict, question) => {
-        let languageCode = this.getNewPropertyValueFromChangeDict(changeDict);
+        let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
         question.setInapplicableSkillMisconceptionIds(languageCode);
       }, (changeDict, question) => {
         question.setInapplicableSkillMisconceptionIds(
@@ -190,8 +190,8 @@ export class QuestionUpdateService {
     // for creating the change to send to the backend.
     updateFunction();
     let newStateData = question.getStateData();
-    this.updateContentIdsInAssets(newStateData, oldStateData);
-    this.applyPropertyChange(
+    this._updateContentIdsInAssets(newStateData, oldStateData);
+    this._applyPropertyChange(
       question, this.QUESTION_PROPERTY_QUESTION_STATE_DATA,
       newStateData.toBackendDict(),
       oldStateData.toBackendDict(),
