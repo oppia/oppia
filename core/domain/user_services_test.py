@@ -1625,14 +1625,20 @@ title: Title
             })], 'Change state name'
         )
 
+        # This method is called when exploration data is fetched since now
+        # latest exploration version > most recently interacted exploration
+        # version.
+        # Working - First the furthest reached checkpoint ('Introduction' in
+        # this case) is searched in current exploration. It will not be found
+        # since its state name is changed to 'Intro'. It will then search for
+        # an checkpoint that had been reached in older exploration and also
+        # exists in current exploration. If such checkpoint is not found,
+        # furthest reached checkpoint is set to None. Similar workflow is
+        # carried out for most recently reached checkpoint.
+        user_services.sync_learner_checkpoint_progress_with_current_exp_version(
+            self.viewer_id, self.EXP_ID)
+
         # First checkpoint reached again.
-        # Working - First the furthest reached checkpoint
-        # ('Introduction' in this case) is searched in current exploration.
-        # It will not be found since its state name is changed to 'Intro'.
-        # It will then search for an checkpoint that had been reached in
-        # previous exploration and also exists in current exploration. If such
-        # checkpoint is not found, it will make the most recently reached
-        # checkpoint as the furthest reached checkpoint.
         user_services.update_learner_checkpoint_progress(
             self.viewer_id, self.EXP_ID, 'Intro', 4)
         exploration_user_data = exp_fetchers.get_exploration_user_data(
