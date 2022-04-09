@@ -81,7 +81,7 @@ class GetInvalidSkillMediumRubricsJob(base_jobs.JobBase):
             | 'Save info on invalid skills' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
                     'The id of the skill is %s'
-                    %(objects[0])))
+                    % (objects[0])))
         )
 
         return (
