@@ -329,7 +329,7 @@ class PretestHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET request."""
-        story_url_fragment = self.request.get('story_url_fragment')
+        story_url_fragment = self.normalized_request.get('story_url_fragment')
         story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
         if story is None:
             raise self.InvalidInputException
