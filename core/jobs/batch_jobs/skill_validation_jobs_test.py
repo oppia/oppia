@@ -41,14 +41,14 @@ class GetInvalidSkillMediumRubricsJobTests(
         self.valid_rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[1],
-                ['<p> Explanation Medium </p>'] * 3
+                ['<p> Explanation Medium </p>']
             )
         ]
 
         self.invalid_rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0],
-                ['<p> Explanation Easy </p>'] * 3
+                ['<p> Explanation Easy </p>']
             )
         ]
 
@@ -59,7 +59,7 @@ class GetInvalidSkillMediumRubricsJobTests(
             language_code='en',
             misconceptions=[],
             rubrics=[
-                rubric.to_dict() for rubric in self.invalid_rubrics
+                self.invalid_rubrics[0].to_dict()
             ],
             next_misconception_id=0,
             misconceptions_schema_version=2,
@@ -75,7 +75,7 @@ class GetInvalidSkillMediumRubricsJobTests(
             language_code='en',
             misconceptions=[],
             rubrics=[
-                rubric.to_dict() for rubric in self.valid_rubrics
+                self.valid_rubrics[0].to_dict()
             ],
             next_misconception_id=0,
             misconceptions_schema_version=2,
@@ -111,8 +111,5 @@ class GetInvalidSkillMediumRubricsJobTests(
             job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
                 'The id of the skill is %s'
-                % ('skill_id_1')),
-            job_run_result.JobRunResult.as_stderr(
-                'The id of the skill is %s'
-                % ('skill_id_2'))
+                % ('skill_id_1'))
         ])

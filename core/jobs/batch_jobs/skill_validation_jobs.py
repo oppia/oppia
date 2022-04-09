@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core.domain import exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -34,20 +33,19 @@ class GetInvalidSkillMediumRubricsJob(base_jobs.JobBase):
     """Job that returns skills which have no medium rubric explanation."""
 
     def filter_invalid_medium_rubrics_explanation(self, skill):
-        """Returns true if the medium rubrics explanation is not presebt.
-        
+        """Returns true if the medium rubrics explanation is not present.
+
         Args:
-            rubrics: JsonProperty. Skill rubrics explanations.
+            skill: SkillModel. Skill model.
 
         Returns:
-
+            bool. True if the medium rubrics explanation is not present.
         """
         rubrics = skill[1]
-        medium_rubrics_explanation = rubrics[1]['explanations']
-        if(len(medium_rubrics_explanation) == 0):
-            return True
-        else:
-            return False
+        for rubric in rubrics:
+            if rubric['difficulty'] == 'Medium':
+                medium_rubrics_explanation = rubric['explanations']
+                return len(medium_rubrics_explanation) == 0
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         total_skills = (
@@ -82,7 +80,7 @@ class GetInvalidSkillMediumRubricsJob(base_jobs.JobBase):
             skills_having_invalid_medium_rubrics_explanation
             | 'Save info on invalid skills' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The id of skill is %s'
+                    'The id of the skill is %s'
                     %(objects[0])))
         )
 
