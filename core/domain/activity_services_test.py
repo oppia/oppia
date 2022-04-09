@@ -71,9 +71,9 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         super(ActivityServicesTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)  # type: ignore[no-untyped-call]
         self.set_moderators([self.MODERATOR_USERNAME]) # type: ignore[no-untyped-call]
         self.owner = user_services.get_user_actions_info(self.owner_id) # type: ignore[no-untyped-call]
         self.moderator = user_services.get_user_actions_info(self.moderator_id) # type: ignore[no-untyped-call]

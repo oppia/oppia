@@ -2119,7 +2119,7 @@ title: Title
         for name in collection_editor_usernames:
             self.add_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
-    def get_user_id_from_email(self, email) -> str:
+    def get_user_id_from_email(self, email):
         """Gets the user ID corresponding to the given email.
 
         Args:

@@ -35,10 +35,10 @@ class ActivityRightsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(ActivityRightsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.owner = user_services.get_user_actions_info(self.owner_id) # type: ignore[no-untyped-call]
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
         self.viewer = user_services.get_user_actions_info(self.viewer_id) # type: ignore[no-untyped-call]
 
         self.exp_id = 'exp_id'
