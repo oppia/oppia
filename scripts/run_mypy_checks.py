@@ -18,15 +18,17 @@
 
 from __future__ import annotations
 
-
 import argparse
 import os
 import site
 import subprocess
 import sys
 
+
 from scripts import common
 from scripts import install_third_party_libs
+
+from typing import List, Optional, Sequence, Tuple
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
@@ -310,7 +312,9 @@ def install_third_party_libraries(skip_install: bool) -> None:
         install_third_party_libs.main()
 
 
-def get_mypy_cmd(files, mypy_exec_path, using_global_mypy):
+def get_mypy_cmd(
+    files: List[str], mypy_exec_path: str, using_global_mypy: bool
+) -> List[str]:
     """Return the appropriate command to be run.
 
     Args:
@@ -338,7 +342,7 @@ def get_mypy_cmd(files, mypy_exec_path, using_global_mypy):
     return cmd
 
 
-def install_mypy_prerequisites(install_globally):
+def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
     """Install mypy and type stubs from mypy_requirements.txt.
 
     Args:
@@ -372,8 +376,9 @@ def install_mypy_prerequisites(install_globally):
             cmd + uextention_text, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         new_process.communicate()
-        _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
-        mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
+        if site.USER_BASE:
+            _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
+            mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
         return (new_process.returncode, mypy_exec_path)
     else:
         _PATHS_TO_INSERT.append(os.path.join(MYPY_TOOLS_DIR, 'bin'))
@@ -381,7 +386,7 @@ def install_mypy_prerequisites(install_globally):
         return (process.returncode, mypy_exec_path)
 
 
-def main(args=None):
+def main(args: Optional[Sequence[str]] = None) -> int:
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)
 

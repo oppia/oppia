@@ -30,32 +30,39 @@ import sys
 
 from core.tests import test_utils
 
+from typing import Any, Dict, List, Tuple
+from typing_extensions import Literal
+
 
 class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
     """Tests import of install third party libs."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(InstallThirdPartyLibsImportTests, self).setUp()
-        self.commands = []
-        def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs): # pylint: disable=unused-argument
-            class Ret(test_utils.GenericTestBase):
-                """Return object that gives user-prefix error."""
+        self.commands: List[str] = []
+        class Ret(test_utils.GenericTestBase):
+            """Return object that gives user-prefix error."""
 
-                def __init__(self):  # pylint: disable=super-init-not-called
-                    self.returncode = 1
-                def communicate(self):
-                    """Return user-prefix error as stderr."""
-                    return b'', b'can\'t combine user with prefix'
+            def __init__(self) -> None:  # pylint: disable=super-init-not-called
+                self.returncode = 1
+            def communicate(self) -> Tuple[bytes, bytes]:
+                """Return user-prefix error as stderr."""
+                return b'', b'can\'t combine user with prefix'
+        def mock_popen_error_call(
+            unused_cmd_tokens: List[str], # pylint: disable=unused-argument
+            *args: Tuple[Any], # pylint: disable=unused-argument
+            **kwargs: Dict[str, Any] # pylint: disable=unused-argument
+        ) -> Ret:
             return Ret()
-        def mock_check_call(cmd_tokens):
+        def mock_check_call(cmd_tokens: List[str]) -> None:
             self.commands.extend(cmd_tokens)
         self.Popen_swap = self.swap(
             subprocess, 'Popen', mock_popen_error_call)
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call)
 
-    def test_import_with_missing_packages(self):
-        def mock_exists(unused_path):
+    def test_import_with_missing_packages(self) -> None:
+        def mock_exists(unused_path: str) -> Literal[False]:
             return False
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         with self.Popen_swap, self.check_call_swap, exists_swap:

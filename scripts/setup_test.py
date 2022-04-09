@@ -28,6 +28,9 @@ import urllib.request as urlrequest
 
 from core.tests import test_utils
 
+from typing import List
+from typing_extensions import Literal
+
 from . import clean
 from . import common
 from . import setup
@@ -41,20 +44,25 @@ MOCK_YARN_PATH = os.path.join(TEST_DATA_DIR, 'yarn-v' + common.YARN_VERSION)
 class MockCD:
     """Mock for context manager for changing the current working directory."""
 
-    def __init__(self, unused_new_path):
+    def __init__(self, unused_new_path: str) -> None:
         pass
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         pass
 
-    def __exit__(self, unused_arg1, unused_arg2, unused_arg3):
+    def __exit__(
+        self,
+        unused_arg1: str,
+        unused_arg2: str,
+        unused_arg3: str
+    ) -> None:
         pass
 
 
 class SetupTests(test_utils.GenericTestBase):
     """Test the methods for setup script."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(SetupTests, self).setUp()
         self.check_function_calls = {
             'create_directory_is_called': False,
@@ -64,28 +72,35 @@ class SetupTests(test_utils.GenericTestBase):
             'rename_is_called': False,
             'delete_file_is_called': False
         }
-        self.urls = []
-        def mock_create_directory(unused_path):
+        self.urls: List[str] = []
+        def mock_create_directory(unused_path: str) -> None:
             self.check_function_calls['create_directory_is_called'] = True
-        def mock_test_python_version():
+        def mock_test_python_version() -> None:
             self.check_function_calls['test_python_version_is_called'] = True
-        def mock_download_and_install_package(url, unused_filename):
+        def mock_download_and_install_package(
+            url: str,
+            unused_filename: str
+        ) -> None:
             self.urls.append(url)
-        def mock_exists(unused_path):
+        def mock_exists(unused_path: str) -> Literal[True]:
             return True
-        def mock_recursive_chown(unused_path, unused_uid, unused_gid):
+        def mock_recursive_chown(
+            unused_path: str,
+            unused_uid: int,
+            unused_gid: int
+        ) -> None:
             self.check_function_calls['recursive_chown_is_called'] = True
-        def mock_recursive_chmod(unused_path, unused_mode):
+        def mock_recursive_chmod(unused_path: str, unused_mode: int) -> None:
             self.check_function_calls['recursive_chmod_is_called'] = True
-        def mock_uname():
+        def mock_uname() -> List[str]:
             return ['Linux']
-        def mock_rename(unused_path1, unused_path2):
+        def mock_rename(unused_path1: str, unused_path2: str) -> None:
             self.check_function_calls['rename_is_called'] = True
-        def mock_isfile(unused_path):
+        def mock_isfile(unused_path: str) -> Literal[True]:
             return True
-        def mock_delete_file(unused_path):
+        def mock_delete_file(unused_path: str) -> None:
             self.check_function_calls['delete_file_is_called'] = True
-        def mock_get(unused_var):
+        def mock_get(unused_var: str) -> None:
             return None
 
         self.create_swap = self.swap(
@@ -123,13 +138,13 @@ class SetupTests(test_utils.GenericTestBase):
             )]
         )
 
-    def test_create_directory_tree_with_missing_dir(self):
+    def test_create_directory_tree_with_missing_dir(self) -> None:
         check_function_calls = {
             'makedirs_is_called': False
         }
-        def mock_makedirs(unused_path):
+        def mock_makedirs(unused_path: str) -> None:
             check_function_calls['makedirs_is_called'] = True
-        def mock_exists(unused_path):
+        def mock_exists(unused_path: str) -> Literal[False]:
             return False
         makedirs_swap = self.swap(os, 'makedirs', mock_makedirs)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -137,13 +152,13 @@ class SetupTests(test_utils.GenericTestBase):
             setup.create_directory('dir')
         self.assertTrue(check_function_calls['makedirs_is_called'])
 
-    def test_create_directory_tree_with_existing_dir(self):
+    def test_create_directory_tree_with_existing_dir(self) -> None:
         check_function_calls = {
             'makedirs_is_called': False
         }
-        def mock_makedirs(unused_path):
+        def mock_makedirs(unused_path: str) -> None:
             check_function_calls['makedirs_is_called'] = True
-        def mock_exists(unused_path):
+        def mock_exists(unused_path: str) -> Literal[True]:
             return True
         makedirs_swap = self.swap(os, 'makedirs', mock_makedirs)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -151,15 +166,19 @@ class SetupTests(test_utils.GenericTestBase):
             setup.create_directory('dir')
         self.assertFalse(check_function_calls['makedirs_is_called'])
 
-    def test_python_version_testing_with_correct_version(self):
+    def test_python_version_testing_with_correct_version(self) -> None:
         with self.version_info_py37_swap:
             setup.test_python_version()
 
-    def test_python_version_testing_with_incorrect_version_and_linux_os(self):
+    def test_python_version_testing_with_incorrect_version_and_linux_os(
+        self
+    ) -> None:
         print_arr = []
-        def mock_print(msg_list):
+
+        def mock_print(msg_list: List[str]) -> None:
             print_arr.extend(msg_list)
-        def mock_uname():
+
+        def mock_uname() -> List[str]:
             return ['Linux']
         print_swap = self.swap(
             common, 'print_each_string_after_two_new_lines', mock_print)
@@ -168,14 +187,17 @@ class SetupTests(test_utils.GenericTestBase):
             'version_info', ['major', 'minor'])
         version_swap = self.swap(
             sys, 'version_info', version_info(major=3, minor=4))
-        with print_swap, uname_swap, version_swap, self.assertRaisesRegex(
+        with print_swap, uname_swap, version_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'No suitable python version found.'):
             setup.test_python_version()
         self.assertEqual(print_arr, [])
 
-    def test_python_version_testing_with_incorrect_version_and_windows_os(self):
+    def test_python_version_testing_with_incorrect_version_and_windows_os(
+        self
+    ) -> None:
         print_arr = []
-        def mock_print(msg_list):
+
+        def mock_print(msg_list: List[str]) -> None:
             print_arr.extend(msg_list)
         print_swap = self.swap(
             common, 'print_each_string_after_two_new_lines', mock_print)
@@ -185,7 +207,7 @@ class SetupTests(test_utils.GenericTestBase):
         version_swap = self.swap(
             sys, 'version_info', version_info(major=3, minor=4))
         with print_swap, os_name_swap, version_swap:
-            with self.assertRaisesRegex(
+            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 Exception, 'No suitable python version found.'):
                 setup.test_python_version()
         self.assertEqual(
@@ -201,14 +223,14 @@ class SetupTests(test_utils.GenericTestBase):
                 'https://stackoverflow.com/questions/3701646/how-to-add-to-the-'
                 'pythonpath-in-windows-7'])
 
-    def test_python_version_testing_with_python2_wrong_code(self):
+    def test_python_version_testing_with_python2_wrong_code(self) -> None:
         check_call_swap = self.swap_to_always_return(subprocess, 'call', 1)
 
         with self.python2_print_swap, self.version_info_py37_swap:
-            with check_call_swap, self.assertRaisesRegex(SystemExit, '1'):
+            with check_call_swap, self.assertRaisesRegex(SystemExit, '1'):  # type: ignore[no-untyped-call]
                 setup.test_python_version()
 
-    def test_download_and_install_package(self):
+    def test_download_and_install_package(self) -> None:
         check_function_calls = {
             'url_retrieve_is_called': False,
             'open_is_called': False,
@@ -223,17 +245,17 @@ class SetupTests(test_utils.GenericTestBase):
             'close_is_called': True,
             'remove_is_called': True
         }
-        def mock_url_retrieve(unused_url, filename):  # pylint: disable=unused-argument
+        def mock_url_retrieve(unused_url: str, filename: str) -> None:  # pylint: disable=unused-argument
             check_function_calls['url_retrieve_is_called'] = True
         temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
-        def mock_open(name):  # pylint: disable=unused-argument
+        def mock_open(name: str) -> tarfile.TarFile:  # pylint: disable=unused-argument
             check_function_calls['open_is_called'] = True
             return temp_file
-        def mock_extractall(unused_self, path):  # pylint: disable=unused-argument
+        def mock_extractall(unused_self: str, path: str) -> None:  # pylint: disable=unused-argument
             check_function_calls['extractall_is_called'] = True
-        def mock_close(unused_self):
+        def mock_close(unused_self: str) -> None:
             check_function_calls['close_is_called'] = True
-        def mock_remove(unused_path):
+        def mock_remove(unused_path: str) -> None:
             check_function_calls['remove_is_called'] = True
 
         url_retrieve_swap = self.swap(
@@ -248,7 +270,7 @@ class SetupTests(test_utils.GenericTestBase):
                 setup.download_and_install_package('url', 'filename')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_rename_yarn_folder(self):
+    def test_rename_yarn_folder(self) -> None:
         # Creates a dummy yarn folder and then checks if `v` was removed
         # upon function call.
         os.mkdir(MOCK_YARN_PATH)
@@ -258,17 +280,17 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertTrue(os.path.exists(target))
         os.rmdir(target)
 
-    def test_invalid_dir(self):
-        def mock_getcwd():
+    def test_invalid_dir(self) -> None:
+        def mock_getcwd() -> str:
             return 'invalid'
         print_arr = []
-        def mock_print(msg):
+        def mock_print(msg: str) -> None:
             print_arr.append(msg)
 
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         print_swap = self.swap(builtins, 'print', mock_print)
         with self.test_py_swap, getcwd_swap, print_swap:
-            with self.assertRaisesRegex(Exception, 'Invalid root directory.'):
+            with self.assertRaisesRegex(Exception, 'Invalid root directory.'):  # type: ignore[no-untyped-call]
                 setup.main(args=[])
         self.assertFalse(
             'WARNING   This script should be run from the oppia/ '
@@ -276,11 +298,11 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertTrue(
             self.check_function_calls['test_python_version_is_called'])
 
-    def test_package_install_with_darwin_x64(self):
-        def mock_exists(unused_path):
+    def test_package_install_with_darwin_x64(self) -> None:
+        def mock_exists(unused_path: str) -> Literal[False]:
             return False
 
-        def mock_is_x64():
+        def mock_is_x64() -> Literal[True]:
             return True
         os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
         architecture_swap = self.swap(
@@ -302,16 +324,16 @@ class SetupTests(test_utils.GenericTestBase):
                 'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
 
-    def test_package_install_with_darwin_x86(self):
-        def mock_exists(unused_path):
+    def test_package_install_with_darwin_x86(self) -> None:
+        def mock_exists(unused_path: str) -> Literal[False]:
             return False
-        def mock_is_x64():
+        def mock_is_x64() -> Literal[False]:
             return False
         os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
         architecture_swap = self.swap(
             common, 'is_x64_architecture', mock_is_x64)
         all_cmd_tokens = []
-        def mock_check_call(cmd_tokens):
+        def mock_check_call(cmd_tokens: List[str]) -> None:
             all_cmd_tokens.extend(cmd_tokens)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
@@ -332,10 +354,10 @@ class SetupTests(test_utils.GenericTestBase):
                     common.YARN_VERSION, common.YARN_VERSION)])
         self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
-    def test_package_install_with_linux_x64(self):
-        def mock_exists(unused_path):
+    def test_package_install_with_linux_x64(self) -> None:
+        def mock_exists(unused_path: str) -> Literal[False]:
             return False
-        def mock_is_x64():
+        def mock_is_x64() -> Literal[True]:
             return True
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
         architecture_swap = self.swap(
@@ -358,16 +380,16 @@ class SetupTests(test_utils.GenericTestBase):
                 'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
 
-    def test_package_install_with_linux_x86(self):
-        def mock_exists(unused_path):
+    def test_package_install_with_linux_x86(self) -> None:
+        def mock_exists(unused_path: str) -> Literal[False]:
             return False
-        def mock_is_x64():
+        def mock_is_x64() -> Literal[False]:
             return False
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
         architecture_swap = self.swap(
             common, 'is_x64_architecture', mock_is_x64)
         all_cmd_tokens = []
-        def mock_check_call(cmd_tokens):
+        def mock_check_call(cmd_tokens: List[str]) -> None:
             all_cmd_tokens.extend(cmd_tokens)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
@@ -388,17 +410,19 @@ class SetupTests(test_utils.GenericTestBase):
                     common.YARN_VERSION, common.YARN_VERSION)])
         self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
-    def test_package_install_with_windows_x86(self):
-        def mock_exists(unused_path):
+    def test_package_install_with_windows_x86(self) -> None:
+        def mock_exists(unused_path: str) -> Literal[False]:
             return False
 
-        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
+        def mock_url_retrieve(url: str, filename: str) -> None: # pylint: disable=unused-argument
             self.urls.append(url)
 
-        def mock_check_call(commands):
-            mock_check_call.commands = commands
+        def mock_check_call(commands: List[str]) -> None:
+            # Here commands attribute is defined but still mypy is unable to
+            # detect this. Thus, added an ignore.
+            mock_check_call.commands = commands  # type: ignore[attr-defined]
 
-        def mock_is_x64():
+        def mock_is_x64() -> Literal[False]:
             return False
         os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
         architecture_swap = self.swap(
@@ -418,8 +442,10 @@ class SetupTests(test_utils.GenericTestBase):
         del check_function_calls['recursive_chmod_is_called']
         for _, item in check_function_calls.items():
             self.assertTrue(item)
+        # Here commands attribute is defined but still mypy is unable to detect
+        # this. Thus, added an ignore.
         self.assertEqual(
-            mock_check_call.commands,
+            mock_check_call.commands,  # type: ignore[attr-defined]
             ['powershell.exe', '-c', 'expand-archive',
              'node-download', '-DestinationPath',
              common.OPPIA_TOOLS_DIR])
@@ -431,17 +457,19 @@ class SetupTests(test_utils.GenericTestBase):
                 'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
 
-    def test_package_install_with_windows_x64(self):
-        def mock_exists(unused_path):
+    def test_package_install_with_windows_x64(self) -> None:
+        def mock_exists(unused_path: str) -> Literal[False]:
             return False
 
-        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
+        def mock_url_retrieve(url: str, filename: str) -> None: # pylint: disable=unused-argument
             self.urls.append(url)
 
-        def mock_check_call(commands):
-            mock_check_call.commands = commands
+        def mock_check_call(commands: List[str]) -> None:
+            # Here commands attribute is defined but still mypy is unable to
+            # detect this. Thus, added an ignore.
+            mock_check_call.commands = commands  # type: ignore[attr-defined]
 
-        def mock_is_x64():
+        def mock_is_x64() -> Literal[True]:
             return True
 
         os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
@@ -462,8 +490,10 @@ class SetupTests(test_utils.GenericTestBase):
         del check_function_calls['recursive_chmod_is_called']
         for _, item in check_function_calls.items():
             self.assertTrue(item)
+        # Here commands attribute is defined but still mypy is unable to detect
+        # this. Thus, added an ignore.
         self.assertEqual(
-            mock_check_call.commands,
+            mock_check_call.commands,  # type: ignore[attr-defined]
             ['powershell.exe', '-c', 'expand-archive',
              'node-download', '-DestinationPath',
              common.OPPIA_TOOLS_DIR])
@@ -475,8 +505,8 @@ class SetupTests(test_utils.GenericTestBase):
                 'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
 
-    def test_chrome_bin_setup_with_google_chrome(self):
-        def mock_isfile(path):
+    def test_chrome_bin_setup_with_google_chrome(self) -> None:
+        def mock_isfile(path: str) -> bool:
             return path == '/usr/bin/google-chrome'
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         with self.test_py_swap, self.create_swap, self.uname_swap:
@@ -485,8 +515,8 @@ class SetupTests(test_utils.GenericTestBase):
                     setup.main(args=[])
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/google-chrome')
 
-    def test_chrome_bin_setup_with_brave_browser(self):
-        def mock_isfile(path):
+    def test_chrome_bin_setup_with_brave_browser(self) -> None:
+        def mock_isfile(path: str) -> bool:
             return path == '/usr/bin/brave'
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         with self.test_py_swap, self.create_swap, self.uname_swap:
@@ -495,8 +525,8 @@ class SetupTests(test_utils.GenericTestBase):
                     setup.main(args=[])
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/brave')
 
-    def test_chrome_bin_setup_with_chromium_browser(self):
-        def mock_isfile(path):
+    def test_chrome_bin_setup_with_chromium_browser(self) -> None:
+        def mock_isfile(path: str) -> bool:
             return path == '/usr/bin/chromium-browser'
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         with self.test_py_swap, self.create_swap, self.uname_swap:
@@ -505,8 +535,8 @@ class SetupTests(test_utils.GenericTestBase):
                     setup.main(args=[])
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/chromium-browser')
 
-    def test_chrome_bin_setup_with_chromium_browser_arch(self):
-        def mock_isfile(path):
+    def test_chrome_bin_setup_with_chromium_browser_arch(self) -> None:
+        def mock_isfile(path: str) -> bool:
             return path == '/usr/bin/chromium'
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         with self.test_py_swap, self.create_swap, self.uname_swap:
@@ -515,8 +545,8 @@ class SetupTests(test_utils.GenericTestBase):
                     setup.main(args=[])
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/chromium')
 
-    def test_chrome_bin_setup_with_chrome_exe_c_files(self):
-        def mock_isfile(path):
+    def test_chrome_bin_setup_with_chrome_exe_c_files(self) -> None:
+        def mock_isfile(path: str) -> bool:
             return (
                 path == (
                     '/c/Program Files (x86)/Google/Chrome/'
@@ -530,8 +560,8 @@ class SetupTests(test_utils.GenericTestBase):
             os.environ['CHROME_BIN'],
             '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
 
-    def test_chrome_bin_setup_with_windows_chrome(self):
-        def mock_isfile(path):
+    def test_chrome_bin_setup_with_windows_chrome(self) -> None:
+        def mock_isfile(path: str) -> bool:
             return path == (
                 'c:\\Program Files (x86)\\Google\\Chrome\\' +
                 'Application\\Chrome.exe')
@@ -544,8 +574,8 @@ class SetupTests(test_utils.GenericTestBase):
             os.environ['CHROME_BIN'],
             'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe')
 
-    def test_chrome_bin_setup_with_chrome_exe_mnt_files(self):
-        def mock_isfile(path):
+    def test_chrome_bin_setup_with_chrome_exe_mnt_files(self) -> None:
+        def mock_isfile(path: str) -> bool:
             return (
                 path == (
                     '/mnt/c/Program Files (x86)/Google/Chrome/'
@@ -559,8 +589,8 @@ class SetupTests(test_utils.GenericTestBase):
             os.environ['CHROME_BIN'],
             '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
 
-    def test_chrome_bin_setup_with_mac_google_chrome(self):
-        def mock_isfile(path):
+    def test_chrome_bin_setup_with_mac_google_chrome(self) -> None:
+        def mock_isfile(path: str) -> bool:
             return (
                 path == (
                     '/Applications/Google Chrome.app/Contents/MacOS/'
@@ -574,18 +604,18 @@ class SetupTests(test_utils.GenericTestBase):
             os.environ['CHROME_BIN'],
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
 
-    def test_chrome_bin_setup_with_error(self):
-        def mock_isfile(unused_path):
+    def test_chrome_bin_setup_with_error(self) -> None:
+        def mock_isfile(unused_path: str) -> Literal[False]:
             return False
         print_arr = []
-        def mock_print(msg):
+        def mock_print(msg: str) -> None:
             print_arr.append(msg)
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         print_swap = self.swap(builtins, 'print', mock_print)
 
         with self.test_py_swap, self.create_swap, self.uname_swap:
             with self.exists_swap, self.chown_swap, self.chmod_swap, print_swap:
-                with isfile_swap, self.get_swap, self.assertRaisesRegex(
+                with isfile_swap, self.get_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                     Exception, 'Chrome not found.'):
                     setup.main(args=[])
         self.assertTrue('Chrome is not found, stopping ...' in print_arr)

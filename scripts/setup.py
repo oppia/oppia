@@ -23,6 +23,8 @@ import sys
 import tarfile
 import urllib.request as urlrequest
 
+from typing import Optional, Sequence
+
 from . import clean
 from . import common
 
@@ -32,7 +34,7 @@ Python execution environent set up for all scripts.
 """)
 
 
-def create_directory(directory_path):
+def create_directory(directory_path: str) -> None:
     """Creates a new directory. Does not do anything if directory already
     exists.
 
@@ -47,14 +49,14 @@ def create_directory(directory_path):
 # This function takes a command for python as its only input.
 # It checks this input for a specific version of python and returns false
 # if it does not match the expected prefix.
-def test_python_version():
+def test_python_version() -> None:
     running_python_version = '{0[0]}.{0[1]}'.format(sys.version_info)
     if running_python_version != '3.7':
         print('Please use Python 3.7. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
-        if common.is_windows_os():
-            common.print_each_string_after_two_new_lines([
+        if common.is_windows_os():  # type: ignore[no-untyped-call]
+            common.print_each_string_after_two_new_lines([  # type: ignore[no-untyped-call]
                 'It looks like you are using Windows. If you have Python '
                 'installed,',
                 'make sure it is in your PATH and that PYTHONPATH is set.',
@@ -86,7 +88,7 @@ def test_python_version():
         sys.exit(1)
 
 
-def download_and_install_package(url_to_retrieve, filename):
+def download_and_install_package(url_to_retrieve: str, filename: str) -> None:
     """Downloads and installs package in Oppia tools directory.
 
     Args:
@@ -102,7 +104,7 @@ def download_and_install_package(url_to_retrieve, filename):
     os.remove(filename)
 
 
-def rename_yarn_folder(filename, path):
+def rename_yarn_folder(filename: str, path: str) -> None:
     """Removes the `v` from the yarn folder name.
 
     Args:
@@ -115,12 +117,12 @@ def rename_yarn_folder(filename, path):
         os.rename(path + '/' + old_name, path + '/' + new_name)
 
 
-def download_and_install_node():
+def download_and_install_node() -> None:
     """Download and install node to Oppia tools directory."""
     outfile_name = 'node-download'
 
-    if common.is_windows_os():
-        if common.is_x64_architecture():
+    if common.is_windows_os():  # type: ignore[no-untyped-call]
+        if common.is_x64_architecture():  # type: ignore[no-untyped-call]
             architecture = 'x64'
         else:
             architecture = 'x86'
@@ -137,10 +139,10 @@ def download_and_install_node():
              common.OPPIA_TOOLS_DIR])
     else:
         extension = '.tar.gz'
-        if common.is_x64_architecture():
-            if common.is_mac_os():
+        if common.is_x64_architecture():  # type: ignore[no-untyped-call]
+            if common.is_mac_os():  # type: ignore[no-untyped-call]
                 node_file_name = 'node-v%s-darwin-x64' % (common.NODE_VERSION)
-            elif common.is_linux_os():
+            elif common.is_linux_os():  # type: ignore[no-untyped-call]
                 node_file_name = 'node-v%s-linux-x64' % (common.NODE_VERSION)
         else:
             node_file_name = 'node-v%s' % common.NODE_VERSION
@@ -152,12 +154,12 @@ def download_and_install_node():
         os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
         common.NODE_PATH)
     if node_file_name == 'node-v%s' % common.NODE_VERSION:
-        with common.CD(common.NODE_PATH):
+        with common.CD(common.NODE_PATH):  # type: ignore[no-untyped-call]
             subprocess.check_call(['./configure'])
             subprocess.check_call(['make'])
 
 
-def main(args=None):
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the script to setup Oppia."""
     unused_parsed_args = _PARSER.parse_args(args=args)
     test_python_version()
@@ -177,13 +179,13 @@ def main(args=None):
     # as $PYTHONPATH).
     create_directory(common.OPPIA_TOOLS_DIR)
     create_directory(common.THIRD_PARTY_DIR)
-    common.create_readme(
+    common.create_readme(  # type: ignore[no-untyped-call]
         common.THIRD_PARTY_DIR,
         'This folder contains third party libraries used in Oppia codebase.\n'
         'You can regenerate this folder by deleting it and then running '
         'the start.py script.\n')
     create_directory(common.NODE_MODULES_PATH)
-    common.create_readme(
+    common.create_readme(  # type: ignore[no-untyped-call]
         common.NODE_MODULES_PATH,
         'This folder contains node utilities used in Oppia codebase.\n'
         'You can regenerate this folder by deleting it and then running '
@@ -196,16 +198,16 @@ def main(args=None):
         download_and_install_node()
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
-    if not common.is_windows_os():
-        common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
-        common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
+    if not common.is_windows_os():  # type: ignore[no-untyped-call]
+        common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)  # type: ignore[no-untyped-call]
+        common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)  # type: ignore[no-untyped-call]
 
     # Download and install yarn.
     print('Checking if yarn is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.YARN_PATH):
         print('Removing package-lock.json')
         clean.delete_file('package-lock.json')
-        common.print_each_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([  # type: ignore[no-untyped-call]
             'Installing yarn',
             'WARNING: Please note that Oppia uses Yarn to manage node packages',
             'do *NOT* use npm. For more information on how to use yarn,',
