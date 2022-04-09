@@ -34,8 +34,6 @@ from core.domain import subtopic_page_domain
 from typing import List, Optional
 from typing_extensions import TypedDict
 
-from core.domain import fs_services # pylint: disable=invalid-import-from # isort:skip
-
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
 CMD_REMOVE_MANAGER_ROLE = feconf.CMD_REMOVE_MANAGER_ROLE
@@ -1172,31 +1170,6 @@ class Topic:
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, '')
 
     @classmethod
-    def _convert_subtopic_v3_dict_to_v4_dict(
-        cls, topic_id: str, subtopic_dict: SubtopicDict
-    ) -> SubtopicDict:
-        """Converts old Subtopic schema to the modern v4 schema. v4 schema
-        introduces the thumbnail_size_in_bytes field.
-
-        Args:
-            topic_id: str. The id of the topic to which the subtopic is linked
-                to.
-            subtopic_dict: dict. A dict used to initialize a Subtopic domain
-                object.
-
-        Returns:
-            dict. The converted subtopic_dict.
-        """
-        fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
-            feconf.ENTITY_TYPE_TOPIC, topic_id)
-        filepath = '%s/%s' % (
-            constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
-        subtopic_dict['thumbnail_size_in_bytes'] = (
-            len(fs.get(filepath)) if fs.isfile(filepath) else None)  # type: ignore[no-untyped-call]
-
-        return subtopic_dict
-
-    @classmethod
     def _convert_subtopic_v2_dict_to_v3_dict(
         cls, subtopic_dict: SubtopicDict
     ) -> SubtopicDict:
@@ -1334,31 +1307,18 @@ class Topic:
         """
         self.url_fragment = new_url_fragment
 
-    def update_thumbnail_filename(
-        self, new_thumbnail_filename: Optional[str]
+    def update_thumbnail_filename_and_size(
+        self, new_thumbnail_filename: str, new_thumbnail_size: int
     ) -> None:
         """Updates the thumbnail filename and file size of a topic object.
 
         Args:
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the topic.
-
-        Raises:
-            Exception. The thumbnail does not exist for expected topic in
-                the filesystem.
+            new_thumbnail_size: int. The updated thumbnail file size.
         """
-        fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
-            feconf.ENTITY_TYPE_TOPIC, self.id)
-
-        filepath = '%s/%s' % (
-            constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
-        if fs.isfile(filepath):  # type: ignore[no-untyped-call]
-            self.thumbnail_filename = new_thumbnail_filename
-            self.thumbnail_size_in_bytes = len(fs.get(filepath))  # type: ignore[no-untyped-call]
-        else:
-            raise Exception(
-                'The thumbnail %s for topic with id %s does not exist'
-                ' in the filesystem.' % (new_thumbnail_filename, self.id))
+        self.thumbnail_filename = new_thumbnail_filename
+        self.thumbnail_size_in_bytes = new_thumbnail_size
 
     def update_thumbnail_bg_color(
         self, new_thumbnail_bg_color: Optional[str]
@@ -1543,34 +1503,29 @@ class Topic:
         subtopic_index = self.get_subtopic_index(subtopic_id)
         self.subtopics[subtopic_index].title = new_title
 
-    def update_subtopic_thumbnail_filename(
-        self, subtopic_id: int, new_thumbnail_filename: str
+    def update_subtopic_thumbnail_filename_and_size(
+        self,
+        subtopic_id: int,
+        new_thumbnail_filename: str,
+        new_thumbnail_size: int
     ) -> None:
-        """Updates the thumbnail filename property of the new subtopic.
+        """Updates the thumbnail filename and file size property
+         of the new subtopic.
 
         Args:
             subtopic_id: int. The id of the subtopic to edit.
             new_thumbnail_filename: str. The new thumbnail filename for the
                 subtopic.
+            new_thumbnail_size: int. The updated thumbnail file size.
 
         Raises:
             Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
-
-        fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
-            feconf.ENTITY_TYPE_TOPIC, self.id)
-        filepath = '%s/%s' % (
-            constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
-        if fs.isfile(filepath):  # type: ignore[no-untyped-call]
-            self.subtopics[subtopic_index].thumbnail_filename = (
+        self.subtopics[subtopic_index].thumbnail_filename = (
                 new_thumbnail_filename)
-            self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
-                len(fs.get(filepath)))  # type: ignore[no-untyped-call]
-        else:
-            raise Exception(
-                'The thumbnail %s for subtopic with topic_id %s does not exist'
-                ' in the filesystem.' % (new_thumbnail_filename, self.id))
+        self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
+                new_thumbnail_size)  # type: ignore[no-untyped-call]
 
     def update_subtopic_url_fragment(
         self, subtopic_id: int, new_url_fragment: str
