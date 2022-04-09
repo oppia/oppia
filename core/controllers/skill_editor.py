@@ -285,7 +285,7 @@ class SkillDataHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'comma_separated_skill_ids': {
             'schema': {
-                'type': '',
+                'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.ENTITY_ID_REGEX
