@@ -34,6 +34,8 @@ from core.domain import subtopic_page_domain
 from typing import List, Optional
 from typing_extensions import TypedDict
 
+from core.domain import fs_services # pylint: disable=invalid-import-from # isort:skip
+
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
 CMD_REMOVE_MANAGER_ROLE = feconf.CMD_REMOVE_MANAGER_ROLE
@@ -1168,6 +1170,31 @@ class Topic:
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, '')
+
+    @classmethod
+    def _convert_subtopic_v3_dict_to_v4_dict(
+        cls, topic_id: str, subtopic_dict: SubtopicDict
+    ) -> SubtopicDict:
+        """Converts old Subtopic schema to the modern v4 schema. v4 schema
+        introduces the thumbnail_size_in_bytes field.
+
+        Args:
+            topic_id: str. The id of the topic to which the subtopic is linked
+                to.
+            subtopic_dict: dict. A dict used to initialize a Subtopic domain
+                object.
+
+        Returns:
+            dict. The converted subtopic_dict.
+        """
+        fs = fs_services.GcsFileSystem( # type: ignore[no-untyped-call]
+            feconf.ENTITY_TYPE_TOPIC, topic_id)
+        filepath = '%s/%s' % (
+            constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
+        subtopic_dict['thumbnail_size_in_bytes'] = (
+            len(fs.get(filepath)) if fs.isfile(filepath) else None)  # type: ignore[no-untyped-call]
+
+        return subtopic_dict
 
     @classmethod
     def _convert_subtopic_v2_dict_to_v3_dict(
