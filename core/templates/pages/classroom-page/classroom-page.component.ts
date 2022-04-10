@@ -83,14 +83,10 @@ export class ClassroomPageComponent implements OnDestroy {
         this.classroomNameTranslationKey = this.i18nLanguageCodeService.
           getClassroomTranslationKey(this.classroomDisplayName);
         this.setPageTitle();
+        this.subscribeToOnLangChange();
         this.loaderService.hideLoadingScreen();
         this.classroomBackendApiService.onInitializeTranslation.emit();
         this.siteAnalyticsService.registerClassroomPageViewed();
-        this.directiveSubscriptions.add(
-          this.translateService.onLangChange.subscribe(() => {
-            this.setPageTitle();
-          })
-        );
       }, (errorResponse) => {
         if (AppConstants.FATAL_ERROR_CODES.indexOf(
           errorResponse.status) !== -1) {
@@ -103,6 +99,14 @@ export class ClassroomPageComponent implements OnDestroy {
         null, 'classroom', AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT);
       this.ngOnInit();
     });
+  }
+
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
   }
 
   setPageTitle(): void {
