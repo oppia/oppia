@@ -1187,8 +1187,7 @@ class Topic:
         Returns:
             dict. The converted subtopic_dict.
         """
-        fs = fs_services.GcsFileSystem( # type: ignore[no-untyped-call]
-            feconf.ENTITY_TYPE_TOPIC, topic_id)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id) # type: ignore[no-untyped-call]
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
         subtopic_dict['thumbnail_size_in_bytes'] = (
@@ -1334,7 +1333,7 @@ class Topic:
         """
         self.url_fragment = new_url_fragment
 
-    def update_thumbnail_filename_and_size(
+    def update_thumbnail_filename(
         self, new_thumbnail_filename: str, new_thumbnail_size: int
     ) -> None:
         """Updates the thumbnail filename and file size of a topic object.
@@ -1530,7 +1529,7 @@ class Topic:
         subtopic_index = self.get_subtopic_index(subtopic_id)
         self.subtopics[subtopic_index].title = new_title
 
-    def update_subtopic_thumbnail_filename_and_size(
+    def update_subtopic_thumbnail_filename(
         self,
         subtopic_id: int,
         new_thumbnail_filename: str,
