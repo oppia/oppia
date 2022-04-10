@@ -42,10 +42,10 @@ PREREQUISITES = (
     ('pyyaml', '6.0', os.path.join(TOOLS_DIR, 'pyyaml-6.0')),
     ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
     ('six', '1.16.0', os.path.join('third_party', 'python_libs')),
-    ('certifi', '2021.10.8', os.path.join(
-        TOOLS_DIR, 'certifi-2021.10.8')),
+    ('certifi', '2021.10.8', os.path.join(TOOLS_DIR, 'certifi-2021.10.8')),
     ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs'))
 )
+
 
 def install_prerequisite(package: Tuple[str]) -> None:
     """Install prerequisite Python package.
@@ -59,7 +59,7 @@ def install_prerequisite(package: Tuple[str]) -> None:
     package_name, version_number, target_path = package
     command_text = [sys.executable, '-m', 'pip', 'install', '%s==%s'
         % (package_name, version_number), '--target', target_path]
-    uextention_text = ['--user', '--prefix=']
+    uextention_text = ['--user', '--prefix=', '--system']
     current_process = subprocess.Popen(
         command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output_stderr = current_process.communicate()[1]  # pylint: disable=invalid-name
@@ -67,8 +67,9 @@ def install_prerequisite(package: Tuple[str]) -> None:
         try:
             subprocess.check_call(command_text + uextention_text)
         except subprocess.CalledProcessError as e:
-            raise Exception('Error installing prerequisite %s' %
-                package_name) from e
+            raise Exception(
+                'Error installing prerequisite %s' % package_name) from e
+
 
 for prerequisite in PREREQUISITES:
     install_prerequisite(prerequisite)
@@ -105,6 +106,7 @@ PROTO_FILES_PATHS = [
     os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
 # Path to typescript plugin required to compile ts compatible files from proto.
 PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
+
 
 def tweak_yarn_executable():
     """When yarn is run on Windows, the file yarn will be executed by default.
