@@ -123,7 +123,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
         # Update thumbnail properties.
-        topic.update_thumbnail_filename('test_svg.svg')
+        topic_services.update_thumbnail_filename(topic, 'test_svg.svg')
         topic.update_thumbnail_bg_color('#C6DCDA')
 
         # Add other structures to the topic.
@@ -132,7 +132,8 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.add_subtopic(1, 'Test Subtopic Title')
 
         # Update and validate subtopic.
-        topic.update_subtopic_thumbnail_filename(1, 'test_svg.svg')
+        topic_services.update_subtopic_thumbnail_filename(
+            topic, 1, 'test_svg.svg')
         topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
         topic.update_subtopic_url_fragment(1, 'suburl')
         topic.move_skill_id_to_subtopic(None, 1, skill_id)
