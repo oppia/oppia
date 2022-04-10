@@ -1333,7 +1333,7 @@ class Topic:
         """
         self.url_fragment = new_url_fragment
 
-    def update_thumbnail_filename(
+    def update_thumbnail_filename_and_size(
         self, new_thumbnail_filename: str, new_thumbnail_size: int
     ) -> None:
         """Updates the thumbnail filename and file size of a topic object.
@@ -1529,7 +1529,7 @@ class Topic:
         subtopic_index = self.get_subtopic_index(subtopic_id)
         self.subtopics[subtopic_index].title = new_title
 
-    def update_subtopic_thumbnail_filename(
+    def update_subtopic_thumbnail_filename_and_size(
         self,
         subtopic_id: int,
         new_thumbnail_filename: str,
