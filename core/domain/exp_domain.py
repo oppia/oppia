@@ -41,6 +41,7 @@ from core.domain import html_cleaner  # pylint: disable=invalid-import-from # is
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
+
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
