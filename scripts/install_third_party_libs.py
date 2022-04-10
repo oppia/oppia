@@ -49,9 +49,6 @@ for package_name, version_number, target_path in PREREQUISITES:
     if b'can\'t combine user with prefix' in output_stderr:
         subprocess.check_call(command_text + uextention_text)
 
-_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _THIRD_PARTY_PATH)
-
 from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
