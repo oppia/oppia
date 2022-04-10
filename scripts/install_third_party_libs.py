@@ -24,6 +24,7 @@ import subprocess
 import sys
 import urllib.request as urlrequest
 import zipfile
+from typing import Tuple
 
 from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
@@ -46,33 +47,31 @@ PREREQUISITES = (
     ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs'))
 )
 
-def install_prerequisites(prerequisites):
-    """Install prerequisites.
+def install_prerequisite(package: Tuple[str]) -> None:
+    """Install prerequisite Python package.
 
     Args:
-        prerequisites: tuple. Group of arguments to pip install.
+        package: tuple. The args to provide to pip install.
 
     Raises:
-        Exception. If any of the packages fail to install.
+        Exception. If the package fails to install due to issues with --prefix.
     """
-    for package_name, version_number, target_path in prerequisites:
-        command_text = [
-            sys.executable, '-m', 'pip', 'install', '%s==%s'
-            % (package_name, version_number), '--target', target_path]
-        #uextention_text = ['--user', '--prefix=', '--system']
-        uextention_text = ['--user', '--prefix=']
-        current_process = subprocess.Popen(
-            command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output_stderr = current_process.communicate()[1]  # pylint: disable=invalid-name
-        if b'can\'t combine user with prefix' in output_stderr:
-            try:
-                #return subprocess.check_call(command_text + uextention_text)
-                subprocess.check_call(command_text + uextention_text)
-            except subprocess.CalledProcessError as e:
-                raise Exception('Error installing prerequisite %s' %
-                    package_name) from e
+    package_name, version_number, target_path = package
+    command_text = [sys.executable, '-m', 'pip', 'install', '%s==%s'
+        % (package_name, version_number), '--target', target_path]
+    uextention_text = ['--user', '--prefix=']
+    current_process = subprocess.Popen(
+        command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output_stderr = current_process.communicate()[1]  # pylint: disable=invalid-name
+    if b'can\'t combine user with prefix' in output_stderr:
+        try:
+            subprocess.check_call(command_text + uextention_text)
+        except subprocess.CalledProcessError as e:
+            raise Exception('Error installing prerequisite %s' %
+                package_name) from e
 
-install_prerequisites(PREREQUISITES)
+for prerequisite in PREREQUISITES:
+    install_prerequisite(prerequisite)
 
 _PARSER = argparse.ArgumentParser(
     description="""
