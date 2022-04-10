@@ -306,6 +306,14 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
       'I18N_COLLECTION_PLAYER_PAGE_TITLE', {
@@ -348,11 +356,7 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
         // manually, and the onLangChange subscription is added after
         // the collection is loaded.
         this.setPageTitle();
-        this.directiveSubscriptions.add(
-          this.translateService.onLangChange.subscribe(() => {
-            this.setPageTitle();
-          })
-        );
+        this.subscribeToOnLangChange();
 
         // Load the user's current progress in the collection. If the
         // user is a guest, then either the defaults from the server

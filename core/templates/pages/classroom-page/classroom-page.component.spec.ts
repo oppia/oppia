@@ -225,6 +225,7 @@ describe('Classroom Page Component', () => {
 
   it('should unsubscribe on component destruction', () => {
     component.subscribeToOnLangChange();
+    expect(component.directiveSubscriptions.closed).toBe(false);
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.closed).toBe(true);
