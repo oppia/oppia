@@ -174,11 +174,12 @@ def get_redirect_route(
     Warning: this method strips off parameters after the trailing slash. URLs
     with parameters should be formulated without the trailing slash.
 
-     Args:
+    Args:
         regex_route: A raw string representing a route.
         handler: A callable to handle the route.
         defaults: Optional defaults parameter to be passed
             into the RedirectRoute object.
+
     Returns:
         A RedirectRoute object for redirects.
     """
@@ -999,6 +1000,7 @@ class NdbWsgiMiddleware:
 
     def __init__(self, wsgi_app: webapp2.WSGIApplication) -> None:
         """Wraps the WSGI application into the NDB client context.
+
         Args:
             wsgi_app: A WSGIApplication.
         """
@@ -1015,6 +1017,7 @@ class NdbWsgiMiddleware:
         Args:
             environ: A dictionary of eniroment variable.
             start_response: A webapp2's response.
+
         Returns:
             A modified version of webapp2's response.
         """
