@@ -188,7 +188,6 @@
         "scripts.run_e2e_tests_test",
         "scripts.install_chrome_for_ci_test",
         "scripts.run_mypy_checks_test",
-        "scripts.linters.pylint_extensions_test",
         "core.domain.html_cleaner_test",
         "core.platform.taskqueue.dev_mode_taskqueue_services_test",
         "scripts.create_topological_sort_of_all_services_test",

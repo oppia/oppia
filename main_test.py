@@ -75,11 +75,11 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             """Mock WSGI app.
 
             Args:
-                environ: dict. Environment variables.
-                response: webtest.TestResponse. Response to return.
+                environ: Environment variables.
+                response: Response to return.
 
             Returns:
-                webtest.TestResponse. Response.
+                Response.
             """
             self.assertEqual(environ, {'key': 'value'})
             self.assertEqual(type(response), webtest.TestResponse)
@@ -91,10 +91,10 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             """Mock the NDB context.
 
             Args:
-                global_cache: RedisCache. Cache used by the NDB.
+                global_cache: Cache used by the NDB.
 
             Returns:
-                ContextManager. Context manager that does nothing.
+                Context manager that does nothing.
             """
             self.assertEqual(type(global_cache), datastore_services.RedisCache)
             return contextlib.nullcontext()

@@ -174,14 +174,13 @@ def get_redirect_route(
     Warning: this method strips off parameters after the trailing slash. URLs
     with parameters should be formulated without the trailing slash.
 
-    Args:
-        regex_route: unicode. A raw string representing a route.
-        handler: BaseHandler. A callable to handle the route.
-        defaults: dict. Optional defaults parameter to be passed
+     Args:
+        regex_route: A raw string representing a route.
+        handler: A callable to handle the route.
+        defaults: Optional defaults parameter to be passed
             into the RedirectRoute object.
-
     Returns:
-        RedirectRoute. A RedirectRoute object for redirects.
+        A RedirectRoute object for redirects.
     """
     if defaults is None:
         defaults = {}
@@ -999,6 +998,10 @@ class NdbWsgiMiddleware:
     """Wraps the WSGI application into the NDB client context."""
 
     def __init__(self, wsgi_app: webapp2.WSGIApplication) -> None:
+        """Wraps the WSGI application into the NDB client context.
+        Args:
+            wsgi_app: A WSGIApplication.
+        """
         self.wsgi_app = wsgi_app
 
     def __call__(
@@ -1006,6 +1009,15 @@ class NdbWsgiMiddleware:
         environ: Dict[str, str],
         start_response: webapp2.Response
     ) -> webapp2.Response:
+        """This function is invoked whenever NdbWsgiMiddleware's object
+        is called.
+
+        Args:
+            environ: A dictionary of eniroment variable.
+            start_response: A webapp2's response.
+        Returns:
+            A modified version of webapp2's response.
+        """
         global_cache = datastore_services.RedisCache(
             cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]
         with datastore_services.get_ndb_context(global_cache=global_cache):
