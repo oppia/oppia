@@ -152,7 +152,6 @@ describe('Opportunities List Item Component', () => {
 
   describe('when opportunity is not provided', () => {
     beforeEach(() => {
-      component.opportunity = undefined;
       component.opportunityType = '';
       component.clickActionButton.emit =
         () => jasmine.createSpy('click', () => {});

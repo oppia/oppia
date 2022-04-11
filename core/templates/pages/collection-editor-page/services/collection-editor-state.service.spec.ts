@@ -279,12 +279,12 @@ describe('Collection editor state service', () => {
       let savedChanges = collectionEditorStateService.saveCollection(
         'Commit message');
       tick();
-      expect(savedChanges).toBe(false);
+      expect(savedChanges).toBeFalse();
     }));
 
   it('should check whether a collection is being saved', () => {
     let result = collectionEditorStateService.isSavingCollection();
 
-    expect(result).toBe(false);
+    expect(result).toBeFalse();
   });
 });

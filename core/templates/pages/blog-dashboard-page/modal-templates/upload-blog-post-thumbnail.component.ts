@@ -36,9 +36,9 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   uploadedImage!: SafeResourceUrl | null;
   croppedFilename!: string;
   cropper!: Cropper;
-  windowIsNarrow: boolean = false;
   @ViewChild('croppableImage') croppableImageRef!: ElementRef;
   invalidTagsAndAttributes!: { tags: string[]; attrs: string[] };
+  windowIsNarrow: boolean = false;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
