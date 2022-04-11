@@ -67,7 +67,7 @@ BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 class ParamNames(enum.Enum):
     """Enum for parameter names."""
 
-    TEST_FEATURE_1 = 'TEST_FEATURE_1'
+    TEST_FEATURE_1 = 'test_feature_1'
 
 
 FeatureStages = platform_parameter_domain.FeatureStages
@@ -476,7 +476,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, feature.name)])
+            [getattr(ParamNames, ParamNames.TEST_FEATURE_1.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -509,7 +509,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, feature.name)])
+            [getattr(ParamNames, ParamNames.TEST_FEATURE_1.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -553,7 +553,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, feature.name)])
+            [getattr(ParamNames, ParamNames.TEST_FEATURE_1.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -598,7 +598,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, feature.name)])
+            [getattr(ParamNames, ParamNames.TEST_FEATURE_1.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -766,7 +766,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, feature.name)])
+            [getattr(ParamNames, ParamNames.TEST_FEATURE_1.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
