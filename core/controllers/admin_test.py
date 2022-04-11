@@ -646,7 +646,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             response = self.post_json(
                 '/adminhandler', {
                     'action': 'update_feature_flag_rules',
-                    'feature_name': 'TEST_FEATURE_1',
+                    'feature_name': 'test_feature_1',
                     'new_rules': new_rule_dicts,
                     'commit_message': 'test update feature',
                 },
@@ -655,7 +655,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             )
             self.assertEqual(
                 response['error'],
-                'Unknown feature flag: TEST_FEATURE_1.')
+                'Unknown feature flag: test_feature_1.')
 
         self.logout()
 
