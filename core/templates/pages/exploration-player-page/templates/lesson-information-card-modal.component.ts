@@ -17,9 +17,11 @@
  */
 
 import { Component } from '@angular/core';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from
+  'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { EditableExplorationBackendApiService } from
+  'domain/exploration/editable-exploration-backend-api.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
@@ -63,13 +65,13 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
 
   constructor(
-    private ngbModal: NgbModal,
     private ngbActiveModal: NgbActiveModal,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private windowRef: WindowRef,
-    private eebas: EditableExplorationBackendApiService,
+    private editableExplorationBackendApiService:
+      EditableExplorationBackendApiService
   ) {
     super(ngbActiveModal);
   }
@@ -121,14 +123,12 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   }
 
   restartExploration(): void {
-    this.eebas.resetExplorationProgressAsync(
+    this.editableExplorationBackendApiService.resetExplorationProgressAsync(
       this.explorationId
     ).then(() => {
       // Required for the put operation to deliver data to backend.
-    });
-    setTimeout(() => {
       this.windowRef.nativeWindow.location.reload();
-    }, 2000);
+    });
   }
 
   isHackyStoryTitleTranslationDisplayed(): boolean {
