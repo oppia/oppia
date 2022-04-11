@@ -58,7 +58,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
-import { State, StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { State } from 'domain/state/StateObjectFactory';
 import { InteractionRulesService } from '../services/answer-classification.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -192,8 +192,7 @@ export class ConversationSkinComponent {
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
     private eebas: EditableExplorationBackendApiService,
-    private roebas: ReadOnlyExplorationBackendApiService,
-    private stateObjectFactory: StateObjectFactory,
+    private roebas: ReadOnlyExplorationBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -612,41 +611,43 @@ export class ConversationSkinComponent {
     this.roebas.loadLatestExplorationAsync(this.explorationId).then(
       response => {
         states = response.exploration.states;
-        // this.mostRecentlyReachedCheckpoint = (
-        //   response.exploration.most_recently_reached_checkpoint_state_name
-        // );
-        this.mostRecentlyReachedCheckpoint = "test2";
-        this.previousSessionStatesProgress = (
-          this.explorationEngineService.getShortestPathToState(
-            states, this.mostRecentlyReachedCheckpoint
-          )
+        this.mostRecentlyReachedCheckpoint = (
+          response.most_recently_reached_checkpoint_state_name
         );
-        let indexToRedirectTo = 0;
-        for (let i = 0; i < this.previousSessionStatesProgress.length; i++) {
 
-          let stateName = this.previousSessionStatesProgress[i];
-          // Skip the card if it has already been added to transcript
-          if (!this.playerTranscriptService.hasEncounteredStateBefore(
-            stateName)
-          ) {
-            let stateCard = (
-              this.explorationEngineService.getStateCardByName(stateName)
-            );
-            this._addNewCard(stateCard);
+        if (this.mostRecentlyReachedCheckpoint) {
+          this.previousSessionStatesProgress = (
+            this.explorationEngineService.getShortestPathToState(
+              states, this.mostRecentlyReachedCheckpoint
+            )
+          );
+          let indexToRedirectTo = 0;
+          for (let i = 0; i < this.previousSessionStatesProgress.length; i++) {
+  
+            let stateName = this.previousSessionStatesProgress[i];
+            // Skip the card if it has already been added to transcript
+            if (!this.playerTranscriptService.hasEncounteredStateBefore(
+              stateName)
+            ) {
+              let stateCard = (
+                this.explorationEngineService.getStateCardByName(stateName)
+              );
+              this._addNewCard(stateCard);
+            }
+  
+            if (this.mostRecentlyReachedCheckpoint === stateName) break;
+  
+            this.visitedStateNames.push(stateName)
+            indexToRedirectTo += 1;
           }
-
-          if (this.mostRecentlyReachedCheckpoint === stateName) break;
-
-          this.visitedStateNames.push(stateName)
-          indexToRedirectTo += 1;
+  
+          // Remove the last card from progress as it is not completed
+          // yet and is only most recently reached
+          this.previousSessionStatesProgress.pop();
+  
+          // Move to most recently reached checkpoint card
+          this.changeCard(indexToRedirectTo);
         }
-
-        // Remove the last card from progress as it is not completed
-        // yet and is only most recently reached
-        this.previousSessionStatesProgress.pop();
-
-        // Move to most recently reached checkpoint card
-        this.changeCard(indexToRedirectTo);
       }
     );
   }
