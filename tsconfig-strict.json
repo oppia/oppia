@@ -363,8 +363,6 @@
     "core/templates/pages/blog-dashboard-page/blog-dashboard-page.constants.ts",
     "core/templates/pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component.ts",
     "core/templates/pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component.spec.ts",
-    "core/templates/pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component.ts",
-    "core/templates/pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component.spec.ts",
     "core/templates/pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component.ts",
     "core/templates/pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component.spec.ts",
     "core/templates/pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component.ts",

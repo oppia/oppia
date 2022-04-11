@@ -31,7 +31,7 @@ import { LoggerService } from 'services/contextual/logger.service';
   providedIn: 'root'
 })
 export class TranslationTopicService {
-  // This property is initialized using Angular lifecycle hooks
+  // This property is initialized using async methods
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private activeTopicName!: string;

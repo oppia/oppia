@@ -52,9 +52,6 @@ describe('Delete account page', () => {
   it('should open a delete account modal',
     fakeAsync(() => {
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        if (opt?.beforeDismiss !== undefined) {
-          setTimeout(opt.beforeDismiss);
-        }
         return ({
           result: Promise.resolve('success')
         }) as NgbModalRef;
@@ -65,9 +62,6 @@ describe('Delete account page', () => {
 
   it('should do nothing when cancel button is clicked', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      if (opt?.beforeDismiss !== undefined) {
-        setTimeout(opt.beforeDismiss);
-      }
       return ({
         result: Promise.reject('cancel')
       }) as NgbModalRef;
