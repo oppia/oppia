@@ -37,7 +37,6 @@ from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
-
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
