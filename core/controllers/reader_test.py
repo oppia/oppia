@@ -183,10 +183,14 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
 
 
 class ExplorationHandlerTest(test_utils.GenericTestBase):
-    """Test the handler for providing the initial data for a single exploration."""
+    """Test the handler for providing the initial data
+    for a single exploration.
+    """
 
     def test_error_if_exploration_is_none(self):
-        """Test that a missing exploration raises a page not found exception"""
+        """Test that a missing exploration raises
+        a page not found exception.
+        """
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -194,11 +198,12 @@ class ExplorationHandlerTest(test_utils.GenericTestBase):
         exp_services.delete_demo(exp_id)
         exp_services.load_demo(exp_id)
 
-        def _mock_none_function(*args, **kwargs):
+        def _mock_none_function(*_, **__):
             """Mocks None."""
             return None
 
-        with self.swap(exp_fetchers, 'get_exploration_by_id', _mock_none_function):
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id', _mock_none_function):
             self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id),
                 expected_status_int=404)
