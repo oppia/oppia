@@ -125,5 +125,8 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_constants_can_be_set(self) -> None:
         """Test __setattr__ to see if constants can be set as needed."""
-        with self.swap(constants.constants, "TESTING_CONSTANT", "constants_test value"):
-            self.assertEqual(constants.constants.TESTING_CONSTANT, "constants_test value")
+        with self.swap(constants.constants,
+                       'TESTING_CONSTANT',
+                       'constants_test value'):
+            self.assertEqual(constants.constants.TESTING_CONSTANT,
+                             'constants_test value')
