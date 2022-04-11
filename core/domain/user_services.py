@@ -2396,7 +2396,10 @@ def update_learner_checkpoint_progress(
             exp_fetchers.get_exploration_by_id(
                 exploration_id,
                 strict=True,
-                version=exploration_user_model.furthest_reached_checkpoint_exp_version
+                version=(
+                    exploration_user_model
+                        .furthest_reached_checkpoint_exp_version
+                )
             )
         )
         checkpoints_in_current_exploration = _get_checkpoints_in_order(
