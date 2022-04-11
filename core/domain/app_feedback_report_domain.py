@@ -318,7 +318,7 @@ class AppFeedbackReport:
     @classmethod
     def get_report_type_from_string(
         cls, report_type_name: str
-    ) -> app_feedback_report_constants.REPORT_TYPE:
+    ) -> app_feedback_report_constants.ReportType:
         """Determines the report type based on the JSON value.
 
         Args:
@@ -432,7 +432,7 @@ class UserSuppliedFeedback:
 
     def __init__(
         self,
-        report_type: app_feedback_report_constants.REPORT_TYPE,
+        report_type: app_feedback_report_constants.ReportType,
         category: app_feedback_report_constants.CATEGORY,
         user_feedback_selected_items: List[str],
         user_feedback_other_text_input: str
@@ -440,7 +440,7 @@ class UserSuppliedFeedback:
         """Constructs a UserSuppliedFeedback domain object.
 
         Args:
-            report_type: REPORT_TYPE. The type of feedback submitted by the user
+            report_type: ReportType. The type of feedback submitted by the user
                 as an enum.
             category: CATEGORY. The category enum that this specific report_type
                 is providing feedback on that correponds.
@@ -492,12 +492,12 @@ class UserSuppliedFeedback:
 
     @classmethod
     def require_valid_report_type(
-        cls, report_type: app_feedback_report_constants.REPORT_TYPE
+        cls, report_type: app_feedback_report_constants.ReportType
     ) -> None:
         """Checks whether the report_type is valid.
 
         Args:
-            report_type: REPORT_TYPE. The report type enum to validate.
+            report_type: ReportType. The report type enum to validate.
 
         Raises:
             ValidationError. No report_type supplied.
