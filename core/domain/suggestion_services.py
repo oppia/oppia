@@ -642,38 +642,23 @@ def get_reviewable_translation_suggestions_by_offset(
 
 
 def get_reviewable_translation_suggestion_target_ids(user_id):
-    """Returns a list of translation suggestions matching the
-     passed opportunity IDs which the user can review.
+    """Returns the target IDs of translation suggestions for which the supplied
+    user can review.
 
     Args:
         user_id: str. The ID of the user.
-        opportunity_summary_exp_ids: list(str) or None.
-            The list of exploration IDs for which suggestions
-            are fetched. If the list is empty, no suggestions are
-            fetched. If the value is None, all reviewable
-            suggestions are fetched. If the list consists of some
-            valid number of ids, suggestions corresponding to the
-            IDs are fetched.
-        limit: int. The maximum number of results to return.
-        offset: int. The number of results to skip from the beginning of all
-            results matching the query.
 
     Returns:
-        Tuple of (results, next_offset). Where:
-            results: list(Suggestion). A list of translation suggestions
-            which the supplied user is permitted to review.
-            next_offset: int. The input offset + the number of results returned
-                by the current query.
+        list(str). A list of target IDs of the translation suggestions that the
+            supplied user can review.
     """
     contribution_rights = user_services.get_user_contribution_rights(
         user_id)
     language_codes = (
         contribution_rights.can_review_translation_for_language_codes)
-
     in_review_translation_suggestions = (
         suggestion_models.GeneralSuggestionModel
         .get_in_review_translation_suggestions(user_id, language_codes))
-
     translation_suggestions = ([
         get_suggestion_from_model(s)
         for s in in_review_translation_suggestions

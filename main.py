@@ -283,7 +283,7 @@ URLS = [
         r'%s/<opportunity_type>' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
         contributor_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
-        r'/getreviewableopportunitieshandler',
+        r'%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
         contributor_dashboard.ReviewableOpportunitiesHandler),
     get_redirect_route(
         r'/gettranslatabletexthandler',

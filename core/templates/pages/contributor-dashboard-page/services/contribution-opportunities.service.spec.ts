@@ -220,6 +220,35 @@ describe('Contribution Opportunities Service', () => {
     expect(successHandler).toHaveBeenCalledWith(translationOpportunitiesDict);
   }));
 
+  it('should return reviewable translation opportunities when calling ' +
+    '\'getReviewableTranslationOpportunitiesAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    let translationOpportunitiesDict: ExplorationOpportunitiesDict = {
+      opportunities: sampleTranslationOpportunitiesResponse,
+      more: false
+    };
+
+    let getReviewableTranslationOpportunitiesSpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'fetchReviewableTranslationOpportunitiesAsync')
+      .and.returnValue(Promise.resolve(
+        {
+          opportunities: sampleTranslationOpportunitiesResponse,
+          more: false
+        }
+      ));
+
+    contributionOpportunitiesService
+      .getReviewableTranslationOpportunitiesAsync('Topic')
+      .then(successHandler, failHandler);
+    tick();
+
+    expect(getReviewableTranslationOpportunitiesSpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(translationOpportunitiesDict);
+  }));
+
   it('should return all topic names when calling \'getAllTopicNamesAsync\'',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');

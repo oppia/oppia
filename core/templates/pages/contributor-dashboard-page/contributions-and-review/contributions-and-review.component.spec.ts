@@ -22,6 +22,7 @@ import { fakeAsync, tick } from '@angular/core/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
+import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
@@ -89,6 +90,40 @@ describe('Contributions and review component', function() {
         .and.returnValue($q.resolve({
           can_review_translation_for_language_codes: [{}],
           can_review_questions: true
+        }));
+      spyOn(
+        contributionOpportunitiesService,
+        'getReviewableTranslationOpportunitiesAsync').and.returnValue(
+        Promise.resolve({
+          opportunities: [
+            ExplorationOpportunitySummary.createFromBackendDict({
+              id: '1',
+              topic_name: 'Topic 1',
+              story_title: 'Story 1',
+              chapter_title: 'Chapter 1',
+              content_count: 1,
+              translation_counts: {
+                en: 2
+              },
+              translation_in_review_counts: {
+                en: 2
+              }
+            }),
+            ExplorationOpportunitySummary.createFromBackendDict({
+              id: '2',
+              topic_name: 'Topic 2',
+              story_title: 'Story 2',
+              chapter_title: 'Chapter 2',
+              content_count: 2,
+              translation_counts: {
+                en: 4
+              },
+              translation_in_review_counts: {
+                en: 4
+              }
+            })
+          ],
+          more: false
         }));
       spyOn(
         contributionAndReviewService,
@@ -253,6 +288,29 @@ describe('Contributions and review component', function() {
             expect(more).toEqual(false);
           });
         });
+    });
+
+    describe('ctrl.loadReviewableTranslationOpportunities', () => {
+      it('should load opportunities correctly', () => {
+        ctrl.loadReviewableTranslationOpportunities().then(
+          ({opportunitiesDicts, more}) => {
+            expect(opportunitiesDicts).toEqual([
+              {
+                id: '1',
+                heading: 'Chapter 1',
+                subheading: 'Topic 1 - Story 1',
+                actionButtonTitle: 'Translations'
+              },
+              {
+                id: '2',
+                heading: 'Chapter 2',
+                subheading: 'Topic 2 - Story 2',
+                actionButtonTitle: 'Translations'
+              }
+            ]);
+            expect(more).toEqual(false);
+          });
+      });
     });
 
     describe('ctrl.loadOpportunities', () => {

@@ -386,7 +386,7 @@ angular.module('oppia').component('contributionsAndReview', {
                 id: opportunity.getExplorationId(),
                 heading: opportunity.getOpportunityHeading(),
                 subheading: opportunity.getOpportunitySubheading(),
-                actionButtonTitle: 'Reviewable Translations'
+                actionButtonTitle: 'Translations'
               };
               opportunitiesDicts.push(opportunityDict);
             });

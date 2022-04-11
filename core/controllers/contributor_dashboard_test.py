@@ -22,6 +22,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -65,6 +66,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        user_services.allow_user_to_review_translation_in_language(
+            self.admin_id, 'hi')
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -411,6 +414,182 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/invalid_opportunity_type' % (
                     feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL),
                 expected_status_int=404)
+
+    def test_get_reviewable_translation_opportunities_with_in_review_suggestions( # pylint: disable=line-too-long
+            self):
+        # Create a translation suggestion for exploration 0.
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 1, self.owner_id, change_dict, 'description')
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'topic_name': 'topic'})
+
+        # Should only return opportunities that have corresponding translation
+        # suggestions in review (exploration 0).
+        self.assertEqual(
+            response['opportunities'], [self.expected_opportunity_dict_1])
+
+    def test_get_reviewable_translation_opportunities_with_all_topic_name(self):
+        # Create a translation suggestion for exploration 0.
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 1, self.owner_id, change_dict, 'description')
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'topic_name': 'All'})
+
+        # Should return all available reviewable opportunities.
+        self.assertEqual(
+            response['opportunities'], [self.expected_opportunity_dict_1])
+
+    def test_get_reviewable_translation_opportunities_with_invalid_topic(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'topic_name': 'Invalid'},
+            expected_status_int=400)
+
+    def test_get_reviewable_translation_opportunities_returns_opportunities_in_story_order( # pylint: disable=line-too-long
+            self):
+        # Create new explorations 10, 20, 30.
+        exp_10 = self.save_new_valid_exploration(
+            '10',
+            self.owner_id,
+            title='title 10',
+            category='category',
+            end_state_name='End State',
+            correctness_feedback_enabled=True
+        )
+        self.publish_exploration(self.owner_id, exp_10.id)
+        exp_20 = self.save_new_valid_exploration(
+            '20',
+            self.owner_id,
+            title='title 20',
+            category='category',
+            end_state_name='End State',
+            correctness_feedback_enabled=True
+        )
+        self.publish_exploration(self.owner_id, exp_20.id)
+        exp_30 = self.save_new_valid_exploration(
+            '30',
+            self.owner_id,
+            title='title 30',
+            category='category',
+            end_state_name='End State',
+            correctness_feedback_enabled=True
+        )
+        self.publish_exploration(self.owner_id, exp_30.id)
+
+        # Create a new story.
+        topic_id = '0'
+        story_title = 'story title'
+        story = story_domain.Story.create_default_story(
+            'story-id', story_title, 'description', topic_id, 'url-fragment')
+        story.language_code = 'en'
+
+        # Add explorations 10, 20, 30 as story nodes.
+        story.add_node('node_1', 'Node1')
+        story.update_node_exploration_id('node_1', exp_10.id)
+        story.add_node('node_2', 'Node2')
+        story.update_node_exploration_id('node_2', exp_20.id)
+        story.add_node('node_3', 'Node3')
+        story.update_node_exploration_id('node_3', exp_30.id)
+        story.update_node_destination_node_ids(
+            'node_1', ['node_2'])
+        story.update_node_destination_node_ids(
+            'node_2', ['node_3'])
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(self.owner_id, topic_id, story.id)
+        topic_services.publish_story(topic_id, story.id, self.admin_id)
+
+        # Create translation suggestions for the explorations.
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_10.id, 1, self.owner_id, change_dict, 'description')
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_20.id, 1, self.owner_id, change_dict, 'description')
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_30.id, 1, self.owner_id, change_dict, 'description')
+
+        expected_opportunity_dict_10 = {
+            'id': exp_10.id,
+            'topic_name': 'topic',
+            'story_title': story_title,
+            'chapter_title': 'Node1',
+            'content_count': 2,
+            'translation_counts': {},
+            'translation_in_review_counts': {}
+        }
+        expected_opportunity_dict_20 = {
+            'id': exp_20.id,
+            'topic_name': 'topic',
+            'story_title': story_title,
+            'chapter_title': 'Node2',
+            'content_count': 2,
+            'translation_counts': {},
+            'translation_in_review_counts': {}
+        }
+        expected_opportunity_dict_30 = {
+            'id': exp_30.id,
+            'topic_name': 'topic',
+            'story_title': story_title,
+            'chapter_title': 'Node3',
+            'content_count': 2,
+            'translation_counts': {},
+            'translation_in_review_counts': {}
+        }
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'topic_name': 'topic'})
+
+        # Should return reviewable opportunities in story order.
+        self.assertEqual(
+            response['opportunities'],
+            [
+                expected_opportunity_dict_10,
+                expected_opportunity_dict_20,
+                expected_opportunity_dict_30])
+
 
     def _publish_valid_topic(self, topic, uncategorized_skill_ids):
         """Saves and publishes a valid topic with linked skills and subtopic.

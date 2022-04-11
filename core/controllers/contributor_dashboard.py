@@ -25,6 +25,7 @@ from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
+from core.domain import story_fetchers
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import translation_services
@@ -241,7 +242,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
 
 
 class ReviewableOpportunitiesHandler(base.BaseHandler):
-    """Provides data for opportunities available in different categories."""
+    """Provides opportunities that have translation suggestions in review."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
@@ -256,20 +257,68 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
         }
     }
 
-    # TODO: add new decorator, or move to suggestion.py.
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         topic_name = self.normalized_request.get('topic_name')
         opportunity_dicts = [
             opp.to_dict()
-            for opp in opportunity_services
-                .get_reviewable_exploration_opportunity_summaries(
+            for opp in self
+                ._get_reviewable_exploration_opportunity_summaries(
                     self.user_id, topic_name)]
         self.values = {
             'opportunities': opportunity_dicts,
         }
         self.render_json(self.values)
+
+
+    def _get_reviewable_exploration_opportunity_summaries(
+            self, user_id, topic_name):
+        """Returns exploration opportunity summaries that have translation
+        suggestions that are reviewable by the supplied user.
+
+        Args:
+            user_id: str. The user ID of the user for which to filter
+                translation suggestions.
+            topic_name: str. A topic name for which to filter the exploration
+                opportunity summaries. If 'All' is supplied, all available
+                exploration opportunity summaries will be returned.
+
+        Returns:
+            list(ExplorationOpportunitySummary). A list of the matching
+            exploration opportunity summaries.
+        """
+        # 1. Fetch the eligible topics.
+        # 2. Fetch the stories for the topics.
+        # 3. Get the reviewable translation suggestion target IDs for the user.
+        # 4. Get story exploration nodes in order, filtering for explorations
+        # that have in review translation suggestions.
+        topics = []
+        if topic_name == feconf.ALL_LITERAL_CONSTANT:
+            topics = topic_fetchers.get_all_topics()
+        else:
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            if topic is None:
+                raise self.InvalidInputException(
+                    'The supplied input topic: %s is not valid' % topic_name)
+            topics = [topic]
+        exp_ids = []
+        for topic in topics:
+            stories = story_fetchers.get_stories_by_ids([
+                reference.story_id
+                for reference in topic.get_all_story_references()
+                if reference.story_is_published])
+            in_review_suggestion_target_ids = (
+                suggestion_services
+                .get_reviewable_translation_suggestion_target_ids(user_id))
+            exp_ids = [
+                node.exploration_id
+                for story in stories
+                for node in story.story_contents.get_ordered_nodes()
+                if node.exploration_id in in_review_suggestion_target_ids]
+        return (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                exp_ids).values())
 
 
 class TranslatableTextHandler(base.BaseHandler):
