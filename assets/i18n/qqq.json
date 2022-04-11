@@ -1030,7 +1030,7 @@
 	"I18N_TOPIC_VIEWER_SELECT_SKILLS": "Subtitle shown in the 'Practice' tab in the topic viewer, where the user can select skills to tackle questions on them.",
 	"I18N_TOPIC_VIEWER_SKILL": "Label for the 'Skill' counter, displayed in the 'Info' tab in the topic viewer when number of skills equal to one.",
 	"I18N_TOPIC_VIEWER_SKILLS": "Label for the 'Skill' counter, displayed in the 'Info' tab in the topic viewer when number of skills greater than one.",
-	"I18N_TOPIC_VIEWER_START_PRACTICE": "Text displayed on the start button in the 'Practice' tab in the topic viewer. Clicking this, the user can start a practice session on skills selected by the user.",
+	"I18N_TOPIC_VIEWER_START_PRACTICE": "Text displayed on the start button in the 'Practice' tab in the topic viewer. Clicking this, the user can start a practice session on skills selected by the user.\n{{Identical|Start}}",
 	"I18N_TOPIC_VIEWER_STORIES": "Label for the 'Story' counter, displayed in the 'Info' tab in the topic viewer, when number of stories is greater than one.",
 	"I18N_TOPIC_VIEWER_STORIES_HEAD": "Text displayed above all stories specifically in mobile view.",
 	"I18N_TOPIC_VIEWER_STORY": "Label for the 'Story' counter, displayed in the 'Info' tab in the topic viewer, when number of stories is equal to one.",
