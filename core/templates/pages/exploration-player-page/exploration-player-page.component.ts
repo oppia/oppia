@@ -34,7 +34,7 @@ require('interactions/interactionsRequires.ts');
   templateUrl: './exploration-player-page.component.html'
 })
 export class ExplorationPlayerPageComponent implements OnDestroy {
-  directiveSubsriptions = new Subscription();
+  directiveSubscriptions = new Subscription();
   pageIsIframed: boolean = false;
   explorationTitle!: string;
 
@@ -60,11 +60,7 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
       // manually, and the onLangChange subscription is added after
       // the exploration is fetch from the backend.
       this.setPageTitle();
-      this.directiveSubsriptions.add(
-        this.translateService.onLangChange.subscribe(() => {
-          this.setPageTitle();
-        })
-      );
+      this.subscribeToOnLangChange();
       this.metaTagCustomizationService.addOrReplaceMetaTags([
         {
           propertyType: 'itemprop',
@@ -93,6 +89,14 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
     this.keyboardShortcutService.bindExplorationPlayerShortcuts();
   }
 
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
       'I18N_EXPLORATION_PLAYER_PAGE_TITLE', {
@@ -102,7 +106,7 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.directiveSubsriptions.unsubscribe();
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 

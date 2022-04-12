@@ -32,7 +32,7 @@ import { Subscription } from 'rxjs';
 })
 export class ErrorPageComponent implements OnInit, OnDestroy {
   @Input() statusCode: string;
-  directiveSubcriptions = new Subscription();
+  directiveSubscriptions = new Subscription();
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private pageTitleService: PageTitleService,
@@ -40,7 +40,7 @@ export class ErrorPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.directiveSubcriptions.add(
+    this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
         this.setPageTitle();
       })
@@ -65,7 +65,7 @@ export class ErrorPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.directiveSubcriptions.unsubscribe();
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 
