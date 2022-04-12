@@ -24,6 +24,7 @@ import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { BindableVoiceovers, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
@@ -273,7 +274,7 @@ export class ExplorationEngineService {
   }
 
   private _getInteractionHtmlByStateName(
-    labelForFocusTarget: string, stateName: string
+      labelForFocusTarget: string, stateName: string
   ): string {
     let interactionId: string = this.exploration.getInteractionId(
       stateName);
@@ -595,7 +596,9 @@ export class ExplorationEngineService {
     return stateCard;
   }
 
-  getShortestPathToState(allStates, destStateName): string[] {
+  getShortestPathToState(
+      allStates: StateObjectsBackendDict, destStateName: string
+  ): string[] {
     let stateGraphLinks: { source: string; target: string }[] = [];
 
     // Create a list of all possible links between states.
@@ -623,7 +626,6 @@ export class ExplorationEngineService {
     let queue: string[] = [];
     let seen: Record<string, boolean> = {};
     let parent: Record<string, string> = {};
-    console.log('initStateName: ', this.exploration.initStateName);
     seen[this.exploration.initStateName] = true;
     queue.push(this.exploration.initStateName);
     // 1st state does not have a parent
@@ -635,7 +637,9 @@ export class ExplorationEngineService {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       let currStateName = queue.shift()!;
 
-      if(currStateName === destStateName) break;
+      if (currStateName === destStateName) {
+        break;
+      }
 
       for (let e = 0; e < stateGraphLinks.length; e++) {
         let edge = stateGraphLinks[e];
@@ -656,7 +660,6 @@ export class ExplorationEngineService {
     }
     // Reverse the path to go initStateName to destStateName.
     shortestPathToState = shortestPathToState.reverse();
-    console.log(shortestPathToState, "shortestPathToState");
     return shortestPathToState;
   }
 }

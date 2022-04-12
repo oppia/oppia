@@ -198,7 +198,6 @@ export class ConversationSkinComponent {
   ) {}
 
   ngOnInit(): void {
-    console.log("--------- testing load --------", this.displayedCard);
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.isLoggedIn = userInfo.isLoggedIn();
@@ -391,7 +390,6 @@ export class ConversationSkinComponent {
   }
 
   changeCard(index: number): void {
-    console.log("changing card", index);
     this.playerPositionService.recordNavigationButtonClick();
     this.playerPositionService.setDisplayedCardIndex(index);
     this.explorationEngineService.onUpdateActiveStateIfInEditor.emit(
@@ -611,7 +609,7 @@ export class ConversationSkinComponent {
     }
   }
 
-  private _navigateToMostRecentlyReachedCheckpoint(){
+  private _navigateToMostRecentlyReachedCheckpoint() {
     let states: StateObjectsBackendDict;
     this.readOnlyExplorationBackendApiService.
       loadLatestExplorationAsync(this.explorationId).then(
@@ -627,11 +625,13 @@ export class ConversationSkinComponent {
                 states, this.mostRecentlyReachedCheckpoint
               )
             );
+
             let indexToRedirectTo = 0;
+
             for (let i = 0; i < this.prevSessionStatesProgress.length; i++) {
-    
+              // Set state name of a previously completed state.
               let stateName = this.prevSessionStatesProgress[i];
-              // Skip the card if it has already been added to transcript
+              // Skip the card if it has already been added to transcript.
               if (!this.playerTranscriptService.hasEncounteredStateBefore(
                 stateName)
               ) {
@@ -640,18 +640,20 @@ export class ConversationSkinComponent {
                 );
                 this._addNewCard(stateCard);
               }
-    
-              if (this.mostRecentlyReachedCheckpoint === stateName) break;
-    
-              this.visitedStateNames.push(stateName)
+
+              if (this.mostRecentlyReachedCheckpoint === stateName) {
+                break;
+              }
+
+              this.visitedStateNames.push(stateName);
               indexToRedirectTo += 1;
             }
-    
+
             // Remove the last card from progress as it is not completed
-            // yet and is only most recently reached
+            // yet and is only most recently reached.
             this.prevSessionStatesProgress.pop();
-    
-            // Move to most recently reached checkpoint card
+
+            // Move to most recently reached checkpoint card.
             this.changeCard(indexToRedirectTo);
           }
         }
@@ -882,17 +884,10 @@ export class ConversationSkinComponent {
   }
 
   private _initializeDirectiveComponents(initialCard, focusLabel): void {
-    console.log("came here as well")
     this._addNewCard(initialCard);
-
-    let transcriptLength = this.playerTranscriptService.getNumCards();
-    console.log(this.displayedCard, "displayedCard");
-    console.log(transcriptLength, "transcriptLength");
-
     this.playerPositionService.onNewCardAvailable.emit();
 
     this.nextCard = initialCard;
-    console.log(this.nextCard, "next card");
     this.explorationPlayerStateService.onPlayerStateChange.emit(
       this.nextCard.getStateName());
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
@@ -918,7 +913,7 @@ export class ConversationSkinComponent {
     this.adjustPageHeight(false, null);
     this.windowRef.nativeWindow.scrollTo(0, 0);
 
-    // Navigate the learner to the most recently reached checkpoint state
+    // Navigate the learner to the most recently reached checkpoint state.
     this._navigateToMostRecentlyReachedCheckpoint();
 
     // The timeout is needed in order to give the recipient of the

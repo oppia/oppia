@@ -34,7 +34,6 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
-import { PlayerPositionService } from '../services/player-position.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 
 @Component({

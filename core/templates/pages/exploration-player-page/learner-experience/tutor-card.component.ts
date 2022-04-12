@@ -169,7 +169,6 @@ export class TutorCardComponent {
         changes.displayedCard.currentValue)) {
       this.updateDisplayedCard();
     }
-    console.log("value of the displayed card is: ", this.displayedCard);
   }
 
   isAudioBarExpandedOnMobileDevice(): boolean {
@@ -282,9 +281,10 @@ export class TutorCardComponent {
 
   isDisplayedCardCompletedInPreviousSession(): boolean {
     return (
-      this.displayedCard.getInteraction()
-      && (this.prevSessionStatesProgress.indexOf(
-        this.displayedCard.getStateName()) !== -1)
+      this.displayedCard.getInteraction() &&
+      (this.prevSessionStatesProgress.indexOf(
+        this.displayedCard.getStateName()) !== -1
+      )
     );
   }
 }

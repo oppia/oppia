@@ -18,8 +18,7 @@
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from
-  'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { EditableExplorationBackendApiService } from
   'domain/exploration/editable-exploration-backend-api.service';
 import { StateCard } from 'domain/state_card/state-card.model';
