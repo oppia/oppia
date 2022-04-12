@@ -224,13 +224,11 @@ describe('Contribution Opportunities Service', () => {
     '\'getReviewableTranslationOpportunitiesAsync\'', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-
-    let translationOpportunitiesDict: ExplorationOpportunitiesDict = {
+    const translationOpportunitiesDict: ExplorationOpportunitiesDict = {
       opportunities: sampleTranslationOpportunitiesResponse,
       more: false
     };
-
-    let getReviewableTranslationOpportunitiesSpy = spyOn(
+    const getReviewableTranslationOpportunitiesSpy = spyOn(
       contributionOpportunitiesBackendApiService,
       'fetchReviewableTranslationOpportunitiesAsync')
       .and.returnValue(Promise.resolve(
