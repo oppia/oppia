@@ -90,3 +90,60 @@ class GetExpsHavingNonEmptyParamChangesJob(base_jobs.JobBase):
             )
             | 'Combine results' >> beam.Flatten()
         )
+
+
+class GetExpsHavingNonEmptyParamSpecsJob(base_jobs.JobBase):
+    """Job that returns explorations having non-empty param specs."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns PCollection of invalid explorations where
+        param specs is non-empty along with the length of param specs.
+        
+        Returns:
+            PCollection. Returns PCollection of invalid explorations where
+            param specs is non-empty along with the length of param specs.
+        """
+        total_exps = (
+            self.pipeline
+            | 'Get all ExplorationModels' >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all(include_deleted=False))
+            | 'Get exploration from model' >> beam.Map(
+                exp_fetchers.get_exploration_from_model)
+        )
+
+        exps_having_non_empty_param_specs = (
+            total_exps
+            | 'Filter explorations having non-empty param specs' >>
+                beam.Filter(lambda exp: len(exp.param_specs) > 0)
+        )
+
+        report_number_of_exps_queried = (
+            total_exps
+            | 'Count explorations' >> (
+                job_result_transforms.CountObjectsToJobRunResult('EXPS'))
+        )
+
+        report_number_of_inavlid_exps = (
+            exps_having_non_empty_param_specs
+            | 'Count explorations having non-empty param specs' >> (
+                job_result_transforms.CountObjectsToJobRunResult('INVALID'))
+        )
+
+        report_invalid_exps_along_with_their_param_changes = (
+            exps_having_non_empty_param_specs
+            | 'Save info on invalid exps' >> beam.Map(
+                lambda exp: job_run_result.JobRunResult.as_stderr(
+                    'The id of exp is %s and the length of '
+                    'its param specs is %s'
+                    % (exp.id, len(exp.param_specs))
+                ))
+        )
+
+        return (
+            (
+                report_number_of_exps_queried,
+                report_number_of_inavlid_exps,
+                report_invalid_exps_along_with_their_param_changes
+            )
+            | 'Combine results' >> beam.Flatten()
+        )
