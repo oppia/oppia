@@ -69,20 +69,6 @@ describe('Story object factory', () => {
       sampleStoryBackendDict);
   });
 
-  it('should be able to create an interstitial story object', () => {
-    var story = storyObjectFactory.createInterstitialStory();
-    expect(story.getId()).toEqual(null);
-    expect(story.getThumbnailFilename()).toEqual(null);
-    expect(story.getThumbnailBgColor()).toEqual(null);
-    expect(story.getTitle()).toEqual('Story title loading');
-    expect(story.getDescription()).toEqual('Story description loading');
-    expect(story.getLanguageCode()).toBe('en');
-    expect(story.getStoryContents()).toEqual(null);
-    expect(story.getNotes()).toEqual('Story notes loading');
-    expect(story.getCorrespondingTopicId()).toEqual(null);
-    expect(story.getUrlFragment()).toEqual(null);
-  });
-
   it('should correctly validate a valid story', () => {
     expect(_sampleStory.validate()).toEqual([]);
   });
