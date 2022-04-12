@@ -33,7 +33,7 @@ if MYPY:  # pragma: no cover
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 class GetNumberOfExpWithInvalidStateClassifierModelIdJob(base_jobs.JobBase):
-    """Job that returns curated explorations where state classifier
+    """Job that returns explorations where state classifier
     model id is not None."""
 
     def get_invalid_state_names(self, states):
@@ -68,11 +68,11 @@ class GetNumberOfExpWithInvalidStateClassifierModelIdJob(base_jobs.JobBase):
         return False
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns PCollection of invalid curated explorations where
+        """Returns PCollection of invalid explorations where
         state classifier model id is not None along with the state names.
 
         Returns:
-            PCollection. Returns PCollection of invalid curated explorations
+            PCollection. Returns PCollection of invalid explorations
             where state classifier model id is not None along with the
             state names.
         """
@@ -84,41 +84,31 @@ class GetNumberOfExpWithInvalidStateClassifierModelIdJob(base_jobs.JobBase):
                 exp_fetchers.get_exploration_from_model)
         )
 
-        curated_explorations = (
+        exps_having_state_classifier_model_id_not_none = (
             total_explorations
-            | 'Combine exploration ids and states' >> beam.Map(
-                lambda exp: (exp.id, exp.states))
-            | 'Filter curated explorations' >> beam.Filter(
-                lambda exp: opportunity_services
-                    .is_exploration_available_for_contribution(exp[0]))
-        )
-
-        curated_exps_having_state_classifier_model_id_not_none = (
-            curated_explorations
-            | 'Filter curated explorations having state classifier model id' >>
-                beam.Filter(lambda id, states: (
-                    self.filter_invalid_states(states)))
+            | 'Filter explorations having state classifier model id' >>
+                beam.Filter(lambda exp: (self.filter_invalid_states(exp.states)))
         )
 
         report_number_of_exps_queried = (
-            curated_explorations
+            total_explorations
             | 'Report count of exp models' >> (
                 job_result_transforms.CountObjectsToJobRunResult('EXPS'))
         )
 
         report_number_of_invalid_exps = (
-            curated_exps_having_state_classifier_model_id_not_none
+            exps_having_state_classifier_model_id_not_none
             | 'Report count of invalid exp models' >> (
                 job_result_transforms.CountObjectsToJobRunResult('INVALID'))
         )
 
         report_invalid_states_along_with_state_name = (
-            curated_exps_having_state_classifier_model_id_not_none
+            exps_having_state_classifier_model_id_not_none
             | 'Save info on invalid exps' >> beam.Map(
-                lambda id, states: job_run_result.JobRunResult.as_stderr(
+                lambda exp: job_run_result.JobRunResult.as_stderr(
                     'The id of exp is %s and the states having not None '
                     'classifier model id are %s'
-                    % (id, self.get_invalid_state_names(states))
+                    % (exp.id, self.get_invalid_state_names(exp.states))
                 ))
         )
 
