@@ -60,7 +60,7 @@ export class ExplorationFooterComponent {
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth: number = 0;
   expStates: StateObjectsBackendDict;
-  mostRecentlyReachedCheckpointStateName: string;
+  mostRecentlyReachedCheckpointStateName!: string;
   completedCheckpoints: number = 0;
   isLastCheckpointReached: boolean = false;
 

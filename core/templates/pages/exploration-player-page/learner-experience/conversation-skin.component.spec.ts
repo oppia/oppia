@@ -24,6 +24,7 @@ import { Collection } from 'domain/collection/collection.model';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
@@ -100,7 +101,7 @@ describe('Conversation skin component', () => {
   let explorationEngineService: ExplorationEngineService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let explorationRecommendationsService:
-  ExplorationRecommendationsService;
+    ExplorationRecommendationsService;
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
   let fatigueDetectionService: FatigueDetectionService;
   let focusManagerService: FocusManagerService;
@@ -114,14 +115,14 @@ describe('Conversation skin component', () => {
   let messengerService: MessengerService;
   let numberAttemptsService: NumberAttemptsService;
   let playerCorrectnessFeedbackEnabledService:
-  PlayerCorrectnessFeedbackEnabledService;
+    PlayerCorrectnessFeedbackEnabledService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let questionPlayerStateService: QuestionPlayerStateService;
   let readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
   let refresherExplorationConfirmationModalService:
-  RefresherExplorationConfirmationModalService;
+    RefresherExplorationConfirmationModalService;
   let siteAnalyticsService: SiteAnalyticsService;
   let statsReportingService: StatsReportingService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -130,11 +131,269 @@ describe('Conversation skin component', () => {
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let windowRef: WindowRef;
+  let readOnlyExplorationBackendApiService:
+    ReadOnlyExplorationBackendApiService;
 
   let displayedCard = new StateCard(
     null, null, null, new Interaction(
       [], [], null, null, [], '', null),
     [], null, null, '', null);
+
+  let explorationDict = {
+    states: {
+      Start: {
+        classifier_model_id: null,
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            ca_placeholder_0: {},
+            feedback_1: {},
+            rule_input_2: {},
+            content: {},
+            default_outcome: {}
+          }
+        },
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            ca_placeholder_0: {},
+            feedback_1: {},
+            rule_input_2: {},
+            content: {},
+            default_outcome: {}
+          }
+        },
+        interaction: {
+          solution: null,
+          confirmed_unclassified_answers: [],
+          id: 'TextInput',
+          hints: [],
+          customization_args: {
+            rows: {
+              value: 1
+            },
+            placeholder: {
+              value: {
+                unicode_str: '',
+                content_id: 'ca_placeholder_0'
+              }
+            }
+          },
+          answer_groups: [
+            {
+              outcome: {
+                missing_prerequisite_skill_id: null,
+                refresher_exploration_id: null,
+                labelled_as_correct: false,
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '<p>Good Job</p>'
+                },
+                param_changes: [],
+                dest: 'Mid'
+              },
+              training_data: [],
+              rule_specs: [
+                {
+                  inputs: {
+                    x: {
+                      normalizedStrSet: [
+                        'answer'
+                      ],
+                      contentId: 'rule_input_2'
+                    }
+                  },
+                  rule_type: 'FuzzyEquals'
+                }
+              ],
+              tagged_skill_misconception_id: null
+            }
+          ],
+          default_outcome: {
+            missing_prerequisite_skill_id: null,
+            refresher_exploration_id: null,
+            labelled_as_correct: false,
+            feedback: {
+              content_id: 'default_outcome',
+              html: '<p>Try again.</p>'
+            },
+            param_changes: [],
+            dest: 'Start'
+          }
+        },
+        param_changes: [],
+        next_content_id_index: 3,
+        card_is_checkpoint: true,
+        linked_skill_id: null,
+        content: {
+          content_id: 'content',
+          html: '<p>First Question</p>'
+        }
+      },
+      End: {
+        classifier_model_id: null,
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {}
+          }
+        },
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {}
+          }
+        },
+        interaction: {
+          solution: null,
+          confirmed_unclassified_answers: [],
+          id: 'EndExploration',
+          hints: [],
+          customization_args: {
+            recommendedExplorationIds: {
+              value: ['recommnendedExplorationId']
+            }
+          },
+          answer_groups: [],
+          default_outcome: null
+        },
+        param_changes: [],
+        next_content_id_index: 0,
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        content: {
+          content_id: 'content',
+          html: 'Congratulations, you have finished!'
+        }
+      },
+      Mid: {
+        classifier_model_id: null,
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            ca_placeholder_0: {},
+            feedback_1: {},
+            rule_input_2: {},
+            content: {},
+            default_outcome: {}
+          }
+        },
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            ca_placeholder_0: {},
+            feedback_1: {},
+            rule_input_2: {},
+            content: {},
+            default_outcome: {}
+          }
+        },
+        interaction: {
+          solution: null,
+          confirmed_unclassified_answers: [],
+          id: 'TextInput',
+          hints: [],
+          customization_args: {
+            rows: {
+              value: 1
+            },
+            placeholder: {
+              value: {
+                unicode_str: '',
+                content_id: 'ca_placeholder_0'
+              }
+            }
+          },
+          answer_groups: [
+            {
+              outcome: {
+                missing_prerequisite_skill_id: null,
+                refresher_exploration_id: null,
+                labelled_as_correct: false,
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ' <p>Good Job</p>'
+                },
+                param_changes: [],
+                dest: 'End'
+              },
+              training_data: [],
+              rule_specs: [
+                {
+                  inputs: {
+                    x: {
+                      normalizedStrSet: [
+                        'answer'
+                      ],
+                      contentId: 'rule_input_2'
+                    }
+                  },
+                  rule_type: 'FuzzyEquals'
+                }
+              ],
+              tagged_skill_misconception_id: null
+            }
+          ],
+          default_outcome: {
+            missing_prerequisite_skill_id: null,
+            refresher_exploration_id: null,
+            labelled_as_correct: false,
+            feedback: {
+              content_id: 'default_outcome',
+              html: '<p>try again.</p>'
+            },
+            param_changes: [],
+            dest: 'Mid'
+          }
+        },
+        param_changes: [],
+        next_content_id_index: 3,
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        content: {
+          content_id: 'content',
+          html: '<p>Second Question</p>'
+        }
+      }
+    },
+    auto_tts_enabled: true,
+    version: 2,
+    draft_change_list_id: 9,
+    is_version_of_draft_valid: null,
+    title: 'Exploration',
+    language_code: 'en',
+    correctness_feedback_enabled: true,
+    init_state_name: 'Start',
+    param_changes: [],
+    param_specs: null,
+    draft_changes: null,
+  };
+
+  let explorationResponse: FetchExplorationBackendResponse = {
+    exploration_id: 'exp_id',
+    is_logged_in: true,
+    session_id: 'KERH',
+    exploration: {
+      init_state_name: 'Start',
+      param_changes: [],
+      param_specs: null,
+      title: 'Exploration',
+      language_code: 'en',
+      correctness_feedback_enabled: true,
+      objective: 'To learn',
+      states: explorationDict.states
+    },
+    version: 2,
+    can_edit: true,
+    preferred_audio_language_code: 'en',
+    preferred_language_codes: [],
+    auto_tts_enabled: true,
+    correctness_feedback_enabled: true,
+    record_playthrough_probability: 1,
+    draft_change_list_id: 0,
+    user_has_viewed_lesson_info_modal_once: false,
+    furthest_completed_checkpoint_exp_version: 1,
+    furthest_completed_checkpoint_state_name: 'End',
+    most_recently_reached_checkpoint_state_name: 'Mid',
+    most_recently_reached_checkpoint_exp_version: 2
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -206,6 +465,8 @@ describe('Conversation skin component', () => {
     userService = TestBed.inject(UserService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     windowRef = TestBed.inject(WindowRef);
+    readOnlyExplorationBackendApiService = TestBed.inject(
+      ReadOnlyExplorationBackendApiService);
   }));
 
   it('should create', () => {
@@ -263,6 +524,10 @@ describe('Conversation skin component', () => {
     spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
     spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
     spyOn(messengerService, 'sendMessage');
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(explorationResponse));
+    spyOn(explorationEngineService, 'getShortestPathToState')
+      .and.returnValue(['Start', 'Mid']);
 
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
@@ -509,6 +774,7 @@ describe('Conversation skin component', () => {
     spyOn(playerPositionService, 'setDisplayedCardIndex');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(0);
 
+    componentInstance.explorationId = explorationResponse.exploration_id;
     componentInstance.displayedCard = displayedCard;
 
     componentInstance.initializePage();

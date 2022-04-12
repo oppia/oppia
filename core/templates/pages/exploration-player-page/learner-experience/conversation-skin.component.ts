@@ -665,10 +665,10 @@ export class ConversationSkinComponent {
   private _navigateToDisplayedCard(): void {
     let index = this.playerPositionService.getDisplayedCardIndex();
     this.displayedCard = this.playerTranscriptService.getCard(index);
-    let currentState = this.explorationEngineService.getState();
-    let currentStateName = currentState.name;
 
     if (index > 0) {
+      let currentState = this.explorationEngineService.getState();
+      let currentStateName = currentState.name;
       if (currentState.cardIsCheckpoint &&
           !this.visitedStateNames.includes(currentStateName)) {
         let version: number;

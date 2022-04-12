@@ -902,6 +902,69 @@ describe('Exploration engine service ', () => {
     }).toThrowError('Cannot populate exploration in learner mode.');
   });
 
+  it('should return state when calling \'getStateFromStateName\'', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    expect(() => {
+      explorationEngineService.getStateFromStateName('Start');
+    }).toThrowError(
+      'Cannot read properties of undefined (reading \'getState\')'
+    );
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    // Check for first state.
+    let state = explorationEngineService.getStateFromStateName('Start');
+
+    expect(state.name).toBe('Start');
+
+    // Check for second state.
+    state = explorationEngineService.getStateFromStateName('Mid');
+
+    expect(state.name).toBe('Mid');
+  });
+
+  it('should return state card when calling \'getStateCardByName\'', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    expect(() => {
+      explorationEngineService.getStateCardByName('Start');
+    }).toThrowError(
+      'Cannot read properties of undefined (reading \'getInteraction\')'
+    );
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    // Check for first state.
+    let stateCard = explorationEngineService.getStateCardByName('Start');
+
+    expect(stateCard.getStateName()).toBe('Start');
+
+    // Check for second state.
+    stateCard = explorationEngineService.getStateCardByName('Mid');
+
+    expect(stateCard.getStateName()).toBe('Mid');
+  });
+
+  it('should return shortest path to state when calling ' +
+    '\'getShortestPathToState\'', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    // Check for first state.
+    let shortestPathToState = explorationEngineService.getShortestPathToState(
+      explorationDict.states, 'Mid');
+
+    expect(shortestPathToState).toEqual(['Start', 'Mid']);
+  });
+
   describe('on validating parameters ', () => {
     it('should create new parameters successfully', () => {
       paramChangeDict.customization_args.parse_with_jinja = true;
