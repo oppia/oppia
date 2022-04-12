@@ -473,7 +473,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         cls,
         user_id: str,
         language_codes: List[str]
-    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
+    ) -> Sequence[GeneralSuggestionModel]:
         """Fetches all translation suggestions that are in-review where the
         author_id != user_id and language_code matches one of the supplied
         language_codes.
