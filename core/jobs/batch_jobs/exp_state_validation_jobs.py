@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Validation jobs for exploration states."""
+
 from __future__ import annotations
 
 from core.domain import exp_fetchers
-from core.domain import opportunity_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -32,6 +33,7 @@ if MYPY:  # pragma: no cover
 
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
+
 class GetNumberOfExpWithInvalidStateClassifierModelIdJob(base_jobs.JobBase):
     """Job that returns explorations where state classifier
     model id is not None."""
@@ -39,7 +41,7 @@ class GetNumberOfExpWithInvalidStateClassifierModelIdJob(base_jobs.JobBase):
     def get_invalid_state_names(self, states):
         """Returns a list of state names that have not None
         classifier model id.
-        
+
         Args:
             states: list[States]. The list of states.
 
@@ -55,7 +57,7 @@ class GetNumberOfExpWithInvalidStateClassifierModelIdJob(base_jobs.JobBase):
 
     def filter_invalid_states(self, states):
         """Returns True if any state has classifier model id not None.
-        
+
         Args:
             states: dict(str, State). A dict of states.
 
@@ -87,7 +89,8 @@ class GetNumberOfExpWithInvalidStateClassifierModelIdJob(base_jobs.JobBase):
         exps_having_state_classifier_model_id_not_none = (
             total_explorations
             | 'Filter explorations having state classifier model id' >>
-                beam.Filter(lambda exp: (self.filter_invalid_states(exp.states)))
+                beam.Filter(lambda exp: (self.filter_invalid_states(
+                    exp.states)))
         )
 
         report_number_of_exps_queried = (

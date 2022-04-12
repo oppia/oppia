@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core.domain import exp_fetchers
-from core.domain import opportunity_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -41,7 +40,7 @@ class GetExpsHavingNonEmptyParamChangesJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid explorations where
         param changes is non-empty along with the length of param changes.
-        
+
         Returns:
             PCollection. Returns PCollection of invalid explorations where
             param changes is non-empty along with the length of param changes.
@@ -98,7 +97,7 @@ class GetExpsHavingNonEmptyParamSpecsJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid explorations where
         param specs is non-empty along with the length of param specs.
-        
+
         Returns:
             PCollection. Returns PCollection of invalid explorations where
             param specs is non-empty along with the length of param specs.
