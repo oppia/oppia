@@ -294,7 +294,9 @@ def get_role_actions() -> Dict[str, List[str]]:
 
 
 def log_role_query(
-        user_id: str, intent: str, role: Optional[str]=None,
+        user_id: str,
+        intent: str,
+        role: Optional[str]=None,
         username: Optional[str]=None) -> None:
     """Stores the query to role structure in RoleQueryAuditModel."""
     model_id = '%s.%s.%s.%s' % (
