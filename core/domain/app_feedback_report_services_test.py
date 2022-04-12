@@ -131,7 +131,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             'android_device_language_locale_code': 'en'
         },
         'user_supplied_feedback': {
-            'report_type': 'suggestion',
+            'report_type': 'SUGGESTION',
             'category': 'language_suggestion',
             'user_feedback_selected_items': [],
             'user_feedback_other_text_input': 'french'
