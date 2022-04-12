@@ -188,6 +188,8 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
                         include_deleted=False)
                     )
                 )
+            | 'Remove the Exploration Temporary' >> beam.Filter(
+                lambda exp_model: exp_model.id != 'umPkwp0L1M0-')
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add exploration keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
