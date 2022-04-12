@@ -96,6 +96,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             common, 'ensure_directory_exists', mock_ensure_directory_exists)
 
     def test_install_prerequisite(self) -> None:
+        self.check_function_calls['check_call_is_called'] = False
         prerequisite = install_third_party_libs.PREREQUISITES[0]
         with self.Popen_swap:
             install_third_party_libs.install_prerequisite(prerequisite)
@@ -110,13 +111,13 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_install_prerequisite_raises_exception_if_prefix_fix_fails(
-        self) -> None:
+            self) -> None:
         self.check_function_calls['check_call_is_called'] = False
         prerequisite = install_third_party_libs.PREREQUISITES[0]
         with self.Popen_error_swap:
             with self.check_call_error_swap:
                 with self.assertRaisesRegex(
-                    Exception, 'Error installing prerequisite'):
+                        Exception, 'Error installing prerequisite'):
                     install_third_party_libs.install_prerequisite(prerequisite)
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 

@@ -24,17 +24,18 @@ import subprocess
 import sys
 import urllib.request as urlrequest
 import zipfile
+
+from core import utils
+
 from typing import Tuple
 
-from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-
-from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import setup  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import common
+from . import install_backend_python_libs
+from . import install_third_party
+from . import pre_commit_hook
+from . import pre_push_hook
+from . import setup
+from . import setup_gae
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
@@ -57,7 +58,8 @@ def install_prerequisite(package: Tuple[str]) -> None:
         Exception. If the package fails to install due to issues with --prefix.
     """
     package_name, version_number, target_path = package
-    command_text = [sys.executable, '-m', 'pip', 'install', '%s==%s'
+    command_text = [
+        sys.executable, '-m', 'pip', 'install', '%s==%s'
         % (package_name, version_number), '--target', target_path]
     uextention_text = ['--user', '--prefix=', '--system']
     current_process = subprocess.Popen(
