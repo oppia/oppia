@@ -554,7 +554,7 @@ describe('Learner Dashboard Backend API Service', () => {
 
     let req = httpTestingController.expectOne(
       LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL);
-    expect(req.request.method).toEqual('GET');
+    expect(req.request.method).toEqual('POST');
     req.flush(sampleFeedbackUpdatesDataResults);
 
     flushMicrotasks();
@@ -698,7 +698,7 @@ describe('Learner Dashboard Backend API Service', () => {
 
     let req = httpTestingController.expectOne(
       LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL);
-    expect(req.request.method).toEqual('GET');
+    expect(req.request.method).toEqual('POST');
     req.flush({
       error: 'Error loading dashboard data.'
     }, {

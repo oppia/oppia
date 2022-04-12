@@ -96,6 +96,7 @@ interface LearnerDashboardExplorationsDataBackendDict {
 interface LearnerDashboardFeedbackUpdatesDataBackendDict {
   'number_of_unread_threads': number;
   'thread_summaries': FeedbackThreadSummaryBackendDict[];
+  'more': FeedbackThreadSummaryBackendDict[][];
 }
 
 
@@ -132,6 +133,7 @@ interface LearnerDashboardExplorationsData {
 interface LearnerDashboardFeedbackUpdatesData {
   numberOfUnreadThreads: number;
   threadSummaries: FeedbackThreadSummary[];
+  more: FeedbackThreadSummaryBackendDict[][];
 }
 
 
@@ -268,11 +270,16 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async _fetchLearnerDashboardFeedbackUpdatesDataAsync():
+  async _fetchLearnerDashboardFeedbackUpdatesDataAsync(
+      more: FeedbackThreadSummaryBackendDict[][]
+  ):
   Promise<LearnerDashboardFeedbackUpdatesData> {
     return new Promise((resolve, reject) => {
-      this.http.get<LearnerDashboardFeedbackUpdatesDataBackendDict>(
-        '/learnerdashboardfeedbackupdateshandler/data').toPromise().then(
+      this.http.post<LearnerDashboardFeedbackUpdatesDataBackendDict>(
+        '/learnerdashboardfeedbackupdateshandler/data',
+        {
+          more: more
+        }).toPromise().then(
         dashboardData => {
           resolve({
             numberOfUnreadThreads: dashboardData.number_of_unread_threads,
@@ -280,6 +287,7 @@ export class LearnerDashboardBackendApiService {
               dashboardData.thread_summaries.map(
                 threadSummary => FeedbackThreadSummary
                   .createFromBackendDict(threadSummary))),
+            more: dashboardData.more
           });
         }, errorResponse => {
           reject(errorResponse.status);
@@ -315,9 +323,9 @@ export class LearnerDashboardBackendApiService {
     return this._fetchLearnerDashboardExplorationsDataAsync();
   }
 
-  async fetchLearnerDashboardFeedbackUpdatesDataAsync():
+  async fetchLearnerDashboardFeedbackUpdatesDataAsync(more = []):
   Promise<LearnerDashboardFeedbackUpdatesData> {
-    return this._fetchLearnerDashboardFeedbackUpdatesDataAsync();
+    return this._fetchLearnerDashboardFeedbackUpdatesDataAsync(more);
   }
 
   async addNewMessageAsync(

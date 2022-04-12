@@ -26,7 +26,7 @@ import { trigger, state, style, transition,
 import { AppConstants } from 'app.constants';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { FeedbackThreadSummary } from 'domain/feedback_thread/feedback-thread-summary.model';
+import { FeedbackThreadSummary, FeedbackThreadSummaryBackendDict } from 'domain/feedback_thread/feedback-thread-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message-summary.model';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
@@ -118,13 +118,15 @@ export class LearnerDashboardPageComponent implements OnInit {
 
   completedToIncompleteCollections: string[];
   learntToPartiallyLearntTopics: string[];
-  threadSummaries: FeedbackThreadSummary[];
+  threadSummaries: FeedbackThreadSummary[] = [];
   numberOfUnreadThreads: number;
   explorationPlaylist: LearnerExplorationSummary[];
   collectionPlaylist: CollectionSummary[];
   activeSection: string;
   activeSubsection: string;
   feedbackThreadActive: boolean;
+  more: FeedbackThreadSummaryBackendDict[][] = [];
+  loadingIndicatorIsShown = false;
 
   messageSendingInProgress: boolean;
   profilePictureDataUrl: SafeResourceUrl;
@@ -220,32 +222,11 @@ export class LearnerDashboardPageComponent implements OnInit {
       }
     );
 
-    let dashboardFeedbackUpdatesDataPromise = (
-      this.learnerDashboardBackendApiService
-        .fetchLearnerDashboardFeedbackUpdatesDataAsync());
-    dashboardFeedbackUpdatesDataPromise.then(
-      responseData => {
-        this.isCurrentFeedbackSortDescending = true;
-        this.currentFeedbackThreadsSortType = (
-          LearnerDashboardPageConstants
-            .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
-        this.threadSummaries = responseData.threadSummaries;
-        this.numberOfUnreadThreads =
-          responseData.numberOfUnreadThreads;
-        this.feedbackThreadActive = false;
-      }, errorResponseStatus => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
-          this.alertsService.addWarning(
-            'Failed to get learner dashboard feedback updates data');
-        }
-      }
-    );
+    this.fetchFeedbackUpdates();
 
     Promise.all([
       userInfoPromise,
-      dashboardTopicAndStoriesDataPromise,
-      dashboardFeedbackUpdatesDataPromise
+      dashboardTopicAndStoriesDataPromise
     ]).then(() => {
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();
@@ -267,6 +248,36 @@ export class LearnerDashboardPageComponent implements OnInit {
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
       }));
+  }
+
+  fetchFeedbackUpdates(): void {
+    this.loadingIndicatorIsShown = true;
+    let dashboardFeedbackUpdatesDataPromise = (
+      this.learnerDashboardBackendApiService
+        .fetchLearnerDashboardFeedbackUpdatesDataAsync(this.more));
+    dashboardFeedbackUpdatesDataPromise.then(
+      responseData => {
+        this.isCurrentFeedbackSortDescending = true;
+        this.currentFeedbackThreadsSortType = (
+          LearnerDashboardPageConstants
+            .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
+        this.threadSummaries = [
+          ... this.threadSummaries,
+          ... responseData.threadSummaries];
+        this.more = responseData.more;
+        this.numberOfUnreadThreads =
+          responseData.numberOfUnreadThreads;
+        this.feedbackThreadActive = false;
+        this.loadingIndicatorIsShown = false;
+      }, errorResponseStatus => {
+        this.loadingIndicatorIsShown = false;
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard feedback updates data');
+        }
+      }
+    );
   }
 
   getStaticImageUrl(imagePath: string): string {

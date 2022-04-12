@@ -205,7 +205,8 @@ describe('Question Suggestion Review Modal Controller', function() {
         skillDifficulty: skillDifficulty,
         skillRubrics: skillRubrics,
         suggestion: suggestion,
-        suggestionId: suggestionId
+        suggestionId: suggestionId,
+        editSuggestionCallback: () => {}
       });
     }));
 
@@ -401,7 +402,8 @@ describe('Question Suggestion Review Modal Controller', function() {
         skillDifficulty: skillDifficulty,
         skillRubrics: skillRubrics,
         suggestion: suggestion,
-        suggestionId: suggestionId
+        suggestionId: suggestionId,
+        editSuggestionCallback: () => {}
       });
     }));
 
@@ -513,7 +515,8 @@ describe('Question Suggestion Review Modal Controller', function() {
         skillDifficulty: skillDifficulty,
         skillRubrics: skillRubrics,
         suggestion: suggestion,
-        suggestionId: suggestionId
+        suggestionId: suggestionId,
+        editSuggestionCallback: () => {}
       });
     }));
 

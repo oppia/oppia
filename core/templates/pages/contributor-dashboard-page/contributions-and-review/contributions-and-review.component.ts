@@ -197,7 +197,7 @@ angular.module('oppia').component('contributionsAndReview', {
 
       var _showQuestionSuggestionModal = function(
           suggestion, contributionDetails, reviewable,
-          misconceptionsBySkill) {
+          misconceptionsBySkill, question) {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'question-suggestion-review.directive.html');
@@ -205,7 +205,7 @@ angular.module('oppia').component('contributionsAndReview', {
         var suggestionId = suggestion.suggestion_id;
         var authorName = suggestion.author_name;
         var questionHeader = contributionDetails.skill_description;
-        var question = QuestionObjectFactory.createFromBackendDict(
+        var question = question || QuestionObjectFactory.createFromBackendDict(
           suggestion.change.question_dict);
         var contentHtml = question.getStateData().content.html;
         var skillRubrics = contributionDetails.skill_rubrics;
@@ -245,7 +245,8 @@ angular.module('oppia').component('contributionsAndReview', {
             },
             suggestionId: function() {
               return suggestionId;
-            }
+            },
+            editSuggestionCallback: () => openQuestionSuggestionModal
           },
           controller: 'QuestionSuggestionReviewModalController'
         }).result.then(function(result) {
@@ -298,23 +299,30 @@ angular.module('oppia').component('contributionsAndReview', {
           ctrl.activeSuggestionType === suggestionType);
       };
 
+      const openQuestionSuggestionModal = function(
+          suggestionId, question = undefined) {
+        var suggestion = ctrl.contributions[suggestionId].suggestion;
+        var reviewable = ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS;
+        var contributionDetails = ctrl.contributions[suggestionId].details;
+        var skillId = suggestion.change.skill_id;
+        ContextService.setCustomEntityContext(
+          IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
+        SkillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
+          var misconceptionsBySkill = {};
+          var skill = skillDict.skill;
+          misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
+          _showQuestionSuggestionModal(
+            suggestion, contributionDetails, reviewable,
+            misconceptionsBySkill, question);
+          $rootScope.$apply();
+        });
+      };
+
       ctrl.onClickViewSuggestion = function(suggestionId) {
         var suggestion = ctrl.contributions[suggestionId].suggestion;
         var reviewable = ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS;
         if (suggestion.suggestion_type === SUGGESTION_TYPE_QUESTION) {
-          var contributionDetails = ctrl.contributions[suggestionId].details;
-          var skillId = suggestion.change.skill_id;
-          ContextService.setCustomEntityContext(
-            IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
-          SkillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
-            var misconceptionsBySkill = {};
-            var skill = skillDict.skill;
-            misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
-            _showQuestionSuggestionModal(
-              suggestion, contributionDetails, reviewable,
-              misconceptionsBySkill);
-            $rootScope.$apply();
-          });
+          openQuestionSuggestionModal(suggestionId);
         }
         if (suggestion.suggestion_type === SUGGESTION_TYPE_TRANSLATE) {
           const suggestionIdToContribution = {};

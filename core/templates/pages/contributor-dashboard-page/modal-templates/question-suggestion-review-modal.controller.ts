@@ -38,15 +38,17 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   'ThreadDataBackendApiService', 'UrlInterpolationService',
   'authorName', 'contentHtml', 'misconceptionsBySkill', 'question',
   'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics',
-  'suggestion', 'suggestionId', 'ACTION_ACCEPT_SUGGESTION',
-  'ACTION_REJECT_SUGGESTION', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+  'suggestion', 'suggestionId', 'editSuggestionCallback',
+  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+  'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
       $rootScope, $scope, $uibModal, $uibModalInstance, ContextService,
       ContributionOpportunitiesService, SkillBackendApiService,
       SiteAnalyticsService, SuggestionModalService,
       ThreadDataBackendApiService, UrlInterpolationService,
       authorName, contentHtml, misconceptionsBySkill, question, questionHeader,
-      reviewable, skillDifficulty, skillRubrics, suggestion, suggestionId,
+      reviewable, skillDifficulty, skillRubrics,
+      suggestion, suggestionId, editSuggestionCallback,
       ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION,
       SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     const getSkillDifficultyLabel = () => {
@@ -143,6 +145,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     };
 
     $scope.edit = function() {
+      $uibModalInstance.dismiss();
       SkillBackendApiService.fetchSkillAsync(
         suggestion.change.skill_id).then((skillDict) => {
         $uibModal.open({
@@ -161,11 +164,11 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
             skillDifficulty: () => skillDifficulty
           },
           controller: 'QuestionSuggestionEditorModalController'
-        }).result.then(function() {}, function() {
+        }).result.then(function() {
+          editSuggestionCallback(suggestionId, question);
+        }, function() {
           ContextService.resetImageSaveDestination();
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
+          editSuggestionCallback(suggestionId);
         });
       });
     };
