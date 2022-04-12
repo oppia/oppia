@@ -23,6 +23,7 @@ import { ExplorationSummaryBackendApiService, ExplorationSummaryBackendDict } fr
   'domain/summary/exploration-summary-backend-api.service';
 import { ReadOnlyExplorationBackendApiService, FetchExplorationBackendResponse } from
   './read-only-exploration-backend-api.service';
+import constants from 'assets/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -48,6 +49,26 @@ export class ExplorationIdValidationService {
       .fetchExplorationAsync(explorationId, null).then(
         (response: FetchExplorationBackendResponse) => {
           return response.correctness_feedback_enabled;
+        });
+  }
+
+  async categoryNotDefault(explorationId: string): Promise<boolean> {
+    return this.explorationSummartBackendApiService
+      .loadPublicAndPrivateExplorationSummariesAsync([explorationId]).then(
+        (response: ExplorationSummaryBackendDict) => {
+          let summaries = response.summaries;
+          if (summaries.length !== 1) {
+            return false;
+          } else {
+            let category = summaries[0].category;
+            let isCategoryPresent = false;
+            for (let i of constants.ALL_CATEGORIES) {
+              if (i === category) {
+                isCategoryPresent = true;
+              }
+            }
+            return !isCategoryPresent;
+          }
         });
   }
 }

@@ -60,6 +60,10 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
       StoryUpdateService.addStoryNode($scope.story, $scope.title);
       $scope.correctnessFeedbackDisabled = false;
+      $scope.categoryNotDefault = false;
+      $scope.categoryNotDefaultString = 'The category ' +
+        'of this exploration is invalid. Curated lessons need to have their ' +
+        'category to be one of the default categories.';
     };
 
     $scope.init();
@@ -108,6 +112,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $scope.errorMsg = null;
       $scope.invalidExpId = false;
       $scope.correctnessFeedbackDisabled = false;
+      $scope.categoryNotDefault = false;
       $scope.invalidExpErrorString = 'Please enter a valid exploration id.';
     };
 
@@ -147,8 +152,18 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
                 return;
               }
               $scope.correctnessFeedbackDisabled = false;
-              $scope.updateTitle();
-              $scope.updateExplorationId();
+              ExplorationIdValidationService.categoryNotDefault(
+                $scope.explorationId).then(
+                (categoryNotDefault) => {
+                  if (categoryNotDefault) {
+                    $scope.categoryNotDefault = true;
+                    $scope.$applyAsync();
+                    return;
+                  }
+                  $scope.categoryNotDefault = false;
+                  $scope.updateTitle();
+                  $scope.updateExplorationId();
+                });
             });
         });
     };
