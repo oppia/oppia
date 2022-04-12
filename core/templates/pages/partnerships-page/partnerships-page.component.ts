@@ -56,7 +56,6 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
-    this.pageTitleService.setDocumentTitle('Partnerships | Oppia');
     this.partnershipsImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/partnerships_hero_image.png');
     this.formIconUrl = this.urlInterpolationService.getStaticImageUrl(

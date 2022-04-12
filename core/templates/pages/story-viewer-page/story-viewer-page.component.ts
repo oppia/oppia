@@ -164,6 +164,14 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     return result;
   }
 
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
       'I18N_STORY_VIEWER_PAGE_TITLE', {
@@ -205,11 +213,7 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
         // manually, and the onLangChange subscription is added after
         // the story is loaded.
         this.setPageTitle();
-        this.directiveSubscriptions.add(
-          this.translateService.onLangChange.subscribe(() => {
-            this.setPageTitle();
-          })
-        );
+        this.subscribeToOnLangChange();
         this.storyTitleTranslationKey = (
           this.i18nLanguageCodeService
             .getStoryTranslationKey(
