@@ -606,7 +606,7 @@ describe('Question player engine service ', () => {
     singleQuestionBackendDict.question_state_data
       .content.html = null;
     let alertsServiceSpy = spyOn(
-      alertsService, 'addWarning').and.callThrough();
+      alertsService, 'addWarning').and.returnValue();
     spyOn(expressionInterpolationService, 'processHtml')
       .and.callFake((html, envs) => html);
 
@@ -623,7 +623,7 @@ describe('Question player engine service ', () => {
     let initErrorCb = jasmine.createSpy('fail');
 
     let alertsServiceSpy = spyOn(
-      alertsService, 'addWarning').and.callThrough();
+      alertsService, 'addWarning').and.returnValue();
 
     questionPlayerEngineService.init(
       [], initSuccessCb, initErrorCb);
@@ -693,7 +693,7 @@ describe('Question player engine service ', () => {
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
       let alertsServiceSpy = spyOn(
-        alertsService, 'addWarning').and.callThrough();
+        alertsService, 'addWarning').and.returnValue();
       spyOn(expressionInterpolationService, 'processHtml')
         .and.callFake((html, envs) => html);
 
@@ -730,7 +730,7 @@ describe('Question player engine service ', () => {
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
       let alertsServiceSpy = spyOn(
-        alertsService, 'addWarning').and.callThrough();
+        alertsService, 'addWarning').and.returnValue();
       spyOn(questionPlayerEngineService, 'init').and.callFake(() => {
         questionPlayerEngineService.addQuestion(sampleQuestion);
       });
