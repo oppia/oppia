@@ -1061,6 +1061,15 @@ def validate_exploration_for_story(exp, strict):
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
 
+    if exp.category not in constants.ALL_CATEGORIES:
+        error_string = (
+            'Expected all explorations in a story to '
+            'be of a default category '
+            'Invalid exploration: %s' % exp.id)
+        if strict:
+            raise utils.ValidationError(error_string)
+        validation_error_messages.append(error_string)
+
     for state_name in exp.states:
         state = exp.states[state_name]
         if not state.interaction.is_supported_on_android_app():
