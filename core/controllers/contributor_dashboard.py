@@ -311,11 +311,11 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
             in_review_suggestion_target_ids = (
                 suggestion_services
                 .get_reviewable_translation_suggestion_target_ids(user_id))
-            exp_ids = [
+            exp_ids.extend([
                 node.exploration_id
                 for story in stories
                 for node in story.story_contents.get_ordered_nodes()
-                if node.exploration_id in in_review_suggestion_target_ids]
+                if node.exploration_id in in_review_suggestion_target_ids])
         return (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 exp_ids).values())
