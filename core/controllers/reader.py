@@ -294,6 +294,14 @@ class ExplorationHandler(base.BaseHandler):
         most_recently_reached_checkpoint_exp_version = None
         most_recently_reached_checkpoint_state_name = None
 
+        # If exploration_user_data is None, it means the exploration is started
+        # for the first time and no checkpoint progress of the user exists for
+        # the respective exploration.
+        # Exploration version 'v' passed as a parameter in GET request means a
+        # previous version of the exploration is being fetched. In that case,
+        # we want that exploration to start from the beginning and do not
+        # allow users to save their checkpoint progress in older exploration
+        # version.
         if exploration_user_data is not None and version is None:
             # If the latest exploration version is ahead of the most recently
             # interacted exploration version.

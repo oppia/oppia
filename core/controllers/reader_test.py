@@ -2183,6 +2183,7 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ExplorationStartEventHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_cannot_fetch_exploration_with_invalid_version(self):
@@ -2197,6 +2198,77 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id),
             {'v': 5},
             expected_status_int=404)
+
+        self.logout()
+
+    def test_user_checkpoint_progress_is_none_on_fetching_older_exploration(
+        self):
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.login(self.VIEWER_EMAIL)
+
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        # Update exploration.
+        # Now version of the exploration becomes 2.
+        exp_services.update_exploration(
+            owner_id, exp_id,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'What language',
+                'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                'new_value': True
+            })], 'Made What language state a checkpoint'
+        )
+
+        # First checkpoint reached.
+        self.put_json(
+            '/explorehandler/checkpoint_reached/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 2,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!'
+            }
+        )
+
+        # Fetching latest exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_exp_version'], 2)
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_state_name'],
+            'Welcome!')
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'],
+            2)
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_state_name'],
+            'Welcome!')
+
+        # Fetching older exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id),
+            {'v': 1})
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
 
         self.logout()
 
