@@ -141,7 +141,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
             $scope.invalidExpId = true;
             $scope.$applyAsync();
             return;
-          } 
+          }
           $scope.invalidExpId = false;
           ExplorationIdValidationService.isCorrectnessFeedbackEnabled(
             $scope.explorationId).then(
