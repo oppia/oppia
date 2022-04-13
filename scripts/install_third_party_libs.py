@@ -25,19 +25,11 @@ import sys
 import urllib.request as urlrequest
 import zipfile
 
-from core import utils
-
 from typing import Tuple
 
-from . import common
-from . import install_backend_python_libs
-from . import install_third_party
-from . import pre_commit_hook
-from . import pre_push_hook
-from . import setup
-from . import setup_gae
-
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
+
+# These libraries need to be installed before running or importing any script.
 
 PREREQUISITES = (
     ('pyyaml', '6.0', os.path.join(TOOLS_DIR, 'pyyaml-6.0')),
@@ -75,6 +67,16 @@ def install_prerequisite(package: Tuple[str]) -> None:
 
 for prerequisite in PREREQUISITES:
     install_prerequisite(prerequisite)
+
+from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+
+from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import setup  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""
