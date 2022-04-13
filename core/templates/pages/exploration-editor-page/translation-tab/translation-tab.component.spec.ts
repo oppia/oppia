@@ -377,38 +377,29 @@ fdescribe('Translation tab component', function() {
         .toHaveBeenCalled();
       expect($scope.tutorialInProgress).toBe(false);
     });
-
+  
   it('should start tutorial when welcome translation modal is closed',
-    fakeAsync(() => 
-
+    fakeAsync(() => {
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
         }));
-      
+
       ctrl.$onInit();
-      
       $scope.$apply();
-      
 
       spyOn(siteAnalyticsService, 'registerAcceptTutorialModalEvent');
-      
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.resolve('exp1')
       } as NgbModalRef);
-      
       enterTranslationForTheFirstTimeEmitter.emit();
-      
       tick();
-      
       $scope.$apply();
-      
 
       expect(siteAnalyticsService.registerAcceptTutorialModalEvent)
         .toHaveBeenCalled();
-      
     }));
-
+  
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', fakeAsync(() => {
     console.log("1"+contextService.getExplorationId());
