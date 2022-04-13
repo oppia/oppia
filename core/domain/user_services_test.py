@@ -1519,25 +1519,24 @@ title: Title
 
     def test_user_checkpoint_progress_is_updated_correctly(self):
         self.login(self.VIEWER_EMAIL)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
-        self.assertIsNone(exploration_user_data)
+        self.assertIsNone(exp_user_data)
 
         # First checkpoint reached.
         user_services.update_learner_checkpoint_progress(
             self.viewer_id, self.EXP_ID, 'Introduction', 1)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version, 1)
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name,
+            exp_user_data.furthest_reached_checkpoint_state_name,
             'Introduction')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version,
-            1)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            exp_user_data.most_recently_reached_checkpoint_state_name,
             'Introduction')
 
         # Make 'New state' a checkpoint.
@@ -1552,36 +1551,32 @@ title: Title
         # Second checkpoint reached.
         user_services.update_learner_checkpoint_progress(
             self.viewer_id, self.EXP_ID, 'New state', 2)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version, 2)
+            exp_user_data.furthest_reached_checkpoint_exp_version, 2)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name,
+            exp_user_data.furthest_reached_checkpoint_state_name,
             'New state')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version,
-            2)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 2)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            exp_user_data.most_recently_reached_checkpoint_state_name,
             'New state')
 
         # Restart the exploration.
         user_services.update_learner_checkpoint_progress_on_restart(
             self.viewer_id, self.EXP_ID)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version, 2)
+            exp_user_data.furthest_reached_checkpoint_exp_version, 2)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name,
-            'New state')
+            exp_user_data.furthest_reached_checkpoint_state_name, 'New state')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version,
-            None)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, None)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name,
-            None)
+            exp_user_data.most_recently_reached_checkpoint_state_name, None)
 
         # Unmark 'New state' as a checkpoint.
         # Now version of the exploration becomes 3.
@@ -1599,19 +1594,17 @@ title: Title
         # state in this case) becomes the new furthest reached checkpoint.
         user_services.update_learner_checkpoint_progress(
             self.viewer_id, self.EXP_ID, 'Introduction', 3)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version,
-            3)
+            exp_user_data.furthest_reached_checkpoint_exp_version, 3)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name,
+            exp_user_data.furthest_reached_checkpoint_state_name,
             'Introduction')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version,
-            3)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 3)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            exp_user_data.most_recently_reached_checkpoint_state_name,
             'Introduction')
 
         # Change state name of 'Introduction' state.
@@ -1628,63 +1621,58 @@ title: Title
         # First checkpoint reached again.
         user_services.update_learner_checkpoint_progress(
             self.viewer_id, self.EXP_ID, 'Intro', 4)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version,
-            4)
+            exp_user_data.furthest_reached_checkpoint_exp_version, 4)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name,
-            'Intro')
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Intro')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version,
-            4)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 4)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name,
-            'Intro')
+            exp_user_data.most_recently_reached_checkpoint_state_name, 'Intro')
 
         self.logout()
 
     def test_restart_event_creates_exploration_user_data_if_not_existing(self):
         self.login(self.VIEWER_EMAIL)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
-        self.assertIsNone(exploration_user_data)
+        self.assertIsNone(exp_user_data)
         user_services.update_learner_checkpoint_progress_on_restart(
             self.viewer_id, self.EXP_ID)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
-        self.assertIsNotNone(exploration_user_data)
+        self.assertIsNotNone(exp_user_data)
         self.assertIsNone(
-            exploration_user_data.furthest_reached_checkpoint_exp_version)
+            exp_user_data.furthest_reached_checkpoint_exp_version)
         self.assertIsNone(
-            exploration_user_data.furthest_reached_checkpoint_state_name)
+            exp_user_data.furthest_reached_checkpoint_state_name)
         self.assertIsNone(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version)
+            exp_user_data.most_recently_reached_checkpoint_exp_version)
         self.assertIsNone(
-            exploration_user_data.most_recently_reached_checkpoint_state_name)
+            exp_user_data.most_recently_reached_checkpoint_state_name)
 
     def test_sync_learner_checkpoint_progress_with_current_exp_version(self):
         self.login(self.VIEWER_EMAIL)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
-        self.assertIsNone(exploration_user_data)
+        self.assertIsNone(exp_user_data)
 
         # First checkpoint reached.
         user_services.update_learner_checkpoint_progress(
             self.viewer_id, self.EXP_ID, 'Introduction', 1)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version, 1)
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name,
+            exp_user_data.furthest_reached_checkpoint_state_name,
             'Introduction')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version,
-            1)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            exp_user_data.most_recently_reached_checkpoint_state_name,
             'Introduction')
 
         # Change state name of 'Introduction' state.
@@ -1708,18 +1696,17 @@ title: Title
         # exists in current exploration. If such checkpoint is not found,
         # furthest reached checkpoint is set to None. Similar workflow is
         # carried out for most recently reached checkpoint.
-        exploration_user_data = (
+        exp_user_data = (
             user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
                 self.viewer_id, self.EXP_ID))
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version, 2)
+            exp_user_data.furthest_reached_checkpoint_exp_version, 2)
         self.assertIsNone(
-            exploration_user_data.furthest_reached_checkpoint_state_name)
+            exp_user_data.furthest_reached_checkpoint_state_name)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version,
-            2)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 2)
         self.assertIsNone(
-            exploration_user_data.most_recently_reached_checkpoint_state_name)
+            exp_user_data.most_recently_reached_checkpoint_state_name)
 
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):

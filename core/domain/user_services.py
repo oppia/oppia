@@ -2314,8 +2314,10 @@ def _get_checkpoints_in_order(init_state_name, states):
         if current_state_name not in visited_state_names:
             visited_state_names.append(current_state_name)
             current_state = states[current_state_name]
-            if (current_state.card_is_checkpoint and (
-                current_state_name not in checkpoint_state_names)):
+            if (
+                current_state.card_is_checkpoint and 
+                current_state_name not in checkpoint_state_names
+            ):
                 checkpoint_state_names.append(current_state_name)
             for answer_group in current_state.interaction.answer_groups:
                 queue.append(answer_group.outcome.dest)
@@ -2353,10 +2355,10 @@ def _get_most_distant_reached_checkpoint_in_current_exploration(
     # Loop through checkpoints of furthest_reached_exploration backwards until
     # a checkpoint is found that exists in current_exploration too.
     while mdrc_index >= 0:
-        if checkpoints_in_older_exploration[mdrc_index] in (
-            checkpoints_in_current_exploration):
-            return checkpoints_in_older_exploration[mdrc_index]
-        mdrc_index = mdrc_index - 1
+        checkpoint_in_old_exp = checkpoints_in_older_exploration[mdrc_index]
+        if checkpoint_in_old_exp in checkpoints_in_current_exploration:
+            return checkpoint_in_old_exp
+        mdrc_index -= 1
 
     return None
 
@@ -2375,76 +2377,64 @@ def update_learner_checkpoint_progress(
             checkpoint.
     """
 
-    exploration_user_model = user_models.ExplorationUserDataModel.get(
+    exp_user_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
-    if exploration_user_model is None:
-        exploration_user_model = user_models.ExplorationUserDataModel.create(
+    if exp_user_model is None:
+        exp_user_model = user_models.ExplorationUserDataModel.create(
             user_id, exploration_id)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, True, exp_version)
 
     # If the exploration is being visited the first time.
-    if exploration_user_model.furthest_reached_checkpoint_state_name is None:
-        exploration_user_model.furthest_reached_checkpoint_exp_version = (
-            exp_version)
-        exploration_user_model.furthest_reached_checkpoint_state_name = (
-            state_name)
-    elif (exploration_user_model.furthest_reached_checkpoint_exp_version) < (
-        exp_version):
-        furthest_reached_checkpoint_exploration = (
+    if exp_user_model.furthest_reached_checkpoint_state_name is None:
+        exp_user_model.furthest_reached_checkpoint_exp_version = exp_version
+        exp_user_model.furthest_reached_checkpoint_state_name = state_name
+    elif exp_user_model.furthest_reached_checkpoint_exp_version < exp_version:
+        furthest_reached_checkpoint_exp = (
             exp_fetchers.get_exploration_by_id(
                 exploration_id,
                 strict=True,
-                version=(
-                    exploration_user_model
-                        .furthest_reached_checkpoint_exp_version
-                )
+                version=exp_user_model.furthest_reached_checkpoint_exp_version
             )
         )
-        checkpoints_in_current_exploration = _get_checkpoints_in_order(
+        checkpoints_in_current_exp = _get_checkpoints_in_order(
             current_exploration.init_state_name, current_exploration.states)
-        checkpoints_in_older_exploration = _get_checkpoints_in_order(
-            furthest_reached_checkpoint_exploration.init_state_name,
-            furthest_reached_checkpoint_exploration.states)
+        checkpoints_in_older_exp = _get_checkpoints_in_order(
+            furthest_reached_checkpoint_exp.init_state_name,
+            furthest_reached_checkpoint_exp.states)
 
         # Get the furthest reached checkpoint in current exploration.
-        furthest_reached_checkpoint_in_current_exploration = (
+        furthest_reached_checkpoint_in_current_exp = (
             _get_most_distant_reached_checkpoint_in_current_exploration(
-                checkpoints_in_current_exploration,
-                checkpoints_in_older_exploration,
-                exploration_user_model.furthest_reached_checkpoint_state_name
+                checkpoints_in_current_exp,
+                checkpoints_in_older_exp,
+                exp_user_model.furthest_reached_checkpoint_state_name
             )
         )
 
         # If the furthest reached checkpoint doesn't exist in current
         # exploration.
-        if furthest_reached_checkpoint_in_current_exploration is None:
-            exploration_user_model.furthest_reached_checkpoint_exp_version = (
+        if furthest_reached_checkpoint_in_current_exp is None:
+            exp_user_model.furthest_reached_checkpoint_exp_version = (
                 exp_version)
-            exploration_user_model.furthest_reached_checkpoint_state_name = (
-                state_name)
+            exp_user_model.furthest_reached_checkpoint_state_name = state_name
         else:
+            # Index of the furthest reached checkpoint.
+            frc_index = checkpoints_in_current_exp.index(
+                furthest_reached_checkpoint_in_current_exp)
             # If furthest reached checkpoint is behind most recently
             # reached checkpoint.
-            if (checkpoints_in_current_exploration.index(
-                furthest_reached_checkpoint_in_current_exploration) <= (
-                    checkpoints_in_current_exploration.index(state_name))):
-                (
-                    exploration_user_model
-                    .furthest_reached_checkpoint_exp_version
-                ) = exp_version
-                (
-                    exploration_user_model
-                    .furthest_reached_checkpoint_state_name
-                ) = state_name
+            if frc_index <= checkpoints_in_current_exp.index(state_name):
+                exp_user_model.furthest_reached_checkpoint_exp_version = (
+                    exp_version)
+                exp_user_model.furthest_reached_checkpoint_state_name = (
+                    state_name)
 
-    exploration_user_model.most_recently_reached_checkpoint_exp_version = (
-        exp_version)
-    exploration_user_model.most_recently_reached_checkpoint_state_name = (
-        state_name)
-    exploration_user_model.update_timestamps()
-    exploration_user_model.put()
+    exp_user_model.most_recently_reached_checkpoint_exp_version = exp_version
+    exp_user_model.most_recently_reached_checkpoint_state_name = state_name
+    exp_user_model.update_timestamps()
+    exp_user_model.put()
 
 
 def set_user_has_viewed_lesson_info_modal_once(user_id):
@@ -2453,7 +2443,6 @@ def set_user_has_viewed_lesson_info_modal_once(user_id):
     Args:
         user_id: str. The Id of the user.
     """
-
     user_settings = get_user_settings(user_id)
     user_settings.mark_lesson_info_modal_viewed()
     _save_user_settings(user_settings)
@@ -2466,25 +2455,26 @@ def update_learner_checkpoint_progress_on_restart(user_id, exploration_id):
         user_id: str. The Id of the user.
         exploration_id: str. The Id of the exploration.
     """
-    exploration_user_model = user_models.ExplorationUserDataModel.get(
+    exp_user_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
-    if exploration_user_model is None:
+    if exp_user_model is None:
         # This case normally won't arise since as soon as the exploration
         # starts most_recently_reached_checkpoint is updated (First state of
         # an exploration is always a checkpoint). This is just a double check
         # in case learner hits the restart button while the other content of
         # the page is loading.
-        exploration_user_model = user_models.ExplorationUserDataModel.create(
+        exp_user_model = user_models.ExplorationUserDataModel.create(
             user_id, exploration_id)
-    exploration_user_model.most_recently_reached_checkpoint_exp_version = None
-    exploration_user_model.most_recently_reached_checkpoint_state_name = None
-    exploration_user_model.update_timestamps()
-    exploration_user_model.put()
+    exp_user_model.most_recently_reached_checkpoint_exp_version = None
+    exp_user_model.most_recently_reached_checkpoint_state_name = None
+    exp_user_model.update_timestamps()
+    exp_user_model.put()
 
 
 def sync_learner_checkpoint_progress_with_current_exp_version(
     user_id,
-    exploration_id):
+    exploration_id
+):
     """Synchronizes the most recently reached checkpoint and the furthest
     reached checkpoint with the latest exploration.
 
@@ -2496,24 +2486,22 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
         ExplorationUserData. The domain object corresponding to the given user
         and exploration.
     """
-    exploration_user_model = user_models.ExplorationUserDataModel.get(
+    exp_user_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
 
-    if exploration_user_model is not None:
+    if exp_user_model is not None:
         latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         most_recently_interacted_exploration = (
             exp_fetchers.get_exploration_by_id(
                 exploration_id,
                 True,
-                (
-                    exploration_user_model
-                        .most_recently_reached_checkpoint_exp_version
-                )))
+                exp_user_model.most_recently_reached_checkpoint_exp_version
+                ))
         furthest_reached_exploration = (
             exp_fetchers.get_exploration_by_id(
                 exploration_id,
                 True,
-                exploration_user_model.furthest_reached_checkpoint_exp_version
+                exp_user_model.furthest_reached_checkpoint_exp_version
             ))
 
         most_recently_reached_checkpoint_in_current_exploration = (
@@ -2524,10 +2512,7 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
                 _get_checkpoints_in_order(
                     most_recently_interacted_exploration.init_state_name,
                     most_recently_interacted_exploration.states),
-                (
-                    exploration_user_model
-                        .most_recently_reached_checkpoint_state_name
-                )
+                exp_user_model.most_recently_reached_checkpoint_state_name
             )
         )
 
@@ -2539,43 +2524,32 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
                 _get_checkpoints_in_order(
                     furthest_reached_exploration.init_state_name,
                     furthest_reached_exploration.states),
-                (
-                    exploration_user_model
-                        .furthest_reached_checkpoint_state_name
-                )
+                exp_user_model.furthest_reached_checkpoint_state_name
             )
         )
 
         # If the most recently reached checkpoint doesn't exist in current
         # exploration.
         if most_recently_reached_checkpoint_in_current_exploration != (
-            exploration_user_model.most_recently_reached_checkpoint_state_name):
-            (
-                exploration_user_model
-                    .most_recently_reached_checkpoint_state_name
-            ) = most_recently_reached_checkpoint_in_current_exploration
-            (
-                exploration_user_model
-                    .most_recently_reached_checkpoint_exp_version
-            ) = latest_exploration.version
-            exploration_user_model.update_timestamps()
-            exploration_user_model.put()
+            exp_user_model.most_recently_reached_checkpoint_state_name):
+            exp_user_model.most_recently_reached_checkpoint_state_name = (
+                most_recently_reached_checkpoint_in_current_exploration)
+            exp_user_model.most_recently_reached_checkpoint_exp_version = (
+                latest_exploration.version)
+            exp_user_model.update_timestamps()
+            exp_user_model.put()
 
         # If the furthest reached checkpoint doesn't exist in current
         # exploration.
         if furthest_reached_checkpoint_in_current_exploration != (
-            exploration_user_model.furthest_reached_checkpoint_state_name):
-            (
-                exploration_user_model
-                    .furthest_reached_checkpoint_state_name
-            ) = furthest_reached_checkpoint_in_current_exploration
-            (
-                exploration_user_model
-                    .furthest_reached_checkpoint_exp_version
-             ) = latest_exploration.version
-            exploration_user_model.update_timestamps()
-            exploration_user_model.put()
+            exp_user_model.furthest_reached_checkpoint_state_name):
+            exp_user_model.furthest_reached_checkpoint_state_name = (
+                furthest_reached_checkpoint_in_current_exploration)
+            exp_user_model.furthest_reached_checkpoint_exp_version = (
+                latest_exploration.version)
+            exp_user_model.update_timestamps()
+            exp_user_model.put()
 
-    exploration_user_data = exp_fetchers.get_exploration_user_data(
+    exp_user_data = exp_fetchers.get_exploration_user_data(
         user_id, exploration_id)
-    return exploration_user_data
+    return exp_user_data

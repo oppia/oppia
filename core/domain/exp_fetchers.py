@@ -427,30 +427,24 @@ def get_exploration_user_data(user_id, exp_id):
         ExplorationUserData. The domain object corresponding to the given user
         and exploration.
     """
-    exploration_user_data_model = user_models.ExplorationUserDataModel.get(
+    exp_user_data_model = user_models.ExplorationUserDataModel.get(
         user_id, exp_id)
-    if exploration_user_data_model is not None:
+    if exp_user_data_model is not None:
         return user_domain.ExplorationUserData(
-            exploration_user_data_model.user_id,
-            exploration_user_data_model.exploration_id,
-            exploration_user_data_model.rating,
-            exploration_user_data_model.rated_on,
-            exploration_user_data_model.draft_change_list,
-            exploration_user_data_model.draft_change_list_last_updated,
-            exploration_user_data_model.draft_change_list_exp_version,
-            exploration_user_data_model.draft_change_list_id,
-            exploration_user_data_model.mute_suggestion_notifications,
-            exploration_user_data_model.mute_feedback_notifications,
-            exploration_user_data_model.furthest_reached_checkpoint_exp_version,
-            exploration_user_data_model.furthest_reached_checkpoint_state_name,
-            (
-                exploration_user_data_model
-                    .most_recently_reached_checkpoint_exp_version
-            ),
-            (
-                exploration_user_data_model
-                    .most_recently_reached_checkpoint_state_name
-            )
+            exp_user_data_model.user_id,
+            exp_user_data_model.exploration_id,
+            exp_user_data_model.rating,
+            exp_user_data_model.rated_on,
+            exp_user_data_model.draft_change_list,
+            exp_user_data_model.draft_change_list_last_updated,
+            exp_user_data_model.draft_change_list_exp_version,
+            exp_user_data_model.draft_change_list_id,
+            exp_user_data_model.mute_suggestion_notifications,
+            exp_user_data_model.mute_feedback_notifications,
+            exp_user_data_model.furthest_reached_checkpoint_exp_version,
+            exp_user_data_model.furthest_reached_checkpoint_state_name,
+            exp_user_data_model.most_recently_reached_checkpoint_exp_version,
+            exp_user_data_model.most_recently_reached_checkpoint_state_name
         )
     else:
         return None

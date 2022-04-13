@@ -1402,7 +1402,7 @@ class ExplorationUserData:
         furthest_reached_checkpoint_state_name: Optional[str]= None,
         most_recently_reached_checkpoint_exp_version: Optional[int] = None,
         most_recently_reached_checkpoint_state_name: Optional[str] = None
-        ) -> None:
+    ) -> None:
         """Constructs a ExplorationUserData domain object.
 
         Attributes:

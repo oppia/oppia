@@ -264,22 +264,21 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
         user_services.update_learner_checkpoint_progress(
             user_id, self.EXP_1_ID, 'Introduction', 1)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             user_id, self.EXP_1_ID)
-        self.assertIsNotNone(exploration_user_data)
-        self.assertEqual(exploration_user_data.user_id, user_id)
-        self.assertEqual(exploration_user_data.exploration_id, self.EXP_1_ID)
+        self.assertIsNotNone(exp_user_data)
+        self.assertEqual(exp_user_data.user_id, user_id)
+        self.assertEqual(exp_user_data.exploration_id, self.EXP_1_ID)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name,
+            exp_user_data.furthest_reached_checkpoint_state_name,
             'Introduction')
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version, 1)
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            exp_user_data.most_recently_reached_checkpoint_state_name,
             'Introduction')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version,
-            1)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
 
 
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):

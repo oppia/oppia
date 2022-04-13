@@ -274,7 +274,7 @@ class ExplorationHandler(base.BaseHandler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         user_settings = user_services.get_user_settings(self.user_id)
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             self.user_id, exploration_id)
 
         preferred_audio_language_code = None
@@ -294,7 +294,7 @@ class ExplorationHandler(base.BaseHandler):
         most_recently_reached_checkpoint_exp_version = None
         most_recently_reached_checkpoint_state_name = None
 
-        # If exploration_user_data is None, it means the exploration is started
+        # If exp_user_data is None, it means the exploration is started
         # for the first time and no checkpoint progress of the user exists for
         # the respective exploration.
         # Exploration version 'v' passed as a parameter in GET request means a
@@ -302,25 +302,23 @@ class ExplorationHandler(base.BaseHandler):
         # we want that exploration to start from the beginning and do not
         # allow users to save their checkpoint progress in older exploration
         # version.
-        if exploration_user_data is not None and version is None:
+        if exp_user_data is not None and version is None:
             # If the latest exploration version is ahead of the most recently
             # interacted exploration version.
-            if (exploration_user_data.most_recently_reached_checkpoint_exp_version is not None and ( # pylint: disable=line-too-long
-                    exploration_user_data.most_recently_reached_checkpoint_exp_version < exploration.version)): # pylint: disable=line-too-long
-                exploration_user_data = (
+            if (exp_user_data.most_recently_reached_checkpoint_exp_version is not None and ( # pylint: disable=line-too-long
+                    exp_user_data.most_recently_reached_checkpoint_exp_version < exploration.version)): # pylint: disable=line-too-long
+                exp_user_data = (
                     user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
                         self.user_id, exploration_id))
 
             furthest_reached_checkpoint_exp_version = (
-                exploration_user_data.furthest_reached_checkpoint_exp_version)
+                exp_user_data.furthest_reached_checkpoint_exp_version)
             furthest_reached_checkpoint_state_name = (
-                exploration_user_data.furthest_reached_checkpoint_state_name)
+                exp_user_data.furthest_reached_checkpoint_state_name)
             most_recently_reached_checkpoint_exp_version = (
-                exploration_user_data
-                    .most_recently_reached_checkpoint_exp_version)
+                exp_user_data.most_recently_reached_checkpoint_exp_version)
             most_recently_reached_checkpoint_state_name = (
-                exploration_user_data
-                    .most_recently_reached_checkpoint_state_name)
+                exp_user_data.most_recently_reached_checkpoint_state_name)
 
         self.values.update({
             'can_edit': (

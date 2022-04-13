@@ -2720,18 +2720,16 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
             }
         )
 
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             viewer_id, exp_id)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version, 1)
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name,
-            'Welcome!')
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version,
-            1)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            exp_user_data.most_recently_reached_checkpoint_state_name,
             'Welcome!')
 
         # Update exploration.
@@ -2750,15 +2748,13 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
         exploration_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version, 1)
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name,
-            'Welcome!')
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version,
-            1)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            exp_user_data.most_recently_reached_checkpoint_state_name,
             'Welcome!')
 
         # Second checkpoint reached.
@@ -2769,18 +2765,17 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
                 'most_recently_reached_checkpoint_state_name': 'What language'
             }
         )
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             viewer_id, exp_id)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version, 2)
+            exp_user_data.furthest_reached_checkpoint_exp_version, 2)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name,
+            exp_user_data.furthest_reached_checkpoint_state_name,
             'What language')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version,
-            2)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 2)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            exp_user_data.most_recently_reached_checkpoint_state_name,
             'What language')
 
         self.logout()
@@ -2821,18 +2816,16 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
                 'most_recently_reached_checkpoint_state_name': 'Welcome!'
             }
         )
-        exploration_user_data = exp_fetchers.get_exploration_user_data(
+        exp_user_data = exp_fetchers.get_exploration_user_data(
             viewer_id, exp_id)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_exp_version, 1)
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name,
-            'Welcome!')
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_exp_version,
-            1)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
         self.assertEqual(
-            exploration_user_data.most_recently_reached_checkpoint_state_name,
+            exp_user_data.most_recently_reached_checkpoint_state_name,
             'Welcome!')
 
         # Exploration restarted.
@@ -2847,8 +2840,7 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_dict['furthest_reached_checkpoint_exp_version'], 1)
         self.assertEqual(
-            exploration_user_data.furthest_reached_checkpoint_state_name,
-            'Welcome!')
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
         self.assertIsNone(
             exploration_dict['most_recently_reached_checkpoint_exp_version'])
         self.assertIsNone(
