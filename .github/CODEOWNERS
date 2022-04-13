@@ -125,7 +125,7 @@
 /core/domain/opportunity*.py @oppia/contributor-experience-team
 /core/domain/translation*.py @oppia/contributor-experience-team
 /core/domain/voiceover_services*.py @oppia/contributor-experience-team
-/core/storage/translation/ @vojtechjelinek
+/core/storage/translation/ @oppia/data-and-stability-reviewers
 /core/templates/domain/opportunity/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-page/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-admin-page/ @oppia/contributor-experience-team
@@ -201,14 +201,14 @@
 # Exploration project.
 /core/controllers/editor*.py @aks681
 /core/controllers/reader*.py @aks681
-/core/controllers/resources*.py @vojtechjelinek
+/core/controllers/resources*.py @oppia/data-and-stability-reviewers
 /core/domain/exp*.py @aks681
 /core/domain/fs*.py @aks681
 /core/domain/param_domain*.py @aks681
 /core/domain/rating_services*.py @aks681
 /core/domain/state_domain*.py @aks681
 /core/domain/summary_services*.py @aks681
-/core/domain/value_generators_domain*.py @vojtechjelinek
+/core/domain/value_generators_domain*.py @oppia/data-and-stability-reviewers
 /core/templates/components/entity-creation-services/exploration-creation.service*.ts @kevintab95
 /core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @kevintab95
@@ -473,11 +473,12 @@
 # Beam jobs
 /setup.py @vojtechjelinek
 /MANIFEST.in @vojtechjelinek
-/core/jobs/ @vojtechjelinek
-/core/jobs/transforms @vojtechjelinek
-/core/jobs/types @vojtechjelinek
-/core/templates/domain/jobs/ @vojtechjelinek
-/core/controllers/beam_jobs*.py @vojtechjelinek
+/core/jobs/ @oppia/data-and-stability-reviewers
+/core/jobs/transforms @oppia/data-and-stability-reviewers
+/core/jobs/types @oppia/data-and-stability-reviewers
+/core/templates/domain/jobs/ @oppia/data-and-stability-reviewers
+/core/controllers/beam_jobs*.py @oppia/data-and-stability-reviewers
+/core/domain/beam_job*.py @oppia/data-and-stability-reviewers
 
 # Infrastructure.
 /core/controllers/cron*.py @nithusha21
@@ -487,10 +488,9 @@
 /core/constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/tasks*.py @aks681
-/core/domain/beam_job*.py @vojtechjelinek
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @oppia/lace-backend-reviewers
-/core/platform/ @vojtechjelinek
+/core/platform/ @oppia/data-and-stability-reviewers
 /core/templates/App*.ts @srijanreddy98
 /core/templates/app.constants.ts @srijanreddy98
 /core/templates/app.constants.ajs.ts @srijanreddy98
@@ -527,9 +527,9 @@
 
 
 # Python typing
-/mypy.ini @hardikkat24 @vojtechjelinek
-/mypy_imports.py @hardikkat24 @vojtechjelinek
-/mypy_requirements.txt @hardikkat24 @vojtechjelinek
+/mypy.ini @oppia/mypy-reviewers
+/mypy_imports.py @oppia/mypy-reviewers
+/mypy_requirements.txt @oppia/mypy-reviewers
 /stubs/ @oppia/mypy-reviewers
 /scripts/run_mypy_checks*.py @oppia/mypy-reviewers
 
@@ -639,8 +639,8 @@
 
 # User Data Takeout.
 # TODO(#14285): Replace @seanlip with @BenHenning for both.
-/core/domain/takeout_*.py @seanlip @vojtechjelinek
-/core/domain/wipeout_*.py @seanlip @vojtechjelinek
+/core/domain/takeout_*.py @seanlip @oppia/data-and-stability-reviewers
+/core/domain/wipeout_*.py @seanlip @oppia/data-and-stability-reviewers
 
 
 # User’s profile page.
@@ -678,9 +678,9 @@
 
 
 # Data stability.
-/core/controllers/domain_objects_validator*.py @vojtechjelinek
-/core/controllers/payload_validator*.py @vojtechjelinek
-/core/handler_schema_constants.py @vojtechjelinek
+/core/controllers/domain_objects_validator*.py @oppia/data-and-stability-reviewers
+/core/controllers/payload_validator*.py @oppia/data-and-stability-reviewers
+/core/handler_schema_constants.py @oppia/data-and-stability-reviewers
 
 
 # QA team.
@@ -703,9 +703,9 @@
 
 
 # Python 3 Migration project.
-/core/domain/auth*.py @vojtechjelinek
-/core/domain/caching*.py @vojtechjelinek
-/core/domain/taskqueue*.py @vojtechjelinek
+/core/domain/auth*.py @oppia/data-and-stability-reviewers
+/core/domain/caching*.py @oppia/data-and-stability-reviewers
+/core/domain/taskqueue*.py @oppia/data-and-stability-reviewers
 /core/templates/services/auth.service*.ts @vojtechjelinek
 /core/templates/services/auth-backend-api.service*.ts @vojtechjelinek
 
