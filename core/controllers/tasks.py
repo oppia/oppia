@@ -102,7 +102,7 @@ class SuggestionEmailHandler(base.BaseHandler):
             }
         }
     }
-    
+
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
@@ -121,7 +121,7 @@ class SuggestionEmailHandler(base.BaseHandler):
 
 
 class InstantFeedbackMessageEmailHandler(base.BaseHandler):
-    
+
     """Handles task of sending feedback message emails instantly."""
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
@@ -144,7 +144,7 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
             },
         }
     }
-    
+
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
