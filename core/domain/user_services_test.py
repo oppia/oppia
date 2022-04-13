@@ -1541,12 +1541,12 @@ title: Title
 
         # Make 'New state' a checkpoint.
         # Now version of the exploration becomes 2.
+        change_list =  _get_change_list(
+            'New state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True)
         exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, _get_change_list(
-                'New state',
-                exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
-                True),
-            '')
+            self.owner_id, self.EXP_ID, change_list, '')
 
         # Second checkpoint reached.
         user_services.update_learner_checkpoint_progress(
@@ -1580,12 +1580,12 @@ title: Title
 
         # Unmark 'New state' as a checkpoint.
         # Now version of the exploration becomes 3.
+        change_list = _get_change_list(
+            'New state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            False)
         exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, _get_change_list(
-                'New state',
-                exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
-                False),
-            '')
+            self.owner_id, self.EXP_ID, change_list, '')
 
         # First checkpoint reached again.
         # Since the previously furthest reached checkpoint 'New state' doesn't
