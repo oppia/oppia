@@ -1634,25 +1634,6 @@ title: Title
 
         self.logout()
 
-    def test_restart_event_creates_exploration_user_data_if_not_existing(self):
-        self.login(self.VIEWER_EMAIL)
-        exp_user_data = exp_fetchers.get_exploration_user_data(
-            self.viewer_id, self.EXP_ID)
-        self.assertIsNone(exp_user_data)
-        user_services.update_learner_checkpoint_progress_on_restart(
-            self.viewer_id, self.EXP_ID)
-        exp_user_data = exp_fetchers.get_exploration_user_data(
-            self.viewer_id, self.EXP_ID)
-        self.assertIsNotNone(exp_user_data)
-        self.assertIsNone(
-            exp_user_data.furthest_reached_checkpoint_exp_version)
-        self.assertIsNone(
-            exp_user_data.furthest_reached_checkpoint_state_name)
-        self.assertIsNone(
-            exp_user_data.most_recently_reached_checkpoint_exp_version)
-        self.assertIsNone(
-            exp_user_data.most_recently_reached_checkpoint_state_name)
-
     def test_sync_learner_checkpoint_progress_with_current_exp_version(self):
         self.login(self.VIEWER_EMAIL)
         exp_user_data = exp_fetchers.get_exploration_user_data(
