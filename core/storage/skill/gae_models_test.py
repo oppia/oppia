@@ -8,7 +8,7 @@
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed  to in writing, software
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
@@ -24,6 +24,9 @@ from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
 from core import feconf
+from core.domain import skill_domain
+from core.domain import skill_services
+
 
 
 MYPY = False
@@ -157,6 +160,48 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
             skill_models.SkillModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
+    def test_get_merged_skills(self):
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
+                'old_value': None,
+                'new_value': False
+            })
+        ]
+        skill_services.update_skill(
+            'comitter_id', 'skill_id', changelist,
+            'Merging skill.')
+        skill = skill_fetchers.get_skill_by_id('skill_id')
+        self.assertEqual(skill.version, 2)
+        self.assertEqual(skill.superseding_skill_id, 'TestSkillId')
+        self.assertEqual(skill.all_questions_merged, False)
+
+        # skills = skill_services.get_merged_skills()
+        # self.assertEqual(len(skills), 0)
+        # changelist = [
+        #     skill_domain.SkillChange({
+        #         'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+        #         'property_name': (
+        #             skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+        #         'old_value': '',
+        #         'new_value': 'TestSkillId'
+        #     })
+        # skill_services.update_skill(
+        #     self.USER_ID, self.SKILL_ID, changelist,
+        #     'Merging skill.')
+        # ]
+        # skills = skill_services.get_merged_skills()
+        # self.assertEqual(len(skills), 1)
+        # self.assertEqual(skill_ids[0], self.SKILL_ID)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -164,35 +209,20 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
     def test_get_by_description(self) -> None:
-        committer_id = 'test_committer_id'
-        commit_message = 'test_commit_message'
-        commit_cmds = [{'cmd': 'test_command'}]
-
-        skill_instance = skill_models.SkillModel(
-            id = 'id',
-            description = 'description',
-            # misconceptions_schema_version = (feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION ),
-            # rubric_schema_version = (feconf.CURRENT_RUBRIC_SCHEMA_VERSION),
-            language_code = 'language_code')
-            # skill_contents_schema_version = (feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
-            # next_misconception_id = 0)
-            # all_questions_merged = 'all_questions_merged')
-
-        skill_instance.commit(committer_id, commit_message, commit_cmds)
-        skill_by_description = skill_models.SkillModel.test_get_by_description('description')
-        
-        assert skill_by_description is not None
-        self.assertEqual(skill_by_description.id, 'id')
-        # self.assertEqual(skill_by_description.misconceptions_schema_version, (feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION ))
-        # self.assertEqual(skill_by_description.rubric_schema_version, (feconf.CURRENT_RUBRIC_SCHEMA_VERSION))
-        self.assertEqual(skill_by_description.language_code, 'language_code')
-        # self.assertEqual(skill_by_description.skill_contents_schema_version, (feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION))
-        # self.assertEqual(skill_by_description.next_misconception_id , 'next_misconception_id')
-        # self.assertEqual(skill_by_description.all_questions_merged, 'all_questions_merged')
-
-
-
-        
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skill = skill_domain.Skill.create_default_skill('skill_id', 'description', rubrics)
+        skill_services.save_new_skill('test_comitter_id', skill)
+        skill_model = skill_models.SkillModel.get_by_description('description')
+        assert skill_model is not None
+        self.assertEqual(skill_model.description, 'description')
+        self.assertEqual(skill_model.id, 'skill_id')
+       
 
 class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillSummaryModel class."""
