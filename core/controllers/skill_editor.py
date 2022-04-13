@@ -286,10 +286,10 @@ class SkillDataHandler(base.BaseHandler):
         'comma_separated_skill_ids': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                # 'validators': [{
+                #     'id': 'is_regex_matched',
+                #     'regex_pattern': constants.ENTITY_ID_REGEX
+                # }]
             }
         }
     }
