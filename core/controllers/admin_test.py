@@ -476,7 +476,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, ParamNames.TEST_FEATURE_1.name)])
+            [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -509,7 +509,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, ParamNames.TEST_FEATURE_1.name)])
+            [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -553,7 +553,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, ParamNames.TEST_FEATURE_1.name)])
+            [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -598,7 +598,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, ParamNames.TEST_FEATURE_1.name)])
+            [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -766,7 +766,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, ParamNames.TEST_FEATURE_1.name)])
+            [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
