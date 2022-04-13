@@ -328,39 +328,33 @@ export class ConversationSkinComponent {
         );
     }
 
-    // For the first state which is always a checkpoint.
-    let firstStateName: string;
-    this.getLastSavedDataAsync().then(
-      response => {
-        firstStateName = response.init_state_name;
-      }
-    );
-    let version: number;
-    this.readOnlyExplorationBackendApiService.
-      loadLatestExplorationAsync(this.explorationId).then(
-        response => {
-          version = response.version;
-        }
-      );
-    this.editableExplorationBackendApiService.
-      recordMostRecentlyReachedCheckpointAsync(
-        this.explorationId,
-        version,
-        firstStateName
-      ).then((response) => {
-        // Required for the put operation to deliver data to backend.
-      });
-    this.visitedStateNames.push(firstStateName);
-  }
-
-  // Returns a promise supplying the last saved version for the current
-  // exploration.
-  async getLastSavedDataAsync(): Promise<ReadOnlyExplorationBackendDict> {
-    return this.readOnlyExplorationBackendApiService.
-      loadLatestExplorationAsync(
-        this.explorationId).then(response => {
-        return response.exploration;
-      });
+    // We do not save checkpoints progress for iframes
+    if (!this.isIframed) {
+      // For the first state which is always a checkpoint.
+      let firstStateName: string;
+      let expVersion: number;
+      this.readOnlyExplorationBackendApiService.
+        loadLatestExplorationAsync(this.explorationId).then(
+          response => {
+            expVersion = response.version;
+            firstStateName = response.exploration.init_state_name
+            this.mostRecentlyReachedCheckpoint = (
+              response.most_recently_reached_checkpoint_state_name
+            );
+            // If the exploration is freshly started, mark the first state
+            // as the most recently reached checkpoint.
+            if(!this.mostRecentlyReachedCheckpoint) {
+              this.editableExplorationBackendApiService.
+                recordMostRecentlyReachedCheckpointAsync(
+                  this.explorationId,
+                  expVersion,
+                  firstStateName
+                );
+            }
+          }
+        );
+      this.visitedStateNames.push(firstStateName);
+    }
   }
 
   doesCollectionAllowsGuestProgress(collectionId: string): boolean {
@@ -666,27 +660,24 @@ export class ConversationSkinComponent {
     let index = this.playerPositionService.getDisplayedCardIndex();
     this.displayedCard = this.playerTranscriptService.getCard(index);
 
-    if (index > 0) {
+    if (index > 0 && !this.isIframed) {
       let currentState = this.explorationEngineService.getState();
       let currentStateName = currentState.name;
       if (currentState.cardIsCheckpoint &&
           !this.visitedStateNames.includes(currentStateName)) {
-        let version: number;
+        let expVersion: number;
         this.readOnlyExplorationBackendApiService.
           loadLatestExplorationAsync(this.explorationId).then(
             response => {
-              version = response.version;
+              expVersion = response.version;
+              this.editableExplorationBackendApiService.
+                recordMostRecentlyReachedCheckpointAsync(
+                  this.explorationId,
+                  expVersion,
+                  currentStateName,
+                );
             }
           );
-
-        this.editableExplorationBackendApiService.
-          recordMostRecentlyReachedCheckpointAsync(
-            this.explorationId,
-            version,
-            currentStateName,
-          ).then(() => {
-            // Required for the put operation to deliver data to backend.
-          });
         this.visitedStateNames.push(currentStateName);
       }
     }
@@ -913,8 +904,12 @@ export class ConversationSkinComponent {
     this.adjustPageHeight(false, null);
     this.windowRef.nativeWindow.scrollTo(0, 0);
 
-    // Navigate the learner to the most recently reached checkpoint state.
-    this._navigateToMostRecentlyReachedCheckpoint();
+    // We do not store checkpoints progress for iframes hence we do not
+    // need to consider redirecting in that case.
+    if (this.isIframed) {
+      // Navigate the learner to the most recently reached checkpoint state.
+      this._navigateToMostRecentlyReachedCheckpoint();
+    }
 
     // The timeout is needed in order to give the recipient of the
     // broadcast sufficient time to load.

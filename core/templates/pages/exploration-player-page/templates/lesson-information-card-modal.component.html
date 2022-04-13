@@ -44,6 +44,7 @@
     </div>
     <button type="button"
             class="btn btn-secondary restart-lesson-btn"
+            [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
             (click)="restartExploration()">
         Restart lesson!
     </button>
