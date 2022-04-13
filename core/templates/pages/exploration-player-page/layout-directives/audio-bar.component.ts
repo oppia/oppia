@@ -40,8 +40,8 @@ export class AudioBarComponent {
   isPaused: boolean = true;
   directiveSubscriptions: Subscription = new Subscription();
   languagesInExploration: ExplorationLanguageInfo[];
-  audioBarIsExpanded: boolean;
-  progressBarIsShown: boolean;
+  audioBarIsExpanded: boolean = false;
+  progressBarIsShown: boolean = false;
   audioLoadingIndicatorIsShown: boolean = false;
   explorationPlayerModeIsActive: boolean;
   selectedLanguage: { value: string };
