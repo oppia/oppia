@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import json
 
-from core.controllers import acl_decorators
+from core.controllers import acl_decorators, domain_objects_validator
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import exp_fetchers
@@ -75,6 +75,33 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
 class SuggestionEmailHandler(base.BaseHandler):
     """Handler task of sending email of suggestion."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'thread_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'exploration': {
+                'schema': {
+                    'type': 'basestring'
+                },
+            },
+            'suggestion': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
@@ -94,7 +121,30 @@ class SuggestionEmailHandler(base.BaseHandler):
 
 class InstantFeedbackMessageEmailHandler(base.BaseHandler):
     """Handles task of sending feedback message emails instantly."""
-
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'user_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'reference_dict': {
+                'schema': {
+                    'type' : 'object-dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_task_entries
+                    ),
+                }
+            },
+            'subject': {
+                'schema': {
+                    'type': 'basestring'
+                },
+            },
+        }
+    }
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
