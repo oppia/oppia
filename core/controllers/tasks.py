@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import json
 
-from core.controllers import acl_decorators, domain_objects_validator
+from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import exp_fetchers
@@ -133,9 +133,6 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
             'reference_dict': {
                 'schema': {
                     'type' : 'object-dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_task_entries
-                    ),
                 }
             },
             'subject': {
