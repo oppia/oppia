@@ -24,7 +24,8 @@
       <div *ngFor="let storySummary of canonicalStorySummaries" class="story-info-container">
         <oppia-story-summary-tile [classroomUrlFragment]="classroomUrlFragment"
                                   [storySummary]="storySummary"
-                                  [topicUrlFragment]="topicUrlFragment">
+                                  [topicUrlFragment]="topicUrlFragment"
+                                  [allChaptersAreShown]="canonicalStorySummaries.length === 1">
         </oppia-story-summary-tile>
       </div>
     </mat-card>
