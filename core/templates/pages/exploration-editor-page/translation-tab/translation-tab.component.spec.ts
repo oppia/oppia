@@ -60,7 +60,7 @@ import $ from 'jquery';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-describe('Translation tab component', function() {
+fdescribe('Translation tab component', function() {
   var ctrl = null;
   var $q = null;
   var $scope = null;
@@ -380,29 +380,39 @@ describe('Translation tab component', function() {
 
   it('should start tutorial when welcome translation modal is closed',
     fakeAsync(() => {
+      console.log("1"+contextService.getExplorationId());
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
         }));
-
+      console.log("2"+contextService.getExplorationId());
       ctrl.$onInit();
+      console.log("3"+contextService.getExplorationId());
       $scope.$apply();
+      console.log("4"+contextService.getExplorationId());
 
       spyOn(siteAnalyticsService, 'registerAcceptTutorialModalEvent');
+      console.log("5"+contextService.getExplorationId());
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.resolve('exp1')
       } as NgbModalRef);
+      console.log("6"+contextService.getExplorationId());
       enterTranslationForTheFirstTimeEmitter.emit();
+      console.log("7"+contextService.getExplorationId());
       tick();
+      console.log("8"+contextService.getExplorationId());
       $scope.$apply();
+      console.log("9"+contextService.getExplorationId());
 
       expect(siteAnalyticsService.registerAcceptTutorialModalEvent)
         .toHaveBeenCalled();
+      console.log("10"+contextService.getExplorationId());
     }));
 
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', fakeAsync(() => {
     ctrl.$onInit();
+    console.log("2");
 
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished')
       .and.stub();
