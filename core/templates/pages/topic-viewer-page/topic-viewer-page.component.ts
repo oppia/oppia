@@ -107,11 +107,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
         // manually, and the onLangChange subscription is added after
         // the topic is loaded.
         this.setPageTitle();
-        this.directiveSubscriptions.add(
-          this.translateService.onLangChange.subscribe(() => {
-            this.setPageTitle();
-          })
-        );
+        this.subscribeToOnLangChange();
         this.pageTitleService.updateMetaTag(readOnlyTopic.getMetaTagContent());
         this.canonicalStorySummaries = (
           readOnlyTopic.getCanonicalStorySummaries());
@@ -139,6 +135,14 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
   }
 
   setPageTitle(): void {

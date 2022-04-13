@@ -70,6 +70,14 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
       'I18N_SUBTOPIC_VIEWER_PAGE_TITLE', {
@@ -102,11 +110,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       // manually, and the onLangChange subscription is added after
       // the subtopic is loaded.
       this.setPageTitle();
-      this.directiveSubscriptions.add(
-        this.translateService.onLangChange.subscribe(() => {
-          this.setPageTitle();
-        })
-      );
+      this.subscribeToOnLangChange();
       this.pageTitleService.updateMetaTag(
         `Review the skill of ${this.subtopicTitle.toLowerCase()}.`);
 
