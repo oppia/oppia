@@ -121,8 +121,8 @@ class SuggestionEmailHandler(base.BaseHandler):
 
 
 class InstantFeedbackMessageEmailHandler(base.BaseHandler):
-
     """Handles task of sending feedback message emails instantly."""
+
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
