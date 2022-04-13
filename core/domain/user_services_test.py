@@ -1541,7 +1541,7 @@ title: Title
 
         # Make 'New state' a checkpoint.
         # Now version of the exploration becomes 2.
-        change_list =  _get_change_list(
+        change_list = _get_change_list(
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True)
