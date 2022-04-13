@@ -34,6 +34,10 @@ from core.domain import subtopic_page_domain
 from typing import List, Optional
 from typing_extensions import TypedDict
 
+# The fs_services module is required in one of the migration
+# functions in Topic class. This import should be removed
+# once the schema migration functions are moved outside the
+# domain file.
 from core.domain import fs_services # pylint: disable=invalid-import-from # isort:skip
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
@@ -1549,9 +1553,9 @@ class Topic:
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
         self.subtopics[subtopic_index].thumbnail_filename = (
-                new_thumbnail_filename)
+            new_thumbnail_filename)
         self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
-                new_thumbnail_size)
+            new_thumbnail_size)
 
     def update_subtopic_url_fragment(
         self, subtopic_id: int, new_url_fragment: str

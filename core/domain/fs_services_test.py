@@ -56,8 +56,10 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, '')
 
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid entity_name received: '
-            'invalid_name.'):
+            utils.ValidationError,
+            'Invalid entity_name received: '
+            'invalid_name.'
+        ):
             fs_services.GcsFileSystem('invalid_name', 'exp_id')
 
     def test_delete(self):
@@ -148,24 +150,6 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
                 fs.delete(filepath)
             with self.assertRaisesRegex(IOError, 'Invalid filepath'):
                 fs.listdir(filepath)
-
-
-class FileSystemServicesTests(test_utils.GenericTestBase):
-    """Tests for File System services."""
-
-    def test_get_exploration_file_system_with_dev_mode_enabled(self):
-        with self.swap(constants, 'DEV_MODE', True):
-            self.assertIsInstance(
-                fs_services.GcsFileSystem(
-                    feconf.ENTITY_TYPE_EXPLORATION, 'entity_id'),
-                fs_services.GcsFileSystem)
-
-    def test_get_exploration_file_system_with_dev_mode_disabled(self):
-        with self.swap(constants, 'DEV_MODE', False):
-            self.assertIsInstance(
-                fs_services.GcsFileSystem(
-                    feconf.ENTITY_TYPE_EXPLORATION, 'entity_id'),
-                fs_services.GcsFileSystem)
 
 
 class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):

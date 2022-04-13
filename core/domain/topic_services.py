@@ -1157,8 +1157,8 @@ def get_story_titles_in_topic(topic):
 
 def update_thumbnail_filename(
     topic: topic_domain.Topic, new_thumbnail_filename: Optional[str]
-    ) -> None:
-    """Updates the thumbnail filename and file size of a topic object.
+) -> None:
+    """Updates the thumbnail filename and file size in a topic object.
 
     Args:
         topic: topic_domain.Topic. The topic domain object whose thumbnail
@@ -1185,15 +1185,15 @@ def update_thumbnail_filename(
 
 
 def update_subtopic_thumbnail_filename(
-        topic: topic_domain.Topic,
-        subtopic_id: int,
-        new_thumbnail_filename: str
-    ) -> None:
-    """Updates the thumbnail filename property of the new subtopic.
+    topic: topic_domain.Topic,
+    subtopic_id: int,
+    new_thumbnail_filename: str
+) -> None:
+    """Updates the thumbnail filename and file size in a subtopic.
 
     Args:
-        topic: topic_domain.Topic. The topic domain object whose thumbnail
-            is to be updated.
+        topic: topic_domain.Topic. The topic domain object containing
+            the subtopic whose thumbnail is to be updated.
         subtopic_id: int. The id of the subtopic to edit.
         new_thumbnail_filename: str. The new thumbnail filename for the
             subtopic.

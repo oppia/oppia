@@ -443,8 +443,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
         fs.commit(
             '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -642,8 +641,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
         fs.commit(
             '%s/thumbnail.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -1721,16 +1719,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'The thumbnail img.svg for topic with id %s does not exist'
-            ' in the filesystem.' % (self.TOPIC_ID)):
+            ' in the filesystem.' % (self.TOPIC_ID)
+        ):
             topic_services.update_thumbnail_filename(self.topic, 'img.svg')
 
         # Save the dummy image to the filesystem to be used as thumbnail.
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-            'rb', encoding=None) as f:
+            'rb',
+            encoding=None
+        ) as f:
             raw_image = f.read()
-        fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
-            feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
         fs.commit(  # type: ignore[no-untyped-call]
             '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -1746,20 +1746,22 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         # Test Exception when the thumbnail is not found in filesystem.
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception, 'The thumbnail %s for subtopic with topic_id %s does'
-            ' not exist in the filesystem.' % (
-                'new_image.svg', self.TOPIC_ID)):
+            Exception,
+            'The thumbnail %s for subtopic with topic_id %s does not exist '
+            ' in the filesystem.' % ('new_image.svg', self.TOPIC_ID)
+        ):
             topic_services.update_subtopic_thumbnail_filename(
                 self.topic, 1, 'new_image.svg')
 
         # Test successful update of thumbnail_filename when the thumbnail
         # is found in the filesystem.
         with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-            encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb',
+            encoding=None
+        ) as f:
             raw_image = f.read()
-        fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
-            feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
         fs.commit(  # type: ignore[no-untyped-call]
             'thumbnail/new_image.svg', raw_image, mimetype='image/svg+xml')
         topic_services.update_subtopic_thumbnail_filename(
