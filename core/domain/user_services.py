@@ -2315,7 +2315,7 @@ def _get_checkpoints_in_order(init_state_name, states):
             visited_state_names.append(current_state_name)
             current_state = states[current_state_name]
             if (
-                current_state.card_is_checkpoint and 
+                current_state.card_is_checkpoint and
                 current_state_name not in checkpoint_state_names
             ):
                 checkpoint_state_names.append(current_state_name)
