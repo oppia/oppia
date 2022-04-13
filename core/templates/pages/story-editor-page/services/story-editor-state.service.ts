@@ -235,8 +235,7 @@ export class StoryEditorStateService {
           successCallback();
         }
       }, error => {
-        let errorMessage = error || (
-          'There was an error when saving the story.');
+        let errorMessage = error || 'There was an error when saving the story.';
         this.alertsService.addWarning(errorMessage);
         this._storyIsBeingSaved = false;
         if (errorCallback) {

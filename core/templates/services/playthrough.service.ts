@@ -98,8 +98,7 @@ class CyclicStateTransitionsTracker {
     this.pathOfVisitedStates.push(destStateName);
   }
 
-  generateIssueCustomizationArgs():
-    CyclicStateTransitionsCustomizationArgs {
+  generateIssueCustomizationArgs(): CyclicStateTransitionsCustomizationArgs {
     return {
       state_names: {value: this.cycleOfVisitedStates}
     };
@@ -124,7 +123,8 @@ class EarlyQuitTracker {
   private expDurationInSecs!: number;
 
   foundAnIssue(): boolean {
-    // TODO(#15212): Remove the below check once codebase is strictly typed.
+    // TODO(#15212): Remove the below non-null check (!==) after codebase
+    // is strictly typed.
     return (
       this.expDurationInSecs !== undefined &&
       this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);

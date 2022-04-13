@@ -269,7 +269,7 @@ describe('State Skill Editor Component', () => {
 
   it('should throw error on call getSkillEditorUrl when there is no skill' +
     'is selected', () => {
-    stateLinkedSkillIdService.displayed = null;
+    stateLinkedSkillIdService.displayed = undefined;
     expect(() => {
       componentInstance.getSkillEditorUrl();
     }).toThrowError('Expected a skill id to be displayed');
@@ -304,7 +304,7 @@ describe('State Skill Editor Component', () => {
         prerequisite_skill_ids: [],
         all_questions_merged: false,
         next_misconception_id: 0,
-        superseding_skill_id: '',
+        superseding_skill_id: '2',
       };
       const fetchSkillResponse = {
         skill: skillObjectFactory.createFromBackendDict(skillBackendDict),
