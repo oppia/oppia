@@ -238,7 +238,7 @@
     "I18N_ERROR_MESSAGE_404": "Sorry, we looked and looked but we just couldn't find that page.",
     "I18N_ERROR_MESSAGE_500": "Something went horribly wrong. But it wasn't your fault. An internal error occurred.",
     "I18N_ERROR_NEXT_STEPS": "The best thing to do now is probably to return to the <a href=\"<[homeUrl]>\">home page</a>. However, if this issue recurs, and you think it shouldn't, please let us know on our <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">issue tracker</a>. Sorry about this.",
-    "I18N_ERROR_PAGE_ROOT_TITLE": "Error <[statusCode]> | Oppia",
+    "I18N_ERROR_PAGE_ROOT_BROWSER_TAB_TITLE": "Error <[statusCode]> | Oppia",
     "I18N_ERROR_PAGE_TITLE": "Error <[statusCode]> - Oppia",
     "I18N_ERROR_PAGE_TITLE_400": "Error 400 - Oppia",
     "I18N_ERROR_PAGE_TITLE_401": "Error 401 - Oppia",
