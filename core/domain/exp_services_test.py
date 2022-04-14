@@ -1202,7 +1202,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_validation_for_valid_exploration(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id,
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            category='Algebra'
         )
         errors = exp_services.validate_exploration_for_story(exploration, False)
         self.assertEqual(len(errors), 0)
@@ -1210,7 +1211,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_validation_fail_for_exploration_for_invalid_language(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end',
-            language_code='bn', correctness_feedback_enabled=True)
+            language_code='bn', correctness_feedback_enabled=True,
+            category='Algebra')
         error_string = (
             'Invalid language %s found for exploration '
             'with ID %s. This language is not supported for explorations '
@@ -1224,7 +1226,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_validate_exploration_for_correctness_feedback_not_enabled(self):
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id)
+            self.EXP_0_ID, self.owner_id, category='Algebra')
         error_string = (
             'Expected all explorations in a story to '
             'have correctness feedback '
@@ -1235,9 +1237,23 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegex(utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(exploration, True)
 
-    def test_validate_exploration_for_param_specs(self):
+    def test_validate_exploration_for_default_category(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True)
+        error_string = (
+            'Expected all explorations in a story to '
+            'be of a default category. '
+            'Invalid exploration: %s' % exploration.id)
+        errors = exp_services.validate_exploration_for_story(exploration, False)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], error_string)
+        with self.assertRaisesRegex(utils.ValidationError, error_string):
+            exp_services.validate_exploration_for_story(exploration, True)
+
+    def test_validate_exploration_for_param_specs(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
+            category='Algebra')
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
         error_string = (
@@ -1251,7 +1267,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_validate_exploration_for_invalid_interaction_id(self):
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True)
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
+            category='Algebra')
         error_string = (
             'Invalid interaction %s in exploration '
             'with ID: %s. This interaction is not supported for '
@@ -1299,7 +1316,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_validation_fail_for_end_exploration(self):
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True)
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
+            category='Algebra')
         error_string = (
             'Explorations in a story are not expected to contain '
             'exploration recommendations. Exploration with ID: '
@@ -1348,7 +1366,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_validation_fail_for_android_rte_content(self):
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True)
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
+            category='Algebra')
         error_string = (
             'RTE content in state %s of exploration '
             'with ID %s is not supported on mobile for explorations '

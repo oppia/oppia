@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';
 import { ExplorationSummaryBackendDict, ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
 
-fdescribe('Exploration id validation service', () => {
+describe('Exploration id validation service', () => {
   let explorationIdValidationService:
     ExplorationIdValidationService;
   let httpTestingController: HttpTestingController;
@@ -210,10 +210,12 @@ fdescribe('Exploration id validation service', () => {
 
   it('should determine if the exploration category is ' +
     'default for the exploration', fakeAsync(() => {
-    const explorationId = '0';
-    const requestUrl = '/explorehandler/init/' + explorationId;
+    const explorationIds = ['0'];
+    const requestUrl = '/explorationsummarieshandler/data?' +
+        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+        '&' + 'include_private_explorations=false';
 
-    explorationIdValidationService.categoryNotDefault(explorationId)
+    explorationIdValidationService.categoryNotDefault(explorationIds[0])
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
@@ -226,10 +228,12 @@ fdescribe('Exploration id validation service', () => {
 
   it('should determine if the exploration category is ' +
     'not default for the exploration', fakeAsync(() => {
-    const explorationId = '0';
-    const requestUrl = '/explorehandler/init/' + explorationId;
+    const explorationIds = ['0'];
+    const requestUrl = '/explorationsummarieshandler/data?' +
+        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+        '&' + 'include_private_explorations=false';
 
-    explorationIdValidationService.categoryNotDefault(explorationId)
+    explorationIdValidationService.categoryNotDefault(explorationIds[0])
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');

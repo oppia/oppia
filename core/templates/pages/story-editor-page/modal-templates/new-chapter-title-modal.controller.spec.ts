@@ -280,10 +280,8 @@ describe('Create New Chapter Modal Controller', function() {
       .and.returnValue(deferred.promise);
     spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
       .and.returnValue(deferred.promise);
-    var deferred2 = $q.defer();
-    deferred2.resolve(false);
     spyOn(explorationIdValidationService, 'categoryNotDefault')
-      .and.returnValue(deferred2.promise);
+      .and.returnValue(deferred.promise);
     $scope.save();
     $rootScope.$apply();
     expect($scope.categoryNotDefault).toBe(true);

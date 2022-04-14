@@ -54,7 +54,7 @@ export class ExplorationIdValidationService {
 
   async categoryNotDefault(explorationId: string): Promise<boolean> {
     return this.explorationSummartBackendApiService
-      .loadPublicAndPrivateExplorationSummariesAsync([explorationId]).then(
+      .loadPublicExplorationSummariesAsync([explorationId]).then(
         (response: ExplorationSummaryBackendDict) => {
           let summaries = response.summaries;
           if (summaries.length !== 1) {
