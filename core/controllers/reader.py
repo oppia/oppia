@@ -1347,8 +1347,6 @@ class CheckpointReachedEventHandler(base.BaseHandler):
         }
     }
 
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
-
     @acl_decorators.can_play_exploration
     def put(self, exploration_id):
         """Handles PUT requests.
@@ -1395,8 +1393,6 @@ class ExplorationRestartEventHandler(base.BaseHandler):
             },
         }
     }
-
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_play_exploration
     def put(self, exploration_id):
