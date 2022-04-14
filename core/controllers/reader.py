@@ -279,15 +279,15 @@ class ExplorationHandler(base.BaseHandler):
 
         preferred_audio_language_code = None
         preferred_language_codes = None
-        user_has_viewed_lesson_info_modal_once = None
+        has_viewed_lesson_info_modal_once = None
 
         if user_settings is not None:
             preferred_audio_language_code = (
                 user_settings.preferred_audio_language_code)
             preferred_language_codes = (
                 user_settings.preferred_language_codes)
-            user_has_viewed_lesson_info_modal_once = (
-                user_settings.user_has_viewed_lesson_info_modal_once)
+            has_viewed_lesson_info_modal_once = (
+                user_settings.has_viewed_lesson_info_modal_once)
 
         furthest_reached_checkpoint_exp_version = None
         furthest_reached_checkpoint_state_name = None
@@ -336,8 +336,8 @@ class ExplorationHandler(base.BaseHandler):
                 exploration.correctness_feedback_enabled),
             'record_playthrough_probability': (
                 config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value),
-            'user_has_viewed_lesson_info_modal_once': (
-                user_has_viewed_lesson_info_modal_once),
+            'has_viewed_lesson_info_modal_once': (
+                has_viewed_lesson_info_modal_once),
             'furthest_reached_checkpoint_exp_version': (
                 furthest_reached_checkpoint_exp_version),
             'furthest_reached_checkpoint_state_name': (

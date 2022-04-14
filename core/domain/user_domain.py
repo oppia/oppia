@@ -37,7 +37,7 @@ class UserSettingsDict(TypedDict):
     email: str
     roles: List[str]
     banned: bool
-    user_has_viewed_lesson_info_modal_once: bool
+    has_viewed_lesson_info_modal_once: bool
     username: Optional[str]
     normalized_username: Optional[str]
     last_agreed_to_terms: Optional[datetime.datetime]
@@ -68,7 +68,7 @@ class UserSettings:
         user_id: str. The unique ID of the user.
         email: str. The user email.
         roles: list(str). Roles of the user.
-        user_has_viewed_lesson_info_modal_once: bool. Flag to check whether
+        has_viewed_lesson_info_modal_once: bool. Flag to check whether
             the user has viewed lesson info modal once which shows the progress
             of the user through exploration checkpoints.
         username: str or None. Identifiable username to display in the UI.
@@ -107,7 +107,7 @@ class UserSettings:
         email: str,
         roles: List[str],
         banned: bool,
-        user_has_viewed_lesson_info_modal_once: bool,
+        has_viewed_lesson_info_modal_once: bool,
         username: Optional[str] = None,
         last_agreed_to_terms: Optional[datetime.datetime] = None,
         last_started_state_editor_tutorial: (
@@ -141,7 +141,7 @@ class UserSettings:
             email: str. The user email.
             roles: list(str). Roles of the user.
             banned: bool. Whether the uses is banned.
-            user_has_viewed_lesson_info_modal_once: bool. Flag to check whether
+            has_viewed_lesson_info_modal_once: bool. Flag to check whether
                 the user has viewed lesson info modal once which shows the
                 progress of the user through exploration checkpoints.
             username: str or None. Identifiable username to display in the UI.
@@ -209,8 +209,8 @@ class UserSettings:
         self.banned = banned
         self.deleted = deleted
         self.created_on = created_on
-        self.user_has_viewed_lesson_info_modal_once = (
-            user_has_viewed_lesson_info_modal_once)
+        self.has_viewed_lesson_info_modal_once = (
+            has_viewed_lesson_info_modal_once)
 
     def validate(self) -> None:
         """Checks that the user_id, email, roles, banned, pin and display_alias
@@ -394,8 +394,8 @@ class UserSettings:
             'display_alias': self.display_alias,
             'deleted': self.deleted,
             'created_on': self.created_on,
-            'user_has_viewed_lesson_info_modal_once': (
-                self.user_has_viewed_lesson_info_modal_once)
+            'has_viewed_lesson_info_modal_once': (
+                self.has_viewed_lesson_info_modal_once)
         }
 
     @property
@@ -496,11 +496,11 @@ class UserSettings:
         self.roles = [default_role]
 
     def mark_lesson_info_modal_viewed(self) -> None:
-        """Sets user_has_viewed_lesson_info_modal_once to true which shows
+        """Sets has_viewed_lesson_info_modal_once to true which shows
         the user has viewed their progress through exploration in the lesson
         info modal at least once in their lifetime journey.
         """
-        self.user_has_viewed_lesson_info_modal_once = True
+        self.has_viewed_lesson_info_modal_once = True
 
 
 class UserActionsInfo:

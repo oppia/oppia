@@ -133,7 +133,7 @@ class UserSettingsModel(base_models.BaseModel):
     banned = datastore_services.BooleanProperty(indexed=True, default=False)
     # Flag to check whether the user has viewed lesson info modal once which
     # shows the progress of the user through exploration checkpoints.
-    user_has_viewed_lesson_info_modal_once = datastore_services.BooleanProperty(
+    has_viewed_lesson_info_modal_once = datastore_services.BooleanProperty(
         indexed=True, default=False)
 
     @staticmethod
@@ -200,7 +200,7 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'user_has_viewed_lesson_info_modal_once':
+            'has_viewed_lesson_info_modal_once':
                 base_models.EXPORT_POLICY.EXPORTED,
             # Pin is not exported since this is an auth mechanism.
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -295,8 +295,8 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
             'display_alias': user.display_alias,
-            'user_has_viewed_lesson_info_modal_once': (
-                user.user_has_viewed_lesson_info_modal_once)
+            'has_viewed_lesson_info_modal_once': (
+                user.has_viewed_lesson_info_modal_once)
         }
 
     @classmethod

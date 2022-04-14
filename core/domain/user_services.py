@@ -178,7 +178,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
                 ],
                 banned=False,
                 username='admin',
-                user_has_viewed_lesson_info_modal_once=False,
+                has_viewed_lesson_info_modal_once=False,
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:
@@ -662,8 +662,8 @@ def _get_user_settings_from_model(user_settings_model):
         display_alias=user_settings_model.display_alias,
         deleted=user_settings_model.deleted,
         created_on=user_settings_model.created_on,
-        user_has_viewed_lesson_info_modal_once=(
-            user_settings_model.user_has_viewed_lesson_info_modal_once)
+        has_viewed_lesson_info_modal_once=(
+            user_settings_model.has_viewed_lesson_info_modal_once)
     )
 
 

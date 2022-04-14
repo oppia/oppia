@@ -213,7 +213,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'display_alias': None,
-            'user_has_viewed_lesson_info_modal_once': False
+            'has_viewed_lesson_info_modal_once': False
         }
         self.assertEqual(expected_user_data, user_data)
 
@@ -244,7 +244,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'display_alias': self.GENERIC_DISPLAY_ALIAS,
-            'user_has_viewed_lesson_info_modal_once': False
+            'has_viewed_lesson_info_modal_once': False
         }
         self.assertEqual(expected_user_data, user_data)
 
