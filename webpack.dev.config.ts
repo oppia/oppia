@@ -16,9 +16,9 @@
  * @fileoverview Development environment config file for Webpack.
  */
 
-const { merge } = require('webpack-merge');
-const common = require('./webpack.common.config.ts');
-const path = require('path');
+import {merge} from 'webpack-merge'
+import common from './webpack.common.config'
+import path from 'path'
 
 module.exports = merge(common, {
   mode: 'development',

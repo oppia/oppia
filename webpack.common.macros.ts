@@ -16,8 +16,8 @@
  * @fileoverview Macros for underscore template loader.
  */
 
-const loaderUtils = require('loader-utils');
-const path = require('path');
+import loaderUtils from 'loader-utils'
+import path from 'path'
 
 const objExtend = function(args, obj) {
   args = Array.prototype.slice.call(args);

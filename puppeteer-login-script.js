@@ -36,40 +36,34 @@ var roleEditorContainer = '.protractor-test-roles-editor-card-container';
 var addNewRoleButton = '.protractor-test-add-new-role-button';
 var roleSelect = '.protractor-test-new-role-selector';
 
-module.exports = async(browser, context) => {
+module.exports = async (browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0);
   // Sign into Oppia.
   await login(context, page);
-  if (context.url.includes('moderator')) {
-    await setRole(page, 'MODERATOR');
-  } else if (context.url.includes('emaildashboard')) {
-    await setRole(page, 'ADMIN');
-  } else if (context.url.includes('collection/0')) {
-    await createCollections(context, page);
-  } else if (context.url.includes('explore/0')) {
-    await createExplorations(context, page);
-  } else if (context.url.includes('blog-dashboard')) {
-    await setRole(page, 'BLOG_ADMIN');
-  }
+  if (context.url.includes('moderator')) await setRole(page, 'MODERATOR');
+  else if (context.url.includes('emaildashboard')) await setRole(page, 'ADMIN');
+  else if (context.url.includes('collection/0')) await createCollections(context, page);
+  else if (context.url.includes('explore/0')) await createExplorations(context, page);
+  else if (context.url.includes('blog-dashboard')) await setRole(page, 'BLOG_ADMIN');
   await page.close();
 };
 
 // Needed to relogin after lighthouse_setup.js.
-const login = async function(context, page) {
+const login = async function (context, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(LOGIN_URL, {waitUntil: networkIdle});
+    await page.goto(LOGIN_URL, { waitUntil: networkIdle });
     // The user is already logged in.
     if (!page.url().includes('login')) {
       return;
     }
-    await page.waitForSelector(emailInput, {visible: true});
+    await page.waitForSelector(emailInput, { visible: true });
     await page.type(emailInput, 'testadmin@example.com');
     await page.click(signInButton);
     // Checks if the user's account was already made.
     try {
-      await page.waitForSelector(usernameInput, {visible: true});
+      await page.waitForSelector(usernameInput, { visible: true });
       await page.type(usernameInput, 'username1');
       await page.click(agreeToTermsCheckBox);
       await page.waitForSelector(registerUser);
@@ -84,7 +78,7 @@ const login = async function(context, page) {
   }
 };
 
-const setRole = async function(page, role) {
+const setRole = async function (page, role) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -103,14 +97,14 @@ const setRole = async function(page, role) {
     await page.click(selector);
     await page.waitForTimeout(2000);
     // eslint-disable-next-line dot-notation
-    await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
+    await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle });
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
   }
 };
 
-const createCollections = async function(context, page) {
+const createCollections = async function (context, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
@@ -129,7 +123,7 @@ const createCollections = async function(context, page) {
   }
 };
 
-const createExplorations = async function(context, page) {
+const createExplorations = async function (context, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Exploration...');

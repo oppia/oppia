@@ -15,8 +15,7 @@
 /**
  * @fileoverview Configuration for lighthouse-ci.
  */
-
-const baseConfig = require('./.lighthouserc-base.js')
+import baseConfig from './.lighthouserc-base'
 
 module.exports = {
   'ci': {
@@ -78,14 +77,14 @@ module.exports = {
             // The YouTube embed on donate page loads images in jpg format, thus
             // we need to allow one image.
             'modern-image-formats': [
-              'error', {'maxLength': 1, 'strategy': 'pessimistic'}
+              'error', { 'maxLength': 1, 'strategy': 'pessimistic' }
             ],
             // The YouTube embed on donate page uses passive listeners.
-            'uses-passive-event-listeners': ['error', {'minScore': 0}],
-            'uses-rel-preload': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}],
-            'redirects': ['error', {'minScore': 1}],
-            'uses-responsive-images': ['error', {'minScore': 1}]
+            'uses-passive-event-listeners': ['error', { 'minScore': 0 }],
+            'uses-rel-preload': ['error', { 'minScore': 1 }],
+            'deprecations': ['error', { 'minScore': 1 }],
+            'redirects': ['error', { 'minScore': 1 }],
+            'uses-responsive-images': ['error', { 'minScore': 1 }]
           }
         },
         {

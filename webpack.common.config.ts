@@ -16,11 +16,11 @@
  * @fileoverview General config file for Webpack.
  */
 
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
-const webpack = require('webpack');
-const macros = require('./webpack.common.macros.ts');
+import {CleanWebpackPlugin} from 'clean-webpack-plugin'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import path from 'path'
+import webpack from 'webpack'
+import macros from './webpack.common.macros'
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [/<\[[\s\S]*?\]>/],

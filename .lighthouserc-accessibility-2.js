@@ -15,8 +15,8 @@
 /**
  * @fileoverview Configuration for accessibility.
  */
+import baseConfig from './.lighthouserc-base'
 
-const baseConfig = require('./.lighthouserc-base.js')
 
 module.exports = {
   'ci': {
@@ -30,19 +30,19 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/preferences$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.85}]
+            'categories:accessibility': ['error', { 'minScore': 0.85 }]
           }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/privacy-policy$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', { 'minScore': 0.98 }]
           }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/profile/username1$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', { 'minScore': 0.98 }]
           }
         },
         {
@@ -56,13 +56,13 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/topics-and-skills-dashboard$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.9}]
+            'categories:accessibility': ['error', { 'minScore': 0.9 }]
           }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/terms$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', { 'minScore': 0.98 }]
           }
         },
         {
@@ -72,37 +72,37 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/volunteer$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.9}]
+            'categories:accessibility': ['error', { 'minScore': 0.9 }]
           }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/create/.*$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.91}]
+            'categories:accessibility': ['error', { 'minScore': 0.91 }]
           }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/collection_editor/create/.*$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.86}]
+            'categories:accessibility': ['error', { 'minScore': 0.86 }]
           }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/topic_editor/.*$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.84}]
+            'categories:accessibility': ['error', { 'minScore': 0.84 }]
           }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/skill_editor/.*$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.91}]
+            'categories:accessibility': ['error', { 'minScore': 0.91 }]
           }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/story_editor/.*$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.84}]
+            'categories:accessibility': ['error', { 'minScore': 0.84 }]
           }
         },
       ]
