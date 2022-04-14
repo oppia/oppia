@@ -2305,8 +2305,7 @@ def _get_checkpoints_in_order(init_state_name, states):
         list(str). List of all checkpoints of the exploration in sequential
         order.
     """
-    queue = []
-    queue.append(init_state_name)
+    queue = [init_state_name]
     checkpoint_state_names = []
     visited_state_names = []
     while len(queue) > 0:
@@ -2481,66 +2480,72 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
     exp_user_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
 
-    if exp_user_model is not None:
-        latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        most_recently_interacted_exploration = (
-            exp_fetchers.get_exploration_by_id(
-                exploration_id,
-                True,
-                exp_user_model.most_recently_reached_checkpoint_exp_version
-                ))
-        furthest_reached_exploration = (
-            exp_fetchers.get_exploration_by_id(
-                exploration_id,
-                True,
-                exp_user_model.furthest_reached_checkpoint_exp_version
-            ))
+    if exp_user_model is None:
+        return None
 
-        most_recently_reached_checkpoint_in_current_exploration = (
-            _get_most_distant_reached_checkpoint_in_current_exploration(
-                _get_checkpoints_in_order(
-                    latest_exploration.init_state_name,
-                    latest_exploration.states),
-                _get_checkpoints_in_order(
-                    most_recently_interacted_exploration.init_state_name,
-                    most_recently_interacted_exploration.states),
-                exp_user_model.most_recently_reached_checkpoint_state_name
-            )
+    latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    most_recently_interacted_exploration = (
+        exp_fetchers.get_exploration_by_id(
+            exploration_id,
+            True,
+            exp_user_model.most_recently_reached_checkpoint_exp_version
+        ))
+    furthest_reached_exploration = (
+        exp_fetchers.get_exploration_by_id(
+            exploration_id,
+            True,
+            exp_user_model.furthest_reached_checkpoint_exp_version
+        ))
+
+    most_recently_reached_checkpoint_in_current_exploration = (
+        _get_most_distant_reached_checkpoint_in_current_exploration(
+            _get_checkpoints_in_order(
+                latest_exploration.init_state_name,
+                latest_exploration.states),
+            _get_checkpoints_in_order(
+                most_recently_interacted_exploration.init_state_name,
+                most_recently_interacted_exploration.states),
+            exp_user_model.most_recently_reached_checkpoint_state_name
         )
+    )
 
-        furthest_reached_checkpoint_in_current_exploration = (
-            _get_most_distant_reached_checkpoint_in_current_exploration(
-                _get_checkpoints_in_order(
-                    latest_exploration.init_state_name,
-                    latest_exploration.states),
-                _get_checkpoints_in_order(
-                    furthest_reached_exploration.init_state_name,
-                    furthest_reached_exploration.states),
-                exp_user_model.furthest_reached_checkpoint_state_name
-            )
+    furthest_reached_checkpoint_in_current_exploration = (
+        _get_most_distant_reached_checkpoint_in_current_exploration(
+            _get_checkpoints_in_order(
+                latest_exploration.init_state_name,
+                latest_exploration.states),
+            _get_checkpoints_in_order(
+                furthest_reached_exploration.init_state_name,
+                furthest_reached_exploration.states),
+            exp_user_model.furthest_reached_checkpoint_state_name
         )
+    )
 
-        # If the most recently reached checkpoint doesn't exist in current
-        # exploration.
-        if most_recently_reached_checkpoint_in_current_exploration != (
-            exp_user_model.most_recently_reached_checkpoint_state_name):
-            exp_user_model.most_recently_reached_checkpoint_state_name = (
-                most_recently_reached_checkpoint_in_current_exploration)
-            exp_user_model.most_recently_reached_checkpoint_exp_version = (
-                latest_exploration.version)
-            exp_user_model.update_timestamps()
-            exp_user_model.put()
+    # If the most recently reached checkpoint doesn't exist in current
+    # exploration.
+    if (
+        most_recently_reached_checkpoint_in_current_exploration != (
+            exp_user_model.most_recently_reached_checkpoint_state_name)
+    ):
+        exp_user_model.most_recently_reached_checkpoint_state_name = (
+            most_recently_reached_checkpoint_in_current_exploration)
+        exp_user_model.most_recently_reached_checkpoint_exp_version = (
+            latest_exploration.version)
+        exp_user_model.update_timestamps()
+        exp_user_model.put()
 
-        # If the furthest reached checkpoint doesn't exist in current
-        # exploration.
-        if furthest_reached_checkpoint_in_current_exploration != (
-            exp_user_model.furthest_reached_checkpoint_state_name):
-            exp_user_model.furthest_reached_checkpoint_state_name = (
-                furthest_reached_checkpoint_in_current_exploration)
-            exp_user_model.furthest_reached_checkpoint_exp_version = (
-                latest_exploration.version)
-            exp_user_model.update_timestamps()
-            exp_user_model.put()
+    # If the furthest reached checkpoint doesn't exist in current
+    # exploration.
+    if (
+        furthest_reached_checkpoint_in_current_exploration != (
+            exp_user_model.furthest_reached_checkpoint_state_name)
+    ):
+        exp_user_model.furthest_reached_checkpoint_state_name = (
+            furthest_reached_checkpoint_in_current_exploration)
+        exp_user_model.furthest_reached_checkpoint_exp_version = (
+            latest_exploration.version)
+        exp_user_model.update_timestamps()
+        exp_user_model.put()
 
     exp_user_data = exp_fetchers.get_exploration_user_data(
         user_id, exploration_id)
