@@ -71,8 +71,10 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
         cleaned_links = []
         for link in links:
             # Remove &quot; from the links.
-            cleaned_links.append(
-                link.get('url-with-value').replace('&quot;', ''))
+            link_text = link.get('url-with-value')
+            if link_text is not None:
+                cleaned_links.append(
+                    link_text.replace('&quot;', ''))
 
         invalid_links = []
         for link in cleaned_links:
