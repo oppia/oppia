@@ -264,21 +264,26 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
         user_services.update_learner_checkpoint_progress(
             user_id, self.EXP_1_ID, 'Introduction', 1)
+        expected_user_data_dict = {
+            'rating': None,
+            'rated_on': None,
+            'draft_change_list': None,
+            'draft_change_list_last_updated': None,
+            'draft_change_list_exp_version': None,
+            'draft_change_list_id': 0,
+            'mute_suggestion_notifications': (
+                feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+            'mute_feedback_notifications': (
+                feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
+            'furthest_reached_checkpoint_exp_version': 1,
+            'furthest_reached_checkpoint_state_name': 'Introduction',
+            'most_recently_reached_checkpoint_exp_version': 1,
+            'most_recently_reached_checkpoint_state_name': 'Introduction'
+        }
         exp_user_data = exp_fetchers.get_exploration_user_data(
             user_id, self.EXP_1_ID)
         self.assertIsNotNone(exp_user_data)
-        self.assertEqual(exp_user_data.user_id, user_id)
-        self.assertEqual(exp_user_data.exploration_id, self.EXP_1_ID)
-        self.assertEqual(
-            exp_user_data.furthest_reached_checkpoint_state_name,
-            'Introduction')
-        self.assertEqual(
-            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
-        self.assertEqual(
-            exp_user_data.most_recently_reached_checkpoint_state_name,
-            'Introduction')
-        self.assertEqual(
-            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(expected_user_data_dict, exp_user_data.to_dict())
 
 
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
