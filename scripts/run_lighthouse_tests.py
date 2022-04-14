@@ -155,18 +155,18 @@ def run_lighthouse_checks(lighthouse_mode, shard):
     process = subprocess.Popen(
         bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
+    print('Return code: %s' % process.returncode)
+    print('OUTPUT:')
+    # Standard output is in bytes, we need to decode the line to
+    # print it.
+    print(stdout.decode('utf-8'))
+    print('ERROR:')
+    # Error output is in bytes, we need to decode the line to
+    # print it.
+    print(stderr.decode('utf-8'))
     if process.returncode == 0:
         print('Lighthouse checks completed successfully.')
     else:
-        print('Return code: %s' % process.returncode)
-        print('OUTPUT:')
-        # Standard output is in bytes, we need to decode the line to
-        # print it.
-        print(stdout.decode('utf-8'))
-        print('ERROR:')
-        # Error output is in bytes, we need to decode the line to
-        # print it.
-        print(stderr.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
 
