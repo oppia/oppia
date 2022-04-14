@@ -486,7 +486,8 @@ describe('Learner dashboard page', () => {
           threadSummaries: (
             learnerDashboardFeedbackUpdatesData.thread_summaries.map(
               threadSummary => FeedbackThreadSummary
-                .createFromBackendDict(threadSummary)))
+                .createFromBackendDict(threadSummary))),
+          more: []
         }));
 
       component.ngOnInit();

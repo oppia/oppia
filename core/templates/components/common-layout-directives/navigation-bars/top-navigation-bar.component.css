@@ -281,6 +281,7 @@
   border-radius: 0;
   box-shadow: 0 0;
   color: #34665c;
+  padding: 10px 0;
 }
 .language-element:hover {
   background-color: rgb(52, 102, 92, 0.1);
