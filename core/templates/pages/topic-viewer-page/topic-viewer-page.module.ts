@@ -39,6 +39,7 @@ import { TopicViewerPageComponent } from
   'pages/topic-viewer-page/topic-viewer-page.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { PracticeSessionConfirmationModal } from './modals/practice-session-confirmation-modal.component';
 
 @NgModule({
   imports: [
@@ -52,13 +53,15 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     StoriesListComponent,
     SubtopicsListComponent,
     TopicViewerNavbarBreadcrumbComponent,
-    TopicViewerPageComponent
+    TopicViewerPageComponent,
+    PracticeSessionConfirmationModal
   ],
   entryComponents: [
     StoriesListComponent,
     SubtopicsListComponent,
     TopicViewerNavbarBreadcrumbComponent,
-    TopicViewerPageComponent
+    TopicViewerPageComponent,
+    PracticeSessionConfirmationModal
   ],
   providers: [
     {
