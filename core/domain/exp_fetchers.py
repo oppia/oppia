@@ -429,22 +429,23 @@ def get_exploration_user_data(user_id, exp_id):
     """
     exp_user_data_model = user_models.ExplorationUserDataModel.get(
         user_id, exp_id)
-    if exp_user_data_model is not None:
-        return user_domain.ExplorationUserData(
-            exp_user_data_model.user_id,
-            exp_user_data_model.exploration_id,
-            exp_user_data_model.rating,
-            exp_user_data_model.rated_on,
-            exp_user_data_model.draft_change_list,
-            exp_user_data_model.draft_change_list_last_updated,
-            exp_user_data_model.draft_change_list_exp_version,
-            exp_user_data_model.draft_change_list_id,
-            exp_user_data_model.mute_suggestion_notifications,
-            exp_user_data_model.mute_feedback_notifications,
-            exp_user_data_model.furthest_reached_checkpoint_exp_version,
-            exp_user_data_model.furthest_reached_checkpoint_state_name,
-            exp_user_data_model.most_recently_reached_checkpoint_exp_version,
-            exp_user_data_model.most_recently_reached_checkpoint_state_name
-        )
-    else:
+
+    if exp_user_data_model is None:
         return None
+
+    return user_domain.ExplorationUserData(
+        exp_user_data_model.user_id,
+        exp_user_data_model.exploration_id,
+        exp_user_data_model.rating,
+        exp_user_data_model.rated_on,
+        exp_user_data_model.draft_change_list,
+        exp_user_data_model.draft_change_list_last_updated,
+        exp_user_data_model.draft_change_list_exp_version,
+        exp_user_data_model.draft_change_list_id,
+        exp_user_data_model.mute_suggestion_notifications,
+        exp_user_data_model.mute_feedback_notifications,
+        exp_user_data_model.furthest_reached_checkpoint_exp_version,
+        exp_user_data_model.furthest_reached_checkpoint_state_name,
+        exp_user_data_model.most_recently_reached_checkpoint_exp_version,
+        exp_user_data_model.most_recently_reached_checkpoint_state_name
+    )
