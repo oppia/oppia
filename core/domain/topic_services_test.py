@@ -1748,7 +1748,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'The thumbnail %s for subtopic with topic_id %s does not exist '
-            ' in the filesystem.' % ('new_image.svg', self.TOPIC_ID)
+            'in the filesystem.' % ('new_image.svg', self.TOPIC_ID)
         ):
             topic_services.update_subtopic_thumbnail_filename(
                 self.topic, 1, 'new_image.svg')
