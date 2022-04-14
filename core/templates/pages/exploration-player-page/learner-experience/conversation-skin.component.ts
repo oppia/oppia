@@ -297,6 +297,11 @@ export class ConversationSkinComponent {
         let confirmationMessage = (
           'If you navigate away from this page, your progress on the ' +
           'exploration will be lost.');
+        if (!this.isIframed) {
+          confirmationMessage = (
+            'If you navigate away from this page, your progress after the ' +
+            'last completed checkpoint will be lost.');
+        }
         (e || this.windowRef.nativeWindow.event).returnValue = (
           confirmationMessage);
         return confirmationMessage;
@@ -906,7 +911,7 @@ export class ConversationSkinComponent {
 
     // We do not store checkpoints progress for iframes hence we do not
     // need to consider redirecting in that case.
-    if (this.isIframed) {
+    if (!this.isIframed) {
       // Navigate the learner to the most recently reached checkpoint state.
       this._navigateToMostRecentlyReachedCheckpoint();
     }

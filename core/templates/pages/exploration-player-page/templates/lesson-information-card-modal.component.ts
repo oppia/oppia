@@ -153,4 +153,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
 }
