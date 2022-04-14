@@ -1636,8 +1636,9 @@ title: Title
 
     def test_sync_learner_checkpoint_progress_with_current_exp_version(self):
         self.login(self.VIEWER_EMAIL)
-        exp_user_data = exp_fetchers.get_exploration_user_data(
-            self.viewer_id, self.EXP_ID)
+        exp_user_data = (
+            user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                self.viewer_id, self.EXP_ID))
         self.assertIsNone(exp_user_data)
 
         # First checkpoint reached.
