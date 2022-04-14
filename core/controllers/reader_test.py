@@ -48,6 +48,16 @@ from core.tests import test_utils
     [models.NAMES.classifier, models.NAMES.statistics])
 
 
+def _get_change_list(state_name, property_name, new_value):
+    """Generates a change list for a single state change."""
+    return [exp_domain.ExplorationChange({
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'state_name': state_name,
+        'property_name': property_name,
+        'new_value': new_value
+    })]
+
+
 class ReaderPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for readers to view explorations."""
 
@@ -2202,7 +2212,8 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_user_checkpoint_progress_is_none_on_fetching_older_exploration(
-        self):
+        self
+    ):
         exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
@@ -2223,14 +2234,16 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
         # Update exploration.
         # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'What language',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True
+        )
         exp_services.update_exploration(
-            owner_id, exp_id,
-            [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'What language',
-                'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
-                'new_value': True
-            })], 'Made What language state a checkpoint'
+            owner_id,
+            exp_id,
+            change_list,
+            'Made What language state a checkpoint'
         )
 
         # First checkpoint reached.
@@ -2734,14 +2747,16 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 
         # Update exploration.
         # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'What language',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True
+        )
         exp_services.update_exploration(
-            owner_id, exp_id,
-            [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'What language',
-                'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
-                'new_value': True
-            })], 'Made What language state a checkpoint'
+            owner_id,
+            exp_id,
+            change_list,
+            'Made What language state a checkpoint'
         )
 
         # Viewer opens exploration again.
