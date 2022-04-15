@@ -2537,8 +2537,8 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
     # If the furthest reached checkpoint doesn't exist in current
     # exploration.
     if (
-        furthest_reached_checkpoint_in_current_exploration != (
-            exp_user_model.furthest_reached_checkpoint_state_name)
+        furthest_reached_checkpoint_in_current_exploration !=
+        exp_user_model.furthest_reached_checkpoint_state_name
     ):
         exp_user_model.furthest_reached_checkpoint_state_name = (
             furthest_reached_checkpoint_in_current_exploration)
