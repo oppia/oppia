@@ -37,7 +37,6 @@ core.domain.exp_domain_test
 scripts.linters.pylint_extensions_test
 core.storage.suggestion.gae_models_test
 core.storage.app_feedback_report.gae_models_test
-core.jobs.job_test_utils_test
 core.domain.image_validation_services_test
 scripts.linters.js_ts_linter_test
 core.storage.audit.gae_models_test
