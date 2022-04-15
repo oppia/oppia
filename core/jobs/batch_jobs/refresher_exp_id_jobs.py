@@ -45,8 +45,16 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
     @staticmethod
     def _flatten_user_id_to_exp_id(
         exp_id: str, owner_ids: List[str]) -> Iterable[Tuple[str, str]]:
+        """Flatten owner ids."""
         for user_id in owner_ids:
-            yield(user_id, exp_id)
+            yield (user_id, exp_id)
+
+    @staticmethod
+    def _flatten_exp_id_to_email(
+        exp_ids_list: List[str], email: List[str]) -> Iterable[Tuple[str, str]]:
+        """Flatten exploration ids."""
+        for exp_id in exp_ids_list:
+            yield (exp_id, email[0])
 
     @staticmethod
     def _process_exploration_states(
@@ -81,7 +89,6 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
             PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
             matching entity_type as collection.
         """
-        # exp ids to state names
         exp_to_state_name = (
             self.pipeline
             | 'Get all Exploration models' >> ndb_io.GetModels(
@@ -91,7 +98,7 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
             | 'Extract ' >> beam.FlatMap(
                 self._process_exploration_states)
         )
-        # exp id to owner ids
+
         exp_rights_collection = (
             self.pipeline
             | 'Get all exp rights model' >> ndb_io.GetModels(
@@ -100,15 +107,15 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
                 lambda exp_rights: (exp_rights.id, exp_rights.owner_ids)
             )
         )
-        # keys of exp_to_state_name
+
         relevant_exp_ids = (
             exp_to_state_name
-            | 'extract just the ids' >> beam.Keys()
+            | 'extract just the ids' >> beam.Keys() # pylint: disable=no-value-for-parameter
         )
+
         relevant_exp_ids_iter = beam.pvalue.AsIter(
             relevant_exp_ids)
 
-        # filtered exp id to owner ids
         exp_rights_filtered = (
             exp_rights_collection
             | 'filter ' >> beam.Filter(
@@ -117,13 +124,11 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
             )
         )
 
-        # user_id: exp_id
         user_id_to_exp_id = (
             exp_rights_filtered
             | beam.FlatMapTuple(self._flatten_user_id_to_exp_id)
         )
 
-        # who is gonna filter this -> can be done in later phases
         user_id_to_user_emails = (
             self.pipeline
             | 'Get all user settings models' >> ndb_io.GetModels(
@@ -136,27 +141,21 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
         grouped_exp_id_to_email = (
             (user_id_to_exp_id, user_id_to_user_emails)
             | 'Group by user id ' >> beam.CoGroupByKey()
-            | 'Drop user id ' >> beam.Values()
-            | 'Filter ' >> beam.Filter(
-                lambda groups: len(groups[0]) > 0 and len(groups[1]) > 0) # CoGroupByKeys will return a List because no keys were provided
-            | beam.FlatMapTuple(
-                lambda a, b : (
-                    (a[0] if len(a) else a, b[0] if len(b) else b),
-                    )
-                ) # Returning a Tuple
+            | 'Drop user id ' >> beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Filter out empty results' >> beam.Filter(
+                lambda groups: len(groups[0]) > 0 and len(groups[1]) > 0)
+            | 'Form tuples' >> beam.FlatMapTuple(
+                lambda a, b: ((a, b),))
+            | 'Flatten exp id list' >> beam.FlatMapTuple(
+                self._flatten_exp_id_to_email)
             )
 
         grouped_email_state_name_by_exp_id = (
             {
-                'user emails': grouped_exp_id_to_email, 
+                'user emails': grouped_exp_id_to_email,
                 'state names': exp_to_state_name
             }
             | 'Group by exp id' >> beam.CoGroupByKey()
-        )
-
-        debug = (
-            grouped_email_state_name_by_exp_id
-            | 'print it out \n\n\n\n\n\n\n\n out ' >> beam.Map(print)
         )
 
         return (

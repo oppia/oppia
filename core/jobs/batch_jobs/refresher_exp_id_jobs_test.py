@@ -67,7 +67,7 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
             email='some3@email.com',
         )
         user2.update_timestamps()
-        exp_rights1 = self.create_model( # this will not change
+        exp_rights1 = self.create_model(
             exp_models.ExplorationRightsModel,
             id=self.EXP_1_ID,
             owner_ids=[self.USER_ID_1, self.USER_ID_2],
@@ -96,13 +96,6 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
             }
         )
         exp.update_timestamps()
-        exp_rights = self.create_model(
-            exp_models.ExplorationRightsModel,
-            id=self.EXP_1_ID,
-            owner_ids=[self.USER_ID_1, self.USER_ID_2],
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-        )
-        exp_rights.update_timestamps()
         self.put_multi([user1, user2, user3, exp_rights1, exp_rights2])
 
     def test_empty_storage(self) -> None:
@@ -244,51 +237,56 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
             )
         ])
 
-    # def test_multiple_exploration(self) -> None:
-    #     state1 = state_domain.State.create_default_state('state1')  # type: ignore[no-untyped-call]
-    #     state3 = state_domain.State.create_default_state('state3')  # type: ignore[no-untyped-call]
-    #     default_outcome = state_domain.Outcome(
-    #         'Introduction', state_domain.SubtitledHtml(
-    #             'default_outcome', '<p>The default outcome.</p>'),
-    #         False, [], 'ref_exp_id_1', None
-    #     )
-    #     state1.update_interaction_default_outcome(default_outcome)
-    #     state3.update_interaction_default_outcome(default_outcome)
-    #     exp1 = self.create_model(
-    #         exp_models.ExplorationModel,
-    #         id=self.EXP_1_ID,
-    #         title='exploration 1 title',
-    #         category='category',
-    #         objective='objective',
-    #         language_code='en',
-    #         init_state_name='state1',
-    #         states_schema_version=48,
-    #         states={
-    #             'state1': state1.to_dict(),
-    #             'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
-    #                 'state2'
-    #             ).to_dict()
-    #         })
-    #     exp1.update_timestamps()
-    #     exp2 = self.create_model(
-    #         exp_models.ExplorationModel,
-    #         id=self.EXP_2_ID,
-    #         title='exploration 1 title',
-    #         category='category',
-    #         objective='objective',
-    #         language_code='en',
-    #         init_state_name='state3',
-    #         states_schema_version=48,
-    #         states={'state3': state3.to_dict()}
-    #     )
-    #     exp2.update_timestamps()
-    #     self.put_multi([exp1, exp2])
+    def test_multiple_exploration(self) -> None:
+        state1 = state_domain.State.create_default_state('state1')  # type: ignore[no-untyped-call]
+        state3 = state_domain.State.create_default_state('state3')  # type: ignore[no-untyped-call]
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], 'refresher_exp_id_1', None
+        )
+        state1.update_interaction_default_outcome(default_outcome)
+        state3.update_interaction_default_outcome(default_outcome)
+        exp1 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_1_ID,
+            title='exploration 1 title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            init_state_name='state1',
+            states_schema_version=48,
+            states={
+                'state1': state1.to_dict(),
+                'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                    'state2'
+                ).to_dict()
+            })
+        exp1.update_timestamps()
+        exp2 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_2_ID,
+            title='exploration 1 title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            init_state_name='state3',
+            states_schema_version=48,
+            states={'state3': state3.to_dict()}
+        )
+        exp2.update_timestamps()
+        self.put_multi([exp1, exp2])
+        self.put_multi([exp2])
 
-    #     self.assert_job_output_is([
-    #         job_run_result.JobRunResult(
-    #             stdout='exp_id: exp_1_id, state name: state1'
-    #         ),
-    #         job_run_result.JobRunResult(
-    #             stdout='exp_id: exp_2_id, state name: state3'
-    #         )
-    #     ])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='exp_id: exp_1_id, data: {\'user emails\': '
+                '[\'some@email.com\', \'some2@email.com\'], \'state names\': '
+                '[\'state1\']}'
+            ),
+            job_run_result.JobRunResult(
+                stdout='exp_id: exp_2_id, data: {\'user emails\': '
+                '[\'some@email.com\', \'some3@email.com\'], \'state names\': '
+                '[\'state3\']}'
+            )
+        ])
