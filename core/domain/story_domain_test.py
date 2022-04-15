@@ -539,6 +539,13 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected notes to be a string, received 1')
 
+    def test_validation_fails_with_long_notes(self):
+        self.story.notes = '#####' * 1000 + '#'
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected notes length to be less than 5000,'
+            ' but it is 5001 long'):
+            self.story.validate()
+
     def test_language_code_validation(self):
         self.story.language_code = 0
         self._assert_validation_error(

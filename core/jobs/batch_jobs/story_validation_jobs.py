@@ -59,7 +59,7 @@ class GetNumberOfStoryNotesExceedsMaxLengthJob(base_jobs.JobBase):
         report_number_of_stories_queried = (
             total_stories
             | 'Report count of story models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('EXPS'))
+                job_result_transforms.CountObjectsToJobRunResult('Stories'))
         )
 
         report_number_of_invalid_stories = (
@@ -72,7 +72,7 @@ class GetNumberOfStoryNotesExceedsMaxLengthJob(base_jobs.JobBase):
             story_notes_ids_with_exceeding_max_len
             | 'Save info on invalid stories' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The id of story is %s and its actual len of notes is %s'
+                    'The id of story is %s and its actual length is %s'
                     % (objects[0], len(objects[1]))
                 ))
         )
