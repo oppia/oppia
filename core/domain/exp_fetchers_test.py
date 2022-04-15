@@ -253,14 +253,19 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             exp_fetchers.get_multiple_explorations_by_id(
                 exp_ids + ['doesnt_exist'])
 
+    def test_exploration_user_data_is_none_before_starting_exploration(self):
+        auth_id = 'test_id'
+        user_email = 'test@email.com'
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        self.assertIsNone(exp_fetchers.get_exploration_user_data(
+            user_id, self.EXP_1_ID))
+
     def test_get_exploration_user_data(self):
         auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
-        self.assertIsNone(exp_fetchers.get_exploration_user_data(
-            user_id, self.EXP_1_ID))
 
         user_services.update_learner_checkpoint_progress(
             user_id, self.EXP_1_ID, 'Introduction', 1)
