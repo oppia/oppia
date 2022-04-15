@@ -2524,8 +2524,8 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
     # If the most recently reached checkpoint doesn't exist in current
     # exploration.
     if (
-        most_recently_reached_checkpoint_in_current_exploration != (
-            exp_user_model.most_recently_reached_checkpoint_state_name)
+        most_recently_reached_checkpoint_in_current_exploration !=
+        exp_user_model.most_recently_reached_checkpoint_state_name
     ):
         exp_user_model.most_recently_reached_checkpoint_state_name = (
             most_recently_reached_checkpoint_in_current_exploration)
@@ -2547,6 +2547,4 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
         exp_user_model.update_timestamps()
         exp_user_model.put()
 
-    exp_user_data = exp_fetchers.get_exploration_user_data(
-        user_id, exploration_id)
-    return exp_user_data
+    return exp_fetchers.get_exploration_user_data(user_id, exploration_id)
