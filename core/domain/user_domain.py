@@ -1439,8 +1439,7 @@ class ExplorationUserData:
         self.rating = rating
         self.rated_on = rated_on
         self.draft_change_list = draft_change_list
-        self.draft_change_list_last_updated = (
-            draft_change_list_last_updated)
+        self.draft_change_list_last_updated = draft_change_list_last_updated
         self.draft_change_list_exp_version = draft_change_list_exp_version
         self.draft_change_list_id = draft_change_list_id
         self.mute_suggestion_notifications = mute_suggestion_notifications
