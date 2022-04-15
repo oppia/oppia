@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { fakeAsync, tick } from '@angular/core/testing';
+import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
@@ -49,8 +50,11 @@ describe('Contributions and review component', function() {
   var misconceptionObjectFactory = null;
   var skillBackendApiService = null;
   var skillObjectFactory = null;
+  var translationTopicService = null;
   var userService = null;
   var getUserCreatedTranslationSuggestionsAsyncSpy = null;
+
+  const mockActiveTopicEventEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -79,6 +83,7 @@ describe('Contributions and review component', function() {
       skillBackendApiService = $injector.get('SkillBackendApiService');
       contributionOpportunitiesService = $injector.get(
         'ContributionOpportunitiesService');
+      translationTopicService = $injector.get('TranslationTopicService');
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
@@ -232,6 +237,8 @@ describe('Contributions and review component', function() {
           },
           more: false
         }));
+      spyOnProperty(translationTopicService, 'onActiveTopicChanged')
+        .and.returnValue(mockActiveTopicEventEmitter);
 
       $scope = $rootScope.$new();
       ctrl = $componentController('contributionsAndReview', {
@@ -252,6 +259,57 @@ describe('Contributions and review component', function() {
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(2);
+      expect(ctrl.activeExplorationId).toBeNull();
+    });
+
+    it('should clear activeExplorationId when active topic changes',
+      fakeAsync(function() {
+        ctrl.onClickReviewableTranslations('explorationId');
+        expect(ctrl.activeExplorationId).toBe('explorationId');
+
+        mockActiveTopicEventEmitter.emit();
+        tick();
+
+        expect(ctrl.activeExplorationId).toBeNull();
+      }));
+
+    describe('ctrl.isReviewTranslationsTab', () => {
+      it('should return true on Review Translations tab', function() {
+        ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
+        expect(ctrl.isReviewTranslationsTab()).toBeTrue();
+      });
+
+      it('should return false on Review Questions tab', function() {
+        ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
+        expect(ctrl.isReviewTranslationsTab()).toBeFalse();
+      });
+
+      it('should return false on Translation Contributions tab', function() {
+        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
+        expect(ctrl.isReviewTranslationsTab()).toBeFalse();
+      });
+
+      it('should return false on Question Contributions tab', function() {
+        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+        expect(ctrl.isReviewTranslationsTab()).toBeFalse();
+      });
+    });
+
+    describe('ctrl.onClickReviewableTranslations', () => {
+      it('should set activeExplorationId', function() {
+        expect(ctrl.activeExplorationId).toBeNull();
+        ctrl.onClickReviewableTranslations('explorationId');
+        expect(ctrl.activeExplorationId).toBe('explorationId');
+      });
+    });
+
+    describe('ctrl.onClickBackToReviewableLessons', () => {
+      it('should clear activeExplorationId', function() {
+        ctrl.onClickReviewableTranslations('explorationId');
+        expect(ctrl.activeExplorationId).toBe('explorationId');
+        ctrl.onClickBackToReviewableLessons();
+        expect(ctrl.activeExplorationId).toBeNull();
+      });
     });
 
     describe('ctrl.loadContributions', () => {

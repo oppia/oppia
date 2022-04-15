@@ -30,7 +30,7 @@ import { UrlInterpolationService } from
 import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-translation-language.model';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 
-fdescribe('Contribution Opportunities backend API service', function() {
+describe('Contribution Opportunities backend API service', function() {
   let contributionOpportunitiesBackendApiService:
     ContributionOpportunitiesBackendApiService;
   let httpTestingController: HttpTestingController;

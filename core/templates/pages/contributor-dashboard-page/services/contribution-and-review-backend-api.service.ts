@@ -90,7 +90,7 @@ export class ContributionAndReviewBackendApiService {
       limit: number,
       offset: number,
       topicName: string,
-      explorationId: string
+      explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
@@ -102,7 +102,7 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'skill', 'add_question', limit, offset, topicName, null);
+        'skill', 'add_question', limit, offset, topicName);
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
@@ -140,7 +140,7 @@ export class ContributionAndReviewBackendApiService {
       limit: number,
       offset: number,
       topicName: string,
-      explorationId: string
+      explorationId: string = null
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEWABLE_SUGGESTIONS_HANDLER_URL, {

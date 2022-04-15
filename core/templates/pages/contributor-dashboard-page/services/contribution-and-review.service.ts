@@ -117,7 +117,7 @@ export class ContributionAndReviewService {
       fetcher: SuggestionFetcher,
       shouldResetOffset: boolean,
       topicName: string,
-      explorationId: string
+      explorationId: string = null
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
       // Handle the case where we need to fetch starting from the beginning.
@@ -168,44 +168,38 @@ export class ContributionAndReviewService {
 
   async getUserCreatedQuestionSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      topicName: string = 'All',
-      explorationId: string = null):
+      topicName: string = 'All'):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.userCreatedQuestionFetcher,
       shouldResetOffset,
-      topicName,
-      explorationId);
+      topicName);
   }
 
   async getReviewableQuestionSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      topicName: string = 'All',
-      explorationId: string = null):
+      topicName: string = 'All'):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.reviewableQuestionFetcher,
       shouldResetOffset,
-      topicName,
-      explorationId);
+      topicName);
   }
 
   async getUserCreatedTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      topicName: string = 'All',
-      explorationId: string = null):
+      topicName: string = 'All'):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.userCreatedTranslationFetcher,
       shouldResetOffset,
-      topicName,
-      explorationId);
+      topicName);
   }
 
   async getReviewableTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
       topicName: string = 'All',
-      explorationId: string = null):
+      explorationId: string):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,

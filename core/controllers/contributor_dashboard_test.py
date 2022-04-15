@@ -22,7 +22,6 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -269,8 +268,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
     def test_get_skill_opportunity_data_pagination_multiple_fetches(self):
         # Unassign topic 0 from the classroom.
-        config_services.revert_property(
-            self.admin_id, 'classroom_pages_data')
+        config_services.revert_property(self.admin_id, 'classroom_pages_data')
 
         # Create a new topic.
         topic_id = '1'
@@ -589,7 +587,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 expected_opportunity_dict_10,
                 expected_opportunity_dict_20,
                 expected_opportunity_dict_30])
-
 
     def _publish_valid_topic(self, topic, uncategorized_skill_ids):
         """Saves and publishes a valid topic with linked skills and subtopic.
