@@ -1135,9 +1135,38 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertEqual(max_old_space_size, 4096)
             yield scripts_test_utils.PopenStub()
 
-        with self.swap(
-                servers,
-                'managed_webpack_compiler',
-                mock_managed_webpack_compiler
-        ):
+        def mock_get_file_count(unused_path):
+            return 1
+
+        webpack_compiler_swap = self.swap(
+                servers, 'managed_webpack_compiler',
+                mock_managed_webpack_compiler)
+        get_file_count_swap = self.swap(
+            build, 'get_file_count', mock_get_file_count)
+
+
+        with webpack_compiler_swap, get_file_count_swap:
             build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
+
+    def test_build_using_webpack_command_with_incorrect_filecount_fails(self):
+
+        @contextlib.contextmanager
+        def mock_managed_webpack_compiler(config_path, max_old_space_size):
+            self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
+            self.assertEqual(max_old_space_size, 4096)
+            yield scripts_test_utils.PopenStub()
+
+        def mock_get_file_count(unused_path):
+            return 0
+
+        webpack_compiler_swap = self.swap(
+                servers, 'managed_webpack_compiler',
+                mock_managed_webpack_compiler)
+        get_file_count_swap = self.swap(
+            build, 'get_file_count', mock_get_file_count)
+
+
+        with webpack_compiler_swap, get_file_count_swap:
+            with self.assertRaisesRegex(
+                AssertionError, 'webpack_bundles should be non-empty.'):
+                build.build_using_webpack(build.WEBPACK_PROD_CONFIG)

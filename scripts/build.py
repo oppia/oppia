@@ -657,6 +657,8 @@ def build_using_webpack(config_path):
         config_path=config_path, max_old_space_size=4096)
     with managed_webpack_compiler as p:
         p.wait()
+    assert get_file_count('backend_prod_files/webpack_bundles/') != 0, (
+        'webpack_bundles should be non-empty.')
 
 
 def hash_should_be_inserted(filepath):
