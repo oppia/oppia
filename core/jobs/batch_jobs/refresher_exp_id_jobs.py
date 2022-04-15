@@ -26,20 +26,27 @@ from core.platform import models
 
 import apache_beam as beam
 
-from typing import Iterable, Tuple
+from typing import Iterable, List, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, user_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.user])
 
 datastore_services = models.Registry.import_datastore_services()
 
 
 class FilterRefresherExplorationIdJob(base_jobs.JobBase):
     """Job that match entity_type as collection."""
+
+    @staticmethod
+    def _flatten_user_id_to_exp_id(
+        exp_id: str, owner_ids: List[str]) -> Iterable[Tuple[str, str]]:
+        for user_id in owner_ids:
+            yield(user_id, exp_id)
 
     @staticmethod
     def _process_exploration_states(
@@ -51,7 +58,7 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
                 Exploration model to check for refresher_exploration_id.
 
         Yields:
-            (str,str). Tuple containing exploration id and state name.
+            (str, List[str]). Tuple containing exploration id and state name.
         """
 
         for state_name, state in exp.states.items():
@@ -74,7 +81,8 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
             PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
             matching entity_type as collection.
         """
-        refresher_exp_id_models = (
+        # exp ids to state names
+        exp_to_state_name = (
             self.pipeline
             | 'Get all Exploration models' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all())
@@ -83,11 +91,75 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
             | 'Extract ' >> beam.FlatMap(
                 self._process_exploration_states)
         )
+        # exp id to owner ids
+        exp_rights_collection = (
+            self.pipeline
+            | 'Get all exp rights model' >> ndb_io.GetModels(
+                exp_models.ExplorationRightsModel.get_all())
+            | 'Extract exp id and exp owner id ' >> beam.Map(
+                lambda exp_rights: (exp_rights.id, exp_rights.owner_ids)
+            )
+        )
+        # keys of exp_to_state_name
+        relevant_exp_ids = (
+            exp_to_state_name
+            | 'extract just the ids' >> beam.Keys()
+        )
+        relevant_exp_ids_iter = beam.pvalue.AsIter(
+            relevant_exp_ids)
+
+        # filtered exp id to owner ids
+        exp_rights_filtered = (
+            exp_rights_collection
+            | 'filter ' >> beam.Filter(
+                lambda exp_rights, ids: (
+                    exp_rights[0] in ids), ids=relevant_exp_ids_iter
+            )
+        )
+
+        # user_id: exp_id
+        user_id_to_exp_id = (
+            exp_rights_filtered
+            | beam.FlatMapTuple(self._flatten_user_id_to_exp_id)
+        )
+
+        # who is gonna filter this -> can be done in later phases
+        user_id_to_user_emails = (
+            self.pipeline
+            | 'Get all user settings models' >> ndb_io.GetModels(
+                user_models.UserSettingsModel.get_all())
+            | 'Extract id and email' >> beam.Map(
+                    lambda user_setting: (
+                        user_setting.id, user_setting.email))
+        )
+
+        grouped_exp_id_to_email = (
+            (user_id_to_exp_id, user_id_to_user_emails)
+            | 'Group by user id ' >> beam.CoGroupByKey()
+            | 'Drop user id ' >> beam.Values()
+            | 'Filter ' >> beam.Filter(
+                lambda groups: len(groups[1]) > 0) # CoGroupByKeys will return a List becuase no keys were provided 
+            | beam.FlatMapTuple(
+                lambda a, b : ((a[0], b[0]),)) # Returning a Tuple
+            )
+
+        grouped_email_state_name_by_exp_id = (
+            {
+                'user emails': grouped_exp_id_to_email, 
+                'state names': exp_to_state_name
+            }
+            | 'Group by exp id' >> beam.CoGroupByKey()
+        )
+
+        debug = (
+            grouped_email_state_name_by_exp_id
+            | 'print it out \n\n\n\n\n\n\n\n out ' >> beam.Map(print)
+        )
 
         return (
-            refresher_exp_id_models
+            grouped_email_state_name_by_exp_id
             | 'The output' >> beam.MapTuple(
-                lambda exp_id, state: job_run_result.JobRunResult.as_stdout(
-                    'exp_id: %s, state name: %s' % (exp_id, state)
+                lambda exp_id, data: job_run_result.JobRunResult.as_stdout(
+                    'exp_id: %s, data: %s' % (exp_id, data)
                 ))
         )
