@@ -1399,7 +1399,7 @@ class ExplorationUserData:
         mute_feedback_notifications: bool = (
             feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
         furthest_reached_checkpoint_exp_version: Optional[int] = None,
-        furthest_reached_checkpoint_state_name: Optional[str]= None,
+        furthest_reached_checkpoint_state_name: Optional[str] = None,
         most_recently_reached_checkpoint_exp_version: Optional[int] = None,
         most_recently_reached_checkpoint_state_name: Optional[str] = None
     ) -> None:
