@@ -57,11 +57,9 @@ export class ExplorationIdValidationService {
       .loadPublicExplorationSummariesAsync([explorationId]).then(
         (response: ExplorationSummaryBackendDict) => {
           let summaries = response.summaries;
-          if (summaries.length !== 1) {
-            return false;
-          } else {
+          let isCategoryPresent = false;
+          if (summaries.length === 1) {
             let category = summaries[0].category;
-            let isCategoryPresent = false;
             for (let i of constants.ALL_CATEGORIES) {
               if (i === category) {
                 isCategoryPresent = true;
