@@ -424,8 +424,9 @@ def get_exploration_user_data(user_id, exp_id):
         exp_id: str. The Id of the exploration.
 
     Returns:
-        ExplorationUserData. The domain object corresponding to the given user
-        and exploration.
+        ExplorationUserData or None. The domain object corresponding to the
+        given user and exploration. If the model corresponsing to given user
+        and exploration is not found, return None.
     """
     exp_user_data_model = user_models.ExplorationUserDataModel.get(
         user_id, exp_id)
