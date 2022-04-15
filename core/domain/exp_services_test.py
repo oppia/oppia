@@ -22,7 +22,6 @@ import datetime
 import logging
 import os
 import re
-from unicodedata import category
 import zipfile
 
 from core import feconf
@@ -2174,7 +2173,7 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
         """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
-category: A category
+category: Algebra
 correctness_feedback_enabled: false
 init_state_name: %s
 language_code: en
@@ -2282,7 +2281,7 @@ title: A title
         """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
-category: A category
+category: Algebra
 correctness_feedback_enabled: false
 init_state_name: %s
 language_code: en
@@ -2390,7 +2389,7 @@ title: A title
         """Test the export_to_zip_file() method."""
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, objective='The objective',
-            category='A Category')
+            category='Algebra')
         init_state = exploration.states[exploration.init_state_name]
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
@@ -2471,7 +2470,7 @@ title: A title
     def test_export_to_zip_file_with_unpublished_exploration(self):
         """Test the export_to_zip_file() method."""
         self.save_new_default_exploration(
-            self.EXP_0_ID, self.owner_id, title='', category='A Category')
+            self.EXP_0_ID, self.owner_id, title='')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
         zf = zipfile.ZipFile(zip_file_output)
@@ -2482,7 +2481,7 @@ title: A title
         """Test exporting an exploration with assets to a zip file."""
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, objective='The objective',
-            category='A Category')
+            category='Algebra')
         init_state = exploration.states[exploration.init_state_name]
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
@@ -2572,7 +2571,7 @@ title: A title
         """Test export_to_zip_file() for different versions."""
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, objective='The objective',
-            category='A Category')
+            category='Algebra')
         self.assertEqual(exploration.version, 1)
 
         init_state = exploration.states[exploration.init_state_name]
@@ -4541,7 +4540,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'commit_cmds': [{
                 'cmd': 'create_new',
                 'title': 'A title',
-                'category': 'A category'
+                'category': 'Algebra'
             }],
             'committer_id': self.owner_id,
             'commit_message': (
@@ -4569,7 +4568,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'commit_cmds': [{
                 'cmd': 'create_new',
                 'title': 'A title',
-                'category': 'A category'
+                'category': 'Algebra'
             }],
             'committer_id': self.owner_id,
             'commit_message': (
@@ -4615,7 +4614,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'commit_cmds': [{
                 'cmd': 'create_new',
                 'title': 'A title',
-                'category': 'A category'
+                'category': 'Algebra'
             }],
             'committer_id': self.owner_id,
             'commit_message': (
@@ -5575,7 +5574,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         expected_summaries = {
             self.EXP_ID_1: exp_domain.ExplorationSummary(
                 self.EXP_ID_1, 'Exploration 1 title',
-                'A category', 'An objective', 'en', [],
+                'Algebra', 'An objective', 'en', [],
                 feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
                 rights_domain.ACTIVITY_STATUS_PRIVATE, False,
                 [self.albert_id], [], [], [], [self.albert_id, self.bob_id],
@@ -5586,7 +5585,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             ),
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
-                'A category', 'An objective', 'en', [],
+                'Algebra', 'An objective', 'en', [],
                 feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
                 rights_domain.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [], [self.albert_id],
