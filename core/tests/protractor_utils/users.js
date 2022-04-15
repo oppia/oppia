@@ -93,7 +93,6 @@ var logout = async function() {
   }, async() => {
     await waitFor.visibilityOf(
       splashPage, 'Splash page takes too long to appear');
-    await waitFor.pageToFullyLoad();
   });
 };
 
