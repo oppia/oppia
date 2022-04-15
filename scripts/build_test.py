@@ -1144,7 +1144,6 @@ class BuildTests(test_utils.GenericTestBase):
         get_file_count_swap = self.swap(
             build, 'get_file_count', mock_get_file_count)
 
-
         with webpack_compiler_swap, get_file_count_swap:
             build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
 
@@ -1164,7 +1163,6 @@ class BuildTests(test_utils.GenericTestBase):
                 mock_managed_webpack_compiler)
         get_file_count_swap = self.swap(
             build, 'get_file_count', mock_get_file_count)
-
 
         with webpack_compiler_swap, get_file_count_swap:
             with self.assertRaisesRegex(
