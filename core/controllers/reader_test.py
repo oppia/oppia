@@ -2247,12 +2247,14 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
         )
 
         # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
         self.put_json(
             '/explorehandler/checkpoint_reached/%s' % exp_id,
             {
                 'most_recently_reached_checkpoint_exp_version': 2,
                 'most_recently_reached_checkpoint_state_name': 'Welcome!'
-            }
+            },
+            csrf_token=csrf_token
         )
 
         # Fetching latest exploration.
@@ -2725,12 +2727,14 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
             exploration_dict['most_recently_reached_checkpoint_state_name'])
 
         # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
         self.put_json(
             '/explorehandler/checkpoint_reached/%s' % exp_id,
             {
                 'most_recently_reached_checkpoint_exp_version': 1,
                 'most_recently_reached_checkpoint_state_name': 'Welcome!'
-            }
+            },
+            csrf_token=csrf_token
         )
 
         exp_user_data = exp_fetchers.get_exploration_user_data(
@@ -2773,12 +2777,14 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
             'Welcome!')
 
         # Second checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
         self.put_json(
             '/explorehandler/checkpoint_reached/%s' % exp_id,
             {
                 'most_recently_reached_checkpoint_exp_version': 2,
                 'most_recently_reached_checkpoint_state_name': 'What language'
-            }
+            },
+            csrf_token=csrf_token
         )
         exp_user_data = exp_fetchers.get_exploration_user_data(
             viewer_id, exp_id)
@@ -2824,12 +2830,14 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
             exploration_dict['most_recently_reached_checkpoint_state_name'])
 
         # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
         self.put_json(
             '/explorehandler/checkpoint_reached/%s' % exp_id,
             {
                 'most_recently_reached_checkpoint_exp_version': 1,
                 'most_recently_reached_checkpoint_state_name': 'Welcome!'
-            }
+            },
+            csrf_token=csrf_token
         )
         exp_user_data = exp_fetchers.get_exploration_user_data(
             viewer_id, exp_id)
@@ -2844,11 +2852,13 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
             'Welcome!')
 
         # Exploration restarted.
+        csrf_token = self.get_new_csrf_token()
         self.put_json(
             '/explorehandler/restart/%s' % exp_id,
             {
                 'most_recently_reached_checkpoint_state_name': None
-            }
+            },
+            csrf_token=csrf_token
         )
         exploration_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
