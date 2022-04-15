@@ -303,22 +303,29 @@ class ExplorationHandler(base.BaseHandler):
         # allow users to save their checkpoint progress in older exploration
         # version.
         if exp_user_data is not None and version is None:
+            synced_exp_user_data = None
             # If the latest exploration version is ahead of the most recently
             # interacted exploration version.
-            if (exp_user_data.most_recently_reached_checkpoint_exp_version is not None and ( # pylint: disable=line-too-long
-                    exp_user_data.most_recently_reached_checkpoint_exp_version < exploration.version)): # pylint: disable=line-too-long
-                exp_user_data = (
+            if (
+                exp_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
+                exp_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
+            ):
+                synced_exp_user_data = (
                     user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
                         self.user_id, exploration_id))
+            else:
+                synced_exp_user_data = exp_user_data
 
             furthest_reached_checkpoint_exp_version = (
-                exp_user_data.furthest_reached_checkpoint_exp_version)
+                synced_exp_user_data.furthest_reached_checkpoint_exp_version)
             furthest_reached_checkpoint_state_name = (
-                exp_user_data.furthest_reached_checkpoint_state_name)
+                synced_exp_user_data.furthest_reached_checkpoint_state_name)
             most_recently_reached_checkpoint_exp_version = (
-                exp_user_data.most_recently_reached_checkpoint_exp_version)
+                synced_exp_user_data
+                    .most_recently_reached_checkpoint_exp_version)
             most_recently_reached_checkpoint_state_name = (
-                exp_user_data.most_recently_reached_checkpoint_state_name)
+                synced_exp_user_data
+                    .most_recently_reached_checkpoint_state_name)
 
         self.values.update({
             'can_edit': (
