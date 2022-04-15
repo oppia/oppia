@@ -895,6 +895,11 @@ URLS = [
     get_redirect_route(
         r'/voice_artist_management_handler/<entity_type>/<entity_id>',
         voice_artist.VoiceArtistManagementHandler),
+
+    get_redirect_route(
+        r'/topics_and_skills_dashboard/categorized_and_untriaged_skills_data',
+        topics_and_skills_dashboard
+            .CategorizedAndUntriagedSkillsDataHandler)
 ]
 
 # Adding redirects for topic landing pages.

@@ -71,7 +71,7 @@
       </angular-html-bind>
       <h3>Content</h3>
       <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-        <li class="oppia-rule-block oppia-prevent-selection mt-0"
+        <li class="oppia-rule-block mt-0"
             ng-repeat="caContent in interactionCustomizationArgTranslatableContent track by $index"
             ng-class="{'active': activeCustomizationArgContentIndex === $index}">
           <a ng-click="changeActiveCustomizationArgContentIndex($index)"
@@ -114,7 +114,7 @@
     <div ng-if="isActive(TAB_ID_RULE_INPUTS)" class="translation-state-content">
       <div>
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-          <li class="oppia-rule-block oppia-prevent-selection protractor-test-translation-feedback mt-0"
+          <li class="oppia-rule-block protractor-test-translation-feedback mt-0"
               ng-repeat="ruleContent in interactionRuleTranslatableContents track by $index"
               ng-class="{'active': activeRuleContentIndex === $index}">
             <a class="oppia-rule-tab protractor-test-feedback-<[$index]>"
@@ -139,7 +139,7 @@
     <div ng-if="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
       <div>
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-          <li class="oppia-rule-block oppia-prevent-selection protractor-test-translation-feedback mt-0"
+          <li class="oppia-rule-block protractor-test-translation-feedback mt-0"
               ng-repeat="answerGroup in stateAnswerGroups track by $index"
               ng-class="{'active': activeAnswerGroupIndex === $index}">
             <a class="oppia-rule-tab protractor-test-feedback-<[$index]>"
@@ -217,7 +217,7 @@
     </div>
     <div ng-if="isActive(TAB_ID_HINTS)" class="translation-state-content">
       <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-        <li class="oppia-rule-block oppia-prevent-selection protractor-test-translation-hint mt-0"
+        <li class="oppia-rule-block protractor-test-translation-hint mt-0"
             ng-repeat="hint in stateHints track by $index"
             ng-class="{'active': activeHintIndex === $index}">
           <a ng-click="changeActiveHintIndex($index)"

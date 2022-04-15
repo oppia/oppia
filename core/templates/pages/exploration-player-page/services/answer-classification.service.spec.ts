@@ -19,28 +19,21 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerClassificationResult } from
-  'domain/classifier/answer-classification-result.model';
-import { AnswerClassificationService, InteractionRulesService } from
-  'pages/exploration-player-page/services/answer-classification.service';
+import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
+import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AppService } from 'services/app.service';
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { Classifier } from 'domain/classifier/classifier.model';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { PredictionAlgorithmRegistryService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/prediction-algorithm-registry.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
+import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { AlertsService } from 'services/alerts.service';
+import { TextInputPredictionService } from 'interactions/TextInput/text-input-prediction.service';
 
 describe('Answer Classification Service', () => {
   const stateName = 'Test State';
@@ -356,7 +349,11 @@ describe('Answer Classification Service', () => {
       stateClassifierMappingService.testOnlySetClassifierData(
         stateName, testClassifier);
       predictionAlgorithmRegistryService.testOnlySetPredictionService(
-        'TestClassifier', 1, { predict: (classifierData, answer) => 1 });
+        'TestClassifier', 1,
+        {
+          predict: (classifierData, answer) => 1
+        } as TextInputPredictionService
+      );
 
       stateDict = {
         content: {
@@ -484,7 +481,7 @@ describe('Answer Classification Service', () => {
           predictionAlgorithmRegistryService, 'getPredictionService'
         ).and.returnValue({
           predict: (classifierData, answer) => -1
-        });
+        } as TextInputPredictionService);
 
         const state = (
           stateObjectFactory.createFromBackendDict(stateName, stateDict));

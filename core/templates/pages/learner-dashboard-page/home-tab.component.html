@@ -74,8 +74,7 @@
        [oppiaFocusOn]="'ourLessonsBtn'">
     </a>
   </div>
-  <div [ngStyle]="isLanguageRTL() ? {'padding': '32px 32px 0 113px'} : {'padding': '32px 113px 0 32px'}"
-       class="empty-suggested-for-you"
+  <div class="empty-suggested-for-you learn-something-new-section"
        *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>

@@ -1,8 +1,8 @@
 <link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/library-page/library-page.component.css" as="style">
 <link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/library-page/library-page.component.rtl.css" as="style">
 
-<div class="oppia-library-container">
-  <div class="oppia-library-container-inner">
+<div class="oppia-library-container d-flex">
+  <div class="oppia-library-container-inner m-auto">
     <div>
       <div class="oppia-exp-summary-tiles-container" *ngIf="pageMode === LIBRARY_PAGE_MODES.SEARCH">
         <oppia-search-results></oppia-search-results>

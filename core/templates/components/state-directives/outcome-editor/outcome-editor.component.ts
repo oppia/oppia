@@ -17,8 +17,6 @@
  * @fileoverview Directives for the outcome editor.
  */
 
-import {SubtitledHtml} from "domain/exploration/subtitled-html.model";
-
 require(
   'components/state-directives/outcome-editor/' +
   'outcome-destination-editor.component.ts');
@@ -58,11 +56,11 @@ angular.module('oppia').component('outcomeEditor', {
   template: require('./outcome-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    'ExternalSaveService', 'HtmlEscaperService', 'StateEditorService',
+    '$rootScope', 'ExternalSaveService', 'StateEditorService',
     'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
     'INTERACTION_SPECS',
     function(
-        ExternalSaveService, HtmlEscaperService, StateEditorService,
+        $rootScope, ExternalSaveService, StateEditorService,
         StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
         INTERACTION_SPECS) {
       var ctrl = this;
@@ -73,6 +71,10 @@ angular.module('oppia').component('outcomeEditor', {
 
       ctrl.isCorrectnessFeedbackEnabled = function() {
         return StateEditorService.getCorrectnessFeedbackEnabled();
+      };
+
+      ctrl.getChanges = function() {
+        $rootScope.$applyAsync();
       };
 
       // This returns false if the current interaction ID is null.
@@ -184,16 +186,13 @@ angular.module('oppia').component('outcomeEditor', {
           var imageFilenameList: string[] = [];
           var elements = doc.getElementsByTagName('oppia-noninteractive-image');
           for (let i = 0; i < elements.length; i++) {
-            console.log('element', elements[i]);
-            console.log('element-getattribute', elements[i].getAttribute('filepath-with-value'))
             imageFilenameList.push(
               String(HtmlEscaperService.escapedStrToUnescapedStr(
                 elements[i].getAttribute('filepath-with-value'))
               ).replace('"', ''))
-            // replaces only first ", need to fix for second "
+            // Replaces only first ", need to fix for second ".
           }
           ctrl.savedOutcome.feedback._image_list = imageFilenameList
-          console.log(ctrl.savedOutcome.feedback)
           ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
         }
         ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);

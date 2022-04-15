@@ -31,7 +31,8 @@ export class SubtitledHtml {
   _contentId: string | null;
   _image_list: string[];
 
-  constructor(html: string, contentId: string | null, imageList: string[] = []) {
+  constructor(
+    html: string, contentId: string | null, imageList: string[] = []) {
     this._html = html;
     this._contentId = contentId;
     this._image_list = imageList;
@@ -71,7 +72,8 @@ export class SubtitledHtml {
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
   }
 
-  static createDefault(html: string, contentId: string, imageList: string[] = []): SubtitledHtml {
+  static createDefault(
+    html: string, contentId: string, imageList: string[] = []): SubtitledHtml {
     return new SubtitledHtml(html, contentId, imageList);
   }
 }

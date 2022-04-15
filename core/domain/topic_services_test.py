@@ -21,7 +21,7 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.domain import exp_services
 from core.domain import fs_domain
@@ -107,6 +107,32 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_admin = user_services.get_user_actions_info(
             self.user_id_admin)
+
+    def test_get_story_titles_in_topic(self):
+        story_titles = topic_services.get_story_titles_in_topic(
+            self.topic)
+        self.assertEqual(len(story_titles), 2)
+        self.assertIn('Title', story_titles)
+        self.assertIn('Title 2', story_titles)
+
+    def test_update_story_and_topic_summary(self):
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                    'property_name': story_domain.STORY_PROPERTY_TITLE,
+                    'old_value': 'Title',
+                    'new_value': 'New Title'
+                }
+            )
+        ]
+        topic_services.update_story_and_topic_summary(
+            self.user_id, self.story_id_1, change_list,
+            'Updated story title', self.TOPIC_ID
+        )
+        story_titles = topic_services.get_story_titles_in_topic(
+            self.topic)
+        self.assertIn('New Title', story_titles)
 
     def test_compute_summary(self):
         topic_summary = topic_services.compute_summary_of_topic(self.topic)
@@ -413,7 +439,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopics[0].title, 'Title')
 
         # Store a dummy image in filesystem.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
@@ -613,7 +639,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_topic(self):
         # Save a dummy image on filesystem, to be used as thumbnail.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()

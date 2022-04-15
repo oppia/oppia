@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 import os
 
-from core import python_utils
+from core import utils
 from core.domain import rules_registry
 from core.tests import test_utils
 
@@ -35,7 +35,7 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
 
         spec_file = os.path.join(
             'extensions', 'interactions', 'html_field_types_to_rule_specs.json')
-        with python_utils.open_file(spec_file, 'r') as f:
+        with utils.open_file(spec_file, 'r') as f:
             specs_from_json = json.loads(f.read())
 
         self.assertDictEqual(
@@ -51,7 +51,7 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
             'extensions', 'interactions',
             'legacy_html_field_types_to_rule_specs_by_state_version',
             'html_field_types_to_rule_specs_state_v41.json')
-        with python_utils.open_file(spec_file_v41, 'r') as f:
+        with utils.open_file(spec_file_v41, 'r') as f:
             specs_from_json_v41 = json.loads(f.read())
 
         self.assertDictEqual(

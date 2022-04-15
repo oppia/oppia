@@ -58,7 +58,6 @@ import { RatioExpressionInputValidationService } from 'interactions/RatioExpress
 import { Warning } from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { ImageWithRegions } from 'interactions/customization-args-defs';
-import {string} from "mathjs";
 import {HtmlEscaperService} from "services/html-escaper.service";
 
 interface DefaultValueHtml {
@@ -357,12 +356,10 @@ export class CustomizeInteractionModalComponent
   }
 
   populateImageList(): void {
-
     let traverseSchemaAndAssignImageIds = (
         value: Object | Object[],
         schema: Schema,
     ): void => {
-      console.log('Inside traverseSchemaAndAssignImageIds')
       const schemaIsSubtitledHtml = (
         schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
         schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
@@ -375,19 +372,14 @@ export class CustomizeInteractionModalComponent
         var parser = new DOMParser();
         var doc = parser.parseFromString((value as SubtitledHtml)._html, 'text/html');
         var imageFilenameList: string[] = [];
-        console.log(doc);
         var elements = doc.getElementsByTagName('oppia-noninteractive-image');
-        console.log('elements', elements)
         for (let i = 0; i < elements.length; i++) {
-          console.log('element', elements[i]);
-          console.log('element-getattribute', elements[i].getAttribute('filepath-with-value'))
           imageFilenameList.push(
             String(this.htmlEscaperService.escapedStrToUnescapedStr(
               elements[i].getAttribute('filepath-with-value'))
             ).replace('"', ''))
           // replaces only first ", need to fix for second "
         }
-        console.log('imagelist', imageFilenameList);
         (value as SubtitledHtml)._image_list = imageFilenameList;
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
         for (
@@ -402,7 +394,6 @@ export class CustomizeInteractionModalComponent
       }
     };
 
-    console.log('*** Inside populate image list ***')
     const interactionId = this.stateInteractionIdService.displayed;
 
     const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
@@ -417,7 +408,6 @@ export class CustomizeInteractionModalComponent
         )
       }
     }
-    console.log(this.stateCustomizationArgsService.displayed['choices']['value'])
   }
 
   /**

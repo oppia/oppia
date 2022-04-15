@@ -57,14 +57,14 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'ItemSelectionInput',
     'MathEquationInput',
     'MultipleChoiceInput',
+    'MusicNotesInput',
     'NumericExpressionInput',
-    'PencilCodeEditor',
-    'RatioExpressionInput',
     'NumericInput',
     'NumberWithUnits',
+    'PencilCodeEditor',
+    'RatioExpressionInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput'
 ]
 
 _INTERACTION_CONFIG_SCHEMA = [
@@ -547,7 +547,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             png_file = os.path.join(
                 interaction_dir, 'static', '%s.png' % interaction_id)
             self.assertTrue(os.path.isfile(png_file))
-            with python_utils.open_file(png_file, 'rb', encoding=None) as f:
+            with utils.open_file(png_file, 'rb', encoding=None) as f:
                 img_data = f.read()
                 width, height = struct.unpack('>LL', img_data[16:24])
                 self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)

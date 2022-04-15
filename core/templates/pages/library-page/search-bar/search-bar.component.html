@@ -34,7 +34,7 @@
             class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
             title="{{ selectionDetails.categories.description | translate }}">
       <i *ngIf="isMobileViewActive()" class="material-icons md-18 category-selector-icon">&#xE574;</i>
-      {{categoryButtonText|truncate:14}}
+      {{ categoryButtonText | truncate:14 }}
     </button>
     <ul ngbDropdownMenu
         class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"

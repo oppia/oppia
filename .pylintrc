@@ -126,16 +126,18 @@ disable=abstract-method,
         arguments-renamed,
         consider-using-dict-items,
         consider-using-with,
-        cyclic-import,
         import-outside-toplevel,
-        missing-raises-doc,
         non-explicit-keyword-args,
         not-an-iterable,
         super-with-arguments,
         unnecessary-pass,
         consider-using-f-string,
 # TODO(#14322): Reinstate this.
-        missing-type-doc
+        missing-type-doc,
+        # Pylint considers imports to be cyclic even when the cycle is
+        # broken by putting imports inside functions so they aren't
+        # executed upon module import.
+        cyclic-import,
 
 [REPORTS]
 

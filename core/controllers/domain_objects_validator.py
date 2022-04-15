@@ -23,13 +23,11 @@ from __future__ import annotations
 from core.constants import constants
 from core.controllers import base
 from core.domain import blog_domain
-from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import image_validation_services
 from core.domain import question_domain
 from core.domain import state_domain
-from core.domain import topic_domain
 
 from typing import Dict, Optional, Union
 
@@ -69,20 +67,6 @@ def validate_suggestion_change(obj):
     return obj
 
 
-def validate_exploration_change(obj):
-    """Validates exploration change.
-
-    Args:
-        obj: dict. Data that needs to be validated.
-
-    Returns:
-        ExplorationChange. Returns an ExplorationChange object.
-    """
-    # No explicit call to validate_dict method is necessary, because
-    # ExplorationChange calls validate method while initialization.
-    return exp_domain.ExplorationChange(obj)
-
-
 def validate_new_config_property_values(new_config_property):
     """Validates new config property values.
 
@@ -91,6 +75,11 @@ def validate_new_config_property_values(new_config_property):
 
     Returns:
         dict(str, *). Returns a dict for new config properties.
+
+    Raises:
+        Exception. The config property name is not a string.
+        Exception. The value corresponding to config property name
+            don't have any schema.
     """
     for (name, value) in new_config_property.items():
         if not isinstance(name, str):
@@ -117,6 +106,9 @@ def validate_change_dict_for_blog_post(change_dict):
 
     Returns:
         dict. Returns the change_dict after validation.
+
+    Raises:
+        Exception. Invalid tags provided.
     """
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title( # type: ignore[no-untyped-call]
@@ -139,26 +131,6 @@ def validate_change_dict_for_blog_post(change_dict):
     # to any domain class so we are validating the fields of change_dict
     # as a part of schema validation.
     return change_dict
-
-
-def validate_collection_change(collection_change_dict):
-    """Validates collection change.
-
-    Args:
-        collection_change_dict: dict. Data that needs to be validated.
-
-    Returns:
-        dict. Returns collection change dict after validation.
-    """
-    # No explicit call to validate_dict method is necessary, because
-    # CollectionChange calls validate method while initialization.
-
-    # Object should not be returned from here because it requires modification
-    # in many of the methods in the domain layer of the codebase and we are
-    # planning to remove collections from our codebase hence modification is
-    # not done here.
-    collection_domain.CollectionChange(collection_change_dict)
-    return collection_change_dict
 
 
 def validate_state_dict(state_dict):
@@ -189,6 +161,9 @@ def validate_email_dashboard_data(
 
     Returns:
         dict. Returns the dict after validation.
+
+    Raises:
+        Exception. The key in 'data' is not one of the allowed keys.
     """
     predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     possible_keys = [predicate['backend_attr'] for predicate in predicates]
@@ -302,30 +277,12 @@ def validate_params_dict(params):
 
     Returns:
         dict. Returns the params argument in dict form.
+
+    Raises:
+        Exception. The given params is not of type dict as expected.
     """
     if not isinstance(params, dict):
         raise Exception('Excepted dict, received %s' % params)
     # The params argument do not represent any domain class, hence dict form of
     # the data is returned from here.
     return params
-
-
-def validate_topic_and_sub_topic_change(change_dict):
-    """Validates Topic or Subtopic change.
-
-    Args:
-        change_dict: dict. Data that needs to be validated.
-
-    Returns:
-        dict. Returns the validated change_dict.
-    """
-    allowed_commands = [
-        command['name'] for command in topic_domain.TopicChange.ALLOWED_COMMANDS
-    ]
-
-    if change_dict.get('cmd', None) not in allowed_commands:
-        raise base.BaseHandler.InvalidInputException(
-            '%s cmd is not allowed.' % change_dict.get('cmd', None)
-        )
-
-    return change_dict

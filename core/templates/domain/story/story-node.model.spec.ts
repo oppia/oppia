@@ -64,6 +64,15 @@ describe('Story node model', () => {
 
     expect(() => invalidStoryNode.validate()).toThrowError(
       'The node id 1 is invalid.');
+
+    // This throws "TS2345". We need to suppress this error because
+    // we are testing that _checkValidNodeId return false when
+    // typeof nodeId is not a string.
+    // @ts-ignore
+    const invalidStoryNode2 = StoryNode.createFromIdAndTitle({}, '');
+
+    expect(() => invalidStoryNode2.validate()).toThrowError(
+      'The node id [object Object] is invalid.');
   });
 
   it('should raise issue when validating node with duplicated ' +
@@ -189,12 +198,12 @@ describe('Story node model', () => {
   });
 
   it('should correctly validate story nodes', () => {
-    _sampleStoryNode.addPrerequisiteSkillId('skill_2');
+    _sampleStoryNode.addAcquiredSkillId('skill_1');
     _sampleStoryNode.addDestinationNodeId('node_1');
     _sampleStoryNode.setExplorationId('');
 
     expect(_sampleStoryNode.validate()).toEqual([
-      'The skill with id skill_2 is common to both the acquired and' +
+      'The skill with id skill_1 is common to both the acquired and' +
       ' prerequisite skill id list in node with id node_1',
       'The destination node id of node with id node_1 points to itself.'
     ]);

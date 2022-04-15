@@ -152,10 +152,12 @@ export class CkEditorInitializerService {
                     if (widgetShouldBeRemoved) {
                       var newWidgetSelector = (
                         '[data-cke-widget-id="' + that.id + '"]');
-                      var widgetElement = editor.editable().findOne(
-                        newWidgetSelector);
-                      if (widgetElement) {
-                        widgetElement.remove();
+                      if (newWidgetSelector !== null) {
+                        var widgetElement = editor.editable().findOne(
+                          newWidgetSelector);
+                        if (widgetElement) {
+                          widgetElement.remove();
+                        }
                       }
                     }
                   });

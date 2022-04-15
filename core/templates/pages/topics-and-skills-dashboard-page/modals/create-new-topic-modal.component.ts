@@ -83,6 +83,8 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
       this.newlyCreatedTopic.urlFragment, () => {
         this.topicUrlFragmentExists = (
           this.topicEditorStateService.getTopicWithUrlFragmentExists());
+      }, () => {
+        return;
       });
   }
 
@@ -91,6 +93,8 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
       return;
     }
 
+    this.newlyCreatedTopic.name = this.newlyCreatedTopic.name
+      .replace(/\s+/g, ' ').trim();
     this.topicEditorStateService.updateExistenceOfTopicName(
       this.newlyCreatedTopic.name, () => {
         this.topicNameExists = (

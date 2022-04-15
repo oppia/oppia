@@ -49,7 +49,7 @@ interface LanguageIdAndText {
 })
 export class SearchBarComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   searchBarPlaceholder!: string;
   categoryButtonText!: string;
@@ -187,12 +187,14 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
     this.updateSelectionDetails(itemsType);
     this.onSearchQueryChangeExec();
+    this.refreshSearchBarLabels();
   }
 
   deselectAll(itemsType: string): void {
     this.selectionDetails[itemsType].selections = {};
     this.updateSelectionDetails(itemsType);
     this.onSearchQueryChangeExec();
+    this.refreshSearchBarLabels();
   }
 
   onSearchQueryChangeExec(): void {
@@ -226,9 +228,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.selectionDetails.categories.selections = {};
     this.selectionDetails.languageCodes.selections = {};
 
-    this.updateSelectionDetails('categories');
-    this.updateSelectionDetails('languageCodes');
-
     let newQuery = (
       this.searchService.updateSearchFieldsBasedOnUrlQuery(
         this.windowRef.nativeWindow.location.search, this.selectionDetails));
@@ -237,6 +236,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       this.searchQuery = newQuery;
       this.onSearchQueryChangeExec();
     }
+
+    this.updateSelectionDetails('categories');
+    this.updateSelectionDetails('languageCodes');
+    this.refreshSearchBarLabels();
   }
 
   refreshSearchBarLabels(): void {
@@ -301,6 +304,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     for (let itemsType in this.selectionDetails) {
       this.updateSelectionDetails(itemsType);
     }
+
+    this.refreshSearchBarLabels();
 
     this.searchQueryChanged
       .pipe(debounceTime(1000), distinctUntilChanged())

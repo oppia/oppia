@@ -21,6 +21,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
+import { CreatorExplorationSummaryBackendDict } from 'domain/summary/creator-exploration-summary.model';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -34,7 +36,7 @@ import { SearchService } from 'services/search.service';
 import { UserService } from 'services/user.service';
 import { MockTranslateModule } from 'tests/unit-test-utils';
 import { LibraryPageComponent } from './library-page.component';
-import { LibraryIndexData, LibraryPageBackendApiService } from './services/library-page-backend-api.service';
+import { ActivityDict, LibraryIndexData, LibraryPageBackendApiService } from './services/library-page-backend-api.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -48,7 +50,7 @@ class MockWindowRef {
 class MockWindowDimensionsService {
   getResizeEvent() {
     return {
-      subscribe: (callb) => {
+      subscribe: (callb: () => void) => {
         callb();
         return {
           unsubscribe() {}
@@ -78,15 +80,21 @@ describe('Library Page Component', () => {
   let loggerService: LoggerService;
   let searchService: SearchService;
 
-  let explorationList = [{
+  let explorationList: CreatorExplorationSummaryBackendDict[] = [{
     category: '',
     community_owned: true,
     activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
     last_updated_msec: 1,
-    ratings: null,
+    ratings: {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0
+    },
     id: 'id1',
     created_on_msec: 12,
-    human_readable_contributors_summary: null,
+    human_readable_contributors_summary: {},
     language_code: '',
     num_views: 2,
     objective: '',
@@ -99,7 +107,7 @@ describe('Library Page Component', () => {
     num_open_threads: 3
   }];
 
-  let collectionList = [{
+  let collectionList: CollectionSummaryBackendDict[] = [{
     category: '',
     community_owned: true,
     last_updated_msec: 2,
@@ -114,7 +122,7 @@ describe('Library Page Component', () => {
     node_count: 2
   }];
 
-  let libraryIndexData = {
+  let libraryIndexData: LibraryIndexData = {
     activity_summary_dicts_by_category: [{
       activity_summary_dicts: [{
         activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
@@ -269,7 +277,7 @@ describe('Library Page Component', () => {
     windowRef.nativeWindow.location.pathname = '/community-library';
     fixture.detectChanges();
     spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
-      .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
+      .and.returnValue(Promise.resolve(libraryIndexData));
     spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
       new UserInfo(
         ['role'], true, true, true, true, true, 'en', 'user',
@@ -313,7 +321,7 @@ describe('Library Page Component', () => {
       windowRef.nativeWindow.location.pathname = '/community-library';
       fixture.detectChanges();
       spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
-        .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
+        .and.returnValue(Promise.resolve(libraryIndexData));
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve({ isLoggedIn: () => false } as UserInfo));
       spyOn(loaderService, 'hideLoadingScreen');
@@ -358,7 +366,7 @@ describe('Library Page Component', () => {
     windowRef.nativeWindow.location.pathname = '/not-valid';
     fixture.detectChanges();
     spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
-      .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
+      .and.returnValue(Promise.resolve(libraryIndexData));
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve({ isLoggedIn: () => false } as UserInfo));
     spyOn(loaderService, 'hideLoadingScreen');
@@ -527,7 +535,7 @@ describe('Library Page Component', () => {
 
   it('should scroll carousel', () => {
     componentInstance.libraryGroups = [];
-    let activityDicts = [];
+    let activityDicts: ActivityDict[] = [];
 
     for (let i = 0; i < 5; i++) {
       activityDicts.push({
@@ -585,6 +593,7 @@ describe('Library Page Component', () => {
   it('should not scroll if all tiles are already showing', () => {
     componentInstance.libraryGroups = [];
     let activityDicts = [];
+    let summaryDicts: ActivityDict[] = [];
 
     for (let i = 0; i < 3; i++) {
       activityDicts.push({
@@ -605,7 +614,7 @@ describe('Library Page Component', () => {
 
     for (let i = 0; i < 2; i++) {
       componentInstance.libraryGroups.push({
-        activity_summary_dicts: activityDicts,
+        activity_summary_dicts: summaryDicts,
         categories: [],
         header_i18n_id: '',
         has_full_results_page: true,

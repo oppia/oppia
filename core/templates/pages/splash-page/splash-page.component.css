@@ -30,7 +30,9 @@
 .splash-page .oppia-splash-section-two {
   background-color: #fff;
   display: flex;
+  justify-content: space-evenly;
   padding: 30px;
+  text-align: center;
 }
 
 .splash-page .oppia-splash-h1,
@@ -62,7 +64,7 @@
   background-color: #f4f4f4;
   color: #2c4841;
   display: flex;
-  padding: 50px 5vw 50px 10vw;
+  padding: 50px 5vw 50px 8vw;
   width: 100vw;
 }
 
@@ -145,7 +147,9 @@
 }
 
 .splash-page .splash-icon-text-container {
-  padding-left: 5px;
+  min-width: fit-content;
+  padding-left: 15px;
+  padding-right: 15px;
   padding-top: 5px;
 }
 
@@ -309,14 +313,19 @@
 }
 
 .splash-page .splash-benefits-section {
-  margin-top: 30px;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 25px;
 }
 
 .splash-page .oppia-splash-section-three-right {
-  color: #6d6d6d;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 50px;
+  margin: auto;
+}
+
+.splash-page .oppia-splash-section-three-left {
+  align-items: center;
+  display: flex;
+  width: 50%;
 }
 
 .splash-page .splash-matthew-image img {
@@ -331,22 +340,22 @@
   padding-left: 25px;
 }
 
-.splash-page .oppia-splash-icon-1-container {
-  display: flex;
-  float: left;
-  margin-left: 10vw;
-  width: 20vw;
-}
-
-.splash-page .oppia-splash-icon-2-container {
-  display: flex;
-  float: left;
-  margin-left: 12vw;
-  width: 30vw;
-}
-
+.splash-page .oppia-splash-icon-1-container,
+.splash-page .oppia-splash-icon-2-container,
 .splash-page .oppia-splash-icon-3-container {
   display: flex;
+}
+
+@media (max-width: 950px) {
+  .splash-page .oppia-splash-icon-1-container,
+  .splash-page .oppia-splash-icon-2-container,
+  .splash-page .oppia-splash-icon-3-container {
+    display: flow-root;
+  }
+}
+
+.splash-page .oppia-splash-icon-3-container img {
+  max-height: 2.05em;
 }
 
 .splash-page .splash-icon-text {
@@ -444,6 +453,11 @@
     padding-top: 15px;
   }
 
+  .splash-page .oppia-splash-section-three-left {
+    display: block;
+    width: 100%;
+  }
+
   .splash-page .oppia-splash-section-five-image {
     margin-left: auto;
     margin-right: auto;
@@ -519,24 +533,6 @@
     font-size: 0.8em;
   }
 
-  .splash-page .oppia-splash-icon-1-container {
-    display: block;
-    margin-left: 0;
-  }
-
-  .splash-page .oppia-splash-icon-2-container {
-    display: block;
-  }
-
-  .splash-page .oppia-splash-section-two img {
-    margin-left: 5vw;
-  }
-
-  .splash-page .oppia-splash-icon-3-container {
-    display: block;
-    margin-left: 70vw;
-  }
-
   .splash-page .oppia-splash-h1,
   .splash-page .oppia-splash-h2 {
     display: block;
@@ -561,5 +557,11 @@
   .splash-page .oppia-splash-h2-text {
     font-size: 1.05em;
     font-weight: 600;
+  }
+  @media screen and (max-width: 768px) {
+    .splash-page .oppia-splash-icon-3-container {
+      display: block;
+      margin-left: 12vw;
+    }
   }
 }

@@ -96,6 +96,9 @@ def copy(
             folder.
         dest_assets_path: str. The path to the relevant file within the entity's
             assets folder.
+
+    Raises:
+        Exception. Source asset does not exist.
     """
     src_blob = CLIENT.get_blob(source_assets_path)
     if src_blob is None:

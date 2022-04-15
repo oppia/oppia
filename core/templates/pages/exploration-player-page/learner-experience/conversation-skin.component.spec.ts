@@ -1011,20 +1011,6 @@ describe('Conversation skin component', () => {
     tick(2000);
   }));
 
-  it('should fix supplement card on scroll', () => {
-    let addClassSpy = jasmine.createSpy('add class spy');
-    spyOn(window, '$').and.returnValue({
-      height: () => 30,
-      scrollTop: () => 30,
-      addClass: addClassSpy
-    } as unknown as JQLite);
-
-    componentInstance.fixSupplementOnScroll();
-
-    expect(addClassSpy).toHaveBeenCalled();
-    expect(window.$).toHaveBeenCalled();
-  });
-
   it('should get recommended summaries when exploration in story chapter mode',
     fakeAsync(() => {
       spyOn(explorationPlayerStateService, 'recordNewCardAdded');
@@ -1061,4 +1047,20 @@ describe('Conversation skin component', () => {
       componentInstance.showPendingCard();
       tick(2000);
     }));
+
+  it('should check whether hacky translations are displayed or not', () => {
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValues(false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValues(false, false);
+
+    let expId = 'exp_id';
+
+    let hackyStoryTitleTranslationIsDisplayed =
+      componentInstance.isHackyExpTitleTranslationDisplayed(expId);
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
+    hackyStoryTitleTranslationIsDisplayed =
+      componentInstance.isHackyExpTitleTranslationDisplayed(expId);
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+  });
 });

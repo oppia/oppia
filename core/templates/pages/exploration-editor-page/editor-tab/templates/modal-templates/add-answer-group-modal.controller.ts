@@ -18,8 +18,7 @@
 
 import { EventBusGroup } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
-import {SubtitledHtml} from "domain/exploration/subtitled-html.model";
-import {string} from "mathjs";
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -126,20 +125,18 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     $scope.saveResponse = function(reopen) {
       PopulateRuleContentIdsService.populateNullRuleContentIds($scope.tmpRule);
       var parser = new DOMParser();
-      var doc = parser.parseFromString(($scope.tmpOutcome.feedback as SubtitledHtml)._html, 'text/html');
+      var doc = parser.parseFromString(
+        ($scope.tmpOutcome.feedback as SubtitledHtml)._html, 'text/html');
       var imageFilenameList: string[] = [];
       var elements = doc.getElementsByTagName('oppia-noninteractive-image');
       for (let i = 0; i < elements.length; i++) {
-        console.log('element', elements[i]);
-        console.log('element-getattribute', elements[i].getAttribute('filepath-with-value'))
         imageFilenameList.push(
           String(HtmlEscaperService.escapedStrToUnescapedStr(
             elements[i].getAttribute('filepath-with-value'))
-          ).replace('"', ''))
-        // replaces only first ", need to fix for second "
+          ).replace('"', ''));
+        // Replaces only first ", need to fix for second ".
       }
       ($scope.tmpOutcome.feedback as SubtitledHtml)._image_list = imageFilenameList;
-      console.log($scope.tmpOutcome.feedback)
       StateEditorService.onSaveOutcomeDestDetails.emit();
 
       EditorFirstTimeEventsService.registerFirstSaveRuleEvent();

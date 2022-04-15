@@ -77,6 +77,10 @@ def store_incoming_report_stats(
 
     Args:
         report_obj: AppFeedbackReport. AppFeedbackReport domain object.
+
+    Raises:
+        NotImplementedError. Stats aggregation for the domain object
+            have not been implemented yet.
     """
     if report_obj.platform == PLATFORM_WEB:
         raise NotImplementedError(
@@ -361,6 +365,10 @@ def get_android_report_from_model(
 
     Returns:
         AppFeedbackReport. The corresponding AppFeedbackReport domain object.
+
+    Raises:
+        NotImplementedError. Android app feedback report migrations not added
+            for new report schemas to be implemented.
     """
     feedback_report = app_feedback_report_domain.AppFeedbackReport
     if android_report_model.android_report_info_schema_version < (
@@ -508,8 +516,8 @@ def save_feedback_report_to_storage(
         'android_device_language_locale_code': (
             device_system_context.device_language_locale_code),
         'build_fingerprint': device_system_context.build_fingerprint,
-        'network_type': device_system_context.network_type.name,
-        'text_size': app_context.text_size.name,
+        'network_type': device_system_context.network_type.value,
+        'text_size': app_context.text_size.value,
         'only_allows_wifi_download_and_update': str(
             app_context.only_allows_wifi_download_and_update),
         'automatically_update_topics': str(
@@ -570,6 +578,10 @@ def reassign_ticket(
         new_ticket: AppFeedbackReportTicket|None. The ticket domain object to
             reassign the report to or None if removing the report form a ticket
             wihtout reassigning.
+
+    Raises:
+        NotImplementedError. Assigning web reports to tickets has not been
+            implemented.
     """
     if report.platform == PLATFORM_WEB:
         raise NotImplementedError(

@@ -36,13 +36,16 @@ interface MisconceptionFormSchema {
 })
 export class AddMisconceptionModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  skill: Skill;
-  misconceptionName: string;
-  misconceptionNotes: string;
-  misconceptionFeedback: string;
-  existingMisconceptionNames: string[];
-  misconceptionMustBeAddressed: boolean;
-  misconceptionNameIsDuplicate: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  existingMisconceptionNames!: string[];
+  misconceptionFeedback!: string;
+  misconceptionMustBeAddressed!: boolean;
+  misconceptionName!: string;
+  misconceptionNameIsDuplicate!: boolean;
+  misconceptionNotes!: string;
+  skill!: Skill;
   MAX_CHARS_IN_MISCONCEPTION_NAME: number = (
     AppConstants.MAX_CHARS_IN_MISCONCEPTION_NAME);
 

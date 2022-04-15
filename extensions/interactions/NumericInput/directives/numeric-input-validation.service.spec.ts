@@ -334,33 +334,57 @@ describe('NumericInputValidationService', () => {
       }]);
     });
 
+  it('should generate errors for string representation of the input', ()=>{
+    expect(validatorService.validateNumericString('12.', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL'
+    );
+    expect(validatorService.validateNumericString('12.22.1', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL'
+    );
+    expect(validatorService.validateNumericString('12-', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_MINUS_AT_BEGINNING'
+    );
+    expect(validatorService.validateNumericString('--12', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_MINUS'
+    );
+    expect(validatorService.validateNumericString('12e12e', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_EXPONENT'
+    );
+  });
+
   it('should generate errors in the given input', () => {
     expect(
-      validatorService.getErrorStringI18nKey(1200000000E+27, false)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
+      validatorService.validateNumber(-999999999, true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO');
     expect(
-      validatorService.getErrorStringI18nKey(1200000000E-27, false)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
+      validatorService.validateNumber(1200000000e+27, false)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_DOT');
     expect(
-      validatorService.getErrorStringI18nKey(999999999999999, false)).toEqual(
+      validatorService.validateNumber(1200000000e-27, false, ',')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_COMMA');
+    expect(
+      validatorService.validateNumber(999999999999999, false)).toEqual(
       undefined);
     expect(
-      validatorService.getErrorStringI18nKey(99.9999999999999, false)).toEqual(
+      validatorService.validateNumber(99.9999999999999, false)).toEqual(
       undefined);
     expect(
-      validatorService.getErrorStringI18nKey(-9.9999999999999, false)).toEqual(
+      validatorService.validateNumber(-9.9999999999999, false)).toEqual(
       undefined);
     expect(
-      validatorService.getErrorStringI18nKey(2.2, false)).toEqual(undefined);
+      validatorService.validateNumber(2.2, false)).toEqual(undefined);
     expect(
-      validatorService.getErrorStringI18nKey(-2.2, false)).toEqual(undefined);
+      validatorService.validateNumber(-2.2, false)).toEqual(undefined);
     expect(
-      validatorService.getErrorStringI18nKey(34.56, false)).toEqual(undefined);
+      validatorService.validateNumber(34.56, false)).toEqual(undefined);
     expect(
-      validatorService.getErrorStringI18nKey(99999999999999, true)).toEqual(
+      validatorService.validateNumber(99999999999999, true)).toEqual(
       undefined);
     expect(
-      validatorService.getErrorStringI18nKey(9999999999999999, true)).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1');
+      validatorService.validateNumber(-99999999999999, true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO');
+    expect(
+      validatorService.validateNumber(Number('wqw'), true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
   });
 });

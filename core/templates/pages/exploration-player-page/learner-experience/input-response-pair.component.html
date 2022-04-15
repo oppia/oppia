@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.rtl.css" as="style">
+
 <ng-template #popContent>
   <div class="oppia-answer-popup-container">
     <div class="oppia-answer-popup">
@@ -7,9 +10,8 @@
   </div>
 </ng-template>
 
-<div [ngStyle]="isLanguageRTL() ? {'text-align': 'left'} : {'text-align': 'right'}" class="conversation-skin-learner-answer-container">
-  <img [ngStyle]="isLanguageRTL() ? {'left': '-98px'} : {'right': '-98px'}"
-       class="conversation-skin-user-avatar rounded-circle"
+<div class="conversation-skin-learner-answer-container">
+  <img class="conversation-skin-user-avatar rounded-circle"
        [src]="decodedProfilePicture ? decodedProfilePicture : ''" alt="">
   <div *ngIf="!data.isHint">
     <div dir="auto" *ngIf="getShortAnswerHtml()"
@@ -37,8 +39,7 @@
      [href]="OPPIA_AVATAR_LINK_URL"
      target="_blank"
      rel="noopener">
-    <img [ngStyle]="isLanguageRTL() ? {'right': '-87px'} : {'left': '-87px'}"
-         class="conversation-skin-oppia-avatar rounded-circle"
+    <img class="conversation-skin-oppia-avatar rounded-circle"
          [src]="oppiaAvatarImageUrl" alt="">
   </a>
   <div *ngIf="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"
@@ -58,77 +59,6 @@
   </div>
 </div>
 
-<style>
-  .conversation-skin-learner-answer-container,
-  .conversation-skin-oppia-feedback-container {
-    padding: 0 20px;
-    position: relative;
-  }
-
-  .conversation-skin-learner-answer-container {
-    text-align: right;
-  }
-
-  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
-    border: 2px solid #094142;
-    height: 100px;
-    top: -33px;
-    width: 100px;
-  }
-
-  .oppia-popover {
-    cursor: pointer;
-  }
-  .oppia-answer-popup-container .oppia-answer-popup {
-    max-height: 300px;
-    overflow-y: scroll;
-  }
-
-  .conversation-skin-feedback-dot-one,
-  .conversation-skin-feedback-dot-two,
-  .conversation-skin-feedback-dot-three {
-    background-color: #666;
-    display: inline-block;
-    height: 2px;
-    width: 2px;
-  }
-
-  .conversation-skin-feedback-dot-one {
-    -webkit-animation: dot 1.0s infinite;
-    -moz-animation: dot 1.0s infinite;
-    animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.0s;
-    -moz-animation-delay: 0.0s;
-    animation-delay: 0.0s;
-    opacity: 0;
-  }
-
-  .conversation-skin-feedback-dot-two {
-    -webkit-animation: dot 1.0s infinite;
-    -moz-animation: dot 1.0s infinite;
-    animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.2s;
-    -moz-animation-delay: 0.2s;
-    animation-delay: 0.2s;
-    opacity: 0;
-  }
-
-  .conversation-skin-feedback-dot-three {
-    -webkit-animation: dot 1.0s infinite;
-    -moz-animation: dot 1.0s infinite;
-    animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.4s;
-    -moz-animation-delay: 0.4s;
-    animation-delay: 0.4s;
-    opacity: 0;
-  }
-
-  .conversation-skin-oppia-feedback.ng-enter {
-    opacity: 0;
-    -webkit-transition: all .5s;
-    transition: all .5s;
-  }
-  .conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
-    opacity: 1;
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.rtl.css">

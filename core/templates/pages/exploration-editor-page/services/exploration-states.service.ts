@@ -166,8 +166,12 @@ export class ExplorationStatesService {
         contentIds.add(answerGroup.outcome.feedback.contentId);
         answerGroup.rules.forEach((rule) => {
           Object.keys(rule.inputs).forEach(inputName => {
-            if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
-              contentIds.add(rule.inputs[inputName].contentId);
+            const ruleInput = rule.inputs[inputName];
+            // All rules input types which are translatable are subclasses of
+            // BaseTranslatableObject having dict structure with contentId
+            // as a key.
+            if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+              contentIds.add(ruleInput.contentId);
             }
           });
         });
@@ -754,15 +758,18 @@ export class ExplorationStatesService {
     this._refreshGraphEventEmitter.emit();
   }
 
-  registerOnStateAddedCallback(callback: () => {}): void {
+  registerOnStateAddedCallback(
+      callback: (addedStateName: string) => void): void {
     this.stateAddedCallbacks.push(callback);
   }
 
-  registerOnStateDeletedCallback(callback: () => {}): void {
+  registerOnStateDeletedCallback(
+      callback: (deletedStateName: string) => void): void {
     this.stateDeletedCallbacks.push(callback);
   }
 
-  registerOnStateRenamedCallback(callback: () => {}): void {
+  registerOnStateRenamedCallback(
+      callback: (oldStateName: string, newStateName: string) => void): void {
     this.stateRenamedCallbacks.push(callback);
   }
 
@@ -772,7 +779,8 @@ export class ExplorationStatesService {
     this.stateAddedCallbacks.push(callback);
   }
 
-  registerOnStateInteractionSavedCallback(callback: () => {}): void {
+  registerOnStateInteractionSavedCallback(
+      callback: (state: State) => void): void {
     this.stateInteractionSavedCallbacks.push(callback);
   }
 

@@ -54,7 +54,8 @@ export class HintObjectFactory {
         hintBackendDict.hint_content));
   }
 
-  createNew(hintContentId: string, hintContent: string, imageList: string[]): Hint {
+  createNew(
+    hintContentId: string, hintContent: string, imageList: string[]): Hint {
     return new Hint(
       SubtitledHtml.createDefault(
         hintContent, hintContentId, imageList));

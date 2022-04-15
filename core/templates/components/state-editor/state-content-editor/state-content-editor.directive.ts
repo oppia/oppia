@@ -16,8 +16,6 @@
  * @fileoverview Directive for the state content editor.
  */
 
-import {SubtitledHtml} from "domain/exploration/subtitled-html.model";
-
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
@@ -36,7 +34,6 @@ require('services/editability.service.ts');
 require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
-import {string} from "mathjs";
 
 angular.module('oppia').directive('stateContentEditor', [
   function() {
@@ -115,20 +112,17 @@ angular.module('oppia').directive('stateContentEditor', [
             }
 
             var parser = new DOMParser();
-            var doc = parser.parseFromString(StateContentService.displayed.html, 'text/html');
+            var doc = parser.parseFromString(
+              StateContentService.displayed.html, 'text/html');
             var imageFilenameList: string[] = [];
-            console.log(doc);
-            var elements = doc.getElementsByTagName('oppia-noninteractive-image');
-            console.log('elements', elements)
+            var elements = doc.getElementsByTagName(
+              'oppia-noninteractive-image');
             for (let i = 0; i < elements.length; i++) {
-              console.log('element', elements[i]);
-              console.log('element-getattribute', elements[i].getAttribute('filepath-with-value'))
-              imageFilenameList.push(elements[i].getAttribute('filepath-with-value'))
+              imageFilenameList.push(
+                elements[i].getAttribute('filepath-with-value'));
             }
-            console.log('imagelist', imageFilenameList)
-            StateContentService.displayed._image_list = imageFilenameList
+            StateContentService.displayed._image_list = imageFilenameList;
 
-            console.log('StateContentService.displayed', StateContentService.displayed)
             saveContent();
           };
 

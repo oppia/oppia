@@ -26,7 +26,7 @@ import argparse
 import os
 import subprocess
 
-from core import python_utils
+from core import utils
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -64,7 +64,25 @@ css_files_list = [
     'learner-dashboard-page.component.css',
     'core/templates/pages/topic-viewer-page/stories-list/'
     'topic-viewer-stories-list.component.css',
-    'core/templates/pages/library-page/search-bar/search-bar.component.css'
+    'core/templates/pages/library-page/search-bar/search-bar.component.css',
+    'core/templates/components/button-directives/'
+    'hint-and-solution-buttons.component.css',
+    'core/templates/components/common-layout-directives/common-elements/'
+    'attribution-guide.component.css',
+    'core/templates/components/common-layout-directives/navigation-bars/'
+    'top-navigation-bar.component.css',
+    'core/templates/pages/exploration-player-page/learner-experience/'
+    'tutor-card.component.css',
+    'core/templates/pages/exploration-player-page/learner-experience/'
+    'supplemental-card.component.css',
+    'core/templates/pages/exploration-player-page/learner-experience/'
+    'input-response-pair.component.css',
+    'core/templates/pages/exploration-player-page/learner-experience/'
+    'conversation-skin.component.css',
+    'core/templates/pages/exploration-player-page/layout-directives/'
+    'progress-nav.component.css',
+    'core/templates/pages/exploration-player-page/layout-directives/'
+    'exploration-footer.component.css'
 ]
 
 
@@ -110,13 +128,13 @@ def main(args=None):
     elif parsed_args.mode == 'validate':
         invalid_files = []
         for file_path in css_files_list:
-            css_file = python_utils.open_file(file_path, 'rb', encoding=None)
+            css_file = utils.open_file(file_path, 'rb', encoding=None)
             out, err = start_subprocess_for_result_with_input(
                 [rtlcss_path, '-'], css_file.read())
             out = out.replace(b'\n', b'')
 
             rtl_file_path = file_path[:-4] + '.rtl' + file_path[-4:]
-            rtl_css_content = python_utils.open_file(
+            rtl_css_content = utils.open_file(
                 rtl_file_path, 'rb', encoding=None).read()
             rtl_css_content = rtl_css_content.replace(b'\n', b'')
             if out != rtl_css_content:
