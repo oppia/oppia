@@ -68,7 +68,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ResubmitSuggestionHandler',
     'SkillDataHandler',
     'SkillDescriptionHandler',
-    'SkillMasteryDataHandler',
     'StateCompleteEventHandler',
     'StateHitEventHandler',
     'SubtopicPageDataHandler',
