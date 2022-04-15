@@ -2270,7 +2270,8 @@ class SubtitledHtml:
         """
         return {
             'content_id': self.content_id,
-            'html': self.html
+            'html': self.html,
+            'image_list':self.image_list
         }
 
     @classmethod
@@ -2285,7 +2286,8 @@ class SubtitledHtml:
             SubtitledHtml. The corresponding SubtitledHtml domain object.
         """
         return cls(
-            subtitled_html_dict['content_id'], subtitled_html_dict['html'])
+            subtitled_html_dict['content_id'], subtitled_html_dict['html'],
+            subtitled_html_dict['image_list'])
 
     def validate(self):
         """Validates properties of the SubtitledHtml, and cleans the html.
@@ -2316,7 +2318,7 @@ class SubtitledHtml:
             SubtitledHtml. A default SubtitledHtml domain object, some
             attribute of that object will be ''.
         """
-        return cls(content_id, '')
+        return cls(content_id, '', [])
 
 
 class SubtitledUnicode:

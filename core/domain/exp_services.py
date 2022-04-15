@@ -371,38 +371,11 @@ def apply_change_list(exploration_id, change_list):
     Raises:
         Exception. Any entries in the changelist are invalid.
     """
-    def get_image_diff_dict(oldImageList, newImageList):
-        oldDict = {}
-        for im in oldImageList:
-            if im not in oldDict:
-                oldDict[im] = 0
-            oldDict[im] += 1
-
-        newDict = {}
-        for im in newImageList:
-            if im not in newDict:
-                newDict[im] = 0
-            newDict[im] += 1
-
-        diffDict = {}
-        for im in oldDict:
-            if im not in diffDict:
-                diffDict[im] = 0
-            diffDict[im] -= oldDict[im]
-
-        for im in newDict:
-            if im not in diffDict:
-                diffDict[im] = 0
-            diffDict[im] += newDict[im]
-
-        return {html.unescape(key).replace('"', ''):val for key, val in diffDict.items() if val != 0}
 
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     try:
         to_param_domain = param_domain.ParamChange.from_dict
-        curr_image_size_counts = exploration.image_size_counts.copy()
         for change in change_list:
-            imageDiffDict = {}
             if change.cmd == exp_domain.CMD_ADD_STATE:
                 exploration.add_states([change.state_name])
             elif change.cmd == exp_domain.CMD_RENAME_STATE:
@@ -417,9 +390,6 @@ def apply_change_list(exploration_id, change_list):
                     state.update_param_changes(list(map(
                         to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    imageDiffDict = (
-                        get_image_diff_dict(
-                            change.old_value['image_list'], change.new_value['image_list']))
                     content = (
                         state_domain.SubtitledHtml.from_dict(change.new_value))
                     content.validate()
@@ -438,15 +408,6 @@ def apply_change_list(exploration_id, change_list):
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     print("******* interaction cust args *********")
-                    old_images_list = []
-                    if 'choices' in change.old_value:
-                        for subtitledHtml in change.old_value['choices']['value']:
-                            old_images_list += subtitledHtml['image_list']
-                    new_images_list = []
-                    if 'choices' in change.new_value:
-                        for subtitledHtml in change.new_value['choices']['value']:
-                            new_images_list += subtitledHtml['image_list']
-                    imageDiffDict = get_image_diff_dict(old_images_list, new_images_list)
                     state.update_interaction_customization_args(
                         change.new_value)
                 elif (change.property_name ==
@@ -456,17 +417,6 @@ def apply_change_list(exploration_id, change_list):
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                     print('***** answer groups *******')
-                    old_images_list = []
-                    for chng in change.old_value:
-                        if 'outcome' in chng and 'feedback' in chng['outcome']:
-                            old_images_list += chng['outcome']['feedback']['image_list']
-                    new_images_list = []
-                    for chng in change.new_value:
-                        if 'outcome' in chng and 'feedback' in chng['outcome']:
-                            new_images_list += chng['outcome']['feedback']['image_list']
-                    imageDiffDict = get_image_diff_dict(old_images_list, new_images_list)
-                    for answer_groups in change.new_value:
-                        print(answer_groups)
                     new_answer_groups = [
                         state_domain.AnswerGroup.from_dict(answer_groups)
                         for answer_groups in change.new_value
@@ -477,11 +427,6 @@ def apply_change_list(exploration_id, change_list):
                     new_outcome = None
                     print('**** Default outcome ****')
                     if change.new_value:
-                        imageDiffDict = (
-                            get_image_diff_dict(
-                                change.old_value['feedback']['image_list'],
-                                change.new_value['feedback']['image_list']
-                            ))
                         new_outcome = state_domain.Outcome.from_dict(
                             change.new_value
                         )
@@ -493,16 +438,6 @@ def apply_change_list(exploration_id, change_list):
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     print('***** Hints ******')
-                    old_images_list = []
-                    for chng in change.old_value:
-                        if 'hint_content' in chng:
-                            old_images_list += chng['hint_content']['image_list']
-                    new_images_list = []
-                    for chng in change.new_value:
-                        if 'hint_content' in chng:
-                            new_images_list += chng['hint_content']['image_list']
-                    imageDiffDict = get_image_diff_dict(old_images_list, new_images_list)
-
                     if not isinstance(change.new_value, list):
                         raise Exception(
                             'Expected hints_list to be a list,'
@@ -643,30 +578,6 @@ def apply_change_list(exploration_id, change_list):
                         'version %s, received %s' % (
                             feconf.CURRENT_STATE_SCHEMA_VERSION,
                             change.to_version))
-
-            if imageDiffDict:
-                # Update the image attribute here.
-                for image, diff in imageDiffDict.items():
-                    if image not in curr_image_size_counts:
-                        curr_image_size_counts[image] = {}
-                        curr_image_size_counts[image]['count'] = 0
-                        fs = fs_domain.AbstractFileSystem(
-                            fs_domain.GcsFileSystem(
-                                feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
-                        image_size_in_bytes = len(fs.get(
-                            '%s/%s' % (
-                                constants.ASSET_TYPE_IMAGE, image)))
-                        curr_image_size_counts[image]['size_in_bytes'] = image_size_in_bytes
-
-                    curr_image_size_counts[image]['count'] += diff
-
-                    if curr_image_size_counts[image]['count'] == 0:
-                        del curr_image_size_counts[image]
-
-
-            exploration.image_size_counts = curr_image_size_counts
-            print('*** finally updated exploration image size counts ***')
-            print(exploration.image_size_counts)
 
         return exploration
 
