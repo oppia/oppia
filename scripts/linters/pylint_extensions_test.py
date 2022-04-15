@@ -343,16 +343,24 @@ class HangingIndentCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""
                 if 5 > 7:
-                self.post_json([
-                '(',
-                '', '', ''])""")
+                    self.post_json([
+                    '(',
+                    '', '', ''])
+                    
+                def func(arg1,
+                    arg2, arg3):
+                    a = 2 / 2""")
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
         self.checker_test_object.checker.process_tokens(
            pylint_utils.tokenize_module(node_with_no_error_message))
 
-        with self.checker_test_object.assertNoMessages():
+        message = testutils.Message(
+            msg_id='no-break-after-hanging-indent',
+            line=7)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
 
