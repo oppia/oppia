@@ -49,6 +49,39 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
+
+    def test_exp_with_no_refresher_exp_id(self) -> None:
+        user = self.create_model(
+            user_models.UserSettingsModel,
+            id=self.USER_ID_1,
+            email='some@email.com',
+        )
+        user.update_timestamps()
+        exp_rights = self.create_model(
+            exp_models.ExplorationRightsModel,
+            id=self.EXP_1_ID,
+            owner_ids=[self.USER_ID_1, self.USER_ID_2],
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+        )
+        exp_rights.update_timestamps()
+        exp = exp_domain.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_1_ID,
+            title='exploration 1 title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            init_state_name='state name',
+            state_schema_version=48,
+            states={
+                'state name': state_domain.State.create_default_state( # type: ignore [no-untyped-call]
+                    'state2').to_dict()
+            }
+        )
+        exp.update_timestamps()
+        self.put_multi([user, exp_rights, exp])
+
+        self.assert_job_output_is([])
     
     def test_exploration_with_one_refresher_id(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
