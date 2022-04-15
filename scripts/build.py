@@ -1326,6 +1326,13 @@ def generate_python_package():
     print('Oppia package build completed.')
 
 
+def clean():
+    """Cleans up existing build directories."""
+    safe_delete_directory_tree('build/')
+    safe_delete_directory_tree('backend_prod_files/')
+    safe_delete_directory_tree('webpack_bundles/')
+
+
 def main(args=None):
     """The main method of this script."""
     options = _PARSER.parse_args(args=args)
@@ -1333,6 +1340,9 @@ def main(args=None):
     if options.maintenance_mode and not options.prod_env:
         raise Exception(
             'maintenance_mode should only be enabled in prod build.')
+
+    # Clean up the existing generated folders.
+    clean()
 
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
