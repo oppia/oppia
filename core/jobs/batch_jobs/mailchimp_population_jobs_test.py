@@ -292,16 +292,16 @@ class MockMailchimpPopulateJobTests(job_test_utils.JobTestBase):
 
     def test_job_runs_correctly_for_first_batch(self) -> None:
         expected_emails = [
-            'user_id_1@email.com',
             'user_id_1001@email.com',
             'user_id_1003@email.com',
             'user_id_1005@email.com',
             'user_id_1007@email.com',
-            'user_id_811@email.com',
+            'user_id_1009@email.com',
             'user_id_813@email.com',
             'user_id_815@email.com',
             'user_id_817@email.com',
             'user_id_819@email.com',
+            'user_id_81@email.com',
         ]
 
         expected_output = ','.join(expected_emails)
@@ -324,11 +324,11 @@ class MockMailchimpPopulateJobTests(job_test_utils.JobTestBase):
             'user_id_825@email.com',
             'user_id_827@email.com',
             'user_id_829@email.com',
-            'user_id_991@email.com',
-            'user_id_993@email.com',
             'user_id_995@email.com',
             'user_id_997@email.com',
-            'user_id_999@email.com'
+            'user_id_999@email.com',
+            'user_id_99@email.com',
+            'user_id_9@email.com'
         ]
 
         expected_output = ','.join(expected_emails)

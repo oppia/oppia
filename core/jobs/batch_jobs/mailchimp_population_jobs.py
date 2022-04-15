@@ -83,6 +83,7 @@ class SendBatchMailchimpRequest(beam.DoFn):
             JobRunResult. Job run result which is either 'Ok' or an error with
             corresponding error message.
         """
+        emails = sorted(emails)
         emails = emails[
             batch_index_dict * 500: (batch_index_dict + 1) * 500]
 
