@@ -25,20 +25,31 @@ import sys
 import urllib.request as urlrequest
 import zipfile
 
+from typing import Tuple
+
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 # These libraries need to be installed before running or importing any script.
 
-PREREQUISITES = [
+PREREQUISITES = (
     ('pyyaml', '6.0', os.path.join(TOOLS_DIR, 'pyyaml-6.0')),
     ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
     ('six', '1.16.0', os.path.join('third_party', 'python_libs')),
-    ('certifi', '2021.10.8', os.path.join(
-        TOOLS_DIR, 'certifi-2021.10.8')),
-    ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs')),
-]
+    ('certifi', '2021.10.8', os.path.join(TOOLS_DIR, 'certifi-2021.10.8')),
+    ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs'))
+)
 
-for package_name, version_number, target_path in PREREQUISITES:
+
+def install_prerequisite(package: Tuple[str]) -> None:
+    """Install prerequisite Python package.
+
+    Args:
+        package: tuple. The args to provide to pip install.
+
+    Raises:
+        Exception. If the package fails to install due to issues with --prefix.
+    """
+    package_name, version_number, target_path = package
     command_text = [
         sys.executable, '-m', 'pip', 'install', '%s==%s'
         % (package_name, version_number), '--target', target_path]
@@ -47,8 +58,15 @@ for package_name, version_number, target_path in PREREQUISITES:
         command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output_stderr = current_process.communicate()[1]  # pylint: disable=invalid-name
     if b'can\'t combine user with prefix' in output_stderr:
-        subprocess.check_call(command_text + uextention_text)
+        try:
+            subprocess.check_call(command_text + uextention_text)
+        except subprocess.CalledProcessError as e:
+            raise Exception(
+                'Error installing prerequisite %s' % package_name) from e
 
+
+for prerequisite in PREREQUISITES:
+    install_prerequisite(prerequisite)
 
 from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
