@@ -138,9 +138,12 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
             | 'Group by user id ' >> beam.CoGroupByKey()
             | 'Drop user id ' >> beam.Values()
             | 'Filter ' >> beam.Filter(
-                lambda groups: len(groups[1]) > 0) # CoGroupByKeys will return a List becuase no keys were provided 
+                lambda groups: len(groups[0]) > 0 and len(groups[1]) > 0) # CoGroupByKeys will return a List because no keys were provided
             | beam.FlatMapTuple(
-                lambda a, b : ((a[0], b[0]),)) # Returning a Tuple
+                lambda a, b : (
+                    (a[0] if len(a) else a, b[0] if len(b) else b),
+                    )
+                ) # Returning a Tuple
             )
 
         grouped_email_state_name_by_exp_id = (

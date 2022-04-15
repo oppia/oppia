@@ -47,24 +47,41 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
     EXP_1_ID = 'exp_1_id'
     EXP_2_ID = 'exp_2_id'
 
-    def test_empty_storage(self) -> None:
-        self.assert_job_output_is_empty()
-
-    def test_exp_with_no_refresher_exp_id(self) -> None:
-        user = self.create_model(
+    def setUp(self) -> None:
+        super().setUp()
+        user1 = self.create_model(
             user_models.UserSettingsModel,
             id=self.USER_ID_1,
             email='some@email.com',
         )
-        user.update_timestamps()
-        exp_rights = self.create_model(
+        user1.update_timestamps()
+        user2 = self.create_model(
+            user_models.UserSettingsModel,
+            id=self.USER_ID_2,
+            email='some2@email.com',
+        )
+        user2.update_timestamps()
+        user3 = self.create_model(
+            user_models.UserSettingsModel,
+            id=self.USER_ID_3,
+            email='some3@email.com',
+        )
+        user2.update_timestamps()
+        exp_rights1 = self.create_model( # this will not change
             exp_models.ExplorationRightsModel,
             id=self.EXP_1_ID,
             owner_ids=[self.USER_ID_1, self.USER_ID_2],
             status=constants.ACTIVITY_STATUS_PUBLIC,
         )
-        exp_rights.update_timestamps()
-        exp = exp_domain.create_model(
+        exp_rights1.update_timestamps()
+        exp_rights2 = self.create_model(
+            exp_models.ExplorationRightsModel,
+            id=self.EXP_2_ID,
+            owner_ids=[self.USER_ID_1, self.USER_ID_3],
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+        )
+        exp_rights2.update_timestamps()
+        exp = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXP_1_ID,
             title='exploration 1 title',
@@ -72,17 +89,28 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='en',
             init_state_name='state name',
-            state_schema_version=48,
+            states_schema_version=48,
             states={
                 'state name': state_domain.State.create_default_state( # type: ignore [no-untyped-call]
-                    'state2').to_dict()
+                    'state').to_dict()
             }
         )
         exp.update_timestamps()
-        self.put_multi([user, exp_rights, exp])
+        exp_rights = self.create_model(
+            exp_models.ExplorationRightsModel,
+            id=self.EXP_1_ID,
+            owner_ids=[self.USER_ID_1, self.USER_ID_2],
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+        )
+        exp_rights.update_timestamps()
+        self.put_multi([user1, user2, user3, exp_rights1, exp_rights2])
 
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_exp_with_no_refresher_exp_id(self) -> None:
         self.assert_job_output_is([])
-    
+
     def test_exploration_with_one_refresher_id(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         state1 = exploration.states[exploration.init_state_name]
@@ -102,14 +130,14 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
-            False, [], 'ref_exp_id_1', None
+            False, [], 'refresher_exp_id_1', None
         )
         state1.update_interaction_default_outcome(default_outcome)
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
-                False, [], 'ref_exp_id_2', None),
+                False, [], 'refresher_exp_id_2', None),
             [
                 state_domain.RuleSpec(
                     'Contains',
@@ -125,34 +153,6 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
         )
         state1.update_interaction_answer_groups(
             [state_answer_group])
-
-        user = self.create_model(
-            user_models.UserSettingsModel,
-            id=self.USER_ID_1,
-            email='some@email.com',
-        )
-        user.update_timestamps()
-        user1 = self.create_model(
-            user_models.UserSettingsModel,
-            id=self.USER_ID_2,
-            email='some2@email.com',
-        )
-        user1.update_timestamps()
-
-        exp_rights1 = self.create_model(
-            exp_models.ExplorationRightsModel,
-            id=self.EXP_1_ID,
-            owner_ids=[self.USER_ID_1, self.USER_ID_2],
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-        )
-        exp_rights1.update_timestamps()
-        exp_rights2 = self.create_model(
-            exp_models.ExplorationRightsModel,
-            id=self.EXP_2_ID,
-            owner_ids=[self.USER_ID_1, self.USER_ID_2],
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-        )
-        exp_rights2.update_timestamps()
 
         exp = self.create_model(
             exp_models.ExplorationModel,
@@ -170,7 +170,7 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
                 ).to_dict()
             })
         exp.update_timestamps()
-        self.put_multi([user, user1, exp_rights1, exp_rights2, exp])
+        self.put_multi([exp])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -180,67 +180,69 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
             )
         ])
 
-    # def test_yield_from_answer_group(self) -> None:
-    #     exploration = exp_domain.Exploration.create_default_exploration('1')
-    #     state1 = exploration.states[exploration.init_state_name]
-    #     state1.update_interaction_id('TextInput')
-    #     state_interaction_cust_args = {
-    #         'placeholder': {
-    #             'value': {
-    #                 'content_id': 'ca_placeholder_0',
-    #                 'unicode_str': 'Placeholder'
-    #             }
-    #         },
-    #         'rows': {'value': 1}
-    #     }
-    #     state1.update_interaction_customization_args(
-    #         state_interaction_cust_args)
+    def test_refresher_id_in_answer_group(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('1')
+        state1 = exploration.states[exploration.init_state_name]
+        state1.update_interaction_id('TextInput')
+        state_interaction_cust_args = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': 'Placeholder'
+                }
+            },
+            'rows': {'value': 1}
+        }
+        state1.update_interaction_customization_args(
+            state_interaction_cust_args)
 
-    #     default_outcome = state_domain.Outcome(
-    #         'Introduction', state_domain.SubtitledHtml(
-    #             'default_outcome', '<p>The default outcome.</p>'),
-    #         False, [], None, None
-    #     )
-    #     state1.update_interaction_default_outcome(default_outcome)
-    #     state_answer_group = state_domain.AnswerGroup(
-    #         state_domain.Outcome(
-    #             exploration.init_state_name, state_domain.SubtitledHtml(
-    #                 'feedback_1', '<p>Feedback</p>'),
-    #             False, [], 'ref_exp_id_2', None),
-    #         [
-    #             state_domain.RuleSpec(
-    #                 'Contains',
-    #                 {
-    #                     'x': {
-    #                         'contentId': 'rule_input_4',
-    #                         'normalizedStrSet': ['Input1', 'Input2']
-    #                         }
-    #                 })
-    #         ],
-    #         [],
-    #         None
-    #     )
-    #     state1.update_interaction_answer_groups(
-    #         [state_answer_group])
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+        state1.update_interaction_default_outcome(default_outcome)
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], 'refresher_exp_id', None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'normalizedStrSet': ['Input1', 'Input2']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
+        state1.update_interaction_answer_groups(
+            [state_answer_group])
 
-    #     exp = self.create_model(
-    #         exp_models.ExplorationModel,
-    #         id=self.EXP_1_ID,
-    #         title='exploration 1 title',
-    #         category='category',
-    #         objective='objective',
-    #         language_code='en',
-    #         init_state_name='state1',
-    #         states_schema_version=48,
-    #         states={'state1': state1.to_dict()})
-    #     exp.update_timestamps()
-    #     self.put_multi([exp])
+        exp = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_1_ID,
+            title='exploration 1 title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            init_state_name='state with ref',
+            states_schema_version=48,
+            states={'state with ref': state1.to_dict()})
+        exp.update_timestamps()
+        self.put_multi([exp])
 
-    #     self.assert_job_output_is([
-    #         job_run_result.JobRunResult(
-    #             stdout='exp_id: exp_1_id, state name: state1'
-    #         )
-    #     ])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='exp_id: exp_1_id, data: {\'user emails\': '
+                '[\'some@email.com\', \'some2@email.com\'], \'state names\': '
+                '[\'state with ref\']}'
+            )
+        ])
 
     # def test_multiple_exploration(self) -> None:
     #     state1 = state_domain.State.create_default_state('state1')  # type: ignore[no-untyped-call]
