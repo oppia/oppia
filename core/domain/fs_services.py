@@ -73,8 +73,10 @@ class GeneralFileSystem:
         Raises:
             ValidationError. When parameters passed in are invalid.
         """
-        if entity_name not in ALLOWED_ENTITY_NAMES and (
-                entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS):
+        if (
+                entity_name not in ALLOWED_ENTITY_NAMES and
+                entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS
+        ):
             raise utils.ValidationError(
                 'Invalid entity_name received: %s.' % entity_name)
         if not isinstance(entity_id, str):
@@ -128,8 +130,7 @@ class GcsFileSystem(GeneralFileSystem):
         Raises:
             OSError. Invalid filepath.
         """
-        base_dir = utils.vfs_construct_path(
-            '/', self.assets_path, 'assets')
+        base_dir = utils.vfs_construct_path('/', self.assets_path, 'assets')
         absolute_path = utils.vfs_construct_path(base_dir, filepath)
         normalized_path = utils.vfs_normpath(absolute_path)
 
@@ -219,9 +220,7 @@ class GcsFileSystem(GeneralFileSystem):
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
         """
-        source_file_url = (
-            '%s/%s' % (source_assets_path, filepath)
-        )
+        source_file_url = ('%s/%s' % (source_assets_path, filepath))
         storage_services.copy(
             self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
         )
@@ -255,8 +254,7 @@ class GcsFileSystem(GeneralFileSystem):
         assets_path = '%s/' % self._assets_path
         prefix = utils.vfs_construct_path(self._assets_path, dir_name)
         blobs_in_dir = storage_services.listdir(self._bucket_name, prefix)
-        return [
-            blob.name.replace(assets_path, '') for blob in blobs_in_dir]
+        return [blob.name.replace(assets_path, '') for blob in blobs_in_dir]
 
 
 def save_original_and_compressed_versions_of_image(

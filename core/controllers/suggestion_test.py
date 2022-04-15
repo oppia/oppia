@@ -775,8 +775,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'review_message': u'This looks good!',
             }, csrf_token=csrf_token)
 
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         self.assertTrue(fs.isfile('image/img.png'))
         self.assertTrue(fs.isfile('image/translation_image.png'))
         self.assertTrue(fs.isfile('image/img_compressed.png'))

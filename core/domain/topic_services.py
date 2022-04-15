@@ -1170,8 +1170,7 @@ def update_thumbnail_filename(
         Exception. The thumbnail does not exist for expected topic in
             the filesystem.
     """
-    fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
-        feconf.ENTITY_TYPE_TOPIC, topic.id)
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic.id)
     filepath = '%s/%s' % (
         constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
     if fs.isfile(filepath):  # type: ignore[no-untyped-call]
@@ -1202,8 +1201,7 @@ def update_subtopic_thumbnail_filename(
         Exception. The thumbnail does not exist for expected topic in
             the filesystem.
     """
-    fs = fs_services.GcsFileSystem(  # type: ignore[no-untyped-call]
-        feconf.ENTITY_TYPE_TOPIC, topic.id)
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic.id)
     filepath = '%s/%s' % (
         constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
     if fs.isfile(filepath):  # type: ignore[no-untyped-call]

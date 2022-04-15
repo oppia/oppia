@@ -92,8 +92,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
         self.assertItemsEqual(self.fs.listdir(''), file_names)
 
-        self.assertEqual(
-            self.fs.listdir('abc'), ['abc/abcd.png'])
+        self.assertEqual(self.fs.listdir('abc'), ['abc/abcd.png'])
 
         with self.assertRaisesRegex(IOError, 'Invalid filepath'):
             self.fs.listdir('/abc')
@@ -133,8 +132,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
     def test_invalid_filepaths_are_caught(self):
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_EXPLORATION, 'eid')
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 'eid')
 
         invalid_filepaths = [
             '..', '../another_exploration', '../', '/..', '/abc']
