@@ -546,7 +546,7 @@ class SuggestionListHandler(base.BaseHandler):
         # request.GET.items() parses the params from the url into the above
         # format. So in the url, the query should be passed as:
         # ?field1=value1&field2=value2...fieldN=valueN.
-        query_fields_and_values = list(self.request.GET.items())
+        query_fields_and_values = list(self.normalized_payload.items())
 
         for query in query_fields_and_values:
             if query[0] not in feconf.ALLOWED_SUGGESTION_QUERY_FIELDS:

@@ -173,10 +173,9 @@ class FlagExplorationEmailHandler(base.BaseHandler):
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
-        payload = json.loads(self.request.body)
-        exploration_id = payload['exploration_id']
-        report_text = payload['report_text']
-        reporter_id = payload['reporter_id']
+        exploration_id = self.normalized_payload.get('exploration_id')
+        report_text = self.normalized_payload.get('report_text')
+        reporter_id = self.normalized_payload.get('reporter_id')
 
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
 
