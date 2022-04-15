@@ -17,6 +17,8 @@
 
 """Validation Jobs for story"""
 
+from __future__ import annotations
+
 from core.domain import story_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
