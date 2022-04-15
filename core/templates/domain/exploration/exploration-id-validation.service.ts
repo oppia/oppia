@@ -65,8 +65,8 @@ export class ExplorationIdValidationService {
                 isCategoryPresent = true;
               }
             }
-            return !isCategoryPresent;
           }
+          return !isCategoryPresent;
         });
   }
 }
