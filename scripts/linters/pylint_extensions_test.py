@@ -346,7 +346,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
                     self.post_json([
                     '(',
                     '', '', ''])
-                    
+
                 def func(arg1,
                     arg2, arg3):
                     a = 2 / 2""")
