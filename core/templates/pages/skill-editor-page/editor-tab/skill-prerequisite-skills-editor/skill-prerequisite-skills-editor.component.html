@@ -1,74 +1,99 @@
-<md-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
+<div class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
   <div class="oppia-editor-card-body">
     <div class="oppia-editor-card-section prerequisite-skill-content">
-      <div class="oppia-prerequisite-skills-header oppia-mobile-collapsible-card-header" ng-click="togglePrerequisiteSkills()">
+      <div class="oppia-prerequisite-skills-header oppia-mobile-collapsible-card-header" (click)="togglePrerequisiteSkills()">
         <strong class="heading-text">
           Prerequisite Skills
         </strong>
         <i class="fa fa-caret-down"
-           ng-if="!prerequisiteSkillsAreShown"
+           *ngIf="!prerequisiteSkillsAreShown"
            aria-hidden="true">
         </i>
         <i class="fa fa-caret-up"
-           ng-if="prerequisiteSkillsAreShown"
+           *ngIf="prerequisiteSkillsAreShown"
            aria-hidden="true">
         </i>
       </div>
-      <div ng-if="prerequisiteSkillsAreShown" class="oppia-mobile-collapsible-card-content">
-        <md-card class="skill-id" ng-repeat="skillId in skill.getPrerequisiteSkillIds()">
+      <div *ngIf="prerequisiteSkillsAreShown" class="oppia-mobile-collapsible-card-content">
+        <div class="skill-id md-card"  *ngFor="let skillId of skill.getPrerequisiteSkillIds(); index as i">
           <div class="skill-description-card">
-            <span class="remove-skill-icon" ng-click="removeSkillId(skillId)" aria-hidden="true">
+            <span class="remove-skill-icon" (click)="removeSkillId(skillId)" aria-hidden="true">
               <i class="material-icons md-18">&#xE14C;</i>
             </span>
-            <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
+            <a class="skill-prerequisite-link" [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{getSkillDescription(skillId)}}</a>
           </div>
-        </md-card>
-        <button class="btn skill-editor-add-btn oppia-add-prerequisite-skill-button" ng-click="addSkill()">+ ADD PREREQUISITE SKILL</button>
+        </div>
+        <button class="btn skill-editor-add-btn oppia-add-prerequisite-skill-button" (click)="addSkill()">+ ADD PREREQUISITE SKILL</button>
       </div>
     </div>
   </div>
-</md-card>
+</div>
 <style>
-  skill-prerequisite-skills-editor .remove-skill-icon {
-    color: #f00;
-    cursor: pointer;
-    float: right;
+  .md-card {
+    border: 1px solid #74737375;
   }
 
-  skill-prerequisite-skills-editor .skill-id {
+  .remove-skill-icon {
+    cursor: pointer;
+    float: right;
+    opacity: 0.5;
+    padding-right: 10px;
+  }
+
+  .remove-skill-icon:hover {
+    opacity: 1;
+  }
+
+  .skill-prerequisite-link {
+    color: #000;
+    opacity: 0.85;
+    text-decoration: none;
+  }
+
+  .skill-prerequisite-link:hover {
+    opacity: 1;
+  }
+
+  .skill-editor-add-btn {
+    background-color: #058ca6;
+    color: #fff;
+    margin-top: 1vh;
+  }
+
+  .skill-id {
     background-color: #efefef;
     margin-left: 0;
   }
-  skill-prerequisite-skills-editor .oppia-add-prerequisite-skill-button {
-    background-color: #058CA6;
-    color: #FFF;
+  .oppia-add-prerequisite-skill-button {
+    background-color: #058ca6;
+    color: #fff;
   }
-  skill-prerequisite-skills-editor .heading-text {
+  .heading-text {
     font-size: 16px;
   }
-  skill-prerequisite-skills-editor .skill-id:hover {
+  .skill-id:hover {
     background-color: #e0e0e0;
   }
-  skill-prerequisite-skills-editor .skill-description-card {
+  .skill-description-card {
     max-height: 10em;
     overflow-wrap: break-word;
     padding-bottom: 10px;
     padding-left: 10px;
     padding-top: 10px;
   }
-  skill-prerequisite-skills-editor .oppia-prerequisite-skills-header {
+  .oppia-prerequisite-skills-header {
     display: flex;
     justify-content: space-between;
   }
-  skill-prerequisite-skills-editor .oppia-prerequisite-skills-header i {
+  .oppia-prerequisite-skills-header i {
     display: none;
   }
 
   @media screen and (max-width: 768px) {
-    skill-prerequisite-skills-editor .oppia-prerequisite-skills-header i {
+    .oppia-prerequisite-skills-header i {
       display: block;
     }
-    skill-prerequisite-skills-editor .prerequisite-skill-content {
+    .prerequisite-skill-content {
       padding: 0;
     }
   }

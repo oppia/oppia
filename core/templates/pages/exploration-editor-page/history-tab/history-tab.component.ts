@@ -18,13 +18,11 @@
 
 import { Subscription } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
+import { RevertExplorationModalComponent } from './modal-templates/revert-exploration-modal.component';
 
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.component.ts');
-require(
-  'pages/exploration-editor-page/history-tab/modal-templates/' +
-  'revert-exploration-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
@@ -40,19 +38,20 @@ require(
   'pages/exploration-editor-page/services/' +
   'history-tab-backend-api.service.ts'
 );
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').component('historyTab', {
   template: require('./history-tab.component.html'),
   controller: [
-    '$log', '$rootScope', '$uibModal', 'CompareVersionsService',
+    '$log', '$rootScope', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
-    'HistoryTabBackendApiService', 'LoaderService', 'RouterService',
-    'VersionTreeService', 'WindowRef',
+    'HistoryTabBackendApiService', 'LoaderService', 'NgbModal',
+    'RouterService', 'VersionTreeService', 'WindowRef',
     function(
-        $log, $rootScope, $uibModal, CompareVersionsService,
+        $log, $rootScope, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
-        HistoryTabBackendApiService, LoaderService, RouterService,
-        VersionTreeService, WindowRef) {
+        HistoryTabBackendApiService, LoaderService, NgbModal,
+        RouterService, VersionTreeService, WindowRef) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       // Variable explorationSnapshots is a list of all snapshots for the
@@ -233,16 +232,11 @@ angular.module('oppia').component('historyTab', {
       };
 
       ctrl.showRevertExplorationModal = function(version) {
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/history-tab/modal-templates/' +
-            'revert-exploration-modal.template.html'),
+        const modalRef = NgbModal.open(RevertExplorationModalComponent, {
           backdrop: true,
-          resolve: {
-            version: () => version
-          },
-          controller: 'RevertExplorationModalController'
-        }).result.then(function(version) {
+        });
+        modalRef.componentInstance.version = version;
+        modalRef.result.then(function(version) {
           var data = {
             revertExplorationUrl: ctrl.revertExplorationUrl,
             currentVersion: ExplorationDataService.data.version,

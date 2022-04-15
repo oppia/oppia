@@ -242,6 +242,7 @@ export class TopicUpdateService {
         topic.setUrlFragment(oldUrlFragment);
       });
   }
+
   /**
    * Changes the thumbnail filename of a topic and records the change in the
    * undo/redo service.

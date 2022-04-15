@@ -32,6 +32,16 @@ export class NumericExpressionInputRulesService {
   MatchesExactlyWith(
       answer: NumericExpressionAnswer,
       inputs: NumericExpressionRuleInputs): boolean {
+    answer = answer.replace(/\s/g, '');
+    inputs.x = inputs.x.replace(/\s/g, '');
+
+    return answer === inputs.x;
+  }
+
+  MatchesUpToTrivialManipulations(
+      answer: NumericExpressionAnswer,
+      inputs: NumericExpressionRuleInputs
+  ): boolean {
     let mis = new MathInteractionsService();
 
     // The expression is first split into terms by addition and subtraction.
@@ -45,7 +55,7 @@ export class NumericExpressionInputRulesService {
     // loop.
     for (let i = answerTerms.length - 1; i >= 0; i--) {
       for (let j = 0; j < inputTerms.length; j++) {
-        if (mis.termsMatch(answerTerms[i], inputTerms[j])) {
+        if (mis.doTermsMatch(answerTerms[i], inputTerms[j])) {
           answerTerms.splice(i, 1);
           inputTerms.splice(j, 1);
           break;
@@ -62,11 +72,9 @@ export class NumericExpressionInputRulesService {
   IsEquivalentTo(
       answer: NumericExpressionAnswer, inputs: NumericExpressionRuleInputs
   ): boolean {
-    // TODO(#13083): Remove the 'as unknown as boolean' part after the library
-    // typing is fixed.
     return nerdamer(answer).eq(
       nerdamer(inputs.x).toString()
-    ) as unknown as boolean;
+    );
   }
 
   ContainsSomeOf(
@@ -81,7 +89,7 @@ export class NumericExpressionInputRulesService {
 
     for (let answerTerm of answerTerms) {
       for (let inputTerm of inputTerms) {
-        if (mis.termsMatch(answerTerm, inputTerm)) {
+        if (mis.doTermsMatch(answerTerm, inputTerm)) {
           return true;
         }
       }
@@ -103,7 +111,7 @@ export class NumericExpressionInputRulesService {
     for (let inputTerm of inputTerms) {
       let matched = false;
       for (let answerTerm of answerTerms) {
-        if (mis.termsMatch(answerTerm, inputTerm)) {
+        if (mis.doTermsMatch(answerTerm, inputTerm)) {
           matched = true;
           break;
         }

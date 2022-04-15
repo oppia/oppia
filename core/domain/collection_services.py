@@ -30,7 +30,6 @@ import logging
 import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import activity_services
@@ -632,6 +631,9 @@ def apply_change_list(collection_id, change_list):
 
     Returns:
         Collection. The resulting collection domain object.
+
+    Raises:
+        Exception. The change list is not applicable on the given collection.
     """
     collection = get_collection_by_id(collection_id)
 
@@ -760,7 +762,8 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             'Unexpected error: trying to update version %s of collection '
             'from version %s. Please reload the page and try again.'
             % (collection_model.version, collection.version))
-    elif collection.version < collection_model.version:
+
+    if collection.version < collection_model.version:
         raise Exception(
             'Trying to update version %s of collection from version %s, '
             'which is too old. Please reload the page and try again.'
@@ -953,6 +956,9 @@ def update_collection(
         commit_message: str or None. A description of changes made to the
             collection. For published collections, this must be present; for
             unpublished collections, it may be equal to None.
+
+    Raises:
+        ValueError. The collection is public but no commit message received.
     """
     is_public = rights_manager.is_collection_public(collection_id)
 
@@ -1071,8 +1077,7 @@ def compute_collection_contributors_summary(collection_id):
     contributor_ids = list(contributors_summary)
     # Remove IDs that are deleted or do not exist.
     users_settings = user_services.get_users_settings(contributor_ids)
-    for contributor_id, user_settings in python_utils.ZIP(
-            contributor_ids, users_settings):
+    for contributor_id, user_settings in zip(contributor_ids, users_settings):
         if user_settings is None:
             del contributors_summary[contributor_id]
 
@@ -1172,6 +1177,9 @@ def delete_demo(collection_id):
 
     Args:
         collection_id: str. ID of the demo collection to be deleted.
+
+    Raises:
+        Exception. Invalid demo collection ID.
     """
     if not collection_domain.Collection.is_demo_collection_id(collection_id):
         raise Exception('Invalid demo collection id %s' % collection_id)

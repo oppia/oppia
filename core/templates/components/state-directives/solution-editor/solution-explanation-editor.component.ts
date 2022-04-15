@@ -16,91 +16,107 @@
  * @fileoverview Component for the solution explanation editor.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
-require('services/context.service.ts');
-require('services/editability.service.ts');
-require('services/external-save.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
- 'state-solution.service');
-
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
+import { ContextService } from 'services/context.service';
+import { EditabilityService } from 'services/editability.service';
+import { ExternalSaveService } from 'services/external-save.service';
+import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
-angular.module('oppia').component('solutionExplanationEditor', {
-  bindings: {
-    onSaveSolution: '=',
-    showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
-  },
-  template: require(
-    'components/state-directives/solution-editor/' +
-    'solution-explanation-editor.component.html'),
-  controllerAs: '$ctrl',
-  controller: [
-    'ContextService', 'EditabilityService',
-    'ExternalSaveService', 'StateSolutionService',
-    function(
-        ContextService, EditabilityService,
-        ExternalSaveService, StateSolutionService) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      ctrl.openExplanationEditor = function() {
-        if (ctrl.isEditable) {
-          ctrl.explanationEditorIsOpen = true;
-        }
-      };
+interface ExplanationFormSchema {
+  type: string;
+  ui_config: object;
+}
 
-      ctrl.isSolutionExplanationLengthExceeded = function() {
-        return (
-          StateSolutionService.displayed.explanation.html.length > 3000);
-      };
+@Component({
+  selector: 'oppia-solution-explanation-editor',
+  templateUrl: './solution-explanation-editor.component.html'
+})
+export class SolutionExplanationEditor
+  implements OnDestroy, OnInit {
+  @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
+    EventEmitter<string[]> = new EventEmitter();
 
-      ctrl.saveThisExplanation = function() {
-        var contentHasChanged = (
-          StateSolutionService.displayed.explanation.html !==
-          StateSolutionService.savedMemento.explanation.html);
-        if (contentHasChanged) {
-          var solutionContentId = StateSolutionService.displayed.explanation
-            .contentId;
-          ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-            [solutionContentId]);
-        }
-        StateSolutionService.saveDisplayedValue();
-        ctrl.onSaveSolution(StateSolutionService.displayed);
-        ctrl.explanationEditorIsOpen = false;
-      };
+  directiveSubscriptions = new Subscription();
+  isEditable: boolean;
+  explanationEditorIsOpen: boolean;
+  EXPLANATION_FORM_SCHEMA: ExplanationFormSchema;
 
-      ctrl.cancelThisExplanationEdit = function() {
-        ctrl.explanationEditorIsOpen = false;
-      };
+  constructor(
+    private contextService: ContextService,
+    private editabilityService: EditabilityService,
+    private externalSaveService: ExternalSaveService,
+    private stateSolutionService: StateSolutionService
+  ) {}
 
-      ctrl.$onInit = function() {
-        ctrl.directiveSubscriptions.add(
-          ExternalSaveService.onExternalSave.subscribe(() => {
-            if (ctrl.explanationEditorIsOpen &&
-              ctrl.editSolutionForm.$valid) {
-              ctrl.saveThisExplanation();
-            }
-          })
-        );
-        ctrl.isEditable = EditabilityService.isEditable();
-        ctrl.editSolutionForm = {};
-        ctrl.explanationEditorIsOpen = false;
+  updateExplanationHtml(newHtmlString: string): void {
+    this.stateSolutionService.displayed.explanation._html = newHtmlString;
+  }
 
-        ctrl.StateSolutionService = StateSolutionService;
-        ctrl.EXPLANATION_FORM_SCHEMA = {
-          type: 'html',
-          ui_config: {
-            hide_complex_extensions: (
-              ContextService.getEntityType() === 'question')
-          }
-        };
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
+  getSchema(): object {
+    return this.EXPLANATION_FORM_SCHEMA;
+  }
+
+  openExplanationEditor(): void {
+    if (this.isEditable) {
+      this.explanationEditorIsOpen = true;
     }
-  ]
-});
+  }
+
+  isSolutionExplanationLengthExceeded(): boolean {
+    // TODO(#13764): Edit this check after appropriate limits are found.
+    return (
+      this.stateSolutionService.displayed.explanation.html.length > 100000);
+  }
+
+  saveThisExplanation(): void {
+    const contentHasChanged = (
+      this.stateSolutionService.displayed.explanation.html !==
+      this.stateSolutionService.savedMemento.explanation.html);
+    if (contentHasChanged) {
+      const solutionContentId = this.stateSolutionService.displayed.explanation
+        .contentId;
+      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
+        [solutionContentId]);
+    }
+    this.stateSolutionService.saveDisplayedValue();
+    this.saveSolution.emit(this.stateSolutionService.displayed);
+    this.explanationEditorIsOpen = false;
+  }
+
+  cancelThisExplanationEdit(): void {
+    this.explanationEditorIsOpen = false;
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.externalSaveService.onExternalSave.subscribe(() => {
+        if (this.explanationEditorIsOpen) {
+          this.saveThisExplanation();
+        }
+      })
+    );
+
+    this.isEditable = this.editabilityService.isEditable();
+    this.explanationEditorIsOpen = false;
+    this.EXPLANATION_FORM_SCHEMA = {
+      type: 'html',
+      ui_config: {
+        hide_complex_extensions: (
+          this.contextService.getEntityType() === 'question')
+      }
+    };
+  }
+}
+
+angular.module('oppia').directive('oppiaSolutionExplanationEditor',
+  downgradeComponent({
+    component: SolutionExplanationEditor
+  }) as angular.IDirectiveFactory);

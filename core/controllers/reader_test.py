@@ -2202,7 +2202,9 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
             {
                 'state_name': 'state_name',
                 'version': version,
-                'params': {},
+                'params': {
+                    'test_param1': 1
+                },
                 'session_id': 'session_id'
             }
         )
@@ -2217,7 +2219,9 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(model.state_name, 'state_name')
         self.assertEqual(model.session_id, 'session_id')
         self.assertEqual(model.exploration_version, version)
-        self.assertEqual(model.params, {})
+        self.assertEqual(model.params, {
+            'test_param1': 1
+        })
         self.assertEqual(model.play_type, feconf.PLAY_TYPE_NORMAL)
 
         self.logout()
@@ -2405,7 +2409,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             }
         )
         self.assertIn(
-            b'<exploration-player-page></exploration-player-page>',
+            b'<oppia-exploration-player-page></oppia-exploration-player-page>',
             response.body
         )
 
@@ -2419,7 +2423,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             '%s/invalid_exp_id' % (feconf.EXPLORATION_URL_EMBED_PREFIX),
             params={
                 'collection_id': self.COL_ID
-            }, expected_status_int=404
+            }, expected_status_int=400
         )
 
         self.logout()
@@ -2434,6 +2438,21 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             params={
                 'v': exploration.version,
                 'collection_id': 'invalid_collection_id'
+            }, expected_status_int=400
+        )
+
+        self.logout()
+
+    def test_handler_raises_error_with_no_collection(self):
+        self.login(self.OWNER_EMAIL)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
+            params={
+                'v': exploration.version,
+                'collection_id': 'aZ9_______12'
             }, expected_status_int=404
         )
 

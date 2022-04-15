@@ -16,7 +16,7 @@
  * @fileoverview Component for editing user roles.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminDataService } from '../services/admin-data.service';
@@ -29,6 +29,8 @@ import { AlertsService } from 'services/alerts.service';
   templateUrl: './admin-roles-tab.component.html'
 })
 export class AdminRolesTabComponent implements OnInit {
+  @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
+
   UPDATABLE_ROLES = null;
   VIEWABLE_ROLES = null;
   HUMAN_READABLE_ROLES = null;
@@ -65,11 +67,16 @@ export class AdminRolesTabComponent implements OnInit {
   startEditing(): void {
     this.roleIsCurrentlyBeingEdited = true;
     this.adminBackendApiService.viewUsersRoleAsync(
-      this.username).then((userRoles) => {
+      this.username
+    ).then((userRoles) => {
       this.rolesFetched = true;
       this.userRoles = userRoles.roles;
       this.managedTopicIds = userRoles.managed_topic_ids;
       this.userIsBanned = userRoles.banned;
+    },
+    (errorResponse) => {
+      this.roleIsCurrentlyBeingEdited = false;
+      this.setStatusMessage.emit(errorResponse);
     });
   }
 

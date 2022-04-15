@@ -61,7 +61,8 @@ export interface StateBackendDict {
 }
 
 export class State {
-  name: string;
+  // Name is null before saving a state.
+  name: string | null;
   classifierModelId: string | null;
   linkedSkillId: string | null;
   content: SubtitledHtml;
@@ -74,7 +75,7 @@ export class State {
   nextContentIdIndex: number;
 
   constructor(
-      name: string, classifierModelId: string | null,
+      name: string | null, classifierModelId: string | null,
       linkedSkillId: string | null,
       content: SubtitledHtml, interaction: Interaction,
       paramChanges: ParamChange[], recordedVoiceovers: RecordedVoiceovers,
@@ -92,6 +93,7 @@ export class State {
     this.writtenTranslations = writtenTranslations;
     this.nextContentIdIndex = nextContentIdIndex;
   }
+
   setName(newName: string): void {
     this.name = newName;
   }
@@ -167,7 +169,11 @@ export class StateObjectFactory {
     return constants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
 
-  createDefaultState(newStateName: string): State {
+  // TODO(#14313): Remove the createDefaultState so that full state can be
+  // created from start.
+  // Create a default state until the actual state is saved.
+  // Passes name as null before saving a state.
+  createDefaultState(newStateName: string | null): State {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,
@@ -181,15 +187,20 @@ export class StateObjectFactory {
       written_translations: newStateTemplate.written_translations,
       next_content_id_index: newStateTemplate.next_content_id_index
     });
-    if (newState.interaction.defaultOutcome !== null) {
+    if (
+      newState.interaction.defaultOutcome !== null &&
+      newStateName !== null
+    ) {
       let defaultOutcome = newState.interaction.defaultOutcome;
-      defaultOutcome.dest = newStateName;
+      defaultOutcome.dest = newStateName as string;
     }
     return newState;
   }
 
+  // Passes name as null before saving a state.
   createFromBackendDict(
-      stateName: string, stateDict: StateBackendDict): State {
+      stateName: string | null, stateDict: StateBackendDict
+  ): State {
     return new State(
       stateName,
       stateDict.classifier_model_id,

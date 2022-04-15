@@ -22,7 +22,6 @@ import logging
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import auth_services
 from core.domain import collection_services
@@ -102,7 +101,7 @@ def save_pending_deletion_requests(pending_deletion_requests):
             user_ids, include_deleted=True)
     )
     final_pending_deletion_request_models = []
-    for deletion_request_model, deletion_request in python_utils.ZIP(
+    for deletion_request_model, deletion_request in zip(
             pending_deletion_request_models, pending_deletion_requests):
         deletion_request.validate()
         deletion_request_dict = {
@@ -173,11 +172,11 @@ def pre_delete_user(user_id):
         bulk_email_services.permanently_delete_user_from_list(
             user_settings.email)
 
+    user_services.mark_user_for_deletion(user_id)
+
     date_now = datetime.datetime.utcnow()
     date_before_which_username_should_be_saved = (
         date_now - PERIOD_AFTER_WHICH_USERNAME_CANNOT_BE_REUSED)
-    user_services.mark_user_for_deletion(user_id)
-
     normalized_long_term_username = (
         user_settings.normalized_username
         if user_settings.created_on < date_before_which_username_should_be_saved

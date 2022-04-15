@@ -222,7 +222,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
 
-        with self.assertRaisesRegexp(SystemExit, '1'):
+        with self.assertRaisesRegex(SystemExit, '1'):
             run_e2e_tests.main(args=[])
 
     def test_start_tests_when_no_other_instance_running(self):
@@ -320,14 +320,16 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_rerun_when_tests_fail_with_always_policy(self):
         def mock_run_tests(unused_args):
             return 'sample\noutput', 1
+        def mock_is_test_output_flaky(*_):
+            return True, flake_checker.RERUN_UNKNOWN
 
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'is_test_output_flaky', lambda *_: False,
-            expected_args=[
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky, expected_args=[
                 ('sample\noutput', 'always'),
                 ('sample\noutput', 'always'),
                 ('sample\noutput', 'always'),
@@ -344,14 +346,16 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_do_not_rerun_when_tests_fail_with_known_flakes_policy(self):
         def mock_run_tests(unused_args):
             return 'sample\noutput', 1
+        def mock_is_test_output_flaky(*_):
+            return False, flake_checker.RERUN_UNKNOWN
 
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'is_test_output_flaky', lambda *_: False,
-            expected_args=[
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky, expected_args=[
                 ('sample\noutput', 'known_flakes'),
             ]))
         self.exit_stack.enter_context(self.swap(
@@ -366,14 +370,16 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_do_not_rerun_when_tests_fail_with_never_policy(self):
         def mock_run_tests(unused_args):
             return 'sample\noutput', 1
+        def mock_is_test_output_flaky(*_):
+            return False, flake_checker.RERUN_UNKNOWN
 
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'is_test_output_flaky', lambda *_: False,
-            expected_args=[
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky, expected_args=[
                 ('sample\noutput', 'never'),
             ]))
         self.exit_stack.enter_context(self.swap(
@@ -388,14 +394,40 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_rerun_when_tests_flake_with_always_policy(self):
         def mock_run_tests(unused_args):
             return 'sample\noutput', 1
+        def mock_is_test_output_flaky(*_):
+            return True, flake_checker.RERUN_UNKNOWN
 
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'is_test_output_flaky', lambda *_: False,
-            expected_args=[
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky, expected_args=[
                 ('sample\noutput', 'always'),
                 ('sample\noutput', 'always'),
+                ('sample\noutput', 'always'),
+            ]))
+        self.exit_stack.enter_context(self.swap(
+            flake_checker, 'check_if_on_ci', lambda: True))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(1,)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
+
+        run_e2e_tests.main(args=['--suite', 'always'])
+
+    def test_rerun_when_tests_flake_always_policy_override_no(self):
+        def mock_run_tests(unused_args):
+            return 'sample\noutput', 1
+        def mock_is_test_output_flaky(*_):
+            return True, flake_checker.RERUN_NO
+
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'run_tests', mock_run_tests))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky, expected_args=[
                 ('sample\noutput', 'always'),
             ]))
         self.exit_stack.enter_context(self.swap(
@@ -412,12 +444,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_rerun_when_tests_flake_with_known_flakes_policy(self):
         def mock_run_tests(unused_args):
             return 'sample\noutput', 1
+        def mock_is_test_output_flaky(*_):
+            return True, flake_checker.RERUN_UNKNOWN
 
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'is_test_output_flaky', lambda *_: True,
-            expected_args=[
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky, expected_args=[
                 ('sample\noutput', 'known_flakes'),
                 ('sample\noutput', 'known_flakes'),
                 ('sample\noutput', 'known_flakes'),
@@ -436,12 +470,40 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_do_not_rerun_when_tests_flake_with_never_policy(self):
         def mock_run_tests(unused_args):
             return 'sample\noutput', 1
+        def mock_is_test_output_flaky(*_):
+            return True, flake_checker.RERUN_UNKNOWN
 
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'is_test_output_flaky', lambda *_: False,
-            expected_args=[
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky, expected_args=[
+                ('sample\noutput', 'never'),
+            ]))
+        self.exit_stack.enter_context(self.swap(
+            flake_checker, 'check_if_on_ci', lambda: True))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(1,)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
+
+        run_e2e_tests.main(args=['--suite', 'never'])
+
+    def test_do_not_rerun_when_tests_flake_never_policy_override_yes(self):
+        def mock_run_tests(unused_args):
+            return 'sample\noutput', 1
+        def mock_is_test_output_flaky(*_):
+            return True, flake_checker.RERUN_YES
+
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'run_tests', mock_run_tests))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky, expected_args=[
+                ('sample\noutput', 'never'),
+                ('sample\noutput', 'never'),
                 ('sample\noutput', 'never'),
             ]))
         self.exit_stack.enter_context(self.swap(

@@ -571,6 +571,19 @@ class CategoryConfigTests(test_utils.GenericTestBase):
             '%s.svg' % constants.DEFAULT_THUMBNAIL_ICON))
 
 
+class LibraryRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old 'gallery' page URL to the
+    library index page."""
+
+    def test_old_gallery_page_url(self):
+        """Test to validate that the old gallery page url redirects
+        to the library index page.
+        """
+        response = self.get_html_response('/gallery', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost/community-library', response.headers['location'])
+
+
 class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
     PRIVATE_EXP_ID_EDITOR = 'eid0'

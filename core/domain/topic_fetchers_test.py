@@ -29,6 +29,15 @@ from core.tests import test_utils
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
+class MockTopicObject(topic_domain.Topic):
+    """Mocks Topic domain object."""
+
+    @classmethod
+    def _convert_story_reference_v1_dict_to_v2_dict(cls, story_reference):
+        """Converts v1 story reference dict to v2."""
+        return story_reference
+
+
 class TopicFetchersUnitTests(test_utils.GenericTestBase):
     """Tests for topic fetchers."""
 
@@ -88,6 +97,70 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         topic = topic_fetchers.get_topic_from_model(topic_model)
         self.assertEqual(topic.to_dict(), self.topic.to_dict())
 
+    def test_get_topic_by_name(self):
+        topic = topic_fetchers.get_topic_by_name('Name')
+        self.assertEqual(topic.name, 'Name')
+
+    def test_get_topic_rights_is_none(self):
+        fake_topic_id = topic_fetchers.get_new_topic_id()
+        fake_topic = topic_fetchers.get_topic_rights(
+            fake_topic_id, strict=False)
+        self.assertIsNone(fake_topic)
+
+    def test_get_topic_by_url_fragment(self):
+        topic = topic_fetchers.get_topic_by_url_fragment('name-one')
+        self.assertEqual(topic.url_fragment, 'name-one')
+
+    def test_get_all_topic_rights(self):
+        topic_rights = topic_fetchers.get_all_topic_rights()
+        topic_id_list = [self.TOPIC_ID]
+        for topic_key in topic_rights:
+            self.assertIn(topic_key, topic_id_list)
+
+    def test_get_canonical_story_dicts(self):
+        self.save_new_story(self.story_id_2, self.user_id, self.TOPIC_ID)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_2, self.user_id_admin)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        canonical_dict_list = (
+            topic_fetchers.get_canonical_story_dicts(self.user_id_admin, topic)
+        )
+
+        self.assertEqual(len(canonical_dict_list), 2)
+
+        story_dict_1 = {
+            'id': 'story_1',
+            'title': 'Title',
+            'description': 'Description',
+            'node_titles': [],
+            'thumbnail_bg_color': None,
+            'thumbnail_filename': None,
+            'url_fragment': 'title',
+            'topic_url_fragment': 'name-one',
+            'classroom_url_fragment': 'staging',
+            'story_is_published': True,
+            'completed_node_titles': [], 'all_node_dicts': []}
+
+        story_dict_2 = {
+            'id': 'story_2',
+            'title': 'Title',
+            'description': 'Description',
+            'node_titles': [],
+            'thumbnail_bg_color': None,
+            'thumbnail_filename': None,
+            'url_fragment': 'title',
+            'topic_url_fragment': 'name-one',
+            'classroom_url_fragment': 'staging',
+            'story_is_published': True,
+            'completed_node_titles': [], 'all_node_dicts': []}
+
+        story_dict_list = [story_dict_1, story_dict_2]
+        for canonical_story_dict in canonical_dict_list:
+            self.assertIn(canonical_story_dict, story_dict_list)
+
     def test_get_all_topics(self):
         topics = topic_fetchers.get_all_topics()
         self.assertEqual(len(topics), 1)
@@ -121,7 +194,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_a, 'topic model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d subtopic schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
@@ -145,16 +218,54 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_a, 'topic model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d story reference schemas at '
             'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
             topic_fetchers.get_topic_from_model(model)
 
+    def test_topic_model_migration_to_higher_version(self):
+        topic_services.create_new_topic_rights('topic_id', self.user_id_a)
+        commit_cmd = topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_CREATE_NEW,
+            'name': 'name'
+        })
+        subtopic_v1_dict = {
+            'id': 1,
+            'title': 'subtopic_title',
+            'skill_ids': []
+        }
+        model = topic_models.TopicModel(
+            id='topic_id',
+            name='name 2',
+            description='description 2',
+            abbreviated_name='abbrev',
+            url_fragment='name-three',
+            canonical_name='canonical_name_2',
+            next_subtopic_id=1,
+            language_code='en',
+            subtopics=[subtopic_v1_dict],
+            subtopic_schema_version=1,
+            story_reference_schema_version=1
+        )
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        model.commit(
+            self.user_id_a, 'topic model created', commit_cmd_dicts)
+        swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
+        current_story_refrence_schema_version_swap = self.swap(
+            feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2)
+        with swap_topic_object, current_story_refrence_schema_version_swap:
+            topic = topic_fetchers.get_topic_from_model(model)
+            self.assertEqual(topic.story_reference_schema_version, 2)
+
     def test_get_topic_by_id(self):
         expected_topic = self.topic.to_dict()
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.to_dict(), expected_topic)
+        fake_topic_id = topic_fetchers.get_new_topic_id()
+        fake_topic = topic_fetchers.get_topic_by_id(
+            fake_topic_id, strict=False)
+        self.assertIsNone(fake_topic)
 
     def test_get_topic_by_version(self):
         topic_id = topic_fetchers.get_new_topic_id()
@@ -280,6 +391,11 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.subtopic_count, 1)
         self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
+
+        fake_topic_id = topic_fetchers.get_new_topic_id()
+        fake_topic = topic_fetchers.get_topic_summary_by_id(
+            fake_topic_id, strict=False)
+        self.assertIsNone(fake_topic)
 
     def test_get_new_topic_id(self):
         new_topic_id = topic_fetchers.get_new_topic_id()

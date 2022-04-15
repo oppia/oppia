@@ -72,7 +72,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
     def test_create_profile_user_auth_details_with_self_as_parent_is_error(
             self):
-        with self.assertRaisesRegexp(ValueError, 'cannot be its own parent'):
+        with self.assertRaisesRegex(ValueError, 'cannot be its own parent'):
             auth_services.create_profile_user_auth_details('uid', 'uid')
 
     def test_get_all_profiles_for_parent_user_id_returns_all_profiles(self):
@@ -169,7 +169,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
-        with self.assertRaisesRegexp(Exception, 'already associated'):
+        with self.assertRaisesRegex(Exception, 'already associated'):
             auth_services.associate_auth_id_with_user_id(
                 auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
@@ -189,7 +189,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
 
-        with self.assertRaisesRegexp(Exception, 'already associated'):
+        with self.assertRaisesRegex(Exception, 'already associated'):
             auth_services.associate_multi_auth_ids_with_user_ids(
                 [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
                  auth_domain.AuthIdUserIdPair('aid2', 'uid2'),

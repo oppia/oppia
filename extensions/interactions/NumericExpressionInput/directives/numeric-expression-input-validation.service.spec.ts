@@ -148,7 +148,7 @@ describe('NumericExpressionInputValidationService', () => {
     let matchesExactlyWith2 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: '-1 + 3^2'
+        x: '3^2 - 1'
       }
     }, 'NumericExpressionInput');
 

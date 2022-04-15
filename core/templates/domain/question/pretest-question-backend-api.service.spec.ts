@@ -26,8 +26,7 @@ import { QuestionObjectFactory } from
   'domain/question/QuestionObjectFactory';
 
 describe('Pretest question backend API service', function() {
-  let pretestQuestionBackendApiService:
-    PretestQuestionBackendApiService = null;
+  let pretestQuestionBackendApiService: PretestQuestionBackendApiService;
   let httpTestingController: HttpTestingController;
   let questionObjectFactory: QuestionObjectFactory;
 
@@ -154,17 +153,17 @@ describe('Pretest question backend API service', function() {
     }]
   };
 
-  var sampleDataResultsObjects = null;
+  var sampleDataResultsObjects: {pretest_question_objects: {}};
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [PretestQuestionBackendApiService]
     });
-    pretestQuestionBackendApiService = TestBed.get(
+    pretestQuestionBackendApiService = TestBed.inject(
       PretestQuestionBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    questionObjectFactory = TestBed.get(QuestionObjectFactory);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
 
     sampleDataResultsObjects = {
       pretest_question_objects: [
@@ -226,7 +225,7 @@ describe('Pretest question backend API service', function() {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     let invalidUrl = '-invalid-url-';
-    let emptyList = [];
+    let emptyList: string[] = [];
 
     pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
       'expId', invalidUrl).then(successHandler, failHandler);

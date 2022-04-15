@@ -33,6 +33,8 @@ var TopicViewerPage = require('../protractor_utils/TopicViewerPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var SubTopicViewerPage = require('../protractor_utils/SubTopicViewerPage.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
@@ -73,6 +75,8 @@ describe('Topic and Story viewer functionality', function() {
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     topicAndStoryViewerPage = (
       new TopicAndStoryViewerPage.TopicAndStoryViewerPage());
     topicViewerPage = new TopicViewerPage.TopicViewerPage();
@@ -92,7 +96,6 @@ describe('Topic and Story viewer functionality', function() {
     await topicEditorPage.submitTopicThumbnail(Constants.TEST_SVG_PATH, true);
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.updatePageTitleFragment('topic page title');
-    await topicEditorPage.togglePracticeTab();
     await topicEditorPage.saveTopic('Added thumbnail.');
     var url = await browser.getCurrentUrl();
     var topicId = url.split('/')[4].slice(0, -1);
@@ -115,12 +118,40 @@ describe('Topic and Story viewer functionality', function() {
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
     var url = await browser.getCurrentUrl();
     skillId = url.split('/')[4];
+    await skillEditorPage.get(skillId);
+
+    for (let i = 0; i < 10; i++) {
+      await skillEditorPage.moveToQuestionsTab();
+      await skillEditorPage.clickCreateQuestionButton();
+      await explorationEditorMainTab.setContent(
+        await forms.toRichText('Question 1'));
+      await explorationEditorMainTab.setInteraction(
+        'TextInput', 'Placeholder', 5);
+      await explorationEditorMainTab.addResponse(
+        'TextInput', await forms.toRichText('Correct Answer'), null, false,
+        'FuzzyEquals', ['correct']);
+      var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+      await responseEditor.markAsCorrect();
+      await (
+        await explorationEditorMainTab.getResponseEditor('default')
+      ).setFeedback(await forms.toRichText('Try again'));
+      await explorationEditorMainTab.addHint('Hint 1');
+      await explorationEditorMainTab.addSolution('TextInput', {
+        correctAnswer: 'correct',
+        explanation: 'It is correct'
+      });
+      await skillEditorPage.saveQuestion();
+      await skillEditorPage.get(skillId);
+    }
+
+    await general.closeCurrentTabAndSwitchTo(handle);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
       'Skill TASV1', 'Topic TASV1');
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicEditorPage.togglePracticeTab();
     await topicEditorPage.addSubtopic(
       'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
       'Subtopic content');
@@ -135,7 +166,7 @@ describe('Topic and Story viewer functionality', function() {
     await topicEditorPage.publishTopic();
     await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
     await topicEditorPage.createStory(
-      'Story TASV1', 'story-player-tasv-one', 'Story description',
+      'Story TASV1', 'storyplayertasvone', 'Story description',
       Constants.TEST_SVG_PATH);
     await storyEditorPage.updateMetaTagContent('story meta tag');
     for (var i = 0; i < 3; i++) {
@@ -154,7 +185,7 @@ describe('Topic and Story viewer functionality', function() {
 
   it('should play through story and save progress on login.', async function() {
     await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
+      'math', 'topic-tasv-one', 'storyplayertasvone');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.goToChapterIndex(0);
@@ -169,7 +200,7 @@ describe('Topic and Story viewer functionality', function() {
 
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
+      'math', 'topic-tasv-one', 'storyplayertasvone');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
     await users.logout();
@@ -208,8 +239,10 @@ describe('Topic and Story viewer functionality', function() {
         await topicAndStoryViewerPage.waitForPracticeSessionContainer();
       });
 
-      await explorationPlayerPage.submitAnswer('TextInput', 'correct');
-      await explorationPlayerPage.clickThroughToNextCard();
+      for (let i = 0; i < 10; i++) {
+        await explorationPlayerPage.submitAnswer('TextInput', 'correct');
+        await explorationPlayerPage.clickThroughToNextCard();
+      }
       await topicViewerPage.expectMessageAfterCompletion(
         'Session complete. Well done!'
       );

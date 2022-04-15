@@ -427,7 +427,7 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
             if subscriptions_model else [])
 
     def test_exception_is_raised_when_user_self_subscribes(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'User %s is not allowed to self subscribe.' % USER_ID):
             subscription_services.subscribe_to_creator(USER_ID, USER_ID)
 

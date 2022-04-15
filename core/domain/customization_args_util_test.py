@@ -22,7 +22,6 @@ import os
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import customization_args_util
 from core.domain import interaction_registry
@@ -194,7 +193,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         )
 
         # Check if error is produced when arg name is invalid.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid customization arg name: 23'
         ):
@@ -206,7 +205,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
         # Check if error is produced when extra args are present.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             (
                 'Interaction ItemSelectionInput does not support '
@@ -284,7 +283,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         # does not contain some of the required specs.
 
         # Check if error is produced for missing customization args.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Customization argument is missing key: allowImproperFraction'
         ):
@@ -296,7 +295,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
         # Check if error is produced when arg name is invalid.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid customization arg name: False'
         ):
@@ -308,7 +307,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
         # Check if error is produced when extra args are present.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             (
                 'Interaction FractionInput does not support customization '
@@ -342,7 +341,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         # A general check to see if error are produced when customization args
         # is not of type dict.
         customization_args_with_invalid_type = 23
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected customization args to be a dict, received %s'
             % customization_args_with_invalid_type
@@ -367,7 +366,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'maxAllowableSelectionCount': {'value': 1},
             'choices': {'value': ['']}
         }
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Could not convert str to int: 1b'
         ):
             customization_args_util.validate_customization_args_and_values(
@@ -388,7 +387,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         """
         filepath = os.path.join(
             feconf.INTERACTIONS_DIR, 'customization-args-defs.ts')
-        with python_utils.open_file(filepath, 'r', newline='') as f:
+        with utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 
         all_interaction_ids = (
@@ -445,7 +444,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         filepath = os.path.join(
             'core', 'templates', 'domain', 'exploration',
             'InteractionObjectFactory.ts')
-        with python_utils.open_file(filepath, 'r', newline='') as f:
+        with utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 
         all_interaction_ids = (
@@ -484,7 +483,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         """
         filepath = os.path.join(
             'typings', 'tests', 'customization-args-defs-test.ts')
-        with python_utils.open_file(filepath, 'r', newline='') as f:
+        with utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 
         all_interaction_ids = (

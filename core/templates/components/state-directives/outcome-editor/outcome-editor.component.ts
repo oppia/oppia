@@ -54,11 +54,11 @@ angular.module('oppia').component('outcomeEditor', {
   template: require('./outcome-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    'ExternalSaveService', 'StateEditorService',
+    '$rootScope', 'ExternalSaveService', 'StateEditorService',
     'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
     'INTERACTION_SPECS',
     function(
-        ExternalSaveService, StateEditorService,
+        $rootScope, ExternalSaveService, StateEditorService,
         StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
         INTERACTION_SPECS) {
       var ctrl = this;
@@ -69,6 +69,10 @@ angular.module('oppia').component('outcomeEditor', {
 
       ctrl.isCorrectnessFeedbackEnabled = function() {
         return StateEditorService.getCorrectnessFeedbackEnabled();
+      };
+
+      ctrl.getChanges = function() {
+        $rootScope.$applyAsync();
       };
 
       // This returns false if the current interaction ID is null.
@@ -107,7 +111,8 @@ angular.module('oppia').component('outcomeEditor', {
       };
 
       ctrl.isFeedbackLengthExceeded = function() {
-        return (ctrl.outcome.feedback._html.length > 1000);
+        // TODO(#13764): Edit this check after appropriate limits are found.
+        return (ctrl.outcome.feedback._html.length > 10000);
       };
 
       ctrl.isSelfLoop = function(outcome) {

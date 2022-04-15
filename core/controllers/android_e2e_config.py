@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -88,9 +88,9 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             if topic_rights.topic_is_published:
                 raise self.InvalidInputException(
                     'The topic is already published.')
-            else:
-                raise self.InvalidInputException(
-                    'The topic exists but is not published.')
+
+            raise self.InvalidInputException(
+                'The topic exists but is not published.')
         exp_id = '26'
         user_id = feconf.SYSTEM_COMMITTER_ID
         # Generate new Structure id for topic, story, skill and question.
@@ -115,7 +115,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.update_meta_tag_content('tag')
         topic.update_page_title_fragment_for_web('page title for topic')
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
@@ -174,7 +174,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         )
 
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
@@ -230,7 +230,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         AssetDevHandler.
         """
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             image_content = f.read()

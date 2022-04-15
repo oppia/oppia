@@ -72,7 +72,7 @@
 
     <p class="oppia-profile-subject-interest-container">
       Interests:
-      <span *ngIf="subjectInterests.length > 0"><br>
+      <span class="oppia-profile-subject-interest-blocks" *ngIf="subjectInterests.length > 0">
         <span *ngFor="let interest of subjectInterests; index as index">
           <span class="oppia-profile-subject-interest protractor-test-profile-interest">
             {{ interest }}
@@ -160,8 +160,15 @@
   .oppia-profile-container .oppia-profile-portfolio-pages .oppia-navigation-mouse-pointer:hover {
     background-color: #808080;
     border-radius: 50%;
-    color: #FFF;
+    color: #fff;
     cursor: pointer;
+  }
+  .oppia-profile-subject-interest-blocks {
+    column-gap: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 5px;
+    row-gap: 5px;
   }
   .oppia-profile-container .oppia-stats-value-text {
     font-size: 16px;

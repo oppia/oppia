@@ -23,7 +23,6 @@ import hmac
 import logging
 
 from core import feconf
-from core import python_utils
 from core.domain import classifier_domain
 from core.domain import config_domain
 from core.domain import exp_fetchers
@@ -572,8 +571,7 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
         job_ids = classifier_models.ClassifierTrainingJobModel.create_multi(
             job_dicts)
 
-        for algorithm_id, job_id in python_utils.ZIP(
-                algorithm_ids_to_add, job_ids):
+        for algorithm_id, job_id in zip(algorithm_ids_to_add, job_ids):
             state_training_jobs_mapping.algorithm_ids_to_job_ids[
                 algorithm_id] = job_id
 

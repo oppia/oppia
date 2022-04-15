@@ -34,6 +34,15 @@ describe('Exploration Graph Modal Controller', function() {
   var graphData = {};
   var stateName = 'Introduction';
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(() => {

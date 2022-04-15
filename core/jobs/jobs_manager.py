@@ -27,12 +27,19 @@ from core.domain import beam_job_services
 from core.jobs import base_jobs
 from core.jobs import job_options
 from core.jobs.io import job_io
+from core.platform import models
 from core.storage.beam_job import gae_models as beam_job_models
 
 import apache_beam as beam
 from apache_beam import runners
 from google.cloud import dataflow
 from typing import Iterator, Optional, Type
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
+
+datastore_services = models.Registry.import_datastore_services()
 
 # This is a mapping from the Google Cloud Dataflow JobState enum to our enum.
 # https://cloud.google.com/dataflow/docs/reference/rest/v1b3/projects.jobs#jobstate
@@ -109,6 +116,9 @@ def run_job(
     Returns:
         BeamJobRun. Contains metadata related to the execution status of the
         job.
+
+    Raises:
+        RuntimeError. Failed to deploy given job to the Dataflow service.
     """
     if pipeline is None:
         pipeline = beam.Pipeline(
@@ -136,6 +146,12 @@ def run_job(
             raise RuntimeError(
                 'Failed to deploy %s to the Dataflow service. Please try again '
                 'after a few minutes.' % job_name)
+
+    # NDB operations in Beam do not properly update the context cache
+    # (this cache is separate for every application thread), thus we clear
+    # it ourselves.
+    with datastore_services.get_ndb_context() as ndb_context:
+        ndb_context.clear_cache()
 
     return run_model
 
@@ -195,6 +211,9 @@ def cancel_job(beam_job_run_model: beam_job_models.BeamJobRunModel) -> None:
 
     Args:
         beam_job_run_model: BeamJobRunModel. The model to update.
+
+    Raises:
+        ValueError. The given model has no job ID.
     """
     job_id = beam_job_run_model.dataflow_job_id
     if job_id is None:

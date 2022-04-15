@@ -138,8 +138,7 @@ class ExplorationHandler(EditorHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            objects_validator.validate_exploration_change)
+                        'object_class': exp_domain.ExplorationChange
                     }
                 }
             }
@@ -176,8 +175,8 @@ class ExplorationHandler(EditorHandler):
             exploration_data['exploration_is_linked_to_story'] = (
                 exp_services.get_story_id_linked_to_exploration(
                     exploration_id) is not None)
-        except:
-            raise self.PageNotFoundException
+        except Exception as e:
+            raise self.PageNotFoundException from e
 
         self.values.update(exploration_data)
         self.render_json(self.values)
@@ -195,12 +194,7 @@ class ExplorationHandler(EditorHandler):
                 % (exploration.version, version))
 
         commit_message = self.normalized_payload.get('commit_message')
-        change_list_dict = self.normalized_payload.get('change_list')
-
-        change_list = [
-            exp_domain.ExplorationChange(change)
-            for change in change_list_dict
-        ]
+        change_list = self.normalized_payload.get('change_list')
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
             exploration_id, version, change_list)
@@ -449,7 +443,7 @@ class ExplorationStatusHandler(EditorHandler):
 
     @acl_decorators.can_publish_exploration
     def put(self, exploration_id):
-        make_public = self.payload.get('make_public')
+        make_public = self.normalized_payload.get('make_public')
 
         if make_public:
             self._publish_exploration(exploration_id)
@@ -884,7 +878,8 @@ class ResolveIssueHandler(EditorHandler):
             'exp_issue_dict': {
                 'schema': {
                     'type': 'object_dict',
-                    'object_class': stats_domain.ExplorationIssue
+                    'object_class': stats_domain.ExplorationIssue,
+                    'new_key_for_argument': 'exp_issue_object'
                 },
                 'default_value': None
             },
@@ -897,7 +892,7 @@ class ResolveIssueHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def post(self, exp_id):
         """Handles POST requests."""
-        exp_issue_dict = self.normalized_payload.get('exp_issue_dict')
+        exp_issue_object = self.normalized_payload.get('exp_issue_object')
         exp_version = self.normalized_payload.get('exp_version')
 
         exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
@@ -909,7 +904,7 @@ class ResolveIssueHandler(EditorHandler):
         # issues instance.
         issue_to_remove = None
         for issue in exp_issues.unresolved_issues:
-            if issue.to_dict() == exp_issue_dict:
+            if issue == exp_issue_object:
                 issue_to_remove = issue
                 break
 
@@ -1042,8 +1037,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            objects_validator.validate_exploration_change)
+                        'object_class': exp_domain.ExplorationChange
                     }
                 }
             }
@@ -1071,12 +1065,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         """Handles PUT requests for draft updation."""
         # Raise an Exception if the draft change list fails non-strict
         # validation.
-        change_list_dict = self.normalized_payload.get('change_list')
-        change_list = [
-            exp_domain.ExplorationChange(change)
-            for change in change_list_dict
-        ]
-
+        change_list = self.normalized_payload.get('change_list')
         version = self.normalized_payload.get('version')
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)

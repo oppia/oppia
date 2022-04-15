@@ -58,14 +58,14 @@
     <div *ngIf="activeTab === 'practice'">
       <practice-tab [subtopicsList]="subtopics"
                     [topicName]="topicName"
-                    [startButtonIsDisabled]="true">
+                    [previewMode]="true">
       </practice-tab>
     </div>
   </div>
 </div>
 <style>
   .topic-preview-container {
-    background-color: #FFF;
+    background-color: #fff;
     margin: 0 auto;
     position: relative;
     top: 50px;
@@ -85,7 +85,7 @@
     justify-content: center;
   }
   .topic-preview-nav-active {
-    border-bottom: 4px solid #FFF;
+    border-bottom: 4px solid #fff;
   }
   .topic-preview-navbar-tab {
     cursor: pointer;
@@ -99,7 +99,7 @@
     height: 40px;
   }
   .topic-preview-text {
-    color: #FFF;
+    color: #fff;
     font-family: Capriola, Roboto, Arial, sans-serif;
     font-size: 20px;
     margin-top: 4px;

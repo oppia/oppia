@@ -19,7 +19,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StoryNode } from 'domain/story/story-node.model';
-import { StoryContents } from 'domain/story/StoryContentsObjectFactory';
+import { StoryContents } from 'domain/story/story-contents-object.model';
 import { Story } from 'domain/story/StoryObjectFactory';
 import { Subscription } from 'rxjs';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';

@@ -15,17 +15,30 @@
 /**
  * @fileoverview Service for handling user contributed translations.
  */
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { TranslatableTexts, TranslatableTextsBackendDict } from 'domain/opportunity/translatable-texts.model';
-import { ImagesData } from 'services/image-local-storage.service';
+import { ImageLocalStorageService, ImagesData } from 'services/image-local-storage.service';
 
+interface Data {
+  'suggestion_type': string;
+  'target_type': string;
+  description: string;
+  'target_id': string;
+  'target_version_at_submission': string;
+  change: object;
+  files?: Record<string, unknown>;
+}
 @Injectable({
   providedIn: 'root'
 })
 export class TranslateTextBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private imageLocalStorageService: ImageLocalStorageService
+  ) {}
 
   async getTranslatableTextsAsync(expId: string, languageCode: string):
     Promise<TranslatableTexts> {
@@ -45,7 +58,7 @@ export class TranslateTextBackendApiService {
       languageCode: string, contentHtml: string | string[],
       translationHtml: string | string[], imagesData: ImagesData[],
       dataFormat: string): Promise<unknown> {
-    const postData = {
+    const postData: Data = {
       suggestion_type: 'translate_content',
       target_type: 'exploration',
       description: 'Adds translation',
@@ -59,17 +72,13 @@ export class TranslateTextBackendApiService {
         content_html: contentHtml,
         translation_html: translationHtml,
         data_format: dataFormat
-      }
+      },
+      files: (
+        await this.imageLocalStorageService.getFilenameToBase64MappingAsync(
+          imagesData))
     };
-
     const body = new FormData();
     body.append('payload', JSON.stringify(postData));
-    imagesData.forEach(obj => {
-      if (obj.imageBlob === null) {
-        throw new Error('No image data found');
-      }
-      body.append(obj.filename, obj.imageBlob);
-    });
     return this.http.post(
       '/suggestionhandler/', body).toPromise();
   }

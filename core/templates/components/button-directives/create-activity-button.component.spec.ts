@@ -43,6 +43,7 @@ class MockWindowRef {
     },
     gtag: () => {}
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -250,6 +251,15 @@ describe('CreateActivityButtonComponent', () => {
       );
       expect(component.creationInProgress).toBe(false);
     }));
+
+    it('should create new exploration when clicked on CREATE' +
+    ' EXPLORATION button', () => {
+      spyOn(
+        explorationCreationService, 'createNewExploration');
+      component.createNewExploration();
+      expect(
+        explorationCreationService.createNewExploration).toHaveBeenCalled();
+    });
   });
 
   describe('when user cannot create collection', () => {

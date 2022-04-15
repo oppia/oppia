@@ -41,6 +41,7 @@ export class CoordTwoDimEditorComponent implements OnInit {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
+
   options!: MapOptions;
 
   constructor(private urlInterpolationService: UrlInterpolationService) {}

@@ -64,57 +64,59 @@ export class AdminFeaturesTabComponent implements OnInit {
       inputRegex?: RegExp;
     }
   } = {
-    [PlatformParameterFilterType.ServerMode]: {
-      displayName: 'Server Mode',
-      options: AdminFeaturesTabConstants.ALLOWED_SERVER_MODES,
-      operators: ['='],
-      optionFilter: (feature: PlatformParameter, option: string): boolean => {
-        switch (feature.featureStage) {
-          case FeatureStage.DEV:
-            return option === 'dev';
-          case FeatureStage.TEST:
-            return option === 'dev' || option === 'test';
-          case FeatureStage.PROD:
-            return true;
-          default:
-            return false;
+      [PlatformParameterFilterType.ServerMode]: {
+        displayName: 'Server Mode',
+        options: AdminFeaturesTabConstants.ALLOWED_SERVER_MODES,
+        operators: ['='],
+        optionFilter: (feature: PlatformParameter, option: string): boolean => {
+          switch (feature.featureStage) {
+            case FeatureStage.DEV:
+              return option === 'dev';
+            case FeatureStage.TEST:
+              return option === 'dev' || option === 'test';
+            case FeatureStage.PROD:
+              return true;
+            default:
+              return false;
+          }
         }
+      },
+      [PlatformParameterFilterType.PlatformType]: {
+        displayName: 'Platform Type',
+        options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
+        operators: ['=']
+      },
+      [PlatformParameterFilterType.BrowserType]: {
+        displayName: 'Browser Type',
+        options: AdminFeaturesTabConstants.ALLOWED_BROWSER_TYPES,
+        operators: ['=']
+      },
+      [PlatformParameterFilterType.AppVersion]: {
+        displayName: 'App Version',
+        operators: ['=', '<', '>', '<=', '>='],
+        placeholder: 'e.g. 1.0.0',
+        inputRegex: AdminFeaturesTabConstants.APP_VERSION_REGEXP
+      },
+      [PlatformParameterFilterType.AppVersionFlavor]: {
+        displayName: 'App Version Flavor',
+        options: AdminFeaturesTabConstants.ALLOWED_APP_VERSION_FLAVORS,
+        operators: ['=', '<', '>', '<=', '>=']
       }
-    },
-    [PlatformParameterFilterType.PlatformType]: {
-      displayName: 'Platform Type',
-      options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
-      operators: ['=']
-    },
-    [PlatformParameterFilterType.BrowserType]: {
-      displayName: 'Browser Type',
-      options: AdminFeaturesTabConstants.ALLOWED_BROWSER_TYPES,
-      operators: ['=']
-    },
-    [PlatformParameterFilterType.AppVersion]: {
-      displayName: 'App Version',
-      operators: ['=', '<', '>', '<=', '>='],
-      placeholder: 'e.g. 1.0.0',
-      inputRegex: AdminFeaturesTabConstants.APP_VERSION_REGEXP
-    },
-    [PlatformParameterFilterType.AppVersionFlavor]: {
-      displayName: 'App Version Flavor',
-      options: AdminFeaturesTabConstants.ALLOWED_APP_VERSION_FLAVORS,
-      operators: ['=', '<', '>', '<=', '>=']
-    }
-  };
+    };
 
-  private readonly defaultNewFilter: PlatformParameterFilter =
+  private readonly defaultNewFilter: PlatformParameterFilter = (
     PlatformParameterFilter.createFromBackendDict({
       type: PlatformParameterFilterType.ServerMode,
       conditions: []
-    });
+    })
+  );
 
-  private readonly defaultNewRule: PlatformParameterRule =
+  private readonly defaultNewRule: PlatformParameterRule = (
     PlatformParameterRule.createFromBackendDict({
       filters: [this.defaultNewFilter.toBackendDict()],
       value_when_matched: false
-    });
+    })
+  );
 
   featureFlags: PlatformParameter[] = [];
   featureFlagNameToBackupMap: Map<string, PlatformParameter>;

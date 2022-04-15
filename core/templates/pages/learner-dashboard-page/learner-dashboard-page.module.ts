@@ -25,6 +25,7 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 
 import { LearnerStorySummaryTileComponent } from 'components/summary-tile/learner-story-summary-tile.component';
+import { LearnerTopicGoalsSummaryTileComponent } from 'components/summary-tile/learner-topic-goals-summary-tile.component';
 import { ProgressTabComponent } from './progress-tab.component';
 import { GoalsTabComponent } from './goals-tab.component';
 import { CommunityLessonsTabComponent } from './community-lessons-tab.component';
@@ -53,6 +54,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
   declarations: [
     LearnerDashboardPageComponent,
     LearnerStorySummaryTileComponent,
+    LearnerTopicGoalsSummaryTileComponent,
     ProgressTabComponent,
     GoalsTabComponent,
     HomeTabComponent,
@@ -64,6 +66,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
   entryComponents: [
     LearnerDashboardPageComponent,
     LearnerStorySummaryTileComponent,
+    LearnerTopicGoalsSummaryTileComponent,
     ProgressTabComponent,
     GoalsTabComponent,
     HomeTabComponent,

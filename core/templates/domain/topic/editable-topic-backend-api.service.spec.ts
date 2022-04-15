@@ -21,12 +21,64 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { TopicBackendDict } from 'domain/topic/TopicObjectFactory';
 
 describe('Editable topic backend API service', () => {
-  let httpTestingController = null;
-  let editableTopicBackendApiService = null;
-  let sampleDataResults = null;
-  let csrfService = null;
+  let httpTestingController: HttpTestingController;
+  let editableTopicBackendApiService: EditableTopicBackendApiService;
+  // Sample topic object returnable from the backend.
+  let sampleDataResults = {
+    topic_dict: {
+      id: '0',
+      name: 'Topic Name',
+      description: 'Topic Description',
+      version: '1',
+      canonical_story_references: [{
+        story_id: 'story_1',
+        story_is_published: true
+      }],
+      additional_story_references: [{
+        story_id: 'story_2',
+        story_is_published: true
+      }],
+      uncategorized_skill_ids: ['skill_id_1'],
+      subtopics: [],
+      language_code: 'en'
+    },
+    canonical_story_summary_dicts: [{
+      id: '0',
+      title: 'Title',
+      node_count: 1,
+      story_is_published: false
+    }],
+    grouped_skill_summary_dicts: {},
+    skill_id_to_description_dict: {
+      skill_id_1: 'Description 1'
+    },
+    skill_id_to_rubrics_dict: {
+      skill_id_1: []
+    },
+    classroom_url_fragment: 'math',
+    skill_question_count_dict: {},
+    subtopic_page: {
+      id: 'topicId-1',
+      topicId: 'topicId',
+      page_contents: {
+        subtitled_html: {
+          html: '<p>Data</p>',
+          content_id: 'content'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {}
+          }
+        },
+      },
+      language_code: 'en'
+    },
+    skill_creation_is_allowed: true
+  };
+  let csrfService: CsrfTokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -40,59 +92,6 @@ describe('Editable topic backend API service', () => {
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
     });
-
-    // Sample topic object returnable from the backend.
-    sampleDataResults = {
-      topic_dict: {
-        id: '0',
-        name: 'Topic Name',
-        description: 'Topic Description',
-        version: '1',
-        canonical_story_references: [{
-          story_id: 'story_1',
-          story_is_published: true
-        }],
-        canonical_story_summary_dicts: [{
-          id: '0',
-          title: 'Title',
-          node_count: 1,
-          story_is_published: false
-        }],
-        additional_story_references: [{
-          story_id: 'story_2',
-          story_is_published: true
-        }],
-        uncategorized_skill_ids: ['skill_id_1'],
-        subtopics: [],
-        language_code: 'en'
-      },
-      grouped_skill_summary_dicts: {},
-      skill_id_to_description_dict: {
-        skill_id_1: 'Description 1'
-      },
-      skill_id_to_rubrics_dict: {
-        skill_id_1: []
-      },
-      classroom_url_fragment: 'math',
-      skill_question_count_dict: {},
-      subtopic_page: {
-        id: 'topicId-1',
-        topicId: 'topicId',
-        page_contents: {
-          subtitled_html: {
-            html: '<p>Data</p>',
-            content_id: 'content'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {}
-            }
-          },
-        },
-        language_code: 'en'
-      },
-      skill_creation_is_allowed: true
-    };
   });
 
   afterEach(() => {
@@ -189,7 +188,10 @@ describe('Editable topic backend API service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      let topic = null;
+      // 'topic' is initialized before it's value is fetched from backend,
+      // hence we need to do non-null assertion. For more information, see
+      // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+      let topic!: TopicBackendDict;
 
       // Loading a topic the first time should fetch it from the backend.
       editableTopicBackendApiService.fetchTopicAsync('0').then(
@@ -203,7 +205,7 @@ describe('Editable topic backend API service', () => {
       flushMicrotasks();
 
       topic.name = 'New Name';
-      topic.version = '2';
+      topic.version = 2;
       let topicWrapper = {
         topic_dict: topic,
         skill_id_to_description_dict: {
@@ -237,7 +239,7 @@ describe('Editable topic backend API service', () => {
 
       // Loading a topic the first time should fetch it from the backend.
       editableTopicBackendApiService.updateTopicAsync(
-        '1', '1', 'Update an invalid topic.', []
+        '1', 1, 'Update an invalid topic.', []
       ).then(successHandler, failHandler);
       let req = httpTestingController.expectOne('/topic_editor_handler/data/1');
       expect(req.request.method).toEqual('PUT');
@@ -305,8 +307,9 @@ describe('Editable topic backend API service', () => {
   it('should use the rejection handler if the url fragment already exists',
     fakeAsync(() => {
       editableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
-        'topic-url-fragment').then(() => {}, error => {
-        expect(error).toEqual('Error: Failed to check topic url fragment.');
+        'topic-url-fragment').then(() => {}, errorResponse => {
+        expect(errorResponse.statusText).toEqual(
+          'Error: Failed to check topic url fragment.');
       });
       let req = httpTestingController.expectOne(
         '/topic_url_fragment_handler/topic-url-fragment');

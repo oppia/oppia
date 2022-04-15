@@ -16,9 +16,6 @@
  * @fileoverview Controller for the questions editor directive.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
 require('components/state-editor/state-editor.component.ts');
 
 require('domain/question/question-update.service.ts');
@@ -36,8 +33,10 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/editability.service.ts');
 
 require('pages/interaction-specs.constants.ajs.ts');
+require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
+import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 
 angular.module('oppia').component('questionEditor', {
   bindings: {
@@ -51,12 +50,12 @@ angular.module('oppia').component('questionEditor', {
   template: require('./question-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    '$uibModal', 'EditabilityService', 'LoaderService',
+    '$rootScope', 'EditabilityService', 'LoaderService', 'NgbModal',
     'QuestionUpdateService', 'SolutionValidityService',
     'StateEditorService', 'StateInteractionIdService',
     'UrlInterpolationService',
     function(
-        $uibModal, EditabilityService, LoaderService,
+        $rootScope, EditabilityService, LoaderService, NgbModal,
         QuestionUpdateService, SolutionValidityService,
         StateEditorService, StateInteractionIdService,
         UrlInterpolationService) {
@@ -170,6 +169,7 @@ angular.module('oppia').component('questionEditor', {
         _updateQuestion(function() {
           StateEditorService.setInteractionHints(
             angular.copy(displayedValue));
+          $rootScope.$applyAsync();
         });
       };
 
@@ -192,13 +192,10 @@ angular.module('oppia').component('questionEditor', {
           contentId =>
             recordedVoiceovers.hasUnflaggedVoiceovers(contentId));
         if (shouldPrompt) {
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/components/forms/forms-templates/mark-all-audio-and-' +
-              'translations-as-needing-update-modal.directive.html'),
-            backdrop: 'static',
-            controller: 'ConfirmOrCancelModalController'
-          }).result.then(function() {
+          NgbModal.open(
+            MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent, {
+              backdrop: 'static'
+            }).result.then(function() {
             updateQuestion(function() {
               contentIds.forEach(contentId => {
                 if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {

@@ -57,6 +57,9 @@ def managed_process(
 
     Yields:
         psutil.Process. The process managed by the context manager.
+
+    Raises:
+        Exception. The process exited unexpectedly.
     """
     # TODO(#11549): Move this to top of the file.
     if common.PSUTIL_DIR not in sys.path:
@@ -79,8 +82,10 @@ def managed_process(
     try:
         yield popen_proc
     finally:
-        print('Stopping %s...' % get_proc_info(popen_proc))
+        proc_name = get_proc_info(popen_proc)
+        print('Stopping %s...' % proc_name)
         procs_still_alive = [popen_proc]
+
         try:
             if popen_proc.is_running():
                 # Children must be terminated before the parent, otherwise they
@@ -100,7 +105,7 @@ def managed_process(
             procs_gone, procs_still_alive = (
                 psutil.wait_procs(procs_to_kill, timeout=timeout_secs))
             for proc in procs_still_alive:
-                logging.warn('Forced to kill %s!' % get_proc_info(proc))
+                logging.warning('Forced to kill %s!' % get_proc_info(proc))
                 proc.kill()
             for proc in procs_gone:
                 logging.info('%s has already ended.' % get_proc_info(proc))
@@ -109,6 +114,15 @@ def managed_process(
             # practice, so we log and suppress exceptions instead.
             logging.exception(
                 'Failed to stop %s gracefully!' % get_proc_info(popen_proc))
+
+        exit_code = popen_proc.returncode
+        # Note that negative values indicate termination by a signal: SIGTERM,
+        # SIGINT, etc. Also, exit code 143 indicates that the process received
+        # a SIGTERM from the OS, and it succeeded in gracefully terminating.
+        if exit_code is not None and exit_code > 0 and exit_code != 143:
+            raise Exception(
+                'Process %s exited unexpectedly with exit code %s' %
+                (proc_name, exit_code))
 
 
 @contextlib.contextmanager
@@ -215,10 +229,17 @@ def managed_elasticsearch_dev_server():
     if os.path.exists(common.ES_PATH_DATA_DIR):
         shutil.rmtree(common.ES_PATH_DATA_DIR)
 
-    # -q is the quiet flag.
-    es_args = ['%s/bin/elasticsearch' % common.ES_PATH, '-q']
+    es_args = [
+        '%s/bin/elasticsearch' % common.ES_PATH,
+        # -q is the quiet flag.
+        '-q'
+    ]
     # Override the default path to ElasticSearch config files.
-    es_env = {'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR}
+    es_env = {
+        'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
+        # Set the minimum heap size to 100 MB and maximum to 500 MB.
+        'ES_JAVA_OPTS': '-Xms100m -Xmx500m'
+    }
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
@@ -369,6 +390,9 @@ def managed_webpack_compiler(
 
     Yields:
         psutil.Process. The Webpack compiler process.
+
+    Raises:
+        OSError. First build never completed.
     """
     if config_path is not None:
         pass
@@ -448,7 +472,7 @@ def managed_portserver():
         # standalone scripts do not. Because of this, the following line cannot
         # be covered. This is fine since we want to cleanup this code anyway in
         # #11549.
-        sys.path.insert(1, common.PSUTIL_DIR) # pragma: nocover
+        sys.path.insert(1, common.PSUTIL_DIR) # pragma: no cover
     import psutil
 
     # Check if a socket file exists. This file can exist when previous instance
@@ -503,6 +527,9 @@ def managed_webdriver_server(chrome_version=None):
 
     Yields:
         psutil.Process. The Webdriver process.
+
+    Raises:
+        Exception. Space instead of '\'.
     """
     if chrome_version is None:
         # Although there are spaces between Google and Chrome in the path, we
@@ -513,7 +540,7 @@ def managed_webdriver_server(chrome_version=None):
             if common.is_mac_os() else 'google-chrome')
         try:
             output = subprocess.check_output([chrome_command, '--version'])
-        except OSError:
+        except OSError as e:
             # For the error message on macOS, we need to add the backslashes in.
             # This is because it is likely that a user will try to run the
             # command on their terminal and, as mentioned above, the macOS
@@ -527,7 +554,7 @@ def managed_webdriver_server(chrome_version=None):
                 'chromedriver version to be used, please follow the '
                 'instructions mentioned in the following URL:\n'
                 'https://chromedriver.chromium.org/downloads/version-selection'
-                % chrome_command.replace(' ', r'\ '))
+                % chrome_command.replace(' ', r'\ ')) from e
 
         installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
         installed_version = '.'.join(
@@ -601,6 +628,9 @@ def managed_protractor_server(
 
     Yields:
         psutil.Process. The protractor process.
+
+    Raises:
+        ValueError. Number of sharding instances are less than 0.
     """
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')

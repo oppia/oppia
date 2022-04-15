@@ -16,6 +16,8 @@
  * @fileoverview Component for the skill editor page.
  */
 
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
@@ -36,22 +38,23 @@ require('pages/interaction-specs.constants.ajs.ts');
 require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
 require('services/prevent-page-unload-event.service.ts');
+require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('skillEditorPage', {
   template: require('./skill-editor-page.component.html'),
   controller: [
-    '$rootScope', '$uibModal', 'BottomNavbarStatusService',
-    'PreventPageUnloadEventService',
+    '$rootScope', 'BottomNavbarStatusService',
+    'NgbModal', 'PreventPageUnloadEventService',
     'SkillEditorRoutingService', 'SkillEditorStateService',
-    'UndoRedoService', 'UrlInterpolationService', 'UrlService',
+    'UndoRedoService', 'UrlService',
     'MAX_COMMIT_MESSAGE_LENGTH',
     function(
-        $rootScope, $uibModal, BottomNavbarStatusService,
-        PreventPageUnloadEventService,
+        $rootScope, BottomNavbarStatusService,
+        NgbModal, PreventPageUnloadEventService,
         SkillEditorRoutingService, SkillEditorStateService,
-        UndoRedoService, UrlInterpolationService, UrlService,
+        UndoRedoService, UrlService,
         MAX_COMMIT_MESSAGE_LENGTH) {
       var ctrl = this;
       ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
@@ -72,13 +75,15 @@ angular.module('oppia').component('skillEditorPage', {
         // discarded, the misconceptions won't be saved, but there will be
         // some questions with these now non-existent misconceptions.
         if (UndoRedoService.getChangeCount() > 0) {
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/skill-editor-page/modal-templates/' +
-              'save-pending-changes-modal.directive.html'),
-            backdrop: true,
-            controller: 'ConfirmOrCancelModalController'
-          }).result.then(null, function() {
+          const modalRef = NgbModal.open(SavePendingChangesModalComponent, {
+            backdrop: true
+          });
+
+          modalRef.componentInstance.body = (
+            'Please save all pending changes ' +
+            'before viewing the questions list.');
+
+          modalRef.result.then(function() {}, function() {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.

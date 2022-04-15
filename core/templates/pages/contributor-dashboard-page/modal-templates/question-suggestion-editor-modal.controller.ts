@@ -20,7 +20,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/contributor-dashboard-page/services/' +
   'question-suggestion-backend-api.service.ts');
@@ -29,20 +28,24 @@ require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/site-analytics.service.ts');
 
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmQuestionExitModalComponent } from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
+import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
+
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
-  '$rootScope', '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
+  '$rootScope', '$scope', '$uibModalInstance', 'AlertsService',
   'ContextService', 'ContributionAndReviewService', 'ImageLocalStorageService',
-  'QuestionSuggestionBackendApiService', 'QuestionUndoRedoService',
+  'NgbModal', 'QuestionSuggestionBackendApiService', 'QuestionUndoRedoService',
   'QuestionValidationService', 'SiteAnalyticsService',
-  'UrlInterpolationService', 'question', 'questionId', 'questionStateData',
+  'question', 'questionId', 'questionStateData',
   'skill', 'skillDifficulty', 'suggestionId', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   'IMAGE_CONTEXT',
   function(
-      $rootScope, $scope, $uibModal, $uibModalInstance, AlertsService,
+      $rootScope, $scope, $uibModalInstance, AlertsService,
       ContextService, ContributionAndReviewService, ImageLocalStorageService,
-      QuestionSuggestionBackendApiService, QuestionUndoRedoService,
+      NgbModal, QuestionSuggestionBackendApiService, QuestionUndoRedoService,
       QuestionValidationService, SiteAnalyticsService,
-      UrlInterpolationService, question, questionId, questionStateData,
+      question, questionId, questionStateData,
       skill, skillDifficulty, suggestionId, SKILL_DIFFICULTY_LABEL_TO_FLOAT,
       IMAGE_CONTEXT) {
     $scope.canEditQuestion = true;
@@ -68,6 +71,11 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.setDifficultyString(skillDifficulty);
     $scope.done = function() {
       if (!$scope.isQuestionValid()) {
+        return;
+      }
+      if (!QuestionUndoRedoService.hasChanges()) {
+        AlertsService.addInfoMessage(
+          'No changes detected.', 5000);
         return;
       }
       SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
@@ -111,17 +119,12 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     };
     $scope.skillId = $scope.skill.getId();
     $scope.onClickChangeDifficulty = function() {
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/topic-editor-page/modal-templates/' +
-          'select-skill-and-difficulty-modal.template.html'),
-        backdrop: true,
-        resolve: {
-          skillId: () => $scope.skillId
-        },
-        controller: (
-          'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
-      }).result.then(function(result) {
+      const modalRef: NgbModalRef = NgbModal.open(
+        QuestionsOpportunitiesSelectDifficultyModalComponent, {
+          backdrop: true,
+        });
+      modalRef.componentInstance.skillId = $scope.skillId;
+      modalRef.result.then(function(result) {
         if (AlertsService.warnings.length === 0) {
           $scope.skillDifficulty = result.skillDifficulty;
           $scope.setDifficultyString($scope.skillDifficulty);
@@ -134,17 +137,15 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     };
     $scope.cancel = function() {
       if (QuestionUndoRedoService.hasChanges()) {
-        $uibModal.open({
-          templateUrl:
-            UrlInterpolationService.getDirectiveTemplateUrl(
-              '/components/question-directives/modal-templates/' +
-              'confirm-question-modal-exit-modal.directive.html'),
+        NgbModal.open(ConfirmQuestionExitModalComponent, {
           backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           $uibModalInstance.dismiss('cancel');
           ImageLocalStorageService.flushStoredImagesData();
           ContextService.resetImageSaveDestination();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$apply();
         }, function() {
           // Note to developers:
           // This callback is triggered when the cancel button is clicked.

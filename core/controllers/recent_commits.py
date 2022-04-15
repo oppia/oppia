@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_services
@@ -52,9 +51,7 @@ class RecentCommitsHandler(base.BaseHandler):
 
         unique_user_ids = list(set(commit.user_id for commit in all_commits))
         unique_usernames = user_services.get_usernames(unique_user_ids)
-        user_id_to_username = dict(
-            python_utils.ZIP(unique_user_ids, unique_usernames))
-
+        user_id_to_username = dict(zip(unique_user_ids, unique_usernames))
         all_commit_dicts = []
         for commit in all_commits:
             commit_dict = commit.to_dict()

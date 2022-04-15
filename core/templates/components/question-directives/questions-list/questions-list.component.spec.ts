@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionSummary } from 'domain/question/question-summary-object.model';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
@@ -42,7 +42,6 @@ describe('QuestionsListComponent', () => {
   let $rootScope = null;
   let $scope = null;
   let $q = null;
-  let $uibModal = null;
   let $timeout = null;
 
   let ngbModal: NgbModal;
@@ -62,7 +61,15 @@ describe('QuestionsListComponent', () => {
   let questionStateData = null;
   let skill = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(() => {
@@ -75,7 +82,6 @@ describe('QuestionsListComponent', () => {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $q = $injector.get('$q');
-    $uibModal = $injector.get('$uibModal');
     $timeout = $injector.get('$timeout');
 
     WindowDimensionsService = $injector.get('WindowDimensionsService');
@@ -190,7 +196,7 @@ describe('QuestionsListComponent', () => {
       id: 'skillId1',
       description: 'test description 1',
       misconceptions: [{
-        id: '2',
+        id: 2,
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback',
@@ -300,7 +306,7 @@ describe('QuestionsListComponent', () => {
     ctrl.$onInit();
     $scope.$apply();
 
-    expect(ctrl.misconceptionIdsForSelectedSkill).toEqual(['2']);
+    expect(ctrl.misconceptionIdsForSelectedSkill).toEqual([2]);
   });
 
   it('should start creating question on navigating to question editor', () => {
@@ -334,7 +340,7 @@ describe('QuestionsListComponent', () => {
       id: 'skillId1',
       description: 'test description 1',
       misconceptions: [{
-        id: '2',
+        id: 2,
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback',
@@ -373,7 +379,7 @@ describe('QuestionsListComponent', () => {
     expect(ctrl.misconceptionsBySkill).toEqual({
       skillId1: [
         misconceptionObjectFactory.createFromBackendDict({
-          id: '2',
+          id: 2,
           name: 'test name',
           notes: 'test notes',
           feedback: 'test feedback',
@@ -552,41 +558,46 @@ describe('QuestionsListComponent', () => {
   });
 
   it('should show \'confirm question modal exit\' modal when user ' +
-    'clicks cancel', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
+    'clicks cancel', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        result: Promise.resolve()
+      } as NgbModalRef);
     });
-
     ctrl.cancel();
+    tick();
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
-  });
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
   it('should reset image save destination when user clicks confirm on' +
-    ' \'confirm question modal exit\' modal', () => {
-    spyOn($uibModal, 'open').and.returnValue({
+    ' \'confirm question modal exit\' modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
       result: $q.resolve('confirm')
-    });
+    } as NgbModalRef);
     spyOn(ContextService, 'resetImageSaveDestination');
 
     ctrl.cancel();
     $scope.$apply();
 
     expect(ContextService.resetImageSaveDestination).toHaveBeenCalled();
-  });
+  }));
 
   it('should close \'confirm question modal exit\' modal when user clicks' +
-    ' cancel', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject('close')
+    ' cancel', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        result: Promise.reject()
+      } as NgbModalRef);
     });
 
     ctrl.cancel();
+    tick();
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
-  });
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
   it('should update skill difficulty when user selects a difficulty', () => {
     let skill = SkillDifficulty.create('skillId1', '', 0.9);
@@ -665,7 +676,7 @@ describe('QuestionsListComponent', () => {
           associated_skill_dicts: [{
             id: 'skillId1',
             misconceptions: [{
-              id: 'misconception1',
+              id: 1,
               feedback: '',
               must_be_addressed: false,
               notes: '',
@@ -1015,11 +1026,11 @@ describe('QuestionsListComponent', () => {
   });
 
   it('should open question editor save modal if question' +
-    ' is being updated when user click on \'SAVE\' button', () => {
+    ' is being updated when user click on \'SAVE\' button', fakeAsync(() => {
     ctrl.questionIsBeingUpdated = true;
-    spyOn($uibModal, 'open').and.returnValue({
+    spyOn(ngbModal, 'open').and.returnValue({
       result: $q.resolve('commit')
-    });
+    } as NgbModalRef);
     spyOn(ctrl, 'updateSkillLinkageAndQuestions');
     spyOn(ctrl, 'saveAndPublishQuestion');
 
@@ -1027,6 +1038,7 @@ describe('QuestionsListComponent', () => {
     ctrl.skillLinkageModificationsArray = ['1', '2'];
 
     ctrl.saveQuestion();
+    tick();
     $scope.$apply();
 
     expect(ctrl.updateSkillLinkageAndQuestions).toHaveBeenCalledWith('commit');
@@ -1035,10 +1047,11 @@ describe('QuestionsListComponent', () => {
     ctrl.skillLinkageModificationsArray = [];
 
     ctrl.saveQuestion();
+    tick();
     $scope.$apply();
 
     expect(ctrl.saveAndPublishQuestion).toHaveBeenCalledWith('commit');
-  });
+  }));
 
   it('should create new question if user clicks on \'SAVE\' and if question' +
     ' is not being updates', () => {
@@ -1052,20 +1065,22 @@ describe('QuestionsListComponent', () => {
     expect(SkillEditorRoutingService.creatingNewQuestion).toHaveBeenCalled();
   });
 
-  it('should close question editor save modal if user clicks cancel', () => {
-    ctrl.questionIsBeingUpdated = true;
-    spyOn(ctrl, 'saveAndPublishQuestion');
-    ctrl.skillLinkageModificationsArray = ['1', '2'];
+  it('should close question editor save modal if user clicks cancel',
+    fakeAsync(() => {
+      ctrl.questionIsBeingUpdated = true;
+      spyOn(ctrl, 'saveAndPublishQuestion');
+      ctrl.skillLinkageModificationsArray = ['1', '2'];
 
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: $q.reject()
+      } as NgbModalRef);
 
-    ctrl.saveQuestion();
-    $scope.$apply();
+      ctrl.saveQuestion();
+      tick();
+      $scope.$apply();
 
-    expect(ctrl.saveAndPublishQuestion).not.toHaveBeenCalled();
-  });
+      expect(ctrl.saveAndPublishQuestion).not.toHaveBeenCalled();
+    }));
 
   it('should get cached question summaries for one skill', () => {
     let summary = QuestionSummary

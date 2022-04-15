@@ -43,7 +43,6 @@ import sys
 sys.path.append(os.getcwd())
 from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
 from scripts import install_backend_python_libs # isort:skip  # pylint: disable=wrong-import-position
-from core import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
@@ -113,6 +112,10 @@ def get_remote_name():
 
     Returns:
         str. The remote name of the local repository.
+
+    Raises:
+        ValueError. Subprocess failed to start.
+        Exception. Upstream not set.
     """
     remote_name = ''
     remote_num = 0
@@ -150,7 +153,8 @@ def get_remote_name():
             'command \'git remote add upstream '
             'https://github.com/oppia/oppia.git\'\n'
         )
-    elif remote_num > 1:
+
+    if remote_num > 1:
         print(
             'Warning: Please keep only one remote branch for oppia:develop '
             'to run the lint checks efficiently.\n')
@@ -159,12 +163,12 @@ def get_remote_name():
 
 
 def git_diff_name_status(left, right, diff_filter=''):
-    """Compare two branches/commits etc with git.
+    """Compare two branches/commits with git.
 
     Parameter:
-        left: the lefthand comperator
-        right: the righthand comperator
-        diff_filter: arguments given to --diff-filter (ACMRTD...)
+        left: str. The name of the lefthand branch.
+        right: str. The name of the righthand branch.
+        diff_filter: str. Arguments given to --diff-filter (ACMRTD...).
 
     Returns:
         list. List of FileDiffs (tuple with name/status).
@@ -175,7 +179,7 @@ def git_diff_name_status(left, right, diff_filter=''):
     git_cmd = ['git', 'diff', '--name-status']
     if diff_filter:
         git_cmd.append('--diff-filter={}'.format(diff_filter))
-    git_cmd.extend([left, right])
+    git_cmd.extend([left.encode('utf-8'), right.encode('utf-8')])
     # Append -- to avoid conflicts between branch and directory name.
     # More here: https://stackoverflow.com/questions/26349191
     git_cmd.append('--')
@@ -219,18 +223,18 @@ def get_merge_base(branch, other_branch):
         ['git', 'merge-base', branch, other_branch])
     if err:
         raise ValueError(err)
-    else:
-        return merge_base.strip()
+
+    return merge_base.decode('utf-8').strip()
 
 
 def compare_to_remote(remote, local_branch, remote_branch=None):
     """Compare local with remote branch with git diff.
 
     Parameter:
-        remote: Git remote being pushed to
-        local_branch: Git branch being pushed to
-        remote_branch: The branch on the remote to test against. If None same
-            as local branch.
+        remote: str. Name of the git remote being pushed to.
+        local_branch: str. Name of the git branch being pushed to.
+        remote_branch: str|None. The name of the branch on the remote
+            to test against. If None same as local branch.
 
     Returns:
         list(str). List of file names that are modified, changed, renamed or
@@ -240,7 +244,7 @@ def compare_to_remote(remote, local_branch, remote_branch=None):
         ValueError. Raise ValueError if git command fails.
     """
     remote_branch = remote_branch if remote_branch else local_branch
-    git_remote = b'%s/%s' % (remote, remote_branch)
+    git_remote = '%s/%s' % (remote, remote_branch)
     # Ensure that references to the remote branches exist on the local machine.
     start_subprocess_for_result(['git', 'pull', remote])
     # Only compare differences to the merge base of the local and remote
@@ -266,7 +270,7 @@ def get_parent_branch_name_for_diff():
     if common.is_current_branch_a_hotfix_branch():
         return 'release-%s' % common.get_current_release_version_number(
             common.get_current_branch_name())
-    return b'develop'
+    return 'develop'
 
 
 def collect_files_being_pushed(ref_list, remote):
@@ -274,7 +278,7 @@ def collect_files_being_pushed(ref_list, remote):
 
     Parameter:
         ref_list: list of references to parse (provided by git in stdin)
-        remote: the remote being pushed to
+        remote: str. The name of the remote being pushed to.
 
     Returns:
         dict. Dict mapping branch names to 2-tuples of the form (list of
@@ -293,7 +297,7 @@ def collect_files_being_pushed(ref_list, remote):
     collected_files = {}
     # Git allows that multiple branches get pushed simultaneously with the "all"
     # flag. Therefore we need to loop over the ref_list provided.
-    for branch, _ in python_utils.ZIP(branches, hashes):
+    for branch, _ in zip(branches, hashes):
         # Get the difference to remote/develop.
         modified_files = compare_to_remote(
             remote, branch, remote_branch=get_parent_branch_name_for_diff())
@@ -499,7 +503,7 @@ def main(args=None):
     remote = get_remote_name()
     remote = remote if remote else args.remote
     refs = get_refs()
-    collected_files = collect_files_being_pushed(refs, remote)
+    collected_files = collect_files_being_pushed(refs, remote.decode('utf-8'))
     # Only interfere if we actually have something to lint (prevent annoyances).
     if collected_files and has_uncommitted_files():
         print(

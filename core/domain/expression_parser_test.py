@@ -23,8 +23,8 @@ from core.tests import test_utils
 
 
 class HelperFunctionsUnitTests(test_utils.GenericTestBase):
-    """Test the 'contains_balanced_brackets' and 'is_algebraic' helper
-    functions.
+    """Test the 'contains_balanced_brackets' and
+    'contains_at_least_one_variable' helper functions.
     """
 
     def test_contains_balanced_brackets(self):
@@ -53,32 +53,44 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         self.assertFalse(expression_parser.contains_balanced_brackets('4/{0/]'))
         self.assertFalse(expression_parser.contains_balanced_brackets('(a/2]'))
 
-    def test_is_algebraic(self):
-        """Tests for is_algebraic method."""
-        self.assertTrue(expression_parser.is_algebraic('a^2.3'))
-        self.assertTrue(expression_parser.is_algebraic('abs(alpha)'))
-        self.assertTrue(expression_parser.is_algebraic('alpha/gamma'))
-        self.assertTrue(expression_parser.is_algebraic('A + 2/3'))
+    def test_contains_at_least_one_variable(self):
+        """Tests for contains_at_least_one_variable method."""
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('a^2.3'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('abs(alpha)'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('alpha/gamma'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('A + 2/3'))
         # The following tests might seem as invalid but the individual letters
         # will be joined via '*' during tokenization which makes them valid.
-        self.assertTrue(expression_parser.is_algebraic('Alpha'))
-        self.assertTrue(expression_parser.is_algebraic('invalid + 2'))
-        self.assertTrue(expression_parser.is_algebraic('alpha + bet/22'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('Alpha'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('invalid + 2'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('alpha + bet/22'))
 
-        self.assertFalse(expression_parser.is_algebraic('1 + 2'))
-        self.assertFalse(expression_parser.is_algebraic('1^2^3/4'))
-        self.assertFalse(expression_parser.is_algebraic('1'))
-        self.assertFalse(expression_parser.is_algebraic('sqrt(4/4)'))
-        self.assertFalse(expression_parser.is_algebraic('tan(30)'))
+        self.assertFalse(
+            expression_parser.contains_at_least_one_variable('1 + 2'))
+        self.assertFalse(
+            expression_parser.contains_at_least_one_variable('1^2^3/4'))
+        self.assertFalse(expression_parser.contains_at_least_one_variable('1'))
+        self.assertFalse(
+            expression_parser.contains_at_least_one_variable('sqrt(4/4)'))
+        self.assertFalse(
+            expression_parser.contains_at_least_one_variable('tan(30)'))
 
-        with self.assertRaisesRegexp(Exception, 'Invalid bracket pairing.'):
-            expression_parser.is_algebraic('1 +2)')
-        with self.assertRaisesRegexp(Exception, 'Invalid character: ~.'):
-            expression_parser.is_algebraic('a~2')
-        with self.assertRaisesRegexp(Exception, 'Invalid character: !.'):
-            expression_parser.is_algebraic('4! 2')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
-            expression_parser.is_algebraic('alpha + bet/22.3.4')
+        with self.assertRaisesRegex(Exception, 'Invalid bracket pairing.'):
+            expression_parser.contains_at_least_one_variable('1 +2)')
+        with self.assertRaisesRegex(Exception, 'Invalid character: ~.'):
+            expression_parser.contains_at_least_one_variable('a~2')
+        with self.assertRaisesRegex(Exception, 'Invalid character: !.'):
+            expression_parser.contains_at_least_one_variable('4! 2')
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
+            expression_parser.contains_at_least_one_variable(
+                'alpha + bet/22.3.4')
 
     def test_tokenize(self):
         """Tests for tokenize method."""
@@ -233,17 +245,17 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('a.3')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('.3 -  2.4')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('1.2.3 + 4/2')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('a . . 3')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('3..4')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('..5')
 
     def test_get_variables(self):
@@ -287,9 +299,9 @@ class TokenUnitTests(test_utils.GenericTestBase):
         self.assertEqual(expression_parser.Token('abs').category, 'function')
         self.assertEqual(expression_parser.Token('tan').category, 'function')
 
-        with self.assertRaisesRegexp(Exception, 'Invalid token: tan().'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: tan().'):
             expression_parser.Token('tan()')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: Sqrt.'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: Sqrt.'):
             expression_parser.Token('Sqrt')
 
     def test_is_identifier(self):
@@ -300,7 +312,7 @@ class TokenUnitTests(test_utils.GenericTestBase):
             expression_parser.Token('alpha').category, 'identifier')
         self.assertEqual(expression_parser.Token('A').category, 'identifier')
 
-        with self.assertRaisesRegexp(Exception, 'Invalid token: al.'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: al.'):
             expression_parser.Token('al')
         self.assertNotEqual(
             expression_parser.Token('5').category, 'identifier')
@@ -314,7 +326,7 @@ class TokenUnitTests(test_utils.GenericTestBase):
         self.assertEqual(expression_parser.Token('pi').category, 'number')
         self.assertEqual(expression_parser.Token('e').category, 'number')
 
-        with self.assertRaisesRegexp(Exception, 'Invalid token: 8.4.3.'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: 8.4.3.'):
             expression_parser.Token('8.4.3')
 
     def test_is_operator(self):

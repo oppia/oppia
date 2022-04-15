@@ -106,7 +106,15 @@ describe('State Graph Visualization directive', function() {
       reachableFromEnd: false
     }
   };
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   importAllAngularServices();
 
@@ -311,6 +319,20 @@ describe('State Graph Visualization directive', function() {
           });
         expect($scope.getNodeErrorMessage('This is a label for node 1')).toBe(
           nodeErrorMessage);
+      });
+
+      it('should throw error when nodeId is undefined', () => {
+        $scope.currentStateId = () => undefined;
+        $scope.centerAtCurrentState = true;
+        $scope.allowPanning = false;
+        spyOn($element, 'height').and.returnValue(10);
+        spyOn($element, 'width').and.returnValue(10);
+        try {
+          $scope.getCenterGraph();
+          $flushPendingTasks();
+        } catch (e) {
+          expect(e).toBe(TypeError);
+        }
       });
     });
 

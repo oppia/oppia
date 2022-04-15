@@ -96,6 +96,66 @@ export class MathInteractionsService {
     return errorMessage;
   }
 
+  isParenRedundant(
+      expressionString: string,
+      openingInd: number,
+      closingInd: number
+  ): boolean {
+    /*
+    Assumes that expressionString is syntactically valid.
+
+    Multiple consecutive parens are considered redundant. eg: for ((a - b))
+    the outer pair of parens are considered as redundant.
+    */
+    if ((closingInd + 2 < expressionString.length &&
+        expressionString[closingInd + 2] === '^') ||
+        (openingInd - 2 >= 0 &&
+        expressionString[openingInd - 2] === '^')) {
+      // Guppy adds redundant parens while using exponents, so we need to ignore
+      // them.
+      return false;
+    }
+    let leftParenIsRedundant = (
+      openingInd - 1 >= 0 && expressionString[openingInd - 1] === '(');
+    let rightParenIsRedundant = (
+      closingInd + 1 < expressionString.length &&
+      expressionString[closingInd + 1] === ')');
+    return leftParenIsRedundant && rightParenIsRedundant;
+  }
+
+  /**
+  * This function checks if an expression contains redundant params. It assumes
+  * that the expression will be syntactically valid.
+  * @param expressionString The math expression to be validated.
+  *
+  * @returns [boolean, string]. The boolean represents if the given expression
+  * contains any redundant params, and the string is the substring of the
+  * expression that contains redundant params.
+  */
+  containsRedundantParens(expressionString: string): [boolean, string] {
+    let stack: number[] = [];
+
+    for (let i = 0; i < expressionString.length; i++) {
+      let char = expressionString[i];
+      if (char === '(') {
+        // Hack to identify if this is the opening paren of a function call
+        // like sqrt(...). If so, we ignore that paren.
+        if (i > 0 && expressionString[i - 1].match(/[a-zA-Z]|\^/)) {
+          stack.push(-1);
+        } else {
+          stack.push(i);
+        }
+      } else if (char === ')') {
+        let openingInd = stack.pop() || 0;
+        if (openingInd !== -1 && this.isParenRedundant(
+          expressionString, openingInd, i)) {
+          return [true, expressionString.slice(openingInd - 1, i + 2)];
+        }
+      }
+    }
+    return [false, ''];
+  }
+
   _validateExpression(expressionString: string): boolean {
     expressionString = expressionString.replace(/\s/g, '');
     if (expressionString.length === 0) {
@@ -122,6 +182,19 @@ export class MathInteractionsService {
         'Your answer contains an invalid term: ' + invalidIntegers[0]);
       return false;
     }
+    let invalidMultiTerms = expressionString.match(/([a-zA-Z]+\d+)/g);
+    if (invalidMultiTerms !== null) {
+      let firstNumberIndex = invalidMultiTerms[0].search(/\d/);
+      let correctString = (
+        invalidMultiTerms[0].slice(firstNumberIndex) +
+        invalidMultiTerms[0].slice(0, firstNumberIndex));
+      this.warningText = (
+        'When multiplying, the variable should come after the number: ' +
+        correctString + '. Please update your answer and try again.'
+      );
+      return false;
+    }
+
     try {
       expressionString = this.insertMultiplicationSigns(expressionString);
       nerdamer(expressionString);
@@ -132,6 +205,35 @@ export class MathInteractionsService {
       }
       return false;
     }
+
+    if (expressionString.match(/\w\^((\w+\^)|(\(.*\^.*\)))/g)) {
+      this.warningText = (
+        'Your expression contains an exponent in an exponent ' +
+        'which is not supported.');
+      return false;
+    }
+
+    let exponents = expressionString.match(/\^((\([^\(\)]*\))|(\w+))/g);
+    if (exponents !== null) {
+      for (let exponent of exponents) {
+        exponent = exponent.replace(/^\^/g, '');
+        if (nerdamer(exponent).gt('5')) {
+          this.warningText = (
+            'Your expression contains an exponent with value greater than 5 ' +
+            'which is not supported.');
+          return false;
+        }
+      }
+    }
+
+    let [expressionContainsRedundantParens, errorString] = (
+      this.containsRedundantParens(expressionString));
+    if (expressionContainsRedundantParens) {
+      this.warningText = (
+        `Your expression contains redundant parentheses: ${errorString}.`);
+      return false;
+    }
+
     this.warningText = '';
     return true;
   }
@@ -160,12 +262,8 @@ export class MathInteractionsService {
         variablesList[i] = greekNameToSymbolMap[variablesList[i]];
       }
     }
-    if (variablesList.length === 0) {
-      this.warningText = 'It looks like you have entered only ' +
-      'numbers. Make sure to include the necessary variables' +
-      ' mentioned in the question.';
-      return false;
-    } else if (validVariablesList.length !== 0) {
+
+    if (validVariablesList.length !== 0) {
       for (let variable of variablesList) {
         if (validVariablesList.indexOf(variable) === -1) {
           this.warningText = (
@@ -307,6 +405,12 @@ export class MathInteractionsService {
       expressionString = expressionString.replace(new RegExp(
         '([a-zA-Z0-9\)])' + functionName, 'g'), '$1*' + functionName);
     }
+
+    // Inserting multiplication signs between digit and variable.
+    // For eg. 5w - z => 5*w - z.
+    expressionString = expressionString.replace(new RegExp(
+      '([0-9])([a-zA-Z])', 'g'), '$1*$2');
+
     // Inserting multiplication signs after closing parens.
     expressionString = expressionString.replace(/\)([^\*\+\/\-\^\)])/g, ')*$1');
     // Inserting multiplication signs before opening parens.
@@ -417,9 +521,43 @@ export class MathInteractionsService {
     return listOfTerms;
   }
 
+  replaceConstantsWithVariables(
+      expressionString: string, replaceZero = true): string {
+    // Multiple instances of the same constant will be replaced by the same
+    // variable.
+
+    if (replaceZero) {
+      // Replacing decimals with variables.
+      // Eg: 3.4 + x => const3point4 + x
+      // We need to do this differently since const3.4 would be
+      // an invalid variable.
+      expressionString = expressionString.replace(
+        /([0-9]+)\.([0-9]+)/g, 'const$1point$2');
+
+      // Replacing integers with variables.
+      // Eg: 2 + x * 4 + 2 => const2 + x * const4 + const2
+      // const2, const4 are considered as variables by nerdamer, just like x.
+      expressionString = expressionString.replace(/([0-9]+)/g, 'const$1');
+    } else {
+      expressionString = expressionString.replace(
+        /([1-9]+)\.([1-9]+)/g, 'const$1point$2');
+      expressionString = expressionString.replace(/([1-9]+)/g, 'const$1');
+    }
+    return expressionString;
+  }
+
+  doPartsMatch(part1: string, part2: string): boolean {
+    // Splitting a term by '*' or '/' would give a list of parts.
+    // Nerdamer simplifies constant terms automatically so to avoid that,
+    // we'll replace all constants with a variable.
+    part1 = this.replaceConstantsWithVariables(part1);
+    part2 = this.replaceConstantsWithVariables(part2);
+    return nerdamer(part1).eq(nerdamer(part2).toString());
+  }
+
   // The input terms to this function should be the terms split by '+'/'-'
   // from an expression.
-  termsMatch(term1: string, term2: string): boolean {
+  doTermsMatch(term1: string, term2: string): boolean {
     // We split both terms by multiplication and division into separate parts
     // and try to match these parts from both inputs by checking equivalency.
     let partsList1 = this.getTerms(term1, false);
@@ -431,7 +569,7 @@ export class MathInteractionsService {
     // loop.
     for (let i = partsList1.length - 1; i >= 0; i--) {
       for (let j = 0; j < partsList2.length; j++) {
-        if (nerdamer(partsList1[i]).eq(nerdamer(partsList2[j]).toString())) {
+        if (this.doPartsMatch(partsList1[i], partsList2[j])) {
           partsList1.splice(i, 1);
           partsList2.splice(j, 1);
           break;
@@ -494,6 +632,11 @@ export class MathInteractionsService {
 
     // Checks if all terms have matched.
     return termsWithPlaceholders.length + inputTerms.length === 0;
+  }
+
+  containsAtLeastOneVariable(expressionString: string): boolean {
+    let variablesList = nerdamer(expressionString).variables();
+    return variablesList.length > 0;
   }
 }
 

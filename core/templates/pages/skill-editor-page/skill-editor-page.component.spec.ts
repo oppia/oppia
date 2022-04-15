@@ -17,6 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -28,6 +29,12 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
+class MockNgbModalRef {
+  componentInstance: {
+    body: 'xyz';
+  };
+}
+
 require('pages/skill-editor-page/skill-editor-page.component.ts');
 
 describe('Skill editor page', function() {
@@ -36,18 +43,28 @@ describe('Skill editor page', function() {
   var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
   var UndoRedoService = null;
-  var $uibModal = null;
+  let ngbModal: NgbModal = null;
   var UrlService = null;
   var $rootScope = null;
   var mockOnSkillChangeEmitter = new EventEmitter();
 
   importAllAngularServices();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     PreventPageUnloadEventService = $injector.get(
       'PreventPageUnloadEventService');
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
@@ -111,10 +128,16 @@ describe('Skill editor page', function() {
     expect(routingSpy).toHaveBeenCalled();
   });
 
-  it('should open save changes modal with $uibModal when unsaved changes are' +
+  it('should open save changes modal with ngbModal when unsaved changes are' +
     ' present', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve()
+      }) as NgbModalRef;
+    });
+
     ctrl.selectQuestionsTab();
     expect(modalSpy).toHaveBeenCalled();
   });

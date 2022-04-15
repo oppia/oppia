@@ -47,7 +47,7 @@ class ModelProperty:
         """
         if not isinstance(model_class, type):
             raise TypeError('%r is not a model class' % model_class)
-        elif not issubclass(model_class, base_models.BaseModel):
+        if not issubclass(model_class, base_models.BaseModel):
             raise TypeError('%r is not a subclass of BaseModel' % model_class)
 
         self._model_kind = job_utils.get_model_kind(model_class)

@@ -17,10 +17,8 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
+import { EventEmitter, Injectable } from '@angular/core';
 import {
   BackendChangeObject,
   Change,
@@ -36,6 +34,8 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
   providedIn: 'root',
 })
 export class SkillUpdateService {
+  private _prerequisiteSkillChanged = new EventEmitter();
+
   constructor(private undoRedoService: UndoRedoService) {}
 
   private _applyChange = (
@@ -74,7 +74,7 @@ export class SkillUpdateService {
 
   private _applyMisconceptionPropertyChange = (
       skill,
-      misconceptionId: string,
+      misconceptionId: number,
       propertyName: string,
       newValue: string | boolean,
       oldValue: string | boolean,
@@ -280,7 +280,7 @@ export class SkillUpdateService {
     );
   }
 
-  deleteMisconception(skill: Skill, misconceptionId: string): void {
+  deleteMisconception(skill: Skill, misconceptionId: number): void {
     const params = {
       misconception_id: misconceptionId,
     };
@@ -313,6 +313,7 @@ export class SkillUpdateService {
         skill.deletePrerequisiteSkill(skillId);
       }
     );
+    this._prerequisiteSkillChanged.emit();
   }
 
   deletePrerequisiteSkill(skill: Skill, skillId: string): void {
@@ -330,11 +331,16 @@ export class SkillUpdateService {
         skill.addPrerequisiteSkill(skillId);
       }
     );
+    this._prerequisiteSkillChanged.emit();
+  }
+
+  get onPrerequisiteSkillChange(): EventEmitter<unknown> {
+    return this._prerequisiteSkillChanged;
   }
 
   updateMisconceptionName(
       skill: Skill,
-      misconceptionId: string,
+      misconceptionId: number,
       oldName: string,
       newName: string
   ): void {
@@ -358,7 +364,7 @@ export class SkillUpdateService {
 
   updateMisconceptionMustBeAddressed(
       skill: Skill,
-      misconceptionId: string,
+      misconceptionId: number,
       oldValue: boolean,
       newValue: boolean
   ): void {
@@ -382,7 +388,7 @@ export class SkillUpdateService {
 
   updateMisconceptionNotes(
       skill: Skill,
-      misconceptionId: string,
+      misconceptionId: number,
       oldNotes: string,
       newNotes: string
   ): void {
@@ -406,7 +412,7 @@ export class SkillUpdateService {
 
   updateMisconceptionFeedback(
       skill: Skill,
-      misconceptionId: string,
+      misconceptionId: number,
       oldFeedback: string,
       newFeedback: string
   ): void {

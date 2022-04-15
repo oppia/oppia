@@ -23,9 +23,6 @@ require(
   'pages/exploration-editor-page/translation-tab/state-translation/' +
   'state-translation.component.ts');
 require(
-  'pages/exploration-editor-page/translation-tab/modal-templates/' +
-  'welcome-translation-modal.controller.ts');
-require(
   'pages/exploration-editor-page/translation-tab/' +
   'state-translation-status-graph/state-translation-status-graph.component.ts');
 require(
@@ -53,23 +50,25 @@ require(
 require('services/context.service.ts');
 require('services/editability.service.ts');
 require('pages/admin-page/services/admin-router.service.ts');
+require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
+import { WelcomeTranslationModalComponent } from 'pages/exploration-editor-page/translation-tab/modal-templates/welcome-translation-modal.component';
 
 angular.module('oppia').component('translationTab', {
   template: require('./translation-tab.component.html'),
   controller: [
-    '$scope', '$templateCache', '$uibModal',
+    '$rootScope', '$scope', '$templateCache',
     'ContextService', 'EditabilityService', 'ExplorationStatesService',
-    'LoaderService', 'RouterService', 'SiteAnalyticsService',
+    'LoaderService', 'NgbModal', 'RouterService', 'SiteAnalyticsService',
     'StateEditorService', 'StateRecordedVoiceoversService',
     'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
     'TranslationTabActiveModeService',
     'UserExplorationPermissionsService',
     function(
-        $scope, $templateCache, $uibModal,
+        $rootScope, $scope, $templateCache,
         ContextService, EditabilityService, ExplorationStatesService,
-        LoaderService, RouterService, SiteAnalyticsService,
+        LoaderService, NgbModal, RouterService, SiteAnalyticsService,
         StateEditorService, StateRecordedVoiceoversService,
         StateTutorialFirstTimeService, StateWrittenTranslationsService,
         TranslationTabActiveModeService,
@@ -133,16 +132,13 @@ angular.module('oppia').component('translationTab', {
       };
 
       $scope.showWelcomeTranslationModal = function() {
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/translation-tab/' +
-            'modal-templates/welcome-translation-modal.template.html'),
+        NgbModal.open(WelcomeTranslationModalComponent, {
           backdrop: true,
-          controller: 'WelcomeTranslationModalController',
           windowClass: 'oppia-welcome-modal'
         }).result.then(function(explorationId) {
           SiteAnalyticsService.registerAcceptTutorialModalEvent(
             explorationId);
+          $rootScope.$applyAsync();
           $scope.startTutorial();
         }, function(explorationId) {
           SiteAnalyticsService.registerDeclineTutorialModalEvent(

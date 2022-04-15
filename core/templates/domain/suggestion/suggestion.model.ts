@@ -84,6 +84,7 @@ export class Suggestion {
       suggestionBackendDict.change.old_value,
       suggestionBackendDict.last_updated_msecs);
   }
+
   getThreadId(): string {
     return this.threadId;
   }

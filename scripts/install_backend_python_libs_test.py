@@ -27,7 +27,7 @@ import shutil
 import subprocess
 import sys
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts import install_backend_python_libs
@@ -119,7 +119,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 pass
 
         self.open_file_swap = self.swap(
-            python_utils, 'open_file', MockOpenFile)
+            utils, 'open_file', MockOpenFile)
 
         self.cmd_token_list = []
         def mock_check_call(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
@@ -193,7 +193,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.INVALID_GIT_REQUIREMENTS_TEST_TXT_FILE_PATH)
 
         with swap_requirements:
-            self.assertRaisesRegexp(
+            self.assertRaisesRegex(
                 Exception, 'does not match GIT_DIRECT_URL_REQUIREMENT_PATTERN',
                 install_backend_python_libs.get_mismatches)
 
@@ -643,7 +643,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             os.path, 'isdir', mock_is_dir
         )
 
-        metadata_exception = self.assertRaisesRegexp(
+        metadata_exception = self.assertRaisesRegex(
             Exception,
             'The python library dependency5 was installed without the correct '
             'metadata folders which may indicate that the convention for '
@@ -662,7 +662,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         # with an optional suffix of the pattern [str] with no brackets inside
         # the outside brackets.
         library_name_pattern = re.compile(r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$')
-        with python_utils.open_file(
+        with utils.open_file(
             common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
             for line in lines:
@@ -684,7 +684,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_backend_python_libs.pip_install('pkg==ver', 'path')
 
     def test_pip_install_exception_handling(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Error installing package'
         ):
             install_backend_python_libs.pip_install('package==version', 'path')
@@ -696,7 +696,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         try:
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.swap_check_call:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     ImportError,
                     'Error importing pip: import of pip halted; '
                     'None in sys.modules'
@@ -716,7 +716,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         try:
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.swap_check_call:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     ImportError,
                     'Error importing pip: import of pip halted; '
                     'None in sys.modules'
@@ -735,7 +735,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         try:
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.swap_check_call:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     ImportError,
                     'Error importing pip: import of pip halted; '
                     'None in sys.modules'
@@ -750,7 +750,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_uniqueness_of_normalized_lib_names_in_requirements_file(self):
         normalized_library_names = set()
-        with python_utils.open_file(common.REQUIREMENTS_FILE_PATH, 'r') as f:
+        with utils.open_file(common.REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
@@ -768,7 +768,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     def test_uniqueness_of_normalized_lib_names_in_compiled_requirements_file(
             self):
         normalized_library_names = set()
-        with python_utils.open_file(
+        with utils.open_file(
             common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
             for line in lines:

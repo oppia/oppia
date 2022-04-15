@@ -963,7 +963,7 @@ class MainTests(test_utils.GenericTestBase):
             ])
 
         with parse_url_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 RuntimeError,
                 'Failed to parse PR URL %s' % url,
             ):
@@ -990,7 +990,7 @@ class MainTests(test_utils.GenericTestBase):
             ])
 
         with parse_url_swap, lookup_pr_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 RuntimeError,
                 'Failed to load PR',
             ):
@@ -1041,7 +1041,7 @@ class MainTests(test_utils.GenericTestBase):
 
         with parse_url_swap, lookup_pr_swap, load_diff_swap:
             with run_cmd_swap:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     RuntimeError,
                     'Failed to load PR diff',
                 ):

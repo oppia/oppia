@@ -125,7 +125,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skills[1].description, 'Description B')
         self.assertEqual(skills[1].misconceptions, [])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'No skill exists for ID skill_c'):
             skill_fetchers.get_multi_skills(['skill_a', 'skill_c'])
 
@@ -133,6 +133,9 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         expected_skill = self.skill.to_dict()
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         self.assertEqual(skill.to_dict(), expected_skill)
+        self.assertEqual(
+            skill_fetchers.get_skill_by_id('Does Not Exist', strict=False), None
+        )
 
     def test_get_skill_from_model_with_invalid_skill_contents_schema_version(
             self):
@@ -155,7 +158,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d skill schemas at '
             'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
@@ -200,7 +203,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d misconception schemas at '
             'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
@@ -244,7 +247,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d rubric schemas at '
             'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
@@ -279,3 +282,55 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID, version=2)
         self.assertEqual(skill.id, self.SKILL_ID)
         self.assertEqual(skill.language_code, 'bn')
+
+    def test_get_skill_from_model_with_latest_schemas_version(self):
+        commit_cmd = skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
+        model = skill_models.SkillModel(
+            id='skill_id',
+            description='description',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[],
+            next_misconception_id=0,
+            misconceptions_schema_version=2,
+            rubric_schema_version=2,
+            skill_contents_schema_version=2,
+            all_questions_merged=False,
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
+                [example_1],
+                state_domain.RecordedVoiceovers.from_dict({
+                    'voiceovers_mapping': {
+                        '1': {}, '2': {}, '3': {}
+                    }
+                }),
+                state_domain.WrittenTranslations.from_dict({
+                    'translations_mapping': {
+                        '1': {}, '2': {}, '3': {}
+                    }
+                })
+            ).to_dict()
+        )
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        model.commit(
+            self.user_id_admin, 'skill model created', commit_cmd_dicts)
+
+        skill = skill_fetchers.get_skill_from_model(model)
+        self.assertEqual(
+            skill.misconceptions_schema_version,
+            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+        )
+        self.assertEqual(
+            skill.skill_contents_schema_version,
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+        )
+        self.assertEqual(
+            skill.rubric_schema_version,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION
+        )

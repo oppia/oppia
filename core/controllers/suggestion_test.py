@@ -18,10 +18,11 @@
 
 from __future__ import annotations
 
+import base64
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -51,7 +52,6 @@ from core.tests import test_utils
 
 class SuggestionUnitTests(test_utils.GenericTestBase):
 
-    IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
     ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
     EXP_ID = 'exp1'
     TRANSLATION_LANGUAGE_CODE = 'en'
@@ -171,7 +171,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'content_id': 'content',
                     'language_code': 'hi',
                     'content_html': '<p>old content html</p>',
-                    'translation_html': '<p>In Hindi</p>',
+                    'translation_html': '<p>In हिन्दी (Hindi)</p>',
                     'data_format': 'html'
                 },
                 'description': 'change to state 3',
@@ -689,13 +689,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
             raw_image = f.read()
         self.post_json(
-            '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
+            '%s/exploration/%s' % (
+                feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
             {'filename': 'img.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))
@@ -741,10 +742,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                         '</oppia-noninteractive-image>'),
                     'data_format': 'html'
                 },
-            }, csrf_token=csrf_token,
-            upload_files=(
-                ('translation_image.png', 'translation_image.png', raw_image), )
-            )
+                'description': 'test',
+                'files': {
+                    'translation_image.png': (
+                        base64.b64encode(raw_image).decode('utf-8'))
+                 },
+            },
+            csrf_token=csrf_token
+        )
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
@@ -926,12 +931,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     def test_update_suggestion_updates_question_suggestion_content(self):
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, self.author_id, description='description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
@@ -959,30 +961,34 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
-        question_state_data['content'][
-            'html'] = (
-                '<p>Updated question</p>'
-                '<oppia-noninteractive-image filepath-with-value='
-                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
-                'alt-with-value="&quot;Image&quot;">'
-                '</oppia-noninteractive-image>')
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
+        question_state_data['content']['html'] = (
+            '<p>Updated question</p>'
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>')
+        question_state_data['interaction']['solution'] = new_solution_dict
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb',
+            encoding=None
+        ) as f:
             raw_image = f.read()
 
-        self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
+        self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ), {
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6
-            }, csrf_token=csrf_token, upload_files=(
-                ('img.png', 'img.png', raw_image),))
+            },
+            csrf_token=csrf_token,
+            upload_files=(('img.png', 'img.png', raw_image),)
+        )
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
@@ -990,28 +996,23 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'question_state_data']
 
         self.assertEqual(
-            new_question_state_data['content'][
-                'html'],
-            (
-                '<p>Updated question</p>'
-                '<oppia-noninteractive-image filepath-with-value='
-                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
-                'alt-with-value="&quot;Image&quot;">'
-                '</oppia-noninteractive-image>'))
+            new_question_state_data['content']['html'],
+            '<p>Updated question</p>'
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>'
+        )
         self.assertEqual(
-            new_question_state_data['interaction'][
-                'solution'],
+            new_question_state_data['interaction']['solution'],
             new_solution_dict)
         self.logout()
 
     def test_cannot_update_question_with_invalid_skill_difficulty(self):
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, self.author_id, description='description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
@@ -1031,8 +1032,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
-        question_state_data['content'][
-            'html'] = '<p>Updated question</p>'
+        question_state_data['content']['html'] = '<p>Updated question</p>'
         new_solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
@@ -1041,18 +1041,23 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is the updated solution.</p>',
             },
         }
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
+        question_state_data['interaction']['solution'] = new_solution_dict
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
+        response = self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ),
+            {
                 'question_state_data': question_state_data,
                 'skill_difficulty': '0.6'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
 
         self.assertEqual(
             response['error'],
@@ -1061,12 +1066,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_update_question_without_state_data(self):
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, self.author_id, description='description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
@@ -1094,19 +1096,23 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
-        question_state_data['content'][
-            'html'] = '<p>Updated question</p>'
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
+        question_state_data['content']['html'] = '<p>Updated question</p>'
+        question_state_data['interaction']['solution'] = new_solution_dict
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
+        response = self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ),
+            {
                 'skill_difficulty': 0.6
-            }, csrf_token=csrf_token, expected_status_int=400)
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
 
         self.assertEqual(
             response['error'],
@@ -1118,9 +1124,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
@@ -1148,23 +1152,26 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
-        question_state_data['content'][
-            'html'] = '<p>Updated question</p>'
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
+        question_state_data['content']['html'] = '<p>Updated question</p>'
+        question_state_data['interaction']['solution'] = new_solution_dict
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
+        response = self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ),
+            {
                 'question_state_data': question_state_data
-            }, csrf_token=csrf_token, expected_status_int=400)
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
 
         self.assertEqual(
-            response['error'],
-            'The parameter \'skill_difficulty\' is missing.')
+            response['error'], 'The parameter \'skill_difficulty\' is missing.')
         self.logout()
 
     def test_cannot_update_already_handled_question(self):
@@ -1172,9 +1179,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
@@ -1205,25 +1210,31 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
-        question_state_data['content'][
-            'html'] = '<p>Updated question</p>'
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
+        question_state_data['content']['html'] = '<p>Updated question</p>'
+        question_state_data['interaction']['solution'] = new_solution_dict
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
+        response = self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ),
+            {
                 'question_state_data': question_state_data,
                 'skill_difficulty': '0.6'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
 
         self.assertEqual(
             response['error'],
             'The suggestion with id %s has been accepted or rejected' % (
-                suggestion.suggestion_id))
+                suggestion.suggestion_id
+            )
+        )
         self.logout()
 
     def test_cannot_update_question_when_provided_state_data_is_invalid(self):
@@ -1231,9 +1242,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
@@ -1256,12 +1265,18 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
+        self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ),
+            {
                 'question_state_data': invalid_question_state_data,
                 'skill_difficulty': '0.6'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
         self.logout()
 
     def test_suggestion_creation_when_images_are_not_provided(self):
@@ -1282,13 +1297,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
             raw_image = f.read()
         self.post_json(
-            '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
+            '%s/exploration/%s' % (
+                feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
             {'filename': 'img.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))
@@ -1330,11 +1346,11 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': valid_html,
                     'data_format': 'html'
                 },
+                'files': {'file.svg': None},
+                'description': 'test'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertIn(
-            'No image data provided for file with name file.svg.',
-            response_dict['error'])
+        self.assertIn('No image supplied', response_dict['error'])
         self.logout()
 
     def test_suggestion_creation_when_images_are_not_valid(self):
@@ -1355,13 +1371,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
             raw_image = f.read()
         self.post_json(
-            '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
+            '%s/exploration/%s' % (
+                feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
             {'filename': 'img.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))
@@ -1405,10 +1422,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': valid_html,
                     'data_format': 'html'
                 },
-            }, csrf_token=csrf_token,
-            upload_files=(
-                 ('file.svg', 'file.svg', large_image),),
-            expected_status_int=400)
+                'description': 'test',
+                'files': {'file.svg': large_image},
+            }, csrf_token=csrf_token, expected_status_int=400,
+        )
 
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
@@ -1541,7 +1558,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_accept_question_suggestion_with_image_region_interactions(self):
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             original_image_content = f.read()
@@ -1742,8 +1759,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'Expected target_version_at_submission to be an int, '
-            'received <class \'str\'>'
+            'Schema validation for \'target_version_at_submission\' failed: '
+            'Could not convert str to int: invalid_target_version'
         )
         self.assertEqual(len(suggestions), 1)
         self.logout()
@@ -1772,7 +1789,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None
         ) as f:
@@ -1793,9 +1810,12 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'skill_id': self.SKILL_ID,
                     'skill_difficulty': 0.3
                 },
-                'description': 'Add new question to skill'
-            }, csrf_token=csrf_token, upload_files=(
-                ('file.svg', 'file.svg', raw_image), ))
+                'description': 'Add new question to skill',
+                'files': {
+                    'file.svg': (
+                        base64.b64encode(raw_image).decode('utf-8'))
+                }
+            }, csrf_token=csrf_token,)
         self.logout()
 
 
@@ -2201,22 +2221,38 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.login(self.AUTHOR_EMAIL)
 
         response = self.get_json(
-            '/getsubmittedsuggestions/exploration/translate_content')
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(response['next_offset'], 1)
+
         response = self.get_json(
-            '/getsubmittedsuggestions/topic/translate_content')
+            '/getsubmittedsuggestions/topic/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(response, {})
 
     def test_skill_handler_returns_data(self):
         self.login(self.AUTHOR_EMAIL)
 
         response = self.get_json(
-            '/getsubmittedsuggestions/skill/add_question')
+            '/getsubmittedsuggestions/skill/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(response['next_offset'], 1)
+
         response = self.get_json(
-            '/getsubmittedsuggestions/topic/add_question')
+            '/getsubmittedsuggestions/topic/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(response, {})
 
     def test_question_suggestions_data_for_deleted_opportunities(self):
@@ -2224,9 +2260,13 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         opportunity_services.delete_skill_opportunity(self.SKILL_ID)
         response = self.get_json(
-            '/getsubmittedsuggestions/skill/add_question')
+            '/getsubmittedsuggestions/skill/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(response['next_offset'], 1)
         self.assertEqual(
             response['target_id_to_opportunity_dict'][self.SKILL_ID], None)
 
@@ -2235,9 +2275,13 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         opportunity_services.delete_exploration_opportunities([self.EXP_ID])
         response = self.get_json(
-            '/getsubmittedsuggestions/exploration/translate_content')
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(response['next_offset'], 1)
         self.assertEqual(
             response['target_id_to_opportunity_dict'][self.EXP_ID], None)
 
@@ -2245,23 +2289,34 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.login(self.AUTHOR_EMAIL)
 
         response = self.get_json(
-            '/getsubmittedsuggestions/exploration/translate_content')
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
 
         self.get_json(
-            '/getsubmittedsuggestions/exploration/invalid_suggestion_type',
+            '/getsubmittedsuggestions/exploration/invalid_suggestion_type', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            },
             expected_status_int=400)
 
     def test_handler_with_invalid_target_type_raise_error(self):
         self.login(self.AUTHOR_EMAIL)
 
         response = self.get_json(
-            '/getsubmittedsuggestions/exploration/translate_content')
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
 
         self.get_json(
-            '/getsubmittedsuggestions/invalid_target_type'
-            '/translate_content', expected_status_int=400)
+            '/getsubmittedsuggestions/invalid_target_type/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            }, expected_status_int=400)
 
 
 class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
@@ -2407,10 +2462,91 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.logout()
         self.login(self.REVIEWER_EMAIL)
 
-    def test_exploration_handler_returns_data(self):
+    def test_exploration_handler_returns_data_with_no_topic(self):
+        # If no topic name is provided, we fetch all available
+        # translation suggestions.
         response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
+            '/getreviewablesuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(response['next_offset'], 1)
+        suggestion = response['suggestions'][0]
+        self.assertDictEqual(
+            suggestion['change'], self.translate_suggestion_change)
+        self.assertEqual(
+            suggestion['suggestion_type'],
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        )
+        self.assertEqual(
+            suggestion['target_type'], feconf.ENTITY_TYPE_EXPLORATION)
+        self.assertEqual(suggestion['language_code'], 'hi')
+        self.assertEqual(suggestion['author_name'], 'author')
+        self.assertEqual(suggestion['status'], 'review')
+        self.assertDictEqual(
+            response['target_id_to_opportunity_dict'],
+            {
+                'exp1': {
+                    'chapter_title': 'Node1',
+                    'content_count': 2,
+                    'id': 'exp1',
+                    'story_title': 'A story',
+                    'topic_name': 'topic',
+                    'translation_counts': {},
+                    'translation_in_review_counts': {}
+                }
+            }
+        )
+
+    def test_exploration_handler_returns_data_with_topic_value_all(self):
+        # If the passed topic name value is All, we fetch all available
+        # translation suggestions.
+        response = self.get_json(
+            '/getreviewablesuggestions/exploration/translate_content', params={
+                'topic_name': feconf.ALL_LITERAL_CONSTANT,
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(response['next_offset'], 1)
+        suggestion = response['suggestions'][0]
+        self.assertDictEqual(
+            suggestion['change'], self.translate_suggestion_change)
+        self.assertEqual(
+            suggestion['suggestion_type'],
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        )
+        self.assertEqual(
+            suggestion['target_type'], feconf.ENTITY_TYPE_EXPLORATION)
+        self.assertEqual(suggestion['language_code'], 'hi')
+        self.assertEqual(suggestion['author_name'], 'author')
+        self.assertEqual(suggestion['status'], 'review')
+        self.assertDictEqual(
+            response['target_id_to_opportunity_dict'],
+            {
+                'exp1': {
+                    'chapter_title': 'Node1',
+                    'content_count': 2,
+                    'id': 'exp1',
+                    'story_title': 'A story',
+                    'topic_name': 'topic',
+                    'translation_counts': {},
+                    'translation_in_review_counts': {}
+                }
+            }
+        )
+
+    def test_exploration_handler_returns_data_with_valid_topic_and_exp_ids( # pylint: disable=line-too-long
+            self):
+        response = self.get_json(
+            '/getreviewablesuggestions/exploration/translate_content', params={
+                'topic_name': 'topic',
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(response['next_offset'], 1)
         suggestion = response['suggestions'][0]
         self.assertDictEqual(
             suggestion['change'], self.translate_suggestion_change)
@@ -2438,6 +2574,19 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 }
             }
         )
+        self.assertEqual(response['next_offset'], 1)
+
+    def test_exploration_handler_raises_exception_with_invalid_topic_and_no_exp_id( # pylint: disable=line-too-long
+            self):
+        with self.assertRaisesRegex(
+              Exception,
+                'The supplied input topic: invalid_topic is not valid'):
+            self.get_json(
+            '/getreviewablesuggestions/exploration/translate_content', params={
+                'topic_name': 'invalid_topic',
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
 
     def test_get_reviewable_suggestions_when_state_of_a_target_is_removed(
         self):
@@ -2521,12 +2670,16 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.REVIEWER_EMAIL)
         response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
+            '/getreviewablesuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
 
         # Since there is a properly created translation in the setup and another
         # one in this test case, there should be 2 suggestions when it is
         # requested for available translations.
         self.assertEqual(len(response['suggestions']), 2)
+        self.assertEqual(response['next_offset'], 2)
 
         self.logout()
 
@@ -2538,11 +2691,18 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.REVIEWER_EMAIL)
         response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
+            '/getreviewablesuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
 
         # Now the state of the exploration created in this case is deleted.
         # Therefore only one translation should be retrieved.
         self.assertEqual(len(response['suggestions']), 1)
+        # The suggestion with the deleted exploration state was filtered out
+        # after the storage query, so the next offset skips the filtered
+        # suggestion.
+        self.assertEqual(response['next_offset'], 2)
 
         self.logout()
 
@@ -2631,7 +2791,10 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         # requested for available translations.
         self.login(self.REVIEWER_EMAIL)
         response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
+            '/getreviewablesuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
 
         self.assertEqual(len(response['suggestions']), 2)
 
@@ -2659,7 +2822,10 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         # Therefore only one translation should be retrieved.
         self.login(self.REVIEWER_EMAIL)
         response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
+            '/getreviewablesuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
 
         self.assertEqual(len(response['suggestions']), 1)
 
@@ -2667,12 +2833,18 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     def test_topic_translate_handler_returns_no_data(self):
         response = self.get_json(
-            '/getreviewablesuggestions/topic/translate_content')
+            '/getreviewablesuggestions/topic/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(response, {})
 
     def test_skill_handler_returns_data(self):
         response = self.get_json(
-            '/getreviewablesuggestions/skill/add_question')
+            '/getreviewablesuggestions/skill/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(len(response['suggestions']), 1)
         suggestion = response['suggestions'][0]
         self.assertDictEqual(
@@ -2710,17 +2882,26 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     def test_topic_question_handler_returns_no_data(self):
         response = self.get_json(
-            '/getreviewablesuggestions/topic/add_question')
+            '/getreviewablesuggestions/topic/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
         self.assertEqual(response, {})
 
     def test_handler_with_invalid_suggestion_type_raise_error(self):
         self.get_json(
-            '/getreviewablesuggestions/exploration/invalid_suggestion_type',
+            '/getreviewablesuggestions/exploration/invalid_suggestion_type', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            },
             expected_status_int=404
         )
 
     def test_handler_with_invalid_target_type_raise_error(self):
         self.get_json(
-            '/getreviewablesuggestions/invalid_target_type/translate_content',
+            '/getreviewablesuggestions/invalid_target_type/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            },
             expected_status_int=400
         )

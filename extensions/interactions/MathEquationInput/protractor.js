@@ -75,13 +75,13 @@ var testSuite = [{
   ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on Left Hand Side'],
   expectedInteractionDetails: [],
   wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
-  correctAnswers: ['y=m*x+c', 'y=m*x^2+c', '2*y-y=m*x+c', 'y=0', 'y=m*x-c']
+  correctAnswers: ['y=m*x+c', 'y=m*x^2+c', 'y=0', 'y=m*x-c']
 }, {
   interactionArguments: [['y', 'm', 'x', 'c']],
   ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on both sides'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
-  correctAnswers: ['y=m*x+c', 'y=c+m*x']
+  wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c', 'y=c+m*x'],
+  correctAnswers: ['y=m*x+c']
 }];
 
 exports.customizeInteraction = customizeInteraction;

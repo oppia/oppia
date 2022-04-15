@@ -16,8 +16,8 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core import utils
-from core.platform import models
 
 from typing import Dict, Optional
 
@@ -91,6 +91,6 @@ class PendingDeletionRequest:
                 contains wrong key.
         """
         for key in self.pseudonymizable_entity_mappings.keys():
-            if key not in [name.value for name in models.NAMES]:
+            if key not in [name.value for name in feconf.VALID_MODEL_NAMES]:
                 raise utils.ValidationError(
                     'pseudonymizable_entity_mappings contain wrong key')

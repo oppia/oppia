@@ -18,9 +18,9 @@ from __future__ import annotations
 
 import io
 import logging
+import urllib
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -85,7 +85,7 @@ class AssetDevHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         try:
-            filename = python_utils.urllib_unquote(encoded_filename)
+            filename = urllib.parse.unquote(encoded_filename)
             file_format = filename[(filename.rfind('.') + 1):]
 
             # If the following is not cast to str, an error occurs in the wsgi

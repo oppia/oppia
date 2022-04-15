@@ -38,7 +38,7 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(isinstance(action_name, str))
 
     def test_get_all_actions(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Role TEST_ROLE does not exist.'):
             role_services.get_all_actions(['TEST_ROLE'])
 

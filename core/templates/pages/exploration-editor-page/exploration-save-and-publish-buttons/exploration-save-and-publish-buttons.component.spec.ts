@@ -146,7 +146,7 @@ describe('Exploration save and publish buttons component', function() {
       }));
     spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
       mockConnectionServiceEmitter);
-    spyOn(explorationSaveService, 'saveChanges').and
+    spyOn(explorationSaveService, 'saveChangesAsync').and
       .callFake((showCallback, hideCallback) => {
         showCallback();
         hideCallback();

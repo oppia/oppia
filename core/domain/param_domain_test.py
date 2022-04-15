@@ -29,11 +29,11 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
     def test_param_spec_validation(self):
         """Test validation of param specs."""
         param_spec = param_domain.ParamSpec('FakeType')
-        with self.assertRaisesRegexp(TypeError, 'is not a valid object class'):
+        with self.assertRaisesRegex(TypeError, 'is not a valid object class'):
             param_spec.validate()
 
         param_spec.obj_type = 'Real'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'is not among the supported object types'
         ):
             param_spec.validate()
@@ -45,31 +45,31 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
     def test_param_change_validation(self):
         """Test validation of parameter changes."""
         # Raise an error because the name is invalid.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Only parameter names'
         ):
             param_domain.ParamChange('¡hola', 'Copier', {}).validate()
 
         # Raise an error because generator ID is not string.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected generator ID to be a string'
         ):
             param_domain.ParamChange('abc', 123, {}).validate()
 
         # Raise an error because no such generator type exists.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid generator ID'
         ):
             param_domain.ParamChange('abc', 'InvalidGenerator', {}).validate()
 
         # Raise an error because customization_args is not a dict.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected a dict'
         ):
             param_domain.ParamChange('abc', 'Copier', ['a', 'b']).validate()
 
         # Raise an error because the param_change name is not a string.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected param_change name to be a string, received'
         ):
@@ -77,9 +77,23 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
 
         # Raise an error because the arg names in customization_args are not
         # strings.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Invalid parameter change customization_arg name:'):
             param_domain.ParamChange('abc', 'Copier', {1: '1'}).validate()
+
+    def test_param_spec_to_dict(self):
+        sample_dict = {
+            'obj_type': 'UnicodeString'
+        }
+        param_spec = param_domain.ParamSpec(sample_dict['obj_type'])
+        self.assertEqual(param_spec.to_dict(), sample_dict)
+
+    def test_param_spec_from_dict(self):
+        sample_dict = {
+            'obj_type': 'UnicodeString'
+        }
+        param_spec = param_domain.ParamSpec.from_dict(sample_dict)
+        self.assertEqual(param_spec.to_dict(), sample_dict)
 
     def test_param_change_class(self):
         """Test the ParamChange class."""
@@ -93,3 +107,12 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             'customization_args': {'value': '3'}
         })
         self.assertEqual(param_change.get_normalized_value('Int', {}), 3)
+
+    def test_param_change_from_dict(self):
+        sample_dict = {
+            'name': 'abc',
+            'generator_id': 'Copier',
+            'customization_args': {'value': '3'}
+        }
+        param_change = param_domain.ParamChange.from_dict(sample_dict)
+        self.assertEqual(param_change.to_dict(), sample_dict)

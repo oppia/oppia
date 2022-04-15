@@ -17,27 +17,26 @@
  */
 
 import { Subscription } from 'rxjs';
+import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
 require('services/external-save.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
-    '$scope', '$uibModal', 'EditabilityService',
-    'ExplorationStatesService', 'ExternalSaveService',
+    '$scope', 'EditabilityService',
+    'ExplorationStatesService', 'ExternalSaveService', 'NgbModal',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService',
     'WrittenTranslationObjectFactory',
     function(
-        $scope, $uibModal, EditabilityService,
-        ExplorationStatesService, ExternalSaveService,
+        $scope, EditabilityService,
+        ExplorationStatesService, ExternalSaveService, NgbModal,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
         TranslationTabActiveContentIdService,
@@ -57,12 +56,8 @@ angular.module('oppia').component('stateTranslationEditor', {
           if (voiceover.needsUpdate) {
             return;
           }
-          $uibModal.open({
-            template: require(
-              'components/forms/forms-templates/' +
-              'mark-audio-as-needing-update-modal.directive.html'),
-            backdrop: 'static',
-            controller: 'ConfirmOrCancelModalController'
+          NgbModal.open(MarkAudioAsNeedingUpdateModalComponent, {
+            backdrop: 'static'
           }).result.then(function() {
             recordedVoiceovers.toggleNeedsUpdateAttribute(
               contentId, languageCode);

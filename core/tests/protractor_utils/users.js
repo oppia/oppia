@@ -70,22 +70,14 @@ var login = async function(email, useManualNavigation = true) {
 
   var signInButton = element(by.css('.protractor-test-sign-in-button'));
 
-  var currentUrl = decodeURIComponent(await browser.getCurrentUrl());
-
-  var returnUrl = currentUrl.split('return_url=')[
-    currentUrl.split('return_url=').length - 1];
-
   await waitFor.clientSideRedirection(async() => {
     // Click the "sign in" button to trigger redirection.
     await action.click('Sign in button', signInButton);
   }, (url) => {
-    if (returnUrl === '/') {
-      // Users will be redirected to preferred dashboard if they are fully
-      // registered. Otherwise, they will be redirected to signup page.
-      return /(learner-dashboard|creator-dashboard|signup)/.test(url);
-    } else {
-      return (new RegExp(returnUrl + '|signup')).test(url);
-    }
+    // Users will be redirected to preferred dashboard if they are fully
+    // registered. Otherwise, they will be redirected to signup page.
+    // eslint-disable-next-line max-len
+    return /(learner-dashboard|creator-dashboard|signup|pending-account-deletion)/.test(url);
   }, async() => {
     // Cannot predict the new page, so waiting for loading message to disappear.
     await waitFor.pageToFullyLoad();

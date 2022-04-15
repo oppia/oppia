@@ -50,7 +50,7 @@ const skillDict: SkillBackendDict = {
   id: 'skill_id_1',
   description: 'Description',
   misconceptions: [{
-    id: '2',
+    id: 2,
     name: 'test name',
     notes: 'test notes',
     feedback: 'test feedback',
@@ -79,7 +79,7 @@ const skillDict2: SkillBackendDict = {
   id: 'skill_id_2',
   description: 'Description 2',
   misconceptions: [{
-    id: '2',
+    id: 2,
     name: 'test name',
     notes: 'test notes',
     feedback: 'test feedback',

@@ -25,7 +25,19 @@ from core.tests import test_utils
 class ActionRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the action registry."""
 
-    def test_action_registry(self):
+    def test_action_registry(self) -> None:
         """Do some sanity checks on the action registry."""
         self.assertEqual(
             len(action_registry.Registry.get_all_actions()), 3)
+
+    def test_cannot_get_action_by_invalid_type(self) -> None:
+        # Testing with invalid action type.
+        # Invalid action type raises 'KeyError' with invalid_key
+        # as the error message.
+        with self.assertRaisesRegex(KeyError, 'fakeAction'):  # type: ignore[no-untyped-call]
+            action_registry.Registry.get_action_by_type('fakeAction')
+
+    def test_can_get_action_by_valid_type(self) -> None:
+        # Testing with valid action type.
+        self.assertIsNotNone(
+            action_registry.Registry.get_action_by_type('ExplorationStart'))

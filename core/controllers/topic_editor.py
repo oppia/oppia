@@ -49,6 +49,53 @@ class TopicEditorStoryHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'title': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'description': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': (
+                            constants.MAX_CHARS_IN_STORY_DESCRIPTION)
+                    }]
+                }
+            },
+            'filename': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'thumbnailBgColor': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'image': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
+        }
+    }
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
@@ -95,12 +142,12 @@ class TopicEditorStoryHandler(base.BaseHandler):
         Currently, this only adds the story to the canonical story id list of
         the topic.
         """
-        title = self.payload.get('title')
-        description = self.payload.get('description')
-        thumbnail_filename = self.payload.get('filename')
-        thumbnail_bg_color = self.payload.get('thumbnailBgColor')
-        raw_image = self.request.get('image')
-        story_url_fragment = self.payload.get('story_url_fragment')
+        title = self.normalized_payload.get('title')
+        description = self.normalized_payload.get('description')
+        thumbnail_filename = self.normalized_payload.get('filename')
+        thumbnail_bg_color = self.normalized_payload.get('thumbnailBgColor')
+        raw_image = self.normalized_request.get('image')
+        story_url_fragment = self.normalized_payload.get('story_url_fragment')
 
         story_domain.Story.require_valid_title(title)
         if story_services.does_story_exist_with_url_fragment(
@@ -121,8 +168,9 @@ class TopicEditorStoryHandler(base.BaseHandler):
         story_services.save_new_story(self.user_id, story)
 
         try:
-            file_format = image_validation_services.validate_image_and_filename(
-                raw_image, thumbnail_filename)
+            file_format = (
+                image_validation_services.
+                validate_image_and_filename(raw_image, thumbnail_filename))
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -156,6 +204,21 @@ class TopicEditorStoryHandler(base.BaseHandler):
 class TopicEditorPage(base.BaseHandler):
     """The editor page for a single topic."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
@@ -172,6 +235,30 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
     """The data handler for subtopic pages."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'subtopic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id, subtopic_id):
@@ -194,14 +281,52 @@ class EditableTopicDataHandler(base.BaseHandler):
     """A data handler for topics which supports writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int'
+                }
+            },
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
+                    }]
+                }
+            },
+            'topic_and_subtopic_page_change_dicts': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': topic_domain.TopicChange
+                    }
+                }
+            }
+        },
+        'DELETE': {}
+    }
 
     def _require_valid_version(self, version_from_payload, topic_version):
         """Check that the payload version matches the given topic
         version.
         """
-        if version_from_payload is None:
-            raise base.BaseHandler.InvalidInputException(
-                'Invalid POST request: a version must be specified.')
 
         if version_from_payload != topic_version:
             raise base.BaseHandler.InvalidInputException(
@@ -285,28 +410,21 @@ class EditableTopicDataHandler(base.BaseHandler):
         """
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
-        version = self.payload.get('version')
+        version = self.normalized_payload.get('version')
         self._require_valid_version(version, topic.version)
 
-        commit_message = self.payload.get('commit_message')
+        commit_message = self.normalized_payload.get('commit_message')
 
-        if (commit_message is not None and
-                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
-            raise self.InvalidInputException(
-                'Commit messages must be at most %s characters long.'
-                % constants.MAX_COMMIT_MESSAGE_LENGTH)
-
-        topic_and_subtopic_page_change_dicts = self.payload.get(
+        topic_and_subtopic_page_change_dicts = self.normalized_payload.get(
             'topic_and_subtopic_page_change_dicts')
         topic_and_subtopic_page_change_list = []
         for change in topic_and_subtopic_page_change_dicts:
-            if change['cmd'] == (
+            if change.cmd == (
                     subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 topic_and_subtopic_page_change_list.append(
-                    subtopic_page_domain.SubtopicPageChange(change))
+                    subtopic_page_domain.SubtopicPageChange(change.to_dict()))
             else:
-                topic_and_subtopic_page_change_list.append(
-                    topic_domain.TopicChange(change))
+                topic_and_subtopic_page_change_list.append(change)
         try:
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, topic_and_subtopic_page_change_list,
@@ -361,6 +479,21 @@ class TopicRightsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Returns the TopicRights object of a topic."""
@@ -390,6 +523,31 @@ class TopicPublishSendMailHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'topic_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_CHARS_IN_TOPIC_NAME
+                    }]
+                }
+            },
+        }
+    }
+
     @acl_decorators.can_view_any_topic_editor
     def put(self, topic_id):
         """Returns the TopicRights object of a topic."""
@@ -399,13 +557,39 @@ class TopicPublishSendMailHandler(base.BaseHandler):
                 'Request to review and publish a topic',
                 '%s wants to publish topic: %s at URL %s, please review'
                 ' and publish if it looks good.'
-                % (self.username, self.payload.get('topic_name'), topic_url))
+                % (
+                    self.username,
+                    self.normalized_payload.get('topic_name'),
+                    topic_url
+                )
+            )
 
         self.render_json(self.values)
 
 
 class TopicPublishHandler(base.BaseHandler):
     """A handler for publishing and unpublishing topics."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'publish_status': {
+                'schema': {
+                    'type': 'bool'
+                }
+            },
+        }
+    }
 
     @acl_decorators.can_change_topic_publication_status
     def put(self, topic_id):
@@ -414,11 +598,7 @@ class TopicPublishHandler(base.BaseHandler):
         if topic is None:
             raise self.PageNotFoundException
 
-        publish_status = self.payload.get('publish_status')
-
-        if not isinstance(publish_status, bool):
-            raise self.InvalidInputException(
-                'Publish status should only be true or false.')
+        publish_status = self.normalized_payload.get('publish_status')
 
         try:
             if publish_status:
@@ -435,6 +615,13 @@ class TopicUrlFragmentHandler(base.BaseHandler):
     """A data handler for checking if a topic with given url fragment exists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_create_topic
     def get(self, topic_url_fragment):
@@ -453,6 +640,21 @@ class TopicNameHandler(base.BaseHandler):
     """A data handler for checking if a topic with given name exists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_name': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_TOPIC_NAME
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_create_topic
     def get(self, topic_name):

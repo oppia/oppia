@@ -11,7 +11,7 @@
       </i>
       <img [hidden]="!hidePlaceholder" [src]="placeholderImageUrl" align="center" class="oppia-thumbnail-placeholder" alt="">
       <oppia-thumbnail-display *ngIf="editableThumbnailDataUrl"
-                               [hidden]="!thumbnailIsLoading"
+                               [hidden]="thumbnailIsLoading"
                                [imgSrc]="editableThumbnailDataUrl"
                                [aspectRatio]="aspectRatio"
                                [classes]="['img-thumbnail', 'protractor-test-custom-photo']"

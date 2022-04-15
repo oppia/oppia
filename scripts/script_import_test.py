@@ -62,8 +62,8 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
             from scripts import install_third_party_libs  # isort:skip pylint: disable=unused-import,line-too-long
         self.assertEqual(
             self.commands, [
-                sys.executable, '-m', 'pip', 'install', 'pyyaml==5.4.1',
-                '--target', '../oppia_tools/pyyaml-5.4.1',
+                sys.executable, '-m', 'pip', 'install', 'pyyaml==6.0',
+                '--target', '../oppia_tools/pyyaml-6.0',
                 '--user', '--prefix=', '--system',
                 sys.executable, '-m', 'pip', 'install',
                 'future==0.18.2', '--target',
@@ -74,7 +74,11 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                 'third_party/python_libs',
                 '--user', '--prefix=', '--system',
                 sys.executable, '-m', 'pip', 'install',
-                'certifi==2021.5.30', '--target',
-                '../oppia_tools/certifi-2021.5.30',
+                'certifi==2021.10.8', '--target',
+                '../oppia_tools/certifi-2021.10.8',
+                '--user', '--prefix=', '--system',
+                sys.executable, '-m', 'pip', 'install',
+                'typing-extensions==4.0.1', '--target',
+                'third_party/python_libs',
                 '--user', '--prefix=', '--system',
             ])

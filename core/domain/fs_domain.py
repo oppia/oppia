@@ -20,7 +20,10 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
-from core.platform import models
+from core.platform import models   # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
@@ -190,6 +193,9 @@ class GcsFileSystem(GeneralFileSystem):
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
+
+        Raises:
+            OSError. Given file does not exist.
         """
         if self.isfile(filepath):
             storage_services.delete(
@@ -222,6 +228,9 @@ class GcsFileSystem(GeneralFileSystem):
 
         Returns:
             list(str). A lexicographically-sorted list of filenames.
+
+        Raises:
+            OSError. The directory name starts or ends with '/'.
         """
         if dir_name.startswith('/') or dir_name.endswith('/'):
             raise IOError(
@@ -266,7 +275,7 @@ class AbstractFileSystem:
                 assets folder.
 
         Raises:
-            IOError. Invalid filepath.
+            OSError. Invalid filepath.
         """
         base_dir = utils.vfs_construct_path(
             '/', self.impl.assets_path, 'assets')
@@ -314,7 +323,7 @@ class AbstractFileSystem:
             FileStream. The file stream domain object.
 
         Raises:
-            IOError. The given file stream does not exist.
+            OSError. The given file stream does not exist.
         """
         file_stream = self.open(filepath)
         if file_stream is None:

@@ -25,6 +25,10 @@
           </button>
           <img id="croppable-image" [src]="uploadedImage" #croppableImage>
         </div>
+        <div *ngIf="invalidTagsAndAttributes.tags.length || invalidTagsAndAttributes.attrs.length"
+             class="oppia-unsupported-svg-tag-attribute-error"
+             [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: svgSanitizerService.getIssueURL(invalidTagsAndAttributes) }"
+        ></div>
       </div>
     </div>
   </div>
@@ -43,7 +47,7 @@
 </div>
 <style>
   .oppia-profile-picture-container .oppia-profile-picture-crop-area {
-    background: #E4E4E4;
+    background: #e4e4e4;
     height: 350px;
     margin-top: 20px;
     max-width: 100%;
@@ -60,5 +64,12 @@
   }
   .oppia-profile-picture-container .oppia-form-error-text {
     margin-top: 15px;
+  }
+  .oppia-unsupported-svg-tag-attribute-error {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+    margin-top: 15px;
+    padding: 10px;
   }
 </style>

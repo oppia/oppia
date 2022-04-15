@@ -28,7 +28,6 @@ import tempfile
 import urllib.request as urlrequest
 import zipfile
 
-from core import python_utils
 from core import utils
 from core.tests import test_utils
 
@@ -81,7 +80,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             zipfile.ZipFile, 'extractall', mock_extractall)
 
     def test_download_files_with_invalid_source_filenames(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError,
             'Expected list of filenames, got \'invalid source filename\''):
             install_third_party.download_files(
@@ -148,7 +147,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             # So, the mock returns a file object as a mock so that the read
             # function can work correctly.
             temp_file = tempfile.NamedTemporaryFile()
-            file_obj = python_utils.open_file(temp_file.name, 'r')
+            file_obj = utils.open_file(temp_file.name, 'r')
             return file_obj
         def mock_string_io(buffer_value):  # pylint: disable=unused-argument
             return MOCK_TMP_UNZIP_PATH
@@ -191,7 +190,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     def test_get_file_contents(self):
         temp_file = tempfile.NamedTemporaryFile().name
         actual_text = 'Testing install third party file.'
-        with python_utils.open_file(temp_file, 'w') as f:
+        with utils.open_file(temp_file, 'w') as f:
             f.write(actual_text)
         self.assertEqual(
             install_third_party.get_file_contents(temp_file), actual_text)
@@ -199,7 +198,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     def test_return_json(self):
         temp_file = tempfile.NamedTemporaryFile().name
         actual_text = '{"Testing": "install_third_party"}'
-        with python_utils.open_file(temp_file, 'w') as f:
+        with utils.open_file(temp_file, 'w') as f:
             f.write(actual_text)
         self.assertEqual(
             install_third_party.return_json(temp_file),
@@ -219,7 +218,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_print(msg):
             print_arr.append(msg)
         print_swap = self.swap(builtins, 'print', mock_print)
-        with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        with print_swap, self.assertRaisesRegex(SystemExit, '1'):
             install_third_party.test_dependencies_syntax(
                 'files', {
                     'files': ['yuicompressor-2.4.8.jar'],
@@ -234,7 +233,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_print(msg):
             print_arr.append(msg)
         print_swap = self.swap(builtins, 'print', mock_print)
-        with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        with print_swap, self.assertRaisesRegex(SystemExit, '1'):
             install_third_party.test_dependencies_syntax(
                 'zip', {
                     'url': 'https://github.com/jsocol/bleach/v3.1.0.zip',
@@ -252,7 +251,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_print(msg):
             print_arr.append(msg)
         print_swap = self.swap(builtins, 'print', mock_print)
-        with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        with print_swap, self.assertRaisesRegex(SystemExit, '1'):
             install_third_party.test_dependencies_syntax(
                 'tar', {
                     'version': '4.7.1',
@@ -295,7 +294,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                             'targetDirPrefix': 'yuicompressor-'}}}}
         return_json_swap = self.swap(
             install_third_party, 'return_json', mock_return_json)
-        with return_json_swap, self.assertRaisesRegexp(
+        with return_json_swap, self.assertRaisesRegex(
             Exception,
             re.escape(
                 'downloadFormat not specified in {\'url\': '
@@ -398,7 +397,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     def test_windows_os_throws_exception(self):
         def mock_is_windows_os():
             return True
-        windows_not_supported_exception = self.assertRaisesRegexp(
+        windows_not_supported_exception = self.assertRaisesRegex(
             Exception,
             'The redis command line interface will not be installed because '
             'your machine is on the Windows operating system.')
@@ -436,8 +435,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             # exception so that the script can execute the installation pathway.
             if unused_cmd_tokens == [common.REDIS_SERVER_PATH, '--version']:
                 raise OSError('redis-server: command not found')
-            else:
-                return Ret()
+
+            return Ret()
 
         swap_call = self.swap(
             subprocess, 'call', mock_call)
@@ -486,8 +485,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             if unused_cmd_tokens == [
                     '%s/bin/elasticsearch' % common.ES_PATH, '--version']:
                 raise OSError('elasticsearch: command not found')
-            else:
-                return Ret()
+
+            return Ret()
 
         swap_call = self.swap(
             subprocess, 'call', mock_call)
@@ -533,8 +532,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             if unused_cmd_tokens == [
                     '%s/bin/elasticsearch' % common.ES_PATH, '--version']:
                 raise OSError('elasticsearch: command not found')
-            else:
-                return Ret()
+
+            return Ret()
 
         swap_call = self.swap(
             subprocess, 'call', mock_call)
@@ -578,13 +577,13 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             if unused_cmd_tokens == [
                     '%s/bin/elasticsearch' % common.ES_PATH, '--version']:
                 raise OSError('elasticsearch: command not found')
-            else:
-                return Ret()
+
+            return Ret()
 
         swap_call = self.swap(
             subprocess, 'call', mock_call)
 
-        os_not_supported_exception = self.assertRaisesRegexp(
+        os_not_supported_exception = self.assertRaisesRegex(
             Exception, 'Unrecognized or unsupported operating system.')
         mac_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
         linux_swap = self.swap(common, 'is_linux_os', mock_is_linux_os)

@@ -45,7 +45,6 @@ describe('Skill Description Editor Component', () => {
       declarations: [SkillDescriptionEditorComponent],
       providers: [
         SkillUpdateService,
-        SkillEditorStateService,
         SkillEditorStateService
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -121,6 +120,7 @@ describe('Skill Description Editor Component', () => {
   it('should save skill description successfully', () => {
     let saveSkillDescriptionSpy = spyOn(
       skillUpdateService, 'setSkillDescription').and.returnValue(null);
+    spyOn(component.onSaveDescription, 'emit').and.callThrough();
     spyOn(skillObjectFactory, 'hasValidDescription').and.returnValue(true);
     component.ngOnInit();
     // Old Description.
@@ -128,6 +128,7 @@ describe('Skill Description Editor Component', () => {
 
     component.saveSkillDescription('newSkillDescription');
     expect(saveSkillDescriptionSpy).toHaveBeenCalled();
+    expect(component.onSaveDescription.emit).toHaveBeenCalled();
   });
 
   it('should not save skill description if it is old description', () => {

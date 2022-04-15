@@ -175,20 +175,20 @@ class AuditsExistingTests(test_utils.TestBase):
             MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [DoFn])
 
     def test_raises_value_error_when_given_no_args(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, 'Must target at least one model'
         ):
             MockAuditsExisting()
 
     def test_raises_type_error_when_given_unregistered_model(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             TypeError, re.escape(
                 '%r is not a model registered in core.platform' % FooModel),
         ):
             MockAuditsExisting(FooModel)
 
     def test_raises_type_error_when_decorating_non_do_fn_class(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             TypeError, '%r is not a subclass of DoFn' % NotDoFn,
         ):
             MockAuditsExisting(base_models.BaseModel)(NotDoFn)
@@ -277,15 +277,15 @@ class RelationshipsOfTests(test_utils.TestBase):
     def test_rejects_values_that_are_not_types(self):
         foo_model = FooModel()
 
-        with self.assertRaisesRegexp(TypeError, 'is an instance, not a type'):
+        with self.assertRaisesRegex(TypeError, 'is an instance, not a type'):
             MockRelationshipsOf(foo_model)
 
     def test_rejects_types_that_are_not_models(self):
-        with self.assertRaisesRegexp(TypeError, 'not a subclass of BaseModel'):
+        with self.assertRaisesRegex(TypeError, 'not a subclass of BaseModel'):
             MockRelationshipsOf(int)
 
     def test_rejects_relationship_generator_with_wrong_name(self):
-        with self.assertRaisesRegexp(ValueError, 'Please rename the function'):
+        with self.assertRaisesRegex(ValueError, 'Please rename the function'):
             @MockRelationshipsOf(BarModel)
             def unused_bar_model_relationships(unused_model):
                 """Defines the relationships of BarModel."""

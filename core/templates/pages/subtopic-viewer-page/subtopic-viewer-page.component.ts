@@ -26,6 +26,7 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 
@@ -35,18 +36,21 @@ import { PageTitleService } from 'services/page-title.service';
   styleUrls: []
 })
 export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
-  nextSubtopicSummaryIsShown: boolean = false;
+  subtopicSummaryIsShown: boolean = false;
   topicUrlFragment: string;
   classroomUrlFragment: string;
   subtopicUrlFragment: string;
   pageContents: SubtopicPageContents;
   subtopicTitle: string;
+  subtopicTitleTranslationKey: string;
   parentTopicId: string;
-  nextSubtopic: Subtopic;
+  nextSubtopic: Subtopic = null;
+  prevSubtopic: Subtopic = null;
 
   constructor(
     private alertsService: AlertsService,
     private contextService: ContextService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
@@ -56,6 +60,10 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
   checkMobileView(): boolean {
     return (this.windowDimensionsService.getWidth() < 500);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnInit(): void {
@@ -82,10 +90,22 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
         `Review the skill of ${this.subtopicTitle.toLowerCase()}.`);
 
       let nextSubtopic = subtopicDataObject.getNextSubtopic();
+      let prevSubtopic = subtopicDataObject.getPrevSubtopic();
       if (nextSubtopic) {
         this.nextSubtopic = nextSubtopic;
-        this.nextSubtopicSummaryIsShown = true;
+        this.subtopicSummaryIsShown = true;
       }
+      if (prevSubtopic) {
+        this.prevSubtopic = prevSubtopic;
+        this.subtopicSummaryIsShown = true;
+      }
+
+      this.subtopicTitleTranslationKey = (
+        this.i18nLanguageCodeService.
+          getSubtopicTranslationKey(
+            this.parentTopicId, this.subtopicUrlFragment,
+            TranslationKeyType.TITLE)
+      );
 
       this.loaderService.hideLoadingScreen();
     },
@@ -99,6 +119,14 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.contextService.removeCustomEntityContext();
+  }
+
+  isHackySubtopicTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.subtopicTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 
