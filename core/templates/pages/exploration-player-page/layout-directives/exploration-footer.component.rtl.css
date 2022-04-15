@@ -140,6 +140,26 @@
   padding: 12px;
 }
 
+.oppia-footer-info-icon {
+  font-size: 20px;
+  margin-left: 5px;
+}
+
+.oppia-lesson-info {
+  cursor: pointer;
+  display: flex;
+  list-style-type: none;
+  padding-right: 2px;
+  padding-top: 10px;
+}
+
+.oppia-lesson-info-h1 {
+  color: #fff;
+  display: inline;
+  font-size: 17px;
+  font-weight: normal;
+}
+
 @media (max-width: 475px) {
   .oppia-exploration-footer-sharing-links {
     display: none;
