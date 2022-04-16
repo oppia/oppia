@@ -328,7 +328,7 @@ class AppFeedbackReport:
             REPORT_TYPE. The enum representing this report type.
         """
         for report_type in app_feedback_report_constants.ALLOWED_REPORT_TYPES:
-            if report_type_name == report_type.name:
+            if report_type_name == report_type.value:
                 return report_type
         raise utils.InvalidInputException(
             'The given report type %s is invalid.' % report_type_name)
