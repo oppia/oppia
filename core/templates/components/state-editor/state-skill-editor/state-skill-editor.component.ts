@@ -26,7 +26,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { TopicsAndSkillsDashboardBackendApiService, CategorizedAndUntriagedSkillsData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { AlertsService } from 'services/alerts.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import {WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { StateLinkedSkillIdService } from '../state-editor-properties-services/state-skill.service';
 import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -46,16 +46,15 @@ export class StateSkillEditorComponent implements OnInit {
   @Output() onSaveStateContent: EventEmitter<string> = (
     new EventEmitter<string>());
 
-  categorizedSkills!: SkillsCategorizedByTopics;
-  untriagedSkillSummaries!: ShortSkillSummary[];
+  categorizedSkills: SkillsCategorizedByTopics = null;
+  untriagedSkillSummaries: ShortSkillSummary[] = null;
   skillEditorIsShown: boolean = true;
-  skillIsSelected = false;
-  skillName!: string;
+  skillName: string = null;
   userCanEditSkills: boolean = false;
 
   constructor(
-    private topicsAndSkillsDashboardBackendApiService:
-      TopicsAndSkillsDashboardBackendApiService,
+    private topicsAndSkillsDashboardBackendApiService: (
+      TopicsAndSkillsDashboardBackendApiService),
     private storyEditorStateService: StoryEditorStateService,
     private alertsService: AlertsService,
     private windowDimensionsService: WindowDimensionsService,
@@ -78,13 +77,16 @@ export class StateSkillEditorComponent implements OnInit {
       .then((canUserAccessTopicsAndSkillsDashboard) => {
         this.userCanEditSkills = canUserAccessTopicsAndSkillsDashboard;
       });
-    if (this.stateLinkedSkillIdService.displayed) {
-      this.skillBackendApiService.fetchSkillAsync(
-        this.stateLinkedSkillIdService.displayed
-      ).then((skill) => {
-        this.skillName = skill.skill.getDescription();
+    this.stateLinkedSkillIdService.onStateLinkedSkillIdInitialized.subscribe(
+      () => {
+        if (this.stateLinkedSkillIdService.displayed) {
+          this.skillBackendApiService.fetchSkillAsync(
+            this.stateLinkedSkillIdService.displayed
+          ).then((skill) => {
+            this.skillName = skill.skill.getDescription();
+          });
+        }
       });
-    }
   }
 
   addSkill(): void {
@@ -125,7 +127,7 @@ export class StateSkillEditorComponent implements OnInit {
       DeleteStateSkillModalComponent, {
         backdrop: true,
       }).result.then(() => {
-      this.skillIsSelected = false;
+      this.stateLinkedSkillIdService.displayed = null;
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(this.stateLinkedSkillIdService.displayed);
     }, () => {
@@ -136,10 +138,12 @@ export class StateSkillEditorComponent implements OnInit {
   }
 
   getSkillEditorUrl(): string {
-    return this.urlInterpolationService.interpolateUrl(
-      '/skill_editor/<skill_id>', {
-        skill_id: this.stateLinkedSkillIdService.displayed
-      });
+    if (this.stateLinkedSkillIdService.displayed) {
+      return this.urlInterpolationService.interpolateUrl(
+        '/skill_editor/<skill_id>', {
+          skill_id: this.stateLinkedSkillIdService.displayed
+        });
+    }
   }
 
   toggleSkillEditor(): void {
