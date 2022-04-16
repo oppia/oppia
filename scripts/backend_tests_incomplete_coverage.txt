@@ -9,6 +9,7 @@ core.domain.suggestion_registry_test
 core.controllers.feedback_test
 core.domain.topic_domain_test
 core.domain.rights_manager_test
+core.domain.story_domain_test
 core.domain.stats_services_test
 core.domain.value_generators_domain_test
 core.domain.interaction_registry_test
