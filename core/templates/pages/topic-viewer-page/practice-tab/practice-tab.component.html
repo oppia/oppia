@@ -8,6 +8,8 @@
       <h2 class="tab-title"
           *ngIf="displayArea === 'topicViewer'">
         <span [innerHTML]="'I18N_TOPIC_VIEWER_MASTER_SKILLS' | translate: {topicName: topicName}"></span>
+        <span>&nbsp;</span>
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG' | translate"></span>
       </h2>
       <div class="practice-content"
            *ngIf="displayArea === 'topicViewer'">
@@ -39,7 +41,7 @@
           <button mat-raised-button
                   [disabled]="isStartButtonDisabled() && questionsStatusCallIsComplete"
                   [ngClass]="{'practice-button-background-status-pending': !questionsStatusCallIsComplete, 'practice-button-background-status-complete': questionsStatusCallIsComplete}"
-                  (click)="openNewPracticeSession()"
+                  (click)="checkSiteLanguageBeforeBeginningPracticeSession()"
                   class="practice-session-button protractor-test-practice-start-button" >
             <span *ngIf="questionsStatusCallIsComplete"
                   class="font-heavy"
