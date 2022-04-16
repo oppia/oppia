@@ -198,12 +198,15 @@ class ExplorationHandlerTest(test_utils.GenericTestBase):
         exp_services.delete_demo(exp_id)
         exp_services.load_demo(exp_id)
 
-        def _mock_none_function(*_, **__):
+        def _mock_none_get_exploration_by_id(*_, **__):
             """Mocks None."""
             return None
 
-        with self.swap(
-            exp_fetchers, 'get_exploration_by_id', _mock_none_function):
+        with self.swap_with_checks(
+                exp_fetchers, 'get_exploration_by_id',
+                _mock_none_get_exploration_by_id,
+                expected_args=[(exp_id,)],
+                expected_kwargs=[{'strict': False, 'version': None}]):
             self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id),
                 expected_status_int=404)
