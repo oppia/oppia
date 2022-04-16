@@ -20,7 +20,7 @@
 /**
  * NOTE: This component creates an Object Editor Component. Since it is a
  * created by us dynamically, we have to manage the entire life cycle of the
- * component. From creation to deletion. This also includes updating of @Input
+ * component from creation to deletion. This also includes updating of @Input
  * properties and listening to @Output events. In future, if some of the @Input
  * properties change, you can pass them to the ObjectEditor using ngOnChanges
  * function.
