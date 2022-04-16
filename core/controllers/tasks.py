@@ -152,20 +152,28 @@ class FlagExplorationEmailHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'exploration_id': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                }
             },
             'report_text': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }]
                 }
             },
             'reporter_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }]
                 }
             }
         }
