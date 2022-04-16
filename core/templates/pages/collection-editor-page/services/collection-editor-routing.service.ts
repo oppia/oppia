@@ -24,7 +24,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class CollectionEditorRoutingService {
-  // These properties are initialized using Angular lifecycle hooks
+  // These properties are initialized using private functions
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _activeTabName!: string;

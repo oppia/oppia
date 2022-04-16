@@ -31,7 +31,7 @@ import { BlogPostData } from 'domain/blog/blog-post.model';
   providedIn: 'root'
 })
 export class BlogDashboardPageService {
-  // This property is initialized using Angular lifecycle hooks
+  // This property is initialized using getters and setters
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _blogPostData!: BlogPostData;

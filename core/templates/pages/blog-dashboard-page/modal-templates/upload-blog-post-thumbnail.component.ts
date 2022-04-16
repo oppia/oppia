@@ -33,11 +33,13 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  uploadedImage!: SafeResourceUrl | null;
   croppedFilename!: string;
   cropper!: Cropper;
   @ViewChild('croppableImage') croppableImageRef!: ElementRef;
   invalidTagsAndAttributes!: { tags: string[]; attrs: string[] };
+  // This property will be null when the SVG uploaded is not valid or when
+  // the image is not yet uploaded.
+  uploadedImage: SafeResourceUrl | null = null;
   windowIsNarrow: boolean = false;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
@@ -97,7 +99,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   }
 
   reset(): void {
-    this.uploadedImage = false;
+    this.uploadedImage = null;
     this.cropppedImageDataUrl = '';
     this.invalidTagsAndAttributes = {
       tags: [],
@@ -120,11 +122,11 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     this.imageLocalStorageService.saveImage(
       this.croppedFilename, this.cropppedImageDataUrl);
     this.imageLocallySaved.emit(this.cropppedImageDataUrl);
-    this.uploadedImage = false;
+    this.uploadedImage = null;
   }
 
   cancel(): void {
-    this.uploadedImage = false;
+    this.uploadedImage = null;
     this.invalidTagsAndAttributes = {
       tags: [],
       attrs: []
