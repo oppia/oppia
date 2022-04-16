@@ -165,10 +165,11 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
           },
           controller: 'QuestionSuggestionEditorModalController'
         }).result.then(function() {
-          editSuggestionCallback(suggestionId, question);
+          editSuggestionCallback(
+            suggestionId, suggestion, reviewable, question);
         }, function() {
           ContextService.resetImageSaveDestination();
-          editSuggestionCallback(suggestionId);
+          editSuggestionCallback(suggestionId, suggestion, reviewable);
         });
       });
     };
