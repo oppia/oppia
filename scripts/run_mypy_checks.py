@@ -119,8 +119,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/recommendations_services_test.py',
     'core/domain/rights_manager.py',
     'core/domain/rights_manager_test.py',
-    'core/domain/role_services.py',
-    'core/domain/role_services_test.py',
     'core/domain/rte_component_registry.py',
     'core/domain/rte_component_registry_test.py',
     'core/domain/rules_registry.py',
