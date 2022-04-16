@@ -1,48 +1,24 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.rtl.css" as="style">
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.rtl.css">
 
 <div class="footer navbar-fixed-bottom oppia-exploration-footer" *ngIf="!iframed">
   <div class="row">
     <div [ngClass]="{'col-sm-5': isLanguageRTL(), 'col-sm-3': !isLanguageRTL()}">
-      <ul class="author-profile">
-        <li>
-          <img [src]="getStaticImageUrl('/general/apple.svg')"
-               class="exploration-footer-img"
-               alt="">
+      <ul class="oppia-lesson-info"
+          (click)="showInformationCard()">
+        <li
+            [ngbTooltip]="'I18N_PLAYER_INFO_TOOLTIP' | translate"
+            class="oppia-exploration-info-icon protractor-test-exploration-info-icon">
+          <i class="material-icons oppia-navbar-breadcrumb-icon oppia-footer-info-icon">&#xE88E;</i>
+          <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_INFO_TOOLTIP' | translate }}</span>
         </li>
-        <li class="hover-link"
-            (mouseenter)="hovering = true; dropUp.open()"
-            (mouseleave)="hovering = false; dropUp.close()"
-            tabindex="0"
-            aria-haspopup="true"
-            aria-expanded="false">
-          <div ngbDropdown
-               class="dropup"
-               placement="top"
-               [ngClass]="{'open': hovering}"
-               #dropUp="ngbDropdown">
-            <a ngbDropdownAnchor id="dropdownMenu2"
-               [ngClass]="{'hovered-text': hovering}"
-               *ngIf="contributorNames.length > 0"
-               aria-haspopup="true"
-               aria-expanded="false">
-              <h4 class="author-profile-text protractor-test-author-profile-text"
-                  [ngClass]="{'hovered-text': hovering, 'not-hovered' : !hovering}">
-                  {{ 'I18N_FOOTER_AUTHOR_PROFILES' | translate }}
-              </h4>
-            </a>
-            <ul ngbDropdownMenu class="author-profile-dropdown-menu"
-                aria-labelledby="dropdownMenu2">
-              <li *ngFor="let name of contributorNames | limitTo: 5" ngbDropdownItem>
-                <a href="/profile/{{ name }}"
-                   [routerLink]="'/profile/' + name"
-                   target="_blank"
-                   rel="noopener">
-                   {{ name }}
-                </a>
-              </li>
-            </ul>
-          </div>
+        <li>
+          <h1 class="oppia-lesson-info-h1">
+            <span class="oppia-lesson-info-header">
+                {{ 'I18N_LESSON_INFO_HEADER' | translate }}
+            </span>
+          </h1>
         </li>
       </ul>
       <oppia-hint-and-solution-buttons *ngIf="windowIsNarrow && hintsAndSolutionsAreSupported">
@@ -56,7 +32,3 @@
     </div>
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.rtl.css">

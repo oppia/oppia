@@ -263,14 +263,6 @@ describe('Site language', function() {
         by.css('.protractor-test-share-collection-footer')).getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
       await general.ensurePageHasNoTranslationIds();
-
-      // Checking exploration player page.
-      await browser.get('/explore/' + firstExplorationId);
-      await waitFor.pageToFullyLoad();
-      expect(await element(
-        by.css('.protractor-test-author-profile-text')).getText())
-        .toEqual('PERFILES DE AUTORES');
-      await general.ensurePageHasNoTranslationIds();
     }
   );
 

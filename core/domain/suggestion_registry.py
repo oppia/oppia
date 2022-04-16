@@ -847,7 +847,6 @@ class SuggestionAddQuestion(BaseSuggestion):
             self.change.question_dict['language_code'], None,
             self.change.question_dict['linked_skill_ids'],
             self.change.question_dict['inapplicable_skill_misconception_ids'])
-        question.partial_validate()
         question_state_data_schema_version = (
             self.change.question_dict['question_state_data_schema_version'])
         if question_state_data_schema_version != (
@@ -857,6 +856,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 '%s' % (
                     feconf.CURRENT_STATE_SCHEMA_VERSION,
                     question_state_data_schema_version))
+        question.partial_validate()
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
