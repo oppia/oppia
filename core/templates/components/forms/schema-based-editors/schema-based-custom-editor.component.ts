@@ -52,7 +52,7 @@ implements ControlValueAccessor, Validator {
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnChange(fn: (_: string) => void): void {
+  registerOnChange(fn: (_: unknown) => void): void {
     this.onChange = fn;
   }
 
