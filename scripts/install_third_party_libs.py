@@ -41,7 +41,6 @@ PREREQUISITES = [
 ]
 
 
-
 def install_prerequisite(package: Tuple[str]) -> None:
     """Install prerequisite Python package.
 
