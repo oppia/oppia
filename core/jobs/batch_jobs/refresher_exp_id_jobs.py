@@ -45,14 +45,16 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
     @staticmethod
     def _flatten_user_id_to_exp_id(
         exp_id: str, owner_ids: List[str]) -> Iterable[Tuple[str, str]]:
-        """Flatten owner ids."""
+        """Flatten owner ids to user_id in exp id to owner ids collection."""
         for user_id in owner_ids:
             yield (user_id, exp_id)
 
     @staticmethod
     def _flatten_exp_id_to_email(
         exp_ids_list: List[str], email: List[str]) -> Iterable[Tuple[str, str]]:
-        """Flatten exploration ids."""
+        """Flatten exploration ids to exploration id in exploration ids to email
+        collection.
+        """
         for exp_id in exp_ids_list:
             yield (exp_id, email[0])
 
@@ -75,19 +77,20 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
             if default_outcome is not None:
                 if default_outcome.refresher_exploration_id is not None:
                     yield (exp.id, state_name)
-                    return
+                    continue
 
             for group in interaction.answer_groups:
                 if group.outcome.refresher_exploration_id is not None:
                     yield (exp.id, state_name)
+                    break
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
-        matching entity_type as collection.
+        """Returns a PCollection of exploration id to state name and user email
+        results from matching refresher_exp_id as not None in exploration.
 
         Returns:
-            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
-            matching entity_type as collection.
+            PCollection. A PCollection of 'exp_id: %s, data: %s' results from
+            matching refresher_exp_id as not None in exploration.
         """
         exp_to_state_name = (
             self.pipeline
