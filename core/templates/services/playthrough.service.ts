@@ -262,6 +262,8 @@ export class PlaythroughService {
     }
 
     // TODO(#15212): Remove the below check once codebase is strictly typed.
+    // And if check is needed, means we are actually passes null or undefined
+    // then add proper comment to explain why we are doing this check.
     if (
       this.recordedLearnerActions &&
       this.playthroughStopwatch &&
