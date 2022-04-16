@@ -131,7 +131,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             'android_device_language_locale_code': 'en'
         },
         'user_supplied_feedback': {
-            'report_type': 'SUGGESTION',
+            'report_type': 'suggestion',
             'category': 'language_suggestion',
             'user_feedback_selected_items': [],
             'user_feedback_other_text_input': 'french'
@@ -140,7 +140,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
     REPORT_STATS = {
         'platform': {PLATFORM_ANDROID: 1},
-        'report_type': {REPORT_TYPE_SUGGESTION.name: 1},
+        'report_type': {REPORT_TYPE_SUGGESTION.value: 1},
         'country_locale_code': {COUNTRY_LOCALE_CODE_INDIA: 1},
         'entry_point_name': {ENTRY_POINT_NAVIGATION_DRAWER.name: 1},
         'text_language_code': {TEXT_LANGUAGE_CODE_ENGLISH: 1},
@@ -160,7 +160,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         app_feedback_report_models.AppFeedbackReportModel.create(
             self.android_report_id, self.PLATFORM_ANDROID,
             self.REPORT_SUBMITTED_TIMESTAMP, 0,
-            self.REPORT_TYPE_SUGGESTION.name, self.CATEGORY_OTHER.name,
+            self.REPORT_TYPE_SUGGESTION.value, self.CATEGORY_OTHER.name,
             self.ANDROID_PLATFORM_VERSION,
             self.COUNTRY_LOCALE_CODE_INDIA,
             self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
@@ -202,7 +202,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         app_feedback_report_models.AppFeedbackReportModel.create(
             new_report_id_1, self.PLATFORM_ANDROID,
             self.REPORT_SUBMITTED_TIMESTAMP, 0,
-            self.REPORT_TYPE_SUGGESTION.name, self.CATEGORY_OTHER.name,
+            self.REPORT_TYPE_SUGGESTION.value, self.CATEGORY_OTHER.name,
             self.ANDROID_PLATFORM_VERSION,
             self.COUNTRY_LOCALE_CODE_INDIA,
             self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
@@ -215,7 +215,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         app_feedback_report_models.AppFeedbackReportModel.create(
             new_report_id_2, self.PLATFORM_ANDROID,
             self.REPORT_SUBMITTED_TIMESTAMP, 0,
-            self.REPORT_TYPE_SUGGESTION.name, self.CATEGORY_OTHER.name,
+            self.REPORT_TYPE_SUGGESTION.value, self.CATEGORY_OTHER.name,
             self.ANDROID_PLATFORM_VERSION,
             self.COUNTRY_LOCALE_CODE_INDIA,
             self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
@@ -264,7 +264,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         user_supplied_feedback = self.android_report_obj.user_supplied_feedback
 
         self.assertEqual(
-            user_supplied_feedback.report_type.name,
+            user_supplied_feedback.report_type.value,
             self.android_report_model.report_type)
         self.assertEqual(
             user_supplied_feedback.category.name,
@@ -490,7 +490,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     {self.PLATFORM_ANDROID: 1})),
             'report_type': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {self.REPORT_TYPE_SUGGESTION.name: 1})),
+                    {self.REPORT_TYPE_SUGGESTION.value: 1})),
             'country_locale_code': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts(
                     {self.COUNTRY_LOCALE_CODE_INDIA: 1})),
@@ -725,7 +725,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     filter_field_names.report_type):
                 self.assertEqual(
                     filter_obj.filter_options[0],
-                    self.REPORT_TYPE_SUGGESTION.name)
+                    self.REPORT_TYPE_SUGGESTION.value)
             elif filter_obj.filter_field == (
                     filter_field_names.platform):
                 self.assertEqual(
@@ -1415,7 +1415,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 ticket_id=ticket_id,
                 submitted_on=submitted_on,
                 local_timezone_offset_hrs=0,
-                report_type=self.REPORT_TYPE_SUGGESTION.name,
+                report_type=self.REPORT_TYPE_SUGGESTION.value,
                 category=self.CATEGORY_OTHER.name,
                 platform_version=self.ANDROID_PLATFORM_VERSION,
                 android_device_country_locale_code=(
@@ -1446,7 +1446,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 ticket_id=ticket_id,
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
                 local_timezone_offset_hrs=0,
-                report_type=self.REPORT_TYPE_SUGGESTION.name,
+                report_type=self.REPORT_TYPE_SUGGESTION.value,
                 category=self.CATEGORY_OTHER.name,
                 platform_version=self.ANDROID_PLATFORM_VERSION,
                 android_device_country_locale_code=(
@@ -1478,7 +1478,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 ticket_id=ticket_id,
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
                 local_timezone_offset_hrs=0,
-                report_type=self.REPORT_TYPE_SUGGESTION.name,
+                report_type=self.REPORT_TYPE_SUGGESTION.value,
                 category=self.CATEGORY_OTHER.name,
                 platform_version=self.ANDROID_PLATFORM_VERSION,
                 android_device_country_locale_code=(
