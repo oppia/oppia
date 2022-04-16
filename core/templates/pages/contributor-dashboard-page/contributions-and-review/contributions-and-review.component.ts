@@ -300,9 +300,7 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       const openQuestionSuggestionModal = function(
-          suggestionId, question = undefined) {
-        var suggestion = ctrl.contributions[suggestionId].suggestion;
-        var reviewable = ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS;
+          suggestionId, suggestion, reviewable, question = undefined) {
         var contributionDetails = ctrl.contributions[suggestionId].details;
         var skillId = suggestion.change.skill_id;
         ContextService.setCustomEntityContext(
@@ -322,7 +320,7 @@ angular.module('oppia').component('contributionsAndReview', {
         var suggestion = ctrl.contributions[suggestionId].suggestion;
         var reviewable = ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS;
         if (suggestion.suggestion_type === SUGGESTION_TYPE_QUESTION) {
-          openQuestionSuggestionModal(suggestionId);
+          openQuestionSuggestionModal(suggestionId, suggestion, reviewable);
         }
         if (suggestion.suggestion_type === SUGGESTION_TYPE_TRANSLATE) {
           const suggestionIdToContribution = {};

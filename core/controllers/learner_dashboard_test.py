@@ -718,7 +718,7 @@ class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
             feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
-            {'more': []},
+            {'paginated_threads_list': []},
             csrf_token=csrf_token,
             expected_status_int=200)
         thread_summaries = response['thread_summaries']
@@ -732,14 +732,14 @@ class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
 
         response = self.post_json(
             feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
-            {'more': []},
+            {'paginated_threads_list': []},
             csrf_token=csrf_token,
             expected_status_int=200)
         thread_summaries = response['thread_summaries']
         thread_id = thread_summaries[0]['thread_id']
         thread = feedback_services.get_thread(thread_id)
 
-        self.assertEqual(len(response['more']), 0)
+        self.assertEqual(len(response['paginated_threads_list']), 0)
         self.assertEqual(len(thread_summaries), 1)
         self.assertEqual(thread_summaries[0]['total_message_count'], 1)
         self.assertEqual(
@@ -765,16 +765,16 @@ class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
 
         response = self.post_json(
             feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
-            {'more': []},
+            {'paginated_threads_list': []},
             csrf_token=csrf_token,
             expected_status_int=200)
         thread_summaries = response['thread_summaries']
         thread_id = thread_summaries[0]['thread_id']
         thread = feedback_services.get_thread(thread_id)
-        more = response['more']
+        paginated_threads_list = response['paginated_threads_list']
 
-        self.assertEqual(len(more), 1)
-        self.assertEqual(len(more[0]), 90)
+        self.assertEqual(len(paginated_threads_list), 1)
+        self.assertEqual(len(paginated_threads_list[0]), 90)
         self.assertEqual(len(thread_summaries), 100)
         self.assertEqual(thread_summaries[0]['total_message_count'], 1)
         self.assertEqual(
@@ -789,15 +789,15 @@ class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
 
         response = self.post_json(
             feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
-            {'more': more},
+            {'paginated_threads_list': paginated_threads_list},
             csrf_token=csrf_token,
             expected_status_int=200)
         thread_summaries = response['thread_summaries']
         thread_id = thread_summaries[0]['thread_id']
         thread = feedback_services.get_thread(thread_id)
-        more = response['more']
+        paginated_threads_list = response['paginated_threads_list']
 
-        self.assertEqual(len(response['more']), 0)
+        self.assertEqual(len(response['paginated_threads_list']), 0)
         self.assertEqual(len(thread_summaries), 90)
         self.assertEqual(thread_summaries[0]['total_message_count'], 1)
         self.assertEqual(

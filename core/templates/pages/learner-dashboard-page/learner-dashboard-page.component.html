@@ -334,7 +334,7 @@
             <i class="material-icons">&#xE88F;</i>
             <span [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING' | translate"></span>
           </div>
-          <div class="oppia-learnerdashboard-pagination-container" *ngIf="more.length > 0">
+          <div class="oppia-learnerdashboard-pagination-container" *ngIf="paginatedThreadsList.length > 0">
             <button class="oppia-pagination-button" type="button" (click)="fetchFeedbackUpdates()">
               <span *ngIf="!loadingIndicatorIsShown">Show more</span>
               <span *ngIf="loadingIndicatorIsShown">
