@@ -39,43 +39,97 @@ if MYPY: # pragma: no cover
 
 
 class SkillSnapshotContentModelTests(test_utils.GenericTestBase):
+    """Test the SkillSnapshotContentModel class."""
 
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             skill_models.SkillSnapshotContentModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_get_export_policy(self) -> None:
-        expected_export_policy_dict = {
-            'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'post_commit_community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'post_commit_is_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'post_commit_status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        }
-
-        self.assertEqual(
-            skill_models.SkillCommitLogEntryModel
-                .get_export_policy(),
-            expected_export_policy_dict
-        )
 
 class SkillModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillModel class."""
+
+    SKILL_ID = None
+    USER_ID = 'user'
+ 
+    def setUp(self):
+        super(SkillModelUnitTest, self).setUp()
+        self.SKILL_ID = skill_services.get_new_skill_id()
+        self.skill = self.save_new_skill(
+            self.SKILL_ID, self.USER_ID, description='Description'
+        )
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             skill_models.SkillModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+    
+    def test_get_merged_skills(self):
+        skill = skill_models.SkillModel.get_merged_skills()
+        self.assertEqual(len(skill), 0)
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': '',
+                'new_value': 'TestingSkillMerge'
+            })
+        ]
+        skill_services.update_skill(
+            self.USER_ID, self.SKILL_ID, changelist,
+            'Merging skill.')
+        skill_ids = skill_services.get_merged_skill_ids()
+        self.assertEqual(len(skill_ids), 1)
+        self.assertEqual(skill_ids[0], self.SKILL_ID)
+    
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            skill_models.SkillModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+    
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'all_questions_merged': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE, 
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE, 
+            'misconceptions': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconceptions_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'prerequisite_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rubric_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rubrics': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_contents_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_misconception_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'superseding_skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            skill_models.SkillModel.get_export_policy(),
+            expected_export_policy_dict)
+
+
+    def test_get_by_description(self) -> None:
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skill = skill_domain.Skill.create_default_skill('skill_id', 'description', rubrics)
+        skill_services.save_new_skill('test_comitter_id', skill)
+        skill_model = skill_models.SkillModel.get_by_description('description')
+        assert skill_model is not None
+        self.assertEqual(skill_model.description, 'description')
+        self.assertEqual(skill_model.id, 'skill_id')
 
 
 class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -99,8 +153,7 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             skill_models.SkillCommitLogEntryModel.get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-        )
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
@@ -122,107 +175,8 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill_models.SkillCommitLogEntryModel
                 .get_export_policy(),
-            expected_export_policy_dict
-        )
+            expected_export_policy_dict)
 
-    def test_get_export_policy(self) -> None:
-        expected_export_policy_dict = {
-            'all_questions_merged': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'misconceptions': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'misconceptions_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'next_misconception_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'prerequisite_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'rubric_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'rubrics': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skill_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skill_contents_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'superseding_skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-        }
-        self.assertEqual(
-            skill_models.SkillModel
-                .get_export_policy(),
-            expected_export_policy_dict
-        )
-
-
-class SkillModelUnitTest(test_utils.GenericTestBase):
-    """Test the SkillModel class."""
-   
-    def test_get_deletion_policy(self) -> None:
-        self.assertEqual(
-            skill_models.SkillModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE
-        )
-    def test_get_merged_skills(self):
-        changelist = [
-            skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                'property_name': (
-                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
-                'old_value': '',
-                'new_value': 'TestSkillId'
-            }),
-            skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                'property_name': (
-                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
-                'old_value': None,
-                'new_value': False
-            })
-        ]
-        skill_services.update_skill(
-            'comitter_id', 'skill_id', changelist,
-            'Merging skill.')
-        skill = skill_fetchers.get_skill_by_id('skill_id')
-        self.assertEqual(skill.version, 2)
-        self.assertEqual(skill.superseding_skill_id, 'TestSkillId')
-        self.assertEqual(skill.all_questions_merged, False)
-
-        # skills = skill_services.get_merged_skills()
-        # self.assertEqual(len(skills), 0)
-        # changelist = [
-        #     skill_domain.SkillChange({
-        #         'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-        #         'property_name': (
-        #             skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
-        #         'old_value': '',
-        #         'new_value': 'TestSkillId'
-        #     })
-        # skill_services.update_skill(
-        #     self.USER_ID, self.SKILL_ID, changelist,
-        #     'Merging skill.')
-        # ]
-        # skills = skill_services.get_merged_skills()
-        # self.assertEqual(len(skills), 1)
-        # self.assertEqual(skill_ids[0], self.SKILL_ID)
-
-    def test_get_model_association_to_user(self) -> None:
-        self.assertEqual(
-            skill_models.SkillModel.get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-        )
-    def test_get_by_description(self) -> None:
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
-        skill = skill_domain.Skill.create_default_skill('skill_id', 'description', rubrics)
-        skill_services.save_new_skill('test_comitter_id', skill)
-        skill_model = skill_models.SkillModel.get_by_description('description')
-        assert skill_model is not None
-        self.assertEqual(skill_model.description, 'description')
-        self.assertEqual(skill_model.id, 'skill_id')
-       
 
 class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillSummaryModel class."""
@@ -312,6 +266,3 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(skill_summaries[0].id, 'skill_id1')
         self.assertEqual(skill_summaries[1].id, 'skill_id2')
         self.assertFalse(more)
-
-
-    
