@@ -3241,9 +3241,9 @@ md-card.preview-conversation-skin-supplemental-card {
   bottom: 0;
   color: white;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  margin: 12px 0;
+  margin-bottom: 0;
   padding: 0;
-  position: absolute;
+  position: relative;
 }
 
 .oppia-info-card-bg-image {
@@ -3260,8 +3260,10 @@ md-card.preview-conversation-skin-supplemental-card {
   background-repeat: no-repeat;
   background-size: cover;
   height: 300px;
-  padding: 20px;
+  padding: 15px;
   position: relative;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
 .oppia-info-card-content {
@@ -3278,6 +3280,11 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-right: 5px;
   vertical-align: middle;
 }
+
+.fas {
+  margin-right: 5px
+}
+
 .oppia-info-card-bottom-row ul li a img {
   height: 20px;
   width: 20px;
@@ -3322,6 +3329,11 @@ md-card.preview-conversation-skin-supplemental-card {
 /* This is necessary so that long usernames don't overflow the tooltip. */
 .oppia-info-card-content .tooltip-inner {
   max-width: none;
+}
+
+.oppia-info-card-tag-row {
+  display: flex;
+  flex-direction: row;
 }
 
 .oppia-info-card-tag-icon {
