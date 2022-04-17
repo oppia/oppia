@@ -46,8 +46,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/change_domain.py',
     'core/domain/classifier_services.py',
     'core/domain/classifier_services_test.py',
-    'core/domain/classroom_services.py',
-    'core/domain/classroom_services_test.py',
     'core/domain/collection_services.py',
     'core/domain/collection_services_test.py',
     'core/domain/cron_services.py',
