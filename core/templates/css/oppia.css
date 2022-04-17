@@ -3255,17 +3255,6 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 120px;
 }
 
-.oppia-info-card-logo-thumbnail {
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 300px;
-  padding: 15px;
-  position: relative;
-  display: flex;
-  flex-direction: column-reverse;
-}
-
 .oppia-info-card-content {
   padding: 10px 20px 10px 20px;
 }
@@ -3298,6 +3287,17 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-info-card-content .card-metrics ul li .oppia-contributors-circle {
   height: 20px;
   width: 20px;
+}
+
+.oppia-info-card-logo-thumbnail {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 300px;
+  padding: 15px;
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
 .oppia-contributors-more-circle {
