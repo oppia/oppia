@@ -235,10 +235,12 @@ export class PlaythroughService {
     }
 
     // TODO(#15212): Remove the below check once codebase is strictly typed.
+    // And if check is needed, means we are actually passes null then add
+    // proper comment to explain why we are doing this check.
     if (
-      this.recordedLearnerActions &&
-      this.misTracker &&
-      this.cstTracker
+      this.recordedLearnerActions !== null &&
+      this.misTracker !== null &&
+      this.cstTracker !== null
     ) {
       this.recordedLearnerActions.push(
         this.learnerActionObjectFactory.createNewAnswerSubmitAction({
@@ -262,12 +264,12 @@ export class PlaythroughService {
     }
 
     // TODO(#15212): Remove the below check once codebase is strictly typed.
-    // And if check is needed, means we are actually passes null or undefined
-    // then add proper comment to explain why we are doing this check.
+    // And if check is needed, means we are actually passes null then add
+    // proper comment to explain why we are doing this check.
     if (
-      this.recordedLearnerActions &&
-      this.playthroughStopwatch &&
-      this.eqTracker
+      this.recordedLearnerActions !== null &&
+      this.playthroughStopwatch !== null &&
+      this.eqTracker !== null
     ) {
       this.recordedLearnerActions.push(
         this.learnerActionObjectFactory.createNewExplorationQuitAction({
@@ -302,10 +304,12 @@ export class PlaythroughService {
    */
   private createNewPlaythrough(): Playthrough | null {
     // TODO(#15212): Remove the below check once codebase is strictly typed.
+    // And if check is needed, means we are actually passes null then add
+    // proper comment to explain why we are doing this check.
     if (
-      this.explorationId &&
-      this.explorationVersion &&
-      this.recordedLearnerActions
+      this.explorationId !== null &&
+      this.explorationVersion !== null &&
+      this.recordedLearnerActions !== null
     ) {
       if (this.misTracker && this.misTracker.foundAnIssue()) {
         return this.playthroughObjectFactory
@@ -314,25 +318,17 @@ export class PlaythroughService {
             this.misTracker.generateIssueCustomizationArgs(),
             this.recordedLearnerActions);
       } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
-        const cstTrackerIssueCustomizationArgs = (
-          this.cstTracker.generateIssueCustomizationArgs());
-        if (cstTrackerIssueCustomizationArgs !== undefined) {
-          return this.playthroughObjectFactory
-            .createNewCyclicStateTransitionsPlaythrough(
-              this.explorationId, this.explorationVersion,
-              cstTrackerIssueCustomizationArgs,
-              this.recordedLearnerActions);
-        }
+        return this.playthroughObjectFactory
+          .createNewCyclicStateTransitionsPlaythrough(
+            this.explorationId, this.explorationVersion,
+            this.cstTracker.generateIssueCustomizationArgs(),
+            this.recordedLearnerActions);
       } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
-        const eqTrackerIssueCustomizationArgs = (
-          this.eqTracker.generateIssueCustomizationArgs());
-        if (eqTrackerIssueCustomizationArgs !== undefined) {
-          return this.playthroughObjectFactory
-            .createNewEarlyQuitPlaythrough(
-              this.explorationId, this.explorationVersion,
-              eqTrackerIssueCustomizationArgs,
-              this.recordedLearnerActions);
-        }
+        return this.playthroughObjectFactory
+          .createNewEarlyQuitPlaythrough(
+            this.explorationId, this.explorationVersion,
+            this.eqTracker.generateIssueCustomizationArgs(),
+            this.recordedLearnerActions);
       }
     }
     return null;
@@ -347,8 +343,10 @@ export class PlaythroughService {
   private hasRecordingBegun(): boolean {
     return (
       // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
-      // codebase is strictly typed.
-      this.recordedLearnerActions &&
+      // codebase is strictly typed. And if check is needed, means we are
+      // actually passes null then add proper comment to explain why we are
+      // doing this check.
+      this.recordedLearnerActions !== null &&
       this.isPlaythroughRecordingEnabled()
     );
   }
@@ -356,8 +354,10 @@ export class PlaythroughService {
   private hasRecordingFinished(): boolean {
     return (
       // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
-      // codebase is strictly typed.
-      this.recordedLearnerActions &&
+      // codebase is strictly typed. And if check is needed, means we are
+      // actually passes null then add proper comment to explain why we are
+      // doing this check.
+      this.recordedLearnerActions !== null &&
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
       this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
@@ -367,8 +367,10 @@ export class PlaythroughService {
   private isRecordedPlaythroughHelpful(): boolean {
     return (
       // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
-      // codebase is strictly typed.
-      this.recordedLearnerActions &&
+      // codebase is strictly typed. And if check is needed, means we are
+      // actually passes null then add proper comment to explain why we are
+      // doing this check.
+      this.recordedLearnerActions !== null &&
       // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.
