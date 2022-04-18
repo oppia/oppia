@@ -150,6 +150,8 @@ describe('Lesson Information card modal component', () => {
       .and.returnValues(true, true, false);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
       .and.returnValues(false, false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should initialize the component and set values' +
@@ -239,4 +241,8 @@ describe('Lesson Information card modal component', () => {
       expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
     });
   }));
+
+  it('should get RTL language status correctly', () => {
+    expect(componentInstance.isLanguageRTL()).toBeTrue();
+  });
 });

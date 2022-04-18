@@ -753,7 +753,7 @@ describe('Conversation skin component', () => {
       .and.returnValue(stateObjectFactory.createFromBackendDict(
         'Mid', expResponse.exploration.states.Mid
       ));
-    
+
     componentInstance.explorationId = expResponse.exploration_id;
     componentInstance.displayedCard = displayedCard;
     componentInstance.isLoggedIn = true;

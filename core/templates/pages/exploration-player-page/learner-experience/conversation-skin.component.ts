@@ -71,7 +71,7 @@ import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { ReadOnlyExplorationBackendApiService, ReadOnlyExplorationBackendDict } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
@@ -333,7 +333,7 @@ export class ConversationSkinComponent {
         );
     }
 
-    // We do not save checkpoints progress for iframes
+    // We do not save checkpoints progress for iframes.
     if (!this.isIframed && this.isLoggedIn) {
       // For the first state which is always a checkpoint.
       let firstStateName: string;
@@ -342,13 +342,13 @@ export class ConversationSkinComponent {
         loadLatestExplorationAsync(this.explorationId).then(
           response => {
             expVersion = response.version;
-            firstStateName = response.exploration.init_state_name
+            firstStateName = response.exploration.init_state_name;
             this.mostRecentlyReachedCheckpoint = (
               response.most_recently_reached_checkpoint_state_name
             );
             // If the exploration is freshly started, mark the first state
             // as the most recently reached checkpoint.
-            if(!this.mostRecentlyReachedCheckpoint) {
+            if (!this.mostRecentlyReachedCheckpoint) {
               this.editableExplorationBackendApiService.
                 recordMostRecentlyReachedCheckpointAsync(
                   this.explorationId,

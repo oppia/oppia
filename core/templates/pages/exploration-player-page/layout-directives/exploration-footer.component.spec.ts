@@ -432,7 +432,7 @@ describe('ExplorationFooterComponent', () => {
               html: '<p>Second Question</p>'
             }
           }
-        }  
+        }
       },
       version: 1,
       can_edit: true,
