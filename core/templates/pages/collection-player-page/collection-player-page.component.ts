@@ -33,6 +33,7 @@ import { CollectionPlayerBackendApiService } from './services/collection-player-
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 export interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -106,7 +107,8 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private collectionPlayerBackendApiService:
       CollectionPlayerBackendApiService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -320,6 +322,10 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
         collectionTitle: this.collection.getTitle()
       });
     this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnInit(): void {

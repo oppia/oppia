@@ -35,6 +35,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslateService } from '@ngx-translate/core';
 import { PageTitleService } from 'services/page-title.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -62,6 +63,7 @@ describe('Collection player page component', () => {
   let collectionNodeBackendObject: CollectionNodeBackendDict;
   let pageTitleService: PageTitleService;
   let translateService: TranslateService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   const userInfoForCollectionCreator = new UserInfo(
     ['USER_ROLE'], true, false, false, false, true,
@@ -99,6 +101,7 @@ describe('Collection player page component', () => {
       ReadOnlyCollectionBackendApiService);
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     fixture = TestBed.createComponent(CollectionPlayerPageComponent);
     component = fixture.componentInstance;
 
@@ -205,6 +208,8 @@ describe('Collection player page component', () => {
       }));
     spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('collectionId');
     alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue(null);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should throw warning message when an invalid collection ' +
@@ -559,4 +564,8 @@ describe('Collection player page component', () => {
     expect(component.scrollToLocation).toHaveBeenCalled();
     expect(component.explorationCardIsShown).toBeFalse();
   }));
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toBeTrue();
+  });
 });
