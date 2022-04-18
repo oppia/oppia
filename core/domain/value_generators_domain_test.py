@@ -48,6 +48,18 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
                 'generate_value() method has not yet been implemented')):
             base_generator.generate_value()
 
+    def test_get_html_template(self) -> None:
+        copier_id = 'Copier'
+        template_filename = 'extensions/value_generators/templates/Copier.html'
+
+        copier = value_generators_domain.Registry.get_generator_class_by_id(
+            copier_id)
+        template = copier.get_html_template()
+
+        with open(template_filename, 'r', encoding='utf-8') as f:
+            expected_html = f.read()
+            self.assertEqual(expected_html, template)
+
 
 class ValueGeneratorNameTests(test_utils.GenericTestBase):
 
