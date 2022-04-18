@@ -271,7 +271,6 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
         }
         self.render_json(self.values)
 
-
     def _get_reviewable_exploration_opportunity_summaries(
             self, user_id, topic_name):
         """Returns exploration opportunity summaries that have translation

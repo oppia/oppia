@@ -1067,6 +1067,12 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def _create_translation_suggestion_with_language_code(self, language_code):
         """Creates a translation suggestion with the language code given."""
+        return self._create_translation_suggestion(
+            language_code, self.target_id_1)
+
+    def _create_translation_suggestion(self, language_code, target_id):
+        """Creates a translation suggestion for the supplied language code and
+        target ID."""
 
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -1089,7 +1095,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 translation_suggestion = suggestion_services.create_suggestion(
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                     feconf.ENTITY_TYPE_EXPLORATION,
-                    self.target_id_1, 1, self.author_id_1,
+                    target_id, 1, self.author_id_1,
                     add_translation_change_dict, 'test description')
 
         return translation_suggestion
@@ -1396,6 +1402,30 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 self.target_id_1, 'pt'))
 
         self.assertEqual(len(suggestions), 1)
+
+    def test_get_reviewable_translation_suggestion_target_ids(self):
+        # Add a few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion('pt', self.target_id_2)
+        self._create_translation_suggestion('bn', self.target_id_3)
+        self._create_translation_suggestion('bn', self.target_id_3)
+        # Provide the user permission to review suggestions in particular
+        # languages.
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'pt')
+
+        suggestion_target_ids = (
+            suggestion_services.
+            get_reviewable_translation_suggestion_target_ids(
+                self.reviewer_id_1))
+
+        # Expect that the results correspond to translation suggestions that the
+        # user has rights to review.
+        self.assertEqual(
+            suggestion_target_ids, [self.target_id_1, self.target_id_2])
 
     def test_get_reviewable_translation_suggestions_with_valid_exp_ids(
             self):
