@@ -471,6 +471,13 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             params={'topic_name': 'Invalid'},
             expected_status_int=400)
 
+    def test_get_reviewable_translation_opportunities_without_topic(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            expected_status_int=400)
+
     def test_get_reviewable_translation_opportunities_returns_opportunities_in_story_order( # pylint: disable=line-too-long
             self):
         # Create new explorations 10, 20, 30.

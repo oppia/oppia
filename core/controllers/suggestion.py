@@ -33,7 +33,6 @@ from core.domain import opportunity_services
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
-from core.domain import topic_fetchers
 
 
 class SuggestionHandler(base.BaseHandler):

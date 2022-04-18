@@ -1072,7 +1072,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def _create_translation_suggestion(self, language_code, target_id):
         """Creates a translation suggestion for the supplied language code and
-        target ID."""
+        target ID.
+        """
 
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,

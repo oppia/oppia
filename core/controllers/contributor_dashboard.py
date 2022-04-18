@@ -294,7 +294,9 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
         # 4. Get story exploration nodes in order, filtering for explorations
         # that have in review translation suggestions.
         topics = []
-        if topic_name == feconf.ALL_LITERAL_CONSTANT:
+        if topic_name is None:
+            raise self.InvalidInputException
+        elif topic_name == feconf.ALL_LITERAL_CONSTANT:
             topics = topic_fetchers.get_all_topics()
         else:
             topic = topic_fetchers.get_topic_by_name(topic_name)
