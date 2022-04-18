@@ -17,8 +17,10 @@
 from __future__ import annotations
 
 import datetime
+import os
 
 from core import feconf
+from core import utils
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
@@ -416,3 +418,188 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'], 'Sorry, we could not find the specified user.')
         self.logout()
+
+
+class AudioUploaderHandlerTests(BaseVoiceArtistControllerTests):
+
+    EXP_ID = 'expId'
+
+    TEST_AUDIO_FILE_MP3 = 'cafe.mp3'
+    TEST_AUDIO_FILE_FLAC = 'cafe.flac'
+    TEST_AUDIO_FILE_OVER_MAX_LENGTH = 'cafe-over-five-minutes.mp3'
+    TEST_AUDIO_FILE_MPEG_CONTAINER = 'test-mpeg-container.mp3'
+    AUDIO_UPLOAD_URL_PREFIX = '/createhandler/audioupload'
+
+    def setUp(self):
+        super(AudioUploaderHandlerTests, self).setUp()
+        self.login(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End card')
+        self.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin,
+            self.EXP_ID,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
+
+        mock_accepted_audio_extensions = {
+            'mp3': ['audio/mp3'],
+            'flac': ['audio/flac']
+        }
+
+        self.accepted_audio_extensions_swap = self.swap(
+            feconf, 'ACCEPTED_AUDIO_EXTENSIONS',
+            mock_accepted_audio_extensions)
+
+        self.logout()
+
+        self.login(self.VOICE_ARTIST_EMAIL)
+
+        self.csrf_token = self.get_new_csrf_token()
+
+    def test_audio_upload_voice_artist(self):
+        with utils.open_file(
+                os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+                'rb', encoding=None
+        ) as f:
+            raw_audio = f.read()
+        response_dict = self.post_json(
+            '%s/%s' % (self.AUDIO_UPLOAD_URL_PREFIX, self.EXP_ID),
+            {'filename': self.TEST_AUDIO_FILE_MP3},
+            csrf_token=self.csrf_token,
+            upload_files=(
+                ('raw_audio_file', self.TEST_AUDIO_FILE_MP3, raw_audio),)
+        )
+        self.assertEqual(response_dict['filename'], self.TEST_AUDIO_FILE_MP3)
+        self.assertIsNotNone(response_dict['duration_secs'])
+
+    def test_no_audio(self):
+        response_dict = self.post_json(
+            '%s/%s' % (self.AUDIO_UPLOAD_URL_PREFIX, self.EXP_ID),
+            {'filename': self.TEST_AUDIO_FILE_MP3},
+            csrf_token=self.csrf_token,
+            expected_status_int=400,
+            upload_files=(('raw_audio_file', 'unused_filename', ''),)
+        )
+        self.assertEqual(response_dict['status_code'], 400)
+        self.assertEqual(response_dict['error'], 'No audio supplied')
+
+    def test_missing_file_extension(self):
+        missing_extension_filename = 'test'
+        with utils.open_file(
+                os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+                'rb', encoding=None
+        ) as f:
+            raw_audio = f.read()
+        response_dict = self.post_json(
+            '%s/%s' % (self.AUDIO_UPLOAD_URL_PREFIX, self.EXP_ID),
+            {'filename': missing_extension_filename},
+            csrf_token=self.csrf_token,
+            expected_status_int=400,
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
+        )
+        self.assertEqual(response_dict['status_code'], 400)
+        self.assertEqual(
+            response_dict['error'],
+            'No filename extension: it should have '
+            'one of the following extensions: '
+            '%s' % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))
+
+    def test_invalid_extension(self):
+        filename_without_extension = 'test'
+        invalid_extension = 'wav'
+        supplied_filename = (
+                '%s.%s' % (filename_without_extension, invalid_extension))
+
+        with utils.open_file(
+                os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+                'rb', encoding=None
+        ) as f:
+            raw_audio = f.read()
+        response_dict = self.post_json(
+            '%s/%s' % (self.AUDIO_UPLOAD_URL_PREFIX, self.EXP_ID),
+            {'filename': supplied_filename},
+            csrf_token=self.csrf_token,
+            expected_status_int=400,
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
+        )
+        self.assertEqual(response_dict['status_code'], 400)
+        self.assertEqual(
+            response_dict['error'],
+            'Invalid filename extension: it should have '
+            'one of the following extensions: %s'
+            % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))
+
+    def test_mutagen_bad_audio(self):
+        response_dict = self.post_json(
+            '%s/%s' % (self.AUDIO_UPLOAD_URL_PREFIX, self.EXP_ID),
+            {'filename': 'test.mp3'},
+            csrf_token=self.csrf_token,
+            expected_status_int=400,
+            upload_files=(
+                ('raw_audio_file', 'unused_filename', 'non_audio_data'),)
+        )
+        self.assertEqual(response_dict['status_code'], 400)
+        self.assertEqual(
+            response_dict['error'], 'Audio not recognized as a mp3 file')
+
+    def test_detect_non_audio(self):
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_audio = f.read()
+
+        with self.accepted_audio_extensions_swap:
+            response_dict = self.post_json(
+                '%s/%s' % (self.AUDIO_UPLOAD_URL_PREFIX, self.EXP_ID),
+                {'filename': self.TEST_AUDIO_FILE_FLAC},
+                csrf_token=self.csrf_token,
+                expected_status_int=400,
+                upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
+            )
+        self.assertEqual(
+            response_dict['error'], 'Audio not recognized as a flac file')
+
+    def test_too_long(self):
+        with utils.open_file(
+            os.path.join(
+                feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_OVER_MAX_LENGTH),
+            'rb', encoding=None
+        ) as f:
+            raw_audio = f.read()
+        response_dict = self.post_json(
+            '%s/%s' % (self.AUDIO_UPLOAD_URL_PREFIX, self.EXP_ID),
+            {'filename': 'test.mp3'},
+            csrf_token=self.csrf_token,
+            expected_status_int=400,
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
+        )
+        self.assertEqual(response_dict['status_code'], 400)
+        self.assertIn(
+            'Audio files must be under %s seconds in length'
+            % feconf.MAX_AUDIO_FILE_LENGTH_SEC, response_dict['error'])
+
+    def test_extensions_do_not_match(self):
+        mismatched_filename = 'test.flac'
+        with utils.open_file(
+                os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+                'rb', encoding=None
+        ) as f:
+            raw_audio = f.read()
+
+        with self.accepted_audio_extensions_swap:
+            response_dict = self.post_json(
+                '%s/%s' % (self.AUDIO_UPLOAD_URL_PREFIX, self.EXP_ID),
+                {'filename': mismatched_filename},
+                csrf_token=self.csrf_token,
+                expected_status_int=400,
+                upload_files=[
+                    ('raw_audio_file', mismatched_filename, raw_audio)]
+            )
+        self.assertIn(
+            'Although the filename extension indicates the file is a flac '
+            'file, it was not recognized as one. Found mime types:',
+            response_dict['error'])
