@@ -618,43 +618,41 @@ export class ConversationSkinComponent {
             response.most_recently_reached_checkpoint_state_name
           );
 
-          if (this.mostRecentlyReachedCheckpoint) {
-            this.prevSessionStatesProgress = (
-              this.explorationEngineService.getShortestPathToState(
-                states, this.mostRecentlyReachedCheckpoint
-              )
-            );
+          this.prevSessionStatesProgress = (
+            this.explorationEngineService.getShortestPathToState(
+              states, this.mostRecentlyReachedCheckpoint
+            )
+          );
 
-            let indexToRedirectTo = 0;
+          let indexToRedirectTo = 0;
 
-            for (let i = 0; i < this.prevSessionStatesProgress.length; i++) {
-              // Set state name of a previously completed state.
-              let stateName = this.prevSessionStatesProgress[i];
-              // Skip the card if it has already been added to transcript.
-              if (!this.playerTranscriptService.hasEncounteredStateBefore(
-                stateName)
-              ) {
-                let stateCard = (
-                  this.explorationEngineService.getStateCardByName(stateName)
-                );
-                this._addNewCard(stateCard);
-              }
-
-              if (this.mostRecentlyReachedCheckpoint === stateName) {
-                break;
-              }
-
-              this.visitedStateNames.push(stateName);
-              indexToRedirectTo += 1;
+          for (let i = 0; i < this.prevSessionStatesProgress.length; i++) {
+            // Set state name of a previously completed state.
+            let stateName = this.prevSessionStatesProgress[i];
+            // Skip the card if it has already been added to transcript.
+            if (!this.playerTranscriptService.hasEncounteredStateBefore(
+              stateName)
+            ) {
+              let stateCard = (
+                this.explorationEngineService.getStateCardByName(stateName)
+              );
+              this._addNewCard(stateCard);
             }
 
-            // Remove the last card from progress as it is not completed
-            // yet and is only most recently reached.
-            this.prevSessionStatesProgress.pop();
+            if (this.mostRecentlyReachedCheckpoint === stateName) {
+              break;
+            }
 
-            // Move to most recently reached checkpoint card.
-            this.changeCard(indexToRedirectTo);
+            this.visitedStateNames.push(stateName);
+            indexToRedirectTo += 1;
           }
+
+          // Remove the last card from progress as it is not completed
+          // yet and is only most recently reached.
+          this.prevSessionStatesProgress.pop();
+
+          // Move to most recently reached checkpoint card.
+          this.changeCard(indexToRedirectTo);
         }
       );
   }

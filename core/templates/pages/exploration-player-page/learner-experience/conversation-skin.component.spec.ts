@@ -29,6 +29,7 @@ import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
@@ -133,6 +134,7 @@ describe('Conversation skin component', () => {
   let windowRef: WindowRef;
   let readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService;
+  let stateObjectFactory: StateObjectFactory;
 
   let displayedCard = new StateCard(
     null, null, null, new Interaction(
@@ -467,6 +469,7 @@ describe('Conversation skin component', () => {
     windowRef = TestBed.inject(WindowRef);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
   }));
 
   it('should create', () => {
@@ -566,6 +569,85 @@ describe('Conversation skin component', () => {
     tick(1000);
   }));
 
+  it('should initialize component as logged in user', fakeAsync(() => {
+    let collectionId = 'id';
+    let expId = 'exp_id';
+    let isInPreviewMode = false;
+    let isIframed = false;
+    let collectionSummary = {
+      is_admin: true,
+      summaries: [],
+      user_email: '',
+      is_topic_manager: false,
+      username: true
+    };
+    let expResponse = explorationResponse;
+    expResponse.most_recently_reached_checkpoint_state_name = null;
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        [], false, false,
+        false, false, false, '', '', '', true)));
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl')
+      .and.returnValues(collectionId, null);
+
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.returnValue(Promise.resolve(new Collection(
+        '', '', '', '', [], null, '', 6, 8, [])));
+    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
+    spyOn(explorationEngineService, 'isInPreviewMode')
+      .and.returnValue(isInPreviewMode);
+    spyOn(urlService, 'isIframed').and.returnValue(isIframed);
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl')
+      .and.returnValue('oppia_avatar_url');
+    spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
+      .and.returnValues(true, false);
+    spyOn(componentInstance, 'initializePage');
+    spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
+      .and.returnValue(
+        Promise.resolve(collectionSummary));
+    spyOn(questionPlayerStateService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(imagePreloaderService, 'onStateChange');
+    spyOn(statsReportingService, 'recordExplorationCompleted');
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted');
+    spyOn(
+      guestCollectionProgressService, 'recordExplorationCompletedInCollection');
+    spyOn(componentInstance, 'doesCollectionAllowsGuestProgress')
+      .and.returnValue(true);
+    spyOn(statsReportingService, 'recordMaybeLeaveEvent');
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
+    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+    spyOn(messengerService, 'sendMessage');
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(expResponse));
+
+    let mockOnHintConsumed = new EventEmitter();
+    let mockOnSolutionViewedEventEmitter = new EventEmitter();
+    let mockOnPlayerStateChange = new EventEmitter();
+
+    spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
+      .and.returnValue(mockOnHintConsumed);
+    spyOnProperty(
+      hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
+      .and.returnValue(mockOnSolutionViewedEventEmitter);
+    spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
+      .and.returnValue(mockOnPlayerStateChange);
+
+    componentInstance.nextCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, '', null);
+    componentInstance.isLoggedIn = true;
+    componentInstance.isIframed = false;
+    componentInstance.hasInteractedAtLeastOnce = true;
+    componentInstance.displayedCard = displayedCard;
+
+    componentInstance.ngOnInit();
+  }));
+
   it('should show alert when collection summaries are not loaded',
     fakeAsync(() => {
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
@@ -622,6 +704,65 @@ describe('Conversation skin component', () => {
     expect(playerPositionService.getCurrentStateName).toHaveBeenCalled();
     expect(playerPositionService.changeCurrentQuestion).toHaveBeenCalled();
   });
+
+  it('should navigate to the most recently reached checkpoint ' +
+  'on page load if user is logged in', fakeAsync(() => {
+    let stateCardNames = ['Start', 'Mid', 'End'];
+    let stateCards: StateCard[] = [];
+    for (let i = 0; i < 3; i++) {
+      stateCards.push(new StateCard(
+        stateCardNames[i],
+        null, null, new Interaction(
+          [], [], null, null, [], 'Continue', null),
+        [], null, null, '', null)
+      );
+    }
+    let expResponse = explorationResponse;
+    expResponse.exploration.states.Mid.card_is_checkpoint = true;
+    spyOn(playerPositionService, 'init').and.callFake((callb) => {
+      callb();
+    });
+    componentInstance.questionPlayerConfig = {};
+    spyOn(explorationPlayerStateService.onPlayerStateChange, 'emit');
+    spyOn(focusManagerService, 'setFocusIfOnDesktop');
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(explorationPlayerStateService, 'getLanguageCode')
+      .and.returnValues('en', 'en', 'en', 'pq');
+    spyOn(explorationPlayerStateService, 'initializeQuestionPlayer')
+      .and.callFake((config, callb, questionAreAvailable) => {
+        callb(displayedCard, 'label');
+      });
+    spyOn(componentInstance, 'adjustPageHeight');
+    spyOn(playerPositionService.onNewCardOpened, 'emit');
+    componentInstance.isIframed = true;
+    spyOn(playerPositionService, 'setDisplayedCardIndex');
+    spyOn(playerPositionService, 'getCurrentStateName')
+      .and.returnValues('Start', 'Mid', 'End');
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(0);
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(expResponse));
+    spyOn(explorationEngineService, 'getShortestPathToState')
+      .and.returnValue(['Start', 'Mid']);
+
+    spyOn(explorationEngineService, 'getStateCardByName')
+      .and.returnValues(stateCards[0], stateCards[1], stateCards[2]);
+
+    spyOn(playerPositionService, 'getDisplayedCardIndex')
+      .and.returnValue(1);
+    spyOn(explorationEngineService, 'getState')
+      .and.returnValue(stateObjectFactory.createFromBackendDict(
+        'Mid', expResponse.exploration.states.Mid
+      ));
+    
+    componentInstance.explorationId = expResponse.exploration_id;
+    componentInstance.displayedCard = displayedCard;
+    componentInstance.isLoggedIn = true;
+    componentInstance.isIframed = false;
+
+    componentInstance.initializePage();
+    tick(1000);
+  }));
+
 
   it('should unsubscribe on destroy', () => {
     spyOn(componentInstance.directiveSubscriptions, 'unsubscribe');

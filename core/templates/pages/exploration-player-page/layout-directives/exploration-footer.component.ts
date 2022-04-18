@@ -172,8 +172,7 @@ export class ExplorationFooterComponent {
       (100 / (this.checkpointCount)) * this.completedCheckpoints
     );
 
-    if (this.explorationEngineService.getState().name !==
-    this.mostRecentlyReachedCheckpointStateName && this.isLastCheckpointReached) {
+    if (this.isLastCheckpointReached) {
       this.completedWidth = 100;
     }
 

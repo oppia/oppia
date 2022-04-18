@@ -42,6 +42,8 @@ import { StateCard } from 'domain/state_card/state-card.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
+import { UserInfo } from 'domain/user/user-info.model';
+import { UserService } from 'services/user.service';
 
 describe('ExplorationFooterComponent', () => {
   let component: ExplorationFooterComponent;
@@ -62,6 +64,7 @@ describe('ExplorationFooterComponent', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
+  let userService: UserService;
 
   let mockResultsLoadedEventEmitter = new EventEmitter<boolean>();
 
@@ -103,6 +106,7 @@ describe('ExplorationFooterComponent', () => {
       WrittenTranslationsObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
+    userService = TestBed.inject(UserService);
     fixture = TestBed.createComponent(ExplorationFooterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -152,6 +156,10 @@ describe('ExplorationFooterComponent', () => {
         } as unknown as ExplorationSummaryDict
       ]
     });
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        [], false, false,
+        false, false, false, '', '', '', true)));
 
     component.ngOnInit();
     tick();
@@ -199,7 +207,7 @@ describe('ExplorationFooterComponent', () => {
       }
     } as NgbModalRef);
 
-    let sampleDataResults: FetchExplorationBackendResponse = {
+    let sampleExpResponse: FetchExplorationBackendResponse = {
       exploration_id: '0',
       is_logged_in: true,
       session_id: 'KERH',
@@ -213,40 +221,218 @@ describe('ExplorationFooterComponent', () => {
         correctness_feedback_enabled: true,
         objective: 'To learn',
         states: {
-          Introduction: {
-            param_changes: [],
+          Start: {
             classifier_model_id: null,
-            recorded_voiceovers: null,
-            solicit_answer_details: true,
-            card_is_checkpoint: true,
-            written_translations: null,
-            linked_skill_id: null,
-            next_content_id_index: null,
-            content: {
-              html: '',
-              content_id: 'content'
+            recorded_voiceovers: {
+              voiceovers_mapping: {
+                ca_placeholder_0: {},
+                feedback_1: {},
+                rule_input_2: {},
+                content: {},
+                default_outcome: {}
+              }
+            },
+            solicit_answer_details: false,
+            written_translations: {
+              translations_mapping: {
+                ca_placeholder_0: {},
+                feedback_1: {},
+                rule_input_2: {},
+                content: {},
+                default_outcome: {}
+              }
             },
             interaction: {
-              customization_args: {},
-              answer_groups: [],
               solution: null,
-              hints: [],
-              default_outcome: {
-                param_changes: [],
-                dest: 'Introduction',
-                feedback: {
-                  html: '',
-                  content_id: 'content'
-                },
-                labelled_as_correct: true,
-                refresher_exploration_id: 'exp',
-                missing_prerequisite_skill_id: null
-              },
               confirmed_unclassified_answers: [],
-              id: null
+              id: 'TextInput',
+              hints: [],
+              customization_args: {
+                rows: {
+                  value: 1
+                },
+                placeholder: {
+                  value: {
+                    unicode_str: '',
+                    content_id: 'ca_placeholder_0'
+                  }
+                }
+              },
+              answer_groups: [
+                {
+                  outcome: {
+                    missing_prerequisite_skill_id: null,
+                    refresher_exploration_id: null,
+                    labelled_as_correct: false,
+                    feedback: {
+                      content_id: 'feedback_1',
+                      html: '<p>Good Job</p>'
+                    },
+                    param_changes: [],
+                    dest: 'Mid'
+                  },
+                  training_data: [],
+                  rule_specs: [
+                    {
+                      inputs: {
+                        x: {
+                          normalizedStrSet: [
+                            'answer'
+                          ],
+                          contentId: 'rule_input_2'
+                        }
+                      },
+                      rule_type: 'FuzzyEquals'
+                    }
+                  ],
+                  tagged_skill_misconception_id: null
+                }
+              ],
+              default_outcome: {
+                missing_prerequisite_skill_id: null,
+                refresher_exploration_id: null,
+                labelled_as_correct: false,
+                feedback: {
+                  content_id: 'default_outcome',
+                  html: '<p>Try again.</p>'
+                },
+                param_changes: [],
+                dest: 'Start'
+              }
+            },
+            param_changes: [],
+            next_content_id_index: 3,
+            card_is_checkpoint: true,
+            linked_skill_id: null,
+            content: {
+              content_id: 'content',
+              html: '<p>First Question</p>'
+            }
+          },
+          End: {
+            classifier_model_id: null,
+            recorded_voiceovers: {
+              voiceovers_mapping: {
+                content: {}
+              }
+            },
+            solicit_answer_details: false,
+            written_translations: {
+              translations_mapping: {
+                content: {}
+              }
+            },
+            interaction: {
+              solution: null,
+              confirmed_unclassified_answers: [],
+              id: 'EndExploration',
+              hints: [],
+              customization_args: {
+                recommendedExplorationIds: {
+                  value: ['recommnendedExplorationId']
+                }
+              },
+              answer_groups: [],
+              default_outcome: null
+            },
+            param_changes: [],
+            next_content_id_index: 0,
+            card_is_checkpoint: false,
+            linked_skill_id: null,
+            content: {
+              content_id: 'content',
+              html: 'Congratulations, you have finished!'
+            }
+          },
+          Mid: {
+            classifier_model_id: null,
+            recorded_voiceovers: {
+              voiceovers_mapping: {
+                ca_placeholder_0: {},
+                feedback_1: {},
+                rule_input_2: {},
+                content: {},
+                default_outcome: {}
+              }
+            },
+            solicit_answer_details: false,
+            written_translations: {
+              translations_mapping: {
+                ca_placeholder_0: {},
+                feedback_1: {},
+                rule_input_2: {},
+                content: {},
+                default_outcome: {}
+              }
+            },
+            interaction: {
+              solution: null,
+              confirmed_unclassified_answers: [],
+              id: 'TextInput',
+              hints: [],
+              customization_args: {
+                rows: {
+                  value: 1
+                },
+                placeholder: {
+                  value: {
+                    unicode_str: '',
+                    content_id: 'ca_placeholder_0'
+                  }
+                }
+              },
+              answer_groups: [
+                {
+                  outcome: {
+                    missing_prerequisite_skill_id: null,
+                    refresher_exploration_id: null,
+                    labelled_as_correct: false,
+                    feedback: {
+                      content_id: 'feedback_1',
+                      html: ' <p>Good Job</p>'
+                    },
+                    param_changes: [],
+                    dest: 'End'
+                  },
+                  training_data: [],
+                  rule_specs: [
+                    {
+                      inputs: {
+                        x: {
+                          normalizedStrSet: [
+                            'answer'
+                          ],
+                          contentId: 'rule_input_2'
+                        }
+                      },
+                      rule_type: 'FuzzyEquals'
+                    }
+                  ],
+                  tagged_skill_misconception_id: null
+                }
+              ],
+              default_outcome: {
+                missing_prerequisite_skill_id: null,
+                refresher_exploration_id: null,
+                labelled_as_correct: false,
+                feedback: {
+                  content_id: 'default_outcome',
+                  html: '<p>try again.</p>'
+                },
+                param_changes: [],
+                dest: 'Mid'
+              }
+            },
+            param_changes: [],
+            next_content_id_index: 3,
+            card_is_checkpoint: true,
+            linked_skill_id: null,
+            content: {
+              content_id: 'content',
+              html: '<p>Second Question</p>'
             }
           }
-        }
+        }  
       },
       version: 1,
       can_edit: true,
@@ -257,70 +443,20 @@ describe('ExplorationFooterComponent', () => {
       record_playthrough_probability: 1,
       user_has_viewed_lesson_info_modal_once: false,
       furthest_completed_checkpoint_exp_version: 1,
-      furthest_completed_checkpoint_state_name: 'State B',
-      most_recently_reached_checkpoint_state_name: 'State A',
+      furthest_completed_checkpoint_state_name: 'Mid',
+      most_recently_reached_checkpoint_state_name: 'Mid',
       most_recently_reached_checkpoint_exp_version: 1
     };
 
     spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
-      .and.returnValue(Promise.resolve(sampleDataResults));
+      .and.returnValue(Promise.resolve(sampleExpResponse));
 
     component.checkpointCount = 1;
 
     spyOn(component, 'getCheckpointIndexFromStateName').and.returnValue(1);
     spyOn(explorationEngineService, 'getState')
       .and.returnValue(stateObjectFactory.createFromBackendDict(
-        'State B', {
-          classifier_model_id: null,
-          content: {
-            html: '',
-            content_id: 'content'
-          },
-          interaction: {
-            id: 'FractionInput',
-            customization_args: {
-              requireSimplestForm: { value: false },
-              allowImproperFraction: { value: true },
-              allowNonzeroIntegerPart: { value: true },
-              customPlaceholder: { value: {
-                content_id: '',
-                unicode_str: ''
-              } },
-            },
-            answer_groups: [],
-            default_outcome: {
-              dest: 'Introduction',
-              feedback: {
-                content_id: 'default_outcome',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
-            },
-            confirmed_unclassified_answers: [],
-            hints: [],
-            solution: null
-          },
-          linked_skill_id: null,
-          next_content_id_index: 0,
-          param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {}
-            }
-          },
-          solicit_answer_details: false,
-          card_is_checkpoint: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {}
-            }
-          }
-        }
+        'Mid', sampleExpResponse.exploration.states.Mid
       ));
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
     component.openInformationCardModal();
@@ -328,7 +464,7 @@ describe('ExplorationFooterComponent', () => {
     fixture.detectChanges();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.mostRecentlyReachedCheckpointStateName).toEqual('State A');
+    expect(component.mostRecentlyReachedCheckpointStateName).toEqual('Mid');
     expect(component.isLastCheckpointReached).toEqual(true);
     expect(component.completedWidth).toEqual(100);
   }));
