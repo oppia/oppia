@@ -42,10 +42,13 @@ class GetInvalidSkillMediumRubricsJob(base_jobs.JobBase):
             bool. True if the medium rubrics explanation is not present.
         """
         rubrics = skill[1]
+        is_medium_explanation_present = False
         for rubric in rubrics:
             if rubric['difficulty'] == 'Medium':
                 medium_rubrics_explanation = rubric['explanations']
-                return len(medium_rubrics_explanation) == 0
+                is_medium_explanation_present = (
+                    len(medium_rubrics_explanation) != 0)
+        return not is_medium_explanation_present
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         total_skills = (
