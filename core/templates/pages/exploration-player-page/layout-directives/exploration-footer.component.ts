@@ -31,8 +31,10 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { UserService } from 'services/user.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
+import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 
@@ -63,6 +65,7 @@ export class ExplorationFooterComponent {
   mostRecentlyReachedCheckpointStateName!: string;
   completedCheckpoints: number = 0;
   isLastCheckpointReached: boolean = false;
+  userIsLoggedIn: boolean = false;
 
   constructor(
     private contextService: ContextService,
@@ -78,7 +81,9 @@ export class ExplorationFooterComponent {
     private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
     private loggerService: LoggerService,
     private playerTranscriptService: PlayerTranscriptService,
-    private explorationEngineService: ExplorationEngineService
+    private playerPositionService: PlayerPositionService,
+    private explorationEngineService: ExplorationEngineService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -93,6 +98,9 @@ export class ExplorationFooterComponent {
     try {
       this.explorationId = this.contextService.getExplorationId();
       this.iframed = this.urlService.isIframed();
+      this.userService.getUserInfoAsync().then((userInfo) => {
+        this.userIsLoggedIn = userInfo.isLoggedIn();
+      });
       this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
       this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
         .subscribe(evt => {
@@ -139,22 +147,24 @@ export class ExplorationFooterComponent {
 
     modalRef.componentInstance.checkpointCount = this.checkpointCount;
 
-    this.readOnlyExplorationBackendApiService.
-      loadLatestExplorationAsync(this.explorationId).then(
-        response => {
-          if (response.most_recently_reached_checkpoint_state_name) {
-            this.mostRecentlyReachedCheckpointStateName = (
-              response.most_recently_reached_checkpoint_state_name);
-          }
-        }
-      );
+    let displayedCardIndex = (
+      this.playerPositionService.getDisplayedCardIndex()
+    );
+    if (displayedCardIndex > 0) {
+      let state = this.explorationEngineService.getState();
+      if (state.cardIsCheckpoint) {
+        this.mostRecentlyReachedCheckpointStateName = state.name;
+      }
+    }
+    let checkpointIndexFromStateName = (
+      this.getCheckpointIndexFromStateName()
+    );
 
-    let checkpointIndexFromStateName = this.getCheckpointIndexFromStateName();
-    this.completedCheckpoints = checkpointIndexFromStateName - 1;
+    if (checkpointIndexFromStateName > 0) {
+      this.completedCheckpoints = checkpointIndexFromStateName - 1;
+    }
 
     if (checkpointIndexFromStateName === this.checkpointCount) {
-      var lastCheckpointCardStateName = (
-        this.mostRecentlyReachedCheckpointStateName);
       this.isLastCheckpointReached = true;
     }
 
@@ -163,13 +173,14 @@ export class ExplorationFooterComponent {
     );
 
     if (this.explorationEngineService.getState().name !==
-     lastCheckpointCardStateName && this.isLastCheckpointReached) {
+    this.mostRecentlyReachedCheckpointStateName && this.isLastCheckpointReached) {
       this.completedWidth = 100;
     }
 
     modalRef.componentInstance.completedWidth = this.completedWidth;
     modalRef.componentInstance.contributorNames = this.contributorNames;
     modalRef.componentInstance.expInfo = this.expInfo;
+    modalRef.componentInstance.userIsLoggedIn = this.userIsLoggedIn;
 
     modalRef.result.then(() => {}, () => {
       // Note to developers:

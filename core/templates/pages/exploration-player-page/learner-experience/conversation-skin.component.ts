@@ -297,7 +297,7 @@ export class ConversationSkinComponent {
         let confirmationMessage = (
           'If you navigate away from this page, your progress on the ' +
           'exploration will be lost.');
-        if (!this.isIframed) {
+        if (!this.isIframed && this.isLoggedIn) {
           confirmationMessage = (
             'If you navigate away from this page, your progress after the ' +
             'last completed checkpoint will be lost.');
@@ -334,7 +334,7 @@ export class ConversationSkinComponent {
     }
 
     // We do not save checkpoints progress for iframes
-    if (!this.isIframed) {
+    if (!this.isIframed && this.isLoggedIn) {
       // For the first state which is always a checkpoint.
       let firstStateName: string;
       let expVersion: number;
@@ -665,7 +665,7 @@ export class ConversationSkinComponent {
     let index = this.playerPositionService.getDisplayedCardIndex();
     this.displayedCard = this.playerTranscriptService.getCard(index);
 
-    if (index > 0 && !this.isIframed) {
+    if (index > 0 && !this.isIframed && this.isLoggedIn) {
       let currentState = this.explorationEngineService.getState();
       let currentStateName = currentState.name;
       if (currentState.cardIsCheckpoint &&
@@ -911,7 +911,7 @@ export class ConversationSkinComponent {
 
     // We do not store checkpoints progress for iframes hence we do not
     // need to consider redirecting in that case.
-    if (!this.isIframed) {
+    if (!this.isIframed && this.isLoggedIn) {
       // Navigate the learner to the most recently reached checkpoint state.
       this._navigateToMostRecentlyReachedCheckpoint();
     }

@@ -61,6 +61,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth!: number;
   separatorArray: number[] = [];
+  userIsLoggedIn: boolean = false;
 
 
   constructor(
