@@ -31,8 +31,8 @@ import { LoggerService } from 'services/contextual/logger.service';
   providedIn: 'root'
 })
 export class ExplorationPropertyService {
-  public displayed: string | boolean;
-  savedMemento: string | boolean;
+  displayed: string;
+  savedMemento: string;
 
   // The backend name for this property. THIS MUST BE SPECIFIED BY
   // SUBCLASSES.
@@ -66,12 +66,12 @@ export class ExplorationPropertyService {
 
     // The current value of the property (which may not have been saved to
     // the frontend yet). In general, this will be bound directly to the UI.
-    this.displayed = cloneDeep(value);
+    this.displayed = cloneDeep(value) as string;
 
     // The previous (saved-in-the-frontend) value of the property. Here,
     // 'saved' means that this is the latest value of the property as
     // determined by the frontend change list.
-    this.savedMemento = cloneDeep(value);
+    this.savedMemento = cloneDeep(value) as string;
 
     this._explorationPropertyChangedEventEmitter.emit(this.propertyName);
   }
@@ -79,12 +79,6 @@ export class ExplorationPropertyService {
   // Returns whether the current value has changed from the memento.
   hasChanged(): boolean {
     return !angular.equals(this.savedMemento, this.displayed);
-  }
-
-  // Transforms the given value into a normalized form. THIS CAN BE
-  // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
-  _normalize(value: string | boolean): string | boolean {
-    return value;
   }
 
   // Validates the given value and returns a boolean stating whether it
@@ -101,8 +95,6 @@ export class ExplorationPropertyService {
     if (this.propertyName === null) {
       throw new Error('Exploration property name cannot be null.');
     }
-
-    this.displayed = this._normalize(this.displayed);
 
     if (!this._isValid(this.displayed) || !this.hasChanged()) {
       this.restoreFromMemento();
