@@ -18,6 +18,7 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-social-buttons',
@@ -25,7 +26,13 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 export class SocialButtonsComponent {
-  constructor() {}
+  constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService
+  ) {}
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
 }
 
 angular.module('oppia').directive('oppiaSocialButtons',

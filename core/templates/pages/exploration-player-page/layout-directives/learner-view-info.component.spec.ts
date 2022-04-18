@@ -113,6 +113,9 @@ describe('Learner view info component', () => {
         topicDataDict as ReadOnlyTopicBackendDict
       )
     );
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   afterEach(() => {
@@ -225,6 +228,10 @@ describe('Learner view info component', () => {
 
     expect(loggerService.error).toHaveBeenCalled();
   }));
+
+  it('should get RTL language status correctly', () => {
+    expect(componentInstance.isLanguageRTL()).toEqual(true);
+  });
 
   it('should set topic name and subtopic title translation key and ' +
   'check whether hacky translations are displayed or not correctly',

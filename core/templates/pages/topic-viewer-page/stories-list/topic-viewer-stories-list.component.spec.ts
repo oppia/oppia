@@ -97,6 +97,6 @@ describe('Topic Viewer Stories List Component', () => {
   });
 
   it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toEqual(true);
+    expect(component.isLanguageRTL()).toBeTrue();
   });
 });

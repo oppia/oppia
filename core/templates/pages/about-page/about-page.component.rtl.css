@@ -56,6 +56,13 @@
   padding: 6.5vh 0 5vw 0;
   text-align: center;
 }
+.oppia-about-page-section-one,
+.oppia-about-page-section-three,
+.oppia-about-page-section-four,
+.oppia-about-page-section-five,
+.oppia-about-page-section-six {
+  text-align: right;
+}
 .about-page .oppia-about-section-title {
   color: #00424a;
   font-family: "Capriola", Arial, sans-serif;

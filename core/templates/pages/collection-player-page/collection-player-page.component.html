@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/collection-player-page/collection-player-page.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/collection-player-page/collection-player-page.component.rtl.css" as="style">
+
 <div>
   <background-banner></background-banner>
   <div *ngIf="!collection?.getCollectionNodeCount()" class="no-exploration-created">
@@ -258,71 +261,6 @@
 </div>
 <attribution-guide></attribution-guide>
 
-<style>
-  .glow-button:hover {
-    -webkit-filter: drop-shadow(0 0 6px #045a47);
-    filter: drop-shadow(0 0 6px #045a47);
-  }
-
-  @media screen and (max-width: 942px) {
-    .oppia-collection-path-section, .oppia-card-preview-panel {
-        display: none;
-    }
-  }
-
-  @media screen and (min-width: 943px) {
-    .oppia-collection-table {
-        display: none;
-    }
-  }
-
-  .oppia-collection-node-small-screen {
-    left: 50%;
-    position: absolute;
-    text-align: center;
-    transform: translate(-50%, 195px);
-    z-index: 1;
-  }
-  .oppia-collection-node-small-screen::before {
-    color: #3f7a68;
-    content: attr(title-data);
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 16px;
-    left: -60px;
-    position: absolute;
-    text-align: center;
-    top: -30px;
-    width: 220px;
-  }
-  .oppia-collection-exploration {
-    position: relative;
-    top: 20px
-  }
-  .oppia-exploration-summary-tile-container {
-    left: 0;
-    position: fixed;
-    top: 0;
-    z-index: 100;
-  }
-  .oppia-exploration-summary-tile {
-    position: absolute;
-    z-index: 10;
-  }
-  .oppia-exploration-preview-summary-tile {
-    left: 85px;
-    position: absolute;
-    top: 30px;
-    z-index: 10;
-  }
-  .title-section {
-    z-index: 1;
-  }
-
-  .no-exploration-created .oppia-collection-path-section {
-    color: red;
-    font-size: 20px;
-    left: 15em;
-    padding: 70px 40px 90px 40px;
-    top: 228px;
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/collection-player-page/collection-player-page.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/collection-player-page/collection-player-page.component.rtl.css">

@@ -21,6 +21,7 @@ import { ComponentFixture, TestBed, async } from
 
 import { ProfilePageNavbarComponent } from './profile-page-navbar.component';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockUrlService {
   getUsernameFromProfileUrl() {
@@ -30,6 +31,7 @@ class MockUrlService {
 
 let component: ProfilePageNavbarComponent;
 let fixture: ComponentFixture<ProfilePageNavbarComponent>;
+let i18nLanguageCodeService: I18nLanguageCodeService;
 
 describe('Profile Page Navbar Component', function() {
   beforeEach(async(() => {
@@ -43,6 +45,7 @@ describe('Profile Page Navbar Component', function() {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ProfilePageNavbarComponent);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -52,4 +55,10 @@ describe('Profile Page Navbar Component', function() {
       component.ngOnInit();
       expect(component.username).toBe('username1');
     });
+
+  it('should get RTL language status correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+    expect(component.isLanguageRTL()).toEqual(true);
+  });
 });

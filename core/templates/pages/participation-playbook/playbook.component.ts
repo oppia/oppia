@@ -23,6 +23,7 @@ import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 @Component({
@@ -39,7 +40,8 @@ export class PlaybookPageComponent implements OnInit {
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {}
@@ -54,6 +56,10 @@ export class PlaybookPageComponent implements OnInit {
       this.windowRef.nativeWindow.location.href = this.TEACH_FORM_URL;
     }, 150);
     return false;
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
 
