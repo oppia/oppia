@@ -396,7 +396,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     return this.activeSuggestion.change.cmd === 'add_translation';
   }
 
-  translationHtmlContainsTags(): boolean {
+  doesTranslationContainTags(): boolean {
     return /<.*>/g.test(this.translationHtml);
   }
 
