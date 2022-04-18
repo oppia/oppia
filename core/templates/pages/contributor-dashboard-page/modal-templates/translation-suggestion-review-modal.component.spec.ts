@@ -710,5 +710,27 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.editedContent.html).toEqual('old');
       expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
     });
+
+    it('should check if the change cmd is deprecated', () => {
+      const deprecatedCmd = 'add_translation';
+      const validCmd = 'add_written_translation';
+
+      component.activeSuggestion.change.cmd = validCmd;
+      expect(component.isDeprecatedTranslationSuggestionCommand()).toBeFalse();
+
+      component.activeSuggestion.change.cmd = deprecatedCmd;
+      expect(component.isDeprecatedTranslationSuggestionCommand()).toBeTrue();
+    });
+
+    it('should check if translation contains HTML tags', () => {
+      const translationWithTags = '<p>translation with tags</p>';
+      const translationWithoutTags = 'translation without tags';
+
+      component.translationHtml = translationWithTags;
+      expect(component.doesTranslationContainTags()).toBeTrue();
+
+      component.translationHtml = translationWithoutTags;
+      expect(component.doesTranslationContainTags()).toBeFalse();
+    });
   });
 });
