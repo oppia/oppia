@@ -355,12 +355,6 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
                     }]
                 }
             },
-            'topic_name': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
             'exploration_id': {
                 'schema': {
                     'type': 'basestring'
@@ -382,28 +376,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
             target_type, suggestion_type)
         limit = self.normalized_request.get('limit')
         offset = self.normalized_request.get('offset')
-        topic_name = self.normalized_request.get('topic_name')
         exploration_id = self.normalized_request.get('exploration_id')
-
-        opportunity_summary_exp_ids_specific_to_topic = [exploration_id]
-        if (
-                exploration_id is None
-                and topic_name is not None
-                and topic_name != feconf.ALL_LITERAL_CONSTANT
-        ):
-            topic = topic_fetchers.get_topic_by_name(topic_name)
-            if topic is None:
-                raise self.InvalidInputException(
-                    'The supplied input topic: %s is not valid' % topic_name)
-
-            exploration_opportunity_summaries = (
-                opportunity_services.
-                get_exploration_opportunity_summaries_by_topic_id(
-                    topic.id))
-
-            opportunity_summary_exp_ids_specific_to_topic = [
-                opportunity.id for opportunity
-                in exploration_opportunity_summaries]
 
         suggestions = []
         next_offset = 0
@@ -412,7 +385,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
                 suggestion_services.
                 get_reviewable_translation_suggestions_by_offset(
                     self.user_id,
-                    opportunity_summary_exp_ids_specific_to_topic,
+                    [exploration_id],
                     limit, offset))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestions, next_offset = (

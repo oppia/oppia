@@ -274,7 +274,8 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
     def _get_reviewable_exploration_opportunity_summaries(
             self, user_id, topic_name):
         """Returns exploration opportunity summaries that have translation
-        suggestions that are reviewable by the supplied user.
+        suggestions that are reviewable by the supplied user. The result is
+        sorted in descending order by topic, story, and story node order.
 
         Args:
             user_id: str. The user ID of the user for which to filter
@@ -302,14 +303,14 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
                     'The supplied input topic: %s is not valid' % topic_name)
             topics = [topic]
         exp_ids = []
+        in_review_suggestion_target_ids = (
+            suggestion_services
+            .get_reviewable_translation_suggestion_target_ids(user_id))
         for topic in topics:
             stories = story_fetchers.get_stories_by_ids([
                 reference.story_id
                 for reference in topic.get_all_story_references()
                 if reference.story_is_published])
-            in_review_suggestion_target_ids = (
-                suggestion_services
-                .get_reviewable_translation_suggestion_target_ids(user_id))
             exp_ids.extend([
                 node.exploration_id
                 for story in stories

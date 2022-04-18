@@ -287,7 +287,7 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse));
 
-        cars.getReviewableTranslationSuggestionsAsync()
+        cars.getReviewableTranslationSuggestionsAsync('skill_id_1')
           .then((response) => {
             expect(response.suggestionIdToDetails.suggestion_id_1)
               .toEqual(expectedSuggestionDict);

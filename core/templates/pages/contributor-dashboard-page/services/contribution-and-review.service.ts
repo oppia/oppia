@@ -116,7 +116,6 @@ export class ContributionAndReviewService {
   private async fetchSuggestionsAsync(
       fetcher: SuggestionFetcher,
       shouldResetOffset: boolean,
-      topicName: string,
       explorationId: string = null
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
@@ -134,7 +133,6 @@ export class ContributionAndReviewService {
         // page is cached.
         (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
         fetcher.offset,
-        topicName,
         explorationId
       ).then((responseBody) => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
@@ -167,44 +165,36 @@ export class ContributionAndReviewService {
   }
 
   async getUserCreatedQuestionSuggestionsAsync(
-      shouldResetOffset: boolean = true,
-      topicName: string = 'All'):
+      shouldResetOffset: boolean = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.userCreatedQuestionFetcher,
-      shouldResetOffset,
-      topicName);
+      shouldResetOffset);
   }
 
   async getReviewableQuestionSuggestionsAsync(
-      shouldResetOffset: boolean = true,
-      topicName: string = 'All'):
+      shouldResetOffset: boolean = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.reviewableQuestionFetcher,
-      shouldResetOffset,
-      topicName);
+      shouldResetOffset);
   }
 
   async getUserCreatedTranslationSuggestionsAsync(
-      shouldResetOffset: boolean = true,
-      topicName: string = 'All'):
+      shouldResetOffset: boolean = true):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.userCreatedTranslationFetcher,
-      shouldResetOffset,
-      topicName);
+      shouldResetOffset);
   }
 
   async getReviewableTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      topicName: string = 'All',
       explorationId: string):
   Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
       shouldResetOffset,
-      topicName,
       explorationId);
   }
 
