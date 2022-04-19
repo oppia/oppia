@@ -75,8 +75,8 @@ describe('Audio Bar Component', () => {
     fixture.detectChanges();
   });
   beforeEach(() => {
-    spyOn(audioBarStatusService, 'markAudioBarExpanded').and.callThrough();
-    spyOn(audioBarStatusService, 'markAudioBarCollapsed').and.callThrough();
+    spyOn(audioBarStatusService, 'markAudioBarExpanded').and.returnValue();
+    spyOn(audioBarStatusService, 'markAudioBarCollapsed').and.returnValue();
   });
 
   afterEach(() => {
