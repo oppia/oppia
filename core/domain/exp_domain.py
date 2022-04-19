@@ -1928,7 +1928,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state_domain.InteractionInstance
                     .convert_customization_args_dict_to_customization_args(
                         state_dict['interaction']['id'],
-                        state_dict['interaction']['customization_args']))
+                        state_dict['interaction']['customization_args'],
+                        state_schema_version=45))
                 for ca_name in customisation_args:
                     list_of_subtitled_unicode_content_ids.extend(
                         state_domain.InteractionCustomizationArg
