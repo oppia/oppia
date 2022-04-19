@@ -260,7 +260,7 @@ describe('InteractiveGraphInput', () => {
   });
 
   it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toEqual(true);
+    expect(component.isLanguageRTL()).toBeTrue();
   });
 
   it('should set the last answer given by the user as the graph when the' +
