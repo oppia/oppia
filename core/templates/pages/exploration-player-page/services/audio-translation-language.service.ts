@@ -196,7 +196,7 @@ export class AudioTranslationLanguageService {
   /**
    * @param {string} set a new language code.
    */
-  setCurrentAudioLanguageCode(newLanguageCode: string): void {
+  setCurrentAudioLanguageCode(newLanguageCode: string | null): void {
     this._currentAudioLanguageCode = newLanguageCode;
   }
 
