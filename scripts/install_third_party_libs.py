@@ -25,7 +25,7 @@ import sys
 import urllib.request as urlrequest
 import zipfile
 
-from typing import Tuple
+from typing import List, Tuple
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
@@ -44,7 +44,7 @@ def install_prerequisite(package: Tuple[str]) -> None:
     """Install prerequisite Python package.
 
     Args:
-        package: tuple. The args to provide to pip install.
+        package: Tuple. The args to provide to pip install.
 
     Raises:
         Exception. If the package fails to install due to issues with --prefix.
@@ -112,7 +112,7 @@ PROTO_FILES_PATHS = [
 PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
 
-def tweak_yarn_executable():
+def tweak_yarn_executable() -> None:
     """When yarn is run on Windows, the file yarn will be executed by default.
     However, this file is a bash script, and can't be executed directly on
     Windows. So, to prevent Windows automatically executing it by default
@@ -125,14 +125,14 @@ def tweak_yarn_executable():
         os.rename(origin_file_path, renamed_file_path)
 
 
-def get_yarn_command():
+def get_yarn_command() -> None:
     """Get the executable file for yarn."""
     if common.is_windows_os():
         return 'yarn.cmd'
     return 'yarn'
 
 
-def install_buf_and_protoc():
+def install_buf_and_protoc() -> None:
     """Installs buf and protoc for Linux or Darwin, depending upon the
     platform.
     """
@@ -161,7 +161,7 @@ def install_buf_and_protoc():
     common.recursive_chmod(protoc_path, 0o744)
 
 
-def compile_protobuf_files(proto_files_paths):
+def compile_protobuf_files(proto_files_paths: List[str]) -> None:
     """Compiles protobuf files using buf.
 
     Raises:
@@ -198,7 +198,8 @@ def compile_protobuf_files(proto_files_paths):
                 r'^import (\w*_pb2 as)', r'from proto_files import \1')
 
 
-def ensure_pip_library_is_installed(package, version, path):
+def ensure_pip_library_is_installed(
+        package: str, version: str, path: str) -> None:
     """Installs the pip library after ensuring its not already installed.
 
     Args:
@@ -229,7 +230,8 @@ def ensure_pip_library_is_installed(package, version, path):
                 '%s==%s' % (package, version), exact_lib_path)
 
 
-def ensure_system_python_libraries_are_installed(package, version):
+def ensure_system_python_libraries_are_installed(
+        package: str, version: str) -> None:
     """Installs the pip library with the corresponding version to the system
     globally. This is necessary because the development application server
     requires certain libraries on the host machine.
