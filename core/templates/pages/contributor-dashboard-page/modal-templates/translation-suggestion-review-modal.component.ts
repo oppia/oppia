@@ -392,6 +392,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.translationHtml = this.preEditTranslationHtml;
   }
 
+  isDeprecatedTranslationSuggestionCommand(): boolean {
+    return this.activeSuggestion.change.cmd === 'add_translation';
+  }
+
+  doesTranslationContainTags(): boolean {
+    return /<.*>/g.test(this.translationHtml);
+  }
+
   getHtmlSchema(): HTMLSchema {
     return this.HTML_SCHEMA;
   }

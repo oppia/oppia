@@ -461,6 +461,11 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 self.normalized_payload[arg] = normalized_arg_values.get(arg)
 
+        self.request.get = RaiseErrorOnGet(
+            'Use self.normalized_request instead of self.request.').get
+        self.payload = RaiseErrorOnGet(
+            'Use self.normalized_payload instead of self.payload.')
+
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
@@ -673,9 +678,20 @@ class BaseHandler(webapp2.RequestHandler):
             # For GET requests, there is no payload, so we check against
             # GET_HANDLER_ERROR_RETURN_TYPE.
             # Otherwise, we check whether self.payload exists.
-            if (self.payload is not None or
+
+            # This check is to avoid throwing of 401 when payload doesn't
+            # exists and self.payload is replaced by RaiseErrorOnGet object.
+            # TODO(#13155): Change this to self.normalized_payload
+            #  once schema is implemented for all handlers.
+            payload_exists = (
+                self.payload is not None and
+                not isinstance(self.payload, RaiseErrorOnGet)
+            )
+            if (
+                    payload_exists or
                     self.GET_HANDLER_ERROR_RETURN_TYPE ==
-                    feconf.HANDLER_TYPE_JSON):
+                    feconf.HANDLER_TYPE_JSON
+            ):
                 self.error(401)
                 self._render_exception(
                     401, {
@@ -727,6 +743,17 @@ class Error404Handler(BaseHandler):
     """Handles 404 errors."""
 
     pass
+
+
+class RaiseErrorOnGet:
+    """Class that will throw a ValueError when the get function is invoked."""
+
+    def __init__(self, message: str):
+        self.error_message = message
+
+    def get(self, *args: Any, **kwargs: Any) -> None:
+        """Raises an error when invoked."""
+        raise ValueError(self.error_message)
 
 
 class CsrfTokenManager:
