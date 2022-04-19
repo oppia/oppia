@@ -517,7 +517,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
         response = self.get_html_response(
-            '/community-library', expected_status_int=503)
+            '/community-library', expected_status_int=200)
 
         self.assertIn(b'<oppia-maintenance-page>', response.body)
         self.assertNotIn(b'<oppia-library-page-root>', response.body)
@@ -547,31 +547,6 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.assertNotIn(b'<oppia-maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-    def test_json_response_is_rejected(self):
-        destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
-
-        response = self.get_json('/url_handler', expected_status_int=503)
-
-        self.assertIn('error', response)
-        self.assertEqual(
-            response['error'],
-            'Oppia is currently being upgraded, and the site should be up '
-            'and running again in a few hours. Thanks for your patience!')
-        self.assertNotIn('login_url', response)
-        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
-
-    def test_json_response_is_not_rejected_when_user_is_super_admin(self):
-        self.context_stack.enter_context(self.super_admin_context())
-        destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
-
-        response = self.get_json('/url_handler?current_url=login')
-        self.assertIn('login_url', response)
-        self.assertIsNone(response['login_url'])
-        self.assertNotIn('error', response)
-        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
-
     def test_csrfhandler_handler_is_not_rejected(self):
         response = self.get_json('/csrfhandler')
 
@@ -596,7 +571,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.assertEqual(call_counter.times_called, 1)
 
     def test_signup_fails(self):
-        with self.assertRaisesRegex(Exception, 'Bad response: 503'):
+        with self.assertRaisesRegex(
+            Exception, '\'<oppia-maintenance-page>\' unexpectedly found in'):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_maintenance_mode_is_disabled(self):
@@ -635,8 +611,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-        with self.assertRaisesRegex(Exception, 'Bad response: 503'):
-            self.get_json('/url_handler?current_url=/')
+        response = self.get_html_response('/url_handler?current_url=/')
+        self.assertIn(b'<oppia-maintenance-page>', response.body)
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
@@ -1185,8 +1161,8 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
         }
 
         def get(self):
-            iframe_restriction = self.request.get(
-                'iframe_restriction', default_value=None)
+            iframe_restriction = self.normalized_request.get(
+                'iframe_restriction', None)
             self.render_template(
                 'oppia-root.mainpage.html',
                 iframe_restriction=iframe_restriction)
@@ -1342,9 +1318,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
             """Returns the message, vm_id and signature retrieved from the
             incoming requests.
             """
-            signature = self.payload.get('signature')
-            vm_id = self.payload.get('vm_id')
-            message = self.payload.get('message')
+            signature = self.normalized_payload.get('signature')
+            vm_id = self.normalized_payload.get('vm_id')
+            message = self.normalized_payload.get('message')
             return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
 
         @acl_decorators.is_from_oppia_ml
@@ -1734,7 +1710,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_play_exploration
         def get(self):
-            exploration_id = self.request.get('exploration_id')
+            exploration_id = self.normalized_request.get('exploration_id')
             return self.render_json({'exploration_id': exploration_id})
 
     class MockHandlerWithMissingRequestSchema(base.BaseHandler):
@@ -1744,7 +1720,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_play_exploration
         def get(self):
-            exploration_id = self.request.get('exploration_id')
+            exploration_id = self.normalized_request.get('exploration_id')
             return self.render_json({'exploration_id': exploration_id})
 
     class MockHandlerWithDefaultGetSchema(base.BaseHandler):
@@ -2170,4 +2146,68 @@ class UrlPathNormalizationTest(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.testapp):
             self.get_json(
                 '/mock_normalization/%s/%s' % (int_string, list_string),
+                expected_status_int=200)
+
+
+class RaiseErrorOnGetTest(test_utils.GenericTestBase):
+    """This test class is to ensure handlers with schema raises error
+    when they use self.request or self.payload."""
+
+    class MockHandlerWithSchema(base.BaseHandler):
+        """Mock handler with schema."""
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'mock_int': {
+                    'schema': {
+                        'type': 'int'
+                    }
+                }
+            }
+        }
+
+        def post(self):
+            self.payload.get('mock_int')
+            return self.render_json({})
+
+    class MockHandlerWithoutSchema(base.BaseHandler):
+        """Mock handler without schema."""
+
+        def post(self):
+            self.payload.get('mock_int')
+            return self.render_json({})
+
+    def setUp(self):
+        super().setUp()
+        user_id = user_services.get_user_id_from_username('learneruser')
+        self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
+        self.payload = {'mock_int': 1}
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route('/mock_with_schema', self.MockHandlerWithSchema),
+            webapp2.Route(
+                '/mock_without_schema', self.MockHandlerWithoutSchema),
+        ], debug=feconf.DEBUG))
+
+    def test_object_which_raises_error_on_get(self):
+        error_message = 'error_message'
+        object_that_raises_error_on_get = base.RaiseErrorOnGet(error_message)
+        with self.assertRaisesRegex(ValueError, error_message):
+            object_that_raises_error_on_get.get('key')
+
+    def test_request_with_schema_using_payload_or_request_attr_raise_error(
+            self):
+        with self.swap(self, 'testapp', self.testapp):
+            self.post_json(
+                '/mock_with_schema', self.payload, csrf_token=self.csrf_token,
+                expected_status_int=500)
+
+    def test_request_without_schema_using_payload_or_request_attr_raise_no_err(
+            self):
+        test_app_ctx = self.swap(self, 'testapp', self.testapp)
+        handler_class_still_needs_schema_list_ctx = self.swap(
+            handler_schema_constants, 'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
+            ['MockHandlerWithoutSchema'])
+        with test_app_ctx, handler_class_still_needs_schema_list_ctx:
+            self.post_json(
+                '/mock_without_schema', self.payload, csrf_token=self.csrf_token,
                 expected_status_int=200)

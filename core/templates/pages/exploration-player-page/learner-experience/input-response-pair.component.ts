@@ -39,7 +39,7 @@ import { NumberConversionService } from 'services/number-conversion.service';
 })
 export class InputResponsePairComponent {
   // This property is initialized using component interactions
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() data!: InputResponsePair;
   @Input() oppiaAvatarImageUrl!: string;
