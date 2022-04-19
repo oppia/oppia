@@ -94,6 +94,13 @@ describe('Stats reporting service ', () => {
 
   it('should set session properties when calling ' +
     '\'initSession\'', fakeAsync(() => {
+    // Prechecks.
+    expect(statsReportingService.explorationId).toBeUndefined();
+    expect(statsReportingService.explorationTitle).toBeUndefined();
+    expect(statsReportingService.explorationVersion)
+      .toBeUndefined();
+    expect(statsReportingService.sessionId).toBeUndefined();
+    expect(statsReportingService.optionalCollectionId).toBeUndefined();
     statsReportingService.initSession(
       explorationId, explorationTitle, explorationVersion,
       sessionId, collectionId);
@@ -156,6 +163,7 @@ describe('Stats reporting service ', () => {
     let recordExplorationActuallyStartedSpy = spyOn(
       statsReportingBackendApiService, 'recordExplorationActuallyStartedAsync')
       .and.returnValue(Promise.resolve({}));
+    expect(statsReportingService.currentStateName).toBeUndefined();
     expect(statsReportingService.explorationActuallyStarted).toBe(false);
 
     statsReportingService.recordExplorationActuallyStarted('firstState');
@@ -189,6 +197,7 @@ describe('Stats reporting service ', () => {
     let recordLeaveForRefresherExpSpy = spyOn(
       statsReportingBackendApiService, 'recordLeaveForRefresherExpAsync')
       .and.returnValue(Promise.resolve({}));
+    expect(statsReportingService.nextExpId).toBeUndefined();
     statsReportingService.recordLeaveForRefresherExp(
       'firstState', 'refresherExp');
 
@@ -221,6 +230,7 @@ describe('Stats reporting service ', () => {
     let recordStateCompletedSpy = spyOn(
       statsReportingBackendApiService, 'recordStateCompletedAsync')
       .and.returnValue(Promise.resolve({}));
+    expect(statsReportingService.currentStateName).toBeUndefined();
     statsReportingService.recordStateCompleted('firstState');
 
     expect(recordStateCompletedSpy).toHaveBeenCalled();
@@ -268,6 +278,7 @@ describe('Stats reporting service ', () => {
   });
 
   it('should set topic name', () => {
+    expect(statsReportingService.topicName).toBeUndefined();
     statsReportingService.setTopicName('newTopic');
 
     expect(statsReportingService.topicName).toBe('newTopic');

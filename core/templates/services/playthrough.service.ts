@@ -183,14 +183,13 @@ export class PlaythroughService {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private explorationId!: string;
   private explorationVersion!: number;
-  private learnerIsInSamplePopulation: boolean = false;
-
   private eqTracker!: EarlyQuitTracker;
   private cstTracker!: CyclicStateTransitionsTracker;
   private misTracker!: MultipleIncorrectAnswersTracker;
   private recordedLearnerActions!: LearnerAction[];
   private playthroughStopwatch!: Stopwatch;
   private playthroughDurationInSecs!: number;
+  private learnerIsInSamplePopulation: boolean = false;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
@@ -238,9 +237,9 @@ export class PlaythroughService {
     // And if check is needed, means we are actually passes null then add
     // proper comment to explain why we are doing this check.
     if (
-      this.recordedLearnerActions !== null &&
-      this.misTracker !== null &&
-      this.cstTracker !== null
+      this.recordedLearnerActions &&
+      this.misTracker &&
+      this.cstTracker
     ) {
       this.recordedLearnerActions.push(
         this.learnerActionObjectFactory.createNewAnswerSubmitAction({
@@ -267,9 +266,9 @@ export class PlaythroughService {
     // And if check is needed, means we are actually passes null then add
     // proper comment to explain why we are doing this check.
     if (
-      this.recordedLearnerActions !== null &&
-      this.playthroughStopwatch !== null &&
-      this.eqTracker !== null
+      this.recordedLearnerActions &&
+      this.playthroughStopwatch &&
+      this.eqTracker
     ) {
       this.recordedLearnerActions.push(
         this.learnerActionObjectFactory.createNewExplorationQuitAction({
@@ -307,9 +306,9 @@ export class PlaythroughService {
     // And if check is needed, means we are actually passes null then add
     // proper comment to explain why we are doing this check.
     if (
-      this.explorationId !== null &&
-      this.explorationVersion !== null &&
-      this.recordedLearnerActions !== null
+      this.explorationId &&
+      this.explorationVersion &&
+      this.recordedLearnerActions
     ) {
       if (this.misTracker && this.misTracker.foundAnIssue()) {
         return this.playthroughObjectFactory
@@ -346,7 +345,7 @@ export class PlaythroughService {
       // codebase is strictly typed. And if check is needed, means we are
       // actually passes null then add proper comment to explain why we are
       // doing this check.
-      this.recordedLearnerActions !== null &&
+      this.recordedLearnerActions &&
       this.isPlaythroughRecordingEnabled()
     );
   }
@@ -357,7 +356,7 @@ export class PlaythroughService {
       // codebase is strictly typed. And if check is needed, means we are
       // actually passes null then add proper comment to explain why we are
       // doing this check.
-      this.recordedLearnerActions !== null &&
+      this.recordedLearnerActions &&
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
       this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
@@ -370,7 +369,7 @@ export class PlaythroughService {
       // codebase is strictly typed. And if check is needed, means we are
       // actually passes null then add proper comment to explain why we are
       // doing this check.
-      this.recordedLearnerActions !== null &&
+      this.recordedLearnerActions &&
       // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.
