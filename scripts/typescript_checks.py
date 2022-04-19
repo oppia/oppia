@@ -77,8 +77,11 @@ def compile_and_check_typescript(config_path: str) -> None:
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
 
-    if process.stdout is not None:
-        error_messages = list(iter(process.stdout.readline, ''))
+    # The value of process.stdout can be None but according to the
+    # arguments passed here, it should not be None.
+    # Hence add an assert.
+    assert process.stdout is not None
+    error_messages = list(iter(process.stdout.readline, ''))
 
     if error_messages:
         print('Errors found during compilation\n')
