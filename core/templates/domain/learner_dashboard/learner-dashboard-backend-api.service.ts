@@ -96,7 +96,7 @@ interface LearnerDashboardExplorationsDataBackendDict {
 interface LearnerDashboardFeedbackUpdatesDataBackendDict {
   'number_of_unread_threads': number;
   'thread_summaries': FeedbackThreadSummaryBackendDict[];
-  'more': FeedbackThreadSummaryBackendDict[][];
+  'paginated_threads_list': FeedbackThreadSummaryBackendDict[][];
 }
 
 
@@ -133,7 +133,7 @@ interface LearnerDashboardExplorationsData {
 interface LearnerDashboardFeedbackUpdatesData {
   numberOfUnreadThreads: number;
   threadSummaries: FeedbackThreadSummary[];
-  more: FeedbackThreadSummaryBackendDict[][];
+  paginatedThreadsList: FeedbackThreadSummaryBackendDict[][];
 }
 
 
@@ -271,14 +271,14 @@ export class LearnerDashboardBackendApiService {
   }
 
   async _fetchLearnerDashboardFeedbackUpdatesDataAsync(
-      more: FeedbackThreadSummaryBackendDict[][]
+      paginatedThreadsList: FeedbackThreadSummaryBackendDict[][]
   ):
   Promise<LearnerDashboardFeedbackUpdatesData> {
     return new Promise((resolve, reject) => {
       this.http.post<LearnerDashboardFeedbackUpdatesDataBackendDict>(
         '/learnerdashboardfeedbackupdateshandler/data',
         {
-          more: more
+          paginated_threads_list: paginatedThreadsList
         }).toPromise().then(
         dashboardData => {
           resolve({
@@ -287,7 +287,7 @@ export class LearnerDashboardBackendApiService {
               dashboardData.thread_summaries.map(
                 threadSummary => FeedbackThreadSummary
                   .createFromBackendDict(threadSummary))),
-            more: dashboardData.more
+            paginatedThreadsList: dashboardData.paginated_threads_list
           });
         }, errorResponse => {
           reject(errorResponse.status);
@@ -323,9 +323,12 @@ export class LearnerDashboardBackendApiService {
     return this._fetchLearnerDashboardExplorationsDataAsync();
   }
 
-  async fetchLearnerDashboardFeedbackUpdatesDataAsync(more = []):
+  async fetchLearnerDashboardFeedbackUpdatesDataAsync(
+      paginatedThreadsList = []
+  ):
   Promise<LearnerDashboardFeedbackUpdatesData> {
-    return this._fetchLearnerDashboardFeedbackUpdatesDataAsync(more);
+    return this._fetchLearnerDashboardFeedbackUpdatesDataAsync(
+      paginatedThreadsList);
   }
 
   async addNewMessageAsync(
