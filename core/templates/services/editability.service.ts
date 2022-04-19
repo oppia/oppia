@@ -31,6 +31,7 @@ export class EditabilityService {
   static isEditable: boolean = false;
   static isTranslatable: boolean = false;
   static inTutorialMode: boolean = false;
+  static isPublishable: boolean = false;
 
   /**
    * @return {boolean} Whether the service is editable.
@@ -94,6 +95,18 @@ export class EditabilityService {
    */
   onStartTutorial(): void {
     EditabilityService.inTutorialMode = true;
+  }
+
+  markAsNotPublishable(): void {
+    EditabilityService.isPublishable = false;
+  }
+
+  markAsPublishable(): void {
+    EditabilityService.isPublishable = true;
+  }
+
+  isPublishable(): boolean {
+    return EditabilityService.isPublishable;
   }
 }
 

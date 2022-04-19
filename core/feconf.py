@@ -423,6 +423,8 @@ DEFAULT_AUTO_TTS_ENABLED = False
 # Whether new explorations should have correctness-feedback enabled
 # by default.
 DEFAULT_CORRECTNESS_FEEDBACK_ENABLED = True
+# Whether edits can be made to a new exploration.
+DEFAULT_EDITS_ALLOWED = True
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''

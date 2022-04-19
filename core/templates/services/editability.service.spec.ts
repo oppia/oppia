@@ -61,4 +61,14 @@ describe('EditabilityService', () => {
     editabilityService.onStartTutorial();
     expect(editabilityService.inTutorialMode()).toBe(true);
   });
+
+  it('should mark exploration as publishable', () => {
+    editabilityService.markAsPublishable();
+    expect(editabilityService.isPublishable()).toBe(true);
+  });
+
+  it('should mark exploration as not publishable', () => {
+    editabilityService.markAsNotPublishable();
+    expect(editabilityService.isPublishable()).toBe(false);
+  });
 });

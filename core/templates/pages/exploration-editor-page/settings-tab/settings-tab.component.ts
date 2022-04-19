@@ -50,6 +50,9 @@ require(
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-correctness-feedback.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-edits-allowed.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -102,7 +105,8 @@ angular.module('oppia').component('settingsTab', {
     'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
-    'ExplorationDataService', 'ExplorationFeaturesService',
+    'ExplorationDataService', 'ExplorationEditsAllowedService',
+    'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
     'ExplorationParamSpecsService', 'ExplorationRightsService',
@@ -119,7 +123,8 @@ angular.module('oppia').component('settingsTab', {
         EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
-        ExplorationDataService, ExplorationFeaturesService,
+        ExplorationDataService, ExplorationEditsAllowedService,
+        ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
         ExplorationParamSpecsService, ExplorationRightsService,
@@ -285,6 +290,23 @@ angular.module('oppia').component('settingsTab', {
       };
       ctrl.toggleCorrectnessFeedback = function() {
         ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback();
+      };
+
+      ctrl.areEditsAllowed = function() {
+        return ExplorationEditsAllowedService.isEnabled();
+      };
+
+      ctrl.enableEdits = function() {
+        ExplorationEditsAllowedService.setEditsAllowed(true);
+        EditabilityService.markAsPublishable();
+      };
+
+      ctrl.disableEdits = function() {
+        ExplorationEditsAllowedService.setEditsAllowed(false);
+      };
+
+      ctrl.isPublishable = function() {
+        return EditabilityService.isPublishable();
       };
 
       // Methods for rights management.

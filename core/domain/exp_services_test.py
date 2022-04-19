@@ -1579,6 +1579,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: Introduction
 language_code: en
 objective: ''
@@ -1822,6 +1823,7 @@ title: Title
         blurb: ''
         category: Category
         correctness_feedback_enabled: false
+        edits_allowed: true
         init_state_name: Introduction
         language_code: en
         objective: ''
@@ -2155,6 +2157,7 @@ auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -2263,6 +2266,7 @@ auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -5701,6 +5705,7 @@ auto_tts_enabled: true
 blurb: ''
 category: category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: %s
 language_code: en
 objective: Old objective
@@ -6344,6 +6349,47 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.title, 'new title')
         self.assertEqual(exploration.correctness_feedback_enabled, False)
+
+    def test_update_exploration_edits_allowed(self):
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.edits_allowed, True)
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'edits_allowed',
+                'new_value': False
+            })], 'Changed edits_allowed.')
+
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.edits_allowed, False)
+
+        # Check that the property can be changed when working
+        # on old version.
+        # Add change to upgrade the version.
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'new title'
+            })], 'Changed title.')
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'edits_allowed',
+            'new_value': True
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, change_list,
+            'Changed edits_allowed.')
+
+        # Assert that final version consists all the changes.
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.title, 'new title')
+        self.assertEqual(exploration.edits_allowed, True)
 
     def test_update_unclassified_answers(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)

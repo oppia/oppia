@@ -107,7 +107,8 @@ export class ChangeListService {
     tags: true,
     title: true,
     auto_tts_enabled: true,
-    correctness_feedback_enabled: true
+    correctness_feedback_enabled: true,
+    edits_allowed: true
   };
 
   ALLOWED_STATE_BACKEND_NAMES: Record<StatePropertyNames, boolean> = {

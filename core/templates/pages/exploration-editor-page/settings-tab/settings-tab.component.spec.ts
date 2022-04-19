@@ -69,6 +69,7 @@ describe('Settings Tab Component', () => {
   let explorationDataService = null;
   let contextService = null;
   let editableExplorationBackendApiService = null;
+  let editabilityService = null;
   let explorationCategoryService = null;
   let explorationInitStateNameService = null;
   let explorationLanguageCodeService = null;
@@ -187,6 +188,7 @@ describe('Settings Tab Component', () => {
       $rootScope = $injector.get('$rootScope');
       ngbModal = $injector.get('NgbModal');
       explorationDataService = $injector.get('ExplorationDataService');
+      editabilityService = $injector.get('EditabilityService');
       contextService = $injector.get('ContextService');
       settingTabBackendApiService = $injector.get(
         'SettingTabBackendApiService');
@@ -828,6 +830,18 @@ describe('Settings Tab Component', () => {
       expect(ctrl.isCorrectnessFeedbackEnabled()).toBe(true);
       ctrl.toggleCorrectnessFeedback();
       expect(ctrl.isCorrectnessFeedbackEnabled()).toBe(false);
+    });
+
+    it('should evaluate when edits are allowed', () => {
+      ctrl.enableEdits();
+      expect(ctrl.areEditsAllowed()).toBe(true);
+      ctrl.disableEdits();
+      expect(ctrl.areEditsAllowed()).toBe(false);
+    });
+
+    it('should check if exploration is publishable', () => {
+      spyOn(editabilityService, 'isPublishable').and.returnValue(true);
+      expect(ctrl.isPublishable()).toBe(true);
     });
 
     it('should check if exploration is locked for editing', () => {

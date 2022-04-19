@@ -553,6 +553,8 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'correctness_feedback_enabled':
                     exploration.update_correctness_feedback_enabled(
                         change.new_value)
+                elif change.property_name == 'edits_allowed':
+                    exploration.update_edits_allowed(change.new_value)
             elif (change.cmd ==
                   exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
@@ -639,6 +641,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
     exploration_model.correctness_feedback_enabled = (
         exploration.correctness_feedback_enabled)
+    exploration_model.edits_allowed = exploration.edits_allowed
 
     change_list_dict = [change.to_dict() for change in change_list]
     exploration_model.commit(committer_id, commit_message, change_list_dict)
@@ -719,7 +722,8 @@ def _create_exploration(
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
-        correctness_feedback_enabled=exploration.correctness_feedback_enabled
+        correctness_feedback_enabled=exploration.correctness_feedback_enabled,
+        edits_allowed=exploration.edits_allowed
     )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmds_dict)
@@ -1894,6 +1898,7 @@ def get_user_exploration_data(
         'is_version_of_draft_valid': is_valid_draft_version,
         'draft_changes': draft_changes,
         'email_preferences': exploration_email_preferences.to_dict(),
+        'edits_allowed': exploration.edits_allowed
     }
 
     return editor_dict

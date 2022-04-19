@@ -87,6 +87,9 @@ require(
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-correctness-feedback.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-edits-allowed.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -162,7 +165,8 @@ angular.module('oppia').component('explorationEditorPage', {
     'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
-    'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
+    'ExplorationDataService', 'ExplorationEditsAllowedService',
+    'ExplorationFeaturesBackendApiService',
     'ExplorationFeaturesService', 'ExplorationImprovementsService',
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
@@ -187,7 +191,8 @@ angular.module('oppia').component('explorationEditorPage', {
         ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
-        ExplorationDataService, ExplorationFeaturesBackendApiService,
+        ExplorationDataService, ExplorationEditsAllowedService,
+        ExplorationFeaturesBackendApiService,
         ExplorationFeaturesService, ExplorationImprovementsService,
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
@@ -237,6 +242,7 @@ angular.module('oppia').component('explorationEditorPage', {
       // Initializes the exploration page using data from the backend.
       // Called on page load.
       ctrl.initExplorationPage = () => {
+        EditabilityService.markAsNotPublishable();
         return $q.all([
           ExplorationDataService.getDataAsync((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {
@@ -280,6 +286,11 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.auto_tts_enabled);
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
+          ExplorationEditsAllowedService.init(
+            explorationData.edits_allowed);
+          if (ExplorationEditsAllowedService.isEnabled()) {
+            EditabilityService.markAsPublishable();
+          }
 
 
           ctrl.explorationTitleService = ExplorationTitleService;
