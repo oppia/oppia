@@ -30,6 +30,7 @@ describe('Practice session page', function() {
   var CsrfTokenService = null;
   var PageTitleService = null;
   var UrlService = null;
+  var LoaderService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -45,6 +46,7 @@ describe('Practice session page', function() {
     CsrfTokenService = $injector.get('CsrfTokenService');
     PageTitleService = $injector.get('PageTitleService');
     UrlService = $injector.get('UrlService');
+    LoaderService = $injector.get('LoaderService');
 
     spyOn(CsrfTokenService, 'getTokenAsync')
       .and.returnValue($q.resolve('sample-csrf-token'));
@@ -64,6 +66,7 @@ describe('Practice session page', function() {
     spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
     spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
+    spyOn(LoaderService, 'hideLoadingScreen');
 
     $httpBackend.expectGET(
       '/practice_session/data/math/abbrev-topic?' +
@@ -105,5 +108,6 @@ describe('Practice session page', function() {
     });
     expect(PageTitleService.setDocumentTitle).toHaveBeenCalledWith(
       'Practice Session: Foo Topic - Oppia');
+    expect(LoaderService.hideLoadingScreen).toHaveBeenCalled();
   });
 });
