@@ -1750,6 +1750,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         retrieved_object = user_models.ExplorationUserDataModel.get_multi(
         [self.USER_1_ID, self.USER_2_ID],
         self.EXP_ID_ONE)
+        # Mypy Type checking for None.
+        assert retrieved_object[0] is not None
+        assert retrieved_object[1] is not None
         self.assertEqual(len(retrieved_object), 2)
         self.assertEqual(retrieved_object[0].user_id, self.USER_1_ID)
         self.assertEqual(
@@ -1974,6 +1977,9 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
     def test_get_multi(self) -> None:
         retrieved_object = user_models.CollectionProgressModel.get_multi(
             self.USER_ID_1, [self.COLLECTION_ID_1, self.COLLECTION_ID_2])
+        # Mypy checking for None.
+        assert retrieved_object[0] is not None
+        assert retrieved_object[1] is not None
         self.assertEqual(len(retrieved_object), 2)
         self.assertEqual(retrieved_object[0].user_id, self.USER_ID_1)
         self.assertEqual(
