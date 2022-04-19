@@ -1425,8 +1425,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         # Expect that the results correspond to translation suggestions that the
         # user has rights to review.
-        self.assertEqual(
-            suggestion_target_ids, [self.target_id_1, self.target_id_2])
+        self.assertItemsEqual(
+            suggestion_target_ids, [self.target_id_2, self.target_id_1])
 
     def test_get_reviewable_translation_suggestions_with_valid_exp_ids(
             self):

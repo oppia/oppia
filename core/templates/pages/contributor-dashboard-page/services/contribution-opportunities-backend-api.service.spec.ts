@@ -306,14 +306,14 @@ describe('Contribution Opportunities backend API service', function() {
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .fetchReviewableTranslationOpportunitiesAsync(null).then(
+      .fetchReviewableTranslationOpportunitiesAsync('invalid').then(
         successHandler, failHandler
       );
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
         '/getreviewableopportunitieshandler',
         {}
-      ) + '?topic_name=null'
+      ) + '?topic_name=invalid'
     );
 
     expect(req.request.method).toEqual('GET');
