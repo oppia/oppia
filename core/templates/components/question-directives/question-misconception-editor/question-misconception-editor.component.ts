@@ -124,7 +124,9 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   tagAnswerGroupWithMisconception(): void {
     const modalRef: NgbModalRef = this.ngbModal.open(
       TagMisconceptionModalComponent, {
-        backdrop: 'static'
+        backdrop: 'static',
+        backdropClass: 'forced-modal-backdrop-stack-over',
+        windowClass: 'forced-modal-stack-over'
       });
     modalRef.componentInstance.taggedSkillMisconceptionId = (
       this.taggedSkillMisconceptionId);

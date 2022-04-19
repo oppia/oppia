@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/button-directives/social-buttons.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/button-directives/social-buttons.component.rtl.css" as="style">
+
 <div class="oppia-footer-social">
   <div class="oppia-follow-us">
     <h3>
@@ -30,52 +33,6 @@
 
 </div>
 
-<style>
-  .oppia-follow-us {
-    margin-bottom: 15px;
-  }
-
-  .oppia-footer-social a:hover,
-  .oppia-footer-social a:focus {
-    text-decoration: none;
-  }
-  .oppia-footer-social a > img {
-    width: 30px;
-  }
-  .oppia-footer-social a:focus > img {
-    outline: 1px dotted #fff;
-    outline: auto 5px -webkit-focus-ring-color;
-  }
-
-  .oppia-footer-social .oppia-footer-social-icons {
-    display: -webkit-inline-box;
-    font-size: 24px;
-    position: relative;
-  }
-
-  .oppia-footer-social .oppia-footer-social-icons .oppia-youtube-follow {
-    background: #cd201f;
-    margin-right: 6px;
-    padding: 5px 9px;
-  }
-  .oppia-footer-social .oppia-footer-social-icons .oppia-facebook-follow {
-    background: #3b5998;
-    margin-right: 6px;
-    padding: 5px 10px;
-  }
-  .oppia-footer-social .oppia-footer-social-icons .oppia-twitter-follow {
-    background: #1da1f2;
-    margin-right: 6px;
-    padding: 5px 6px;
-  }
-  .oppia-footer-social .oppia-facebook-follow  i.oppia-follow-icons.fab.fa-facebook {
-    bottom: -7px;
-    position: relative;
-    right: -5px;
-  }
-  .oppia-footer-social .oppia-youtube-follow  i.oppia-follow-icons.fab.fa-youtube-play {
-    font-size: 18px;
-    left: -0.35px;
-    position: relative;
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/button-directives/social-buttons.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/button-directives/social-buttons.component.rtl.css">
