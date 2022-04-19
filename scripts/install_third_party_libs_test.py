@@ -59,9 +59,13 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 def __init__(self):
                     self.returncode = 0
                 def communicate(self):
-                    """Return required meathod."""
-                    return '', ''
+                    """Return required method."""
+                    return b'', b''
             return Ret()
+        def mock_check_call_error(*args, **kwargs) -> None:  # pylint: disable=unused-argument
+            """Raise the Exception resulting from a failed check_call()"""
+            self.check_function_calls['check_call_is_called'] = True
+            raise subprocess.CalledProcessError(-1, args[0])
         def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             class Ret:
                 """Return object that gives user-prefix error."""
@@ -70,7 +74,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                     self.returncode = 1
                 def communicate(self):
                     """Return user-prefix error as stderr."""
-                    return '', 'can\'t combine user with prefix'
+                    return b'', b'can\'t combine user with prefix'
             return Ret()
         def mock_print(msg, end=''):  # pylint: disable=unused-argument
             self.print_arr.append(msg)
@@ -79,6 +83,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             subprocess, 'check_call', mock_check_call)
         self.Popen_swap = self.swap(
             subprocess, 'Popen', mock_check_call)
+        self.check_call_error_swap = self.swap(
+            subprocess, 'check_call', mock_check_call_error)
         self.Popen_error_swap = self.swap(
             subprocess, 'Popen', mock_popen_error_call)
         self.print_swap = self.swap(builtins, 'print', mock_print)
@@ -88,6 +94,32 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         self.dir_exists_swap = self.swap(
             common, 'ensure_directory_exists', mock_ensure_directory_exists)
+
+    def test_install_prerequisite(self) -> None:
+        self.check_function_calls['check_call_is_called'] = False
+        prerequisite = install_third_party_libs.PREREQUISITES[0]
+        with self.Popen_swap:
+            install_third_party_libs.install_prerequisite(prerequisite)
+        self.assertTrue(self.check_function_calls['check_call_is_called'])
+
+    def test_install_prerequisite_with_prefix_fix(self) -> None:
+        self.check_function_calls['check_call_is_called'] = False
+        prerequisite = install_third_party_libs.PREREQUISITES[0]
+        with self.Popen_error_swap:
+            with self.check_call_swap:
+                install_third_party_libs.install_prerequisite(prerequisite)
+        self.assertTrue(self.check_function_calls['check_call_is_called'])
+
+    def test_install_prerequisite_raises_exception_if_prefix_fix_fails(
+            self) -> None:
+        self.check_function_calls['check_call_is_called'] = False
+        prerequisite = install_third_party_libs.PREREQUISITES[0]
+        with self.Popen_error_swap:
+            with self.check_call_error_swap:
+                with self.assertRaisesRegex(
+                        Exception, 'Error installing prerequisite'):
+                    install_third_party_libs.install_prerequisite(prerequisite)
+        self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_tweak_yarn_executable(self):
         def mock_is_file(unused_filename):
@@ -279,7 +311,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         with os_name_swap, url_retrieve_swap:
             with self.dir_exists_swap, isfile_swap, zipfile_swap:
                 with self.assertRaisesRegex(
-                    Exception, 'Error installing protoc binary'):
+                        Exception, 'Error installing protoc binary'):
                     install_third_party_libs.install_buf_and_protoc()
 
         self.assertTrue(
@@ -287,6 +319,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertTrue(check_mock_function_calls['extractall_is_called'])
 
     def test_proto_file_compilation(self):
+        self.check_function_calls['check_call_is_called'] = False
         with self.Popen_swap:
             install_third_party_libs.compile_protobuf_files(['mock_path'])
         self.assertTrue(self.check_function_calls['check_call_is_called'])
@@ -294,7 +327,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
     def test_proto_file_compilation_raises_exception_on_compile_errors(self):
         with self.Popen_error_swap:
             with self.assertRaisesRegex(
-                Exception, 'Error compiling proto files at mock_path'):
+                    Exception, 'Error compiling proto files at mock_path'):
                 install_third_party_libs.compile_protobuf_files(['mock_path'])
 
     def test_ensure_pip_library_is_installed_with_regular_package(self):
