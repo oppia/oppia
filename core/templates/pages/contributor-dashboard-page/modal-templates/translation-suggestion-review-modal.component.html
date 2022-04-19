@@ -45,12 +45,12 @@
             </li>
           </ul>
           <schema-based-editor [schema]="getHtmlSchema.bind(this)"
-                               *ngIf="startedEditing && isHtmlContent"
+                               *ngIf="startedEditing && (isHtmlContent || (isDeprecatedTranslationSuggestionCommand(translationHtml) && doesTranslationContainTags(translationHtml)))"
                                [localValue]="editedContent.html"
                                (localValueChange)="updateHtml($event)">
           </schema-based-editor>
           <schema-based-editor [schema]="getUnicodeSchema.bind(this)"
-                               *ngIf="startedEditing && isUnicodeContent"
+                               *ngIf="startedEditing && (isUnicodeContent || (isDeprecatedTranslationSuggestionCommand(translationHtml) && !doesTranslationContainTags(translationHtml)))"
                                [localValue]="editedContent.html"
                                (localValueChange)="updateHtml($event)">
           </schema-based-editor>
