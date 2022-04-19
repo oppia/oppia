@@ -75,6 +75,9 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
             if link_text is not None:
                 cleaned_links.append(
                     link_text.replace('&quot;', ''))
+            else:
+                # If the link is None, it is considered to be invalid.
+                cleaned_links.append('None')
 
         invalid_links = []
         for link in cleaned_links:
