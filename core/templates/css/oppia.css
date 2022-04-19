@@ -2986,7 +2986,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-suggestion-review-panel {
   border: 1px solid black;
   height: 100%;
-  overlow: scroll;
+  overflow: scroll;
   width: 100%;
 }
 
