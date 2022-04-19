@@ -397,6 +397,35 @@ describe('Conversation skin component', () => {
     most_recently_reached_checkpoint_exp_version: 2
   };
 
+  let sampleExpResponse: FetchExplorationBackendResponse = {
+    exploration_id: 'exp_id',
+    is_logged_in: true,
+    session_id: 'KERH',
+    exploration: {
+      init_state_name: 'Start',
+      param_changes: [],
+      param_specs: null,
+      title: 'Exploration',
+      language_code: 'en',
+      correctness_feedback_enabled: true,
+      objective: 'To learn',
+      states: explorationDict.states
+    },
+    version: 2,
+    can_edit: true,
+    preferred_audio_language_code: 'en',
+    preferred_language_codes: [],
+    auto_tts_enabled: true,
+    correctness_feedback_enabled: true,
+    record_playthrough_probability: 1,
+    draft_change_list_id: 0,
+    user_has_viewed_lesson_info_modal_once: false,
+    furthest_completed_checkpoint_exp_version: 1,
+    furthest_completed_checkpoint_state_name: 'End',
+    most_recently_reached_checkpoint_state_name: null,
+    most_recently_reached_checkpoint_exp_version: 2
+  };
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -581,8 +610,6 @@ describe('Conversation skin component', () => {
       is_topic_manager: false,
       username: true
     };
-    const expResponse1 = explorationResponse;
-    expResponse1.most_recently_reached_checkpoint_state_name = null;
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(new UserInfo(
@@ -622,7 +649,7 @@ describe('Conversation skin component', () => {
     spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
     spyOn(messengerService, 'sendMessage');
     spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
-      .and.returnValue(Promise.resolve(expResponse1));
+      .and.returnValue(Promise.resolve(sampleExpResponse));
 
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
