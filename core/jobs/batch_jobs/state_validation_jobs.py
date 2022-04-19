@@ -26,7 +26,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-import bleach
+import bs4
 
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -45,33 +45,36 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
                 exp_fetchers.get_exploration_from_model)
         )
 
-        exploration_with_states = (
+        exploration_with_invalid_states = (
             total_explorations
             | 'Combine exploration id and states' >> beam.Map(
                 lambda exp: (exp.id, exp.states))
             | 'Get only states' >> beam.Map(
                 lambda objects: (objects[0], self.get_states(objects[1]))
             )
+            | 'Get invalid states' >> beam.Filter(
+                lambda objects: self.check_invalid(objects[1])
+            )
         )
 
-        report_number_of_exps_queried = (
+        report_number_of_invalid_states_queried = (
             total_explorations
             | 'Report count of exp models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('EXPS'))
+                job_result_transforms.CountObjectsToJobRunResult('STATES'))
         )
 
         report_invalid_states = (
-            exploration_with_states
+            exploration_with_invalid_states
             | 'Save info on invalid exps' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stdout(
-                    (objects[0], objects[1])
+                    (objects)
                 ))
         )
 
         return (
             (
                 report_invalid_states,
-                report_number_of_exps_queried
+                report_number_of_invalid_states_queried
             )
             | 'Combine results' >> beam.Flatten()
         )
@@ -87,10 +90,25 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
             content html field
         """
         state_content_html = []
-        for _, value in states_dict.items():
-            state_content_html.append(
-                bleach.clean(
-                    value.content.html, tags=['oppia-noninteractive-image'],
-                    attributes=['filepath-with-value'], strip=True))
-
+        for key, value in states_dict.items():
+            soup = bs4.BeautifulSoup(value.content.html, 'html.parser')
+            links = soup.find_all('oppia-noninteractive-image')
+            for link in links:
+                state_content_html.append(
+                    (key, link.get('filepath-with-value').replace('&quot;', ''))
+                )
         return state_content_html
+
+    def check_invalid(self, states):
+        """Checks if the stat is valid or not
+
+        Args:
+            states: list(tuple). Consist of state name and image value
+
+        Returns:
+            bool. Returns True if the state is not valid otherwise False
+        """
+        for state in states:
+            if state[1] == '':
+                return True
+        return False
