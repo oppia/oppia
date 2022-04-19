@@ -581,8 +581,8 @@ describe('Conversation skin component', () => {
       is_topic_manager: false,
       username: true
     };
-    let expResponse = explorationResponse;
-    expResponse.most_recently_reached_checkpoint_state_name = null;
+    const expResponse1 = explorationResponse;
+    expResponse1.most_recently_reached_checkpoint_state_name = null;
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(new UserInfo(
@@ -622,7 +622,7 @@ describe('Conversation skin component', () => {
     spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
     spyOn(messengerService, 'sendMessage');
     spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
-      .and.returnValue(Promise.resolve(expResponse));
+      .and.returnValue(Promise.resolve(expResponse1));
 
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
@@ -709,15 +709,15 @@ describe('Conversation skin component', () => {
   'on page load if user is logged in', fakeAsync(() => {
     let stateCardNames = ['Start', 'Mid', 'End'];
     let stateCards: StateCard[] = [];
-    for (let i = 0; i < 3; i++) {
+    for (let stateName in stateCardNames) {
       stateCards.push(new StateCard(
-        stateCardNames[i],
-        null, null, new Interaction(
+        stateName,
+        '<p>Testing</p>', null, new Interaction(
           [], [], null, null, [], 'Continue', null),
-        [], null, null, '', null)
+        [], null, null, 'content', null)
       );
     }
-    let expResponse = explorationResponse;
+    const expResponse = explorationResponse;
     expResponse.exploration.states.Mid.card_is_checkpoint = true;
     spyOn(playerPositionService, 'init').and.callFake((callb) => {
       callb();
@@ -760,7 +760,11 @@ describe('Conversation skin component', () => {
     componentInstance.isIframed = false;
 
     componentInstance.initializePage();
-    tick(1000);
+    tick(100);
+
+    expect(componentInstance.prevSessionStatesProgress).toEqual(
+      ['Start']);
+    expect(componentInstance.mostRecentlyReachedCheckpoint).toBe('Mid');
   }));
 
 
