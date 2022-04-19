@@ -3331,11 +3331,6 @@ md-card.preview-conversation-skin-supplemental-card {
   max-width: none;
 }
 
-.oppia-info-card-tag-row {
-  display: flex;
-  flex-direction: row;
-}
-
 .oppia-info-card-tag-icon {
   padding-top: 6px;
   width: 28px;
