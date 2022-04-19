@@ -1307,15 +1307,15 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
         playthrough = stats_services.get_playthrough_from_model(model)
 
-        stats_services.assign_playthrough_to_corresponding_issue(playthrough, 
-        exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
+        stats_services.assign_playthrough_to_corresponding_issue(
+        playthrough, exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
         exp_issues.unresolved_issues[0].playthrough_ids = [
         'playthrough_id1', 'playthrough_id2', 'playthrough_id3',
         'playthrough_id4', 'playthrough_id5', 'playthrough_id6']
 
-        stats_services.assign_playthrough_to_corresponding_issue(playthrough, 
-        exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
+        stats_services.assign_playthrough_to_corresponding_issue(
+        playthrough, exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
     def test_get_corresponding_exp_issue(self):
         stats_services.save_exp_issues_model(
