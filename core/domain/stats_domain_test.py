@@ -951,7 +951,8 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             }, [], 1, True)
 
     def _dummy_convert_issue_v1_dict_to_v2_dict(
-        self, issue_dict: Dict[str, Any]) -> Dict[str, Any]:
+        self, issue_dict: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """A test implementation of schema conversion function. It sets all the
         "time spent" fields for EarlyQuit issues to DUMMY_TIME_SPENT_IN_MSECS.
         """
@@ -1341,7 +1342,8 @@ class LearnerActionTests(test_utils.GenericTestBase):
             playthrough1.actions[0].action_type, 'ExplorationQuit')
 
     def test_cannot_update_learner_action_from_invalid_schema_version_model(
-            self) -> None:
+            self
+    ) -> None:
         learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 4)
         learner_action_dict = learner_action.to_dict()
 
@@ -1431,7 +1433,8 @@ class StateAnswersTests(test_utils.GenericTestBase):
     """Tests the StateAnswers domain object."""
 
     def test_can_retrieve_properly_constructed_submitted_answer_dict_list(
-        self) -> None:
+        self
+    ) -> None:
         state_answers = stats_domain.StateAnswers(
             'exp_id', 1, 'initial_state', 'TextInput', [
                 stats_domain.SubmittedAnswer(

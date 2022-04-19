@@ -69,7 +69,7 @@ MAX_ANSWER_DETAILS_BYTE_SIZE = 10000
 class SubmittedAnswerDict(TypedDict, total=False):
     """Dictionary representing the SubmittedAnswer object."""
 
-    answer: Any
+    answer: str
     interaction_id: str
     answer_group_index: int
     rule_spec_index: int
@@ -322,7 +322,8 @@ class ExplorationStats:
             'num_actual_starts_v1',
             'num_actual_starts_v2',
             'num_completions_v1',
-            'num_completions_v2']] = [
+            'num_completions_v2'
+        ]] = [
             'num_starts_v1',
             'num_starts_v2',
             'num_actual_starts_v1',
@@ -485,7 +486,8 @@ class StateStats:
         return cls(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     def aggregate_from(
-        self, other: Union[StateStats, SessionStateStats]) -> None:
+        self, other: Union[StateStats, SessionStateStats]
+    ) -> None:
         """Aggregates data from the other state stats into self.
 
         Args:
@@ -599,34 +601,32 @@ class StateStats:
             bool. Whether the two instances have the same values.
         """
         if not isinstance(other, StateStats):
-            return NotImplemented
-        if other.__class__ is self.__class__:
-            return (
-                self.total_answers_count_v1,
-                self.total_answers_count_v2,
-                self.useful_feedback_count_v1,
-                self.useful_feedback_count_v2,
-                self.total_hit_count_v1,
-                self.total_hit_count_v2,
-                self.first_hit_count_v1,
-                self.first_hit_count_v2,
-                self.num_times_solution_viewed_v2,
-                self.num_completions_v1,
-                self.num_completions_v2,
-            ) == (
-                other.total_answers_count_v1,
-                other.total_answers_count_v2,
-                other.useful_feedback_count_v1,
-                other.useful_feedback_count_v2,
-                other.total_hit_count_v1,
-                other.total_hit_count_v2,
-                other.first_hit_count_v1,
-                other.first_hit_count_v2,
-                other.num_times_solution_viewed_v2,
-                other.num_completions_v1,
-                other.num_completions_v2,
-            )
-        return NotImplemented # https://stackoverflow.com/a/44575926
+            return NotImplemented # https://stackoverflow.com/a/44575926
+        return (
+            self.total_answers_count_v1,
+            self.total_answers_count_v2,
+            self.useful_feedback_count_v1,
+            self.useful_feedback_count_v2,
+            self.total_hit_count_v1,
+            self.total_hit_count_v2,
+            self.first_hit_count_v1,
+            self.first_hit_count_v2,
+            self.num_times_solution_viewed_v2,
+            self.num_completions_v1,
+            self.num_completions_v2,
+        ) == (
+            other.total_answers_count_v1,
+            other.total_answers_count_v2,
+            other.useful_feedback_count_v1,
+            other.useful_feedback_count_v2,
+            other.total_hit_count_v1,
+            other.total_hit_count_v2,
+            other.first_hit_count_v1,
+            other.first_hit_count_v2,
+            other.num_times_solution_viewed_v2,
+            other.num_completions_v1,
+            other.num_completions_v2,
+        )
 
     def __hash__(self) -> int:
         """Disallow hashing StateStats since they are mutable by design."""
@@ -693,9 +693,14 @@ class SessionStateStats:
     """
 
     def __init__(
-            self, total_answers_count: int, useful_feedback_count: int,
-            total_hit_count: int, first_hit_count: int,
-            num_times_solution_viewed: int, num_completions: int):
+        self,
+        total_answers_count: int,
+        useful_feedback_count: int,
+        total_hit_count: int,
+        first_hit_count: int,
+        num_times_solution_viewed: int,
+        num_completions: int
+    ):
         """Constructs a SessionStateStats domain object.
 
         Args:
@@ -754,24 +759,22 @@ class SessionStateStats:
             bool. Whether the two instances have the same values.
         """
         if not isinstance(other, SessionStateStats):
-            return NotImplemented
-        if other.__class__ is self.__class__:
-            return (
-                self.total_answers_count,
-                self.useful_feedback_count,
-                self.total_hit_count,
-                self.first_hit_count,
-                self.num_times_solution_viewed,
-                self.num_completions,
-            ) == (
-                other.total_answers_count,
-                other.useful_feedback_count,
-                other.total_hit_count,
-                other.first_hit_count,
-                other.num_times_solution_viewed,
-                other.num_completions,
-            )
-        return NotImplemented # https://stackoverflow.com/a/44575926
+            return NotImplemented # https://stackoverflow.com/a/44575926
+        return (
+            self.total_answers_count,
+            self.useful_feedback_count,
+            self.total_hit_count,
+            self.first_hit_count,
+            self.num_times_solution_viewed,
+            self.num_completions,
+        ) == (
+            other.total_answers_count,
+            other.useful_feedback_count,
+            other.total_hit_count,
+            other.first_hit_count,
+            other.num_times_solution_viewed,
+            other.num_completions,
+        )
 
     def __hash__(self) -> int:
         """Disallow hashing SessionStateStats since it is mutable by design."""
@@ -784,8 +787,8 @@ class SessionStateStats:
 
     @classmethod
     def from_dict(
-        cls,
-        session_state_stats_dict: Dict[str, int]) -> SessionStateStats:
+        cls, session_state_stats_dict: Dict[str, int]
+    ) -> SessionStateStats:
         """Creates a SessionStateStats domain object from the given dict."""
         return cls(
             session_state_stats_dict['total_answers_count'],
@@ -802,8 +805,11 @@ class ExplorationIssues:
     """
 
     def __init__(
-        self, exp_id: str, exp_version: int,
-        unresolved_issues: List[ExplorationIssue]) -> None:
+        self,
+        exp_id: str,
+        exp_version: int,
+        unresolved_issues: List[ExplorationIssue]
+    ) -> None:
         """Constructs an ExplorationIssues domain object.
 
         Args:
@@ -846,7 +852,8 @@ class ExplorationIssues:
 
     @classmethod
     def from_dict(
-        cls, exp_issues_dict: ExplorationIssuesDict) -> ExplorationIssues:
+        cls, exp_issues_dict: ExplorationIssuesDict
+    ) -> ExplorationIssues:
         """Returns an ExplorationIssues object from a dict.
 
         Args:
@@ -889,9 +896,13 @@ class Playthrough:
     """Domain object representing a learner playthrough."""
 
     def __init__(
-            self, exp_id: str, exp_version: int, issue_type: str,
-            issue_customization_args: Dict[str, Any],
-            actions: List[LearnerAction]):
+        self,
+        exp_id: str,
+        exp_version: int,
+        issue_type: str,
+        issue_customization_args: Dict[str, Any],
+        actions: List[LearnerAction]
+    ):
         """Constructs a Playthrough domain object.
 
         Args:
@@ -1005,12 +1016,13 @@ class ExplorationIssue:
     """Domain object representing an exploration issue."""
 
     def __init__(
-            self,
-            issue_type: str,
-            issue_customization_args: Dict[str, Dict[str, Any]],
-            playthrough_ids: List[str],
-            schema_version: int,
-            is_valid: bool):
+        self,
+        issue_type: str,
+        issue_customization_args: Dict[str, Dict[str, Any]],
+        playthrough_ids: List[str],
+        schema_version: int,
+        is_valid: bool
+    ):
         """Constructs an ExplorationIssue domain object.
 
         Args:
@@ -1057,7 +1069,8 @@ class ExplorationIssue:
 
     @classmethod
     def from_dict(
-        cls, exp_issue_dict: ExplorationIssueDict) -> ExplorationIssue:
+        cls, exp_issue_dict: ExplorationIssueDict
+    ) -> ExplorationIssue:
         """Checks whether the exploration issue dict has the correct keys and
         then returns a domain object instance.
 
@@ -1089,7 +1102,8 @@ class ExplorationIssue:
 
     @classmethod
     def update_exp_issue_from_model(
-        cls, issue_dict: ExplorationIssueDict) -> None:
+        cls, issue_dict: ExplorationIssueDict
+    ) -> None:
         """Converts the exploration issue blob given from
         current issue_schema_version to current issue_schema_version + 1.
         Note that the issue_dict being passed in is modified in-place.
@@ -1107,7 +1121,8 @@ class ExplorationIssue:
     @classmethod
     def _convert_issue_v1_dict_to_v2_dict(
         cls, issue_dict: Dict[str, Union[str, Dict[str, Dict[str, str]],
-        list[str], int, bool]]) -> None:
+        list[str], int, bool]]
+    ) -> None:
         """Converts a v1 issue dict to a v2 issue dict. This function is now
         implemented only for testing purposes and must be rewritten when an
         actual schema migration from v1 to v2 takes place.
@@ -1158,7 +1173,8 @@ class LearnerAction:
         self,
         action_type: str,
         action_customization_args: Dict[str, Dict[str, Any]],
-        schema_version: int):
+        schema_version: int
+    ):
         """Constructs a LearnerAction domain object.
 
         Args:
@@ -1203,7 +1219,8 @@ class LearnerAction:
 
     @classmethod
     def update_learner_action_from_model(
-        cls, action_dict: LearnerActionDict) -> None:
+        cls, action_dict: LearnerActionDict
+    ) -> None:
         """Converts the learner action blob given from
         current action_schema_version to current action_schema_version + 1.
         Note that the action_dict being passed in is modified in-place.
@@ -1220,7 +1237,8 @@ class LearnerAction:
 
     @classmethod
     def _convert_action_v1_dict_to_v2_dict(
-        cls, action_dict: Dict[str, Dict[str, Any]]) -> None:
+        cls, action_dict: Dict[str, Dict[str, Any]]
+    ) -> None:
         """Converts a v1 action dict to a v2 action dict. This function is now
         implemented only for testing purposes and must be rewritten when an
         actual schema migration from v1 to v2 takes place.
@@ -1259,11 +1277,14 @@ class StateAnswers:
     """Domain object containing answers submitted to an exploration state."""
 
     def __init__(
-            self, exploration_id: str, exploration_version: int,
-            state_name: str, interaction_id: str,
-            submitted_answer_list: List[SubmittedAnswer],
-            schema_version: int = feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION
-        ) -> None:
+        self,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        interaction_id: str,
+        submitted_answer_list: List[SubmittedAnswer],
+        schema_version: int = feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION
+    ) -> None:
         """Constructs a StateAnswers domain object.
 
         Args:
@@ -1351,11 +1372,18 @@ class SubmittedAnswer:
     # without warning or migration.
 
     def __init__(
-            self, answer: Any, interaction_id: str, answer_group_index: int,
-            rule_spec_index: int, classification_categorization: str,
-            params: Dict[str, Any], session_id: str, time_spent_in_sec: float,
-            rule_spec_str: Optional[str]=None,
-            answer_str: Optional[str]=None) -> None:
+        self,
+        answer: Any,
+        interaction_id: str,
+        answer_group_index: int,
+        rule_spec_index: int,
+        classification_categorization: str,
+        params: Dict[str, Any],
+        session_id: str,
+        time_spent_in_sec: float,
+        rule_spec_str: Optional[str]=None,
+        answer_str: Optional[str]=None
+    ) -> None:
         self.answer = answer
         self.interaction_id = interaction_id
         self.answer_group_index = answer_group_index
@@ -1391,7 +1419,8 @@ class SubmittedAnswer:
 
     @classmethod
     def from_dict(
-        cls, submitted_answer_dict: SubmittedAnswerDict) -> SubmittedAnswer:
+        cls, submitted_answer_dict: SubmittedAnswerDict
+    ) -> SubmittedAnswer:
         """Returns the domain object representing an answer submitted to a
         state.
 
@@ -1519,10 +1548,10 @@ class AnswerOccurrence:
 
     @classmethod
     def from_raw_type(
-        cls,
-        answer_occurrence_dict: AnswerOccurrenceDict) -> AnswerOccurrence:
-        """Returns domain object that represents a
-        specific answer that occurred some number of times.
+        cls, answer_occurrence_dict: AnswerOccurrenceDict
+    ) -> AnswerOccurrence:
+        """Returns domain object that represents a specific answer that occurred
+        some number of times.
 
         Args:
             answer_occurrence_dict: dict. The specific answer dict in the
@@ -1545,7 +1574,7 @@ class AnswerCalculationOutput:
     calculation.
     """
 
-    def __init__(self, calculation_output_type: object):
+    def __init__(self, calculation_output_type: str):
         self.calculation_output_type = calculation_output_type
 
 
@@ -1553,8 +1582,8 @@ class AnswerFrequencyList(AnswerCalculationOutput):
     """Domain object that represents an output list of AnswerOccurrences."""
 
     def __init__(
-        self, answer_occurrences:
-        Optional[List[AnswerOccurrence]]=None) -> None:
+        self, answer_occurrences: Optional[List[AnswerOccurrence]]=None
+    ) -> None:
         """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
         """
@@ -1581,8 +1610,8 @@ class AnswerFrequencyList(AnswerCalculationOutput):
 
     @classmethod
     def from_raw_type(
-        cls, answer_occurrence_list:
-         List[AnswerOccurrenceDict]) -> AnswerFrequencyList:
+        cls, answer_occurrence_list: List[AnswerOccurrenceDict]
+    ) -> AnswerFrequencyList:
         """Creates a domain object that represents an output list of
         AnswerOccurrences.
 
@@ -1609,7 +1638,8 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
 
     def __init__(
         self, categorized_answer_freq_lists:
-        Optional[Dict[str, AnswerFrequencyList]]=None) -> None:
+        Optional[Dict[str, AnswerFrequencyList]]=None
+    ) -> None:
         """Initialize domain object for categorized answer frequency lists for
         a given dict (default is empty).
         """
@@ -1638,8 +1668,9 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         }
 
     @classmethod
-    def from_raw_type(cls, categorized_frequency_dict: Dict[str,
-        List[AnswerOccurrenceDict]]) -> CategorizedAnswerFrequencyLists:
+    def from_raw_type(
+        cls, categorized_frequency_dict: Dict[str, List[AnswerOccurrenceDict]]
+    ) -> CategorizedAnswerFrequencyLists:
         """Returns the domain object for categorized answer frequency dict for
         a given dict.
 
@@ -1670,9 +1701,14 @@ class StateAnswersCalcOutput:
     """
 
     def __init__(
-            self, exploration_id: str, exploration_version: int,
-            state_name: str, interaction_id: str,
-            calculation_id: str, calculation_output: object) -> None:
+        self,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        interaction_id: str,
+        calculation_id: str,
+        calculation_output: object
+    ) -> None:
         """Initialize domain object for state answers calculation output.
 
         Args:
@@ -1745,11 +1781,15 @@ class LearnerAnswerDetails:
     """
 
     def __init__(
-            self, state_reference: str, entity_type: str, interaction_id: str,
-            learner_answer_info_list: List[LearnerAnswerInfo],
-            accumulated_answer_info_json_size_bytes: int,
-            learner_answer_info_schema_version: int = (
-                feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)) -> None:
+        self,
+        state_reference: str,
+        entity_type: str,
+        interaction_id: str,
+        learner_answer_info_list: List[LearnerAnswerInfo],
+        accumulated_answer_info_json_size_bytes: int,
+        learner_answer_info_schema_version: int = (
+            feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)
+    ) -> None:
         """Constructs a LearnerAnswerDetail domain object.
 
         Args:
@@ -1802,8 +1842,9 @@ class LearnerAnswerDetails:
         }
 
     @classmethod
-    def from_dict(cls, learner_answer_details_dict:
-        LearnerAnswerDetailsDict) -> LearnerAnswerDetails:
+    def from_dict(cls,
+        learner_answer_details_dict: LearnerAnswerDetailsDict
+    ) -> LearnerAnswerDetails:
         """Return a LearnerAnswerDetails domain object from a dict.
 
         Args:
@@ -1947,8 +1988,12 @@ class LearnerAnswerInfo:
     """Domain object containing the answer details submitted by the learner."""
 
     def __init__(
-            self, learner_answer_info_id: str, answer: Any,
-            answer_details: str, created_on: datetime.datetime) -> None:
+        self,
+        learner_answer_info_id: str,
+        answer: Any,
+        answer_details: str,
+        created_on: datetime.datetime
+    ) -> None:
         """Constructs a LearnerAnswerInfo domain object.
 
         Args:
@@ -1984,8 +2029,8 @@ class LearnerAnswerInfo:
 
     @classmethod
     def from_dict(
-        cls, learner_answer_info_dict:
-        LearnerAnswerInfoDict) -> LearnerAnswerInfo:
+        cls, learner_answer_info_dict: LearnerAnswerInfoDict
+    ) -> LearnerAnswerInfo:
         """Returns a dict representing LearnerAnswerInfo domain object.
 
         Returns:
