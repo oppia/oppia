@@ -66,6 +66,9 @@
 .progress-nav-bar .row-item {
   flex-grow: 1;
 }
+.progress-nav-bar .row-item-next-card {
+  text-align: left;
+}
 .progress-nav-bar .row-item-previous-card {
   text-align: right;
 }
