@@ -20,8 +20,8 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import state_domain
 from core.domain import param_domain
+from core.domain import state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_validation_jobs
 from core.jobs.types import job_run_result
@@ -415,4 +415,3 @@ class GetExpsHavingNonEmptyParamSpecsJobTests(
                     'its param specs is %s' % (self.EXPLORATION_ID_2, 2)
             )
         ])
-
