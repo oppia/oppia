@@ -1184,11 +1184,13 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         model = stats_models.PlaythroughModel.get_by_id(
             exp_issue.playthrough_ids[0])
 
-        with self.assertRaisesRegex(Exception, 'Sorry, we can only process v1-v%d and unversioned action schemas '
+        with self.assertRaisesRegex(
+            Exception, 'Sorry, we can only process '
+            'v1-v%d and unversioned action schemas '
             'at present.' % stats_models.CURRENT_ACTION_SCHEMA_VERSION):
             stats_services.get_playthrough_from_model(model)
             stats_models.CURRENT_ACTION_SCHEMA_VERSION = 1
-            
+
     def test_while_migrate_to_latest_action_schema(self):
         stats_models.CURRENT_ACTION_SCHEMA_VERSION = 1
         stats_services.save_exp_issues_model(
@@ -1216,8 +1218,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
         stats_models.CURRENT_ACTION_SCHEMA_VERSION = 2
 
-        with self.assertRaisesRegex(NotImplementedError,
-                'method is missing from the derived class.'):
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            'method is missing from the derived class.'):
             stats_services.get_playthrough_from_model(model)
             stats_models.CURRENT_ACTION_SCHEMA_VERSION = 1
 
@@ -1242,7 +1245,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
         stats_models.CURRENT_ISSUE_SCHEMA_VERSION = 0
 
-        with self.assertRaisesRegex(Exception, 'Sorry, we can only process v1-v%d and unversioned issue schemas '
+        with self.assertRaisesRegex(
+            Exception, 'Sorry, we can only process '
+            'v1-v%d and unversioned issue schemas '
             'at present.' %
             stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
             stats_services.get_exp_issues_from_model(exp_issues_model)
@@ -1270,8 +1275,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
         stats_models.CURRENT_ISSUE_SCHEMA_VERSION = 2
 
-        with self.assertRaisesRegex(NotImplementedError,
-                'method is missing from the derived class.'):
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            'method is missing from the derived class.'):
             stats_services.get_exp_issues_from_model(exp_issues_model)
             stats_models.CURRENT_ISSUE_SCHEMA_VERSION = 1
 
@@ -1301,14 +1307,15 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
         playthrough = stats_services.get_playthrough_from_model(model)
 
-        stats_services.assign_playthrough_to_corresponding_issue(playthrough, exp_issues, 
-                    stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
+        stats_services.assign_playthrough_to_corresponding_issue(playthrough, 
+        exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
-        exp_issues.unresolved_issues[0].playthrough_ids = ['playthrough_id1', 'playthrough_id2', 'playthrough_id3',
+        exp_issues.unresolved_issues[0].playthrough_ids = [
+        'playthrough_id1', 'playthrough_id2', 'playthrough_id3',
         'playthrough_id4', 'playthrough_id5', 'playthrough_id6']
 
-        stats_services.assign_playthrough_to_corresponding_issue(playthrough, exp_issues, 
-                    stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
+        stats_services.assign_playthrough_to_corresponding_issue(playthrough, 
+        exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
     def test_get_corresponding_exp_issue(self):
         stats_services.save_exp_issues_model(
@@ -1339,8 +1346,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         exp_issues = stats_domain.ExplorationIssues(
             self.exp.id, stats_models.CURRENT_ISSUE_SCHEMA_VERSION, [])
 
-        stats_services.assign_playthrough_to_corresponding_issue(playthrough, exp_issues, 
-                stats_models.CURRENT_ISSUE_SCHEMA_VERSION) 
+        stats_services.assign_playthrough_to_corresponding_issue(
+        playthrough, exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
     def test_eq_exp_issue_is_invalidated_when_state_is_deleted(self):
         stats_services.save_exp_issues_model(
