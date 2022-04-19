@@ -28,7 +28,6 @@ from core.domain import exp_services
 from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
-from mock import patch
 
 EXPECTED_TERMINAL_INTERACTIONS_COUNT = 1
 
@@ -88,15 +87,21 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_interaction_registry(self):
         """Do some sanity checks on the interaction registry."""
-        with patch(
-                'core.domain.interaction_registry.Registry._interactions', {}):
-            interaction_registry.Registry.get_all_interactions()
         self.assertEqual(
             {
                 type(i).__name__
                 for i in interaction_registry.Registry.get_all_interactions()
             },
             set(interaction_registry.Registry.get_all_interaction_ids()))
+
+        with self.swap(interaction_registry.Registry, '_interactions', {}):
+            self.assertEqual(
+                {
+                    type(i).__name__
+                    for i in
+                    interaction_registry.Registry.get_all_interactions()
+                },
+                set(interaction_registry.Registry.get_all_interaction_ids()))
 
     def test_get_all_specs(self):
         """Test the get_all_specs() method."""
