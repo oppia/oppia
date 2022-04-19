@@ -1361,7 +1361,6 @@ class CheckpointReachedEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-
         most_recently_reached_checkpoint_state_name = (
             self.normalized_payload.get(
                 'most_recently_reached_checkpoint_state_name'))
@@ -1408,14 +1407,12 @@ class ExplorationRestartEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-
-        user_id = self.user_id
         most_recently_reached_checkpoint_state_name = (
             self.normalized_payload.get(
                 'most_recently_reached_checkpoint_state_name'))
 
         if most_recently_reached_checkpoint_state_name is None:
             user_services.update_learner_checkpoint_progress_on_restart(
-                user_id, exploration_id)
+                self.user_id, exploration_id)
 
         self.render_json(self.values)
