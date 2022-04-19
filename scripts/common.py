@@ -168,6 +168,10 @@ WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
 
 PORTSERVER_SOCKET_FILEPATH = os.path.join(os.getcwd(), 'portserver.socket')
 
+WEBDRIVERIO_BIN_PATH = (
+    os.path.join(NODE_MODULES_PATH, '@wdio', 'cli', 'bin', 'wdio.js'))
+WEBDRIVERIO_CONFIG_FILE_PATH = (
+    os.path.join('core', 'tests', 'wdio.conf.js'))
 WEBDRIVER_HOME_PATH = os.path.join(NODE_MODULES_PATH, 'webdriver-manager')
 WEBDRIVER_MANAGER_BIN_PATH = (
     os.path.join(WEBDRIVER_HOME_PATH, 'bin', 'webdriver-manager'))

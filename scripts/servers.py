@@ -662,3 +662,58 @@ def managed_protractor_server(
         **kwargs)
     with managed_protractor_proc as proc:
         yield proc
+
+@contextlib.contextmanager
+def managed_webdriverio_server(
+        suite_name, dev_mode=True, debug_mode=False,
+        sharding_instances=1, **kwargs):
+    """Returns context manager to start/stop the Protractor server gracefully.
+
+    Args:
+        suite_name: str. The suite name whose tests should be run. If the value
+            is `full`, all tests will run.
+        debug_mode: bool. Whether to run the protractor tests in debugging mode.
+            Read the following instructions to learn how to run e2e tests in
+            debugging mode:
+            https://www.protractortest.org/#/debugging#disabled-control-flow.
+        sharding_instances: int. How many sharding instances to be running.
+        **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
+
+    Yields:
+        psutil.Process. The protractor process.
+
+    Raises:
+        ValueError. Number of sharding instances are less than 0.
+    """
+    if sharding_instances <= 0:
+        raise ValueError('Sharding instance should be larger than 0')
+
+    webdriverio_args = [
+        # common.NODE_BIN_PATH,
+        # # This flag ensures tests fail if the `waitFor()` calls time out.
+        # '--unhandled-rejections=strict',
+        common.WEBDRIVERIO_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
+        '--params.devMode=%s' % dev_mode,
+        '--suite', suite_name,
+    ]
+
+    # if debug_mode:
+    #     # NOTE: This is a flag for Node.js, not Protractor, so we insert it
+    #     # immediately after NODE_BIN_PATH.
+    #     webdriverio_args.insert(1, '--inspect-brk')
+
+    # if sharding_instances > 1:
+    #     webdriverio_args.extend([
+    #         '--capabilities.shardTestFiles=True',
+    #         '--capabilities.maxInstances=%d' % sharding_instances,
+    #     ])
+    print('testing1')
+    print(webdriverio_args)
+
+    # OK to use shell=True here because we are passing string literals and
+    # constants, so there is no risk of a shell-injection attack.
+    managed_webdriverio_proc = managed_process(
+        webdriverio_args, human_readable_name='Webdriverio Server', shell=True,
+        **kwargs)
+    with managed_webdriverio_proc as proc:
+        yield proc
