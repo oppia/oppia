@@ -88,8 +88,8 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_interaction_registry(self):
         """Do some sanity checks on the interaction registry."""
-        with patch("core.domain.interaction_registry.Registry._interactions",
-            {}):
+        with patch(
+                "core.domain.interaction_registry.Registry._interactions", {}):
             interaction_registry.Registry.get_all_interactions()
         self.assertEqual(
             {
