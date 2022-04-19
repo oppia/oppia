@@ -1,7 +1,7 @@
 <link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css" as="style">
 <link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.rtl.css" as="style">
-<div [ngClass]="{'float-right': isLanguageRTL(), 'float-left': !isLanguageRTL()}"
-     class="navbar-header protractor-test-navbar-header">
+
+<div class="navbar-header protractor-test-navbar-header oppia-top-navigation-bar">
   <a *ngIf="windowIsNarrow"
      (click)="toggleSidebar($event)"
      class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button ml-0"
