@@ -1139,8 +1139,8 @@ class BuildTests(test_utils.GenericTestBase):
             return 1
 
         webpack_compiler_swap = self.swap(
-                servers, 'managed_webpack_compiler',
-                mock_managed_webpack_compiler)
+            servers, 'managed_webpack_compiler',
+            mock_managed_webpack_compiler)
         get_file_count_swap = self.swap(
             build, 'get_file_count', mock_get_file_count)
 
@@ -1159,8 +1159,8 @@ class BuildTests(test_utils.GenericTestBase):
             return 0
 
         webpack_compiler_swap = self.swap(
-                servers, 'managed_webpack_compiler',
-                mock_managed_webpack_compiler)
+            servers, 'managed_webpack_compiler',
+            mock_managed_webpack_compiler)
         get_file_count_swap = self.swap(
             build, 'get_file_count', mock_get_file_count)
 
