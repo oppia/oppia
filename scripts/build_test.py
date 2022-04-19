@@ -278,7 +278,8 @@ class BuildTests(test_utils.GenericTestBase):
         # Swapping out constants to check if the reverse is true.
         # ALL JS files that ends with ...Service.js should not be built.
         with self.swap(
-            build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)):
+            build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)
+        ):
             self.assertTrue(build.should_file_be_built(spec_js_filepath))
 
     def test_hash_should_be_inserted(self):
@@ -288,7 +289,8 @@ class BuildTests(test_utils.GenericTestBase):
         with self.swap(
             build, 'FILEPATHS_NOT_TO_RENAME', (
                 '*.py', 'path/to/fonts/*', 'path/to/third_party.min.js.map',
-                'path/to/third_party.min.css.map')):
+                'path/to/third_party.min.css.map')
+        ):
             self.assertFalse(build.hash_should_be_inserted(
                 'path/to/fonts/fontawesome-webfont.svg'))
             self.assertFalse(build.hash_should_be_inserted(
@@ -323,7 +325,8 @@ class BuildTests(test_utils.GenericTestBase):
         """
         with self.swap(
             build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
-            ('path/to/file.js', 'path/to/file.html', 'file.js')):
+            ('path/to/file.js', 'path/to/file.html', 'file.js')
+        ):
             self.assertTrue(
                 build.is_file_hash_provided_to_frontend('path/to/file.js'))
             self.assertTrue(
@@ -331,7 +334,8 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertTrue(build.is_file_hash_provided_to_frontend('file.js'))
         with self.swap(
             build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
-            ('path/to/*', '*.js', '*_end.html')):
+            ('path/to/*', '*.js', '*_end.html')
+        ):
             self.assertTrue(
                 build.is_file_hash_provided_to_frontend('path/to/file.js'))
             self.assertTrue(
@@ -405,7 +409,8 @@ class BuildTests(test_utils.GenericTestBase):
 
         with self.swap(
             build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
-            ('test_path/*', 'path/to/file.js')):
+            ('test_path/*', 'path/to/file.js')
+        ):
             hashes = {'path/to/file.js': '123456',
                       'test_path/to/file.html': '123456',
                       'test_path/to/file.js': 'abcdef',
@@ -916,7 +921,8 @@ class BuildTests(test_utils.GenericTestBase):
 
         with self.swap(
             build, 'safe_delete_directory_tree',
-            mock_safe_delete_directory_tree):
+            mock_safe_delete_directory_tree
+        ):
             build.clean()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -1166,5 +1172,6 @@ class BuildTests(test_utils.GenericTestBase):
 
         with webpack_compiler_swap, get_file_count_swap:
             with self.assertRaisesRegex(
-                AssertionError, 'webpack_bundles should be non-empty.'):
+                AssertionError, 'webpack_bundles should be non-empty.'
+            ):
                 build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
