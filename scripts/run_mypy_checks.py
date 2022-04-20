@@ -231,8 +231,6 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/flake_checker_test.py',
     'scripts/install_backend_python_libs.py',
     'scripts/install_backend_python_libs_test.py',
-    'scripts/install_third_party_libs.py',
-    'scripts/install_third_party_libs_test.py',
     'scripts/install_third_party.py',
     'scripts/install_third_party_test.py',
     'scripts/pre_commit_hook.py',

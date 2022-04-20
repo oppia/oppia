@@ -25,7 +25,7 @@ import sys
 import urllib.request as urlrequest
 import zipfile
 
-from typing import List, Tuple
+from typing import Tuple
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
@@ -40,16 +40,16 @@ PREREQUISITES = (
 )
 
 
-def install_prerequisite(package: Tuple[str]) -> None:
+def install_prerequisite(package: Tuple[str, str, str]) -> None:
     """Install prerequisite Python package.
 
     Args:
-        package: Tuple. The args to provide to pip install.
+        package: tuple. The args to provide to pip install.
 
     Raises:
         Exception. If the package fails to install due to issues with --prefix.
     """
-    package_name, version_number, target_path = package
+    (package_name, version_number, target_path) = package
     command_text = [
         sys.executable, '-m', 'pip', 'install', '%s==%s'
         % (package_name, version_number), '--target', target_path]
@@ -79,9 +79,7 @@ from . import setup  # isort:skip  pylint: disable=wrong-import-position, wrong-
 from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
-    description="""
-Installation script for Oppia third-party libraries.
-""")
+    description='Installation script for Oppia third-party libraries.')
 
 # Download locations for buf binary.
 BUF_BASE_URL = (
@@ -102,12 +100,10 @@ PROTOC_LINUX_FILE = 'protoc-%s-linux-x86_64.zip' % (common.PROTOC_VERSION)
 PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common.PROTOC_VERSION)
 
 # Path of the buf executable.
-BUF_DIR = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
+BUF_DIR = os.path.join(common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
 PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
 # Path of files which needs to be compiled by protobuf.
-PROTO_FILES_PATHS = [
-    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
+PROTO_FILES_PATH = os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')
 # Path to typescript plugin required to compile ts compatible files from proto.
 PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
@@ -125,27 +121,25 @@ def tweak_yarn_executable() -> None:
         os.rename(origin_file_path, renamed_file_path)
 
 
-def get_yarn_command() -> None:
+def get_yarn_command() -> str:
     """Get the executable file for yarn."""
-    if common.is_windows_os():
-        return 'yarn.cmd'
-    return 'yarn'
+    return 'yarn.cmd' if common.is_windows_os() else 'yarn'  # type: ignore[no-untyped-call]
 
 
 def install_buf_and_protoc() -> None:
     """Installs buf and protoc for Linux or Darwin, depending upon the
     platform.
     """
-    buf_files = BUF_DARWIN_FILES if common.is_mac_os() else BUF_LINUX_FILES
+    buf_files = BUF_DARWIN_FILES if common.is_mac_os() else BUF_LINUX_FILES  # type: ignore[no-untyped-call]
     protoc_file = (
-        PROTOC_DARWIN_FILE if common.is_mac_os() else PROTOC_LINUX_FILE)
+        PROTOC_DARWIN_FILE if common.is_mac_os() else PROTOC_LINUX_FILE)  # type: ignore[no-untyped-call]
     buf_path = os.path.join(BUF_DIR, buf_files[0])
     protoc_path = os.path.join(PROTOC_DIR, 'bin', 'protoc')
 
     if os.path.isfile(buf_path) and os.path.isfile(protoc_path):
         return
 
-    common.ensure_directory_exists(BUF_DIR)
+    common.ensure_directory_exists(BUF_DIR)  # type: ignore[no-untyped-call]
     for bin_file in buf_files:
         urlrequest.urlretrieve('%s/%s' % (
             BUF_BASE_URL, bin_file), filename=os.path.join(BUF_DIR, bin_file))
@@ -157,11 +151,11 @@ def install_buf_and_protoc() -> None:
         os.remove(os.path.join(BUF_DIR, protoc_file))
     except Exception as e:
         raise Exception('Error installing protoc binary') from e
-    common.recursive_chmod(buf_path, 0o744)
-    common.recursive_chmod(protoc_path, 0o744)
+    common.recursive_chmod(buf_path, 0o744)  # type: ignore[no-untyped-call]
+    common.recursive_chmod(protoc_path, 0o744)  # type: ignore[no-untyped-call]
 
 
-def compile_protobuf_files(proto_files_paths: List[str]) -> None:
+def compile_protobuf_files(path: str) -> None:
     """Compiles protobuf files using buf.
 
     Raises:
@@ -172,19 +166,16 @@ def compile_protobuf_files(proto_files_paths: List[str]) -> None:
     proto_env['PATH'] += '%s%s/bin' % (os.pathsep, PROTOC_GEN_TS_PATH)
     buf_path = os.path.join(
         BUF_DIR,
-        BUF_DARWIN_FILES[0] if common.is_mac_os() else BUF_LINUX_FILES[0])
-    for path in proto_files_paths:
-        command = [
-            buf_path, 'generate', path]
-        process = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            env=proto_env)
-        stdout, stderr = process.communicate()
-        if process.returncode == 0:
-            print(stdout)
-        else:
-            print(stderr)
-            raise Exception('Error compiling proto files at %s' % path)
+        BUF_DARWIN_FILES[0] if common.is_mac_os() else BUF_LINUX_FILES[0])  # type: ignore[no-untyped-call]
+    command = [buf_path, 'generate', path]
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=proto_env)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        print(stdout)
+    else:
+        print(stderr)
+        raise Exception('Error compiling proto files at %s' % path)
 
     # Since there is no simple configuration for imports when using protobuf to
     # generate Python files we need to manually fix the imports.
@@ -193,7 +184,7 @@ def compile_protobuf_files(proto_files_paths: List[str]) -> None:
         pathlib.Path(os.path.join(common.CURR_DIR, 'proto_files')))
     for p in compiled_protobuf_dir.iterdir():
         if p.suffix == '.py':
-            common.inplace_replace_file(
+            common.inplace_replace_file(  # type: ignore[no-untyped-call]
                 p.absolute(),
                 r'^import (\w*_pb2 as)', r'from proto_files import \1')
 
@@ -213,8 +204,7 @@ def ensure_pip_library_is_installed(
         exact_lib_path = os.path.join(
             path,
             '%s-%s' % (
-                package[package.rindex('/') + 1:package.index('.git')],
-                version
+                package[package.rindex('/') + 1:package.index('.git')], version
             )
         )
     else:
@@ -223,10 +213,10 @@ def ensure_pip_library_is_installed(
     if not os.path.exists(exact_lib_path):
         print('Installing %s' % package)
         if package.startswith('git+'):
-            install_backend_python_libs.pip_install(
+            install_backend_python_libs.pip_install(  # type: ignore[no-untyped-call]
                 '%s@%s' % (package, version), exact_lib_path)
         else:
-            install_backend_python_libs.pip_install(
+            install_backend_python_libs.pip_install(  # type: ignore[no-untyped-call]
                 '%s==%s' % (package, version), exact_lib_path)
 
 
@@ -241,12 +231,12 @@ def ensure_system_python_libraries_are_installed(
         version: str. The package version.
     """
     print('Checking if %s is installed.' % (package))
-    install_backend_python_libs.pip_install_to_system(package, version)
+    install_backend_python_libs.pip_install_to_system(package, version)  # type: ignore[no-untyped-call]
 
 
 def main() -> None:
     """Install third-party libraries for Oppia."""
-    setup.main(args=[])
+    setup.main(args=[])  # type: ignore[no-untyped-call]
     setup_gae.main(args=[])
     # These system python libraries are REQUIRED to start the development server
     # and cannot be added to oppia_tools because the dev_appserver python script
@@ -284,7 +274,7 @@ def main() -> None:
 
     # Download and install required JS and zip files.
     print('Installing third-party JS libraries and zip files.')
-    install_third_party.main(args=[])
+    install_third_party.main(args=[])  # type: ignore[no-untyped-call]
 
     # The following steps solves the problem of multiple google paths confusing
     # the python interpreter. Namely, there are two modules named google/, one
@@ -334,7 +324,7 @@ def main() -> None:
                 # this open does nothing.
                 pass
 
-    if common.is_windows_os():
+    if common.is_windows_os():  # type: ignore[no-untyped-call]
         tweak_yarn_executable()
 
     # Install third-party node modules needed for the build process.
@@ -344,18 +334,18 @@ def main() -> None:
     print('Installing buf and protoc binary.')
     install_buf_and_protoc()
     print('Compiling protobuf files.')
-    compile_protobuf_files(PROTO_FILES_PATHS)
+    compile_protobuf_files(PROTO_FILES_PATH)
 
     # Install pre-commit script.
     print('Installing pre-commit hook for git')
-    pre_commit_hook.main(args=['--install'])
+    pre_commit_hook.main(args=['--install'])  # type: ignore[no-untyped-call]
 
     # TODO(#8112): Once pre_commit_linter is working correctly, this
     # condition should be removed.
-    if not common.is_windows_os():
+    if not common.is_windows_os():  # type: ignore[no-untyped-call]
         # Install pre-push script.
         print('Installing pre-push hook for git')
-        pre_push_hook.main(args=['--install'])
+        pre_push_hook.main(args=['--install'])  # type: ignore[no-untyped-call]
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
