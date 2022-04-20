@@ -69,7 +69,7 @@ language set to Arabic as well (we use Arabic as it is a language written from r
 
 ## PR Pointers
 
-- Make sure to follow the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change). (Oppiabot will notify you when you don't add a PR_CHANGELOG label. If you are unable to do so, please @-mention a code owner (who will be in the Reviewers list), or ask on [Gitter](https://gitter.im/oppia/oppia-chat).)
+- Make sure to follow the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change).
 - If you need a review or an answer to a question, and don't have permissions to assign people, **leave a comment** like the following: "{{Question/comment}} @{{reviewer_username}} PTAL". Oppiabot will help assign that person for you.
 - For what code owners will expect, see the [Code Owner's wiki page](https://github.com/oppia/oppia/wiki/Oppia%27s-code-owners-and-checks-to-be-carried-out-by-developers).
 - Make sure your PR follows conventions in the [style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide), otherwise this will lead to review delays.
