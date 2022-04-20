@@ -276,12 +276,12 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_validate_covers_app_context_validate(self) -> None:
         self.android_report_obj.app_context = (
             app_feedback_report_domain.AndroidAppContext(
-                app_feedback_report_domain.NavigationDrawerEntryPoint(), 
+                app_feedback_report_domain.NavigationDrawerEntryPoint(),
                 LANGUAGE_LOCALE_CODE_ENGLISH,
                 LANGUAGE_LOCALE_CODE_ENGLISH, ANDROID_TEXT_SIZE, None,
                 False, False, EVENT_LOGS, LOGCAT_LOGS))
         self._assert_validation_error(
-            self.android_report_obj, 'only_allows_wifi_download_and_update' 
+            self.android_report_obj, 'only_allows_wifi_download_and_update'
                 'field should be a boolean, received:')
 
     def test_get_report_type_from_string_returns_expected_report_type(
@@ -424,7 +424,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_from_dict_with_valid_report_dict_returns_expected_type(
             self) -> None:
         expected_dict = {
-            'platform_type': 
+            'platform_type':
                 app_feedback_report_constants.PLATFORM_CHOICE_ANDROID,
             'user_supplied_feedback': {
                 'report_type': REPORT_TYPE_SUGGESTION.name,
@@ -436,7 +436,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 'platform_version': ANDROID_PLATFORM_VERSION,
                 'package_version_code': ANDROID_PACKAGE_VERSION_CODE,
                 'android_device_country_locale_code': COUNTRY_LOCALE_CODE_INDIA,
-                'android_device_language_locale_code': 
+                'android_device_language_locale_code':
                     LANGUAGE_LOCALE_CODE_ENGLISH,
                 'android_device_model': ANDROID_DEVICE_MODEL,
                 'android_sdk_version': ANDROID_SDK_VERSION,
@@ -447,7 +447,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 'platform_version': ANDROID_PLATFORM_VERSION,
                 'package_version_code': ANDROID_PACKAGE_VERSION_CODE,
                 'android_device_country_locale_code': COUNTRY_LOCALE_CODE_INDIA,
-                'android_device_language_locale_code': 
+                'android_device_language_locale_code':
                     LANGUAGE_LOCALE_CODE_ENGLISH,
                 'android_device_model': ANDROID_DEVICE_MODEL,
                 'android_sdk_version': ANDROID_SDK_VERSION,
@@ -468,14 +468,14 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 'logcat_logs': LOGCAT_LOGS
             },
             'report_submission_timestamp_sec': 0,
-            'android_report_info_schema_version': 
+            'android_report_info_schema_version':
                 ANDROID_REPORT_INFO_SCHEMA_VERSION,
             'report_submission_utc_offset_hrs': 0
             }
         revision_obj = self.android_report_obj.from_dict(expected_dict)
         self.assertTrue(
-            isinstance(revision_obj, 
-                app_feedback_report_domain.AppFeedbackReport))
+            isinstance(
+                revision_obj,app_feedback_report_domain.AppFeedbackReport))
 
     def test_from_dict_with_invalid_report_dict_raises_error(self) -> None:
         expected_dict = {
