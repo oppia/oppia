@@ -745,7 +745,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL) # type: ignore[no-untyped-call]
 
         # Note that creating an exploration counts as editing it.
-        self.save_new_valid_exploration( # type: ignore[no-untyped-call]
+        self.save_new_valid_exploration(
             self.EXP_ID_1, self.user_b_id, end_state_name='End')
 
         exp_services.update_exploration( # type: ignore[no-untyped-call]
@@ -756,7 +756,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
                     'new_value': 'the objective'
                 })], 'Test edit')
 
-        self.save_new_valid_exploration( # type: ignore[no-untyped-call]
+        self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_b_id, end_state_name='End')
 
         exp_services.update_exploration( # type: ignore[no-untyped-call]

@@ -276,13 +276,13 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_validate_covers_app_context_validate(self) -> None:
         self.android_report_obj.app_context = (
             app_feedback_report_domain.AndroidAppContext(
-                app_feedback_report_domain.NavigationDrawerEntryPoint(), LANGUAGE_LOCALE_CODE_ENGLISH,
+                app_feedback_report_domain.NavigationDrawerEntryPoint(), 
+                LANGUAGE_LOCALE_CODE_ENGLISH,
                 LANGUAGE_LOCALE_CODE_ENGLISH, ANDROID_TEXT_SIZE, None,
                 False, False, EVENT_LOGS, LOGCAT_LOGS))
         self._assert_validation_error(
-            self.android_report_obj, 'only_allows_wifi_download_and_update field should be a '
-                'boolean, received:')
-
+            self.android_report_obj, 'only_allows_wifi_download_and_update' 
+                'field should be a boolean, received:')
 
     def test_get_report_type_from_string_returns_expected_report_type(
             self) -> None:
@@ -421,36 +421,40 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             feedback_report.get_android_network_type_from_string(
                 invalid_network_type)
 
-    def test_from_dict_with_valid_report_dict_returns_expected_type(self) -> None:
+    def test_from_dict_with_valid_report_dict_returns_expected_type(
+            self) -> None:
         expected_dict = {
-            'platform_type': app_feedback_report_constants.PLATFORM_CHOICE_ANDROID,
+            'platform_type': 
+                app_feedback_report_constants.PLATFORM_CHOICE_ANDROID,
             'user_supplied_feedback': {
                 'report_type': REPORT_TYPE_SUGGESTION.name,
                 'category': CATEGORY_SUGGESTION_OTHER.name,
                 'user_feedback_selected_items': USER_SELECTED_ITEMS,
                 'user_feedback_other_text_input': USER_TEXT_INPUT
             },
-            'system_context':{
+            'system_context': {
                 'platform_version': ANDROID_PLATFORM_VERSION,
                 'package_version_code': ANDROID_PACKAGE_VERSION_CODE,
                 'android_device_country_locale_code': COUNTRY_LOCALE_CODE_INDIA,
-                'android_device_language_locale_code': LANGUAGE_LOCALE_CODE_ENGLISH,
+                'android_device_language_locale_code': 
+                    LANGUAGE_LOCALE_CODE_ENGLISH,
                 'android_device_model': ANDROID_DEVICE_MODEL,
                 'android_sdk_version': ANDROID_SDK_VERSION,
                 'build_fingerprint': ANDROID_BUILD_FINGERPRINT,
                 'network_type': NETWORK_WIFI.value
             },
-            'device_context':{
+            'device_context': {
                 'platform_version': ANDROID_PLATFORM_VERSION,
                 'package_version_code': ANDROID_PACKAGE_VERSION_CODE,
                 'android_device_country_locale_code': COUNTRY_LOCALE_CODE_INDIA,
-                'android_device_language_locale_code': LANGUAGE_LOCALE_CODE_ENGLISH,
+                'android_device_language_locale_code': 
+                    LANGUAGE_LOCALE_CODE_ENGLISH,
                 'android_device_model': ANDROID_DEVICE_MODEL,
                 'android_sdk_version': ANDROID_SDK_VERSION,
                 'build_fingerprint': ANDROID_BUILD_FINGERPRINT,
                 'network_type': NETWORK_WIFI.value
             },
-            'app_context':{
+            'app_context': {
                 'entry_point': {
                     'entry_point_name': ENTRY_POINT_NAVIGATION_DRAWER
                 },
@@ -464,12 +468,14 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 'logcat_logs': LOGCAT_LOGS
             },
             'report_submission_timestamp_sec': 0,
-            'android_report_info_schema_version': ANDROID_REPORT_INFO_SCHEMA_VERSION,
+            'android_report_info_schema_version': 
+                ANDROID_REPORT_INFO_SCHEMA_VERSION,
             'report_submission_utc_offset_hrs': 0
             }
         revision_obj = self.android_report_obj.from_dict(expected_dict)
         self.assertTrue(
-            isinstance(revision_obj, app_feedback_report_domain.AppFeedbackReport))
+            isinstance(revision_obj, 
+                app_feedback_report_domain.AppFeedbackReport))
 
     def test_from_dict_with_invalid_report_dict_raises_error(self) -> None:
         expected_dict = {

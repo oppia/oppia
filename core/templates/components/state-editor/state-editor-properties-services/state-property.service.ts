@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -42,7 +42,7 @@ import { UtilsService } from 'services/utils.service';
 })
 export class StatePropertyService<StatePropertyType> {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   // The name of the setter method in ExplorationStatesService for this
   // property. THIS MUST BE SPECIFIED BY SUBCLASSES.
@@ -50,11 +50,13 @@ export class StatePropertyService<StatePropertyType> {
   displayed!: StatePropertyType;
   stateName!: string;
   savedMemento!: StatePropertyType;
+  statePropertyInitializedEmitter!: EventEmitter<string>;
 
   constructor(
     private alertsService: AlertsService,
     private utilsService: UtilsService) {
     this.setterMethodKey = null;
+    this.statePropertyInitializedEmitter = new EventEmitter();
   }
 
   init(stateName: string, value: StatePropertyType): void {
@@ -70,6 +72,7 @@ export class StatePropertyService<StatePropertyType> {
     // 'saved' means that this is the latest value of the property as
     // determined by the frontend change list.
     this.savedMemento = cloneDeep(value);
+    this.statePropertyInitializedEmitter.emit();
   }
 
   // Returns whether the current value has changed from the memento.

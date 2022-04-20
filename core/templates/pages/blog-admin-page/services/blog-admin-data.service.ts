@@ -26,7 +26,7 @@ import { BlogAdminPageData, BlogAdminBackendApiService } from 'domain/blog-admin
 })
 export class BlogAdminDataService {
   // This property is initialized using private methods
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   dataPromise!: Promise<BlogAdminPageData>;
 
