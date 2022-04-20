@@ -1,7 +1,6 @@
 extensions.interactions.base_test
 core.controllers.domain_objects_validator_test
 core.constants_test
-core.controllers.reader_test
 core.controllers.tasks_test
 core.controllers.voice_artist_test
 core.domain.role_services_test
