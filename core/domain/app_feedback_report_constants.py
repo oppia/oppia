@@ -89,17 +89,13 @@ class CATEGORY(enum.Enum): # pylint: disable=invalid-name
     other_crash = 'other_crash' # pylint: disable=invalid-name
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class ENTRY_POINT(enum.Enum): # pylint: disable=invalid-name
+class EntryPoint(enum.Enum): 
     """Enum for entry points."""
 
-    navigation_drawer = 'navigation_drawer' # pylint: disable=invalid-name
-    lesson_player = 'lesson_player' # pylint: disable=invalid-name
-    revision_card = 'revision_card' # pylint: disable=invalid-name
-    crash = 'crash' # pylint: disable=invalid-name
+    NAVIGATION_DRAWER = 'navigation_drawer' 
+    LESSON_PLAYER = 'lesson_player' 
+    REVISION_CARD = 'revision_card'
+    CRASH = 'crash'
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
@@ -140,8 +136,8 @@ class AndroidNetworkType(enum.Enum):
 FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
 
 ANDROID_ENTRY_POINT = [
-    ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
-    ENTRY_POINT.revision_card, ENTRY_POINT.crash]
+    EntryPoint.NAVIGATION_DRAWER, EntryPoint.LESSON_PLAYER,
+    EntryPoint.REVISION_CARD, EntryPoint.CRASH]
 ALLOWED_REPORT_TYPES = [
     REPORT_TYPE.suggestion, REPORT_TYPE.issue, REPORT_TYPE.crash]
 ALLOWED_CATEGORIES = [
