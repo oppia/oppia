@@ -25,7 +25,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 from typing_extensions import TypedDict
 
 
@@ -37,6 +37,7 @@ class UserSettingsDict(TypedDict):
     email: str
     roles: List[str]
     banned: bool
+    has_viewed_lesson_info_modal_once: bool
     username: Optional[str]
     normalized_username: Optional[str]
     last_agreed_to_terms: Optional[datetime.datetime]
@@ -67,6 +68,9 @@ class UserSettings:
         user_id: str. The unique ID of the user.
         email: str. The user email.
         roles: list(str). Roles of the user.
+        has_viewed_lesson_info_modal_once: bool. Flag to check whether
+            the user has viewed lesson info modal once which shows the progress
+            of the user through exploration checkpoints.
         username: str or None. Identifiable username to display in the UI.
         last_agreed_to_terms: datetime.datetime or None. When the user last
             agreed to the terms of the site.
@@ -103,6 +107,7 @@ class UserSettings:
         email: str,
         roles: List[str],
         banned: bool,
+        has_viewed_lesson_info_modal_once: bool,
         username: Optional[str] = None,
         last_agreed_to_terms: Optional[datetime.datetime] = None,
         last_started_state_editor_tutorial: (
@@ -136,6 +141,9 @@ class UserSettings:
             email: str. The user email.
             roles: list(str). Roles of the user.
             banned: bool. Whether the uses is banned.
+            has_viewed_lesson_info_modal_once: bool. Flag to check whether
+                the user has viewed lesson info modal once which shows the
+                progress of the user through exploration checkpoints.
             username: str or None. Identifiable username to display in the UI.
             last_agreed_to_terms: datetime.datetime or None. When the user
                 last agreed to the terms of the site.
@@ -201,6 +209,8 @@ class UserSettings:
         self.banned = banned
         self.deleted = deleted
         self.created_on = created_on
+        self.has_viewed_lesson_info_modal_once = (
+            has_viewed_lesson_info_modal_once)
 
     def validate(self) -> None:
         """Checks that the user_id, email, roles, banned, pin and display_alias
@@ -348,7 +358,7 @@ class UserSettings:
         """Convert the UserSettings domain instance into a dictionary form
         with its keys as the attributes of this class.
 
-        Rerurns:
+        Returns:
             dict. A dictionary containing the UserSettings class information
             in a dictionary form.
         """
@@ -383,7 +393,9 @@ class UserSettings:
             'pin': self.pin,
             'display_alias': self.display_alias,
             'deleted': self.deleted,
-            'created_on': self.created_on
+            'created_on': self.created_on,
+            'has_viewed_lesson_info_modal_once': (
+                self.has_viewed_lesson_info_modal_once)
         }
 
     @property
@@ -482,6 +494,13 @@ class UserSettings:
         """
         self.banned = False
         self.roles = [default_role]
+
+    def mark_lesson_info_modal_viewed(self) -> None:
+        """Sets has_viewed_lesson_info_modal_once to true which shows
+        the user has viewed their progress through exploration in the lesson
+        info modal at least once in their lifetime journey.
+        """
+        self.has_viewed_lesson_info_modal_once = True
 
 
 class UserActionsInfo:
@@ -1314,3 +1333,151 @@ class ModifiableUserData:
             )
 
         return cls.from_dict(raw_user_data_dict)
+
+
+class ExplorationUserDataDict(TypedDict):
+    """Dictionary representing the ExplorationUserData object."""
+
+    rating: Optional[int]
+    rated_on: Optional[datetime.datetime]
+    draft_change_list: Optional[List[Dict[str, str]]]
+    draft_change_list_last_updated: Optional[datetime.datetime]
+    draft_change_list_exp_version: Optional[int]
+    draft_change_list_id: int
+    mute_suggestion_notifications: bool
+    mute_feedback_notifications: bool
+    furthest_reached_checkpoint_exp_version: Optional[int]
+    furthest_reached_checkpoint_state_name: Optional[str]
+    most_recently_reached_checkpoint_exp_version: Optional[int]
+    most_recently_reached_checkpoint_state_name: Optional[str]
+
+
+class ExplorationUserData:
+    """Value object representing a user's exploration data.
+
+    Attributes:
+        user_id: str. The user id.
+        exploration_id: str. The exploration id.
+        rating: int or None. The rating (1-5) the user assigned to the
+            exploration.
+        rated_on: datetime or None. When the most recent rating was awarded,
+            or None if not rated.
+        draft_change_list: list(dict) or None. List of uncommitted changes made
+            by the user to the exploration.
+        draft_change_list_last_updated: datetime or None. Timestamp of when the
+            change list was last updated.
+        draft_change_list_exp_version: int or None. The exploration version
+            that this change list applied to.
+        draft_change_list_id: int. The version of the draft change list which
+            was last saved by the user.
+        mute_suggestion_notifications: bool. The user's preference for
+            receiving suggestion emails for this exploration.
+        mute_feedback_notifications: bool. The user's preference for receiving
+            feedback emails for this exploration.
+        furthest_reached_checkpoint_exp_version: int or None. The exploration
+            version of furthest reached checkpoint.
+        furthest_reached_checkpoint_state_name: str or None. The state name
+            of the furthest reached checkpoint.
+        most_recently_reached_checkpoint_exp_version: int or None. The
+            exploration version of the most recently reached checkpoint.
+        most_recently_reached_checkpoint_state_name: str or None. The state
+            name of the most recently reached checkpoint.
+    """
+
+    def __init__(
+        self,
+        user_id: str,
+        exploration_id: str,
+        rating: Optional[int] = None,
+        rated_on: Optional[datetime.datetime] = None,
+        draft_change_list: Optional[List[Dict[str, str]]] = None,
+        draft_change_list_last_updated: Optional[datetime.datetime] = None,
+        draft_change_list_exp_version: Optional[int] = None,
+        draft_change_list_id: int = 0,
+        mute_suggestion_notifications: bool = (
+            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+        mute_feedback_notifications: bool = (
+            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
+        furthest_reached_checkpoint_exp_version: Optional[int] = None,
+        furthest_reached_checkpoint_state_name: Optional[str] = None,
+        most_recently_reached_checkpoint_exp_version: Optional[int] = None,
+        most_recently_reached_checkpoint_state_name: Optional[str] = None
+    ) -> None:
+        """Constructs a ExplorationUserData domain object.
+
+        Attributes:
+            user_id: str. The user id.
+            exploration_id: str. The exploration id.
+            rating: int or None. The rating (1-5) the user assigned to the
+                exploration.
+            rated_on: datetime or None. When the most recent rating was
+                awarded, or None if not rated.
+            draft_change_list: list(dict) or None. List of uncommitted
+                changes made by the user to the exploration.
+            draft_change_list_last_updated: datetime or None. Timestamp of
+                when the change list was last updated.
+            draft_change_list_exp_version: int or None. The exploration
+                version that this change list applied to.
+            draft_change_list_id: int. The version of the draft change list
+                which was last saved by the user.
+            mute_suggestion_notifications: bool. The user's preference for
+                receiving suggestion emails for this exploration.
+            mute_feedback_notifications: bool. The user's preference for
+                receiving feedback emails for this exploration.
+            furthest_reached_checkpoint_exp_version: int or None. The
+                exploration version of furthest reached checkpoint.
+            furthest_reached_checkpoint_state_name: str or None. The
+                state name of the furthest reached checkpoint.
+            most_recently_reached_checkpoint_exp_version: int or None. The
+                exploration version of the most recently reached
+                checkpoint.
+            most_recently_reached_checkpoint_state_name: str or None. The
+                state name of the most recently reached checkpoint.
+        """
+        self.user_id = user_id
+        self.exploration_id = exploration_id
+        self.rating = rating
+        self.rated_on = rated_on
+        self.draft_change_list = draft_change_list
+        self.draft_change_list_last_updated = draft_change_list_last_updated
+        self.draft_change_list_exp_version = draft_change_list_exp_version
+        self.draft_change_list_id = draft_change_list_id
+        self.mute_suggestion_notifications = mute_suggestion_notifications
+        self.mute_feedback_notifications = mute_feedback_notifications
+        self.furthest_reached_checkpoint_exp_version = (
+            furthest_reached_checkpoint_exp_version)
+        self.furthest_reached_checkpoint_state_name = (
+            furthest_reached_checkpoint_state_name)
+        self.most_recently_reached_checkpoint_exp_version = (
+            most_recently_reached_checkpoint_exp_version)
+        self.most_recently_reached_checkpoint_state_name = (
+            most_recently_reached_checkpoint_state_name)
+
+    def to_dict(self) -> ExplorationUserDataDict:
+        """Convert the ExplorationUserData domain instance into a dictionary
+        form with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the UserSettings class information
+            in a dictionary form.
+        """
+
+        return {
+            'rating': self.rating,
+            'rated_on': self.rated_on,
+            'draft_change_list': self.draft_change_list,
+            'draft_change_list_last_updated': (
+                self.draft_change_list_last_updated),
+            'draft_change_list_exp_version': self.draft_change_list_exp_version,
+            'draft_change_list_id': self.draft_change_list_id,
+            'mute_suggestion_notifications': self.mute_suggestion_notifications,
+            'mute_feedback_notifications': self.mute_feedback_notifications,
+            'furthest_reached_checkpoint_exp_version': (
+                self.furthest_reached_checkpoint_exp_version),
+            'furthest_reached_checkpoint_state_name': (
+                self.furthest_reached_checkpoint_state_name),
+            'most_recently_reached_checkpoint_exp_version': (
+                self.most_recently_reached_checkpoint_exp_version),
+            'most_recently_reached_checkpoint_state_name': (
+                self.most_recently_reached_checkpoint_state_name)
+        }
