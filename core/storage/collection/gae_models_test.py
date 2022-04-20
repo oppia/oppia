@@ -78,7 +78,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         self.assertListEqual(result_list, correct_list)
 
     def test_get_collection_count(self) -> None:
-        collection = collection_domain.Collection.create_default_collection( 
+        collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
         collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
@@ -88,7 +88,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(num_collections, 1)
 
     def test_reconstitute(self) -> None:
-        collection = collection_domain.Collection.create_default_collection( 
+        collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
         collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
