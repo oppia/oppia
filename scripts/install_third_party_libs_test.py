@@ -360,7 +360,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
     def test_proto_file_compilation(self) -> None:
         self.check_function_calls['check_call_is_called'] = False
         with self.Popen_swap:
-            install_third_party_libs.compile_protobuf_files('mock_path')
+            install_third_party_libs.compile_protobuf_files(['mock_path'])
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_proto_file_compilation_raises_exception_on_compile_errors(
@@ -368,7 +368,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         with self.Popen_error_swap:
             with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                     Exception, 'Error compiling proto files at mock_path'):
-                install_third_party_libs.compile_protobuf_files('mock_path')
+                install_third_party_libs.compile_protobuf_files(['mock_path'])
 
     def test_ensure_pip_library_is_installed_with_regular_package(self) -> None:
         pip_install_swap = self.swap_with_checks(

@@ -25,7 +25,7 @@ import sys
 import urllib.request as urlrequest
 import zipfile
 
-from typing import Tuple
+from typing import List, Tuple
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
@@ -103,7 +103,8 @@ PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common.PROTOC_VERSION)
 BUF_DIR = os.path.join(common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
 PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
 # Path of files which needs to be compiled by protobuf.
-PROTO_FILES_PATH = os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')
+PROTO_FILES_PATHS = [
+    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
 # Path to typescript plugin required to compile ts compatible files from proto.
 PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
@@ -155,7 +156,7 @@ def install_buf_and_protoc() -> None:
     common.recursive_chmod(protoc_path, 0o744)  # type: ignore[no-untyped-call]
 
 
-def compile_protobuf_files(path: str) -> None:
+def compile_protobuf_files(filepaths: List[str]) -> None:
     """Compiles protobuf files using buf.
 
     Raises:
@@ -167,15 +168,16 @@ def compile_protobuf_files(path: str) -> None:
     buf_path = os.path.join(
         BUF_DIR,
         BUF_DARWIN_FILES[0] if common.is_mac_os() else BUF_LINUX_FILES[0])  # type: ignore[no-untyped-call]
-    command = [buf_path, 'generate', path]
-    process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=proto_env)
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        print(stdout)
-    else:
-        print(stderr)
-        raise Exception('Error compiling proto files at %s' % path)
+    for path in filepaths:
+        command = [buf_path, 'generate', path]
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=proto_env)
+        stdout, stderr = process.communicate()
+        if process.returncode == 0:
+            print(stdout)
+        else:
+            print(stderr)
+            raise Exception('Error compiling proto files at %s' % path)
 
     # Since there is no simple configuration for imports when using protobuf to
     # generate Python files we need to manually fix the imports.
@@ -334,7 +336,7 @@ def main() -> None:
     print('Installing buf and protoc binary.')
     install_buf_and_protoc()
     print('Compiling protobuf files.')
-    compile_protobuf_files(PROTO_FILES_PATH)
+    compile_protobuf_files(PROTO_FILES_PATHS)
 
     # Install pre-commit script.
     print('Installing pre-commit hook for git')
