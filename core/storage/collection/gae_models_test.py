@@ -66,7 +66,8 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
     def test_get_export_policy(self) -> None:
         results = collection_models.CollectionModel.get_export_policy()
         result_list = [
-            results['title'],results['category'],
+            results['title'],
+            results['category'],
             results['objective'],
             results['language_code'],
             results['tags'],
