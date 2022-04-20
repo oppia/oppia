@@ -81,9 +81,8 @@ def run_dtslint_type_tests() -> None:
            TYPESCRIPT_DIR_RELATIVE_PATH]
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
-    # Here stdout method of an instance 'task' may contain None value which can
-    # give error while accessing other methods from here. Hence added
-    # an ignore.
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
     assert task.stdout is not None
     # Reads and prints realtime output from the subprocess until it terminates.
     while True:
