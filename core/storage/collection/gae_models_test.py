@@ -57,9 +57,20 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             collection_models.CollectionModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+    
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            collection_models.CollectionModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
+    def test_get_export_policy(self) -> None:
+        results = collection_models.CollectionModel.get_export_policy()
+        result_list = [results['title'], results['category'], results['objective'], results['language_code'], results['tags'], results['schema_version'], results['collection_contents']]
+        correct_list = [base_models.EXPORT_POLICY.NOT_APPLICABLE] * 7
+        self.assertListEqual(result_list, correct_list)
+    
     def test_get_collection_count(self) -> None:
-        collection = collection_domain.Collection.create_default_collection(
+        collection = collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
             'id', title='A title',
             category='A Category', objective='An Objective')
         collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
@@ -69,7 +80,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(num_collections, 1)
 
     def test_reconstitute(self) -> None:
-        collection = collection_domain.Collection.create_default_collection(
+        collection = collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
             'id', title='A title',
             category='A Category', objective='An Objective')
         collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
@@ -222,6 +233,44 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
+    
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            collection_models.CollectionRightsModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
+        )
+    
+    def test_get_field_name_mapping_to_takeout_keys(self) -> None:
+        result = {
+            'owner_ids': 'owned_collection_ids',
+            'editor_ids': 'editable_collection_ids',
+            'voice_artist_ids': 'voiced_collection_ids',
+            'viewer_ids': 'viewable_collection_ids'
+        }
+        self.assertEqual(
+            collection_models.CollectionRightsModel.get_field_name_mapping_to_takeout_keys(),
+            result
+        )
+
+    def test_get_export_policy(self) -> None:
+        results = collection_models.CollectionRightsModel.get_export_policy()
+        result_list = [
+            results['owner_ids'],
+            results['editor_ids'],
+            results['voice_artist_ids'],
+            results['viewer_ids'],
+            results['community_owned'],
+            results['viewable_if_private'],
+            results['status'],
+            results['first_published_msec']
+        ]
+        correct_list = [base_models.EXPORT_POLICY.EXPORTED] * 4
+        correct_list.extend([base_models.EXPORT_POLICY.NOT_APPLICABLE] * 4)
+        self.assertListEqual(result_list, correct_list)
+        # self.assertEqual(
+        #     results['title'],
+        #     base_models.EXPORT_POLICY.NOT_APPLICABLE
+        # )
 
     def test_has_reference_to_user_id(self) -> None:
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
@@ -496,6 +545,20 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             .get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
+    
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            collection_models.CollectionCommitLogEntryModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+    
+    def test_get_export_policy(self) -> None:
+        results = collection_models.CollectionCommitLogEntryModel.get_export_policy()
+        self.assertEqual(
+            results['collection_id'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE
+        )
 
     def test_has_reference_to_user_id(self) -> None:
         commit = collection_models.CollectionCommitLogEntryModel.create(
@@ -600,6 +663,36 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
+    
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            collection_models.CollectionSummaryModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+    
+    def test_get_export_policy(self) -> None:
+        results = collection_models.CollectionSummaryModel.get_export_policy()
+        result_list = [
+            results['title'], 
+            results['category'],
+            results['objective'],
+            results['language_code'],
+            results['tags'],
+            results['ratings'],
+            results['collection_model_last_updated'],
+            results['collection_model_created_on'],
+            results['status'],
+            results['community_owned'],
+            results['owner_ids'],
+            results['editor_ids'],
+            results['viewer_ids'],
+            results['contributor_ids'],
+            results['contributors_summary'],
+            results['version'],
+            results['node_count'],
+        ]
+        correct_list = [base_models.EXPORT_POLICY.NOT_APPLICABLE] * 17
+        self.assertListEqual(result_list, correct_list)
 
     def test_has_reference_to_user_id(self) -> None:
         collection_models.CollectionSummaryModel(
