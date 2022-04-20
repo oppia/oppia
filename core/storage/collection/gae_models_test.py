@@ -57,7 +57,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             collection_models.CollectionModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
-    
+
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             collection_models.CollectionModel.get_model_association_to_user(),
@@ -65,10 +65,17 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_export_policy(self) -> None:
         results = collection_models.CollectionModel.get_export_policy()
-        result_list = [results['title'], results['category'], results['objective'], results['language_code'], results['tags'], results['schema_version'], results['collection_contents']]
+        result_list = [
+            results['title'],results['category'],
+            results['objective'],
+            results['language_code'],
+            results['tags'],
+            results['schema_version'],
+            results['collection_contents']
+        ]
         correct_list = [base_models.EXPORT_POLICY.NOT_APPLICABLE] * 7
         self.assertListEqual(result_list, correct_list)
-    
+
     def test_get_collection_count(self) -> None:
         collection = collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
             'id', title='A title',
@@ -233,13 +240,15 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
-    
+
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            collection_models.CollectionRightsModel.get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
+            collection_models.CollectionRightsModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS
         )
-    
+
     def test_get_field_name_mapping_to_takeout_keys(self) -> None:
         result = {
             'owner_ids': 'owned_collection_ids',
@@ -248,7 +257,8 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             'viewer_ids': 'viewable_collection_ids'
         }
         self.assertEqual(
-            collection_models.CollectionRightsModel.get_field_name_mapping_to_takeout_keys(),
+            collection_models.CollectionRightsModel
+            .get_field_name_mapping_to_takeout_keys(),
             result
         )
 
@@ -267,10 +277,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         correct_list = [base_models.EXPORT_POLICY.EXPORTED] * 4
         correct_list.extend([base_models.EXPORT_POLICY.NOT_APPLICABLE] * 4)
         self.assertListEqual(result_list, correct_list)
-        # self.assertEqual(
-        #     results['title'],
-        #     base_models.EXPORT_POLICY.NOT_APPLICABLE
-        # )
 
     def test_has_reference_to_user_id(self) -> None:
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
@@ -545,18 +551,18 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             .get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
-    
+
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             collection_models.CollectionCommitLogEntryModel
             .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
-        results = collection_models.CollectionCommitLogEntryModel.get_export_policy()
+        rs = collection_models.CollectionCommitLogEntryModel.get_export_policy()
         self.assertEqual(
-            results['collection_id'],
+            rs['collection_id'],
             base_models.EXPORT_POLICY.NOT_APPLICABLE
         )
 
@@ -663,17 +669,18 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
-    
+
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            collection_models.CollectionSummaryModel.get_model_association_to_user(),
+            collection_models.CollectionSummaryModel
+            .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         results = collection_models.CollectionSummaryModel.get_export_policy()
         result_list = [
-            results['title'], 
+            results['title'],
             results['category'],
             results['objective'],
             results['language_code'],
