@@ -69,7 +69,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
     ANDROID_SDK_VERSION = 23
     ENTRY_POINT_NAVIGATION_DRAWER = (
-        app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
+        app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER)
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
     ANDROID_REPORT_INFO = {
