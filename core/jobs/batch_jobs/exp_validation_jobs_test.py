@@ -122,7 +122,7 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
                                 ' url-with-value=' +
                                 '"&amp;quot;mailto:example@example.com&amp' +
                                 ';quot;"></oppia-noninteractive-link></p>' +
-                                '<p><oppia-noninteractive-link>'+
+                                '<p><oppia-noninteractive-link>' +
                                 '</oppia-noninteractive-link></p>',
                     },
                     'param_changes': [],

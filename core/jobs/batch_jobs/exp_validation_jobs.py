@@ -78,7 +78,6 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
             else:
                 cleaned_links.append(
                     link_text.replace('&quot;', ''))
-                
 
         for link in cleaned_links:
             link_info = urlparse(link)
