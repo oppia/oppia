@@ -121,7 +121,9 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
                                 ' text-with-value="&amp;quot;&amp;quot;"' +
                                 ' url-with-value=' +
                                 '"&amp;quot;mailto:example@example.com&amp' +
-                                ';quot;"></oppia-noninteractive-link></p>',
+                                ';quot;"></oppia-noninteractive-link></p>' +
+                                '<p><oppia-noninteractive-link>'+
+                                '</oppia-noninteractive-link></p>',
                     },
                     'param_changes': [],
                     'interaction': {
@@ -178,7 +180,8 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
         )
 
     def test_run_with_single_invalid_model(self) -> None:
-        invalid_links = ['http://google.com', 'mailto:example@example.com']
+        invalid_links = ['None', 'http://google.com',
+                         'mailto:example@example.com']
         self.put_multi([self.exp_1])
         self.assert_job_output_is(
             [
@@ -192,7 +195,8 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
         )
 
     def test_run_with_mixed_models(self) -> None:
-        invalid_links = ['http://google.com', 'mailto:example@example.com']
+        invalid_links = ['None', 'http://google.com',
+                         'mailto:example@example.com']
         self.put_multi([self.exp_1, self.exp_2])
         self.assert_job_output_is(
             [

@@ -65,21 +65,21 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
                 string += value
 
         soup = bs4.BeautifulSoup(string, 'html.parser')
-
         # Extract links.
         links = soup.find_all('oppia-noninteractive-link')
+        invalid_links = []
         cleaned_links = []
         for link in links:
             # Remove &quot; from the links.
             link_text = link.get('url-with-value')
-            if link_text is not None:
+            if link_text is None:
+                # If the link is None, it is considered to be invalid.
+                invalid_links.append('None')
+            else:
                 cleaned_links.append(
                     link_text.replace('&quot;', ''))
-            else:
-                # If the link is None, it is considered to be invalid.
-                cleaned_links.append('None')
+                
 
-        invalid_links = []
         for link in cleaned_links:
             link_info = urlparse(link)
             # Protocols other than 'https' are invalid.
