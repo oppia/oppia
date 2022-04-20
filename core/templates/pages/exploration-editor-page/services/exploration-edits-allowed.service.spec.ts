@@ -16,50 +16,49 @@
  * @fileoverview Unit tests for ExplorationEditsAllowedService.
  */
 
- import { TestBed } from '@angular/core/testing';
- import { ExplorationEditsAllowedService } from './exploration-edits-allowed.service';
- import { ExplorationPropertyService } from './exploration-property.service';
- import { HttpClientTestingModule, HttpTestingController } from
-   '@angular/common/http/testing';
- import { ExplorationDataService } from './exploration-data.service';
- 
- describe('Exploration Edits Allowed Service', () => {
-   let eeas: ExplorationEditsAllowedService;
-   let httpTestingController: HttpTestingController;
- 
-   beforeEach(() => {
-     TestBed.configureTestingModule({
-       imports: [HttpClientTestingModule],
-       providers: [
-         ExplorationPropertyService,
-         {
-           provide: ExplorationDataService,
-           useValue: {
-             explorationId: 0,
-             autosaveChangeListAsync() {
-               return;
-             }
-           }
-         }
-       ]
-     });
-     httpTestingController = TestBed.inject(HttpTestingController);
-     eeas = TestBed.inject(ExplorationEditsAllowedService);
-   });
- 
-   afterEach(() => {
-     httpTestingController.verify();
-   });
- 
-   it('should toggle edits allowed property', () => {
-     // Function isEnabled() returns undefined in the first time.
-     expect(eeas.isEnabled()).toBeFalsy();
- 
-     eeas.setEditsAllowed(true);
-     expect(eeas.isEnabled()).toBeTrue();
- 
-     eeas.setEditsAllowed(false);
-     expect(eeas.isEnabled()).toBeFalse();
-   });
- });
- 
+import { TestBed } from '@angular/core/testing';
+import { ExplorationEditsAllowedService } from './exploration-edits-allowed.service';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { ExplorationDataService } from './exploration-data.service';
+
+describe('Exploration Edits Allowed Service', () => {
+  let eeas: ExplorationEditsAllowedService;
+  let httpTestingController: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        ExplorationPropertyService,
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync() {
+              return;
+            }
+          }
+        }
+      ]
+    });
+    httpTestingController = TestBed.inject(HttpTestingController);
+    eeas = TestBed.inject(ExplorationEditsAllowedService);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  it('should toggle edits allowed property', () => {
+    // Function isEnabled() returns undefined in the first time.
+    expect(eeas.isEnabled()).toBeFalsy();
+
+    eeas.setEditsAllowed(true);
+    expect(eeas.isEnabled()).toBeTrue();
+
+    eeas.setEditsAllowed(false);
+    expect(eeas.isEnabled()).toBeFalse();
+  });
+});

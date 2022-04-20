@@ -17,38 +17,37 @@
  * exploration.
  */
 
- import { Injectable } from '@angular/core';
- import { downgradeInjectable } from '@angular/upgrade/static';
- import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
- import { AlertsService } from 'services/alerts.service';
- import { ChangeListService } from './change-list.service';
- import { LoggerService } from 'services/contextual/logger.service';
- 
- @Injectable({
-   providedIn: 'root'
- })
- export class ExplorationEditsAllowedService extends
-   ExplorationPropertyService {
-   propertyName: string = 'edits_allowed';
- 
-   constructor(
-     protected alertsService: AlertsService,
-     protected changeListService: ChangeListService,
-     protected loggerService: LoggerService
-   ) {
-     super(alertsService, changeListService, loggerService);
-   }
- 
-   isEnabled(): string | boolean {
-     return this.savedMemento;
-   }
- 
-   setEditsAllowed(editsAreAllowed: boolean): void {
-     this.displayed = editsAreAllowed;
-     this.saveDisplayedValue();
-   }
- }
- 
- angular.module('oppia').factory('ExplorationEditsAllowedService',
-   downgradeInjectable(ExplorationEditsAllowedService));
- 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
+import { AlertsService } from 'services/alerts.service';
+import { ChangeListService } from './change-list.service';
+import { LoggerService } from 'services/contextual/logger.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationEditsAllowedService extends
+  ExplorationPropertyService {
+  propertyName: string = 'edits_allowed';
+
+  constructor(
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService
+  ) {
+    super(alertsService, changeListService, loggerService);
+  }
+
+  isEnabled(): string | boolean {
+    return this.savedMemento;
+  }
+
+  setEditsAllowed(editsAreAllowed: boolean): void {
+    this.displayed = editsAreAllowed;
+    this.saveDisplayedValue();
+  }
+}
+
+angular.module('oppia').factory('ExplorationEditsAllowedService',
+  downgradeInjectable(ExplorationEditsAllowedService));
