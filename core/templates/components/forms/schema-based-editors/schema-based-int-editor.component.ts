@@ -69,8 +69,11 @@ implements ControlValueAccessor, OnInit, Validator {
   }
 
   // Implemented as a part of Validator interface.
-  validate(control: AbstractControl): ValidationErrors {
-    return {};
+  validate(control: AbstractControl): ValidationErrors | null {
+    if (control && typeof control.value !== 'number') {
+      return {invalidType: typeof control.value};
+    }
+    return null;
   }
 
   onKeypress(evt: KeyboardEvent): void {

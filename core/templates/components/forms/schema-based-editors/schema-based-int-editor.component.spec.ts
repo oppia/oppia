@@ -18,7 +18,7 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { SchemaBasedIntEditorComponent } from './schema-based-int-editor.component';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
@@ -128,5 +128,15 @@ describe('Schema Based Int Editor Component', () => {
 
     expect(schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit)
       .toHaveBeenCalled();
+  });
+
+  it('should return errors for invalid value type', () => {
+    expect(
+      component.validate(new FormControl(false))
+    ).toEqual({invalidType: 'boolean'});
+    expect(
+      component.validate(new FormControl('4'))
+    ).toEqual({invalidType: 'string'});
+    expect(component.validate(new FormControl(3))).toEqual(null);
   });
 });

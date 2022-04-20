@@ -58,8 +58,11 @@ implements ControlValueAccessor, Validator {
   }
 
   // Implemented as a part of Validator interface.
-  validate(control: AbstractControl): ValidationErrors {
-    return {};
+  validate(control: AbstractControl): ValidationErrors | null {
+    if (control && typeof control.value !== 'boolean') {
+      return {invalidType: typeof control.value};
+    }
+    return null;
   }
 
   updateValue(val: boolean): void {

@@ -149,7 +149,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
-    ABCModule,
     // TODO(#13443): Remove hybrid router module provider once all pages are
     // migrated to angular router.
     HybridRouterModuleProvider.provide(),

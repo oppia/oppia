@@ -17,7 +17,7 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { SchemaBasedBoolEditorComponent } from './schema-based-bool-editor.component';
 
@@ -53,8 +53,14 @@ describe('Schema Based Bool Editor Component', () => {
     expect(component.onChange(true)).toEqual(true);
   }));
 
-  it('should get empty object on validating', () => {
-    expect(component.validate(null)).toEqual({});
+  it('should return errors for invalid value type', () => {
+    expect(
+      component.validate(new FormControl(2))
+    ).toEqual({invalidType: 'number'});
+    expect(
+      component.validate(new FormControl('true'))
+    ).toEqual({invalidType: 'string'});
+    expect(component.validate(new FormControl(false))).toEqual(null);
   });
 
   it('should write value', () => {
