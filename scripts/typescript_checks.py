@@ -78,7 +78,7 @@ def compile_and_check_typescript(config_path: str) -> None:
         shutil.rmtree(COMPILED_JS_DIR)
 
     # The value of `process.stdout` should not be None since we passed
-    # the `stdout=subprocess.PIPE` argument to `Popen`
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
     assert process.stdout is not None
     error_messages = list(iter(process.stdout.readline, ''))
 
