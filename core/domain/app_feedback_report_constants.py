@@ -92,8 +92,8 @@ class CATEGORY(enum.Enum): # pylint: disable=invalid-name
 class EntryPoint(enum.Enum): 
     """Enum for entry points."""
 
-    NAVIGATION_DRAWER = 'navigation_drawer' 
-    LESSON_PLAYER = 'lesson_player' 
+    NAVIGATION_DRAWER = 'navigation_drawer'
+    LESSON_PLAYER = 'lesson_player'
     REVISION_CARD = 'revision_card'
     CRASH = 'crash'
 
