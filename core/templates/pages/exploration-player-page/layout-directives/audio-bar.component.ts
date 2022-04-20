@@ -44,7 +44,7 @@ export class AudioBarComponent {
   progressBarIsShown: boolean = false;
   audioLoadingIndicatorIsShown: boolean = false;
   explorationPlayerModeIsActive: boolean;
-  selectedLanguage: { value: string | null };
+  selectedLanguage: { value: string };
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -61,8 +61,11 @@ export class AudioBarComponent {
       this.contextService.isInExplorationPlayerPage();
     this.languagesInExploration = this.audioTranslationLanguageService
       .getLanguageOptionsForDropdown();
+    let currentLanguageCode = (
+      this.audioTranslationLanguageService.getCurrentAudioLanguageCode()
+    );
     this.selectedLanguage = {
-      value: this.audioTranslationLanguageService.getCurrentAudioLanguageCode()
+      value: currentLanguageCode === null ? 'en' : currentLanguageCode
     };
   }
 
