@@ -263,6 +263,27 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.android_report_obj, 'No platform supplied.')
 
+    def test_validate_covers_device_system_context_validate(self) -> None:
+        self.android_report_obj.device_system_context = (
+            app_feedback_report_domain.AndroidDeviceSystemContext(
+                ANDROID_PLATFORM_VERSION, ANDROID_PACKAGE_VERSION_CODE,
+                COUNTRY_LOCALE_CODE_INDIA, LANGUAGE_LOCALE_CODE_ENGLISH,
+                None, ANDROID_SDK_VERSION,
+                ANDROID_BUILD_FINGERPRINT, NETWORK_WIFI)) # type: ignore[assignment]
+        self._assert_validation_error(
+            self.android_report_obj, 'No device model supplied.')
+
+    def test_validate_covers_app_context_validate(self) -> None:
+        self.android_report_obj.app_context = (
+            app_feedback_report_domain.AndroidAppContext(
+                app_feedback_report_domain.NavigationDrawerEntryPoint(), LANGUAGE_LOCALE_CODE_ENGLISH,
+                LANGUAGE_LOCALE_CODE_ENGLISH, ANDROID_TEXT_SIZE, None,
+                False, False, EVENT_LOGS, LOGCAT_LOGS))
+        self._assert_validation_error(
+            self.android_report_obj, 'only_allows_wifi_download_and_update field should be a '
+                'boolean, received:')
+
+
     def test_get_report_type_from_string_returns_expected_report_type(
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
@@ -399,6 +420,64 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 invalid_network_type)):
             feedback_report.get_android_network_type_from_string(
                 invalid_network_type)
+
+    def test_from_dict_with_valid_report_dict_returns_expected_type(self) -> None:
+        expected_dict = {
+            'platform_type': app_feedback_report_constants.PLATFORM_CHOICE_ANDROID,
+            'user_supplied_feedback': {
+                'report_type': REPORT_TYPE_SUGGESTION.name,
+                'category': CATEGORY_SUGGESTION_OTHER.name,
+                'user_feedback_selected_items': USER_SELECTED_ITEMS,
+                'user_feedback_other_text_input': USER_TEXT_INPUT
+            },
+            'system_context':{
+                'platform_version': ANDROID_PLATFORM_VERSION,
+                'package_version_code': ANDROID_PACKAGE_VERSION_CODE,
+                'android_device_country_locale_code': COUNTRY_LOCALE_CODE_INDIA,
+                'android_device_language_locale_code': LANGUAGE_LOCALE_CODE_ENGLISH,
+                'android_device_model': ANDROID_DEVICE_MODEL,
+                'android_sdk_version': ANDROID_SDK_VERSION,
+                'build_fingerprint': ANDROID_BUILD_FINGERPRINT,
+                'network_type': NETWORK_WIFI.value
+            },
+            'device_context':{
+                'platform_version': ANDROID_PLATFORM_VERSION,
+                'package_version_code': ANDROID_PACKAGE_VERSION_CODE,
+                'android_device_country_locale_code': COUNTRY_LOCALE_CODE_INDIA,
+                'android_device_language_locale_code': LANGUAGE_LOCALE_CODE_ENGLISH,
+                'android_device_model': ANDROID_DEVICE_MODEL,
+                'android_sdk_version': ANDROID_SDK_VERSION,
+                'build_fingerprint': ANDROID_BUILD_FINGERPRINT,
+                'network_type': NETWORK_WIFI.value
+            },
+            'app_context':{
+                'entry_point': {
+                    'entry_point_name': ENTRY_POINT_NAVIGATION_DRAWER
+                },
+                'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
+                'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
+                'text_size': ANDROID_TEXT_SIZE.value,
+                'only_allows_wifi_download_and_update': True,
+                'automatically_update_topics': False,
+                'account_is_profile_admin': False,
+                'event_logs': EVENT_LOGS,
+                'logcat_logs': LOGCAT_LOGS
+            },
+            'report_submission_timestamp_sec': 0,
+            'android_report_info_schema_version': ANDROID_REPORT_INFO_SCHEMA_VERSION,
+            'report_submission_utc_offset_hrs': 0
+            }
+        revision_obj = self.android_report_obj.from_dict(expected_dict)
+        self.assertTrue(
+            isinstance(revision_obj, app_feedback_report_domain.AppFeedbackReport))
+
+    def test_from_dict_with_invalid_report_dict_raises_error(self) -> None:
+        expected_dict = {
+            'platform_type': None}
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            NotImplementedError,
+            'Domain objects for web reports must be implemented.'):
+            self.android_report_obj.from_dict(expected_dict)
 
     def _assert_validation_error(
             self,
