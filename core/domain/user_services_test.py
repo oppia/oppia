@@ -418,7 +418,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = feconf.SYSTEM_COMMITTER_ID
         user_ids = [user_id]
 
-        roles = [
+        roles=[
             feconf.ROLE_ID_FULL_USER,
             feconf.ROLE_ID_CURRICULUM_ADMIN,
             feconf.ROLE_ID_MODERATOR,
@@ -2239,6 +2239,15 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.migrate_dashboard_stats_to_latest_schema(
                 user_stats_model)
 
+    def test_update_dashboard_stats_log(self):
+        # TODO: come back to this
+        # how to check version differences and whatnot
+        user_id = 'id_x'
+        user_stats_model = user_models.UserStatsModel.get_or_create(user_id)
+        user_stats_model.schema_version = 0
+
+        user_services.update_dashboard_stats_log(user_id)
+
     def test_get_user_impact_score_non_exisitng_user_id_returns_zero(self):
         auth_id = 'someUser'
         user_email = 'user@example.com'
@@ -2247,6 +2256,18 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         impact_score = user_services.get_user_impact_score(user_id)
 
         self.assertEqual(0, impact_score)
+
+    def test_get_user_impact_score(self):
+        # TODO: come back to this
+        # make sure the model is not None when get_user_impact_score is called
+        auth_id = 'someUser'
+        user_email = 'user@example.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_models.UserStatsModel.get_or_create(user_id)
+        impact_score = user_services.get_user_impact_score(user_id)
+
+        self.assertGreaterEqual(impact_score, 0)
 
     def test_get_dashboard_stats_for_user_with_no_stats_model(self):
         fake_user_id = 'id_x'
@@ -3222,3 +3243,8 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.get_user_contribution_rights(user_id))
 
         self.assertFalse(user_contribution_rights.can_submit_questions)
+
+    def test_get_contributor_usernames_for_review_translation(self):
+        # TODO: come back to this
+        # this requires a way to check for user's rights status
+        return
