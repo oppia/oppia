@@ -23,7 +23,11 @@ module.exports = {
     'collect': {
       'numberOfRuns': baseConfig['numberOfRuns'],
       'puppeteerScript': baseConfig['puppeteerScript'],
-      'url': baseConfig['urlShards'][1]
+      'url': baseConfig['urlShards'][1],
+      'settings': {
+        'chromeFlags': '--no-sandbox --disable-dev-shm-usage --disable-gpu',
+        'maxWaitForLoad': 10 * 60 * 1000,  // Allow pages to load for at most 10 mins.
+      },
     },
     'assert': {
       'assertMatrix': [
