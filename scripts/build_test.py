@@ -278,7 +278,8 @@ class BuildTests(test_utils.GenericTestBase):
         # Swapping out constants to check if the reverse is true.
         # ALL JS files that ends with ...Service.js should not be built.
         with self.swap(
-            build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)):
+            build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)
+        ):
             self.assertTrue(build.should_file_be_built(spec_js_filepath))
 
     def test_hash_should_be_inserted(self):
@@ -288,7 +289,8 @@ class BuildTests(test_utils.GenericTestBase):
         with self.swap(
             build, 'FILEPATHS_NOT_TO_RENAME', (
                 '*.py', 'path/to/fonts/*', 'path/to/third_party.min.js.map',
-                'path/to/third_party.min.css.map')):
+                'path/to/third_party.min.css.map')
+        ):
             self.assertFalse(build.hash_should_be_inserted(
                 'path/to/fonts/fontawesome-webfont.svg'))
             self.assertFalse(build.hash_should_be_inserted(
@@ -323,7 +325,8 @@ class BuildTests(test_utils.GenericTestBase):
         """
         with self.swap(
             build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
-            ('path/to/file.js', 'path/to/file.html', 'file.js')):
+            ('path/to/file.js', 'path/to/file.html', 'file.js')
+        ):
             self.assertTrue(
                 build.is_file_hash_provided_to_frontend('path/to/file.js'))
             self.assertTrue(
@@ -331,7 +334,8 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertTrue(build.is_file_hash_provided_to_frontend('file.js'))
         with self.swap(
             build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
-            ('path/to/*', '*.js', '*_end.html')):
+            ('path/to/*', '*.js', '*_end.html')
+        ):
             self.assertTrue(
                 build.is_file_hash_provided_to_frontend('path/to/file.js'))
             self.assertTrue(
@@ -405,7 +409,8 @@ class BuildTests(test_utils.GenericTestBase):
 
         with self.swap(
             build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
-            ('test_path/*', 'path/to/file.js')):
+            ('test_path/*', 'path/to/file.js')
+        ):
             hashes = {'path/to/file.js': '123456',
                       'test_path/to/file.html': '123456',
                       'test_path/to/file.js': 'abcdef',
@@ -903,6 +908,24 @@ class BuildTests(test_utils.GenericTestBase):
         build.safe_delete_file(
             'core/tests/data/third_party/js/third_party.min.js.map')
 
+    def test_clean(self):
+        check_function_calls = {
+            'safe_delete_directory_tree_gets_called': 0,
+        }
+        expected_check_function_calls = {
+            'safe_delete_directory_tree_gets_called': 3,
+        }
+
+        def mock_safe_delete_directory_tree(unused_path):
+            check_function_calls['safe_delete_directory_tree_gets_called'] += 1
+
+        with self.swap(
+            build, 'safe_delete_directory_tree',
+            mock_safe_delete_directory_tree
+        ):
+            build.clean()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
     def test_build_with_prod_env(self):
         check_function_calls = {
             'build_using_webpack_gets_called': False,
@@ -910,6 +933,7 @@ class BuildTests(test_utils.GenericTestBase):
             'modify_constants_gets_called': False,
             'compare_file_count_gets_called': False,
             'generate_python_package_called': False,
+            'clean_gets_called': False,
         }
         expected_check_function_calls = {
             'build_using_webpack_gets_called': True,
@@ -917,6 +941,7 @@ class BuildTests(test_utils.GenericTestBase):
             'modify_constants_gets_called': True,
             'compare_file_count_gets_called': True,
             'generate_python_package_called': True,
+            'clean_gets_called': True,
         }
 
         expected_config_path = build.WEBPACK_PROD_CONFIG
@@ -937,6 +962,9 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_generate_python_package():
             check_function_calls['generate_python_package_called'] = True
 
+        def mock_clean():
+            check_function_calls['clean_gets_called'] = True
+
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
         build_using_webpack_swap = self.swap(
@@ -947,8 +975,9 @@ class BuildTests(test_utils.GenericTestBase):
             build, '_compare_file_count', mock_compare_file_count)
         generate_python_package_swap = self.swap(
             build, 'generate_python_package', mock_generate_python_package)
+        clean_swap = self.swap(build, 'clean', mock_clean)
 
-        with ensure_files_exist_swap, build_using_webpack_swap:
+        with ensure_files_exist_swap, build_using_webpack_swap, clean_swap:
             with modify_constants_swap, compare_file_count_swap:
                 with generate_python_package_swap:
                     build.main(args=['--prod_env'])
@@ -960,13 +989,15 @@ class BuildTests(test_utils.GenericTestBase):
             'build_using_webpack_gets_called': False,
             'ensure_files_exist_gets_called': False,
             'modify_constants_gets_called': False,
-            'compare_file_count_gets_called': False
+            'compare_file_count_gets_called': False,
+            'clean_gets_called': False,
         }
         expected_check_function_calls = {
             'build_using_webpack_gets_called': True,
             'ensure_files_exist_gets_called': True,
             'modify_constants_gets_called': True,
             'compare_file_count_gets_called': True,
+            'clean_gets_called': True,
         }
 
         expected_config_path = build.WEBPACK_PROD_SOURCE_MAPS_CONFIG
@@ -984,6 +1015,9 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_compare_file_count(unused_first_dir, unused_second_dir):
             check_function_calls['compare_file_count_gets_called'] = True
 
+        def mock_clean():
+            check_function_calls['clean_gets_called'] = True
+
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
         build_using_webpack_swap = self.swap(
@@ -992,10 +1026,12 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'modify_constants', mock_modify_constants)
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
+        clean_swap = self.swap(build, 'clean', mock_clean)
 
         with ensure_files_exist_swap, build_using_webpack_swap:
             with modify_constants_swap, compare_file_count_swap:
-                build.main(args=['--prod_env', '--source_maps'])
+                with clean_swap:
+                    build.main(args=['--prod_env', '--source_maps'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -1003,10 +1039,12 @@ class BuildTests(test_utils.GenericTestBase):
         check_function_calls = {
             'ensure_files_exist_gets_called': False,
             'modify_constants_gets_called': False,
+            'clean_gets_called': False,
         }
         expected_check_function_calls = {
             'ensure_files_exist_gets_called': True,
             'modify_constants_gets_called': True,
+            'clean_gets_called': True,
         }
 
         def mock_ensure_files_exist(unused_filepaths):
@@ -1015,11 +1053,16 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
+        def mock_clean():
+            check_function_calls['clean_gets_called'] = True
+
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
         modify_constants_swap = self.swap(
             build, 'modify_constants', mock_modify_constants)
-        with ensure_files_exist_swap, modify_constants_swap:
+        clean_swap = self.swap(build, 'clean', mock_clean)
+
+        with ensure_files_exist_swap, modify_constants_swap, clean_swap:
             build.main(args=[])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -1034,21 +1077,28 @@ class BuildTests(test_utils.GenericTestBase):
     def test_cannot_minify_third_party_libs_in_dev_mode(self):
         check_function_calls = {
             'ensure_files_exist_gets_called': False,
+            'clean_gets_called': False,
         }
         expected_check_function_calls = {
             'ensure_files_exist_gets_called': True,
+            'clean_gets_called': True,
         }
 
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
+        def mock_clean():
+            check_function_calls['clean_gets_called'] = True
+
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
+        clean_swap = self.swap(build, 'clean', mock_clean)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'minify_third_party_libs_only should not be set in non-prod env.')
         with ensure_files_exist_swap, assert_raises_regexp_context_manager:
-            build.main(args=['--minify_third_party_libs_only'])
+            with clean_swap:
+                build.main(args=['--minify_third_party_libs_only'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -1056,10 +1106,12 @@ class BuildTests(test_utils.GenericTestBase):
         check_function_calls = {
             'ensure_files_exist_gets_called': False,
             'ensure_modify_constants_gets_called': False,
+            'clean_gets_called': False,
         }
         expected_check_function_calls = {
             'ensure_files_exist_gets_called': True,
             'ensure_modify_constants_gets_called': False,
+            'clean_gets_called': True,
         }
 
         def mock_ensure_files_exist(unused_filepaths):
@@ -1068,11 +1120,15 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_modify_constants(unused_prod_env, maintenance_mode):  # pylint: disable=unused-argument
             check_function_calls['ensure_modify_constants_gets_called'] = True
 
+        def mock_clean():
+            check_function_calls['clean_gets_called'] = True
+
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
         modify_constants_swap = self.swap(
             build, 'modify_constants', mock_modify_constants)
-        with ensure_files_exist_swap, modify_constants_swap:
+        clean_swap = self.swap(build, 'clean', mock_clean)
+        with ensure_files_exist_swap, modify_constants_swap, clean_swap:
             build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -1085,9 +1141,37 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertEqual(max_old_space_size, 4096)
             yield scripts_test_utils.PopenStub()
 
-        with self.swap(
-                servers,
-                'managed_webpack_compiler',
-                mock_managed_webpack_compiler
-        ):
+        def mock_get_file_count(unused_path):
+            return 1
+
+        webpack_compiler_swap = self.swap(
+            servers, 'managed_webpack_compiler',
+            mock_managed_webpack_compiler)
+        get_file_count_swap = self.swap(
+            build, 'get_file_count', mock_get_file_count)
+
+        with webpack_compiler_swap, get_file_count_swap:
             build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
+
+    def test_build_using_webpack_command_with_incorrect_filecount_fails(self):
+
+        @contextlib.contextmanager
+        def mock_managed_webpack_compiler(config_path, max_old_space_size):
+            self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
+            self.assertEqual(max_old_space_size, 4096)
+            yield scripts_test_utils.PopenStub()
+
+        def mock_get_file_count(unused_path):
+            return 0
+
+        webpack_compiler_swap = self.swap(
+            servers, 'managed_webpack_compiler',
+            mock_managed_webpack_compiler)
+        get_file_count_swap = self.swap(
+            build, 'get_file_count', mock_get_file_count)
+
+        with webpack_compiler_swap, get_file_count_swap:
+            with self.assertRaisesRegex(
+                AssertionError, 'webpack_bundles should be non-empty.'
+            ):
+                build.build_using_webpack(build.WEBPACK_PROD_CONFIG)

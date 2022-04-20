@@ -657,6 +657,8 @@ def build_using_webpack(config_path):
         config_path=config_path, max_old_space_size=4096)
     with managed_webpack_compiler as p:
         p.wait()
+    assert get_file_count('backend_prod_files/webpack_bundles/') > 0, (
+        'webpack_bundles should be non-empty.')
 
 
 def hash_should_be_inserted(filepath):
@@ -1326,6 +1328,13 @@ def generate_python_package():
     print('Oppia package build completed.')
 
 
+def clean():
+    """Cleans up existing build directories."""
+    safe_delete_directory_tree('build/')
+    safe_delete_directory_tree('backend_prod_files/')
+    safe_delete_directory_tree('webpack_bundles/')
+
+
 def main(args=None):
     """The main method of this script."""
     options = _PARSER.parse_args(args=args)
@@ -1333,6 +1342,9 @@ def main(args=None):
     if options.maintenance_mode and not options.prod_env:
         raise Exception(
             'maintenance_mode should only be enabled in prod build.')
+
+    # Clean up the existing generated folders.
+    clean()
 
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
