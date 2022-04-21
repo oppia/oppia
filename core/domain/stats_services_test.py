@@ -1159,7 +1159,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             actions[3]['action_customization_args']['state_name']['value'],
             'Z')
 
-    def test_migrate_to_latest_action_schema(self):
+    def test_migrate_to_latest_action_schema_riases_error_from_v0(self):
         stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_cst_exp_issue(
@@ -1167,16 +1167,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange({
-                'cmd': 'rename_state',
-                'old_state_name': 'A',
-                'new_state_name': 'Z',
-            })
-        ], 'change')
-
         exp_issues = (
-            stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
+            stats_services.get_exp_issues(self.exp.id, self.exp.version))
 
         exp_issue = exp_issues.unresolved_issues[0]
 
@@ -1191,7 +1183,27 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             stats_services.get_playthrough_from_model(model)
             stats_models.CURRENT_ACTION_SCHEMA_VERSION = 1
 
-    def test_while_migrate_to_latest_action_schema(self):
+    DUMMY_TIME_SPENT_IN_MSECS = 1000.0
+
+    def _dummy_convert_issue_v1_dict_to_v2_dict(self, issue_dict):
+        """A test implementation of schema conversion function. It sets all the
+        "time spent" fields for EarlyQuit issues to DUMMY_TIME_SPENT_IN_MSECS.
+        """
+        issue_dict['schema_version'] = 2
+        if issue_dict['issue_type'] == 'EarlyQuit':
+            issue_dict['issue_customization_args'][
+                'time_spent_in_exp_in_msecs'] = self.DUMMY_TIME_SPENT_IN_MSECS
+
+        return issue_dict
+
+    def _dummy_convert_action_v1_dict_to_v2_dict(self, action_dict):
+        """A test implementation of schema conversion function."""
+        action_dict['schema_version'] = 2
+        if action_dict['action_type'] == 'ExplorationStart':
+            action_dict['action_type'] = 'ExplorationStart1'
+            action_dict['action_customization_args']['new_key'] = 5
+
+    def test_update_latest_learner_action_from_model(self):
         stats_models.CURRENT_ACTION_SCHEMA_VERSION = 1
         stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
@@ -1200,45 +1212,32 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange({
-                'cmd': 'rename_state',
-                'old_state_name': 'A',
-                'new_state_name': 'Z',
-            })
-        ], 'change')
-
         exp_issues = (
-            stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
+            stats_services.get_exp_issues(self.exp.id, self.exp.version))
 
         exp_issue = exp_issues.unresolved_issues[0]
 
         model = stats_models.PlaythroughModel.get_by_id(
-        exp_issue.playthrough_ids[0])
+            exp_issue.playthrough_ids[0])
 
-        stats_models.CURRENT_ACTION_SCHEMA_VERSION = 2
+        current_action_schema_version_swap = self.swap(
+            stats_models, 'CURRENT_ACTION_SCHEMA_VERSION', 2)
+        convert_action_dict_swap = self.swap(
+            stats_domain.LearnerAction,
+            '_convert_action_v1_dict_to_v2_dict',
+            self._dummy_convert_action_v1_dict_to_v2_dict)
 
-        with self.assertRaisesRegex(
-            NotImplementedError,
-            'method is missing from the derived class.'):
-            stats_services.get_playthrough_from_model(model)
-            stats_models.CURRENT_ACTION_SCHEMA_VERSION = 1
+        with current_action_schema_version_swap, convert_action_dict_swap:
+            playthrough = stats_services.get_playthrough_from_model(
+                model)
 
-    def test_get_exp_issues_from_model(self):
+    def test_migrate_to_latest_issue_schema_riases_error_from_v0(self):
         stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_cst_exp_issue(
                     [self._create_cst_playthrough(['A', 'B', 'A'])],
                     ['A', 'B', 'A'])
             ]))
-
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange({
-                'cmd': 'rename_state',
-                'old_state_name': 'A',
-                'new_state_name': 'Z',
-            })
-        ], 'change')
 
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             self.exp.id, self.exp.version)
@@ -1253,7 +1252,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             stats_services.get_exp_issues_from_model(exp_issues_model)
             stats_models.CURRENT_ISSUE_SCHEMA_VERSION = 1
 
-    def test_while_get_exp_issues_from_model(self):
+    def test_update_latest_exp_issue_from_model(self):
         stats_models.CURRENT_ISSUE_SCHEMA_VERSION = 1
         stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
@@ -1262,26 +1261,22 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange({
-                'cmd': 'rename_state',
-                'old_state_name': 'A',
-                'new_state_name': 'Z',
-            })
-        ], 'change')
-
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             self.exp.id, self.exp.version)
 
-        stats_models.CURRENT_ISSUE_SCHEMA_VERSION = 2
+        convert_issue_dict_swap = self.swap(
+            stats_domain.ExplorationIssue,
+            '_convert_issue_v1_dict_to_v2_dict',
+            self._dummy_convert_issue_v1_dict_to_v2_dict)
 
-        with self.assertRaisesRegex(
-            NotImplementedError,
-            'method is missing from the derived class.'):
-            stats_services.get_exp_issues_from_model(exp_issues_model)
-            stats_models.CURRENT_ISSUE_SCHEMA_VERSION = 1
+        current_issue_schema_version_swap = self.swap(
+            stats_models, 'CURRENT_ISSUE_SCHEMA_VERSION', 2)
 
-    def test_assign_playthrough_to_corresponding_issue(self):
+        with convert_issue_dict_swap, current_issue_schema_version_swap:
+            exp_issue_from_model = stats_services.get_exp_issues_from_model(
+                exp_issues_model)
+
+    def test_assign_playthrough_to_corresponding_issue_is_true(self):
         stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_cst_exp_issue(
@@ -1289,33 +1284,49 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange({
-                'cmd': 'rename_state',
-                'old_state_name': 'A',
-                'new_state_name': 'Z',
-            })
-        ], 'change')
-
         exp_issues = (
-            stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
+            stats_services.get_exp_issues(self.exp.id, self.exp.version))
 
         exp_issue = exp_issues.unresolved_issues[0]
 
         model = stats_models.PlaythroughModel.get_by_id(
-        exp_issue.playthrough_ids[0])
+            exp_issue.playthrough_ids[0])
 
         playthrough = stats_services.get_playthrough_from_model(model)
 
+        self.assertLess(len(exp_issues.unresolved_issues[0].playthrough_ids), 
+            feconf.MAX_PLAYTHROUGHS_FOR_ISSUE)
+
         stats_services.assign_playthrough_to_corresponding_issue(
-        playthrough, exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
+            playthrough, exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
+
+    def test_assign_playthrough_to_corresponding_issue_is_false(self):
+        stats_services.save_exp_issues_model(
+            stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
+                self._create_cst_exp_issue(
+                    [self._create_cst_playthrough(['A', 'B', 'A'])],
+                    ['A', 'B', 'A'])
+            ]))
+
+        exp_issues = (
+            stats_services.get_exp_issues(self.exp.id, self.exp.version))
+
+        exp_issue = exp_issues.unresolved_issues[0]
+
+        model = stats_models.PlaythroughModel.get_by_id(
+            exp_issue.playthrough_ids[0])
+
+        playthrough = stats_services.get_playthrough_from_model(model)
 
         exp_issues.unresolved_issues[0].playthrough_ids = [
-        'playthrough_id1', 'playthrough_id2', 'playthrough_id3',
-        'playthrough_id4', 'playthrough_id5', 'playthrough_id6']
+            'playthrough_id1', 'playthrough_id2', 'playthrough_id3',
+            'playthrough_id4', 'playthrough_id5', 'playthrough_id6']
+
+        self.assertTrue(len(exp_issues.unresolved_issues[0].playthrough_ids) 
+            >= feconf.MAX_PLAYTHROUGHS_FOR_ISSUE)
 
         stats_services.assign_playthrough_to_corresponding_issue(
-        playthrough, exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
+            playthrough, exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
     def test_get_corresponding_exp_issue(self):
         stats_services.save_exp_issues_model(
