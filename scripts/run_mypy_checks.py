@@ -48,8 +48,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/change_domain.py',
     'core/domain/classifier_services.py',
     'core/domain/classifier_services_test.py',
-    'core/domain/classroom_services.py',
-    'core/domain/classroom_services_test.py',
     'core/domain/collection_services.py',
     'core/domain/collection_services_test.py',
     'core/domain/cron_services.py',
@@ -121,8 +119,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/recommendations_services_test.py',
     'core/domain/rights_manager.py',
     'core/domain/rights_manager_test.py',
-    'core/domain/role_services.py',
-    'core/domain/role_services_test.py',
     'core/domain/rte_component_registry.py',
     'core/domain/rte_component_registry_test.py',
     'core/domain/rules_registry.py',
@@ -259,8 +255,6 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/run_presubmit_checks.py',
     'scripts/servers.py',
     'scripts/servers_test.py',
-    'scripts/typescript_checks.py',
-    'scripts/typescript_checks_test.py',
     'scripts/linters/',
     'scripts/release_scripts/'
 ]
