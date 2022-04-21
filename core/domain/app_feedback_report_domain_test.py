@@ -265,7 +265,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
     def test_validate_covers_device_system_context_validate(self) -> None:
         self.android_report_obj.device_system_context = (
-            app_feedback_report_domain.AndroidDeviceSystemContext( 
+            app_feedback_report_domain.AndroidDeviceSystemContext(
                 ANDROID_PLATFORM_VERSION, ANDROID_PACKAGE_VERSION_CODE,
                 COUNTRY_LOCALE_CODE_INDIA, LANGUAGE_LOCALE_CODE_ENGLISH,
                 None, ANDROID_SDK_VERSION, # type: ignore[assignment]
@@ -275,7 +275,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
     def test_validate_covers_app_context_validate(self) -> None:
         self.android_report_obj.app_context = (
-            app_feedback_report_domain.AndroidAppContext( 
+            app_feedback_report_domain.AndroidAppContext(
                 app_feedback_report_domain.NavigationDrawerEntryPoint(),
                 LANGUAGE_LOCALE_CODE_ENGLISH,
                 LANGUAGE_LOCALE_CODE_ENGLISH, ANDROID_TEXT_SIZE, None, # type: ignore[assignment]
