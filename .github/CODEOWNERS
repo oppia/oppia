@@ -735,7 +735,7 @@
 /dependencies.json @vojtechjelinek
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek
-/scripts/install_third_party_libs.py @oppia/devßß-workflow-reviewers
+/scripts/install_third_party_libs.py @oppia/dev-workflow-reviewers
 /.github/ @oppia/dev-workflow-reviewers
 /.github/CODEOWNERS @oppia/dev-workflow-reviewers
 /.github/stale.yml @vojtechjelinek
