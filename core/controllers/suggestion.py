@@ -376,7 +376,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
             target_type, suggestion_type)
         limit = self.normalized_request.get('limit')
         offset = self.normalized_request.get('offset')
-        topic_name = self.request.get('topic_name', None)
+        topic_name = self.normalized_request.get('topic_name')
 
         opportunity_summary_exp_ids_specific_to_topic = None
         if (topic_name is not None) and (

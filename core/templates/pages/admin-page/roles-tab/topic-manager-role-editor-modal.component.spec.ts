@@ -96,7 +96,7 @@ describe('TopicManagerRoleEditorModalComponent', () => {
       spyOn(
         adminBackendApiService, 'assignManagerToTopicAsync').and.returnValue(
         Promise.reject());
-      spyOn(alertsService, 'addWarning').and.callThrough();
+      spyOn(alertsService, 'addWarning').and.returnValue();
 
       component.newTopicId = 'topic000';
 
@@ -130,7 +130,7 @@ describe('TopicManagerRoleEditorModalComponent', () => {
       spyOn(
         adminBackendApiService,
         'deassignManagerFromTopicAsync').and.returnValue(Promise.reject());
-      spyOn(alertsService, 'addWarning').and.callThrough();
+      spyOn(alertsService, 'addWarning').and.returnValue();
 
       component.removeTopicId('topic123');
       tick();
@@ -140,7 +140,7 @@ describe('TopicManagerRoleEditorModalComponent', () => {
   });
 
   it('should close with correct managed topic ids', () => {
-    const modalCloseSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+    const modalCloseSpy = spyOn(ngbActiveModal, 'close').and.returnValue();
     component.managedTopicIds = ['topic000'];
 
     component.close();
