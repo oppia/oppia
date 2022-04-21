@@ -268,7 +268,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             app_feedback_report_domain.AndroidDeviceSystemContext(
                 ANDROID_PLATFORM_VERSION, ANDROID_PACKAGE_VERSION_CODE,
                 COUNTRY_LOCALE_CODE_INDIA, LANGUAGE_LOCALE_CODE_ENGLISH,
-                None, ANDROID_SDK_VERSION, # type: ignore[assignment]
+                None, ANDROID_SDK_VERSION, # type: ignore[code]
                 ANDROID_BUILD_FINGERPRINT, NETWORK_WIFI))
         self._assert_validation_error(
             self.android_report_obj, 'No device model supplied.')
@@ -278,7 +278,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             app_feedback_report_domain.AndroidAppContext(
                 app_feedback_report_domain.NavigationDrawerEntryPoint(),
                 LANGUAGE_LOCALE_CODE_ENGLISH,
-                LANGUAGE_LOCALE_CODE_ENGLISH, ANDROID_TEXT_SIZE, None, # type: ignore[assignment]
+                LANGUAGE_LOCALE_CODE_ENGLISH, ANDROID_TEXT_SIZE, None, # type: ignore[no-untyped-call]
                 False, False, EVENT_LOGS, LOGCAT_LOGS))
         self._assert_validation_error(
             self.android_report_obj, 'only_allows_wifi_download_and_update'
