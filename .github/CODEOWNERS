@@ -746,5 +746,5 @@
 /core/android_validation_constants*.py @seanlip
 /extensions/interactions/rule_templates.json @seanlip
 /.rtlcssrc @aks681
-/.apt.deb
-/.bash_profileßß
+/.apt.deb @lilytai
+/.bash_profile @lilytai
