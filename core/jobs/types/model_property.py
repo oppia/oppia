@@ -21,6 +21,13 @@ from __future__ import annotations
 from core.jobs import job_utils
 from core.platform import models
 
+from typing import Any, Iterator, Tuple, Type, cast
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -31,7 +38,14 @@ class ModelProperty:
 
     __slots__ = ('_model_kind', '_property_name')
 
-    def __init__(self, model_class, property_obj):
+    # Here, argument property_obj accepts a property of a model and the
+    # property of a model can be a object of str, int, datetime and other
+    # objects too. So, Any type has to be used for property_obj argument.
+    def __init__(
+        self,
+        model_class: Type[base_models.BaseModel],
+        property_obj: Any
+    ) -> None:
         """Initializes a new ModelProperty instance.
 
         Args:
@@ -62,12 +76,14 @@ class ModelProperty:
             raise ValueError(
                 '%r is not a property of %s' % (property_obj, self._model_kind))
         else:
-            property_name = property_obj._name # pylint: disable=protected-access
+            # Here, ignore [attr-defined] is added because, mypy is not
+            # able to recognize '_name' attribute of ndb's models.
+            property_name = property_obj._name  # type: ignore[attr-defined]  # pylint: disable=protected-access
 
         self._property_name = property_name
 
     @property
-    def model_kind(self):
+    def model_kind(self) -> str:
         """Returns the kind of model this instance refers to.
 
         Returns:
@@ -76,7 +92,7 @@ class ModelProperty:
         return self._model_kind
 
     @property
-    def property_name(self):
+    def property_name(self) -> str:
         """Returns the name of the property this instance refers to.
 
         Returns:
@@ -84,7 +100,12 @@ class ModelProperty:
         """
         return self._property_name
 
-    def yield_value_from_model(self, model):
+    # This method yields the values of properties of a model and that values
+    # can be of type string, list, integer and other types too. So, that's
+    # why Iterator[Any] type is used as a yield value of function.
+    def yield_value_from_model(
+        self, model: base_models.BaseModel
+    ) -> Iterator[Any]:
         """Yields the value(s) of the property from the given model.
 
         If the property is repeated, all values are yielded. Otherwise, a single
@@ -109,15 +130,25 @@ class ModelProperty:
         else:
             yield value
 
-    def _to_model_class(self):
+    def _to_model_class(self) -> Type[base_models.BaseModel]:
         """Returns the model class associated with this instance.
 
         Returns:
             type(BaseModel). The model type.
         """
-        return job_utils.get_model_class(self._model_kind)
+        # Here, get_model_class() returns the value of type
+        # Type[datastore_services.Model] but expected return value from this
+        # method is Type[base_models.BaseModel]. So, that's why we used cast
+        # here.
+        return cast(
+            Type[base_models.BaseModel],
+            job_utils.get_model_class(self._model_kind)
+        )
 
-    def _to_property(self):
+    # This method returns the property of a model and that property of a model
+    # can be a object of str, int, datetime and other objects too. So, that's
+    # why Any type is used as a return value type.
+    def _to_property(self) -> Any:
         """Returns the Property object associated with this instance.
 
         Returns:
@@ -125,7 +156,7 @@ class ModelProperty:
         """
         return getattr(self._to_model_class(), self._property_name)
 
-    def _is_repeated_property(self):
+    def _is_repeated_property(self) -> bool:
         """Returns whether the property is repeated.
 
         Returns:
@@ -133,7 +164,7 @@ class ModelProperty:
         """
         return self._property_name != 'id' and self._to_property()._repeated # pylint: disable=protected-access
 
-    def __getstate__(self):
+    def __getstate__(self) -> Tuple[str, str]:
         """Called by pickle to get the value that uniquely defines self.
 
         Returns:
@@ -141,7 +172,7 @@ class ModelProperty:
         """
         return self._model_kind, self._property_name
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: Tuple[str, str]) -> None:
         """Called by pickle to build an instance from __getstate__'s value.
 
         Args:
@@ -149,22 +180,26 @@ class ModelProperty:
         """
         self._model_kind, self._property_name = state
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '%s.%s' % (self._model_kind, self._property_name)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'ModelProperty(%s, %s)' % (self._model_kind, self)
 
-    def __eq__(self, other):
+    # NOTE: Needs to return Any because of:
+    # https://github.com/python/mypy/issues/363#issue-39383094
+    def __eq__(self, other: Any) -> Any:
         return (
             (self._model_kind, self._property_name) == (
                 other._model_kind, other._property_name) # pylint: disable=protected-access
             if self.__class__ is other.__class__ else NotImplemented)
 
-    def __ne__(self, other):
+    # NOTE: Needs to return Any because of:
+    # https://github.com/python/mypy/issues/363#issue-39383094
+    def __ne__(self, other: Any) -> Any:
         return (
             not (self == other)
             if self.__class__ is other.__class__ else NotImplemented)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self._model_kind, self._property_name))
