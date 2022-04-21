@@ -258,8 +258,6 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/servers_test.py',
     'scripts/setup.py',
     'scripts/setup_test.py',
-    'scripts/typescript_checks.py',
-    'scripts/typescript_checks_test.py',
     'scripts/linters/',
     'scripts/release_scripts/'
 ]
