@@ -405,8 +405,8 @@ export class ExplorationEngineService {
     return this.version;
   }
 
-  getAuthorRecommendedExpIds(): string[] {
-    return this.exploration.getAuthorRecommendedExpIds(this.currentStateName);
+  getAuthorRecommendedExpIds(stateName: string): string[] {
+    return this.exploration.getAuthorRecommendedExpIds(stateName);
   }
 
   getLanguageCode(): string {

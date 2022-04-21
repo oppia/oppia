@@ -2313,13 +2313,22 @@ def _get_checkpoints_in_order(init_state_name, states):
         if current_state_name not in visited_state_names:
             visited_state_names.append(current_state_name)
             current_state = states[current_state_name]
+            # We treat the last state card also as a checkpoint to store
+            # the progress till the end of exploration otherwise we do not
+            # have a way to know that the exploration has been completed in
+            # the current playthrough using most recently reached checkpoint.
             if (
-                current_state.card_is_checkpoint and
+                (current_state.card_is_checkpoint or
+                current_state.interaction.id == 'EndExploration') and
                 current_state_name not in checkpoint_state_names
             ):
                 checkpoint_state_names.append(current_state_name)
             for answer_group in current_state.interaction.answer_groups:
                 queue.append(answer_group.outcome.dest)
+
+            # Add the default outcome destination in the queue
+            if current_state.interaction.default_outcome is not None:
+                queue.append(current_state.interaction.default_outcome.dest)
 
     return checkpoint_state_names
 

@@ -198,168 +198,170 @@ export class ConversationSkinComponent {
   ) {}
 
   ngOnInit(): void {
-    this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
-    this.userService.getUserInfoAsync().then((userInfo) => {
-      this.isLoggedIn = userInfo.isLoggedIn();
-    });
+      this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
 
-    this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
+      // Moved the following code to then section as isLoggedIn
+      // variable needs to be defined before the following code is executed.
+      this.userService.getUserInfoAsync().then((userInfo) => {
+        this.isLoggedIn = userInfo.isLoggedIn();
+        this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
 
-    if (this.collectionId) {
-      this.readOnlyCollectionBackendApiService.loadCollectionAsync(
-        this.collectionId).then((collection) => {
-        this.collectionTitle = collection.getTitle();
-      });
-    } else {
-      this.collectionTitle = null;
-    }
+        if (this.collectionId) {
+          this.readOnlyCollectionBackendApiService.loadCollectionAsync(
+            this.collectionId).then((collection) => {
+            this.collectionTitle = collection.getTitle();
+          });
+        } else {
+          this.collectionTitle = null;
+        }
 
-    this.explorationId = this.explorationEngineService.getExplorationId();
-    this.isInPreviewMode = this.explorationEngineService.isInPreviewMode();
-    this.isIframed = this.urlService.isIframed();
-    this.loaderService.showLoadingScreen('Loading');
+        this.explorationId = this.explorationEngineService.getExplorationId();
+        this.isInPreviewMode = this.explorationEngineService.isInPreviewMode();
+        this.isIframed = this.urlService.isIframed();
+        this.loaderService.showLoadingScreen('Loading');
 
-    this.OPPIA_AVATAR_IMAGE_URL = (
-      this.urlInterpolationService.getStaticImageUrl(
-        '/avatar/oppia_avatar_100px.svg'));
+        this.OPPIA_AVATAR_IMAGE_URL = (
+          this.urlInterpolationService.getStaticImageUrl(
+            '/avatar/oppia_avatar_100px.svg'));
 
-    if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
-      this.directiveSubscriptions.add(
-        this.hintsAndSolutionManagerService.onHintConsumed.subscribe(
-          () => {
-            this.questionPlayerStateService.hintUsed(
-              this.questionPlayerEngineService.getCurrentQuestion());
-          }
-        )
-      );
+        if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+          this.directiveSubscriptions.add(
+            this.hintsAndSolutionManagerService.onHintConsumed.subscribe(
+              () => {
+                this.questionPlayerStateService.hintUsed(
+                  this.questionPlayerEngineService.getCurrentQuestion());
+              }
+            )
+          );
 
-      this.directiveSubscriptions.add(
-        this.hintsAndSolutionManagerService.onSolutionViewedEventEmitter
-          .subscribe(() => {
-            this.questionPlayerStateService.solutionViewed(
-              this.questionPlayerEngineService.getCurrentQuestion()
-            );
-          })
-      );
-    }
+          this.directiveSubscriptions.add(
+            this.hintsAndSolutionManagerService.onSolutionViewedEventEmitter
+              .subscribe(() => {
+                this.questionPlayerStateService.solutionViewed(
+                  this.questionPlayerEngineService.getCurrentQuestion()
+                );
+              })
+          );
+        }
 
-    this.directiveSubscriptions.add(
-      this.explorationPlayerStateService.onPlayerStateChange.subscribe(
-        (newStateName) => {
-          if (!newStateName) {
+        this.directiveSubscriptions.add(
+          this.explorationPlayerStateService.onPlayerStateChange.subscribe(
+            (newStateName) => {
+              if (!newStateName) {
+                return;
+              }
+              // To restart the preloader for the new state if required.
+              if (!this._editorPreviewMode) {
+                this.imagePreloaderService.onStateChange(newStateName);
+              }
+              // Ensure the transition to a terminal state properly logs
+              // the end of the exploration.
+              if (
+                !this._editorPreviewMode && this.nextCard.isTerminal()) {
+                this.statsReportingService.recordExplorationCompleted(
+                  newStateName, this.learnerParamsService.getAllParams());
+
+                // If the user is a guest, has completed this exploration
+                // within the context of a collection, and the collection is
+                // whitelisted, record their temporary progress.
+
+                if (this.doesCollectionAllowsGuestProgress(
+                  this.collectionId) && !this.isLoggedIn) {
+                  this.guestCollectionProgressService.
+                    recordExplorationCompletedInCollection(
+                      this.collectionId, this.explorationId);
+                }
+
+                // For single state explorations, when the exploration
+                // reachesthe terminal state and explorationActuallyStarted
+                // is false, record exploration actual start event.
+                if (!this.explorationActuallyStarted) {
+                  this.statsReportingService.recordExplorationActuallyStarted(
+                    newStateName);
+                  this.explorationActuallyStarted = true;
+                }
+              }
+            }
+          )
+        );
+
+        this.windowRef.nativeWindow.addEventListener('beforeunload', (e) => {
+          if (this.redirectToRefresherExplorationConfirmed) {
             return;
           }
-          // To restart the preloader for the new state if required.
-          if (!this._editorPreviewMode) {
-            this.imagePreloaderService.onStateChange(newStateName);
-          }
-          // Ensure the transition to a terminal state properly logs
-          // the end of the exploration.
-          if (
-            !this._editorPreviewMode && this.nextCard.isTerminal()) {
-            this.statsReportingService.recordExplorationCompleted(
-              newStateName, this.learnerParamsService.getAllParams());
-
-            // If the user is a guest, has completed this exploration
-            // within the context of a collection, and the collection is
-            // whitelisted, record their temporary progress.
-
-            if (this.doesCollectionAllowsGuestProgress(
-              this.collectionId) && !this.isLoggedIn) {
-              this.guestCollectionProgressService.
-                recordExplorationCompletedInCollection(
-                  this.collectionId, this.explorationId);
+          if (this.hasInteractedAtLeastOnce && !this.isInPreviewMode &&
+              !this.displayedCard.isTerminal() &&
+              !this.explorationPlayerStateService.isInQuestionMode()) {
+            this.statsReportingService.recordMaybeLeaveEvent(
+              this.playerTranscriptService.getLastStateName(),
+              this.learnerParamsService.getAllParams());
+            let confirmationMessage = (
+              'If you navigate away from this page, your progress on the ' +
+              'exploration will be lost.');
+            if (!this.isIframed && this.isLoggedIn) {
+              confirmationMessage = (
+                'If you navigate away from this page, your progress after the ' +
+                'last completed checkpoint will be lost.');
             }
-
-            // For single state explorations, when the exploration
-            // reachesthe terminal state and explorationActuallyStarted
-            // is false, record exploration actual start event.
-            if (!this.explorationActuallyStarted) {
-              this.statsReportingService.recordExplorationActuallyStarted(
-                newStateName);
-              this.explorationActuallyStarted = true;
-            }
+            (e || this.windowRef.nativeWindow.event).returnValue = (
+              confirmationMessage);
+            return confirmationMessage;
           }
-        }
-      )
-    );
+        });
 
-    this.windowRef.nativeWindow.addEventListener('beforeunload', (e) => {
-      if (this.redirectToRefresherExplorationConfirmed) {
-        return;
-      }
-      if (this.hasInteractedAtLeastOnce && !this.isInPreviewMode &&
-          !this.displayedCard.isTerminal() &&
-          !this.explorationPlayerStateService.isInQuestionMode()) {
-        this.statsReportingService.recordMaybeLeaveEvent(
-          this.playerTranscriptService.getLastStateName(),
-          this.learnerParamsService.getAllParams());
-        let confirmationMessage = (
-          'If you navigate away from this page, your progress on the ' +
-          'exploration will be lost.');
-        if (!this.isIframed && this.isLoggedIn) {
-          confirmationMessage = (
-            'If you navigate away from this page, your progress after the ' +
-            'last completed checkpoint will be lost.');
-        }
-        (e || this.windowRef.nativeWindow.event).returnValue = (
-          confirmationMessage);
-        return confirmationMessage;
-      }
-    });
+        this.windowRef.nativeWindow.onresize = () => {
+          this.adjustPageHeight(false, null);
+        };
 
-    this.windowRef.nativeWindow.onresize = () => {
-      this.adjustPageHeight(false, null);
-    };
+        this.currentInteractionService.setOnSubmitFn(this.submitAnswer.bind(this));
+        this.startCardChangeAnimation = false;
+        this.initializePage();
 
-    this.currentInteractionService.setOnSubmitFn(this.submitAnswer.bind(this));
-    this.startCardChangeAnimation = false;
-    this.initializePage();
+        this.collectionSummary = null;
 
-    this.collectionSummary = null;
-
-    if (this.collectionId) {
-      this.collectionPlayerBackendApiService
-        .fetchCollectionSummariesAsync(this.collectionId)
-        .then(
-          (response) => {
-            this.collectionSummary = response.summaries[0];
-          },
-          () => {
-            this.alertsService.addWarning(
-              'There was an error while fetching the collection ' +
-              'summary.');
-          }
-        );
-    }
-
-    // We do not save checkpoints progress for iframes.
-    if (!this.isIframed && this.isLoggedIn) {
-      // For the first state which is always a checkpoint.
-      let firstStateName: string;
-      let expVersion: number;
-      this.readOnlyExplorationBackendApiService.
-        loadLatestExplorationAsync(this.explorationId).then(
-          response => {
-            expVersion = response.version;
-            firstStateName = response.exploration.init_state_name;
-            this.mostRecentlyReachedCheckpoint = (
-              response.most_recently_reached_checkpoint_state_name
+        if (this.collectionId) {
+          this.collectionPlayerBackendApiService
+            .fetchCollectionSummariesAsync(this.collectionId)
+            .then(
+              (response) => {
+                this.collectionSummary = response.summaries[0];
+              },
+              () => {
+                this.alertsService.addWarning(
+                  'There was an error while fetching the collection ' +
+                  'summary.');
+              }
             );
-            // If the exploration is freshly started, mark the first state
-            // as the most recently reached checkpoint.
-            if (!this.mostRecentlyReachedCheckpoint) {
-              this.editableExplorationBackendApiService.
-                recordMostRecentlyReachedCheckpointAsync(
-                  this.explorationId,
-                  expVersion,
-                  firstStateName
+        }
+
+        // We do not save checkpoints progress for iframes.
+        if (!this.isIframed && this.isLoggedIn) {
+          // For the first state which is always a checkpoint.
+          let firstStateName: string;
+          let expVersion: number;
+          this.readOnlyExplorationBackendApiService.
+            loadLatestExplorationAsync(this.explorationId).then(
+              response => {
+                expVersion = response.version;
+                firstStateName = response.exploration.init_state_name;
+                this.mostRecentlyReachedCheckpoint = (
+                  response.most_recently_reached_checkpoint_state_name
                 );
-            }
-          }
-        );
-      this.visitedStateNames.push(firstStateName);
-    }
+                // If the exploration is freshly started, mark the first state
+                // as the most recently reached checkpoint.
+                if (!this.mostRecentlyReachedCheckpoint) {
+                  this.editableExplorationBackendApiService.
+                    recordMostRecentlyReachedCheckpointAsync(
+                      this.explorationId,
+                      expVersion,
+                      firstStateName
+                    );
+                }
+              }
+            );
+          this.visitedStateNames.push(firstStateName);
+        }
+      });
   }
 
   doesCollectionAllowsGuestProgress(collectionId: string): boolean {
@@ -666,17 +668,16 @@ export class ConversationSkinComponent {
     if (index > 0 && !this.isIframed && this.isLoggedIn) {
       let currentState = this.explorationEngineService.getState();
       let currentStateName = currentState.name;
-      if (currentState.cardIsCheckpoint &&
-          !this.visitedStateNames.includes(currentStateName)) {
-        let expVersion: number;
+      if ((currentState.cardIsCheckpoint || this.displayedCard.isTerminal()) &&
+          !this.visitedStateNames.includes(currentStateName) &&
+          !this.prevSessionStatesProgress.includes(currentStateName)) {
         this.readOnlyExplorationBackendApiService.
           loadLatestExplorationAsync(this.explorationId).then(
             response => {
-              expVersion = response.version;
               this.editableExplorationBackendApiService.
                 recordMostRecentlyReachedCheckpointAsync(
                   this.explorationId,
-                  expVersion,
+                  response.version,
                   currentStateName,
                 );
             }
@@ -798,7 +799,9 @@ export class ConversationSkinComponent {
         recommendedExplorationIds.push(parentExplorationId);
       } else {
         recommendedExplorationIds =
-          this.explorationEngineService.getAuthorRecommendedExpIds();
+          this.explorationEngineService.getAuthorRecommendedExpIds(
+            this.displayedCard.getStateName()
+          );
         includeAutogeneratedRecommendations = true;
       }
 
@@ -911,7 +914,7 @@ export class ConversationSkinComponent {
     // need to consider redirecting in that case.
     if (!this.isIframed && this.isLoggedIn) {
       // Navigate the learner to the most recently reached checkpoint state.
-      this._navigateToMostRecentlyReachedCheckpoint();
+        this._navigateToMostRecentlyReachedCheckpoint();
     }
 
     // The timeout is needed in order to give the recipient of the

@@ -44,6 +44,7 @@ import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTran
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
 describe('ExplorationFooterComponent', () => {
   let component: ExplorationFooterComponent;
@@ -451,20 +452,29 @@ describe('ExplorationFooterComponent', () => {
     spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
       .and.returnValue(Promise.resolve(sampleExpResponse));
 
-    component.checkpointCount = 1;
+    component.checkpointCount = 2;
 
-    spyOn(component, 'getCheckpointIndexFromStateName').and.returnValue(1);
+    spyOn(component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(2);
     spyOn(explorationEngineService, 'getState')
       .and.returnValue(stateObjectFactory.createFromBackendDict(
-        'Mid', sampleExpResponse.exploration.states.Mid
+        'End', sampleExpResponse.exploration.states.End
       ));
-    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+
+    let stateCard = new StateCard('End',
+      '<p>Testing</p>', null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, 'content', null
+    );
+
+    spyOn(explorationEngineService, 'getStateCardByName')
+      .and.returnValue(stateCard);
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
     component.openInformationCardModal();
     tick();
     fixture.detectChanges();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.mostRecentlyReachedCheckpointStateName).toEqual('Mid');
+    expect(component.completedCheckpoints).toEqual(2);
     expect(component.isLastCheckpointReached).toEqual(true);
     expect(component.completedWidth).toEqual(100);
   }));
@@ -499,7 +509,6 @@ describe('ExplorationFooterComponent', () => {
       RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
-    component.mostRecentlyReachedCheckpointStateName = 'State A';
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
     spyOn(explorationEngineService, 'getStateFromStateName')
       .and.returnValue(stateObjectFactory.createFromBackendDict(
@@ -557,7 +566,7 @@ describe('ExplorationFooterComponent', () => {
 
       ));
 
-    let checkpointIndex = component.getCheckpointIndexFromStateName();
+    let checkpointIndex = component.getMostRecentlyReachedCheckpointIndex();
     tick();
     fixture.detectChanges();
     expect(checkpointIndex).toEqual(1);

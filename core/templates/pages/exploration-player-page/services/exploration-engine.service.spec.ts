@@ -728,7 +728,7 @@ describe('Exploration engine service ', () => {
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
 
     expect(() => {
-      explorationEngineService.getAuthorRecommendedExpIds();
+      explorationEngineService.getAuthorRecommendedExpIds('Start');
     }).toThrowError(
       'Cannot read properties of undefined ' +
       '(reading \'getAuthorRecommendedExpIds\')');
@@ -736,17 +736,16 @@ describe('Exploration engine service ', () => {
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
 
-    explorationEngineService.currentStateName = 'Start';
     expect(() => {
-      explorationEngineService.getAuthorRecommendedExpIds();
+      explorationEngineService.getAuthorRecommendedExpIds('Start');
     }).toThrowError(
       'Tried to get recommendations for a non-terminal state: Start');
 
     // Please note that in order to get author recommended exploration id's
     // current should be the last state.
-    explorationEngineService.currentStateName = 'End';
-
-    const recommendedId = explorationEngineService.getAuthorRecommendedExpIds();
+    const recommendedId = explorationEngineService.getAuthorRecommendedExpIds(
+      'End'
+    );
     expect(recommendedId).toContain('recommnendedExplorationId');
   });
 

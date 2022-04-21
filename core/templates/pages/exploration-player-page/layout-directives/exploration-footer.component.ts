@@ -62,7 +62,6 @@ export class ExplorationFooterComponent {
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth: number = 0;
   expStates: StateObjectsBackendDict;
-  mostRecentlyReachedCheckpointStateName!: string;
   completedCheckpoints: number = 0;
   isLastCheckpointReached: boolean = false;
   userIsLoggedIn: boolean = false;
@@ -147,24 +146,25 @@ export class ExplorationFooterComponent {
 
     modalRef.componentInstance.checkpointCount = this.checkpointCount;
 
+    let mostRecentlyReachedCheckpointIndex = (
+      this.getMostRecentlyReachedCheckpointIndex()
+    );
+
+    this.completedCheckpoints = mostRecentlyReachedCheckpointIndex-1;
+
     let displayedCardIndex = (
       this.playerPositionService.getDisplayedCardIndex()
     );
     if (displayedCardIndex > 0) {
       let state = this.explorationEngineService.getState();
-      if (state.cardIsCheckpoint) {
-        this.mostRecentlyReachedCheckpointStateName = state.name;
+      let stateCard = this.explorationEngineService.getStateCardByName(
+        state.name);
+      if (stateCard.isTerminal()) {
+        this.completedCheckpoints += 1;
       }
     }
-    let checkpointIndexFromStateName = (
-      this.getCheckpointIndexFromStateName()
-    );
 
-    if (checkpointIndexFromStateName > 0) {
-      this.completedCheckpoints = checkpointIndexFromStateName - 1;
-    }
-
-    if (checkpointIndexFromStateName === this.checkpointCount) {
+    if (this.completedCheckpoints === this.checkpointCount) {
       this.isLastCheckpointReached = true;
     }
 
@@ -215,7 +215,7 @@ export class ExplorationFooterComponent {
     }
   }
 
-  getCheckpointIndexFromStateName(): number {
+  getMostRecentlyReachedCheckpointIndex(): number {
     let checkpointIndex = 0;
     let numberOfCards = this.playerTranscriptService.getNumCards();
     for (let i = 0; i < numberOfCards; i++) {
@@ -224,11 +224,9 @@ export class ExplorationFooterComponent {
         getStateFromStateName(stateName);
       if (correspondingState.cardIsCheckpoint) {
         checkpointIndex++;
-        if (stateName === this.mostRecentlyReachedCheckpointStateName) {
-          return checkpointIndex;
-        }
       }
     }
+    return checkpointIndex;
   }
 
   async getCheckpointCount(explorationId: string): Promise<void> {

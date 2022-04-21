@@ -677,6 +677,10 @@ describe('Conversation skin component', () => {
 
   it('should show alert when collection summaries are not loaded',
     fakeAsync(() => {
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(new UserInfo(
+          [], false, false,
+          false, false, false, '', '', '', true)));
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
       spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
         'collection_id');
