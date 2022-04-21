@@ -1443,3 +1443,61 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             modifiable_user_data.preferred_audio_language_code, 'en')
         self.assertEqual(modifiable_user_data.fake_field, 'default_value')
         self.assertEqual(modifiable_user_data.user_id, None)
+
+
+class ExplorationUserDataTests(test_utils.GenericTestBase):
+    """Tests for ExplorationUserData domain object."""
+
+    def test_initialization(self) -> None:
+        exploration_user_data = user_domain.ExplorationUserData(
+            'user1', 'exp1')
+
+        expected_exploration_user_data_dict = {
+            'rating': None,
+            'rated_on': None,
+            'draft_change_list': None,
+            'draft_change_list_last_updated': None,
+            'draft_change_list_exp_version': None,
+            'draft_change_list_id': 0,
+            'mute_suggestion_notifications': (
+                feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+            'mute_feedback_notifications': (
+                feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
+            'furthest_reached_checkpoint_exp_version': None,
+            'furthest_reached_checkpoint_state_name': None,
+            'most_recently_reached_checkpoint_state_name': None,
+            'most_recently_reached_checkpoint_exp_version': None
+        }
+
+        self.assertEqual(exploration_user_data.user_id, 'user1')
+        self.assertEqual(exploration_user_data.exploration_id, 'exp1')
+        self.assertEqual(
+            exploration_user_data.to_dict(),
+            expected_exploration_user_data_dict)
+
+    def test_to_dict(self) -> None:
+        exploration_user_data = user_domain.ExplorationUserData(
+            'user1', 'exp1', 4,
+            datetime.datetime(2022, 4, 1, 0, 0, 0, 0), None,
+            None, None, 0, False, False, 1, 'checkpoint2', 2, 'checkpoint1'
+        )
+        expected_exploration_user_data_dict = {
+            'rating': 4,
+            'rated_on': datetime.datetime(2022, 4, 1, 0, 0, 0, 0),
+            'draft_change_list': None,
+            'draft_change_list_last_updated': None,
+            'draft_change_list_exp_version': None,
+            'draft_change_list_id': 0,
+            'mute_suggestion_notifications': False,
+            'mute_feedback_notifications': False,
+            'furthest_reached_checkpoint_exp_version': 1,
+            'furthest_reached_checkpoint_state_name': 'checkpoint2',
+            'most_recently_reached_checkpoint_exp_version': 2,
+            'most_recently_reached_checkpoint_state_name': 'checkpoint1'
+        }
+
+        self.assertEqual(exploration_user_data.user_id, 'user1')
+        self.assertEqual(exploration_user_data.exploration_id, 'exp1')
+        self.assertEqual(
+            exploration_user_data.to_dict(),
+            expected_exploration_user_data_dict)
