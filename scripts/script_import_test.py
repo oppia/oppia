@@ -79,6 +79,5 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                 '--user', '--prefix=', '--system',
                 sys.executable, '-m', 'pip', 'install',
                 'typing-extensions==4.0.1', '--target',
-                'third_party/python_libs',
-                '--user', '--prefix=', '--system',
+                '', '--user', '--prefix=', '--system',
             ])

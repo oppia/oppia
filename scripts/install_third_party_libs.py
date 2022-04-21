@@ -36,7 +36,10 @@ PREREQUISITES = (
     ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
     ('six', '1.16.0', os.path.join('third_party', 'python_libs')),
     ('certifi', '2021.10.8', os.path.join(TOOLS_DIR, 'certifi-2021.10.8')),
-    ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs'))
+    # This library is used very frequently so we install it to default location.
+    # If installed in third_party, for it to work correctly, we may have to add 
+    # it to path in many different places.
+    ('typing-extensions', '4.0.1', '')
 )
 
 
