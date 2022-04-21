@@ -32,8 +32,8 @@ import string
 import sys
 import time
 import unicodedata
-import urllib
-from urllib import request
+import urllib.parse
+import urllib.request
 import zlib
 
 from core import feconf
