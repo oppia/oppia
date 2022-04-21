@@ -53,18 +53,21 @@ describe('HintsAndSolutionManager service', () => {
       hint_content: {
         content_id: 'one',
         html: 'one',
+        image_list: []
       }
     });
     secondHint = hof.createFromBackendDict({
       hint_content: {
         content_id: 'two',
         html: 'two',
+        image_list: []
       }
     });
     thirdHint = hof.createFromBackendDict({
       hint_content: {
         content_id: 'three',
         html: 'three',
+        image_list: []
       }
     });
     solution = sof.createFromBackendDict({
@@ -73,6 +76,7 @@ describe('HintsAndSolutionManager service', () => {
       explanation: {
         content_id: 'sol-one',
         html: 'This is the explanation to the answer',
+        image_list: []
       }
     });
   }));

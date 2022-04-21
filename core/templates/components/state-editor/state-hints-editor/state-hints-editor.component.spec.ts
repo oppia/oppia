@@ -271,7 +271,7 @@ describe('StateHintsEditorComponent', () => {
   });
 
   it('should get hint summary when hint is given', () => {
-    let hint = hintObjectFactory.createNew('id', 'Hint');
+    let hint = hintObjectFactory.createNew('id', 'Hint', []);
 
     expect(component.getHintSummary(hint)).toBe('Hint');
   });

@@ -54,7 +54,8 @@ describe('StateResponsesComponent', () => {
       dest: 'State 4',
       feedback: {
         content_id: 'feedback_1',
-        html: ''
+        html: '',
+        image_list: [],
       },
       param_changes: [],
       refresher_exploration_id: null,
@@ -65,7 +66,8 @@ describe('StateResponsesComponent', () => {
       dest: 'State 5',
       feedback: {
         content_id: 'feedback_2',
-        html: "Let's go to state 5 ImageAndRegion"
+        html: "Let's go to state 5 ImageAndRegion",
+        image_list: [],
       },
       param_changes: [],
       refresher_exploration_id: null,
@@ -123,6 +125,7 @@ describe('StateResponsesComponent', () => {
               feedback: {
                 html: '',
                 content_id: 'This is a new feedback text',
+                image_list: [],
               },
               refresher_exploration_id: 'test',
               missing_prerequisite_skill_id: 'test_skill_id',
@@ -145,6 +148,7 @@ describe('StateResponsesComponent', () => {
           feedback: {
             content_id: '',
             html: '',
+            image_list: [],
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -167,6 +171,7 @@ describe('StateResponsesComponent', () => {
           explanation: {
             content_id: '2',
             html: 'test_explanation1',
+            image_list: []
           },
         },
       });
@@ -184,7 +189,8 @@ describe('StateResponsesComponent', () => {
             dest: 'State',
             feedback: {
               html: '',
-              content_id: 'This is a new feedback text'
+              content_id: 'This is a new feedback text',
+              image_list: [],
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -199,7 +205,8 @@ describe('StateResponsesComponent', () => {
         dest: 'Hola',
         feedback: {
           content_id: '',
-          html: ''
+          html: '',
+          image_list: [],
         },
         labelled_as_correct: true,
         param_changes: [],
@@ -617,7 +624,8 @@ describe('StateResponsesComponent', () => {
       dest: 'State Name',
       feedback: {
         content_id: '',
-        html: ''
+        html: '',
+        image_list: [],
       },
       labelled_as_correct: true,
       param_changes: [],
@@ -641,7 +649,8 @@ describe('StateResponsesComponent', () => {
       dest: 'State Name',
       feedback: {
         content_id: '',
-        html: ''
+        html: '',
+        image_list: [],
       },
       labelled_as_correct: true,
       param_changes: [],
@@ -703,7 +712,8 @@ describe('StateResponsesComponent', () => {
       dest: 'State Name',
       feedback: {
         content_id: '',
-        html: ''
+        html: '',
+        image_list: [],
       },
       labelled_as_correct: true,
       param_changes: [],

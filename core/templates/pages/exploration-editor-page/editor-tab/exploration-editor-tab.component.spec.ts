@@ -410,12 +410,14 @@ describe('Exploration editor tab component', function() {
     expect(explorationStatesService.getState('First State').content).toEqual(
       SubtitledHtml.createFromBackendDict({
         content_id: 'content',
-        html: 'First State Content'
+        html: 'First State Content',
+        image_list: [],
       }));
 
     var displayedValue = SubtitledHtml.createFromBackendDict({
       content_id: 'content',
-      html: 'First State Content Changed'
+      html: 'First State Content Changed',
+      image_list: [],
     });
     ctrl.saveStateContent(displayedValue);
 

@@ -65,7 +65,8 @@ describe('SkillSelectorEditorComponent', () => {
       worked_examples: [],
       explanation: {
         content_id: 'explanation',
-        html: '<p>Release Testing Dec 2020</p>'
+        html: '<p>Release Testing Dec 2020</p>',
+        image_list: []
       },
       written_translations: {
         translations_mapping: {
@@ -115,7 +116,8 @@ describe('SkillSelectorEditorComponent', () => {
       worked_examples: [],
       explanation: {
         content_id: 'explanation',
-        html: '<p>A ratio represents...</p>'
+        html: '<p>A ratio represents...</p>',
+        image_list: []
       },
       written_translations: {
         translations_mapping: {

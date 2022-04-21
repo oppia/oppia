@@ -55,11 +55,13 @@ describe('Skill backend API service', () => {
     const exampleDict = {
       question: {
         html: 'worked example question 1',
-        content_id: 'worked_example_q_1'
+        content_id: 'worked_example_q_1',
+        image_list: []
       },
       explanation: {
         html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1'
+        content_id: 'worked_example_e_1',
+        image_list: []
       }
     };
 
@@ -67,6 +69,7 @@ describe('Skill backend API service', () => {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
+        image_list: []
       },
       worked_examples: [exampleDict],
       recorded_voiceovers: {

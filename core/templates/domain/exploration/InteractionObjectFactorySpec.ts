@@ -60,7 +60,8 @@ describe('Interaction object factory', () => {
       dest: 'dest_default',
       feedback: {
         content_id: 'default_outcome',
-        html: ''
+        html: '',
+        image_list: [],
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -73,7 +74,8 @@ describe('Interaction object factory', () => {
         dest: 'dest_1',
         feedback: {
           content_id: 'outcome_1',
-          html: ''
+          html: '',
+          image_list: [],
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -87,13 +89,15 @@ describe('Interaction object factory', () => {
       {
         hint_content: {
           html: '<p>First Hint</p>',
-          content_id: 'content_id1'
+          content_id: 'content_id1',
+          image_list: [],
         }
       },
       {
         hint_content: {
           html: '<p>Second Hint</p>',
-          content_id: 'content_id2'
+          content_id: 'content_id2',
+          image_list: [],
         }
       }
     ];
@@ -103,7 +107,8 @@ describe('Interaction object factory', () => {
       correct_answer: 'This is a correct answer!',
       explanation: {
         content_id: 'solution',
-        html: 'This is the explanation to the answer'
+        html: 'This is the explanation to the answer',
+        image_list: []
       }
     };
 
@@ -477,7 +482,8 @@ describe('Interaction object factory', () => {
         dest: 'dest_3',
         feedback: {
           content_id: 'outcome_3',
-          html: ''
+          html: '',
+          image_list: [],
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -493,7 +499,8 @@ describe('Interaction object factory', () => {
         dest: 'dest_1',
         feedback: {
           content_id: 'outcome_1',
-          html: ''
+          html: '',
+          image_list: [],
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -516,7 +523,8 @@ describe('Interaction object factory', () => {
       dest: 'dest_default_new',
       feedback: {
         content_id: 'default_outcome_new',
-        html: ''
+        html: '',
+        image_list: [],
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -529,7 +537,8 @@ describe('Interaction object factory', () => {
         dest: 'dest_default',
         feedback: {
           content_id: 'default_outcome',
-          html: ''
+          html: '',
+          image_list: [],
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -567,7 +576,8 @@ describe('Interaction object factory', () => {
       correct_answer: 'This is a new correct answer!',
       explanation: {
         content_id: 'solution_new',
-        html: 'This is the new explanation to the answer'
+        html: 'This is the new explanation to the answer',
+        image_list: []
       }
     };
     const newSolution = sof.createFromBackendDict(newSolutionDict);
@@ -577,7 +587,8 @@ describe('Interaction object factory', () => {
         correct_answer: 'This is a correct answer!',
         explanation: {
           content_id: 'solution',
-          html: 'This is the explanation to the answer'
+          html: 'This is the explanation to the answer',
+          image_list: []
         }
       }));
     testInteraction.setSolution(newSolution);
@@ -590,7 +601,8 @@ describe('Interaction object factory', () => {
     const newHintDict = {
       hint_content: {
         html: '<p>New Hint</p>',
-        content_id: 'content_id_new'
+        content_id: 'content_id_new',
+        image_list: [],
       }
     };
     const newHint = hof.createFromBackendDict(newHintDict);
@@ -612,7 +624,8 @@ describe('Interaction object factory', () => {
         dest: 'dest_1_new',
         feedback: {
           content_id: 'outcome_1_new',
-          html: ''
+          html: '',
+          image_list: [],
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -626,7 +639,8 @@ describe('Interaction object factory', () => {
       dest: 'dest_default_new',
       feedback: {
         content_id: 'default_outcome_new',
-        html: ''
+        html: '',
+        image_list: [],
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -637,7 +651,8 @@ describe('Interaction object factory', () => {
       {
         hint_content: {
           html: '<p>New Hint</p>',
-          content_id: 'content_id1_new'
+          content_id: 'content_id1_new',
+          image_list: [],
         }
       }
     ];
@@ -646,7 +661,8 @@ describe('Interaction object factory', () => {
       correct_answer: 'This is a new correct answer!',
       explanation: {
         content_id: 'solution_new',
-        html: 'This is the new explanation to the answer'
+        html: 'This is the new explanation to the answer',
+        image_list: []
       }
     };
     const otherInteractionDict = {
@@ -659,10 +675,12 @@ describe('Interaction object factory', () => {
         choices: {
           value: [{
             html: '<p>Choice 1</p>',
-            content_id: 'ca_choices_0'
+            content_id: 'ca_choices_0',
+            image_list: [],
           }, {
             html: '<p>Choice 2</p>',
-            content_id: 'ca_choices_1'
+            content_id: 'ca_choices_1',
+            image_list: [],
           }]
         }
       },
@@ -688,10 +706,12 @@ describe('Interaction object factory', () => {
         choices: {
           value: [{
             html: '<p>Choice 1</p>',
-            content_id: 'ca_choices_0'
+            content_id: 'ca_choices_0',
+            image_list: [],
           }, {
             html: '<p>Choice 2</p>',
-            content_id: 'ca_choices_1'
+            content_id: 'ca_choices_1',
+            image_list: [],
           }]
         }
       },

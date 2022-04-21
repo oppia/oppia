@@ -50,7 +50,8 @@ describe('Solution object factory', () => {
         correct_answer: 'This is a correct answer!',
         explanation: {
           content_id: 'solution',
-          html: 'This is the explanation to the answer'
+          html: 'This is the explanation to the answer',
+          image_list: []
         }
       });
     });
@@ -174,7 +175,8 @@ describe('Solution object factory', () => {
         correct_answer: 'This is a correct answer!',
         explanation: {
           content_id: 'solution',
-          html: 'This is the explanation to the answer'
+          html: 'This is the explanation to the answer',
+          image_list: [],
         }
       });
 

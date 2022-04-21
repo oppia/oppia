@@ -70,7 +70,8 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
                     page_contents: {
                       subtitled_html: {
                         content_id: 'content_1',
-                        html: 'This is a html'
+                        html: 'This is a html',
+                        image_list: []
                       },
                       recorded_voiceovers: {
                         voiceovers_mapping: {}

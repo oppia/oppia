@@ -84,6 +84,7 @@ describe('Delete Misconception Modal Component', () => {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
+        image_list: []
       },
       worked_examples: [],
       recorded_voiceovers: {

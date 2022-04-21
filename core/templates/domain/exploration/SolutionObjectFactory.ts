@@ -51,6 +51,7 @@ export interface ExplanationBackendDict {
   // the 'content_id' should be set to a string.
   'content_id': string | null;
   'html': string;
+  'image_list': string[];
 }
 
 export interface SolutionBackendDict {

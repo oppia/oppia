@@ -77,7 +77,8 @@ describe('State card object factory', () => {
         dest: '(untitled state)',
         feedback: {
           content_id: 'default_outcome',
-          html: ''
+          html: '',
+          image_list: [],
         },
         param_changes: [],
         labelled_as_correct: false,
@@ -87,7 +88,8 @@ describe('State card object factory', () => {
       hints: [{
         hint_content: {
           content_id: 'abc',
-          html: 'hint 1'
+          html: 'hint 1',
+          image_list: [],
         }
       }],
       id: 'TextInput',
@@ -96,7 +98,8 @@ describe('State card object factory', () => {
         correct_answer: 'correct answer',
         explanation: {
           content_id: 'pqr',
-          html: 'solution explanation'
+          html: 'solution explanation',
+          image_list: [],
         }
       }
     };
@@ -285,7 +288,8 @@ describe('State card object factory', () => {
       hintObjectFactory.createFromBackendDict({
         hint_content: {
           content_id: 'abc',
-          html: 'hint 1'
+          html: 'hint 1',
+          image_list: [],
         }
       })
     ];
@@ -299,7 +303,8 @@ describe('State card object factory', () => {
       correct_answer: 'correct answer',
       explanation: {
         content_id: 'pqr',
-        html: 'solution explanation'
+        html: 'solution explanation',
+        image_list: [],
       }
     });
 

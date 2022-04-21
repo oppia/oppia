@@ -60,7 +60,8 @@ describe('LearnerAnswerInfoCard', () => {
           classifier_model_id: null,
           content: {
             html: '',
-            content_id: 'content'
+            content_id: 'content',
+            image_list: []
           },
           interaction: {
             id: 'FractionInput',
@@ -78,7 +79,8 @@ describe('LearnerAnswerInfoCard', () => {
               dest: 'Introduction',
               feedback: {
                 content_id: 'default_outcome',
-                html: ''
+                html: '',
+                image_list: []
               },
               labelled_as_correct: false,
               param_changes: [],

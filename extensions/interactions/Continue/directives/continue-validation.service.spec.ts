@@ -54,7 +54,8 @@ describe('ContinueValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        content_id: ''
+        content_id: '',
+        image_list: []
       },
       labelled_as_correct: false,
       param_changes: [],

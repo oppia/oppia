@@ -62,7 +62,8 @@ describe('Content translation manager service', () => {
       dest: 'dest_default',
       feedback: {
         content_id: 'default_outcome',
-        html: '<p>en default outcome</p>'
+        html: '<p>en default outcome</p>',
+        image_list: []
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -83,7 +84,8 @@ describe('Content translation manager service', () => {
         dest: 'dest_1',
         feedback: {
           content_id: 'outcome_1',
-          html: '<p>en feedback</p>'
+          html: '<p>en feedback</p>',
+          image_list: []
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -97,7 +99,8 @@ describe('Content translation manager service', () => {
       {
         hint_content: {
           html: '<p>en hint</p>',
-          content_id: 'hint_0'
+          content_id: 'hint_0',
+          image_list: []
         }
       }
     ];
@@ -107,7 +110,8 @@ describe('Content translation manager service', () => {
       correct_answer: 'This is a correct answer!',
       explanation: {
         content_id: 'solution',
-        html: '<p>en solution</p>'
+        html: '<p>en solution</p>',
+        image_list: []
       }
     };
 
@@ -433,7 +437,8 @@ describe('Content translation manager service', () => {
           dest: 'dest_1',
           feedback: {
             content_id: 'outcome_1',
-            html: '<p>en feedback</p>'
+            html: '<p>en feedback</p>',
+            image_list: []
           },
           labelled_as_correct: false,
           param_changes: [],

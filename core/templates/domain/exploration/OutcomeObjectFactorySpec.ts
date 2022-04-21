@@ -68,7 +68,8 @@ describe('Outcome object factory', () => {
         dest: 'A',
         feedback: {
           html: '<p>Hey</p>',
-          content_id: 'feedback_1'
+          content_id: 'feedback_1',
+          image_list: [],
         },
         labelled_as_correct: true,
         param_changes: [],
@@ -80,7 +81,8 @@ describe('Outcome object factory', () => {
         dest: 'A',
         feedback: {
           html: '<p>Hey</p>',
-          content_id: 'feedback_1'
+          content_id: 'feedback_1',
+          image_list: [],
         },
         labelled_as_correct: true,
         param_changes: [],

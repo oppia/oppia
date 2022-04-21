@@ -90,7 +90,7 @@ describe('Add Hint Modal Component', () => {
 
   it('should save hint when closing the modal', () => {
     let contentId = 'cont_1';
-    let hintExpected = hintObjectFactory.createNew(contentId, '');
+    let hintExpected = hintObjectFactory.createNew(contentId, '', []);
     spyOn(ngbActiveModal, 'close');
     spyOn(
       generateContentIdService, 'getNextStateId'

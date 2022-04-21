@@ -207,7 +207,8 @@ describe('ExplorationFooterComponent', () => {
         classifier_model_id: null,
         content: {
           html: '',
-          content_id: 'content'
+          content_id: 'content',
+          image_list: []
         },
         interaction: {
           id: 'FractionInput',
@@ -225,7 +226,8 @@ describe('ExplorationFooterComponent', () => {
             dest: 'Introduction',
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
+              image_list: []
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -293,7 +295,8 @@ describe('ExplorationFooterComponent', () => {
         classifier_model_id: null,
         content: {
           html: '',
-          content_id: 'content'
+          content_id: 'content',
+          image_list: []
         },
         interaction: {
           id: 'FractionInput',
@@ -311,7 +314,8 @@ describe('ExplorationFooterComponent', () => {
             dest: 'Introduction',
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
+              image_list: []
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -431,7 +435,8 @@ describe('ExplorationFooterComponent', () => {
             next_content_id_index: null,
             content: {
               html: '',
-              content_id: 'content'
+              content_id: 'content',
+              image_list: []
             },
             interaction: {
               customization_args: {},
@@ -443,7 +448,8 @@ describe('ExplorationFooterComponent', () => {
                 dest: 'Introduction',
                 feedback: {
                   html: '',
-                  content_id: 'content'
+                  content_id: 'content',
+                  image_list: []
                 },
                 labelled_as_correct: true,
                 refresher_exploration_id: 'exp',

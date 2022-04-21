@@ -31,11 +31,13 @@ describe('Worked example object factory', () => {
     workedExampleBackendDict = {
       question: {
         html: 'worked example question 1',
-        content_id: 'worked_example_q_1'
+        content_id: 'worked_example_q_1',
+        image_list: []
       },
       explanation: {
         html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1'
+        content_id: 'worked_example_e_1',
+        image_list: []
       }
     };
   });

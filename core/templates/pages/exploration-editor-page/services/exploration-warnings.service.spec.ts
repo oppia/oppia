@@ -92,7 +92,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -105,7 +106,8 @@ describe('Exploration Warnings Service', function() {
                 dest: '',
                 feedback: {
                   content_id: 'feedback_1',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -116,6 +118,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
+                image_list: [],
               },
             },
             customization_args: {
@@ -174,7 +177,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -187,7 +191,8 @@ describe('Exploration Warnings Service', function() {
                 dest: '',
                 feedback: {
                   content_id: 'feedback_1',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -197,7 +202,8 @@ describe('Exploration Warnings Service', function() {
                 dest: '',
                 feedback: {
                   content_id: 'feedback_1',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -208,6 +214,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
+                image_list: [],
               },
             },
             customization_args: {
@@ -285,7 +292,8 @@ describe('Exploration Warnings Service', function() {
                 dest: '',
                 feedback: {
                   content_id: 'feedback_1',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -296,6 +304,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
+                image_list: [],
               },
             },
             customization_args: {},
@@ -346,7 +355,8 @@ describe('Exploration Warnings Service', function() {
             card_is_checkpoint: true,
             content: {
               content_id: 'content',
-              html: '{{HtmlValue}}'
+              html: '{{HtmlValue}}',
+              image_list: [],
             },
             recorded_voiceovers: {
               voiceovers_mapping: {},
@@ -358,7 +368,8 @@ describe('Exploration Warnings Service', function() {
                 correct_answer: 'This is the correct answer',
                 answer_is_exclusive: false,
                 explanation: {
-                  html: 'Solution explanation'
+                  html: 'Solution explanation',
+                  image_list: [],
                 }
               },
               answer_groups: [{
@@ -366,7 +377,8 @@ describe('Exploration Warnings Service', function() {
                   dest: '',
                   feedback: {
                     content_id: 'feedback_1',
-                    html: ''
+                    html: '',
+                    image_list: [],
                   },
                 },
                 rule_specs: [],
@@ -377,6 +389,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: '',
                   html: '',
+                  image_list: [],
                 },
               },
               customization_args: {
@@ -439,7 +452,8 @@ describe('Exploration Warnings Service', function() {
             card_is_checkpoint: true,
             content: {
               content_id: 'content',
-              html: '{{HtmlValue}}'
+              html: '{{HtmlValue}}',
+              image_list: [],
             },
             recorded_voiceovers: {
               voiceovers_mapping: {},
@@ -451,7 +465,8 @@ describe('Exploration Warnings Service', function() {
                 correct_answer: 'This is the correct answer',
                 answer_is_exclusive: false,
                 explanation: {
-                  html: 'Solution explanation'
+                  html: 'Solution explanation',
+                  image_list: [],
                 }
               },
               answer_groups: [{
@@ -459,7 +474,8 @@ describe('Exploration Warnings Service', function() {
                   dest: '',
                   feedback: {
                     content_id: 'feedback_1',
-                    html: ''
+                    html: '',
+                    image_list: [],
                   },
                 },
                 rule_specs: [],
@@ -470,6 +486,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: '',
                   html: '',
+                  image_list: [],
                 },
               },
               customization_args: {
@@ -542,7 +559,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -554,7 +572,8 @@ describe('Exploration Warnings Service', function() {
               correct_answer: 'This is the correct answer',
               answer_is_exclusive: false,
               explanation: {
-                html: 'Solution explanation'
+                html: 'Solution explanation',
+                image_list: [],
               }
             },
             answer_groups: [{
@@ -562,7 +581,8 @@ describe('Exploration Warnings Service', function() {
                 dest: '',
                 feedback: {
                   content_id: 'feedback_1',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -573,6 +593,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
+                image_list: [],
               },
             },
             customization_args: {
@@ -631,7 +652,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -643,7 +665,8 @@ describe('Exploration Warnings Service', function() {
               correct_answer: 'This is the correct answer',
               answer_is_exclusive: false,
               explanation: {
-                html: 'Solution explanation'
+                html: 'Solution explanation',
+                image_list: [],
               }
             },
             answer_groups: [{
@@ -651,7 +674,8 @@ describe('Exploration Warnings Service', function() {
                 dest: '',
                 feedback: {
                   content_id: 'feedback_1',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -662,6 +686,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
+                image_list: [],
               },
             },
             customization_args: {
@@ -685,7 +710,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: false,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -697,7 +723,8 @@ describe('Exploration Warnings Service', function() {
               correct_answer: 'This is the correct answer',
               answer_is_exclusive: false,
               explanation: {
-                html: 'Solution explanation'
+                html: 'Solution explanation',
+                image_list: [],
               }
             },
             answer_groups: [{
@@ -716,6 +743,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
+                image_list: [],
               },
             },
             customization_args: {
@@ -781,7 +809,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: false,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -794,7 +823,8 @@ describe('Exploration Warnings Service', function() {
                 dest: '',
                 feedback: {
                   content_id: 'feedback_1',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -805,6 +835,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
+                image_list: [],
               },
             },
             customization_args: {
@@ -847,7 +878,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -860,7 +892,8 @@ describe('Exploration Warnings Service', function() {
                 dest: '',
                 feedback: {
                   content_id: 'feedback_1',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -871,6 +904,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
+                image_list: [],
               },
             },
             customization_args: {
@@ -894,7 +928,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -907,7 +942,8 @@ describe('Exploration Warnings Service', function() {
                 dest: '',
                 feedback: {
                   content_id: 'feedback_2',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -954,7 +990,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -968,7 +1005,8 @@ describe('Exploration Warnings Service', function() {
                   dest: 'State1',
                   feedback: {
                     content_id: 'feedback_1',
-                    html: ''
+                    html: '',
+                    image_list: [],
                   },
                 },
                 rule_specs: [],
@@ -979,7 +1017,8 @@ describe('Exploration Warnings Service', function() {
                   dest: 'State2',
                   feedback: {
                     content_id: 'feedback_2',
-                    html: ''
+                    html: '',
+                    image_list: [],
                   },
                 },
                 rule_specs: [],
@@ -990,7 +1029,8 @@ describe('Exploration Warnings Service', function() {
                   dest: 'State3',
                   feedback: {
                     content_id: 'feedback_3',
-                    html: ''
+                    html: '',
+                    image_list: [],
                   },
                 },
                 rule_specs: [],
@@ -1018,7 +1058,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1031,7 +1072,8 @@ describe('Exploration Warnings Service', function() {
                 dest: 'State4',
                 feedback: {
                   content_id: 'feedback_2',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -1059,7 +1101,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1072,7 +1115,8 @@ describe('Exploration Warnings Service', function() {
                 dest: 'State4',
                 feedback: {
                   content_id: 'feedback_2',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -1100,7 +1144,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1113,7 +1158,8 @@ describe('Exploration Warnings Service', function() {
                 dest: 'State4',
                 feedback: {
                   content_id: 'feedback_2',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -1141,7 +1187,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1154,7 +1201,8 @@ describe('Exploration Warnings Service', function() {
                 dest: 'State5',
                 feedback: {
                   content_id: 'feedback_2',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -1182,7 +1230,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1195,7 +1244,8 @@ describe('Exploration Warnings Service', function() {
                 dest: 'State6',
                 feedback: {
                   content_id: 'feedback_2',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -1223,7 +1273,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1236,7 +1287,8 @@ describe('Exploration Warnings Service', function() {
                 dest: 'State7',
                 feedback: {
                   content_id: 'feedback_2',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -1264,7 +1316,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1277,7 +1330,8 @@ describe('Exploration Warnings Service', function() {
                 dest: 'End',
                 feedback: {
                   content_id: 'feedback_2',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -1305,7 +1359,8 @@ describe('Exploration Warnings Service', function() {
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
-            html: '{{HtmlValue}}'
+            html: '{{HtmlValue}}',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1318,7 +1373,8 @@ describe('Exploration Warnings Service', function() {
                 dest: '',
                 feedback: {
                   content_id: 'feedback_2',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
               },
               rule_specs: [],
@@ -1417,7 +1473,8 @@ describe('Exploration Warnings Service', function() {
         Hola: {
           content: {
             content_id: 'content',
-            html: ''
+            html: '',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1430,7 +1487,8 @@ describe('Exploration Warnings Service', function() {
                 dest: 'State',
                 feedback: {
                   content_id: 'feedback_1',
-                  html: ''
+                  html: '',
+                  image_list: [],
                 },
                 labelled_as_correct: false,
                 missing_prerequisite_skill_id: null,
@@ -1452,6 +1510,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
+                image_list: [],
               },
               labelled_as_correct: false,
               missing_prerequisite_skill_id: null,
@@ -1477,7 +1536,8 @@ describe('Exploration Warnings Service', function() {
               explanation: {
                 html: 'placeholder value',
                 unicode_str: 'placeholder value',
-                content_id: ''
+                content_id: '',
+                image_list: []
               }
             }
           },
@@ -1497,7 +1557,8 @@ describe('Exploration Warnings Service', function() {
           param_changes: [],
           content: {
             content_id: '',
-            html: ''
+            html: '',
+            image_list: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {

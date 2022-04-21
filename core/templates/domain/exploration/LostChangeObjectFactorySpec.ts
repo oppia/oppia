@@ -175,7 +175,8 @@ describe('Lost Change Object Factory', () => {
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
-            html: 'Html'
+            html: 'Html',
+            image_list: [],
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -198,7 +199,8 @@ describe('Lost Change Object Factory', () => {
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
-            html: 'Html'
+            html: 'Html',
+            image_list: [],
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -268,7 +270,8 @@ describe('Lost Change Object Factory', () => {
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_1',
-            html: 'Html'
+            html: 'Html',
+            image_list: [],
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -291,7 +294,8 @@ describe('Lost Change Object Factory', () => {
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_1',
-            html: 'Html'
+            html: 'Html',
+            image_list: [],
           },
           labelled_as_correct: false,
           param_changes: [],

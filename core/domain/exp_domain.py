@@ -2028,6 +2028,26 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v49_dict_to_v50_dict(cls, states_dict):
+        """Converts from version 49 to 50. Version 50 adds image_list attribute
+        to the SubtitledHtml structure in states dict, to allow storing of
+        rich text image filenames as a list.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            state_domain.State.update_image_lists_in_state(state_dict)
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
@@ -2064,7 +2084,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 54
+    CURRENT_EXP_SCHEMA_VERSION = 55
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2244,6 +2264,29 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['states'] = cls._convert_states_v48_dict_to_v49_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 49
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
+        """Converts a v54 exploration dict into a v55 exploration dict.
+        Adds a new attribute image_list to the SubtitledHtml structure,
+        which allows the list of rich text image filenames to be stored
+        as a list.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v54.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v55.
+        """
+        exploration_dict['schema_version'] = 55
+
+        exploration_dict['states'] = cls._convert_states_v49_dict_to_v50_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 50
 
         return exploration_dict
 

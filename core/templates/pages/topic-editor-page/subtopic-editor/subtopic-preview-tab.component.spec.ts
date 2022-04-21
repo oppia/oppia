@@ -40,7 +40,8 @@ describe('SubtopicPreviewTab', () => {
   let subtopicPageContentsDict = SubtopicPageContents.createFromBackendDict({
     subtitled_html: {
       html: 'test content',
-      content_id: 'content'
+      content_id: 'content',
+      image_list: []
     },
     recorded_voiceovers: {
       voiceovers_mapping: {

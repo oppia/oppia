@@ -65,7 +65,8 @@ describe('DragAndDropSortInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        content_id: ''
+        content_id: '',
+        image_list: []
       },
       missing_prerequisite_skill_id: null,
       labelled_as_correct: false,
@@ -77,7 +78,8 @@ describe('DragAndDropSortInputValidationService', () => {
       dest: 'Third State',
       feedback: {
         html: '<p>great job!</p>',
-        content_id: ''
+        content_id: '',
+        image_list: []
       },
       labelled_as_correct: true,
       param_changes: [],

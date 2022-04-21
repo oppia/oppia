@@ -43,7 +43,8 @@ describe('ImprovementsService', () => {
         classifier_model_id: null,
         content: {
           html: '',
-          content_id: 'content'
+          content_id: 'content',
+          image_list: []
         },
         interaction: {
           id: 'TextInput',
@@ -63,7 +64,8 @@ describe('ImprovementsService', () => {
             dest: 'Introduction',
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
+              image_list: []
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -107,7 +109,8 @@ describe('ImprovementsService', () => {
         classifier_model_id: null,
         content: {
           html: '',
-          content_id: 'content'
+          content_id: 'content',
+          image_list: []
         },
         interaction: {
           id: 'FractionInput',
@@ -125,7 +128,8 @@ describe('ImprovementsService', () => {
             dest: 'Introduction',
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
+              image_list: []
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -169,7 +173,8 @@ describe('ImprovementsService', () => {
         classifier_model_id: null,
         content: {
           html: '',
-          content_id: 'content'
+          content_id: 'content',
+          image_list: []
         },
         interaction: {
           id: null,
@@ -187,7 +192,8 @@ describe('ImprovementsService', () => {
             dest: 'Introduction',
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
+              image_list: []
             },
             labelled_as_correct: false,
             param_changes: [],

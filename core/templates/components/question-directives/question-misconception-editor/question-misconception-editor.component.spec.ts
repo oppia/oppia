@@ -42,7 +42,8 @@ describe('Question Misconception Editor Component', () => {
   let outcome = {
     feedback: {
       content_id: null,
-      html: ''
+      html: '',
+      image_list: [],
     }
   };
 
@@ -181,6 +182,7 @@ describe('Question Misconception Editor Component', () => {
     component.outcome.feedback = {
       html: null,
       content_id: null,
+      image_list: [],
     };
     component.editMisconception();
 

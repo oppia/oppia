@@ -80,7 +80,8 @@ describe('Topic update service', function() {
     page_contents: {
       subtitled_html: {
         html: 'test content',
-        content_id: 'content'
+        content_id: 'content',
+        image_list: [],
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -994,7 +995,8 @@ describe('Topic update service', function() {
   it('should set/unset changes to a subtopic page\'s page content', () => {
     var newSampleSubtitledHtmlDict = {
       html: 'new content',
-      content_id: 'content'
+      content_id: 'content',
+      image_list: [],
     };
     var newSampleSubtitledHtml =
       SubtitledHtml.createFromBackendDict(
@@ -1022,7 +1024,8 @@ describe('Topic update service', function() {
     expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
       subtitled_html: {
         html: 'new content',
-        content_id: 'content'
+        content_id: 'content',
+        image_list: [],
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -1042,7 +1045,8 @@ describe('Topic update service', function() {
     expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
       subtitled_html: {
         html: 'test content',
-        content_id: 'content'
+        content_id: 'content',
+        image_list: [],
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -1063,7 +1067,8 @@ describe('Topic update service', function() {
     'html data', () => {
     let newSampleSubtitledHtmlDict = {
       html: 'new content',
-      content_id: 'content'
+      content_id: 'content',
+      image_list: [],
     };
     let newSampleSubtitledHtml =
       SubtitledHtml.createFromBackendDict(
@@ -1077,7 +1082,8 @@ describe('Topic update service', function() {
       new_value: newSampleSubtitledHtml.toBackendDict(),
       old_value: {
         html: 'test content',
-        content_id: 'content'
+        content_id: 'content',
+        image_list: []
       }
     }]);
   }
@@ -1102,7 +1108,8 @@ describe('Topic update service', function() {
     expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
       subtitled_html: {
         html: 'test content',
-        content_id: 'content'
+        content_id: 'content',
+        image_list: [],
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -1123,7 +1130,8 @@ describe('Topic update service', function() {
     expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
       subtitled_html: {
         html: 'test content',
-        content_id: 'content'
+        content_id: 'content',
+        image_list: []
       },
       recorded_voiceovers: newRecordedVoiceoversDict
     });
@@ -1132,7 +1140,8 @@ describe('Topic update service', function() {
     expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
       subtitled_html: {
         html: 'test content',
-        content_id: 'content'
+        content_id: 'content',
+        image_list: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {

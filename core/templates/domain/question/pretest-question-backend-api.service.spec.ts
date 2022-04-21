@@ -42,7 +42,8 @@ describe('Pretest question backend API service', function() {
         solicit_answer_details: false,
         content: {
           content_id: '1',
-          html: 'Question 1'
+          html: 'Question 1',
+          image_list: [],
         },
         written_translations: {
           translations_mapping: {
@@ -59,7 +60,8 @@ describe('Pretest question backend API service', function() {
               dest: 'State 1',
               feedback: {
                 content_id: 'feedback_1',
-                html: '<p>Try Again.</p>'
+                html: '<p>Try Again.</p>',
+                image_list: [],
               },
               param_changes: [],
               refresher_exploration_id: null,
@@ -78,7 +80,8 @@ describe('Pretest question backend API service', function() {
               dest: 'State 2',
               feedback: {
                 content_id: 'feedback_2',
-                html: '<p>Try Again.</p>'
+                html: '<p>Try Again.</p>',
+                image_list: [],
               },
               param_changes: [],
               refresher_exploration_id: null,
@@ -100,7 +103,8 @@ describe('Pretest question backend API service', function() {
             param_changes: [],
             feedback: {
               content_id: 'feedback_id',
-              html: '<p>Dummy Feedback</p>'
+              html: '<p>Dummy Feedback</p>',
+              image_list: [],
             }
           },
           id: 'TextInput',
@@ -120,7 +124,8 @@ describe('Pretest question backend API service', function() {
             {
               hint_content: {
                 content_id: 'hint_1',
-                html: '<p>This is a hint.</p>'
+                html: '<p>This is a hint.</p>',
+                image_list: [],
               }
             }
           ],
@@ -128,7 +133,8 @@ describe('Pretest question backend API service', function() {
             correct_answer: 'Solution',
             explanation: {
               content_id: 'solution',
-              html: '<p>This is a solution.</p>'
+              html: '<p>This is a solution.</p>',
+              image_list: []
             },
             answer_is_exclusive: false
           }

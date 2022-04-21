@@ -32,7 +32,7 @@ describe('Hint object factory', () => {
 
   it('should create a Hint from dict and convert a Hint Object to' +
      'backend dict correctly', inject(() => {
-    var testHint = hof.createNew('content_id', '<p>Some Hint</p>');
+    var testHint = hof.createNew('content_id', '<p>Some Hint</p>', []);
     expect(testHint.toBackendDict()).toEqual({
       hint_content: {
         html: '<p>Some Hint</p>',
@@ -42,17 +42,19 @@ describe('Hint object factory', () => {
     expect(hof.createFromBackendDict({
       hint_content: {
         html: '<p>Some Hint</p>',
-        content_id: 'content_id'
+        content_id: 'content_id',
+        image_list: [],
       }
-    })).toEqual(hof.createNew('content_id', '<p>Some Hint</p>'));
+    })).toEqual(hof.createNew('content_id', '<p>Some Hint</p>', []));
   }));
 
   it('should be able to create a new hint object', inject(() => {
-    expect(hof.createNew('content_id', '<p>Some Hint</p>')).toEqual(
+    expect(hof.createNew('content_id', '<p>Some Hint</p>', [])).toEqual(
       hof.createFromBackendDict({
         hint_content: {
           html: '<p>Some Hint</p>',
-          content_id: 'content_id'
+          content_id: 'content_id',
+          image_list: [],
         }
       })
     );

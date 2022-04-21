@@ -76,7 +76,8 @@ describe('QuestionEditorComponent', () => {
       question_state_data: {
         content: {
           html: 'Question 1',
-          content_id: 'content_1'
+          content_id: 'content_1',
+          image_list: [],
         },
         interaction: {
           answer_groups: [{
@@ -84,7 +85,8 @@ describe('QuestionEditorComponent', () => {
               dest: 'outcome 1',
               feedback: {
                 content_id: 'content_5',
-                html: ''
+                html: '',
+                image_list: [],
               },
               labelled_as_correct: true,
               param_changes: [],
@@ -109,7 +111,8 @@ describe('QuestionEditorComponent', () => {
             dest: null,
             feedback: {
               html: 'Correct Answer',
-              content_id: 'content_2'
+              content_id: 'content_2',
+              image_list: [],
             },
             param_changes: [],
             labelled_as_correct: true,
@@ -119,7 +122,8 @@ describe('QuestionEditorComponent', () => {
           hints: [{
             hint_content: {
               html: 'Hint 1',
-              content_id: 'content_3'
+              content_id: 'content_3',
+              image_list: [],
             }
           }],
           solution: {
@@ -127,7 +131,8 @@ describe('QuestionEditorComponent', () => {
             answer_is_exclusive: false,
             explanation: {
               html: 'Solution explanation',
-              content_id: 'content_4'
+              content_id: 'content_4',
+              image_list: []
             }
           },
           id: 'TextInput'
@@ -297,7 +302,8 @@ describe('QuestionEditorComponent', () => {
     expect(ctrl.questionStateData.content)
       .toEqual(SubtitledHtml.createFromBackendDict({
         html: 'Question 1',
-        content_id: 'content_1'
+        content_id: 'content_1',
+        image_list: [],
       }));
 
     ctrl.saveStateContent('New content');

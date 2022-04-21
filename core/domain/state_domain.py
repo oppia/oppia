@@ -261,6 +261,24 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         return html_list
 
     @staticmethod
+    def update_image_list(answer_group_dict):
+        """Parses for HTML fields in an answer group dict and introduces a new
+        attribute image_list in SubtitledHtml structure which stores the list
+        of rich text image filenames.
+
+        Args:
+            answer_group_dict: dict. The answer group dict.
+
+        Returns:
+            dict. The converted answer group dict.
+        """
+        answer_group_dict['outcome']['feedback']['image_list'] = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                answer_group_dict['outcome']['feedback']['html']))
+
+        return answer_group_dict
+
+    @staticmethod
     def convert_html_in_answer_group(
             answer_group_dict, conversion_fn, html_field_types_to_rule_specs):
         """Checks for HTML fields in an answer group dict and converts it
@@ -364,6 +382,23 @@ class Hint(translation_domain.BaseTranslatableObject):
         """
         hint_dict['hint_content']['html'] = (
             conversion_fn(hint_dict['hint_content']['html']))
+        return hint_dict
+
+    @staticmethod
+    def update_image_list(hint_dict):
+        """Updates the image_list attribute in the SubtitledHtml in hint to
+         store the list of rich text image filenames.
+
+        Args:
+            hint_dict: dict. The hints dict.
+
+        Returns:
+            dict. The converted hints dict.
+        """
+        hint_dict['hint_content']['image_list'] = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                hint_dict['hint_content']['html']))
+
         return hint_dict
 
 
@@ -527,6 +562,29 @@ class Solution(translation_domain.BaseTranslatableObject):
                             raise Exception(
                                 'The solution does not have a valid '
                                 'correct_answer type.')
+
+        return solution_dict
+
+    @staticmethod
+    def update_image_list(interaction_id, solution_dict):
+        """Updates the image_list attribute for all SubtitledHtmls in
+         the solutions dict, to store the list of image filenames for
+         all rich text images.
+
+        Args:
+            interaction_id: str. The interaction ID.
+            solution_dict: dict. The solution dict.
+
+        Returns:
+            dict. The converted solution dict.
+        """
+
+        if interaction_id is None:
+            return solution_dict
+
+        solution_dict['explanation']['image_list'] = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                solution_dict['explanation']['html']))
 
         return solution_dict
 
@@ -1013,6 +1071,48 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         return interaction_dict
 
     @staticmethod
+    def update_image_list_in_customization_args(
+            interaction_id,
+            cust_arg_dict):
+        """Checks for the HTML fields in the interaction, updates the
+        image_list attribute with the list of the rich text image filenames
+        contained in the html.
+
+        Args:
+            interaction_id: str. The ID of the interaction.
+            cust_arg_dict: dict. The customization arguments dict.
+
+        Returns:
+            dict. The updated customization args dict.
+        """
+        customization_args = (
+            InteractionInstance
+            .convert_customization_args_dict_to_customization_args(
+                interaction_id,
+                cust_arg_dict))
+        ca_specs = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).customization_arg_specs
+
+        for ca_spec in ca_specs:
+            ca_spec_name = ca_spec.name
+            customization_args[ca_spec_name].value = (
+                InteractionCustomizationArg
+                    .traverse_by_schema_and_update_image_list(
+                    ca_spec.schema,
+                    customization_args[ca_spec_name].value
+                )
+            )
+
+        customization_args_dict = {}
+        for ca_name in customization_args:
+            customization_args_dict[ca_name] = (
+                customization_args[ca_name].to_customization_arg_dict())
+
+        cust_arg_dict = customization_args_dict
+
+        return cust_arg_dict
+
+    @staticmethod
     def convert_customization_args_dict_to_customization_args(
             interaction_id, customization_args_dict):
         """Converts customization arguments dictionary to customization
@@ -1296,6 +1396,50 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         return value
 
     @staticmethod
+    def traverse_by_schema_and_update_image_list(schema, value):
+        """Helper function that recursively traverses an interaction
+        customization argument spec to locate any SubtitledHtml and updates
+        the image_list attribute with the file names of all the rich text
+        images present in the html string.
+
+        Args:
+            schema: dict. The customization dict to be modified: dict with
+                a single key, 'value', whose corresponding value is the value
+                of the customization arg.
+            value: dict. The current nested customization argument value to be
+                modified.
+
+        Returns:
+            dict. The converted customization dict.
+        """
+        is_subtitled_html_spec = (
+            schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+            schema['obj_type'] ==
+            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+
+        if is_subtitled_html_spec:
+            value.image_sizes_in_bytes = (
+                html_cleaner.get_image_filenames_from_html_strings(value.html))
+        elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
+            # Alternatively.
+            value = [
+                InteractionCustomizationArg.
+                    traverse_by_schema_and_update_image_list(
+                    schema['items'],
+                    value_element) for value_element in value
+            ]
+        elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
+            for property_spec in schema['properties']:
+                name = property_spec['name']
+                value[name] = (
+                    InteractionCustomizationArg.
+                        traverse_by_schema_and_update_image_list(
+                        property_spec['schema'],
+                        value[name]))
+
+        return value
+
+    @staticmethod
     def traverse_by_schema_and_get(
             schema, value, obj_types_to_search_for, value_extractor):
         """Recursively traverses an interaction customization argument spec to
@@ -1532,6 +1676,23 @@ class Outcome(translation_domain.BaseTranslatableObject):
         """
         outcome_dict['feedback']['html'] = (
             conversion_fn(outcome_dict['feedback']['html']))
+        return outcome_dict
+
+    @staticmethod
+    def update_image_list(outcome_dict):
+        """Updates the image_list attribute with the image filenames in the
+        outcome's SubtitledHtml.
+
+        Args:
+            outcome_dict: dict. The outcome dict.
+
+        Returns:
+            dict. The converted outcome dict.
+        """
+        outcome_dict['feedback']['image_list'] = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                outcome_dict['feedback']['html']))
+
         return outcome_dict
 
 
@@ -2038,6 +2199,35 @@ class WrittenTranslations:
                     written_translations_dict['translations_mapping'][
                         content_id][language_code]['html'] = (
                             conversion_fn(translation_dict['html']))
+
+        return written_translations_dict
+
+    @staticmethod
+    def update_image_list(written_translations_dict):
+        """Updates the image_list attribute in the SubtitledHtml of
+         all the WrittenTranslations dict to store the rich text image
+         filenames.
+
+        Args:
+            written_translations_dict: dict. The written translations dict.
+
+        Returns:
+            dict. The converted hints dict.
+        """
+        for content_id, language_code_to_written_translation in (
+                written_translations_dict['translations_mapping'].items()):
+            for language_code in (
+                    language_code_to_written_translation.keys()):
+                translation_dict = written_translations_dict[
+                    'translations_mapping'][content_id][language_code]
+                if 'data_format' in translation_dict:
+                    if (translation_dict['data_format'] ==
+                            WrittenTranslation.DATA_FORMAT_HTML):
+                        written_translations_dict['translations_mapping'][
+                            content_id][language_code][
+                            'image_list'] = (
+                            html_cleaner.get_image_filenames_from_html_strings(
+                                translation_dict['translation']))
 
         return written_translations_dict
 
@@ -3771,6 +3961,75 @@ class State(translation_domain.BaseTranslatableObject):
                     ca_specs_dict,
                     conversion_fn
                 ))
+
+        return state_dict
+
+    @classmethod
+    def update_image_lists_in_state(cls, state_dict):
+        """Updates the image_list attribute for all the SubtitledHtml
+        and WrittenTranslation contents within a states dict.
+
+        Args:
+            state_dict: dict. The dict representation of State object.
+
+        Returns:
+            dict. The updated state_dict, which includes the list of rich
+            text image filenames in image_list attribute of SubtitledHtml.
+        """
+
+        # Update image_sizes_in_bytes for content html.
+        state_dict['content']['image_list'] = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                state_dict['content']['html']))
+
+        # For interactions - default outcome.
+        if state_dict['interaction']['default_outcome']:
+            state_dict['interaction']['default_outcome'] = (
+                Outcome.update_image_list(
+                    state_dict['interaction']['default_outcome']))
+
+        for answer_group_index, answer_group in enumerate(
+                state_dict['interaction']['answer_groups']):
+            state_dict['interaction']['answer_groups'][answer_group_index] = (
+                AnswerGroup.update_image_list(answer_group))
+
+        # For written translations.
+        if 'written_translations' in state_dict.keys():
+            state_dict['written_translations'] = (
+                WrittenTranslations
+                .update_image_list(state_dict['written_translations']))
+
+        for hint_index, hint in enumerate(state_dict['interaction']['hints']):
+            state_dict['interaction']['hints'][hint_index] = (
+                Hint.update_image_list(hint))
+
+        interaction_id = state_dict['interaction']['id']
+        if interaction_id is None:
+            return state_dict
+
+        if interaction_id == 'MathExpressionInput':
+            if state_dict['interaction']['solution']:
+                state_dict['interaction']['solution'][
+                    'explanation']['image_list'] = (
+                    html_cleaner.get_image_filenames_from_html_strings(
+                        state_dict['interaction']['solution']['explanation'][
+                            'html']))
+
+            return state_dict
+
+        # Interactions solution.
+        if state_dict['interaction']['solution']:
+            state_dict['interaction']['solution'] = (
+                Solution.update_image_list(
+                    interaction_id,
+                    state_dict['interaction']['solution']))
+
+        # Interactions - customization args.
+        state_dict['interaction']['customization_args'] = (
+            InteractionInstance
+                .update_image_list_in_customization_args(
+                    interaction_id,
+                    state_dict['interaction']['customization_args']))
 
         return state_dict
 

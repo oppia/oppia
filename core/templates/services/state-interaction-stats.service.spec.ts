@@ -65,7 +65,8 @@ describe('State Interaction Stats Service', () => {
       classifier_model_id: 'model_id',
       content: {
         content_id: 'content',
-        html: 'content'
+        html: 'content',
+        image_list: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {}
@@ -82,7 +83,11 @@ describe('State Interaction Stats Service', () => {
             }],
             outcome: {
               dest: 'Me Llamo',
-              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              feedback: {
+                content_id: 'feedback_1',
+                html: '¡Buen trabajo!',
+                image_list: []
+              },
               labelled_as_correct: true,
               param_changes: [],
               refresher_exploration_id: null,
@@ -101,7 +106,11 @@ describe('State Interaction Stats Service', () => {
             }],
             outcome: {
               dest: 'Me Llamo',
-              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              feedback: {
+                content_id: 'feedback_1',
+                html: '¡Buen trabajo!',
+                image_list: []
+              },
               labelled_as_correct: true,
               param_changes: [],
               refresher_exploration_id: null,
@@ -120,7 +129,11 @@ describe('State Interaction Stats Service', () => {
             }],
             outcome: {
               dest: 'Me Llamo',
-              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              feedback: {
+                content_id: 'feedback_1',
+                html: '¡Buen trabajo!',
+                image_list: []
+              },
               labelled_as_correct: true,
               param_changes: [],
               refresher_exploration_id: null,
@@ -142,7 +155,7 @@ describe('State Interaction Stats Service', () => {
         },
         default_outcome: {
           dest: 'Hola',
-          feedback: {content_id: 'default_outcome', html: ''},
+          feedback: {content_id: 'default_outcome', html: '', image_list: []},
           labelled_as_correct: true,
           param_changes: [],
           refresher_exploration_id: null,
@@ -155,7 +168,8 @@ describe('State Interaction Stats Service', () => {
           correct_answer: '',
           explanation: {
             content_id: '',
-            html: ''
+            html: '',
+            image_list: []
           }
         }
       },

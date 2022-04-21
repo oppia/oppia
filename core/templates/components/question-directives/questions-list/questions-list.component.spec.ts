@@ -114,7 +114,8 @@ describe('QuestionsListComponent', () => {
       question_state_data: {
         content: {
           html: 'Question 1',
-          content_id: 'content_1'
+          content_id: 'content_1',
+          image_list: [],
         },
         interaction: {
           answer_groups: [{
@@ -122,7 +123,8 @@ describe('QuestionsListComponent', () => {
               dest: 'outcome 1',
               feedback: {
                 content_id: 'content_5',
-                html: ''
+                html: '',
+                image_list: [],
               },
               labelled_as_correct: true,
               param_changes: [],
@@ -147,7 +149,8 @@ describe('QuestionsListComponent', () => {
             dest: null,
             feedback: {
               html: 'Correct Answer',
-              content_id: 'content_2'
+              content_id: 'content_2',
+              image_list: [],
             },
             param_changes: [],
             labelled_as_correct: true,
@@ -157,7 +160,8 @@ describe('QuestionsListComponent', () => {
           hints: [{
             hint_content: {
               html: 'Hint 1',
-              content_id: 'content_3'
+              content_id: 'content_3',
+              image_list: [],
             }
           }],
           solution: {
@@ -165,7 +169,8 @@ describe('QuestionsListComponent', () => {
             answer_is_exclusive: false,
             explanation: {
               html: 'Solution explanation',
-              content_id: 'content_4'
+              content_id: 'content_4',
+              image_list: []
             }
           },
           id: 'TextInput'
@@ -207,6 +212,7 @@ describe('QuestionsListComponent', () => {
         explanation: {
           html: 'test explanation',
           content_id: 'explanation',
+          image_list: [],
         },
         worked_examples: [],
         recorded_voiceovers: {
@@ -351,6 +357,7 @@ describe('QuestionsListComponent', () => {
         explanation: {
           html: 'test explanation',
           content_id: 'explanation',
+          image_list: [],
         },
         worked_examples: [],
         recorded_voiceovers: {

@@ -53,7 +53,8 @@ describe('Exploration object factory', () => {
     firstState = {
       content: {
         content_id: 'content',
-        html: 'content'
+        html: 'content',
+        image_list: [],
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -114,7 +115,8 @@ describe('Exploration object factory', () => {
     secondState = {
       content: {
         content_id: 'content',
-        html: 'more content'
+        html: 'more content',
+        image_list: [],
       },
       recorded_voiceovers: {
         voiceovers_mapping: {

@@ -73,7 +73,8 @@ describe('NumericInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         content_id: '',
-        html: ''
+        html: '',
+        image_list: []
       },
       labelled_as_correct: false,
       param_changes: [],

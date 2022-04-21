@@ -79,6 +79,7 @@ describe('Editor state service', () => {
             feedback: {
               html: '',
               content_id: 'This is a new feedback text',
+              image_list: [],
             },
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
@@ -95,6 +96,7 @@ describe('Editor state service', () => {
         feedback: {
           content_id: '',
           html: '',
+          image_list: [],
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -120,6 +122,7 @@ describe('Editor state service', () => {
         explanation: {
           content_id: '2',
           html: 'test_explanation1',
+          image_list: []
         },
       },
     });
@@ -484,6 +487,7 @@ describe('Editor state service', () => {
       explanation: {
         content_id: '2',
         html: 'test_explanation1_new',
+        image_list: []
       },
     });
     ecs.setInteraction(mockInteraction);
@@ -493,6 +497,7 @@ describe('Editor state service', () => {
       explanation: {
         content_id: '2',
         html: 'test_explanation1',
+        image_list: []
       },
     }));
     ecs.setInteractionSolution(newSolution);
@@ -503,7 +508,8 @@ describe('Editor state service', () => {
     let newHints = [hof.createFromBackendDict({
       hint_content: {
         content_id: '',
-        html: 'This is a hint'
+        html: 'This is a hint',
+        image_list: [],
       }
     })];
     ecs.setInteraction(mockInteraction);

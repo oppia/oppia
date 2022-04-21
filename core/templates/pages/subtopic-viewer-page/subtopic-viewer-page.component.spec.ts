@@ -56,7 +56,8 @@ describe('Subtopic viewer page', function() {
       page_contents: {
         subtitled_html: {
           content_id: '',
-          html: 'This is a html'
+          html: 'This is a html',
+          image_list: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {}
@@ -81,7 +82,8 @@ describe('Subtopic viewer page', function() {
       page_contents: {
         subtitled_html: {
           content_id: '',
-          html: 'This is a html'
+          html: 'This is a html',
+          image_list: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {}

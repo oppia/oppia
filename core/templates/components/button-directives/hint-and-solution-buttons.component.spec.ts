@@ -100,6 +100,7 @@ describe('HintAndSolutionButtonsComponent', () => {
               feedback: {
                 html: '',
                 content_id: 'This is a new feedback text',
+                image_list: [],
               },
               refresher_exploration_id: 'test',
               missing_prerequisite_skill_id: 'test_skill_id',
@@ -116,6 +117,7 @@ describe('HintAndSolutionButtonsComponent', () => {
           feedback: {
             content_id: '',
             html: '',
+            image_list: [],
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -138,6 +140,7 @@ describe('HintAndSolutionButtonsComponent', () => {
           explanation: {
             content_id: '2',
             html: 'test_explanation1',
+            image_list: []
           },
         }
       }),

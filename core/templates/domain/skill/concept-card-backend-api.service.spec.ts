@@ -49,47 +49,56 @@ describe('Concept card backend API service', () => {
     var example1 = {
       question: {
         html: 'worked example question 1',
-        content_id: 'worked_example_q_1'
+        content_id: 'worked_example_q_1',
+        image_list: []
       },
       explanation: {
         html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1'
+        content_id: 'worked_example_e_1',
+        image_list: []
       }
     };
     var example2 = {
       question: {
         html: 'worked example question 1',
-        content_id: 'worked_example_q_1'
+        content_id: 'worked_example_q_1',
+        image_list: []
       },
       explanation: {
         html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1'
+        content_id: 'worked_example_e_1',
+        image_list: []
       }
     };
     var example3 = {
       question: {
         html: 'worked example question 3',
-        content_id: 'worked_example_q_3'
+        content_id: 'worked_example_q_3',
+        image_list: []
       },
       explanation: {
         html: 'worked example explanation 3',
-        content_id: 'worked_example_e_3'
+        content_id: 'worked_example_e_3',
+        image_list: []
       }
     };
     var example4 = {
       question: {
         html: 'worked example question 4',
-        content_id: 'worked_example_q_4'
+        content_id: 'worked_example_q_4',
+        image_list: []
       },
       explanation: {
         html: 'worked example explanation 4',
-        content_id: 'worked_example_e_4'
+        content_id: 'worked_example_e_4',
+        image_list: []
       }
     };
     var conceptCardDict1 = {
       explanation: {
         html: 'test explanation 1',
-        content_id: 'explanation_1'
+        content_id: 'explanation_1',
+        image_list: []
       },
       worked_examples: [example1, example2],
       recorded_voiceovers: {
@@ -106,7 +115,8 @@ describe('Concept card backend API service', () => {
     var conceptCardDict2 = {
       explanation: {
         html: 'test explanation 2',
-        content_id: 'explanation_2'
+        content_id: 'explanation_2',
+        image_list: []
       },
       worked_examples: [example3, example4],
       recorded_voiceovers: {

@@ -118,7 +118,8 @@ describe('Exploration engine service ', () => {
                   labelled_as_correct: false,
                   feedback: {
                     content_id: 'feedback_1',
-                    html: '<p>Good Job</p>'
+                    html: '<p>Good Job</p>',
+                    image_list: []
                   },
                   param_changes: [],
                   dest: 'Mid'
@@ -146,7 +147,8 @@ describe('Exploration engine service ', () => {
               labelled_as_correct: false,
               feedback: {
                 content_id: 'default_outcome',
-                html: '<p>Try again.</p>'
+                html: '<p>Try again.</p>',
+                image_list: []
               },
               param_changes: [],
               dest: 'Start'
@@ -158,7 +160,8 @@ describe('Exploration engine service ', () => {
           linked_skill_id: null,
           content: {
             content_id: 'content',
-            html: '<p>First Question</p>'
+            html: '<p>First Question</p>',
+            image_list: []
           }
         },
         End: {
@@ -193,7 +196,8 @@ describe('Exploration engine service ', () => {
           linked_skill_id: null,
           content: {
             content_id: 'content',
-            html: 'Congratulations, you have finished!'
+            html: 'Congratulations, you have finished!',
+            image_list: []
           }
         },
         Mid: {
@@ -241,7 +245,8 @@ describe('Exploration engine service ', () => {
                   labelled_as_correct: false,
                   feedback: {
                     content_id: 'feedback_1',
-                    html: ' <p>Good Job</p>'
+                    html: ' <p>Good Job</p>',
+                    image_list: []
                   },
                   param_changes: [],
                   dest: 'End'
@@ -269,7 +274,8 @@ describe('Exploration engine service ', () => {
               labelled_as_correct: false,
               feedback: {
                 content_id: 'default_outcome',
-                html: '<p>try again.</p>'
+                html: '<p>try again.</p>',
+                image_list: []
               },
               param_changes: [],
               dest: 'Mid'
@@ -281,7 +287,8 @@ describe('Exploration engine service ', () => {
           linked_skill_id: null,
           content: {
             content_id: 'content',
-            html: '<p>Second Question</p>'
+            html: '<p>Second Question</p>',
+            image_list: []
           }
         }
       },
@@ -455,7 +462,8 @@ describe('Exploration engine service ', () => {
           dest: 'Mid',
           feedback: {
             content_id: 'feedback_1',
-            html: 'Answer is correct!'
+            html: 'Answer is correct!',
+            image_list: []
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -495,7 +503,8 @@ describe('Exploration engine service ', () => {
           dest: 'Mid',
           feedback: {
             content_id: 'feedback_1',
-            html: 'Answer is correct!'
+            html: 'Answer is correct!',
+            image_list: []
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -535,7 +544,8 @@ describe('Exploration engine service ', () => {
           dest: 'Mid',
           feedback: {
             content_id: 'feedback_1',
-            html: null
+            html: null,
+            image_list: []
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -576,7 +586,8 @@ describe('Exploration engine service ', () => {
           dest: 'Mid',
           feedback: {
             content_id: 'feedback_1',
-            html: 'feedback'
+            html: 'feedback',
+            image_list: []
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -620,7 +631,8 @@ describe('Exploration engine service ', () => {
           dest: 'Mid',
           feedback: {
             content_id: 'feedback_1',
-            html: 'feedback'
+            html: 'feedback',
+            image_list: []
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -755,7 +767,8 @@ describe('Exploration engine service ', () => {
         dest: 'Mid',
         feedback: {
           content_id: 'feedback_1',
-          html: 'Answer is correct!'
+          html: 'Answer is correct!',
+          image_list: []
         },
         labelled_as_correct: true,
         param_changes: [],

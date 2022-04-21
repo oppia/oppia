@@ -84,10 +84,12 @@ describe('Skill update service', () => {
       question: {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1',
+        image_list: []
       },
       explanation: {
         html: 'worked example explanation 1',
         content_id: 'worked_example_e_1',
+        image_list: []
       },
     };
 
@@ -95,10 +97,12 @@ describe('Skill update service', () => {
       question: {
         html: 'worked example question 2',
         content_id: 'worked_example_q_2',
+        image_list: []
       },
       explanation: {
         html: 'worked example explanation 2',
         content_id: 'worked_example_e_2',
+        image_list: []
       },
     };
 
@@ -106,6 +110,7 @@ describe('Skill update service', () => {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
+        image_list: []
       },
       worked_examples: [example1, example2],
       recorded_voiceovers: {
@@ -164,10 +169,12 @@ describe('Skill update service', () => {
         old_value: {
           html: 'test explanation',
           content_id: 'explanation',
+          image_list: []
         },
         new_value: {
           html: 'new explanation',
           content_id: 'explanation',
+          image_list: []
         },
       },
     ]);
@@ -412,10 +419,12 @@ describe('Skill update service', () => {
       question: {
         html: 'worked example question 3',
         content_id: 'worked_example_q_3',
+        image_list: []
       },
       explanation: {
         html: 'worked example explanation 3',
         content_id: 'worked_example_e_3',
+        image_list: []
       },
     };
 
@@ -480,10 +489,12 @@ describe('Skill update service', () => {
       question: {
         html: 'new question 1',
         content_id: 'worked_example_q_1',
+        image_list: []
       },
       explanation: {
         html: 'new explanation 1',
         content_id: 'worked_example_e_1',
+        image_list: []
       },
     };
 

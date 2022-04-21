@@ -37,27 +37,32 @@ describe('Concept card object factory', () => {
     example1 = {
       question: {
         html: 'worked example question 1',
-        content_id: 'worked_example_q_1'
+        content_id: 'worked_example_q_1',
+        image_list: []
       },
       explanation: {
         html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1'
+        content_id: 'worked_example_e_1',
+        image_list: []
       }
     };
     example2 = {
       question: {
         html: 'worked example question 2',
-        content_id: 'worked_example_q_2'
+        content_id: 'worked_example_q_2',
+        image_list: [],
       },
       explanation: {
         html: 'worked example explanation 2',
-        content_id: 'worked_example_e_2'
+        content_id: 'worked_example_e_2',
+        image_list: [],
       }
     };
     conceptCardDict = {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
+        image_list: [],
       },
       worked_examples: [example1, example2],
       recorded_voiceovers: {

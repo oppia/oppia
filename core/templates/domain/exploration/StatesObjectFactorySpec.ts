@@ -46,7 +46,8 @@ describe('States Object Factory', () => {
       classifier_model_id: null,
       content: {
         content_id: 'content',
-        html: ''
+        html: '',
+        image_list: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -69,7 +70,8 @@ describe('States Object Factory', () => {
           dest: '(untitled state)',
           feedback: {
             content_id: 'default_outcome',
-            html: ''
+            html: '',
+            image_list: []
           },
           param_changes: [],
           labelled_as_correct: false,
@@ -96,7 +98,8 @@ describe('States Object Factory', () => {
       classifier_model_id: null,
       content: {
         content_id: 'content',
-        html: ''
+        html: '',
+        image_list: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -115,7 +118,8 @@ describe('States Object Factory', () => {
           dest: 'new state',
           feedback: {
             content_id: 'default_outcome',
-            html: ''
+            html: '',
+            image_list: []
           },
           param_changes: [],
           labelled_as_correct: false,
@@ -140,7 +144,8 @@ describe('States Object Factory', () => {
       classifier_model_id: null,
       content: {
         content_id: 'content',
-        html: ''
+        html: '',
+        image_list: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -163,7 +168,8 @@ describe('States Object Factory', () => {
           dest: 'new state',
           feedback: {
             content_id: 'default_outcome',
-            html: ''
+            html: '',
+            image_list: []
           },
           param_changes: [],
           labelled_as_correct: false,
@@ -188,7 +194,8 @@ describe('States Object Factory', () => {
     secondState = {
       content: {
         content_id: 'content',
-        html: 'more content'
+        html: 'more content',
+        image_list: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -227,7 +234,8 @@ describe('States Object Factory', () => {
           dest: 'new state',
           feedback: {
             content_id: 'default_outcome',
-            html: ''
+            html: '',
+            image_list: []
           },
           labelled_as_correct: false,
           param_changes: []
@@ -238,7 +246,8 @@ describe('States Object Factory', () => {
           correct_answer: 'answer',
           explanation: {
             content_id: 'solution',
-            html: '<p>This is an explanation.</p>'
+            html: '<p>This is an explanation.</p>',
+            image_list: []
           }
         },
         id: 'TextInput'
@@ -264,7 +273,8 @@ describe('States Object Factory', () => {
       'first state': {
         content: {
           content_id: 'content',
-          html: 'content'
+          html: 'content',
+          image_list: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -284,7 +294,8 @@ describe('States Object Factory', () => {
               dest: 'second state',
               feedback: {
                 content_id: 'feedback_1',
-                html: ''
+                html: '',
+                image_list: []
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -299,7 +310,8 @@ describe('States Object Factory', () => {
             dest: 'second state',
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
+              image_list: []
             },
             labelled_as_correct: false,
             param_changes: []
@@ -320,7 +332,8 @@ describe('States Object Factory', () => {
       'second state': {
         content: {
           content_id: 'content',
-          html: 'content'
+          html: 'content',
+          image_list: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -340,7 +353,8 @@ describe('States Object Factory', () => {
               dest: 'first state',
               feedback: {
                 content_id: 'feedback_1',
-                html: ''
+                html: '',
+                image_list: []
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -355,7 +369,8 @@ describe('States Object Factory', () => {
             dest: 'first state',
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
+              image_list: []
             },
             labelled_as_correct: false,
             param_changes: []
@@ -379,7 +394,8 @@ describe('States Object Factory', () => {
       'first state': {
         content: {
           content_id: 'content',
-          html: 'content'
+          html: 'content',
+          image_list: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -449,7 +465,8 @@ describe('States Object Factory', () => {
               dest: 'second state',
               feedback: {
                 content_id: 'feedback_1',
-                html: '<p>Good.</p>'
+                html: '<p>Good.</p>',
+                image_list: []
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -474,7 +491,8 @@ describe('States Object Factory', () => {
             dest: 'new state',
             feedback: {
               content_id: 'default_outcome',
-              html: '<p>Feedback</p>'
+              html: '<p>Feedback</p>',
+              image_list: []
             },
             labelled_as_correct: false,
             param_changes: []
@@ -482,12 +500,14 @@ describe('States Object Factory', () => {
           hints: [{
             hint_content: {
               content_id: 'hint_1',
-              html: '<p>Here is a hint.</p>'
+              html: '<p>Here is a hint.</p>',
+              image_list: []
             }
           }, {
             hint_content: {
               content_id: 'hint_2',
-              html: '<p>Here is another hint.</p>'
+              html: '<p>Here is another hint.</p>',
+              image_list: []
             }
           }],
           id: 'TextInput'
@@ -593,7 +613,8 @@ describe('States Object Factory', () => {
       'third state': {
         content: {
           content_id: 'content',
-          html: 'content'
+          html: 'content',
+          image_list: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -613,7 +634,8 @@ describe('States Object Factory', () => {
               dest: 'third state',
               feedback: {
                 content_id: 'feedback_1',
-                html: ''
+                html: '',
+                image_list: []
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -628,7 +650,8 @@ describe('States Object Factory', () => {
             dest: 'third state',
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
+              image_list: []
             },
             labelled_as_correct: false,
             param_changes: []
@@ -782,7 +805,8 @@ describe('States Object Factory', () => {
           classifier_model_id: null,
           content: {
             content_id: 'content',
-            html: ''
+            html: '',
+            image_list: []
           },
           recorded_voiceovers: {
             voiceovers_mapping: {
@@ -796,7 +820,8 @@ describe('States Object Factory', () => {
                 dest: 'END',
                 feedback: {
                   content_id: 'feedback_1',
-                  html: '<p>Correct!</p>'
+                  html: '<p>Correct!</p>',
+                  image_list: []
                 },
                 labelled_as_correct: false,
                 missing_prerequisite_skill_id: null,
@@ -828,7 +853,8 @@ describe('States Object Factory', () => {
               dest: 'new state',
               feedback: {
                 content_id: 'default_outcome',
-                html: ''
+                html: '',
+                image_list: []
               },
               param_changes: [],
               labelled_as_correct: false,

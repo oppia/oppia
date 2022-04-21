@@ -57,7 +57,11 @@ describe('StateTopAnswersStatsService', () => {
   const expId = '7';
 
   const stateBackendDict: StateBackendDict = {
-    content: {content_id: 'content', html: 'Say "hello" in Spanish!'},
+    content: {
+      content_id: 'content',
+      html: 'Say "hello" in Spanish!',
+      image_list: []
+    },
     linked_skill_id: null,
     next_content_id_index: 0,
     param_changes: [],
@@ -72,7 +76,11 @@ describe('StateTopAnswersStatsService', () => {
         }],
         outcome: {
           dest: 'Me Llamo',
-          feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+          feedback: {
+            content_id: 'feedback_1',
+            html: '¡Buen trabajo!',
+            image_list: []
+          },
           labelled_as_correct: true,
           param_changes: [],
           refresher_exploration_id: null,
@@ -83,7 +91,11 @@ describe('StateTopAnswersStatsService', () => {
       }],
       default_outcome: {
         dest: 'Hola',
-        feedback: {content_id: 'default_outcome', html: 'Try again!'},
+        feedback: {
+          content_id: 'default_outcome',
+          html: 'Try again!',
+          image_list: []
+        },
         labelled_as_correct: false,
         param_changes: [],
         refresher_exploration_id: null,

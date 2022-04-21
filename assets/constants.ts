@@ -5959,7 +5959,8 @@ export default {
         "dest": "Introduction",
         "feedback": {
           "content_id": "default_outcome",
-          "html": ""
+          "html": "",
+          "image_list": []
         },
         "labelled_as_correct": false,
         "param_changes": [],

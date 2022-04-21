@@ -38,7 +38,6 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
-import { HtmlEscaperService } from 'services/html-escaper.service';
 
 angular.module('oppia').component('outcomeEditor', {
   bindings: {
@@ -55,13 +54,13 @@ angular.module('oppia').component('outcomeEditor', {
   template: require('./outcome-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    '$rootScope', 'ExternalSaveService', 'StateEditorService',
-    'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
-    'INTERACTION_SPECS',
+    '$rootScope', 'ExternalSaveService', 'HtmlEscaperService',
+    'StateEditorService', 'StateInteractionIdService',
+    'ENABLE_PREREQUISITE_SKILLS', 'INTERACTION_SPECS',
     function(
-        $rootScope, ExternalSaveService, StateEditorService,
-        StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
-        INTERACTION_SPECS) {
+        $rootScope, ExternalSaveService, HtmlEscaperService,
+        StateEditorService, StateInteractionIdService,
+        ENABLE_PREREQUISITE_SKILLS, INTERACTION_SPECS) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.isInQuestionMode = function() {

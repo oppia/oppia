@@ -25,7 +25,8 @@ describe('SubtitledHtml model', () => {
   beforeEach(() => {
     subtitledHtml = SubtitledHtml.createFromBackendDict({
       content_id: 'content_id',
-      html: '<p>some html</p>'
+      html: '<p>some html</p>',
+      image_list: [],
     });
   });
 
@@ -54,7 +55,8 @@ describe('SubtitledHtml model', () => {
   it('should convert to backend dict correctly', () => {
     expect(subtitledHtml.toBackendDict()).toEqual({
       content_id: 'content_id',
-      html: '<p>some html</p>'
+      html: '<p>some html</p>',
+      image_list: [],
     });
   });
 
