@@ -1231,6 +1231,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             playthrough = stats_services.get_playthrough_from_model(
                 model)
 
+        self.assertEqual(
+            playthrough.actions[0].action_customization_args['new_key'], 5)
+
     def test_migrate_to_latest_issue_schema_riases_error_from_v0(self):
         stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
@@ -1253,16 +1256,22 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             stats_models.CURRENT_ISSUE_SCHEMA_VERSION = 1
 
     def test_update_latest_exp_issue_from_model(self):
-        stats_models.CURRENT_ISSUE_SCHEMA_VERSION = 1
-        stats_services.save_exp_issues_model(
-            stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
-                self._create_cst_exp_issue(
-                    [self._create_cst_playthrough(['A', 'B', 'A'])],
-                    ['A', 'B', 'A'])
-            ]))
+        exp_issue = stats_domain.ExplorationIssue(
+            'EarlyQuit',
+            {
+                'time_spent_in_exp_in_msecs': {
+                    'value': 0
+                },
+                'state_name': {
+                    'value': ''
+                }
+            }, [], 1, True)
+        exp_issue_dict = exp_issue.to_dict()
+        stats_models.ExplorationIssuesModel.create(
+            'exp_id', 1, [exp_issue_dict])
 
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
-            self.exp.id, self.exp.version)
+            'exp_id', 1)
 
         convert_issue_dict_swap = self.swap(
             stats_domain.ExplorationIssue,
@@ -1275,6 +1284,11 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         with convert_issue_dict_swap, current_issue_schema_version_swap:
             exp_issue_from_model = stats_services.get_exp_issues_from_model(
                 exp_issues_model)
+        
+        self.assertEqual(
+            exp_issue_from_model.unresolved_issues[0].issue_customization_args[
+                'time_spent_in_exp_in_msecs'
+            ], self.DUMMY_TIME_SPENT_IN_MSECS)
 
     def test_assign_playthrough_to_corresponding_issue_is_true(self):
         stats_services.save_exp_issues_model(
@@ -1294,7 +1308,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
         playthrough = stats_services.get_playthrough_from_model(model)
 
-        self.assertLess(len(exp_issues.unresolved_issues[0].playthrough_ids), 
+        self.assertLess(
+            len(exp_issues.unresolved_issues[0].playthrough_ids),
             feconf.MAX_PLAYTHROUGHS_FOR_ISSUE)
 
         stats_services.assign_playthrough_to_corresponding_issue(
@@ -1322,8 +1337,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             'playthrough_id1', 'playthrough_id2', 'playthrough_id3',
             'playthrough_id4', 'playthrough_id5', 'playthrough_id6']
 
-        self.assertTrue(len(exp_issues.unresolved_issues[0].playthrough_ids) 
-            >= feconf.MAX_PLAYTHROUGHS_FOR_ISSUE)
+        self.assertTrue(
+            len(exp_issues.unresolved_issues[0].playthrough_ids) >=
+            feconf.MAX_PLAYTHROUGHS_FOR_ISSUE)
 
         stats_services.assign_playthrough_to_corresponding_issue(
             playthrough, exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
