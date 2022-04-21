@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import os
 import subprocess
+from typing import Optional, Sequence
 
 from . import common
 from . import setup
@@ -31,17 +32,17 @@ The root folder MUST be named 'oppia'.
 """)
 
 
-def main(args=None):
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Produces the expression parser."""
     unused_parsed_args = _PARSER.parse_args(args=args)
-    setup.main(args=[])
+    setup.main(args=[])  # type: ignore[no-untyped-call]
 
     expression_parser_definition = os.path.join(
         'core', 'templates', 'expressions', 'parser.pegjs')
     expression_parser_js = os.path.join(
         'core', 'templates', 'expressions', 'parser.js')
 
-    common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
+    common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)  # type: ignore[no-untyped-call]
 
     subprocess.check_call([
         os.path.join(common.NODE_MODULES_PATH, 'pegjs', 'bin', 'pegjs'),
