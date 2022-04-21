@@ -62,17 +62,17 @@
     </div>
     <div class="oppia-splash-section-three-right">
       <h3 *ngIf="!isWindowNarrow" [innerHTML]="'I18N_SPLASH_BENEFITS_TITLE' | translate"></h3>
-      <div class="splash-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
-        <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_ONE' | translate" class="splash-benefits"></h2>
-      </div>
-      <div class="splash-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet2.svg')" alt="">
-        <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_TWO' | translate" class="splash-benefits"></h2>
-      </div>
-      <div class="splash-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet3.svg')" alt="">
-        <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_THREE' | translate" class="splash-benefits"></h2>
+      <div class="splash-benefits-list">
+        <div class="splash-benefit-bullets-column">
+          <img [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
+          <img [src]="getStaticImageUrl('/splash/bullet2.svg')" alt="">
+          <img [src]="getStaticImageUrl('/splash/bullet3.svg')" alt="">
+        </div>
+        <div class="splash-benefit-text-items-column">
+          <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_ONE' | translate" class="splash-benefits"></h2>
+          <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_TWO' | translate" class="splash-benefits"></h2>
+          <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_THREE' | translate" class="splash-benefits"></h2>
+        </div>
       </div>
     </div>
   </div>

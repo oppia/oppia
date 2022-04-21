@@ -726,7 +726,6 @@ textarea {
   color: #fff;
   font-size: 13px;
   line-height: 20px;
-  padding-bottom: 5vh;
   position: relative;
   width: 100%;
 }
@@ -1671,6 +1670,15 @@ pre.oppia-pre-wrapped-text {
   left: 50%;
   margin-left: -5px;
   top: 0;
+}
+
+.top-section .heading {
+  align-items: flex-start;
+  display: flex;
+}
+
+.top-section .heading-text {
+  display: inline-block;
 }
 
 /* Line-height is set to 1.846 to ensure that the line-spacing inside

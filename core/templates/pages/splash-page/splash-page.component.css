@@ -255,7 +255,7 @@
 
 .splash-page .oppia-splash-section-four .oppia-splash-button-container {
   margin-left: 0;
-  margin-top: 7.5vh;
+  margin-top: 50px;
 }
 
 .splash-page .splash-student-desk-image img {
@@ -264,7 +264,10 @@
 }
 
 .splash-page .oppia-splash-section-three-right h3 {
+  align-self: flex-start;
   color: #6d6d6d;
+  margin-bottom: 25px;
+  margin-left: 10px;
 }
 
 .splash-page .oppia-splash-section-four-left h2,
@@ -312,14 +315,12 @@
   width: 40vw;
 }
 
-.splash-page .splash-benefits-section {
-  display: flex;
-  justify-content: flex-start;
-  margin-top: 25px;
-}
-
 .splash-page .oppia-splash-section-three-right {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
   margin: auto;
+  margin-top: 30px;
 }
 
 .splash-page .oppia-splash-section-three-left {
@@ -335,9 +336,30 @@
 
 .splash-page .splash-benefits {
   color: #094142;
-  display: inline;
   font-size: 1.4em;
-  padding-left: 25px;
+  margin: 0;
+}
+
+.splash-page .splash-benefits-list {
+  display: flex;
+}
+
+.splash-page .splash-benefit-bullets-column {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 220px;
+  justify-content: space-between;
+  margin-right: 25px;
+  width: 40px;
+}
+
+.splash-page .splash-benefit-text-items-column {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 220px;
+  justify-content: space-between;
 }
 
 .splash-page .oppia-splash-icon-1-container,
@@ -542,12 +564,6 @@
   .splash-page .oppia-splash-h1 {
     font-size: 1.7em;
     line-height: 1.5;
-  }
-
-  .splash-page .splash-benefits-section {
-    margin-left: auto;
-    margin-right: auto;
-    width: 20em;
   }
 
   .splash-page .oppia-splash-h2-container {
