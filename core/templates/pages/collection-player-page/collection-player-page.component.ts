@@ -31,6 +31,7 @@ import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 export interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -102,7 +103,8 @@ export class CollectionPlayerPageComponent implements OnInit {
     private pageTitleService: PageTitleService,
     private userService: UserService,
     private collectionPlayerBackendApiService:
-      CollectionPlayerBackendApiService
+      CollectionPlayerBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -300,6 +302,10 @@ export class CollectionPlayerPageComponent implements OnInit {
     ) {
       this.generatePathParameters();
     }
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnInit(): void {
