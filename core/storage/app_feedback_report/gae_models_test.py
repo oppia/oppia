@@ -213,7 +213,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             'randomInteger123')
         expected_data = {
             report_id: {
-                'scrubbed_by': self.USER_ID,
+                'scrubbed_by': None,
                 'platform': self.PLATFORM_ANDROID,
                 'ticket_id': self.TICKET_ID,
                 'submitted_on': utils.get_human_readable_time_string(
