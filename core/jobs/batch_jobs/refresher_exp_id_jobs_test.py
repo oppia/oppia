@@ -46,10 +46,12 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
     USER_ID_3 = 'id_3'
     EXP_1_ID = 'exp_1_id'
     EXP_2_ID = 'exp_2_id'
+    EXP_ID = 'some_id'
+    REFRESHER_EXP_ID = 'refresher_exp_id'
 
     def setUp(self) -> None:
         # Creates 3 users, 3 exp rights, one exp, and some objects which are
-        # reused throughout the test
+        # reused throughout the test.
         super().setUp()
         user1 = self.create_model(
             user_models.UserSettingsModel,
@@ -122,9 +124,6 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([])
 
     def test_community_owned_exp(self) -> None:
-        EXP_ID = 'some_id'
-        REFRESHER_EXP_ID = 'refresher_exp_id'
-
         exploration = exp_domain.Exploration.create_default_exploration('1')
         state1 = exploration.states[exploration.init_state_name]
         state1.update_interaction_id('TextInput')
@@ -135,7 +134,7 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
-                False, [], REFRESHER_EXP_ID, None),
+                False, [], self.REFRESHER_EXP_ID, None),
             [
                 state_domain.RuleSpec(
                     'Contains',
@@ -152,16 +151,17 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
         state1.update_interaction_answer_groups(
             [state_answer_group])
 
+        # Community owned explorations have empty owner ids.
         exp_rights = self.create_model(
             exp_models.ExplorationRightsModel,
-            id=EXP_ID,
-            owner_ids=[], # This makes it a community owned exp.
+            id=self.EXP_ID,
+            owner_ids=[],
             status=constants.ACTIVITY_STATUS_PUBLIC,
         )
         exp_rights.update_timestamps()
         exp = self.create_model(
             exp_models.ExplorationModel,
-            id=EXP_ID,
+            id=self.EXP_ID,
             title='exploration 1 title',
             category='category',
             objective='objective',
@@ -181,13 +181,10 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult(
                 stdout='exp_id: some_id, data: {\'user emails\': [], '
                 '\'state names\': [\'state with ref\']}'
-            )            
+            )
         ])
 
     def test_exp_with_one_owner(self) -> None:
-        EXP_ID = 'some_id'
-        REFRESHER_EXP_ID = 'refresher_exp_id'
-
         exploration = exp_domain.Exploration.create_default_exploration('1')
         state1 = exploration.states[exploration.init_state_name]
         state1.update_interaction_id('TextInput')
@@ -198,7 +195,7 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
-                False, [], REFRESHER_EXP_ID, None),
+                False, [], self.REFRESHER_EXP_ID, None),
             [
                 state_domain.RuleSpec(
                     'Contains',
@@ -217,7 +214,7 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
 
         exp = self.create_model(
             exp_models.ExplorationModel,
-            id=EXP_ID,
+            id=self.EXP_ID,
             title='exploration 1 title',
             category='category',
             objective='objective',
@@ -234,11 +231,11 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
         exp.update_timestamps()
         exp_rights = self.create_model(
             exp_models.ExplorationRightsModel,
-            id=EXP_ID,
+            id=self.EXP_ID,
             owner_ids=[self.USER_ID_1],
             status=constants.ACTIVITY_STATUS_PUBLIC,
         )
-        exp_rights.update_timestamps()        
+        exp_rights.update_timestamps()
         self.put_multi([exp, exp_rights])
         self.assert_job_output_is([
             job_run_result.JobRunResult(

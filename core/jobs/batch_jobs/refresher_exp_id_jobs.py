@@ -109,7 +109,7 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all exp rights model' >> ndb_io.GetModels(
                 exp_models.ExplorationRightsModel.get_all())
-            | 'Add exp id as key' >> beam.WithKeys(
+            | 'Add exp id as key' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda exp_rights: exp_rights.id
             )
         )
@@ -150,8 +150,9 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
             | 'Drop user id' >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Filter out empty results' >> beam.Filter(
                 lambda groups: len(groups[0]) > 0)
+            # Apache beam tries to unpack a, b so it is passed as a tuple.
             | 'Form tuples' >> beam.FlatMapTuple(
-                lambda a, b: ((a, b),)) # Apache beam tries to unpack a, b so it is passed as a tuple
+                lambda a, b: ((a, b),))
             | 'Flatten exp id list' >> beam.FlatMapTuple(
                 self._flatten_exp_id_to_email)
             )
