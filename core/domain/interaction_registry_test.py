@@ -94,6 +94,15 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             },
             set(interaction_registry.Registry.get_all_interaction_ids()))
 
+        with self.swap(interaction_registry.Registry, '_interactions', {}):
+            self.assertEqual(
+                {
+                    type(i).__name__
+                    for i in
+                    interaction_registry.Registry.get_all_interactions()
+                },
+                set(interaction_registry.Registry.get_all_interaction_ids()))
+
     def test_get_all_specs(self):
         """Test the get_all_specs() method."""
 
