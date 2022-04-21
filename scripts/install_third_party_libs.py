@@ -82,8 +82,7 @@ _PARSER = argparse.ArgumentParser(
     description='Installation script for Oppia third-party libraries.')
 
 # Download locations for buf binary.
-BUF_BASE_URL = (
-    'https://github.com/bufbuild/buf/releases/download/v0.29.0/')
+BUF_BASE_URL = 'https://github.com/bufbuild/buf/releases/download/v0.29.0/'
 
 BUF_LINUX_FILES = [
     'buf-Linux-x86_64', 'protoc-gen-buf-check-lint-Linux-x86_64',
@@ -171,11 +170,12 @@ def compile_protobuf_files(filepaths: List[str]) -> None:
     for path in filepaths:
         command = [buf_path, 'generate', path]
         process = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=proto_env)
-        stdout, stderr = process.communicate()
-        if process.returncode == 0:
-            print(stdout)
-        else:
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=proto_env)
+        stderr = process.communicate()[1]
+        if process.returncode != 0:
             print(stderr)
             raise Exception('Error compiling proto files at %s' % path)
 
