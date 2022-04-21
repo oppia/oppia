@@ -32,16 +32,18 @@ MOCK_COMPILED_JS_DIR = os.path.join(TEST_SOURCE_DIR, 'compiled_js_dir', '')
 class TypescriptChecksTests(test_utils.GenericTestBase):
     """Test the typescript checks."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(TypescriptChecksTests, self).setUp()
         process = subprocess.Popen(
             ['test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen(unused_cmd, stdout, encoding):  # pylint: disable=unused-argument
+        def mock_popen(
+            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
             return process
 
         self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
 
-    def test_compiled_js_dir_validation(self):
+    def test_compiled_js_dir_validation(self) -> None:
         """Test that typescript_checks.COMPILED_JS_DIR is validated correctly
         with outDir in typescript_checks.TSCONFIG_FILEPATH.
         """
@@ -56,7 +58,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                     config_data['compilerOptions']['outDir'], '')
             compiled_js_dir_swap = self.swap(
                 typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR)
-            with compiled_js_dir_swap, self.assertRaisesRegex(
+            with compiled_js_dir_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 Exception,
                 'COMPILED_JS_DIR: %s does not match the output directory '
                 'in %s: %s' % (
@@ -65,9 +67,9 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 typescript_checks.compile_and_check_typescript(
                     typescript_checks.TSCONFIG_FILEPATH)
 
-    def test_compiled_js_dir_is_deleted_before_compilation(self):
+    def test_compiled_js_dir_is_deleted_before_compilation(self) -> None:
         """Test that compiled_js_dir is deleted before a fresh compilation."""
-        def mock_validate_compiled_js_dir():
+        def mock_validate_compiled_js_dir() -> None:
             pass
 
         compiled_js_dir_swap = self.swap(
@@ -84,13 +86,15 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             self.assertFalse(
                 os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
-    def test_compiled_js_dir_is_deleted_after_compilation(self):
+    def test_compiled_js_dir_is_deleted_after_compilation(self) -> None:
         """Test that compiled_js_dir is deleted before a fresh compilation."""
-        def mock_validate_compiled_js_dir():
+        def mock_validate_compiled_js_dir() -> None:
             pass
         process = subprocess.Popen(
             ['test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen_for_deletion(unused_cmd, stdout, encoding):  # pylint: disable=unused-argument
+        def mock_popen_for_deletion(
+            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
             os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
             return process
 
@@ -109,27 +113,29 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             self.assertFalse(
                 os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
-    def test_no_error_is_produced_for_valid_compilation(self):
+    def test_no_error_is_produced_for_valid_compilation(self) -> None:
         """Test that no error is produced if stdout is empty."""
         with self.popen_swap:
             typescript_checks.compile_and_check_typescript(
                 typescript_checks.TSCONFIG_FILEPATH)
 
-    def test_error_is_produced_for_invalid_compilation(self):
+    def test_error_is_produced_for_invalid_compilation(self) -> None:
         """Test that error is produced if stdout is not empty."""
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen_for_errors(unused_cmd, stdout, encoding):  # pylint: disable=unused-argument
+        def mock_popen_for_errors(
+            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
             return process
 
         with self.swap(subprocess, 'Popen', mock_popen_for_errors):
-            with self.assertRaisesRegex(SystemExit, '1'):
+            with self.assertRaisesRegex(SystemExit, '1'):  # type: ignore[no-untyped-call]
                 typescript_checks.compile_and_check_typescript(
                     typescript_checks.TSCONFIG_FILEPATH)
 
-    def test_config_path_when_no_arg_is_used(self):
+    def test_config_path_when_no_arg_is_used(self) -> None:
         """Test if the config path is correct when no arg is used."""
-        def mock_compile_and_check_typescript(config_path):
+        def mock_compile_and_check_typescript(config_path: str) -> None:
             self.assertEqual(config_path, typescript_checks.TSCONFIG_FILEPATH)
         compile_and_check_typescript_swap = self.swap(
             typescript_checks, 'compile_and_check_typescript',
@@ -138,9 +144,9 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         with compile_and_check_typescript_swap:
             typescript_checks.main(args=[])
 
-    def test_config_path_when_strict_checks_arg_is_used(self):
+    def test_config_path_when_strict_checks_arg_is_used(self) -> None:
         """Test if the config path is correct when strict checks arg is used."""
-        def mock_compile_and_check_typescript(config_path):
+        def mock_compile_and_check_typescript(config_path: str) -> None:
             self.assertEqual(
                 config_path, typescript_checks.STRICT_TSCONFIG_FILEPATH)
         compile_and_check_typescript_swap = self.swap(
