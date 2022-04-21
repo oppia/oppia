@@ -281,8 +281,8 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 LANGUAGE_LOCALE_CODE_ENGLISH, ANDROID_TEXT_SIZE, None, # type: ignore[arg-type]
                 False, False, EVENT_LOGS, LOGCAT_LOGS))
         self._assert_validation_error(
-            self.android_report_obj, 'only_allows_wifi_download_and_update'
-                'field should be a boolean, received:')
+            self.android_report_obj, 'only_allows_wifi_download_and_update '
+                'field should be a boolean, received: None')
 
     def test_get_report_type_from_string_returns_expected_report_type(
             self) -> None:
