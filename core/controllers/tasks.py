@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import json
+from core import feconf
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -80,15 +81,21 @@ class SuggestionEmailHandler(base.BaseHandler):
         'POST': {
             'exploration_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
                 },
-                'default_value': None
             },
             'thread_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
                 },
-                'default_value': None
             },
             'exploration': {
                 'schema': {
@@ -105,7 +112,7 @@ class SuggestionEmailHandler(base.BaseHandler):
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
-        payload = json.loads(self.request.body)
+        payload = json.loads(self.normalized_payload)
         exploration_id = payload['exploration_id']
         thread_id = payload['thread_id']
 
@@ -128,13 +135,21 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
         'POST': {
             'user_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': feconf.USER_ID_REGEX
+                    },
+                    {
+                        'id': 'has_length',
+                        'value': feconf.USER_ID_LENGTH
+                    }]
                 },
-                'default_value': None
             },
             'reference_dict': {
                 'schema': {
                     'type': 'object-dict',
+                    'object_class': feedback_services.get_feedback_message_references
                 }
             },
             'subject': {
@@ -147,7 +162,7 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
-        payload = json.loads(self.request.body)
+        payload = json.loads(self.normalized_payload)
         user_id = payload['user_id']
         reference_dict = payload['reference_dict']
 

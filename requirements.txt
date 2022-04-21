@@ -220,7 +220,7 @@ mutagen==1.45.1
     # via -r requirements.in
 mypy-extensions==0.4.3
     # via typing-inspect
-numpy==1.20.2
+numpy==1.21.5
     # via
     #   apache-beam
     #   pyarrow
