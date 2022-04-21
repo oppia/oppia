@@ -2326,7 +2326,7 @@ def _get_checkpoints_in_order(init_state_name, states):
             for answer_group in current_state.interaction.answer_groups:
                 queue.append(answer_group.outcome.dest)
 
-            # Add the default outcome destination in the queue
+            # Add the default outcome destination in the queue.
             if current_state.interaction.default_outcome is not None:
                 queue.append(current_state.interaction.default_outcome.dest)
 

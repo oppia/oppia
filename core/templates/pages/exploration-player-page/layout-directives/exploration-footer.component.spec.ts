@@ -454,14 +454,15 @@ describe('ExplorationFooterComponent', () => {
 
     component.checkpointCount = 2;
 
-    spyOn(component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(2);
+    spyOn(component, 'getMostRecentlyReachedCheckpointIndex')
+      .and.returnValue(2);
     spyOn(explorationEngineService, 'getState')
       .and.returnValue(stateObjectFactory.createFromBackendDict(
         'End', sampleExpResponse.exploration.states.End
       ));
 
-    let stateCard = new StateCard('End',
-      '<p>Testing</p>', null, new Interaction(
+    let stateCard = new StateCard(
+      'End', '<p>Testing</p>', null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
       [], null, null, 'content', null
     );

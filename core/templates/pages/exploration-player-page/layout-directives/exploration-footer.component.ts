@@ -150,7 +150,7 @@ export class ExplorationFooterComponent {
       this.getMostRecentlyReachedCheckpointIndex()
     );
 
-    this.completedCheckpoints = mostRecentlyReachedCheckpointIndex-1;
+    this.completedCheckpoints = mostRecentlyReachedCheckpointIndex - 1;
 
     let displayedCardIndex = (
       this.playerPositionService.getDisplayedCardIndex()
