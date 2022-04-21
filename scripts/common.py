@@ -43,7 +43,7 @@ ISORT_VERSION = '5.10.1'
 PYCODESTYLE_VERSION = '2.8.0'
 PSUTIL_VERSION = '5.8.0'
 PYLINT_VERSION = '2.11.1'
-PYLINT_QUOTES_VERSION = '0.2.3'
+PYLINT_QUOTES_VERSION = '0.2.4'
 PYGITHUB_VERSION = '1.55'
 WEBTEST_VERSION = '3.0.0'
 PIP_TOOLS_VERSION = '6.5.0'
@@ -58,7 +58,7 @@ NODE_VERSION = '16.13.0'
 YARN_VERSION = '1.22.15'
 
 # Versions of libraries used in backend.
-PILLOW_VERSION = '8.4.0'
+PILLOW_VERSION = '9.0.1'
 
 # Buf version.
 BUF_VERSION = '0.29.0'
@@ -143,7 +143,7 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
-APP_YAML_PATH = os.path.join('app.yaml')
+APP_DEV_YAML_PATH = os.path.join('app_dev.yaml')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 5 * 60
 MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
 REDIS_CONF_PATH = os.path.join('redis.conf')
@@ -360,6 +360,12 @@ def get_current_branch_name():
     assert git_status_first_line.startswith(branch_message_prefix)
     # Standard output is in bytes, we need to decode the line to print it.
     return git_status_first_line[len(branch_message_prefix):]
+
+
+def update_branch_with_upstream():
+    """Updates the current branch with upstream."""
+    current_branch_name = get_current_branch_name()
+    run_cmd(['git', 'pull', 'upstream', current_branch_name])
 
 
 def get_current_release_version_number(release_branch_name):

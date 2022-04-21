@@ -364,6 +364,20 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.story.update_node_thumbnail_filename(
                 'invalid_id', 'invalid_thumbnail.svg')
 
+    def test_story_description_validation(self):
+        self.story.description = 1
+        self._assert_validation_error(
+            'Expected description to be a string, received 1')
+
+        self.story.description = ''
+        self._assert_validation_error(
+            'Expected description field not to be empty')
+
+        self.story.description = 'a' * 1001
+        self._assert_validation_error(
+            'Expected description to be less than %d chars, received %s' % (
+            1000, 1001))
+
     def test_to_human_readable_dict(self):
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         expected_dict = {
@@ -519,11 +533,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.update_thumbnail_filename('img.svg')
         self.assertEqual(self.story.thumbnail_filename, 'img.svg')
         self.assertEqual(self.story.thumbnail_size_in_bytes, len(raw_image))
-
-    def test_description_validation(self):
-        self.story.description = 1
-        self._assert_validation_error(
-            'Expected description to be a string, received 1')
 
     def test_notes_validation(self):
         self.story.notes = 1

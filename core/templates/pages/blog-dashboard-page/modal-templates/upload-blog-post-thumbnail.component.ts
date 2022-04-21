@@ -33,6 +33,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   uploadedImage: SafeResourceUrl;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
+  invalidTagsAndAttributes: { tags: string[]; attrs: string[] };
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
   croppedFilename: string;
   windowIsNarrow: boolean;
@@ -73,8 +74,15 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     this.invalidImageWarningIsShown = false;
     let reader = new FileReader();
     reader.onload = (e) => {
+      this.invalidTagsAndAttributes = {
+        tags: [],
+        attrs: []
+      };
+      let imageData = (e.target as FileReader).result as string;
+      this.invalidTagsAndAttributes = this.svgSanitizerService
+        .getInvalidSvgTagsAndAttrsFromDataUri(imageData);
       this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        (e.target as FileReader).result as string);
+        imageData);
       if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
           (e.target as FileReader).result as string);
@@ -88,6 +96,10 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   reset(): void {
     this.uploadedImage = null;
     this.cropppedImageDataUrl = '';
+    this.invalidTagsAndAttributes = {
+      tags: [],
+      attrs: []
+    };
   }
 
   onInvalidImageLoaded(): void {
@@ -110,10 +122,18 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
 
   cancel(): void {
     this.uploadedImage = false;
+    this.invalidTagsAndAttributes = {
+      tags: [],
+      attrs: []
+    };
     this.cancelThumbnailUpload.emit();
   }
 
   ngOnInit(): void {
+    this.invalidTagsAndAttributes = {
+      tags: [],
+      attrs: []
+    };
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
 
     this.windowDimensionService.getResizeEvent().subscribe(() => {

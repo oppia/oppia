@@ -98,6 +98,10 @@ export class SkillConceptCardEditorComponent implements OnInit {
       this.skill, explanationObject);
   }
 
+  onSaveDescription(): void {
+    this.getConceptCardChange.emit();
+  }
+
   changeActiveWorkedExampleIndex(idx: number): void {
     if (idx === this.activeWorkedExampleIndex) {
       this.bindableFieldsDict.displayedWorkedExamples = (

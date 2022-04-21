@@ -212,7 +212,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
-            'display_alias': None
+            'display_alias': None,
+            'has_viewed_lesson_info_modal_once': False
         }
         self.assertEqual(expected_user_data, user_data)
 
@@ -242,7 +243,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'display_alias': self.GENERIC_DISPLAY_ALIAS
+            'display_alias': self.GENERIC_DISPLAY_ALIAS,
+            'has_viewed_lesson_info_modal_once': False
         }
         self.assertEqual(expected_user_data, user_data)
 
@@ -745,7 +747,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL) # type: ignore[no-untyped-call]
 
         # Note that creating an exploration counts as editing it.
-        self.save_new_valid_exploration( # type: ignore[no-untyped-call]
+        self.save_new_valid_exploration(
             self.EXP_ID_1, self.user_b_id, end_state_name='End')
 
         exp_services.update_exploration( # type: ignore[no-untyped-call]
@@ -756,7 +758,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
                     'new_value': 'the objective'
                 })], 'Test edit')
 
-        self.save_new_valid_exploration( # type: ignore[no-untyped-call]
+        self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_b_id, end_state_name='End')
 
         exp_services.update_exploration( # type: ignore[no-untyped-call]
@@ -1312,7 +1314,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             draft_change_list={'new_content': {}},
             draft_change_list_last_updated=self.DATETIME_OBJECT,
             draft_change_list_exp_version=3,
-            draft_change_list_id=1
+            draft_change_list_id=1,
+            furthest_reached_checkpoint_exp_version=1,
+            furthest_reached_checkpoint_state_name='checkpoint1',
+            most_recently_reached_checkpoint_exp_version=1,
+            most_recently_reached_checkpoint_state_name='checkpoint1'
         ).put()
         user_models.ExplorationUserDataModel.create(
             self.USER_1_ID, self.EXP_ID_TWO).put()
@@ -1325,7 +1331,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             draft_change_list={'new_content': {}},
             draft_change_list_last_updated=self.DATETIME_OBJECT,
             draft_change_list_exp_version=3,
-            draft_change_list_id=1
+            draft_change_list_id=1,
+            furthest_reached_checkpoint_exp_version=1,
+            furthest_reached_checkpoint_state_name='checkpoint1',
+            most_recently_reached_checkpoint_exp_version=1,
+            most_recently_reached_checkpoint_state_name='checkpoint1'
         ).put()
 
     def test_get_deletion_policy(self) -> None:
@@ -1413,7 +1423,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
                 'mute_suggestion_notifications': (
                     feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
                 'mute_feedback_notifications': (
-                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+                'furthest_reached_checkpoint_exp_version': 1,
+                'furthest_reached_checkpoint_state_name': 'checkpoint1',
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'checkpoint1'
             }
         }
         self.assertDictEqual(expected_data, user_data)
@@ -1429,7 +1443,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             draft_change_list={'new_content': {'content': 3}},
             draft_change_list_last_updated=self.DATETIME_OBJECT,
             draft_change_list_exp_version=2,
-            draft_change_list_id=2).put()
+            draft_change_list_id=2,
+            furthest_reached_checkpoint_exp_version=1,
+            furthest_reached_checkpoint_state_name='checkpoint3',
+            most_recently_reached_checkpoint_exp_version=1,
+            most_recently_reached_checkpoint_state_name='checkpoint2').put()
 
         user_data = user_models.ExplorationUserDataModel.export_data(
             self.USER_1_ID)
@@ -1445,7 +1463,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
                 'mute_suggestion_notifications': (
                     feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
                 'mute_feedback_notifications': (
-                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+                'furthest_reached_checkpoint_exp_version': 1,
+                'furthest_reached_checkpoint_state_name': 'checkpoint1',
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'checkpoint1'
             },
             self.EXP_ID_TWO: {
                 'rating': None,
@@ -1457,7 +1479,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
                 'mute_suggestion_notifications': (
                     feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
                 'mute_feedback_notifications': (
-                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+                'furthest_reached_checkpoint_exp_version': None,
+                'furthest_reached_checkpoint_state_name': None,
+                'most_recently_reached_checkpoint_exp_version': None,
+                'most_recently_reached_checkpoint_state_name': None
             },
             self.EXP_ID_THREE: {
                 'rating': 5,
@@ -1469,10 +1495,13 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
                 'mute_suggestion_notifications': (
                     feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
                 'mute_feedback_notifications': (
-                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+                'furthest_reached_checkpoint_exp_version': 1,
+                'furthest_reached_checkpoint_state_name': 'checkpoint3',
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'checkpoint2'
             }
         }
-
         self.assertDictEqual(expected_data, user_data)
 
 

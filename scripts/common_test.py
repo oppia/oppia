@@ -278,6 +278,17 @@ class CommonTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
 
+    def test_update_branch_with_upstream(self):
+        def mock_check_output(unused_cmd_tokens):
+            return b'On branch test'
+
+        def mock_run_cmd(cmd):
+            return cmd
+
+        with self.swap(subprocess, 'check_output', mock_check_output):
+            with self.swap(common, 'run_cmd', mock_run_cmd):
+                common.update_branch_with_upstream()
+
     def test_get_current_release_version_number_with_non_hotfix_branch(self):
         self.assertEqual(
             common.get_current_release_version_number('release-1.2.3'), '1.2.3')

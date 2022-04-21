@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for StateDiffModalComponent.
  */
 
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { State, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateDiffModalBackendApiService } from '../services/state-diff-modal-backend-api.service';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { StateDiffModalComponent } from './state-diff-modal.component';
+import { headersAndYamlStrs, StateDiffModalComponent } from './state-diff-modal.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -33,10 +33,10 @@ describe('State Diff Modal Component', () => {
   let component: StateDiffModalComponent;
   let fixture: ComponentFixture<StateDiffModalComponent>;
 
-  let headers = null;
-  let newState = null;
+  let headers: headersAndYamlStrs;
+  let newState: State | null;
   let newStateName = 'New state';
-  let oldState = null;
+  let oldState: State | null;
   let oldStateName = 'Old state';
 
   beforeEach(waitForAsync(() => {
@@ -67,8 +67,8 @@ describe('State Diff Modal Component', () => {
 
   describe('when new state and old state are truthy', () => {
     beforeEach(() => {
-      newState = sof.createDefaultState(newState);
-      oldState = sof.createDefaultState(oldState);
+      newState = sof.createDefaultState(newStateName);
+      oldState = sof.createDefaultState(oldStateName);
 
       component.headers = headers;
       component.newState = newState;

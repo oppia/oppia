@@ -23,13 +23,15 @@ import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
 import { Question } from 'domain/question/QuestionObjectFactory';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class QuestionSuggestionBackendApiService {
   constructor(
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private imageLocalStorageService: ImageLocalStorageService
   ) {}
 
   async submitSuggestionAsync(
@@ -50,16 +52,14 @@ export class QuestionSuggestionBackendApiService {
         question_dict: question.toBackendDict(true),
         skill_id: associatedSkill.getId(),
         skill_difficulty: skillDifficulty,
-      }
+      },
+      files: (
+        await this.imageLocalStorageService.getFilenameToBase64MappingAsync(
+          imagesData))
     };
 
     let body: FormData = new FormData();
     body.append('payload', JSON.stringify(postData));
-    let filenames = imagesData.map(obj => obj.filename);
-    let imageBlobs = imagesData.map(obj => obj.imageBlob);
-    for (let idx in imageBlobs) {
-      body.append(filenames[idx], imageBlobs[idx]);
-    }
     return this.httpClient.post<Object>(url, body).toPromise();
   }
 }

@@ -166,6 +166,18 @@ classroom-page .oppia-classroom-page-subheading-text {
   }
 }
 
+@media screen and (max-width: 1080px) {
+  .oppia-classroom-details {
+    margin-top: 40px;
+  }
+}
+
+@media screen and (max-width: 940px) {
+  .oppia-classroom-details {
+    margin-top: 50px;
+  }
+}
+
 @media(max-width: 500px) {
   .oppia-classroom-viewer-container {
     width: 85vw;

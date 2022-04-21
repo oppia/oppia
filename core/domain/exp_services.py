@@ -115,7 +115,8 @@ def get_exploration_titles_and_categories(exp_ids):
     """
     explorations = [
         (exp_fetchers.get_exploration_from_model(e) if e else None)
-        for e in exp_models.ExplorationModel.get_multi(exp_ids)]
+        for e in exp_models.ExplorationModel.get_multi(
+            exp_ids, include_deleted=True)]
 
     result = {}
     for exploration in explorations:
@@ -1958,8 +1959,12 @@ def get_exp_with_draft_applied(exp_id, user_id):
         Exploration or None. Returns the exploration domain object with draft
         applied, or None if draft can not be applied.
     """
+    # TODO(#15075): Refactor this function.
+
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    draft_change_list = None
+    draft_change_list_exp_version = None
     if exp_user_data:
         if exp_user_data.draft_change_list:
             draft_change_list_exp_version = (

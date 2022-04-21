@@ -227,24 +227,50 @@ class LearnerDashboardFeedbackUpdatesHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'paginated_threads_list': {
+                    'schema': {
+                        'type': 'list',
+                        'items': {
+                            'type': 'list',
+                            'items': {
+                                'type': 'basestring'
+                            },
+                        },
+                    },
+                    'default_value': []
+                }
+            }
+        }
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self):
-        """Handles GET requests."""
-
-        full_thread_ids = subscription_services.get_all_threads_subscribed_to(
-            self.user_id)
-        if len(full_thread_ids) > 0:
+    def post(self):
+        """Handles POST requests."""
+        if len(self.normalized_payload.get('paginated_threads_list')) == 0:
+            full_thread_ids = (
+                subscription_services.get_all_threads_subscribed_to(
+                    self.user_id))
+            paginated_threads_list = [
+                full_thread_ids[index: index + 100]
+                for index in range(0, len(full_thread_ids), 100)]
+        else:
+            paginated_threads_list = self.normalized_payload.get(
+                'paginated_threads_list')
+        if (
+            len(paginated_threads_list) > 0 and
+            len(paginated_threads_list[0]) > 0
+        ):
             thread_summaries, number_of_unread_threads = (
                 feedback_services.get_exp_thread_summaries(
-                    self.user_id, full_thread_ids))
+                    self.user_id, paginated_threads_list[0]))
         else:
             thread_summaries, number_of_unread_threads = [], 0
 
         self.values.update({
             'thread_summaries': [s.to_dict() for s in thread_summaries],
             'number_of_unread_threads': number_of_unread_threads,
+            'paginated_threads_list': paginated_threads_list[1:]
         })
         self.render_json(self.values)
 

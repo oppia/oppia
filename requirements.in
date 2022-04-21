@@ -3,7 +3,7 @@
 #    python -m scripts.install_third_party
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
-apache-beam[gcp]==2.36.0
+apache-beam[gcp]==2.37.0
 beautifulsoup4==4.10.0
 bleach==4.1.0
 defusedxml==0.7.1
@@ -22,7 +22,7 @@ gunicorn==20.1.0
 html5lib==1.1
 mailchimp3==3.0.15
 mutagen==1.45.1
-pillow==9.0.0
+pillow==9.0.1
 pylatexenc==2.10
 pytest==6.2.5
 redis==3.5.3

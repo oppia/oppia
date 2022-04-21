@@ -1,7 +1,6 @@
 {
     "APP_DEV_YAML_PATH": "app_dev.yaml",
     "APP_YAML_PATH": "app.yaml",
-    "BLOCKING_BUG_MILESTONE_NUMBER": 39,
     "BRANCH_TYPE_HOTFIX": "hotfix",
     "BRANCH_TYPE_RELEASE": "release",
     "BUILD_MODULE_TARGET": "scripts.build",
@@ -34,7 +33,6 @@
     "RELEASE_DRIVE_URL": "https://drive.google.com/drive/folders/0B9KSjiibL_WDNjJyYlEtbTNvY3c",
     "RELEASE_NOTES_EXAMPLE_URL": "https://docs.google.com/document/d/1OUwgMPNORABJAz7DS0iuDUr5A2FxcXg4Y5-qUEdgo-M",
     "RELEASE_NOTES_TEMPLATE_URL": "https://docs.google.com/document/d/1VBa3pdRLnvobNlfmZB6-uRYJHBz_Gc-6eN_ilSoVlhE",
-    "RELEASE_NOTES_URL": "https://docs.google.com/document/d/1pmcDNfM2KtmkZeYipuInC48RE5JfkSJWQYdIQAkD0hQ",
     "RELEASE_ROTA_URL": "https://github.com/oppia/oppia/wiki/Release-schedule-and-other-information#release-coordinators-and-qa-coordinators-for-upcoming-releases",
     "RELEASE_SUMMARY_FILEPATH": "../release_summary.md",
     "REMOTE_URLS": ["git@github.com:oppia/oppia.git", "https://github.com/oppia/oppia.git"],

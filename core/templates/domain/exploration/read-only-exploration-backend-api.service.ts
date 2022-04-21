@@ -50,6 +50,7 @@ export interface FetchExplorationBackendResponse {
   'auto_tts_enabled': boolean;
   'correctness_feedback_enabled': boolean;
   'record_playthrough_probability': number;
+  'draft_change_list_id': number;
 }
 
 @Injectable({

@@ -35,6 +35,8 @@ ruleTester.run('protractor-practices', rule, {
     conversationContent.los.last()
     var text = unfinishedOneOffJobRows.get(i);`
   }, {
+    code: 'browser.switchTo()'
+  }, {
     code:
     `action.click(elem);
     action.sleep();`,
@@ -84,6 +86,17 @@ ruleTester.run('protractor-practices', rule, {
         message: (
           'Please use “.protractor-test-” prefix classname selector instead ' +
           'of “.oppia-hide-card-height-warning-icon”'),
+      }],
+    },
+    {
+      code:
+      `it('should test a feature', function() {
+        browser.switchTo().activeElement();
+      });`,
+      errors: [{
+        message: 'Please do not use browser.switchTo().activeElement()' +
+          ' in protractor files',
+        type: 'MemberExpression',
       }],
     },
     {

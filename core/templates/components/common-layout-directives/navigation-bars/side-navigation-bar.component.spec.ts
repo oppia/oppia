@@ -101,6 +101,9 @@ describe('Side Navigation Bar Component', () => {
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     userService = TestBed.inject(UserService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should create', () => {
@@ -206,7 +209,6 @@ describe('Side Navigation Bar Component', () => {
       spyOn(
         classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.resolveTo(classroomData);
-      spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
 
       componentInstance.ngOnInit();
 
@@ -215,8 +217,6 @@ describe('Side Navigation Bar Component', () => {
       expect(componentInstance.classroomData).toEqual(array);
       expect(componentInstance.topicTitlesTranslationKeys).toEqual(
         topicTitlesTranslationKeys);
-      expect(siteAnalyticsService.registerClassroomPageViewed)
-        .toHaveBeenCalled();
     }));
 
   it('should check whether hacky translations are displayed or not', () => {
@@ -231,5 +231,9 @@ describe('Side Navigation Bar Component', () => {
     hackyStoryTitleTranslationIsDisplayed =
       componentInstance.isHackyTopicTitleTranslationDisplayed(0);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
 });

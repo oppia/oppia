@@ -70,7 +70,7 @@ import elasticsearch
 import requests_mock
 import webtest
 
-from typing import Any, Dict, Optional # isort: skip
+from typing import Any, Dict, List, Optional # isort: skip
 
 (
     auth_models, base_models, exp_models,
@@ -2016,6 +2016,7 @@ title: Title
 
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
+            self.assertNotIn('<oppia-maintenance-page>', response)
 
             response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
                 'csrf_token': self.get_new_csrf_token(),
@@ -2570,10 +2571,17 @@ title: Title
         state.update_next_content_id_index(next_content_id_index_dict['value'])
 
     def save_new_valid_exploration(
-            self, exploration_id, owner_id, title='A title',
-            category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE, end_state_name=None,
-            interaction_id='TextInput', correctness_feedback_enabled=False):
+        self,
+        exploration_id: str,
+        owner_id: str,
+        title: str = 'A title',
+        category: str = 'A category',
+        objective: str = 'An objective',
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        end_state_name: Optional[str] = None,
+        interaction_id: str = 'TextInput',
+        correctness_feedback_enabled: bool = False
+    ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration.
 
         Args:
@@ -2756,11 +2764,16 @@ title: Title
         return collection
 
     def save_new_valid_collection(
-            self, collection_id, owner_id, title='A title',
-            category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            exploration_id='an_exploration_id',
-            end_state_name=DEFAULT_END_STATE_NAME):
+        self,
+        collection_id: str,
+        owner_id: str,
+        title: str = 'A title',
+        category: str = 'A category',
+        objective: str = 'An objective',
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        exploration_id: str = 'an_exploration_id',
+        end_state_name: str = DEFAULT_END_STATE_NAME
+    ) -> collection_domain.Collection:
         """Creates an Oppia collection and adds a node saving the exploration
         details.
 
@@ -3564,7 +3577,7 @@ class GenericEmailTestBase(GenericTestBase):
             self.emails_dict[recipient_email].append(new_email)
         return True
 
-    def _get_sent_email_messages(self, to):
+    def _get_sent_email_messages(self, to: str) -> List[EmailMessageMock]:
         """Gets messages to a single recipient email.
 
         Args:

@@ -53,6 +53,7 @@ export class SvgEditorComponent implements OnInit {
   @Input() value: string;
   @Output() valueChanged = new EventEmitter();
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
+  @Output() discardImage = new EventEmitter();
   // These constants are used to identify the tool that is currently being
   // used so that other tools can be disabled accordingly.
   STATUS_EDITING = 'editing';
@@ -409,6 +410,10 @@ export class SvgEditorComponent implements OnInit {
       throw new Error(errorText);
     }
     return true;
+  }
+
+  discardSvgFile(): void {
+    this.discardImage.emit();
   }
 
   saveSvgFile(): void {
@@ -1140,7 +1145,8 @@ export class SvgEditorComponent implements OnInit {
     } else {
       this.drawMode = this.DRAW_MODE_NONE;
       if (this.uploadedSvgDataUrl !== null) {
-        var svgString = atob(this.uploadedSvgDataUrl.unsafeUrl.split(',')[1]);
+        const svgString = this._base64DecodeUnicode(
+          this.uploadedSvgDataUrl.unsafeUrl.split(',')[1]);
         fabric.loadSVGFromString(svgString, (args) => this.loadSvgFile(args));
       }
       this.canvas.renderAll();
