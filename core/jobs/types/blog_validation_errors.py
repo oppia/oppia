@@ -28,6 +28,7 @@ if MYPY: # pragma: no cover
 
 (blog_models,) = models.Registry.import_models([models.NAMES.blog])
 
+
 class DuplicateBlogTitleError(base_validation_errors.BaseAuditError):
     """Error class for blog posts with duplicate titles."""
 
