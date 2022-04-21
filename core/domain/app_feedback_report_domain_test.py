@@ -474,7 +474,8 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             }
         self.assertTrue(
             isinstance(
-                self.android_report_obj.from_dict(expected_dict), app_feedback_report_domain.AppFeedbackReport))
+                self.android_report_obj.from_dict(expected_dict),
+                app_feedback_report_domain.AppFeedbackReport))
 
     def test_from_dict_with_invalid_report_dict_raises_error(self) -> None:
         type_error_dict = {
