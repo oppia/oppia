@@ -150,7 +150,7 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
             'reference_dict': {
                 'schema': {
                     'type': 'object-dict',
-                    'object_class': 
+                    'object_class':
                         feedback_services.get_feedback_message_references
                 }
             },
