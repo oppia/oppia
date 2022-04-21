@@ -62,7 +62,7 @@ _PARSER.add_argument(
 
 _PARSER.add_argument(
     '--shard', help='Sets the shard for the lighthouse tests',
-    required=True, choices=['1', '2'])
+    required=True, choices=['1', '2', '3'])
 
 
 def run_lighthouse_puppeteer_script():
