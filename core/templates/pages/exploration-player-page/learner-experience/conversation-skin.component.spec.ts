@@ -750,7 +750,7 @@ describe('Conversation skin component', () => {
     }
     const expResponse = explorationResponse;
     expResponse.exploration.states.Mid.card_is_checkpoint = true;
-    
+
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(new UserInfo(
         [], false, false,
