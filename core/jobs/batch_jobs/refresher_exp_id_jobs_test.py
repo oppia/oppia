@@ -48,6 +48,8 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
     EXP_2_ID = 'exp_2_id'
 
     def setUp(self) -> None:
+        # Creates 3 users, 3 exp rights, one exp, and some objects which are
+        # reused throughout the test
         super().setUp()
         user1 = self.create_model(
             user_models.UserSettingsModel,
@@ -96,7 +98,7 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
             }
         )
         exp.update_timestamps()
-        self.put_multi([user1, user2, user3, exp_rights1, exp_rights2])
+        self.put_multi([user1, user2, user3, exp_rights1, exp_rights2, exp])
         self.state_interaction_cust_args = {
             'placeholder': {
                 'value': {
@@ -116,7 +118,78 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_exp_with_no_refresher_exp_id(self) -> None:
+        # Test is initialized by setup()
         self.assert_job_output_is([])
+
+    def test_community_owned_exp(self) -> None:
+        EXP_ID = 'some_id'
+        REFRESHER_EXP_ID = 'refresher_exp_id'
+
+        exploration = exp_domain.Exploration.create_default_exploration('1')
+        state1 = exploration.states[exploration.init_state_name]
+        state1.update_interaction_id('TextInput')
+        state1.update_interaction_customization_args(
+            self.state_interaction_cust_args)
+
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], REFRESHER_EXP_ID, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'normalizedStrSet': ['Input1', 'Input2']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
+        state1.update_interaction_answer_groups(
+            [state_answer_group])
+
+        exp_rights = self.create_model(
+            exp_models.ExplorationRightsModel,
+            id=EXP_ID,
+            owner_ids=[], # This makes it a community owned exp.
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+        )
+        exp_rights.update_timestamps()
+        exp = self.create_model(
+            exp_models.ExplorationModel,
+            id=EXP_ID,
+            title='exploration 1 title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            init_state_name='state name',
+            states_schema_version=48,
+            states={
+                'state with ref': state1.to_dict(),
+                'state without ref': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                    'state2'
+                ).to_dict()
+            }
+        )
+        exp.update_timestamps()
+        self.put_multi([exp, exp_rights])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='exp_id: some_id, data: {\'user emails\': [], '
+                '\'state names\': [\'state with ref\']}'
+            )            
+        ])
+
+    def test_exp_with_one_owner(self) -> None: # to do 
+        self.assert_job_output_is([])
+
+    # def test_exp_with_more_than_two_owners(self) -> None: # to do
+    #     # I think I already have this
+    #     self.assert_job_output_is([])
 
     def test_exploration_with_one_refresher_id(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -223,7 +296,8 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
         ])
 
     def test_state_with_two_ans_group_with_refresher_id_yield_state_name_once(
-        self) -> None:
+        self
+    ) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         state1 = exploration.states[exploration.init_state_name]
         state1.update_interaction_id('TextInput')
@@ -279,7 +353,7 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
             )
         ])
 
-    def test_multiple_exploration(self) -> None:
+    def test_multiple_explorations(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         exploration1 = exp_domain.Exploration.create_default_exploration('1')
         state1 = state_domain.State.create_default_state('state1')  # type: ignore[no-untyped-call]

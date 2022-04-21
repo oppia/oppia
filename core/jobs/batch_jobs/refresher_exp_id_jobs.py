@@ -44,14 +44,16 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
 
     @staticmethod
     def _flatten_user_id_to_exp_id(
-        exp_id: str, owner_ids: List[str]) -> Iterable[Tuple[str, str]]:
+        exp_id: str, exp_rights_model: exp_models.ExplorationRightsModel
+    ) -> Iterable[Tuple[str, str]]:
         """Flatten owner ids to user_id in exp id to owner ids collection."""
-        for user_id in owner_ids:
+        for user_id in exp_rights_model.owner_ids:
             yield (user_id, exp_id)
 
     @staticmethod
     def _flatten_exp_id_to_email(
-        exp_ids_list: List[str], email: List[str]) -> Iterable[Tuple[str, str]]:
+        exp_ids_list: List[str], email: List[str]
+    ) -> Iterable[Tuple[str, str]]:
         """Flatten exploration ids to exploration id in exploration ids to email
         collection.
         """
@@ -60,7 +62,8 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
 
     @staticmethod
     def _process_exploration_states(
-        exp: exp_models.ExplorationModel) -> Iterable[Tuple[str, str]]:
+        exp: exp_models.ExplorationModel
+    ) -> Iterable[Tuple[str, str]]:
         """Filter explorations with a refresher_exploration_id .
 
         Args:
@@ -98,7 +101,7 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
                 exp_models.ExplorationModel.get_all())
             | 'Get exploration from model' >> beam.Map(
                 exp_fetchers.get_exploration_from_model)
-            | 'Extract ' >> beam.FlatMap(
+            | 'Extract' >> beam.FlatMap(
                 self._process_exploration_states)
         )
 
@@ -106,8 +109,8 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all exp rights model' >> ndb_io.GetModels(
                 exp_models.ExplorationRightsModel.get_all())
-            | 'Extract exp id and exp owner id ' >> beam.Map(
-                lambda exp_rights: (exp_rights.id, exp_rights.owner_ids)
+            | 'Add exp id as key' >> beam.WithKeys(
+                lambda exp_rights: exp_rights.id
             )
         )
 
@@ -116,14 +119,14 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
             | 'extract just the ids' >> beam.Keys() # pylint: disable=no-value-for-parameter
         )
 
-        relevant_exp_ids_iter = beam.pvalue.AsIter(
-            relevant_exp_ids)
+        relevant_exp_ids_iter = beam.pvalue.AsIter(relevant_exp_ids)
 
         exp_rights_filtered = (
             exp_rights_collection
-            | 'filter ' >> beam.Filter(
-                lambda exp_rights, ids: (
-                    exp_rights[0] in ids), ids=relevant_exp_ids_iter
+            | 'Filter exp rights that have refresher ID' >> beam.Filter(
+                lambda exp_rights, relevant_exp_ids: (
+                    exp_rights[0] in relevant_exp_ids),
+                    relevant_exp_ids=relevant_exp_ids_iter
             )
         )
 
@@ -143,12 +146,12 @@ class FilterRefresherExplorationIdJob(base_jobs.JobBase):
 
         grouped_exp_id_to_email = (
             (user_id_to_exp_id, user_id_to_user_emails)
-            | 'Group by user id ' >> beam.CoGroupByKey()
-            | 'Drop user id ' >> beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Group by user id' >> beam.CoGroupByKey()
+            | 'Drop user id' >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Filter out empty results' >> beam.Filter(
-                lambda groups: len(groups[0]) > 0 and len(groups[1]) > 0)
+                lambda groups: len(groups[0]) > 0)
             | 'Form tuples' >> beam.FlatMapTuple(
-                lambda a, b: ((a, b),))
+                lambda a, b: ((a, b),)) # Apache beam tries to unpack a, b so it is passed as a tuple
             | 'Flatten exp id list' >> beam.FlatMapTuple(
                 self._flatten_exp_id_to_email)
             )
