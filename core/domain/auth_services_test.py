@@ -81,16 +81,6 @@ class AuthServicesTests(test_utils.GenericTestBase):
             [auth_models.UserAuthDetailsModel.get(self.profile_user_1_id),
              auth_models.UserAuthDetailsModel.get(self.profile_user_2_id)])
 
-    def test_establish_auth_session(self):
-        request = webapp2.Request.blank('/')
-        response = webapp2.Response('/')
-        self.assertIsNone(auth_services.establish_auth_session(
-            request, response))
-
-    def test_destroy_auth_session(self):
-        response = webapp2.Response('/')
-        self.assertIsNone(auth_services.destroy_auth_session(response))
-
     def test_get_auth_claims_from_request(self):
         request = webapp2.Request.blank('/')
 
