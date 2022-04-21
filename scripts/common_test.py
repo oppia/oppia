@@ -494,6 +494,8 @@ class CommonTests(test_utils.GenericTestBase):
         root_temp_dir = tempfile.mkdtemp()
         temp_dirpath = tempfile.mkdtemp(dir=root_temp_dir)
         temp_file = tempfile.NamedTemporaryFile(dir=temp_dirpath)
+        # Here the `name` attribute is read-only. Hence, used `setattr`
+        # to set the attribute.
         setattr(temp_file, 'name', 'temp_file')
         temp_file_path = os.path.join(temp_dirpath, 'temp_file')
         with utils.open_file(temp_file_path, 'w') as f:
@@ -562,6 +564,8 @@ class CommonTests(test_utils.GenericTestBase):
             of the actual npm library.
             """
             temp_file = tempfile.NamedTemporaryFile()
+            # Here the `name` attribute is read-only. Hence, used `setattr`
+            # to set the attribute.
             setattr(temp_file, 'name', 'temp_file')
             with utils.open_file('temp_file', 'w') as f:
                 f.write('content')
