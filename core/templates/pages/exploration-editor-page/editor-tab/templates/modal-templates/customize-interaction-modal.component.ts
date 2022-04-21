@@ -58,7 +58,7 @@ import { RatioExpressionInputValidationService } from 'interactions/RatioExpress
 import { Warning } from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { ImageWithRegions } from 'interactions/customization-args-defs';
-import {HtmlEscaperService} from "services/html-escaper.service";
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 interface DefaultValueHtml {
   content_id: string;
@@ -363,22 +363,19 @@ export class CustomizeInteractionModalComponent
       const schemaIsSubtitledHtml = (
         schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
         schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
-      const schemaIsSubtitledUnicode = (
-        schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
-        schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
-      );
 
       if (schemaIsSubtitledHtml) {
         var parser = new DOMParser();
-        var doc = parser.parseFromString((value as SubtitledHtml)._html, 'text/html');
+        var doc = parser.parseFromString(
+          (value as SubtitledHtml)._html, 'text/html');
         var imageFilenameList: string[] = [];
         var elements = doc.getElementsByTagName('oppia-noninteractive-image');
         for (let i = 0; i < elements.length; i++) {
           imageFilenameList.push(
             String(this.htmlEscaperService.escapedStrToUnescapedStr(
               elements[i].getAttribute('filepath-with-value'))
-            ).replace('"', ''))
-          // replaces only first ", need to fix for second "
+            ).replace('"', ''));
+          // Replaces only first ", need to fix for second ".
         }
         (value as SubtitledHtml)._image_list = imageFilenameList;
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
@@ -389,7 +386,7 @@ export class CustomizeInteractionModalComponent
         ) {
           traverseSchemaAndAssignImageIds(
             value[i],
-            schema.items as Schema)
+            schema.items as Schema);
         }
       }
     };
@@ -405,7 +402,7 @@ export class CustomizeInteractionModalComponent
         traverseSchemaAndAssignImageIds(
           caValues[name].value,
           caSpec.schema
-        )
+        );
       }
     }
   }
@@ -477,9 +474,6 @@ export class CustomizeInteractionModalComponent
     });
     this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
       contentIdsWithModifiedContent);
-
-    console.log('***** Save method called ****')
-    console.log(this.stateCustomizationArgsService.displayed)
     this.populateImageList();
     this.populateNullContentIds();
     this.editorFirstTimeEventsService.registerFirstSaveInteractionEvent();

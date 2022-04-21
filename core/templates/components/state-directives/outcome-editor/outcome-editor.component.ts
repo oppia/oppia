@@ -38,8 +38,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
-import {string} from "mathjs";
-import {HtmlEscaperService} from "services/html-escaper.service";
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 angular.module('oppia').component('outcomeEditor', {
   bindings: {
@@ -182,17 +181,18 @@ angular.module('oppia').component('outcomeEditor', {
         if (fromClickSaveFeedbackButton && contentHasChanged) {
           var contentId = ctrl.savedOutcome.feedback.contentId;
           var parser = new DOMParser();
-          var doc = parser.parseFromString(ctrl.savedOutcome.feedback.html, 'text/html');
+          var doc = parser.parseFromString(
+            ctrl.savedOutcome.feedback.html, 'text/html');
           var imageFilenameList: string[] = [];
           var elements = doc.getElementsByTagName('oppia-noninteractive-image');
           for (let i = 0; i < elements.length; i++) {
             imageFilenameList.push(
               String(HtmlEscaperService.escapedStrToUnescapedStr(
                 elements[i].getAttribute('filepath-with-value'))
-              ).replace('"', ''))
+              ).replace('"', ''));
             // Replaces only first ", need to fix for second ".
           }
-          ctrl.savedOutcome.feedback._image_list = imageFilenameList
+          ctrl.savedOutcome.feedback._image_list = imageFilenameList;
           ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
         }
         ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);

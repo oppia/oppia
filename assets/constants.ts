@@ -5948,7 +5948,8 @@ export default {
     "linked_skill_id": null,
     "content": {
       "html": "",
-      "content_id": "content"
+      "content_id": "content",
+      "image_list": []
     },
     "interaction": {
       "id": null,

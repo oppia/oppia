@@ -25,7 +25,7 @@ import { StateHintsService } from 'components/state-editor/state-editor-properti
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ContextService } from 'services/context.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
-import {HtmlEscaperService} from "services/html-escaper.service";
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 interface HintFormSchema {
   type: string;
@@ -97,7 +97,7 @@ export class AddHintModalComponent
       imageFilenameList.push(
         String(this.htmlEscaperService.escapedStrToUnescapedStr(
           elements[i].getAttribute('filepath-with-value'))
-        ).replace('"', ''))
+        ).replace('"', ''));
       // Replaces only first ", need to fix for second ".
     }
     this.ngbActiveModal.close({

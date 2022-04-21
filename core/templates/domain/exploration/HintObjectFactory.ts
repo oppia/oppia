@@ -55,7 +55,7 @@ export class HintObjectFactory {
   }
 
   createNew(
-    hintContentId: string, hintContent: string, imageList: string[]): Hint {
+      hintContentId: string, hintContent: string, imageList: string[]): Hint {
     return new Hint(
       SubtitledHtml.createDefault(
         hintContent, hintContentId, imageList));
