@@ -40,7 +40,8 @@ LIGHTHOUSE_CONFIG_FILENAMES = {
     },
     LIGHTHOUSE_MODE_ACCESSIBILITY: {
         '1': '.lighthouserc-accessibility-1.js',
-        '2': '.lighthouserc-accessibility-2.js'
+        '2': '.lighthouserc-accessibility-2.js',
+        '3': '.lighthouserc-accessibility-3.js'
     }
 }
 APP_YAML_FILENAMES = {
