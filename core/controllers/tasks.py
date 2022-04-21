@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 from core import feconf
+from core.constants import Constants
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -84,7 +85,7 @@ class SuggestionEmailHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX
+                        'regex_pattern': Constants.ENTITY_ID_REGEX
                     }]
                 },
             },
@@ -93,7 +94,7 @@ class SuggestionEmailHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX
+                        'regex_pattern': Constants.ENTITY_ID_REGEX
                     }]
                 },
             },
@@ -149,7 +150,8 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
             'reference_dict': {
                 'schema': {
                     'type': 'object-dict',
-                    'object_class': feedback_services.get_feedback_message_references
+                    'object_class': 
+                        feedback_services.get_feedback_message_references
                 }
             },
             'subject': {
