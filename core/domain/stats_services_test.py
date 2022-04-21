@@ -1284,7 +1284,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         with convert_issue_dict_swap, current_issue_schema_version_swap:
             exp_issue_from_model = stats_services.get_exp_issues_from_model(
                 exp_issues_model)
-        
+
         self.assertEqual(
             exp_issue_from_model.unresolved_issues[0].issue_customization_args[
                 'time_spent_in_exp_in_msecs'
