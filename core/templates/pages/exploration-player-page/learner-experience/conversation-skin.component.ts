@@ -200,91 +200,91 @@ export class ConversationSkinComponent {
   ngOnInit(): void {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
 
-    // Moved the following code to then section as isLoggedIn
-    // variable needs to be defined before the following code is executed.
-    this.userService.getUserInfoAsync().then((userInfo) => {
-      this.isLoggedIn = userInfo.isLoggedIn();
-      this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
+    this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
 
-      if (this.collectionId) {
-        this.readOnlyCollectionBackendApiService.loadCollectionAsync(
-          this.collectionId).then((collection) => {
-          this.collectionTitle = collection.getTitle();
-        });
-      } else {
-        this.collectionTitle = null;
-      }
+    if (this.collectionId) {
+      this.readOnlyCollectionBackendApiService.loadCollectionAsync(
+        this.collectionId).then((collection) => {
+        this.collectionTitle = collection.getTitle();
+      });
+    } else {
+      this.collectionTitle = null;
+    }
 
-      this.explorationId = this.explorationEngineService.getExplorationId();
-      this.isInPreviewMode = this.explorationEngineService.isInPreviewMode();
-      this.isIframed = this.urlService.isIframed();
-      this.loaderService.showLoadingScreen('Loading');
+    this.explorationId = this.explorationEngineService.getExplorationId();
+    this.isInPreviewMode = this.explorationEngineService.isInPreviewMode();
+    this.isIframed = this.urlService.isIframed();
+    this.loaderService.showLoadingScreen('Loading');
 
-      this.OPPIA_AVATAR_IMAGE_URL = (
-        this.urlInterpolationService.getStaticImageUrl(
-          '/avatar/oppia_avatar_100px.svg'));
+    this.OPPIA_AVATAR_IMAGE_URL = (
+      this.urlInterpolationService.getStaticImageUrl(
+        '/avatar/oppia_avatar_100px.svg'));
 
-      if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
-        this.directiveSubscriptions.add(
-          this.hintsAndSolutionManagerService.onHintConsumed.subscribe(
-            () => {
-              this.questionPlayerStateService.hintUsed(
-                this.questionPlayerEngineService.getCurrentQuestion());
-            }
-          )
-        );
-
-        this.directiveSubscriptions.add(
-          this.hintsAndSolutionManagerService.onSolutionViewedEventEmitter
-            .subscribe(() => {
-              this.questionPlayerStateService.solutionViewed(
-                this.questionPlayerEngineService.getCurrentQuestion()
-              );
-            })
-        );
-      }
-
+    if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
       this.directiveSubscriptions.add(
-        this.explorationPlayerStateService.onPlayerStateChange.subscribe(
-          (newStateName) => {
-            if (!newStateName) {
-              return;
-            }
-            // To restart the preloader for the new state if required.
-            if (!this._editorPreviewMode) {
-              this.imagePreloaderService.onStateChange(newStateName);
-            }
-            // Ensure the transition to a terminal state properly logs
-            // the end of the exploration.
-            if (
-              !this._editorPreviewMode && this.nextCard.isTerminal()) {
-              this.statsReportingService.recordExplorationCompleted(
-                newStateName, this.learnerParamsService.getAllParams());
-
-              // If the user is a guest, has completed this exploration
-              // within the context of a collection, and the collection is
-              // whitelisted, record their temporary progress.
-
-              if (this.doesCollectionAllowsGuestProgress(
-                this.collectionId) && !this.isLoggedIn) {
-                this.guestCollectionProgressService.
-                  recordExplorationCompletedInCollection(
-                    this.collectionId, this.explorationId);
-              }
-
-              // For single state explorations, when the exploration
-              // reachesthe terminal state and explorationActuallyStarted
-              // is false, record exploration actual start event.
-              if (!this.explorationActuallyStarted) {
-                this.statsReportingService.recordExplorationActuallyStarted(
-                  newStateName);
-                this.explorationActuallyStarted = true;
-              }
-            }
+        this.hintsAndSolutionManagerService.onHintConsumed.subscribe(
+          () => {
+            this.questionPlayerStateService.hintUsed(
+              this.questionPlayerEngineService.getCurrentQuestion());
           }
         )
       );
 
+      this.directiveSubscriptions.add(
+        this.hintsAndSolutionManagerService.onSolutionViewedEventEmitter
+          .subscribe(() => {
+            this.questionPlayerStateService.solutionViewed(
+              this.questionPlayerEngineService.getCurrentQuestion()
+            );
+          })
+      );
+    }
+
+    this.directiveSubscriptions.add(
+      this.explorationPlayerStateService.onPlayerStateChange.subscribe(
+        (newStateName) => {
+          if (!newStateName) {
+            return;
+          }
+          // To restart the preloader for the new state if required.
+          if (!this._editorPreviewMode) {
+            this.imagePreloaderService.onStateChange(newStateName);
+          }
+          // Ensure the transition to a terminal state properly logs
+          // the end of the exploration.
+          if (
+            !this._editorPreviewMode && this.nextCard.isTerminal()) {
+            this.statsReportingService.recordExplorationCompleted(
+              newStateName, this.learnerParamsService.getAllParams());
+
+            // If the user is a guest, has completed this exploration
+            // within the context of a collection, and the collection is
+            // whitelisted, record their temporary progress.
+
+            if (this.doesCollectionAllowsGuestProgress(
+              this.collectionId) && !this.isLoggedIn) {
+              this.guestCollectionProgressService.
+                recordExplorationCompletedInCollection(
+                  this.collectionId, this.explorationId);
+            }
+
+            // For single state explorations, when the exploration
+            // reachesthe terminal state and explorationActuallyStarted
+            // is false, record exploration actual start event.
+            if (!this.explorationActuallyStarted) {
+              this.statsReportingService.recordExplorationActuallyStarted(
+                newStateName);
+              this.explorationActuallyStarted = true;
+            }
+          }
+        }
+      )
+    );
+
+    // Moved the following code to then section as isLoggedIn
+    // variable needs to be defined before the following code is executed.
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.isLoggedIn = userInfo.isLoggedIn();
       this.windowRef.nativeWindow.addEventListener('beforeunload', (e) => {
         if (this.redirectToRefresherExplorationConfirmed) {
           return;

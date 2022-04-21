@@ -750,6 +750,11 @@ describe('Conversation skin component', () => {
     }
     const expResponse = explorationResponse;
     expResponse.exploration.states.Mid.card_is_checkpoint = true;
+    
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        [], false, false,
+        false, false, false, '', '', '', true)));
     spyOn(playerPositionService, 'init').and.callFake((callb) => {
       callb();
     });
@@ -934,6 +939,10 @@ describe('Conversation skin component', () => {
     spyOn(playerPositionService, 'init').and.callFake((callb) => {
       callb();
     });
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        [], false, false,
+        false, false, false, '', '', '', true)));
     componentInstance.questionPlayerConfig = {};
     spyOn(explorationPlayerStateService.onPlayerStateChange, 'emit');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
