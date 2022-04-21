@@ -72,26 +72,37 @@ def run_lighthouse_puppeteer_script():
 
     process = subprocess.Popen(
         bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        print(stdout)
-        for line in stdout.split(b'\n'):
-            # Standard output is in bytes, we need to decode the line to
-            # print it.
-            export_url(line.decode('utf-8'))
-        print('Puppeteer script completed successfully.')
-    else:
-        print('Return code: %s' % process.returncode)
-        print('OUTPUT:')
+
+    stdout_lines = []
+    while process.stdout.readable():
+        line = process.stdout.readline()
+        if not line:
+            break
+        stdout_lines.append(line.strip().decode('utf-8'))
         # Standard output is in bytes, we need to decode the line to
         # print it.
-        print(stdout.decode('utf-8'))
+        print('[CONSOLE LOG OUTPUT] %s' % line.strip().decode('utf-8'))
+
+    returncode = process.wait()
+    if returncode == 0:
+        print('Puppeteer script completed successfully.')
+        for stdout_line in stdout_lines:
+            export_url(stdout_line)
+    else:
+        print('Return code: %s' % returncode)
         print('ERROR:')
-        # Error output is in bytes, we need to decode the line to
-        # print it.
-        print(stderr.decode('utf-8'))
+        while process.stderr.readable():
+            error_line = process.stderr.readline()
+            if not error_line:
+                break
+            # Error output is in bytes, we need to decode the line to
+            # print it.
+            print(error_line.decode('utf-8'))
+
         print('Puppeteer script failed. More details can be found above.')
         sys.exit(1)
+
+    print('Puppeteer script complete')
 
 
 def run_webpack_compilation():
@@ -151,22 +162,31 @@ def run_lighthouse_checks(lighthouse_mode, shard):
         '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode][shard],
         '--max-old-space-size=4096'
     ]
+    print('Starting Lighthouse checks using %s' % bash_command)
 
     process = subprocess.Popen(
         bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
+    stdout_lines = []
+    while process.stdout.readable():
+        line = process.stdout.readline()
+        if not line:
+            break
+        stdout_lines.append(line.strip())
+        print('[LHCI OUTPUT] %s' % line.strip())
+
+    returncode = process.wait()
+    if returncode == 0:
         print('Lighthouse checks completed successfully.')
     else:
-        print('Return code: %s' % process.returncode)
-        print('OUTPUT:')
-        # Standard output is in bytes, we need to decode the line to
-        # print it.
-        print(stdout.decode('utf-8'))
+        print('Return code: %s' % returncode)
         print('ERROR:')
-        # Error output is in bytes, we need to decode the line to
-        # print it.
-        print(stderr.decode('utf-8'))
+        while process.stderr.readable():
+            error_line = process.stderr.readline()
+            if not error_line:
+                break
+            # Error output is in bytes, we need to decode the line to
+            # print it.
+            print(error_line.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
 
@@ -199,7 +219,8 @@ def main(args=None):
 
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
-            stack.enter_context(servers.managed_cloud_datastore_emulator())
+            stack.enter_context(
+                servers.managed_cloud_datastore_emulator(clear_datastore=True))
 
         stack.enter_context(servers.managed_dev_appserver(
             APP_YAML_FILENAMES[server_mode],

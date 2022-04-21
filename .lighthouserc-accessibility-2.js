@@ -23,6 +23,9 @@ module.exports = {
     'collect': {
       'numberOfRuns': baseConfig['numberOfRuns'],
       'puppeteerScript': baseConfig['puppeteerScript'],
+      'settings': {
+        'verbose': true
+      },
       'url': baseConfig['urlShards'][2]
     },
     'assert': {

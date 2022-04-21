@@ -308,8 +308,14 @@ const main = async function() {
 
   await setRole(browser, page, 'ADMIN');
   await getTopicEditorUrl(browser, page);
+  // eslint-disable-next-line no-console
+  console.log('Retrieved topic editor URL');
   await getStoryEditorUrl(browser, page);
+  // eslint-disable-next-line no-console
+  console.log('Retrieved story editor URL');
   await getSkillEditorUrl(browser, page);
+  // eslint-disable-next-line no-console
+  console.log('Retrieved skill editor URL');
   await process.stdout.write(
     [
       explorationEditorUrl,
