@@ -409,11 +409,13 @@ describe('Translation tab component', function() {
 
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', fakeAsync(() => {
+    angular.mock.module('oppia', function($provide) {
     $provide.value('ContextService', {
       getExplorationId: () => {
         return 'exp1';
       }
     });
+    }
     contextService = TestBed.get(ContextService);
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     ctrl.$onInit();
