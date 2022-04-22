@@ -415,3 +415,187 @@ class GetExpsHavingNonEmptyParamSpecsJobTests(
                     'its param specs is %s' % (self.EXPLORATION_ID_2, 2)
             )
         ])
+
+
+class GetExpsHavingNonEmptyTrainingDataJobTests(job_test_utils.JobTestBase):
+    JOB_CLASS = exp_validation_jobs.GetExpsHavingNonEmptyTrainingDataJob
+
+    EXPLORATION_ID_1 = '1'
+    EXPLORATION_ID_2 = '2'
+    EXPLORATION_ID_3 = '3'
+
+    state_answer_groups_1 = [state_domain.AnswerGroup(
+        state_domain.Outcome(
+            'state 1', state_domain.SubtitledHtml(
+                'feedback_1', '<p>state outcome html</p>'),
+            False, [], None, None),
+        [
+            state_domain.RuleSpec(
+                'Equals', {
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                        }})
+        ],
+        [{
+            'answer_group_index': 1,
+            'answers': [
+                u'cheerful',
+                u'merry',
+                u'ecstatic',
+                u'glad',
+                u'overjoyed',
+                u'pleased',
+                u'thrilled',
+                u'smile'
+            ]
+        }],
+        None
+    )]
+
+    state_answer_groups_2 = [state_domain.AnswerGroup(
+        state_domain.Outcome(
+            'state 2', state_domain.SubtitledHtml(
+                'feedback_2', '<p>state outcome html</p>'),
+            False, [], None, None),
+        [
+            state_domain.RuleSpec(
+                'Equals', {
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                        }})
+        ],
+        [{
+            'answer_group_index': 1,
+            'answers': [
+                u'cheerful',
+                u'merry',
+                u'ecstatic',
+                u'glad',
+                u'overjoyed',
+                u'pleased',
+                u'thrilled',
+                u'smile'
+            ]
+        }],
+        None
+    )]
+
+    invalid_state_1 = state_domain.State.create_default_state('state 1')
+    invalid_state_2 = state_domain.State.create_default_state('state 2')
+
+    def setUp(self):
+        super().setUp()
+
+        self.invalid_state_1.interaction.answer_groups = self.state_answer_groups_1
+        self.invalid_state_2.interaction.answer_groups = self.state_answer_groups_2
+
+        # Invalid exploration.
+        self.exp_1 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_1,
+            title='exp 1',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+                'state 1': self.invalid_state_1.to_dict()
+            }
+        )
+
+        # Invalid exploration.
+        self.exp_2 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_2,
+            title='exp 2',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+                'state 1': self.invalid_state_1.to_dict(),
+                'state 2': self.invalid_state_2.to_dict()
+            }
+        )
+
+        # Valid exploration.
+        self.exp_3 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_3,
+            title='exp 3',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={}
+        )
+
+    def test_with_no_models(self):
+        self.assert_job_output_is([])
+
+    def test_with_single_valid_model(self):
+        self.put_multi([self.exp_3])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1')
+        ])
+
+    def test_with_single_invalid_model(self):
+        self.put_multi([self.exp_1])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stderr(
+                'The id of exp is %s and the states having interaction '
+                'with non-empty training data are %s' % (
+                    self.EXPLORATION_ID_1,
+                    ['state 1']
+                )
+            )
+        ])
+
+    def test_with_mixed_models(self):
+        self.put_multi([self.exp_1, self.exp_2, self.exp_3])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 3'),
+            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
+            job_run_result.JobRunResult.as_stderr(
+                'The id of exp is %s and the states having interaction '
+                'with non-empty training data are %s' % (
+                    self.EXPLORATION_ID_1,
+                    ['state 1']
+                )
+            ),
+            job_run_result.JobRunResult.as_stderr(
+                'The id of exp is %s and the states having interaction '
+                'with non-empty training data are %s' % (
+                    self.EXPLORATION_ID_2,
+                    ['state 1', 'state 2']
+                )
+            )
+        ])

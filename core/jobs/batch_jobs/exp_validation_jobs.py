@@ -237,3 +237,96 @@ class GetExpsHavingNonEmptyParamSpecsJob(base_jobs.JobBase):
             )
             | 'Combine results' >> beam.Flatten()
         )
+
+
+class GetExpsHavingNonEmptyTrainingDataJob(base_jobs.JobBase):
+    """Job that returns explorations having non-empty training data."""
+
+    def filter_invalid_explorations(self, exploration):
+        """Returns True if exploration has non-empty training data.
+
+        Args:
+            exploration: Exploration. Exploration to be checked.
+
+        Returns:
+            bool. Returns True if exploration has non-empty training data.
+        """
+        for state_name in exploration.states:
+            for answer_group in exploration.states[state_name].interaction.answer_groups:
+                if len(answer_group.training_data) > 0:
+                    return True
+        return False
+
+    def get_state_names_having_invalid_training_data(self, exploration):
+        """Returns state names having non-empty training data.
+
+        Args:
+            exploration: Exploration. Exploration to be checked.
+
+        Returns:
+            list(str). Returns state names having non-empty training data.
+        """
+        state_names = []
+        for state_name in exploration.states:
+            for answer_group in exploration.states[state_name].interaction.answer_groups:
+                if len(answer_group.training_data) > 0:
+                    state_names.append(state_name)
+        return state_names
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns PCollection of invalid explorations where there are states
+        having interaction with non-empty training data along with the state
+        names having interaction with non-empty training data.
+
+        Returns:
+            PCollection. Returns PCollection of invalid explorations where
+            there are states having interaction with non-empty training data
+            along with the state names having interaction with non-empty
+            training data.
+        """
+        total_exps = (
+            self.pipeline
+            | 'Get all ExplorationModels' >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all(include_deleted=False))
+            | 'Get exploration from model' >> beam.Map(
+                exp_fetchers.get_exploration_from_model)
+        )
+
+        exps_having_invalid_training_data = (
+            total_exps
+            | 'Filter explorations having non-empty training data' >>
+                beam.Filter(self.filter_invalid_explorations)
+        )
+
+        report_number_of_exps_queried = (
+            total_exps
+            | 'Count explorations' >> (
+                job_result_transforms.CountObjectsToJobRunResult('EXPS'))
+        )
+
+        report_number_of_inavlid_exps = (
+            exps_having_invalid_training_data
+            | 'Count explorations having non-empty param specs' >> (
+                job_result_transforms.CountObjectsToJobRunResult('INVALID'))
+        )
+
+        report_invalid_exps_along_with_their_state_names = (
+            exps_having_invalid_training_data
+            | 'Save info on invalid exps' >> beam.Map(
+                lambda exp: job_run_result.JobRunResult.as_stderr(
+                    'The id of exp is %s and the states having interaction '
+                    'with non-empty training data are %s' % (
+                        exp.id,
+                        self.get_state_names_having_invalid_training_data(exp)
+                    )
+                ))
+        )
+
+        return (
+            (
+                report_number_of_exps_queried,
+                report_number_of_inavlid_exps,
+                report_invalid_exps_along_with_their_state_names
+            )
+            | 'Combine results' >> beam.Flatten()
+        )
