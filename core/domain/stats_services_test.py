@@ -1374,7 +1374,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             self.exp.id, stats_models.CURRENT_ISSUE_SCHEMA_VERSION, [])
 
         stats_services.assign_playthrough_to_corresponding_issue(
-        playthrough, exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
+            playthrough, exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
     def test_eq_exp_issue_is_invalidated_when_state_is_deleted(self):
         stats_services.save_exp_issues_model(
