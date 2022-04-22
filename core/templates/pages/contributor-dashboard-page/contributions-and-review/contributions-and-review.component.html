@@ -68,9 +68,8 @@
                                 [label-required]="!$ctrl.activeReviewTab">
       </oppia-opportunities-list>
       <div ng-if="$ctrl.activeExplorationId !== null || !$ctrl.isReviewTranslationsTab()">
-        <div class="oppia-contributions-back-to-lessons-container">
-          <md-button ng-if="$ctrl.isReviewTranslationsTab()"
-                     aria-label="Back to reviewable lessons"
+        <div ng-if="$ctrl.isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
+          <md-button aria-label="Back to reviewable lessons"
                      ng-click="$ctrl.onClickBackToReviewableLessons()"
                      class="oppia-contributions-back-button md-raised">
             <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
@@ -201,6 +200,8 @@
   }
 
   contributions-and-review .oppia-contributions-back-button-label {
+    color: #009688;
+    font-weight: bold;
     margin-left: 6px;
   }
 
