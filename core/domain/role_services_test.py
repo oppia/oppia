@@ -21,6 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.domain import role_services
 from core.tests import test_utils
+from core.storage.audit import gae_models
 
 
 class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
@@ -50,3 +51,11 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
         role_actions = role_services.get_role_actions()
 
         self.assertItemsEqual(list(role_actions), feconf.ALLOWED_USER_ROLES)
+
+    def test_log_role_query(self):
+        role_services.log_role_query('TEST_USER',
+            feconf.ROLE_ACTION_ADD, role='GUEST')
+        self.assertEqual(
+            gae_models.RoleQueryAuditModel.has_reference_to_user_id(
+                'TEST_USER'),
+            True)
