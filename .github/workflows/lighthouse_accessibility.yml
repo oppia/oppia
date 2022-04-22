@@ -42,14 +42,14 @@ jobs:
           # Replace the 1.5 second timeout in lighthouse for retrieving
           # sourcemaps with a 10 second timeout.
           set -e
-          PATH=node_modules/lighthouse/lighthouse-core/gather/gatherers/source-maps.js
+          FILEPATH=node_modules/lighthouse/lighthouse-core/gather/gatherers/source-maps.js
           SEARCH_TARGET="1500"
-          REPLACE="10000"
-          occurrences=$(grep -c $SEARCH_TARGET PATH)
+          REPLACEMENT="10000"
+          occurrences=$(grep -c $SEARCH_TARGET FILEPATH)
           # Assert that there is only one match for the target string.
           [[ occurrences != "1" ]]
           # Replace the target string with the replacement string.
-          sed -i 's/$SEARCH_TARGET/$REPLACE/' $PATH
+          sed -i 's/$SEARCH_TARGET/$REPLACEMENT/' $FILEPATH
         shell: bash
       - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
