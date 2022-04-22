@@ -87,7 +87,7 @@ def export_data_for_user(user_id):
         # Join the split name with underscores and add _data for final name.
 
         exported_model_data = model.export_data(user_id)
-        exported_data_json_string = json.dumps(export_data)
+        exported_data_json_string = json.dumps(exported_model_data)
         user_id_match_object = re.search(
             feconf.USER_ID_REGEX, exported_data_json_string)
         if user_id_match_object:
@@ -99,7 +99,7 @@ def export_data_for_user(user_id):
             )
 
         final_name = ('_').join([x.lower() for x in split_name])
-        exported_data[final_name] = export_data
+        exported_data[final_name] = exported_model_data
 
     # Separate out images. We store the images that need to be separated here
     # as a dictionary mapping tuples to strings. The tuple value indicates the

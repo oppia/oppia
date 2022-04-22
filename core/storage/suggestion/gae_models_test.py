@@ -1863,10 +1863,10 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
         dates_in_iso_format = [
             date.isoformat() for date in self.CONTRIBUTION_DATES]
         model_1_id_without_user_id = model_1_id.replace(
-            '.%s.' % self.CONTRIBUTOR_USER_ID,'.'
+            '.%s.' % self.CONTRIBUTOR_USER_ID, '.'
         )
         model_2_id_without_user_id = model_2_id.replace(
-            '.%s.' % self.CONTRIBUTOR_USER_ID,'.'
+            '.%s.' % self.CONTRIBUTOR_USER_ID, '.'
         )
         expected_data = {
             model_1_id_without_user_id: {
