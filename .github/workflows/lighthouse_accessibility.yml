@@ -45,18 +45,11 @@ jobs:
           FILEPATH=~/work/oppia/oppia/node_modules/lighthouse/lighthouse-core/gather/gatherers/source-maps.js
           SEARCH_TARGET="1500"
           REPLACEMENT="10000"
-          echo '-----'
-          ls /home/runner/work/oppia/oppia
-          echo '-----'
-          ls /home/runner/work/oppia/oppia/node_modules
-          echo '-----'
-          ls /home/runner/work/oppia/oppia/node_modules/lighthouse
-          echo '-----'
-          ls /home/runner/work/oppia/oppia/node_modules/lighthouse/lighthouse-core
-          echo '-----'
           occurrences=$(grep -c $SEARCH_TARGET $FILEPATH)
+          echo "Occurrences: $occurrences"
           # Assert that there is only one match for the target string.
           [[ occurrences != "1" ]]
+          echo "Exit code: $?"
           # Replace the target string with the replacement string.
           sed -i 's/$SEARCH_TARGET/$REPLACEMENT/' $FILEPATH
         shell: bash
