@@ -56,7 +56,6 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
         ) -> Ret:
             return Ret()
 
-
         def mock_check_call(cmd_tokens: List[str]) -> None:
             self.commands.extend(cmd_tokens)
         self.Popen_swap = self.swap(
