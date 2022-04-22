@@ -46,12 +46,12 @@ jobs:
           SEARCH_TARGET="1500"
           REPLACEMENT="10000"
           occurrences=$(grep -c $SEARCH_TARGET $FILEPATH)
-          echo "Occurrences: $occurrences"
+          echo "Found $occurrences occurrences of '$SEARCH_TARGET'"
           # Assert that there is only one match for the target string.
-          [[ $occurrences != "1" ]]
-          echo "Exit code: $?"
+          [[ $occurrences == "1" ]]
           # Replace the target string with the replacement string.
           sed -i 's/$SEARCH_TARGET/$REPLACEMENT/' $FILEPATH
+          echo "Replaced '$SEARCH_TARGET' with '$REPLACEMENT' in $FILEPATH"
         shell: bash
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
