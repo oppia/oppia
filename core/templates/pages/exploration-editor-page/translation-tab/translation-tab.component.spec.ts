@@ -409,6 +409,7 @@ describe('Translation tab component', function() {
 
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', fakeAsync(() => {
+    contextService = TestBed.get(ContextService);
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     ctrl.$onInit();
 
