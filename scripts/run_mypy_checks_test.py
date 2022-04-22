@@ -115,6 +115,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
                     self.returncode = 0
                 else:
                     self.returncode = 1
+
             def communicate(self) -> Tuple[bytes, bytes]:
                 """Return user-prefix error as stderr."""
                 return b'', b'can\'t combine user with prefix'

@@ -24,7 +24,6 @@ import site
 import subprocess
 import sys
 
-
 from scripts import common
 from scripts import install_third_party_libs
 
@@ -365,9 +364,10 @@ def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
             cmd + uextention_text, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         new_process.communicate()
-        if site.USER_BASE:
-            _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
-            mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
+        # Here site.USER_BASE can't be None. Hence add an assert.
+        assert site.USER_BASE is not None
+        _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
+        mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
         return (new_process.returncode, mypy_exec_path)
     else:
         _PATHS_TO_INSERT.append(os.path.join(MYPY_TOOLS_DIR, 'bin'))

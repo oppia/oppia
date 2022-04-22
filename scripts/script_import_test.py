@@ -45,6 +45,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
 
             def __init__(self) -> None:  # pylint: disable=super-init-not-called
                 self.returncode = 1
+
             def communicate(self) -> Tuple[bytes, bytes]:
                 """Return user-prefix error as stderr."""
                 return b'', b'can\'t combine user with prefix'
@@ -54,6 +55,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
             **kwargs: Dict[str, Any] # pylint: disable=unused-argument
         ) -> Ret:
             return Ret()
+
         def mock_check_call(cmd_tokens: List[str]) -> None:
             self.commands.extend(cmd_tokens)
         self.Popen_swap = self.swap(
