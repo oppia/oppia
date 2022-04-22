@@ -146,7 +146,6 @@ describe('Translation tab component', function() {
     stateTutorialFirstTimeService = $injector.get(
       'StateTutorialFirstTimeService');
 
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'Introduction');
     spyOnProperty(
@@ -252,6 +251,7 @@ describe('Translation tab component', function() {
 
   it('should initialize $scope properties after controller is initialized',
     function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
@@ -267,6 +267,7 @@ describe('Translation tab component', function() {
 
   it('should load translation tab data when translation tab page is' +
     ' refreshed', function() {
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canVoiceover: true
@@ -284,6 +285,7 @@ describe('Translation tab component', function() {
 
   it('should start tutorial if in tutorial mode on page load with' +
     ' permissions', () => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canVoiceover: true
@@ -303,6 +305,7 @@ describe('Translation tab component', function() {
 
   it('should not start tutorial if in tutorial mode on page load but' +
     ' no permissions', () => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve(null));
 
@@ -317,6 +320,7 @@ describe('Translation tab component', function() {
   });
 
   it('should not start tutorial if not in tutorial mode on page load', () => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canVoiceover: true
@@ -334,6 +338,7 @@ describe('Translation tab component', function() {
 
   it('should finish tutorial on clicking the end tutorial button when' +
     ' it has already started', function() {
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canVoiceover: true
@@ -357,6 +362,7 @@ describe('Translation tab component', function() {
 
   it('should skip tutorial when the skip tutorial button is clicked',
     function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
@@ -380,6 +386,7 @@ describe('Translation tab component', function() {
 
   it('should start tutorial when welcome translation modal is closed',
     fakeAsync(() => {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
@@ -402,6 +409,7 @@ describe('Translation tab component', function() {
 
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', fakeAsync(() => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     ctrl.$onInit();
 
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished')
@@ -423,6 +431,7 @@ describe('Translation tab component', function() {
   describe('TRANSLATION_TUTORIAL_OPTIONS', function() {
     it('should animate html and body to 0px top when calling function' +
       ' from option 1', function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -438,6 +447,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 20px top when calling function' +
       ' from option 1', function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -453,6 +463,7 @@ describe('Translation tab component', function() {
 
     it('should set new top value to element with tutorialTranslationOverview' +
       ' id when calling function from option 3', function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -479,6 +490,7 @@ describe('Translation tab component', function() {
 
     it('should set new top value to element with tutorialTranslationLanguage' +
     ' id when calling function from option 3', function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -505,6 +517,7 @@ describe('Translation tab component', function() {
 
     it('should set new top value to element with tutorialTranslationState' +
       ' id when calling function from option 5', function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -531,6 +544,7 @@ describe('Translation tab component', function() {
 
     it('should set new top value to element with tutorialTranslationOverview' +
       ' id when calling function from option 5', function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -557,6 +571,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 0px top when calling function' +
       ' from option 7', function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -572,6 +587,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 20px top when calling function' +
       ' from option 7', function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -587,6 +603,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 0px top when calling function' +
       ' from option 9', function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -602,6 +619,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 20px top when calling function' +
       ' from option 9', function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -632,6 +650,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 20px top when calling function' +
       ' from option 11', function() {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
