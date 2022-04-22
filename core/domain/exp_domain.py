@@ -593,8 +593,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             last_updated: datetime.datetime. Date and time when the exploration
                 was last updated.
         """
-        if image_size_counts is None:
-            image_size_counts = {}
         self.id = exploration_id
         self.title = title
         self.category = category
@@ -605,7 +603,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.author_notes = author_notes
         self.states_schema_version = states_schema_version
         self.init_state_name = init_state_name
-        self.image_size_counts = image_size_counts
 
         self.states = {}
         for (state_name, state_dict) in states_dict.items():
