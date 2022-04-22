@@ -1234,7 +1234,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             playthrough.actions[0].action_customization_args['new_key'], 5)
-        
+
         convert_action_dict_swap = self.swap(
             stats_domain.LearnerAction,
             '_convert_action_v1_dict_to_v2_dict',
@@ -1296,7 +1296,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             exp_issue_from_model.unresolved_issues[0].issue_customization_args[
                 'time_spent_in_exp_in_msecs'
             ], self.DUMMY_TIME_SPENT_IN_MSECS)
-        
+
         current_issue_schema_version_swap = self.swap(
             stats_models, 'CURRENT_ISSUE_SCHEMA_VERSION', 1)
 
@@ -1375,7 +1375,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         exp_issues = stats_domain.ExplorationIssues(
             self.exp.id, stats_models.CURRENT_ISSUE_SCHEMA_VERSION, [])
 
-        stats_services._get_corresponding_exp_issue(
+        stats_services.assign_playthrough_to_corresponding_issue(
             playthrough, exp_issues, stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
     def test_eq_exp_issue_is_invalidated_when_state_is_deleted(self):
