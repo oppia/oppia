@@ -37,6 +37,7 @@ jobs:
       #       ${{ runner.os }}-build-${{ env.cache-name }}-
       #       ${{ runner.os }}-build-
       #       ${{ runner.os }}-
+      - run: sudo apt-get install grep sed
       - run: |
           # Replace the 1.5 second timeout in lighthouse for retrieving
           # sourcemaps with a 10 second timeout.
