@@ -1366,7 +1366,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         exp_issue = exp_issues.unresolved_issues[0]
 
         model = stats_models.PlaythroughModel.get_by_id(
-        exp_issue.playthrough_ids[0])
+            exp_issue.playthrough_ids[0])
 
         playthrough = stats_services.get_playthrough_from_model(model)
 
