@@ -60,7 +60,7 @@ import $ from 'jquery';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-describe('Translation tab component', function() {
+fdescribe('Translation tab component', function() {
   var ctrl = null;
   var $q = null;
   var $scope = null;
@@ -383,7 +383,7 @@ describe('Translation tab component', function() {
         .toHaveBeenCalled();
       expect($scope.tutorialInProgress).toBe(false);
     });
-
+  
   it('should start tutorial when welcome translation modal is closed',
     fakeAsync(() => {
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
@@ -406,7 +406,7 @@ describe('Translation tab component', function() {
       expect(siteAnalyticsService.registerAcceptTutorialModalEvent)
         .toHaveBeenCalled();
     }));
-
+  
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', fakeAsync(() => {
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
