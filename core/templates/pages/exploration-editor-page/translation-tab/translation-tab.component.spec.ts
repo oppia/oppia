@@ -128,11 +128,6 @@ describe('Translation tab component', function() {
         };
       }
     });
-    $provide.value('ContextService', {
-      getExplorationId: () => {
-        return 'exp1';
-      }
-    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
