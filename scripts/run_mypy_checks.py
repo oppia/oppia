@@ -208,8 +208,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/jobs/types/topic_validation_errors_test.py',
     'core/jobs/types/user_validation_errors.py',
     'core/jobs/types/user_validation_errors_test.py',
-    'core/python_utils.py',
-    'core/python_utils_test.py',
     'extensions/',
     'scripts/build.py',
     'scripts/build_test.py',
