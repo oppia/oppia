@@ -252,7 +252,9 @@ class GetExpsHavingNonEmptyTrainingDataJob(base_jobs.JobBase):
             bool. Returns True if exploration has non-empty training data.
         """
         for state_name in exploration.states:
-            for answer_group in exploration.states[state_name].interaction.answer_groups:
+            for answer_group in exploration.states[
+                state_name
+            ].interaction.answer_groups:
                 if len(answer_group.training_data) > 0:
                     return True
         return False
@@ -268,7 +270,9 @@ class GetExpsHavingNonEmptyTrainingDataJob(base_jobs.JobBase):
         """
         state_names = []
         for state_name in exploration.states:
-            for answer_group in exploration.states[state_name].interaction.answer_groups:
+            for answer_group in exploration.states[
+                state_name
+            ].interaction.answer_groups:
                 if len(answer_group.training_data) > 0:
                     state_names.append(state_name)
         return state_names
