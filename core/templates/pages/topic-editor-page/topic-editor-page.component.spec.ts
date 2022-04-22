@@ -281,6 +281,9 @@ describe('Topic editor page', function() {
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
     ctrl.$onInit();
+
+    expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+
     TopicEditorStateService.onTopicInitialized.emit();
 
     expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
@@ -316,7 +319,7 @@ describe('Topic editor page', function() {
   it('should check if a tab is stale and emit the corresponding event', () => {
     spyOn(FaviconService, 'setFavicon').and.callThrough();
     spyOn(ctrl.staleTabEventEmitter, 'emit').and.callThrough();
-    var oldValue: EntityEditorBrowserTabsInfoDict = {
+    let oldValue: EntityEditorBrowserTabsInfoDict = {
       topic_1: {
         entityType: 'topic',
         latestVersion: 1,
@@ -324,7 +327,7 @@ describe('Topic editor page', function() {
         someTabHasUnsavedChanges: false
       }
     };
-    var newValue: EntityEditorBrowserTabsInfoDict = {
+    let newValue: EntityEditorBrowserTabsInfoDict = {
       topic_1: {
         entityType: 'topic',
         latestVersion: 2,
@@ -332,7 +335,7 @@ describe('Topic editor page', function() {
         someTabHasUnsavedChanges: true
       }
     };
-    var storageEvent = new StorageEvent('storage', {
+    let storageEvent = new StorageEvent('storage', {
       key: EntityEditorBrowserTabsInfoDomainConstants
         .OPENED_TOPIC_EDITOR_BROWSER_TABS,
       oldValue: JSON.stringify(oldValue),
@@ -349,7 +352,7 @@ describe('Topic editor page', function() {
   it('should check if there is unsaved changes on another tab ' +
   'and emit the corresponding event', () => {
     spyOn(ctrl.presenceOfUnsavedChangesEventEmitter, 'emit').and.callThrough();
-    var oldValue: EntityEditorBrowserTabsInfoDict = {
+    let oldValue: EntityEditorBrowserTabsInfoDict = {
       topic_1: {
         entityType: 'topic',
         latestVersion: 1,
@@ -357,7 +360,7 @@ describe('Topic editor page', function() {
         someTabHasUnsavedChanges: false
       }
     };
-    var newValue: EntityEditorBrowserTabsInfoDict = {
+    let newValue: EntityEditorBrowserTabsInfoDict = {
       topic_1: {
         entityType: 'topic',
         latestVersion: 2,
@@ -365,7 +368,7 @@ describe('Topic editor page', function() {
         someTabHasUnsavedChanges: true
       }
     };
-    var storageEvent = new StorageEvent('storage', {
+    let storageEvent = new StorageEvent('storage', {
       key: EntityEditorBrowserTabsInfoDomainConstants
         .OPENED_TOPIC_EDITOR_BROWSER_TABS,
       oldValue: JSON.stringify(oldValue),
