@@ -623,8 +623,8 @@ def main():
         repo, repo_fork, target_branch, github_username,
         current_release_version_number)
     inform_server_errors_team(
-        common.release_constants.RELEASE_ROTA_URL,
-        common.release_constants.SERVER_ERROR_PLAYBOOK_URL)
+        constants.release_constants.RELEASE_ROTA_URL,
+        constants.release_constants.SERVER_ERROR_PLAYBOOK_URL)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
