@@ -42,7 +42,7 @@ jobs:
           # Replace the 1.5 second timeout in lighthouse for retrieving
           # sourcemaps with a 10 second timeout.
           set -e
-          FILEPATH=~/oppia/oppia/node_modules/lighthouse/lighthouse-core/gather/gatherers/source-maps.js
+          FILEPATH=~/work/oppia/oppia/node_modules/lighthouse/lighthouse-core/gather/gatherers/source-maps.js
           SEARCH_TARGET="1500"
           REPLACEMENT="10000"
           occurrences=$(grep -c $SEARCH_TARGET $FILEPATH)
