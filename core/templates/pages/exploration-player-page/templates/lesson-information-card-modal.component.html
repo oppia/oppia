@@ -23,7 +23,7 @@
       {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
     </h4>
     <p class="progress-text">Progress</p>
-    <div class="progress">
+    <div class="progress" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
       <div class="progress-bar-separator-container">
         <div class="progress-bar-separator"
              *ngFor="let i of separatorArray;"
@@ -50,7 +50,7 @@
             *ngIf="userIsLoggedIn"
             [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
             (click)="restartExploration()">
-        Restart lesson!
+        {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
     </button>
   </div>
 </mat-card>

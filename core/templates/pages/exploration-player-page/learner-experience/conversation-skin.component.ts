@@ -655,6 +655,13 @@ export class ConversationSkinComponent {
           // yet and is only most recently reached.
           this.prevSessionStatesProgress.pop();
 
+          if (indexToRedirectTo > 0) {
+            this.alertsService.addInfoMessage(
+              'Welcome back! Continuing this lesson from where ' +
+              'you left off.', 6000
+            );
+          }
+
           // Move to most recently reached checkpoint card.
           this.changeCard(indexToRedirectTo);
         }
@@ -670,7 +677,7 @@ export class ConversationSkinComponent {
     if (index > 0 && !this.isIframed && this.isLoggedIn) {
       let currentState = this.explorationEngineService.getState();
       let currentStateName = currentState.name;
-      if ((currentState.cardIsCheckpoint || this.displayedCard.isTerminal()) &&
+      if (currentState.cardIsCheckpoint &&
           !this.visitedStateNames.includes(currentStateName) &&
           !this.prevSessionStatesProgress.includes(currentStateName)) {
         this.readOnlyExplorationBackendApiService.
@@ -889,6 +896,14 @@ export class ConversationSkinComponent {
     this.nextCard = initialCard;
     this.explorationPlayerStateService.onPlayerStateChange.emit(
       this.nextCard.getStateName());
+
+    // We do not store checkpoints progress for iframes hence we do not
+    // need to consider redirecting in that case.
+    if (!this.isIframed && this.isLoggedIn) {
+      // Navigate the learner to the most recently reached checkpoint state.
+      this._navigateToMostRecentlyReachedCheckpoint();
+    }
+
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
     this.loaderService.hideLoadingScreen();
     this.hasFullyLoaded = true;
@@ -911,13 +926,6 @@ export class ConversationSkinComponent {
     }
     this.adjustPageHeight(false, null);
     this.windowRef.nativeWindow.scrollTo(0, 0);
-
-    // We do not store checkpoints progress for iframes hence we do not
-    // need to consider redirecting in that case.
-    if (!this.isIframed && this.isLoggedIn) {
-      // Navigate the learner to the most recently reached checkpoint state.
-      this._navigateToMostRecentlyReachedCheckpoint();
-    }
 
     // The timeout is needed in order to give the recipient of the
     // broadcast sufficient time to load.

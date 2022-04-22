@@ -2313,13 +2313,8 @@ def _get_checkpoints_in_order(init_state_name, states):
         if current_state_name not in visited_state_names:
             visited_state_names.append(current_state_name)
             current_state = states[current_state_name]
-            # We treat the last state card also as a checkpoint to store
-            # the progress till the end of exploration otherwise we do not
-            # have a way to know that the exploration has been completed in
-            # the current playthrough using most recently reached checkpoint.
             if (
-                (current_state.card_is_checkpoint or
-                current_state.interaction.id == 'EndExploration') and
+                current_state.card_is_checkpoint and
                 current_state_name not in checkpoint_state_names
             ):
                 checkpoint_state_names.append(current_state_name)
@@ -2456,8 +2451,9 @@ def set_user_has_viewed_lesson_info_modal_once(user_id):
     _save_user_settings(user_settings)
 
 
-def update_learner_checkpoint_progress_on_restart(user_id, exploration_id):
-    """Sets the most recently reached checkpoint on restart exploration event.
+def clear_learner_checkpoint_progress(user_id, exploration_id):
+    """Clears learner's checkpoint progress through the exploration by
+    clearing the most recently reached checkpoint fields of the exploration.
 
     Args:
         user_id: str. The Id of the user.
