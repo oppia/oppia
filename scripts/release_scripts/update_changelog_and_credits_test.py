@@ -616,7 +616,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         with open_tab_swap, ask_user_swap:
-            update_changelog_and_credits.nform_server_errors_team(
+            update_changelog_and_credits.inform_server_errors_team(
                 'rota-url', 'server-error-playbook-url')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
