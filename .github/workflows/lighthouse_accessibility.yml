@@ -45,7 +45,7 @@ jobs:
           FILEPATH=node_modules/lighthouse/lighthouse-core/gather/gatherers/source-maps.js
           SEARCH_TARGET="1500"
           REPLACEMENT="10000"
-          occurrences=$(grep -c $SEARCH_TARGET FILEPATH)
+          occurrences=$(grep -c $SEARCH_TARGET $FILEPATH)
           # Assert that there is only one match for the target string.
           [[ occurrences != "1" ]]
           # Replace the target string with the replacement string.
