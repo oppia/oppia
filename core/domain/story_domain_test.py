@@ -542,8 +542,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_validation_fails_with_long_notes(self):
         self.story.notes = '#####' * 1000 + '#'
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected notes length to be less than 5000,'
-            ' but it is 5001 long'):
+            utils.ValidationError, 'Expected notes length to be less than or '
+            'equal to 5000, but it is 5001 long'
+        ):
             self.story.validate()
 
     def test_language_code_validation(self):

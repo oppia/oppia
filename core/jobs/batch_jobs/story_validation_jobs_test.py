@@ -28,7 +28,8 @@ from core.platform import models
 
 
 class GetNumberOfStoryNotesExceedsMaxLengthJobTests(
-    job_test_utils.JobTestBase):
+    job_test_utils.JobTestBase
+):
 
     JOB_CLASS = story_validation_jobs.GetNumberOfStoryNotesExceedsMaxLengthJob
 
