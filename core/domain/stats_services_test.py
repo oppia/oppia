@@ -1167,8 +1167,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_issues = (
-            stats_services.get_exp_issues(self.exp.id, self.exp.version))
+        exp_issues = stats_services.get_exp_issues(
+            self.exp.id, self.exp.version)
 
         exp_issue = exp_issues.unresolved_issues[0]
 
