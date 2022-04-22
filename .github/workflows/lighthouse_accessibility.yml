@@ -37,6 +37,7 @@ jobs:
       #       ${{ runner.os }}-build-${{ env.cache-name }}-
       #       ${{ runner.os }}-build-
       #       ${{ runner.os }}-
+      - uses: ./.github/actions/install-oppia-dependencies
       - run: |
           # Replace the 1.5 second timeout in lighthouse for retrieving
           # sourcemaps with a 10 second timeout.
@@ -46,8 +47,11 @@ jobs:
           REPLACEMENT="10000"
           echo '-----'
           ls /home/runner/work/oppia/oppia
+          echo '-----'
           ls /home/runner/work/oppia/oppia/node_modules
+          echo '-----'
           ls /home/runner/work/oppia/oppia/node_modules/lighthouse
+          echo '-----'
           ls /home/runner/work/oppia/oppia/node_modules/lighthouse/lighthouse-core
           echo '-----'
           occurrences=$(grep -c $SEARCH_TARGET $FILEPATH)
@@ -56,7 +60,6 @@ jobs:
           # Replace the target string with the replacement string.
           sed -i 's/$SEARCH_TARGET/$REPLACEMENT/' $FILEPATH
         shell: bash
-      - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
