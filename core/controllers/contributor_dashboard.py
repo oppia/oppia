@@ -296,7 +296,6 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
         if topic_name is None:
             raise self.InvalidInputException
 
-        topics = []
         if topic_name == feconf.ALL_LITERAL_CONSTANT:
             topics = topic_fetchers.get_all_topics()
         else:
@@ -305,20 +304,19 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'The supplied input topic: %s is not valid' % topic_name)
             topics = [topic]
-        exp_ids = []
         in_review_suggestion_target_ids = (
             suggestion_services
             .get_reviewable_translation_suggestion_target_ids(user_id))
-        for topic in topics:
-            stories = story_fetchers.get_stories_by_ids([
-                reference.story_id
-                for reference in topic.get_all_story_references()
-                if reference.story_is_published])
-            exp_ids.extend([
-                node.exploration_id
-                for story in stories
-                for node in story.story_contents.get_ordered_nodes()
-                if node.exploration_id in in_review_suggestion_target_ids])
+        topic_stories = story_fetchers.get_stories_by_ids([
+            reference.story_id
+            for topic in topics
+            for reference in topic.get_all_story_references()
+            if reference.story_is_published])
+        exp_ids = [
+            node.exploration_id
+            for story in topic_stories
+            for node in story.story_contents.get_ordered_nodes()
+            if node.exploration_id in in_review_suggestion_target_ids]
         return (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 exp_ids).values())

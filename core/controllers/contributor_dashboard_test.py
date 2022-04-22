@@ -595,6 +595,28 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 expected_opportunity_dict_20,
                 expected_opportunity_dict_30])
 
+        # Update story node order to explorations 10 -> 30 -> 20.
+        story.update_node_destination_node_ids(
+            'node_1', ['node_3'])
+        story.update_node_destination_node_ids(
+            'node_2', [])
+        story.update_node_destination_node_ids(
+            'node_3', ['node_2'])
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.publish_story(topic_id, story.id, self.admin_id)
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'topic_name': 'topic'})
+
+        # Should return reviewable opportunities in new story order.
+        self.assertEqual(
+            response['opportunities'],
+            [
+                expected_opportunity_dict_10,
+                expected_opportunity_dict_30,
+                expected_opportunity_dict_20])
+
     def _publish_valid_topic(self, topic, uncategorized_skill_ids):
         """Saves and publishes a valid topic with linked skills and subtopic.
 

@@ -331,6 +331,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 queries)), 1)
 
     def test_get_in_review_translation_suggestions(self) -> None:
+        # Create two in review translation suggestions.
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -345,6 +346,21 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_7', self.translation_language_code)
+        # Create accepted and rejected suggestions that should not be returned.
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_ACCEPTED, 'author_4',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_8', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_REJECTED, 'author_4',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_9', self.translation_language_code)
 
         suggestions = (
             suggestion_models.GeneralSuggestionModel
