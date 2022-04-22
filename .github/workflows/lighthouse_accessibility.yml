@@ -37,7 +37,6 @@ jobs:
       #       ${{ runner.os }}-build-${{ env.cache-name }}-
       #       ${{ runner.os }}-build-
       #       ${{ runner.os }}-
-      - run: pwd
       - run: |
           # Replace the 1.5 second timeout in lighthouse for retrieving
           # sourcemaps with a 10 second timeout.
@@ -45,6 +44,12 @@ jobs:
           FILEPATH=~/work/oppia/oppia/node_modules/lighthouse/lighthouse-core/gather/gatherers/source-maps.js
           SEARCH_TARGET="1500"
           REPLACEMENT="10000"
+          echo '-----'
+          ls /home/runner/work/oppia/oppia
+          ls /home/runner/work/oppia/oppia/node_modules
+          ls /home/runner/work/oppia/oppia/node_modules/lighthouse
+          ls /home/runner/work/oppia/oppia/node_modules/lighthouse/lighthouse-core
+          echo '-----'
           occurrences=$(grep -c $SEARCH_TARGET $FILEPATH)
           # Assert that there is only one match for the target string.
           [[ occurrences != "1" ]]
