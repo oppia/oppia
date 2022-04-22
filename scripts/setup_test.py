@@ -418,8 +418,8 @@ class SetupTests(test_utils.GenericTestBase):
             self.urls.append(url)
 
         def mock_check_call(commands: List[str]) -> None:
-            # Here commands attribute is defined but still mypy is unable to
-            # detect this. Thus, added an ignore.
+            # `commands` is defined in 'mock_check_call', even though mypy
+            # can't see it. Thus, added an ignore.
             mock_check_call.commands = commands  # type: ignore[attr-defined]
 
         def mock_is_x64() -> Literal[False]:
@@ -442,8 +442,8 @@ class SetupTests(test_utils.GenericTestBase):
         del check_function_calls['recursive_chmod_is_called']
         for _, item in check_function_calls.items():
             self.assertTrue(item)
-        # Here commands attribute is defined but still mypy is unable to detect
-        # this. Thus, added an ignore.
+        # `commands` is defined in 'mock_check_call', even though mypy
+        # can't see it. Thus, added an ignore.
         self.assertEqual(
             mock_check_call.commands,  # type: ignore[attr-defined]
             ['powershell.exe', '-c', 'expand-archive',
@@ -465,8 +465,8 @@ class SetupTests(test_utils.GenericTestBase):
             self.urls.append(url)
 
         def mock_check_call(commands: List[str]) -> None:
-            # Here commands attribute is defined but still mypy is unable to
-            # detect this. Thus, added an ignore.
+            # `commands` is defined in 'mock_check_call', even though mypy
+            # can't see it. Thus, added an ignore.
             mock_check_call.commands = commands  # type: ignore[attr-defined]
 
         def mock_is_x64() -> Literal[True]:
@@ -490,8 +490,8 @@ class SetupTests(test_utils.GenericTestBase):
         del check_function_calls['recursive_chmod_is_called']
         for _, item in check_function_calls.items():
             self.assertTrue(item)
-        # Here commands attribute is defined but still mypy is unable to detect
-        # this. Thus, added an ignore.
+        # `commands` is defined in 'mock_check_call', even though mypy
+        # can't see it. Thus, added an ignore.
         self.assertEqual(
             mock_check_call.commands,  # type: ignore[attr-defined]
             ['powershell.exe', '-c', 'expand-archive',
