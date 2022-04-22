@@ -269,7 +269,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         for report_type in app_feedback_report_constants.ReportType:
             self.assertEqual(
                 feedback_report.get_report_type_from_string(
-                    report_type.name), report_type)
+                    report_type.value), report_type)
 
     def test_get_report_type_from_string_with_invalid_string_raises_error(
             self) -> None:
