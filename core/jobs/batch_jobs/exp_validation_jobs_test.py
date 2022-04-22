@@ -488,8 +488,10 @@ class GetExpsHavingNonEmptyTrainingDataJobTests(job_test_utils.JobTestBase):
     def setUp(self):
         super().setUp()
 
-        self.invalid_state_1.interaction.answer_groups = self.state_answer_groups_1
-        self.invalid_state_2.interaction.answer_groups = self.state_answer_groups_2
+        self.invalid_state_1.interaction.answer_groups = (
+            self.state_answer_groups_1)
+        self.invalid_state_2.interaction.answer_groups = (
+            self.state_answer_groups_2)
 
         # Invalid exploration.
         self.exp_1 = self.create_model(
