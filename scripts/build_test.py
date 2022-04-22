@@ -586,8 +586,8 @@ class BuildTests(test_utils.GenericTestBase):
     def test_re_build_recently_changed_files_at_dev_dir(self) -> None:
         temp_file = tempfile.NamedTemporaryFile()
         temp_file_name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
-        # Here the `name` attribute is read-only. Hence, used `setattr`
-        # to set the attribute.
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(temp_file, 'name', temp_file_name)
         with utils.open_file(
             '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
@@ -692,8 +692,8 @@ class BuildTests(test_utils.GenericTestBase):
         )
 
         app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
-        # Here the `name` attribute is read-only. Hence, used `setattr`
-        # to set the attribute.
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(
             app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
@@ -702,8 +702,8 @@ class BuildTests(test_utils.GenericTestBase):
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
-        # Here the `name` attribute is read-only. Hence, used `setattr`
-        # to set the attribute.
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
         with utils.open_file(mock_yaml_filepath, 'w') as tmp:
             tmp.write(u'Initial content in mock_app.yaml')
@@ -739,8 +739,8 @@ class BuildTests(test_utils.GenericTestBase):
         )
 
         app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
-        # Here the `name` attribute is read-only. Hence, used `setattr`
-        # to set the attribute.
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(
             app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
@@ -749,8 +749,8 @@ class BuildTests(test_utils.GenericTestBase):
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
-        # Here the `name` attribute is read-only. Hence, used `setattr`
-        # to set the attribute.
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
         with utils.open_file(mock_yaml_filepath, 'w') as tmp:
             tmp.write('Initial content in mock_app.yaml')
@@ -780,8 +780,8 @@ class BuildTests(test_utils.GenericTestBase):
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
         constants_temp_file = tempfile.NamedTemporaryFile()
-        # Here the `name` attribute is read-only. Hence, used `setattr`
-        # to set the attribute.
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(
             constants_temp_file, 'name', mock_constants_path)
         with utils.open_file(mock_constants_path, 'w') as tmp:
@@ -791,8 +791,8 @@ class BuildTests(test_utils.GenericTestBase):
             tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
-        # Here the `name` attribute is read-only. Hence, used `setattr`
-        # to set the attribute.
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(feconf_temp_file, 'name', mock_feconf_path)
         with utils.open_file(mock_feconf_path, 'w') as tmp:
             tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
@@ -835,8 +835,8 @@ class BuildTests(test_utils.GenericTestBase):
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
         constants_temp_file = tempfile.NamedTemporaryFile()
-        # Here the `name` attribute is read-only. Hence, used `setattr`
-        # to set the attribute.
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(
             constants_temp_file, 'name', mock_constants_path)
         with utils.open_file(mock_constants_path, 'w') as tmp:
@@ -846,8 +846,8 @@ class BuildTests(test_utils.GenericTestBase):
             tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
-        # Here the `name` attribute is read-only. Hence, used `setattr`
-        # to set the attribute.
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(feconf_temp_file, 'name', mock_feconf_path)
         with utils.open_file(mock_feconf_path, 'w') as tmp:
             tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
@@ -874,8 +874,8 @@ class BuildTests(test_utils.GenericTestBase):
         filepath.
         """
         temp_file = tempfile.NamedTemporaryFile()
-        # Here the `name` attribute is read-only. Hence, used `setattr`
-        # to set the attribute.
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(temp_file, 'name', 'some_file.txt')
         with utils.open_file('some_file.txt', 'w') as tmp:
             tmp.write(u'Some content.')
