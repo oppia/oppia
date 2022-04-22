@@ -21,11 +21,20 @@ from __future__ import annotations
 from core.domain import translation_domain
 from core.platform import models
 
+from typing import Optional
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import translation_models
+
+
 (translation_models,) = models.Registry.import_models([
     models.NAMES.translation])
 
 
-def get_translation_from_model(translation_model):
+def get_translation_from_model(
+    translation_model: translation_models.MachineTranslationModel
+) -> translation_domain.MachineTranslation:
     """Returns a MachineTranslation object given a
     MachineTranslationModel loaded from the datastore.
 
@@ -45,7 +54,10 @@ def get_translation_from_model(translation_model):
 
 
 def get_machine_translation(
-        source_language_code, target_language_code, source_text):
+    source_language_code: str,
+    target_language_code: str,
+    source_text: str
+) -> Optional[translation_domain.MachineTranslation]:
     """Gets MachineTranslation by language codes and source text.
     Returns None if no translation exists for the given parameters.
 

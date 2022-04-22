@@ -27,7 +27,7 @@ from core.storage.audit import gae_models
 class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
     """Tests for roles and actions."""
 
-    def test_get_role_actions_return_value_in_correct_schema(self):
+    def test_get_role_actions_return_value_in_correct_schema(self) -> None:
         role_actions = role_services.get_role_actions()
 
         self.assertTrue(isinstance(role_actions, dict))
@@ -38,8 +38,8 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
             for action_name in allotted_actions:
                 self.assertTrue(isinstance(action_name, str))
 
-    def test_get_all_actions(self):
-        with self.assertRaisesRegex(
+    def test_get_all_actions(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Role TEST_ROLE does not exist.'):
             role_services.get_all_actions(['TEST_ROLE'])
 
@@ -47,10 +47,11 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
             role_services.get_all_actions([feconf.ROLE_ID_GUEST]),
             [role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY])
 
-    def test_action_allocated_to_all_allowed_roles(self):
+    def test_action_allocated_to_all_allowed_roles(self) -> None:
         role_actions = role_services.get_role_actions()
-
-        self.assertItemsEqual(list(role_actions), feconf.ALLOWED_USER_ROLES)
+        
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+            list(role_actions), feconf.ALLOWED_USER_ROLES)
 
     def test_log_role_query(self):
         role_services.log_role_query('TEST_USER',
@@ -59,3 +60,4 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
             gae_models.RoleQueryAuditModel.has_reference_to_user_id(
                 'TEST_USER'),
             True)
+        
