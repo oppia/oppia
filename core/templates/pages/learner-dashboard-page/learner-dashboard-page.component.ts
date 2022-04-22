@@ -125,7 +125,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   activeSection: string;
   activeSubsection: string;
   feedbackThreadActive: boolean;
-  more: FeedbackThreadSummaryBackendDict[][] = [];
+  paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
   loadingIndicatorIsShown = false;
 
   messageSendingInProgress: boolean;
@@ -254,7 +254,8 @@ export class LearnerDashboardPageComponent implements OnInit {
     this.loadingIndicatorIsShown = true;
     let dashboardFeedbackUpdatesDataPromise = (
       this.learnerDashboardBackendApiService
-        .fetchLearnerDashboardFeedbackUpdatesDataAsync(this.more));
+        .fetchLearnerDashboardFeedbackUpdatesDataAsync(
+          this.paginatedThreadsList));
     dashboardFeedbackUpdatesDataPromise.then(
       responseData => {
         this.isCurrentFeedbackSortDescending = true;
@@ -264,7 +265,7 @@ export class LearnerDashboardPageComponent implements OnInit {
         this.threadSummaries = [
           ... this.threadSummaries,
           ... responseData.threadSummaries];
-        this.more = responseData.more;
+        this.paginatedThreadsList = responseData.paginatedThreadsList;
         this.numberOfUnreadThreads =
           responseData.numberOfUnreadThreads;
         this.feedbackThreadActive = false;

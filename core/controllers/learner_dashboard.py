@@ -229,7 +229,7 @@ class LearnerDashboardFeedbackUpdatesHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
             'POST': {
-                'more': {
+                'paginated_threads_list': {
                     'schema': {
                         'type': 'list',
                         'items': {
@@ -247,25 +247,30 @@ class LearnerDashboardFeedbackUpdatesHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def post(self):
         """Handles POST requests."""
-        more = self.normalized_payload.get('more')
-        if len(more) == 0:
+        if len(self.normalized_payload.get('paginated_threads_list')) == 0:
             full_thread_ids = (
                 subscription_services.get_all_threads_subscribed_to(
                     self.user_id))
-            more = [
+            paginated_threads_list = [
                 full_thread_ids[index: index + 100]
                 for index in range(0, len(full_thread_ids), 100)]
-        if len(more) > 0 and len(more[0]) > 0:
+        else:
+            paginated_threads_list = self.normalized_payload.get(
+                'paginated_threads_list')
+        if (
+            len(paginated_threads_list) > 0 and
+            len(paginated_threads_list[0]) > 0
+        ):
             thread_summaries, number_of_unread_threads = (
                 feedback_services.get_exp_thread_summaries(
-                    self.user_id, more[0]))
+                    self.user_id, paginated_threads_list[0]))
         else:
             thread_summaries, number_of_unread_threads = [], 0
 
         self.values.update({
             'thread_summaries': [s.to_dict() for s in thread_summaries],
             'number_of_unread_threads': number_of_unread_threads,
-            'more': more[1:]
+            'paginated_threads_list': paginated_threads_list[1:]
         })
         self.render_json(self.values)
 
