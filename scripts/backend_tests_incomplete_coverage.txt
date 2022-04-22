@@ -11,6 +11,7 @@ core.domain.topic_domain_test
 core.domain.rights_manager_test
 core.domain.story_domain_test
 core.domain.stats_services_test
+core.domain.value_generators_domain_test
 core.domain.interaction_registry_test
 core.domain.auth_services_test
 core.domain.opportunity_services_test
@@ -46,4 +47,3 @@ core.domain.user_domain_test
 scripts.install_third_party_libs_test
 core.storage.exploration.gae_models_test
 scripts.docstrings_checker_test
-core.domain.value_generators_domain_test
