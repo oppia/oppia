@@ -260,6 +260,7 @@ describe('Translation tab component', function() {
 
   it('should initialize $scope properties after controller is initialized',
     function() {
+      contextService = TestBed.get(ContextService);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
@@ -275,6 +276,7 @@ describe('Translation tab component', function() {
 
   it('should load translation tab data when translation tab page is' +
     ' refreshed', function() {
+      contextService = TestBed.get(ContextService);
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canVoiceover: true
@@ -292,6 +294,7 @@ describe('Translation tab component', function() {
 
   it('should start tutorial if in tutorial mode on page load with' +
     ' permissions', () => {
+      contextService = TestBed.get(ContextService);
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canVoiceover: true
@@ -311,6 +314,7 @@ describe('Translation tab component', function() {
 
   it('should not start tutorial if in tutorial mode on page load but' +
     ' no permissions', () => {
+      contextService = TestBed.get(ContextService);
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve(null));
 
@@ -325,6 +329,7 @@ describe('Translation tab component', function() {
   });
 
   it('should not start tutorial if not in tutorial mode on page load', () => {
+    contextService = TestBed.get(ContextService);
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canVoiceover: true
@@ -342,6 +347,7 @@ describe('Translation tab component', function() {
 
   it('should finish tutorial on clicking the end tutorial button when' +
     ' it has already started', function() {
+      contextService = TestBed.get(ContextService);
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canVoiceover: true
@@ -365,6 +371,7 @@ describe('Translation tab component', function() {
 
   it('should skip tutorial when the skip tutorial button is clicked',
     function() {
+      contextService = TestBed.get(ContextService);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
@@ -388,6 +395,7 @@ describe('Translation tab component', function() {
 
   it('should start tutorial when welcome translation modal is closed',
     fakeAsync(() => {
+      contextService = TestBed.get(ContextService);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
@@ -451,6 +459,7 @@ describe('Translation tab component', function() {
   describe('TRANSLATION_TUTORIAL_OPTIONS', function() {
     it('should animate html and body to 0px top when calling function' +
       ' from option 1', function() {
+        contextService = TestBed.get(ContextService);
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -466,6 +475,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 20px top when calling function' +
       ' from option 1', function() {
+        contextService = TestBed.get(ContextService);
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -481,6 +491,7 @@ describe('Translation tab component', function() {
 
     it('should set new top value to element with tutorialTranslationOverview' +
       ' id when calling function from option 3', function() {
+        contextService = TestBed.get(ContextService);
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -507,6 +518,7 @@ describe('Translation tab component', function() {
 
     it('should set new top value to element with tutorialTranslationLanguage' +
     ' id when calling function from option 3', function() {
+      contextService = TestBed.get(ContextService);
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -533,6 +545,7 @@ describe('Translation tab component', function() {
 
     it('should set new top value to element with tutorialTranslationState' +
       ' id when calling function from option 5', function() {
+        contextService = TestBed.get(ContextService);
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -559,6 +572,7 @@ describe('Translation tab component', function() {
 
     it('should set new top value to element with tutorialTranslationOverview' +
       ' id when calling function from option 5', function() {
+        contextService = TestBed.get(ContextService);
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -585,6 +599,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 0px top when calling function' +
       ' from option 7', function() {
+        contextService = TestBed.get(ContextService);
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -600,6 +615,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 20px top when calling function' +
       ' from option 7', function() {
+        contextService = TestBed.get(ContextService);
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -615,6 +631,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 0px top when calling function' +
       ' from option 9', function() {
+        contextService = TestBed.get(ContextService);
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -630,6 +647,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 20px top when calling function' +
       ' from option 9', function() {
+        contextService = TestBed.get(ContextService);
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -645,6 +663,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 0px top when calling function' +
       ' from option 11', function() {
+        contextService = TestBed.get(ContextService);
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -660,6 +679,7 @@ describe('Translation tab component', function() {
 
     it('should animate html and body to 20px top when calling function' +
       ' from option 11', function() {
+        contextService = TestBed.get(ContextService);
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
