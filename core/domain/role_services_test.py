@@ -53,7 +53,7 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(  # type: ignore[no-untyped-call]
             list(role_actions), feconf.ALLOWED_USER_ROLES)
 
-    def test_log_role_query(self):
+    def test_log_role_query(self) -> None:
         role_services.log_role_query(
             'TEST_USER', feconf.ROLE_ACTION_ADD, role='GUEST')
         self.assertEqual(
