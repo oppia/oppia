@@ -525,9 +525,17 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         'POST': {
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params_dict),
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                         'schema': {
+                             'type': 'basestring'
+                         }
+                    }
                 },
                 'default_value': {}
             },
