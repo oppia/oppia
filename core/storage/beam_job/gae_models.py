@@ -24,6 +24,14 @@ import uuid
 from core import utils
 from core.platform import models
 
+from typing import Dict, Type
+from typing_extensions import Final
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -31,7 +39,7 @@ datastore_services = models.Registry.import_datastore_services()
 _MAX_ID_GENERATION_ATTEMPTS = 5
 
 
-def _get_new_model_id(model_class: base_models.BaseModel) -> str:
+def _get_new_model_id(model_class: Type[base_models.BaseModel]) -> str:
     """Generates an ID for a new model.
 
     Returns:
@@ -55,47 +63,47 @@ class BeamJobState(enum.Enum):
     """
 
     # The job is currently running.
-    RUNNING = 'RUNNING'
+    RUNNING: Final = 'RUNNING'
     # The job has been created but is not yet running. Jobs that are pending may
     # only transition to RUNNING, or FAILED.
-    PENDING = 'PENDING'
+    PENDING: Final = 'PENDING'
     # The job has not yet started to run.
-    STOPPED = 'STOPPED'
+    STOPPED: Final = 'STOPPED'
     # The job has has been explicitly cancelled and is in the process of
     # stopping. Jobs that are cancelling may only transition to CANCELLED or
     # FAILED.
-    CANCELLING = 'CANCELLING'
+    CANCELLING: Final = 'CANCELLING'
     # The job has has been explicitly cancelled. This is a terminal job state.
     # This state may only be set via a Cloud Dataflow jobs.update call, and only
     # if the job has not yet reached another terminal state.
-    CANCELLED = 'CANCELLED'
+    CANCELLED: Final = 'CANCELLED'
     # The job is in the process of draining. A draining job has stopped pulling
     # from its input sources and is processing any data that remains in-flight.
     # This state may be set via a Cloud Dataflow jobs.update call, but only as a
     # transition from RUNNING. Jobs that are draining may only transition to
     # DRAINED, CANCELLED, or FAILED.
-    DRAINING = 'DRAINING'
+    DRAINING: Final = 'DRAINING'
     # The job has been drained. A drained job terminated by stopping pulling
     # from its input sources and processing any data that remained in-flight
     # when draining was requested. This state is a terminal state, may only be
     # set by the Cloud Dataflow service, and only as a transition from DRAINING.
-    DRAINED = 'DRAINED'
+    DRAINED: Final = 'DRAINED'
     # The job was successfully updated, meaning that this job was stopped and
     # another job was started, inheriting state from this one. This is a
     # terminal job state. This state may only be set by the Cloud Dataflow
     # service, and only as a transition from RUNNING.
-    UPDATED = 'UPDATED'
+    UPDATED: Final = 'UPDATED'
     # The job has successfully completed. This is a terminal job state. This
     # state may be set by the Cloud Dataflow service, as a transition from
     # RUNNING. It may also be set via a Cloud Dataflow jobs.update call, if the
     # job has not yet reached a terminal state.
-    DONE = 'DONE'
+    DONE: Final = 'DONE'
     # The job has has failed. This is a terminal job state. This state may only
     # be set by the Cloud Dataflow service, and only as a transition from
     # RUNNING.
-    FAILED = 'FAILED'
+    FAILED: Final = 'FAILED'
     # The job's run state isn't specified.
-    UNKNOWN = 'UNKNOWN'
+    UNKNOWN: Final = 'UNKNOWN'
 
 
 class BeamJobRunModel(base_models.BaseModel):
@@ -129,8 +137,10 @@ class BeamJobRunModel(base_models.BaseModel):
             BeamJobState.UNKNOWN.value,
         ])
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with signature of super class's get_new_id() method.
     @classmethod
-    def get_new_id(cls) -> str:
+    def get_new_id(cls) -> str:  # type: ignore[override]
         """Generates an ID for a new BeamJobRunModel.
 
         Returns:
@@ -139,17 +149,17 @@ class BeamJobRunModel(base_models.BaseModel):
         return _get_new_model_id(cls)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model doesn't contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(BeamJobRunModel, cls).get_export_policy(), **{
             'dataflow_job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -178,8 +188,10 @@ class BeamJobRunResultModel(base_models.BaseModel):
     # The error output generated by the corresponding Apache Beam job.
     stderr = datastore_services.TextProperty(required=False, indexed=False)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with signature of super class's get_new_id() method.
     @classmethod
-    def get_new_id(cls) -> str:
+    def get_new_id(cls) -> str:  # type: ignore[override]
         """Generates an ID for a new BeamJobRunResultModel.
 
         Returns:
@@ -188,17 +200,17 @@ class BeamJobRunResultModel(base_models.BaseModel):
         return _get_new_model_id(cls)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model doesn't contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(BeamJobRunResultModel, cls).get_export_policy(), **{
             'job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
