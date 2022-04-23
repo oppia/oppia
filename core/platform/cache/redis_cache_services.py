@@ -50,12 +50,7 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
         memory in bytes, peak memory usage in bytes, and the total number of
         keys stored as values.
     """
-    # We have ignored [attr-defined] below because there is some error in
-    # the redis typeshed. Typestubs don't define the method memory_stats()
-    # for the redis.StrictRedis object.
-    # TODO(#13617): Update our typeshed after redis stubs are improved in
-    # typeshed. Then the ignore[attr-defined] used below can be removed.
-    redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats() # type: ignore[attr-defined]
+    redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats()
     memory_stats = caching_domain.MemoryCacheStats(
         redis_full_profile.get('total.allocated'),
         redis_full_profile.get('peak.allocated'),
@@ -81,12 +76,14 @@ def get_multi(keys: List[str]) -> List[Optional[str]]:
         that are passed in.
     """
     assert isinstance(keys, list)
-    # TODO(#13663): After we install mypy in virtual environment and upgrade
-    # our mypy, we will have latest stubs of redis available. After this
-    # the cast and type ignore used below can be removed.
+    # The internal implementation of mget() method returns ResponseT which
+    # is a type of Union[Awaitable, Any]. But from the usage of this method
+    # we know it returns List[Optional[str]] type. So for the strict typing
+    # we used cast here.
     return cast(
         List[Optional[str]],
-        OPPIA_REDIS_CLIENT.mget(keys)) # type: ignore[no-untyped-call]
+        OPPIA_REDIS_CLIENT.mget(keys)
+    )
 
 
 def set_multi(key_value_mapping: Dict[str, str]) -> bool:
@@ -101,12 +98,13 @@ def set_multi(key_value_mapping: Dict[str, str]) -> bool:
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
-    # TODO(#13663): After we install mypy in virtual environment and upgrade
-    # our mypy, we will have latest stubs of redis available. After this
-    # the cast and type ignore used below can be removed.
+    # The internal implementation of mset() method returns ResponseT which
+    # is a type of Union[Awaitable, Any]. But from the usage of this method
+    # we know it returns bool type. So for the strict typing we used cast here.
     return cast(
         bool,
-        OPPIA_REDIS_CLIENT.mset(key_value_mapping)) # type: ignore[no-untyped-call]
+        OPPIA_REDIS_CLIENT.mset(key_value_mapping)
+    )
 
 
 def delete_multi(keys: List[str]) -> int:
@@ -120,5 +118,10 @@ def delete_multi(keys: List[str]) -> int:
     """
     for key in keys:
         assert isinstance(key, str)
-    number_of_deleted_keys = OPPIA_REDIS_CLIENT.delete(*keys)
-    return number_of_deleted_keys
+    # The internal implementation of delete() method returns ResponseT which
+    # is a type of Union[Awaitable, Any]. But from the usage of this method
+    # we know it returns int type. So for the strict typing we used cast here.
+    return cast(
+        int,
+        OPPIA_REDIS_CLIENT.delete(*keys)
+    )

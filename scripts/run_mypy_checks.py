@@ -171,8 +171,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/voiceover_services_test.py',
     'core/domain/wipeout_service.py',
     'core/domain/wipeout_service_test.py',
-    'core/platform/storage/cloud_storage_emulator.py',
-    'core/platform/storage/cloud_storage_emulator_test.py',
     'core/platform_feature_list.py',
     'core/platform_feature_list_test.py',
     'core/storage/beam_job/gae_models.py',
