@@ -217,7 +217,7 @@ describe('Collection Summary Tile Component', () => {
     const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow')
       .and.returnValue('a few seconds ago');
 
-    component.getLastUpdatedMsec = new Date().getUTCMilliseconds();
+    component.getLastUpdatedMsec = Date.now();
     let relativeLastUpdatedDateTime =
       component.getRelativeLastUpdatedDateTime();
     fixture.detectChanges();
