@@ -86,7 +86,7 @@ describe('Translation tab component', function() {
         return 'exp1';
       }
     });
-  };
+  });
                       
   beforeEach(function() {
     TestBed.configureTestingModule({
@@ -411,22 +411,41 @@ describe('Translation tab component', function() {
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', fakeAsync(() => {
     contextService = TestBed.get(ContextService);
+    console.log("ContextService1"+contextService);
+    console.log("ContextService.getExplorationId1"+contextService.getExplorationId());
     ctrl.$onInit();
-
+    console.log("ContextService2"+contextService);
+    console.log("ContextService.getExplorationId2"+contextService.getExplorationId());
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished')
       .and.stub();
+      console.log("ContextService3"+contextService);
+      console.log("ContextService.getExplorationId3"+contextService.getExplorationId());
     spyOn(siteAnalyticsService, 'registerDeclineTutorialModalEvent').and.stub();
+    console.log("ContextService4"+contextService);
+    console.log("ContextService.getExplorationId4"+contextService.getExplorationId());
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject('exp1')
     } as NgbModalRef);
+    console.log("ContextService5"+contextService);
+    console.log("ContextService.getExplorationId5"+contextService.getExplorationId());
     enterTranslationForTheFirstTimeEmitter.emit();
+    console.log("ContextService6"+contextService);
+    console.log("ContextService.getExplorationId6"+contextService.getExplorationId());
     tick();
+    console.log("ContextService7"+contextService);
+    console.log("ContextService.getExplorationId7"+contextService.getExplorationId());
     $scope.$apply();
+    console.log("ContextService8"+contextService);
+    console.log("ContextService.getExplorationId8"+contextService.getExplorationId());
 
     expect(siteAnalyticsService.registerDeclineTutorialModalEvent)
       .toHaveBeenCalledWith('exp1');
+      console.log("ContextService9"+contextService);
+    console.log("ContextService.getExplorationId9"+contextService.getExplorationId());
     expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
       .toHaveBeenCalled();
+      console.log("ContextService10"+contextService);
+      console.log("ContextService.getExplorationId10"+contextService.getExplorationId());
   }));
 
   describe('TRANSLATION_TUTORIAL_OPTIONS', function() {
