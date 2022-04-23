@@ -91,44 +91,8 @@ describe('Translation tab component', function() {
       UserExplorationPermissionsService);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value(
-      'ExplorationImprovementsTaskRegistryService',
-      TestBed.get(ExplorationImprovementsTaskRegistryService));
-    $provide.value(
-      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
-    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
-    $provide.value(
-      'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
-    $provide.value(
-      'StateCustomizationArgsService',
-      TestBed.get(StateCustomizationArgsService));
-    $provide.value(
-      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
-    $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value(
-      'StateRecordedVoiceoversService',
-      TestBed.get(StateRecordedVoiceoversService));
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    $provide.value(
-      'StateWrittenTranslationsService',
-      TestBed.get(StateWrittenTranslationsService));
-    $provide.value(
-      'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
+ 
+
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
@@ -246,6 +210,49 @@ describe('Translation tab component', function() {
 
   it('should initialize $scope properties after controller is initialized',
     function() {
+      angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
+      TestBed.get(ExplorationImprovementsTaskRegistryService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
+    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
+    $provide.value(
+      'TextInputRulesService',
+      TestBed.get(TextInputRulesService));
+    $provide.value(
+      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    $provide.value(
+      'StateCustomizationArgsService',
+      TestBed.get(StateCustomizationArgsService));
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService',
+      TestBed.get(StateRecordedVoiceoversService));
+    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'StateWrittenTranslationsService',
+      TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+    $provide.value('ContextService', {
+      getExplorationId: () => {
+        return 'exp1';
+      }
+    });
+  });
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
@@ -262,6 +269,50 @@ describe('Translation tab component', function() {
 
   it('should load translation tab data when translation tab page is' +
     ' refreshed', function() {
+    angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
+      TestBed.get(ExplorationImprovementsTaskRegistryService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
+    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
+    $provide.value(
+      'TextInputRulesService',
+      TestBed.get(TextInputRulesService));
+    $provide.value(
+      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    $provide.value(
+      'StateCustomizationArgsService',
+      TestBed.get(StateCustomizationArgsService));
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService',
+      TestBed.get(StateRecordedVoiceoversService));
+    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'StateWrittenTranslationsService',
+      TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+    $provide.value('ContextService', {
+      getExplorationId: () => {
+        return 'exp1';
+      }
+    });
+      
+  });
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
@@ -280,6 +331,49 @@ describe('Translation tab component', function() {
 
   it('should start tutorial if in tutorial mode on page load with' +
     ' permissions', () => {
+    angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
+      TestBed.get(ExplorationImprovementsTaskRegistryService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
+    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
+    $provide.value(
+      'TextInputRulesService',
+      TestBed.get(TextInputRulesService));
+    $provide.value(
+      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    $provide.value(
+      'StateCustomizationArgsService',
+      TestBed.get(StateCustomizationArgsService));
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService',
+      TestBed.get(StateRecordedVoiceoversService));
+    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'StateWrittenTranslationsService',
+      TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+      $provide.value('ContextService', {
+      getExplorationId: () => {
+        return 'exp1';
+      }
+    });
+  });
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
@@ -300,6 +394,49 @@ describe('Translation tab component', function() {
 
   it('should not start tutorial if in tutorial mode on page load but' +
     ' no permissions', () => {
+    angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
+      TestBed.get(ExplorationImprovementsTaskRegistryService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
+    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
+    $provide.value(
+      'TextInputRulesService',
+      TestBed.get(TextInputRulesService));
+    $provide.value(
+      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    $provide.value(
+      'StateCustomizationArgsService',
+      TestBed.get(StateCustomizationArgsService));
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService',
+      TestBed.get(StateRecordedVoiceoversService));
+    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'StateWrittenTranslationsService',
+      TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+      $provide.value('ContextService', {
+      getExplorationId: () => {
+        return 'exp1';
+      }
+    });
+  });
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve(null));
@@ -315,6 +452,49 @@ describe('Translation tab component', function() {
   });
 
   it('should not start tutorial if not in tutorial mode on page load', () => {
+    angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
+      TestBed.get(ExplorationImprovementsTaskRegistryService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
+    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
+    $provide.value(
+      'TextInputRulesService',
+      TestBed.get(TextInputRulesService));
+    $provide.value(
+      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    $provide.value(
+      'StateCustomizationArgsService',
+      TestBed.get(StateCustomizationArgsService));
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService',
+      TestBed.get(StateRecordedVoiceoversService));
+    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'StateWrittenTranslationsService',
+      TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+      $provide.value('ContextService', {
+      getExplorationId: () => {
+        return 'exp1';
+      }
+    });
+  });
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
@@ -333,6 +513,49 @@ describe('Translation tab component', function() {
 
   it('should finish tutorial on clicking the end tutorial button when' +
     ' it has already started', function() {
+    angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
+      TestBed.get(ExplorationImprovementsTaskRegistryService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
+    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
+    $provide.value(
+      'TextInputRulesService',
+      TestBed.get(TextInputRulesService));
+    $provide.value(
+      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    $provide.value(
+      'StateCustomizationArgsService',
+      TestBed.get(StateCustomizationArgsService));
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService',
+      TestBed.get(StateRecordedVoiceoversService));
+    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'StateWrittenTranslationsService',
+      TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+      $provide.value('ContextService', {
+      getExplorationId: () => {
+        return 'exp1';
+      }
+    });
+  });
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
@@ -357,6 +580,49 @@ describe('Translation tab component', function() {
 
   it('should skip tutorial when the skip tutorial button is clicked',
     function() {
+    angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
+      TestBed.get(ExplorationImprovementsTaskRegistryService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
+    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
+    $provide.value(
+      'TextInputRulesService',
+      TestBed.get(TextInputRulesService));
+    $provide.value(
+      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    $provide.value(
+      'StateCustomizationArgsService',
+      TestBed.get(StateCustomizationArgsService));
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService',
+      TestBed.get(StateRecordedVoiceoversService));
+    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'StateWrittenTranslationsService',
+      TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+      $provide.value('ContextService', {
+      getExplorationId: () => {
+        return 'exp1';
+      }
+    });
+  });
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
@@ -381,6 +647,49 @@ describe('Translation tab component', function() {
 
   it('should start tutorial when welcome translation modal is closed',
     fakeAsync(() => {
+    angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
+      TestBed.get(ExplorationImprovementsTaskRegistryService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
+    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
+    $provide.value(
+      'TextInputRulesService',
+      TestBed.get(TextInputRulesService));
+    $provide.value(
+      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    $provide.value(
+      'StateCustomizationArgsService',
+      TestBed.get(StateCustomizationArgsService));
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService',
+      TestBed.get(StateRecordedVoiceoversService));
+    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'StateWrittenTranslationsService',
+      TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+      $provide.value('ContextService', {
+      getExplorationId: () => {
+        return 'exp1';
+      }
+    });
+  });
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
@@ -405,12 +714,50 @@ describe('Translation tab component', function() {
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', fakeAsync(() => {
     angular.mock.module('oppia', function($provide) {
-    $provide.value('ContextService', {
+    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
+      TestBed.get(ExplorationImprovementsTaskRegistryService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
+    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
+    $provide.value(
+      'TextInputRulesService',
+      TestBed.get(TextInputRulesService));
+    $provide.value(
+      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    $provide.value(
+      'StateCustomizationArgsService',
+      TestBed.get(StateCustomizationArgsService));
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService',
+      TestBed.get(StateRecordedVoiceoversService));
+    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'StateWrittenTranslationsService',
+      TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+      $provide.value('ContextService', {
       getExplorationId: () => {
         return 'exp1';
       }
     });
-    }
+  });
+
+
     contextService = TestBed.get(ContextService);
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     ctrl.$onInit();
@@ -421,6 +768,7 @@ describe('Translation tab component', function() {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject('exp1')
     } as NgbModalRef);
+    console.log(contextService);
     enterTranslationForTheFirstTimeEmitter.emit();
     tick();
     $scope.$apply();
