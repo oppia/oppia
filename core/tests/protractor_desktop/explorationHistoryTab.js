@@ -659,7 +659,7 @@ describe('Exploration history', function() {
     await general.moveToPlayer();
     await explorationPlayerPage.expectContentToMatch(
       await forms.toRichText('enter 6 to continue'));
-    await explorationPlayerPage.submitAnswer('6', null);
+    await explorationPlayerPage.submitAnswer('NumericInput', '6');
     await explorationPlayerPage.expectExplorationToNotBeOver();
     await explorationPlayerPage.expectContentToMatch(
       await forms.toRichText('card 2 second commit text'));
