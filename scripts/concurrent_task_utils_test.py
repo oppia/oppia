@@ -28,7 +28,7 @@ from . import concurrent_task_utils
 
 
 def test_function(unused_arg):
-    return builtins.object
+    return object
 
 
 class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
