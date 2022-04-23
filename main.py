@@ -495,6 +495,7 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
     get_redirect_route(r'/userinfohandler', profile.UserInfoHandler),
+    get_redirect_route(r'/userinfohandler/data', profile.UserInfoHandler),
     get_redirect_route(r'/url_handler', profile.UrlHandler),
     get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(
@@ -541,6 +542,12 @@ URLS = [
     get_redirect_route(
         r'/explorehandler/answer_submitted_event/<exploration_id>',
         reader.AnswerSubmittedEventHandler),
+    get_redirect_route(
+        r'/explorehandler/checkpoint_reached/<exploration_id>',
+        reader.CheckpointReachedEventHandler),
+    get_redirect_route(
+        r'/explorehandler/restart/<exploration_id>',
+        reader.ExplorationRestartEventHandler),
     get_redirect_route(
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler),
