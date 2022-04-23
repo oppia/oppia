@@ -20,8 +20,8 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import role_services
-from core.tests import test_utils
 from core.storage.audit import gae_models
+from core.tests import test_utils
 
 
 class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
