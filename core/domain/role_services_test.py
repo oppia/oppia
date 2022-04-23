@@ -49,15 +49,14 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
 
     def test_action_allocated_to_all_allowed_roles(self) -> None:
         role_actions = role_services.get_role_actions()
-        
+
         self.assertItemsEqual(  # type: ignore[no-untyped-call]
             list(role_actions), feconf.ALLOWED_USER_ROLES)
 
     def test_log_role_query(self):
-        role_services.log_role_query('TEST_USER',
-            feconf.ROLE_ACTION_ADD, role='GUEST')
+        role_services.log_role_query(
+            'TEST_USER', feconf.ROLE_ACTION_ADD, role='GUEST')
         self.assertEqual(
             gae_models.RoleQueryAuditModel.has_reference_to_user_id(
                 'TEST_USER'),
             True)
-        
