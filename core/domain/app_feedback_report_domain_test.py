@@ -52,8 +52,8 @@ PLATFORM_WEB = app_feedback_report_constants.PLATFORM_CHOICE_WEB
 TICKET_NAME = 'ticket name'
 TICKET_ID = '%s.%s.%s' % (
     'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC), '16CharString1234')
-REPORT_TYPE_SUGGESTION = app_feedback_report_constants.REPORT_TYPE.suggestion
-REPORT_TYPE_ISSUE = app_feedback_report_constants.REPORT_TYPE.issue
+REPORT_TYPE_SUGGESTION = app_feedback_report_constants.ReportType.SUGGESTION
+REPORT_TYPE_ISSUE = app_feedback_report_constants.ReportType.ISSUE
 CATEGORY_SUGGESTION_OTHER = (
     app_feedback_report_constants.CATEGORY.other_suggestion)
 CATEGORY_ISSUE_TOPICS = app_feedback_report_constants.CATEGORY.topics_issue
@@ -266,10 +266,10 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_get_report_type_from_string_returns_expected_report_type(
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
-        for report_type in app_feedback_report_constants.REPORT_TYPE:
+        for report_type in app_feedback_report_constants.ReportType:
             self.assertEqual(
                 feedback_report.get_report_type_from_string(
-                    report_type.name), report_type)
+                    report_type.value), report_type)
 
     def test_get_report_type_from_string_with_invalid_string_raises_error(
             self) -> None:
