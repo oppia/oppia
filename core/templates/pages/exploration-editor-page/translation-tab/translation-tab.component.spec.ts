@@ -148,7 +148,6 @@ describe('Translation tab component', function() {
     stateTutorialFirstTimeService = $injector.get(
       'StateTutorialFirstTimeService');
 
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'Introduction');
     spyOnProperty(
