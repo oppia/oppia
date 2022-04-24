@@ -534,7 +534,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
                     'values': {
                          'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring']
+                            'options': ['int', 'basestring', 'dict']
                          }
                     }
                 },
@@ -980,7 +980,7 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
                     'values': {
                          'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring']
+                            'options': ['int', 'basestring', 'dict']
                          }
                     }
                 }
@@ -1093,7 +1093,7 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
                     'values': {
                          'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring']
+                            'options': ['int', 'basestring', 'dict']
                          }
                     }
                 }
