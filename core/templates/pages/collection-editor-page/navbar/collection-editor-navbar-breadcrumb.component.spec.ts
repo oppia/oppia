@@ -25,6 +25,7 @@ import { CollectionEditorRoutingService } from '../services/collection-editor-ro
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { Collection } from 'domain/collection/collection.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
 
 describe('Collection editor navbar breadcrumb component', () => {
   let collectionEditorStateService: CollectionEditorStateService;
@@ -41,7 +42,7 @@ describe('Collection editor navbar breadcrumb component', () => {
     objective: 'collection objective',
     languageCode: 'en',
     tags: ['test tag'],
-    playthrough: null,
+    playthrough: new CollectionPlaythrough(null, []),
     category: 'Collection Category',
     version: 0,
     schemaVersion: 1,

@@ -32,6 +32,7 @@ import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
+import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
 
 interface HTMLSchema {
   'type': string;
@@ -49,7 +50,7 @@ interface ActiveContributionDetailsDict {
 
 interface SuggestionChangeDict {
   'cmd': string;
-  'content_html': string;
+  'content_html': string | string[];
   'content_id': string;
   'data_format': string;
   'language_code': string;
@@ -60,7 +61,7 @@ interface SuggestionChangeDict {
 interface ActiveSuggestionDict {
   'author_name': string;
   'change': SuggestionChangeDict;
-  'exploration_content_html': string;
+  'exploration_content_html': string | string[];
   'language_code': string;
   'last_updated_msecs': number;
   'status': string;
@@ -70,8 +71,10 @@ interface ActiveSuggestionDict {
   'target_type': string;
 }
 
+// Details are null if suggestion's corresponding opportunity is deleted.
+// See issue #14234.
 interface ActiveContributionDict {
-  'details': ActiveContributionDetailsDict;
+  'details': ActiveContributionDetailsDict | null;
   'suggestion': ActiveSuggestionDict;
 }
 
@@ -82,34 +85,44 @@ interface ActiveContributionDict {
 })
 
 export class TranslationSuggestionReviewModalComponent implements OnInit {
-  activeContribution: ActiveContributionDict;
-  activeContributionDetails: ActiveContributionDetailsDict;
-  authorName: string;
-  activeSuggestion: ActiveSuggestionDict;
-  activeSuggestionId: string;
-  canEditTranslation: boolean = false;
-  contentHtml: string | string[];
-  editedContent: EditedContentDict;
-  errorFound: boolean;
-  errorMessage: string;
-  explorationContentHtml: string | string[];
-  finalCommitMessage: string;
-  HTML_SCHEMA: HTMLSchema = { type: 'html' };
-  isCurriculumAdmin: boolean;
-  isHtmlContent: boolean;
-  initialSuggestionId: string;
-  isSetOfStringsContent: boolean;
-  isUnicodeContent: boolean;
-  languageCode: string;
-  languageDescription: string;
-  lastSuggestionToReview: boolean;
-  MAX_REVIEW_MESSAGE_LENGTH = constants.MAX_REVIEW_MESSAGE_LENGTH;
-  preEditTranslationHtml: string;
-  remainingContributions: [string, ActiveContributionDict][];
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  activeContribution!: ActiveContributionDict;
+  activeContributionDetails!: ActiveContributionDetailsDict;
+  authorName!: string;
+  activeSuggestion!: ActiveSuggestionDict;
+  activeSuggestionId!: string;
+  contentHtml!: string | string[];
+  editedContent!: EditedContentDict;
+  errorMessage!: string;
+  explorationContentHtml!: string | string[];
+  finalCommitMessage!: string;
+  initialSuggestionId!: string;
+  languageCode!: string;
+  languageDescription!: string;
+  preEditTranslationHtml!: string;
+  remainingContributions!: Record<string, ActiveContributionDict>;
+  reviewMessage!: string;
+  status!: string;
+  subheading!: string;
+  suggestionIdToContribution!: Record<string, ActiveContributionDict>;
+  translationHtml!: string;
+  userCanReviewTranslationSuggestionsInLanguages!: string[];
+  username!: string;
   resolvedSuggestionIds: string[] = [];
-  resolvingSuggestion: boolean;
-  reviewable: boolean;
-  reviewMessage: string;
+  errorFound: boolean = false;
+  contentTypeIsHtml: boolean = false;
+  contentTypeIsSetOfStrings: boolean = false;
+  contentTypeIsUnicode: boolean = false;
+  lastSuggestionToReview: boolean = false;
+  resolvingSuggestion: boolean = false;
+  reviewable: boolean = false;
+  suggestionIsRejected: boolean = false;
+  canEditTranslation: boolean = false;
+  userIsCurriculumAdmin: boolean = false;
+  HTML_SCHEMA: HTMLSchema = { type: 'html' };
+  MAX_REVIEW_MESSAGE_LENGTH = constants.MAX_REVIEW_MESSAGE_LENGTH;
   SET_OF_STRINGS_SCHEMA: ListSchema = {
     type: 'list',
     items: {
@@ -118,15 +131,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   };
 
   startedEditing: boolean = false;
-  status: string;
-  subheading: string;
-  suggestionIdToContribution: Object;
-  suggestionIsRejected: boolean;
-  translationHtml: string;
   translationUpdated: boolean = false;
   UNICODE_SCHEMA: UnicodeSchema = { type: 'unicode' };
-  userCanReviewTranslationSuggestionsInLanguages: string[];
-  username: string;
 
   constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -151,15 +157,15 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.languageDescription = (
       this.languageUtilService.getAudioLanguageDescription(
         this.activeSuggestion.language_code));
-    this.activeContributionDetails = this.activeContribution.details;
+    this.activeContributionDetails = (
+      this.activeContribution.details as ActiveContributionDetailsDict);
     this.status = this.activeSuggestion.status;
     if (this.reviewable) {
       this.siteAnalyticsService
         .registerContributorDashboardViewSuggestionForReview('Translation');
     }
     delete this.suggestionIdToContribution[this.initialSuggestionId];
-    this.remainingContributions = (
-      Object.entries(this.suggestionIdToContribution));
+    this.remainingContributions = this.suggestionIdToContribution;
     this.init();
     // The 'html' value is passed as an object as it is required for
     // schema-based-editor. Otherwise the corrrectly updated value for
@@ -175,13 +181,20 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.languageCode = this.activeSuggestion.change.
       language_code;
     this.userService.getUserInfoAsync().then(userInfo => {
-      this.username = userInfo.getUsername();
-      this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
+      const username = userInfo.getUsername();
+
+      if (username === null) {
+        throw new Error('Cannot fetch username.');
+      }
+      this.username = username;
+      this.userIsCurriculumAdmin = userInfo.isCurriculumAdmin();
     });
     this.userService.getUserContributionRightsDataAsync().then(
-      userContributionRights => {
+      (userContributionRights) => {
+        let userContributionRightsData = (
+          userContributionRights as UserContributionRightsDataBackendDict);
         this.userCanReviewTranslationSuggestionsInLanguages = (
-          userContributionRights
+          userContributionRightsData
             .can_review_translation_for_language_codes);
         this.canEditTranslation = (
           this.userCanReviewTranslationSuggestionsInLanguages.includes(
@@ -193,7 +206,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.errorFound = false;
     this.startedEditing = false;
     this.resolvingSuggestion = false;
-    this.lastSuggestionToReview = this.remainingContributions.length <= 0;
+    this.lastSuggestionToReview = (
+      Object.keys(this.remainingContributions).length <= 0);
     this.translationHtml = (
       this.activeSuggestion.change.translation_html);
     this.status = this.activeSuggestion.status;
@@ -201,13 +215,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.change.content_html);
     this.explorationContentHtml = (
       this.activeSuggestion.exploration_content_html);
-    this.isHtmlContent = (
+    this.contentTypeIsHtml = (
       this.activeSuggestion.change.data_format === 'html'
     );
-    this.isUnicodeContent = (
+    this.contentTypeIsUnicode = (
       this.activeSuggestion.change.data_format === 'unicode'
     );
-    this.isSetOfStringsContent = (
+    this.contentTypeIsSetOfStrings = (
       this.activeSuggestion.change.data_format ===
         'set_of_normalized_string' ||
       this.activeSuggestion.change.data_format ===
@@ -266,8 +280,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
 
-    [this.activeSuggestionId, this.activeContribution] = (
-      this.remainingContributions.pop());
+    let lastContribution = (
+      Object.keys(this.remainingContributions)[
+        Object.keys(this.remainingContributions).length - 1]);
+    this.activeSuggestionId = lastContribution;
+    this.activeContribution = this.remainingContributions[
+      lastContribution];
+    delete this.remainingContributions[this.activeSuggestionId];
     // Close modal instance if the suggestion's corresponding opportunity
     // is deleted. See issue #14234.
     if (!this.activeContribution.details) {
@@ -317,10 +336,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
         'Translation');
 
+      // In case of rejection, the suggestion is not applied, so there is no
+      // commit message. Because there is no commit to make.
       this.contributionAndReviewService.reviewExplorationSuggestion(
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
-        reviewMessage || this.reviewMessage, this.generateCommitMessage(),
+        reviewMessage || this.reviewMessage, null,
         this.showNextItemToReview.bind(this),
         (error) => {
           this.alertsService.clearWarnings();

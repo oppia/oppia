@@ -66,7 +66,7 @@ describe('Translation topic service', () => {
       translationTopicService.setActiveTopicName('Topic 3');
       $flushPendingTasks();
       expect(
-        translationTopicService.getActiveTopicName()).toBeNull();
+        translationTopicService.getActiveTopicName()).toBeUndefined();
       expect(logErrorSpy).toHaveBeenCalledWith(
         'Invalid active topic name: Topic 3'
       );
@@ -74,7 +74,7 @@ describe('Translation topic service', () => {
       translationTopicService.setActiveTopicName(null);
       $flushPendingTasks();
       expect(
-        translationTopicService.getActiveTopicName()).toBeNull();
+        translationTopicService.getActiveTopicName()).toBeUndefined();
     });
 
     it('should emit the new topic name', () => {

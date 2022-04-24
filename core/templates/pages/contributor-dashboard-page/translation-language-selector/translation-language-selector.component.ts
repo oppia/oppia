@@ -17,7 +17,8 @@
  */
 
 import {
-  Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild
+  Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild,
+  ElementRef
 } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
@@ -29,19 +30,27 @@ import { FeaturedTranslationLanguage } from
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 
+interface Options {
+  id: string;
+  description: string;
+}
+
 @Component({
   selector: 'translation-language-selector',
   templateUrl: './translation-language-selector.component.html'
 })
 export class TranslationLanguageSelectorComponent implements OnInit {
-  @Input() activeLanguageCode: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() activeLanguageCode!: string | null;
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
-  @ViewChild('dropdown', {'static': false}) dropdownRef;
+  @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
 
-  options: { id: string; description: string }[];
+  options!: Options[];
+  languageSelection!: string;
   languageIdToDescription: {[id: string]: string} = {};
   featuredLanguages: FeaturedTranslationLanguage[] = [];
-  languageSelection: string;
 
   dropdownShown = false;
   explanationPopupShown = false;

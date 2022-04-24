@@ -46,14 +46,14 @@ class MockWindowRef {
 
 class MockReaderObject {
   result = null;
-  onload = null;
+  onload: {(arg0: { target: { result: string}}): void; (): string};
   constructor() {
-    this.onload = ($evt) => {
+    this.onload = () => {
       return 'Fake onload executed';
     };
   }
 
-  readAsText(file) {
+  readAsText() {
     this.onload({target: {result: 'result'}});
     return 'The file is loaded';
   }
@@ -98,9 +98,9 @@ describe('Admin misc tab component ', () => {
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
 
     statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
-      .and.returnValue(null);
-    spyOn(adminTaskManagerService, 'startTask').and.returnValue(null);
-    spyOn(adminTaskManagerService, 'finishTask').and.returnValue(null);
+      .and.returnValue();
+    spyOn(adminTaskManagerService, 'startTask').and.returnValue();
+    spyOn(adminTaskManagerService, 'finishTask').and.returnValue();
     confirmSpy = spyOn(mockWindowRef.nativeWindow, 'confirm');
     // This throws "Argument of type 'mockReaderObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". We need to suppress this
@@ -115,7 +115,7 @@ describe('Admin misc tab component ', () => {
       confirmSpy.and.returnValue(true);
       let clearSearchIndexSpy = spyOn(
         adminBackendApiService, 'clearSearchIndexAsync')
-        .and.resolveTo(null);
+        .and.resolveTo();
 
       component.clearSearchIndex();
       tick();
@@ -257,6 +257,31 @@ describe('Admin misc tab component ', () => {
       expect(statusMessageSpy).toHaveBeenCalledWith(
         'Server error: Internal Server Error.');
     }));
+
+    it('should throw error if no label is found for uploading files', () => {
+      spyOn(document, 'getElementById').and.returnValue(null);
+      expect(() => {
+        component.uploadTopicSimilaritiesFile();
+      }).toThrowError('No element with id topicSimilaritiesFile found.');
+    });
+
+    it('should throw error if no files are uploaded', () => {
+      // This throws "Argument of type '() => { files: { size: number;
+      // name: string; }[]; }' is not assignable to parameter of type
+      // '(elementId: string) => HTMLElement'.". This is because the
+      // actual 'getElementById' returns more properties than just "files".
+      // We need to suppress this error because we need only "files"
+      // property for testing.
+      // @ts-expect-error
+      spyOn(document, 'getElementById').and.callFake(() => {
+        return {
+          files: null
+        };
+      });
+      expect(() => {
+        component.uploadTopicSimilaritiesFile();
+      }).toThrowError('No files found.');
+    });
   });
 
   it('should download topic similarities csv file ' +
@@ -271,12 +296,12 @@ describe('Admin misc tab component ', () => {
     'on clicking submit query button', () => {
     let message = 'message';
     // Pre-checks.
-    expect(component.showDataExtractionQueryStatus).toBe(undefined);
-    expect(component.dataExtractionQueryStatusMessage).toBe(undefined);
+    expect(component.showDataExtractionQueryStatus).toBeFalse();
+    expect(component.dataExtractionQueryStatusMessage).toBeUndefined();
 
     component.setDataExtractionQueryStatusMessage(message);
 
-    expect(component.showDataExtractionQueryStatus).toBe(true);
+    expect(component.showDataExtractionQueryStatus).toBeTrue();
     expect(component.dataExtractionQueryStatusMessage).toBe(message);
   });
 

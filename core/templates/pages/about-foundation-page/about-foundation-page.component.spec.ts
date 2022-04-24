@@ -32,7 +32,7 @@ describe('About foundation page', () => {
     }).compileComponents();
   });
 
-  let component;
+  let component: AboutFoundationPageComponent;
 
   beforeEach(() => {
     const aboutFoundationPageComponent = TestBed.createComponent(

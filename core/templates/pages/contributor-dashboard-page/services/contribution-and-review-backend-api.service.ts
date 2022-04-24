@@ -33,7 +33,7 @@ interface FetchSuggestionsResponse {
 interface ReviewExplorationSuggestionRequestBody {
   action: string;
   'review_message': string;
-  'commit_message': string;
+  'commit_message': string | null;
 }
 
 interface ReviewSkillSuggestionRequestBody {
@@ -107,6 +107,7 @@ export class ContributionAndReviewBackendApiService {
       return this.fetchReviewableSuggestionsAsync(
         'exploration', 'translate_content', limit, offset, topicName);
     }
+    throw new Error('Invalid fetch type');
   }
 
   async fetchSubmittedSuggestionsAsync(

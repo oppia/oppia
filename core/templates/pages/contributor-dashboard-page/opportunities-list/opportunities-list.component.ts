@@ -26,28 +26,36 @@ import { ExplorationOpportunity } from '../opportunities-list-item/opportunities
 import constants from 'assets/constants';
 import { Subscription } from 'rxjs';
 
+type ExplorationOpportunitiesFetcherFunction = () => Promise<{
+  opportunitiesDicts: ExplorationOpportunity[];
+  more: boolean;
+}>;
+
 @Component({
   selector: 'oppia-opportunities-list',
   templateUrl: './opportunities-list.component.html',
   styleUrls: []
 })
 export class OpportunitiesListComponent {
-  @Input() loadOpportunities: () => Promise<{
-    opportunitiesDicts: ExplorationOpportunity[]; more: boolean; }>;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() loadOpportunities!: ExplorationOpportunitiesFetcherFunction;
+  @Input() loadMoreOpportunities!: ExplorationOpportunitiesFetcherFunction;
+  @Input() opportunityHeadingTruncationLength!: number;
+  @Input() opportunityType!: string;
 
-  @Input() labelRequired: boolean;
-  @Input() progressBarRequired: boolean;
-  @Input() loadMoreOpportunities;
+  @Input() labelRequired: boolean = false;
+  @Input() progressBarRequired: boolean = false;
+
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter()
   );
 
-  @Input() opportunityHeadingTruncationLength: number;
-  @Input() opportunityType: string;
 
   loadingOpportunityData: boolean = true;
   opportunities: ExplorationOpportunity[] = [];
-  visibleOpportunities = [];
+  visibleOpportunities: ExplorationOpportunity[] = [];
   directiveSubscriptions = new Subscription();
   activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;

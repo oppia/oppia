@@ -17,16 +17,17 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { UserService } from 'services/user.service';
 import { BlogAdminNavbarComponent } from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
 import { MockRouterModule } from 'hybrid-router-module-provider';
+import { UserInfo } from 'domain/user/user-info.model';
 
 
 describe('Blog Admin navbar component', () => {
   let component: BlogAdminNavbarComponent;
-  let userService = null;
+  let userService: UserService;
   let userProfileImage = 'profile-data-url';
   let userInfo = {
     getUsername: () => 'username1',
@@ -50,28 +51,55 @@ describe('Blog Admin navbar component', () => {
 
     spyOn(userService, 'getProfileImageDataUrlAsync')
       .and.resolveTo(userProfileImage);
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo);
-
-    component.ngOnInit();
   }));
 
-  it('should initialize component properties correctly', () => {
+  it('should initialize component properties correctly', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     expect(component.profilePictureDataUrl).toBe(userProfileImage);
-    expect(component.username).toBe('username1');
     expect(component.profileUrl).toBe(profileUrl);
     expect(component.profileDropdownIsActive).toBe(false);
-  });
+  }));
 
-  it('should set profileDropdownIsActive to true', () => {
+  it('should throw error if username is invalid', fakeAsync(() => {
+    let userInfo = {
+      getUsername: () => null,
+      isSuperAdmin: () => true
+    };
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    expect(() => {
+      component.ngOnInit();
+      tick();
+    }).not.toThrowError('Cannot fetch username.');
+  }));
+
+  it('should set profileDropdownIsActive to true', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     expect(component.profileDropdownIsActive).toBe(false);
 
     component.activateProfileDropdown();
 
     expect(component.profileDropdownIsActive).toBe(true);
-  });
+  }));
 
-  it('should set profileDropdownIsActive to false', () => {
+  it('should set profileDropdownIsActive to false', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     component.profileDropdownIsActive = true;
 
     expect(component.profileDropdownIsActive).toBe(true);
@@ -79,5 +107,5 @@ describe('Blog Admin navbar component', () => {
     component.deactivateProfileDropdown();
 
     expect(component.profileDropdownIsActive).toBe(false);
-  });
+  }));
 });

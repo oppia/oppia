@@ -36,7 +36,7 @@ describe('Blog Post Page service', () => {
         hash: '/',
         reload: () => {}
       },
-      open: (url) => {},
+      open: (url: string) => {},
       onhashchange() {},
     };
   }

@@ -42,6 +42,9 @@ import { PlatformParameter, FeatureStage } from
   'domain/platform_feature/platform-parameter.model';
 import { PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule.model';
+import { HttpErrorResponse } from '@angular/common/http';
+
+type FilterType = keyof typeof PlatformParameterFilterType;
 
 @Component({
   selector: 'admin-features-tab',
@@ -52,7 +55,10 @@ export class AdminFeaturesTabComponent implements OnInit {
 
   readonly availableFilterTypes: PlatformParameterFilterType[] = Object
     .keys(PlatformParameterFilterType)
-    .map(key => PlatformParameterFilterType[key]);
+    .map(key => {
+      var filterType = key as FilterType;
+      return PlatformParameterFilterType[filterType];
+    });
 
   readonly filterTypeToContext: {
     [key in PlatformParameterFilterType]: {
@@ -118,8 +124,11 @@ export class AdminFeaturesTabComponent implements OnInit {
     })
   );
 
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  featureFlagNameToBackupMap!: Map<string, PlatformParameter>;
   featureFlags: PlatformParameter[] = [];
-  featureFlagNameToBackupMap: Map<string, PlatformParameter>;
 
   isDummyApiEnabled: boolean = false;
 
@@ -213,11 +222,17 @@ export class AdminFeaturesTabComponent implements OnInit {
       this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
 
       this.setStatusMessage.emit('Saved successfully.');
-    } catch (e) {
-      if (e.error && e.error.error) {
-        this.setStatusMessage.emit(`Update failed: ${e.error.error}`);
+    // The type of error 'e' is unknown because anything can be throw
+    // in TypeScript. We need to make sure to check the type of 'e'.
+    } catch (e: unknown) {
+      if (e instanceof HttpErrorResponse) {
+        if (e.error && e.error.error) {
+          this.setStatusMessage.emit(`Update failed: ${e.error.error}`);
+        } else {
+          this.setStatusMessage.emit('Update failed.');
+        }
       } else {
-        this.setStatusMessage.emit('Update failed.');
+        throw new Error('Unexpected error response.');
       }
     } finally {
       this.adminTaskManager.finishTask();
@@ -229,8 +244,13 @@ export class AdminFeaturesTabComponent implements OnInit {
       'This will revert all changes you made. Are you sure?')) {
       return;
     }
-    const backup = this.featureFlagNameToBackupMap.get(featureFlag.name);
-    featureFlag.rules = cloneDeep(backup.rules);
+    const backup = this.featureFlagNameToBackupMap.get(
+      featureFlag.name
+    );
+
+    if (backup) {
+      featureFlag.rules = cloneDeep(backup.rules);
+    }
   }
 
   clearFilterConditions(filter: PlatformParameterFilter): void {
@@ -238,7 +258,12 @@ export class AdminFeaturesTabComponent implements OnInit {
   }
 
   isFeatureFlagRulesChanged(feature: PlatformParameter): boolean {
-    const original = this.featureFlagNameToBackupMap.get(feature.name);
+    const original = this.featureFlagNameToBackupMap.get(
+      feature.name
+    );
+    if (original === undefined) {
+      throw new Error('Backup not found for feature flag: ' + feature.name);
+    }
     return !isEqual(original.rules, feature.rules);
   }
 
