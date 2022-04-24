@@ -236,7 +236,7 @@ describe('Full exploration editor', function() {
       }
     );
     await explorationPlayerPage.expectInteractionToMatch('NumericInput');
-    await explorationPlayerPage.submitAnswer('NumericInput', 6);
+    await explorationPlayerPage.submitAnswer('NumericInput', '6');
     // This checks the previously-deleted group no longer applies.
     await explorationPlayerPage.expectLatestFeedbackToMatch(
       await forms.toRichText('Farewell'));

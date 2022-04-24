@@ -252,14 +252,14 @@ describe('Full exploration editor', function() {
       await general.moveToPlayer();
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 1'));
-      await explorationPlayerPage.submitAnswer('NumericInput', 19);
-      await explorationPlayerPage.submitAnswer('NumericInput', 21);
+      await explorationPlayerPage.submitAnswer('NumericInput', '19');
+      await explorationPlayerPage.submitAnswer('NumericInput', '21');
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 2 with previous answer 21'));
       await explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 1'));
-      await explorationPlayerPage.submitAnswer('NumericInput', 21);
+      await explorationPlayerPage.submitAnswer('NumericInput', '21');
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 2 with previous answer 21'));
       await explorationPlayerPage.expectExplorationToNotBeOver();

@@ -399,14 +399,14 @@ describe('Core exploration functionality', function() {
       await explorationEditorPage.saveChanges();
 
       await general.moveToPlayer();
-      await explorationPlayerPage.submitAnswer('NumericInput', 5);
+      await explorationPlayerPage.submitAnswer('NumericInput', '5');
       await explorationPlayerPage.expectLatestFeedbackToMatch(
         await forms.toRichText('out of bounds')
       );
       await explorationPlayerPage.expectExplorationToNotBeOver();
       // It's important to test the value 0 in order to ensure that it would
       // still get submitted even though it is a falsy value in JavaScript.
-      await explorationPlayerPage.submitAnswer('NumericInput', 0);
+      await explorationPlayerPage.submitAnswer('NumericInput', '0');
       await explorationPlayerPage.expectLatestFeedbackToMatch(
         async function(richTextChecker) {
           await richTextChecker.readBoldText('correct');
