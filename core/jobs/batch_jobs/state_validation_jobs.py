@@ -28,6 +28,10 @@ from core.platform import models
 import apache_beam as beam
 import bs4
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import exp_models
+
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 
@@ -56,7 +60,7 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
                 lambda objects: self.check_invalid(objects[1])
             )
             | 'Remove empty string' >> beam.Map(
-                lambda objects: (objects[0], self.remove_empty(objects[1]))
+                lambda objects: (objects[0], self.extract_name(objects[1]))
             )
         )
 
@@ -110,15 +114,13 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
             states: list[tuple]. Consist of state name and image value
 
         Returns:
-            boolean: bool. Returns True if the state is not valid otherwise False
+            boolean: bool. Returns True if the state is not valid
+            otherwise False
         """
-        for state in states:
-            if state[1] == '':
-                return True
-        return False
+        return any(state[1] == '' for state in states)
 
-    def remove_empty(self, states):
-        """Removes the empty string which are present with states name
+    def extract_name(self, states):
+        """Extract the state name
 
         Args:
             states: list[tuple]. Consist of state name and empty string
@@ -131,3 +133,4 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
             states_list.append(state[0])
 
         return states_list
+        

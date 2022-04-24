@@ -31,11 +31,10 @@ from core.constants import constants
 
 class GetNumberOfExpStatesHavingEmptyImageFieldJobTest(
     job_test_utils.JobTestBase):
-    """
-    """
 
-    JOB_CLASS = (state_validation_jobs.
-                    GetNumberOfExpStatesHavingEmptyImageFieldJob)
+    JOB_CLASS = (
+        state_validation_jobs.GetNumberOfExpStatesHavingEmptyImageFieldJob
+    )
 
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
@@ -43,13 +42,16 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJobTest(
         feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True)
     STATE_CONTENT_DICT_1 = {
             'content_id': 'content',
-            'html': '<p>1</p><oppia-noninteractive-image filepath-with-value="&amp;quot;img_20220308_195805_91e7xo77xs_height_217_width_231.png&amp;quot;"></oppia-noninteractive-image>'
+            'html': '<p>1</p><oppia-noninteractive-image filepath-with-value'
+                    + '="&amp;quot;img_20220308_195805_91e7xo77xs_height_217_width_231.png'
+                    + '&amp;quot;"></oppia-noninteractive-image>'
         }
     STATE_2 = state_domain.State.create_default_state(
         feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True)
     STATE_CONTENT_DICT_2 = {
             'content_id': 'content',
-            'html': '<p>1</p><oppia-noninteractive-image filepath-with-value=""></oppia-noninteractive-image>'
+            'html': '<p>1</p><oppia-noninteractive-image filepath-with-value'
+                    + '=""></oppia-noninteractive-image>'
         }
 
     def setUp(self):
@@ -114,7 +116,7 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJobTest(
             job_run_result.JobRunResult.as_stdout('STATES SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
                 f'The id of exp is {self.EXPLORATION_ID_2} and the '
-                + f'erroneous states are %s' %(['Introduction'])
+                + 'erroneous states are %s' %(['Introduction'])
             )
         ])
 
@@ -124,6 +126,6 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJobTest(
             job_run_result.JobRunResult.as_stdout('STATES SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
                 f'The id of exp is {self.EXPLORATION_ID_2} and the '
-                + f'erroneous states are %s' %(['Introduction'])
+                + 'erroneous states are %s' %(['Introduction'])
             )
         ])
