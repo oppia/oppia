@@ -211,11 +211,9 @@ export class StoryEditorStateService {
       commitMessage: string,
       successCallback: (value?: Object) => void,
       errorCallback: (value?: Object) => void): boolean {
-    const storyId = this._story.getId();
-    if (!storyId || !this._storyIsInitialized) {
+    if (!this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a story before one is loaded.');
-      return false;
     }
 
     // Don't attempt to save the story if there are no changes pending.
@@ -224,7 +222,7 @@ export class StoryEditorStateService {
     }
     this._storyIsBeingSaved = true;
     this.editableStoryBackendApiService.updateStoryAsync(
-      storyId, this._story.getVersion(), commitMessage,
+      this._story.getId(), this._story.getVersion(), commitMessage,
       this.undoRedoService.getCommittableChangeList() as StoryChange[]
     ).then(
       (storyBackendObject) => {
