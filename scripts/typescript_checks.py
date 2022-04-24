@@ -24,6 +24,9 @@ import subprocess
 import sys
 
 from core import utils
+
+from typing import Optional, Sequence
+
 from . import common
 
 _PARSER = argparse.ArgumentParser(
@@ -43,7 +46,7 @@ TSCONFIG_FILEPATH = 'tsconfig.json'
 STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
 
 
-def validate_compiled_js_dir():
+def validate_compiled_js_dir() -> None:
     """Validates that compiled JS dir matches out dir in tsconfig."""
     with utils.open_file(TSCONFIG_FILEPATH, 'r') as f:
         config_data = json.load(f)
@@ -54,7 +57,7 @@ def validate_compiled_js_dir():
             'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
 
 
-def compile_and_check_typescript(config_path):
+def compile_and_check_typescript(config_path: str) -> None:
     """Compiles typescript files and checks the compilation errors.
 
     Args:
@@ -74,7 +77,11 @@ def compile_and_check_typescript(config_path):
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
 
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
+    assert process.stdout is not None
     error_messages = list(iter(process.stdout.readline, ''))
+
     if error_messages:
         print('Errors found during compilation\n')
         print('\n'.join(error_messages))
@@ -83,7 +90,7 @@ def compile_and_check_typescript(config_path):
         print('Compilation successful!')
 
 
-def main(args=None):
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Run the typescript checks."""
     parsed_args = _PARSER.parse_args(args=args)
     compile_and_check_typescript(
