@@ -43,8 +43,8 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJobTest(
     STATE_CONTENT_DICT_1 = {
             'content_id': 'content',
             'html': '<p>1</p><oppia-noninteractive-image filepath-with-value'
-                    + '="&amp;quot;img_20220308_195805_91e7xo77xs_height_217_width_231.png'
-                    + '&amp;quot;"></oppia-noninteractive-image>'
+                    + '="&amp;quot;img_20220308_195805_91e7xo77xs_height_217_'
+                    + 'width_231.png&amp;quot;"></oppia-noninteractive-image>'
         }
     STATE_2 = state_domain.State.create_default_state(
         feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True)
