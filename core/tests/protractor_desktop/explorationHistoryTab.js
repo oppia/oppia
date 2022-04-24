@@ -76,7 +76,7 @@ describe('Exploration history', function() {
       'enter 6 to continue'));
     await explorationEditorMainTab.setInteraction('NumericInput', false);
     await explorationEditorMainTab.addResponse(
-      'NumericInput', null, 'second', true, 'Equals', '6');
+      'NumericInput', null, 'second', true, 'Equals', 6);
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('this is card 2'));
@@ -613,7 +613,7 @@ describe('Exploration history', function() {
       'enter 6 to continue'));
     await explorationEditorMainTab.setInteraction('NumericInput');
     await explorationEditorMainTab.addResponse(
-      'NumericInput', null, 'second', true, 'Equals', '6');
+      'NumericInput', null, 'second', true, 'Equals', 6);
     // Second card.
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
@@ -659,7 +659,7 @@ describe('Exploration history', function() {
     await general.moveToPlayer();
     await explorationPlayerPage.expectContentToMatch(
       await forms.toRichText('enter 6 to continue'));
-    await explorationPlayerPage.submitAnswer('NumericInput', '6');
+    await explorationPlayerPage.submitAnswer('NumericInput', 6);
     await explorationPlayerPage.expectExplorationToNotBeOver();
     await explorationPlayerPage.expectContentToMatch(
       await forms.toRichText('card 2 second commit text'));

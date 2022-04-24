@@ -533,7 +533,8 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
                     },
                     'values': {
                          'schema': {
-                             'type': 'basestring'
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring']
                          }
                     }
                 },
