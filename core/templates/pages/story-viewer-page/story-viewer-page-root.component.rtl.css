@@ -22,6 +22,12 @@
   text-align: right;
 }
 
+.oppia-story-player-tiles-container .oppia-page-heading {
+  color: #005048;
+  text-align: center;
+  width: 100%;
+}
+
 .oppia-story-viewer-container {
   position: relative;
 }
