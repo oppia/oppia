@@ -769,7 +769,8 @@ class ExplorationStartEventHandler(base.BaseHandler):
                     },
                     'values': {
                          'schema': {
-                             'type': 'basestring'
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring']
                         }
                     }
                 }
@@ -978,7 +979,8 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
                     },
                     'values': {
                          'schema': {
-                             'type': 'basestring'
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring']
                          }
                     }
                 }
@@ -1090,7 +1092,8 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
                     },
                     'values': {
                          'schema': {
-                             'type': 'basestring'
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring']
                          }
                     }
                 }
