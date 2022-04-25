@@ -72,7 +72,7 @@ describe('Stopwatch model', () => {
     let stopwatch = Stopwatch.create();
     changeCurrentTime(29);
     expect(stopwatch._getCurrentTime()).toBe(29);
-    expect(stopwatch.getTimeInSecs()).toBeNull();
+    expect(stopwatch.getTimeInSecs()).toBe(0);
     expect(errorLog).toHaveBeenCalledWith(
       'Tried to retrieve the elapsed time, but no start time was set.');
   });
