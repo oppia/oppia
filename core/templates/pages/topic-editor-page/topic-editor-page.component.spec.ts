@@ -23,8 +23,6 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require('pages/topic-editor-page/topic-editor-page.component.ts');
 
-import { TestBed } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EventEmitter } from '@angular/core';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
@@ -43,7 +41,6 @@ class MockWindowRef {
 describe('Topic editor page', function() {
   var ctrl = null;
   var $scope = null;
-  var ngbModal: NgbModal = null;
   var ContextService = null;
   var PageTitleService = null;
   var PreventPageUnloadEventService = null;
@@ -55,8 +52,7 @@ describe('Topic editor page', function() {
   var StoryReferenceObjectFactory = null;
   var topic = null;
   var LocalStorageService = null;
-  var FaviconService = null;
-  var StalenessDetectionService = null;
+  var TopicEditorStalenessDetectionService = null;
   var windowRef: MockWindowRef;
 
   importAllAngularServices();
@@ -74,9 +70,8 @@ describe('Topic editor page', function() {
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     LocalStorageService = $injector.get('LocalStorageService');
-    FaviconService = $injector.get('FaviconService');
-    StalenessDetectionService = $injector.get('StalenessDetectionService');
-    ngbModal = TestBed.inject(NgbModal);
+    TopicEditorStalenessDetectionService =
+      $injector.get('TopicEditorStalenessDetectionService');
     windowRef = new MockWindowRef();
 
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
@@ -100,7 +95,6 @@ describe('Topic editor page', function() {
     $scope = $rootScope.$new();
     ctrl = $componentController('topicEditorPage', {
       $scope: $scope,
-      NgbModal: ngbModal,
       WindowRef: windowRef
     });
   }));
@@ -317,8 +311,9 @@ describe('Topic editor page', function() {
   });
 
   it('should check if a tab is stale and emit the corresponding event', () => {
-    spyOn(FaviconService, 'setFavicon').and.callThrough();
-    spyOn(ctrl.staleTabEventEmitter, 'emit').and.callThrough();
+    spyOn(
+      TopicEditorStalenessDetectionService.staleTabEventEmitter, 'emit'
+    ).and.callThrough();
     let oldValue: EntityEditorBrowserTabsInfoDict = {
       topic_1: {
         entityType: 'topic',
@@ -344,14 +339,17 @@ describe('Topic editor page', function() {
 
     ctrl.onCreateOrUpdateTopicEditorBrowserTabsInfo(storageEvent);
 
-    expect(ctrl.staleTabEventEmitter.emit).toHaveBeenCalled();
-    expect(FaviconService.setFavicon).toHaveBeenCalledWith(
-      '/assets/images/favicon_alert/favicon_alert.ico');
+    expect(
+      TopicEditorStalenessDetectionService.staleTabEventEmitter.emit
+    ).toHaveBeenCalled();
   });
 
   it('should check if there is unsaved changes on another tab ' +
   'and emit the corresponding event', () => {
-    spyOn(ctrl.presenceOfUnsavedChangesEventEmitter, 'emit').and.callThrough();
+    spyOn(
+      TopicEditorStalenessDetectionService
+        .presenceOfUnsavedChangesEventEmitter, 'emit'
+    ).and.callThrough();
     let oldValue: EntityEditorBrowserTabsInfoDict = {
       topic_1: {
         entityType: 'topic',
@@ -377,60 +375,9 @@ describe('Topic editor page', function() {
 
     ctrl.onCreateOrUpdateTopicEditorBrowserTabsInfo(storageEvent);
 
-    expect(ctrl.presenceOfUnsavedChangesEventEmitter.emit).toHaveBeenCalled();
-  });
-
-  it('should show stale tab warning modal when a tab becomes stale', () => {
-    spyOn(windowRef.nativeWindow.location, 'reload');
-    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
-    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
-    ctrl.$onInit();
-
-    class MockComponentInstance {
-      compoenentInstance: {};
-    }
-    let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
-      return ({
-        componentInstance: MockComponentInstance,
-        result: Promise.resolve()
-      }) as NgbModalRef;
-    });
-
-    ctrl.staleTabEventEmitter.emit();
-
-    expect(spyObj).toHaveBeenCalled();
-  });
-
-  it('should show presence of unsaved changes warning modal when ' +
-  'there are unsaved changes on some other tab', () => {
-    spyOn(windowRef.nativeWindow.location, 'reload');
-    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
-    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
-    spyOn(
-      StalenessDetectionService,
-      'doesSomeOtherEntityEditorPageHaveUnsavedChanges'
-    ).and.returnValues(true, false);
-    ctrl.$onInit();
-
-    class MockComponentInstance {
-      compoenentInstance: {};
-    }
-    let mockModalRef = {
-      componentInstance: MockComponentInstance,
-      dismiss: () => {},
-      result: Promise.resolve()
-    } as NgbModalRef;
-    let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
-      return mockModalRef;
-    });
-    spyOn(mockModalRef, 'dismiss');
-
-    ctrl.presenceOfUnsavedChangesEventEmitter.emit();
-
-    expect(spyObj).toHaveBeenCalled();
-
-    ctrl.presenceOfUnsavedChangesEventEmitter.emit();
-
-    expect(mockModalRef.dismiss).toHaveBeenCalled();
+    expect(
+      TopicEditorStalenessDetectionService
+        .presenceOfUnsavedChangesEventEmitter.emit
+    ).toHaveBeenCalled();
   });
 });

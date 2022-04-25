@@ -88,12 +88,12 @@ angular.module('oppia').factory('StoryCreationService', [
             }
           })
             .then(function(response) {
-              $window.open(UrlInterpolationService.interpolateUrl(
+              TopicEditorStateService.loadTopic(topic.getId());
+              $window.location = UrlInterpolationService.interpolateUrl(
                 STORY_EDITOR_URL_TEMPLATE, {
                   story_id: response.data.storyId
                 }
-              ));
-              $window.location.reload();
+              );
             }, function() {
               LoaderService.hideLoadingScreen();
               ImageLocalStorageService.flushStoredImagesData();

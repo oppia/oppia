@@ -404,6 +404,7 @@ import { FaviconService } from './favicon.service';
 import { StalenessDetectionService } from './staleness-detection.service';
 import { ExplorationImprovementsService } from './exploration-improvements.service';
 import { PlaythroughIssuesService } from './playthrough-issues.service';
+import { TopicEditorStalenessDetectionService } from 'pages/topic-editor-page/services/topic-editor-staleness-detection.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -793,6 +794,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
   ['TopicCreationService', TopicCreationService],
   ['TopicEditorRoutingService', TopicEditorRoutingService],
+  ['TopicEditorStalenessDetectionService',
+    TopicEditorStalenessDetectionService],
   ['TopicEditorStateService', TopicEditorStateService],
   ['TopicObjectFactory', TopicObjectFactory],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
