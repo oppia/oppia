@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validation Jobs for tags of exploration"""
+"""Validation Jobs for tags of exploration."""
 
 from __future__ import annotations
 
@@ -26,6 +26,7 @@ from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
+import result
 import apache_beam as beam
 from typing import List
 
@@ -33,47 +34,37 @@ from typing import List
 
 
 class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
-    """Job that returns invalid exploration tags"""
+    """Job that returns invalid exploration tags."""
 
-    def _check_tags_validity(self, tags: List[str]) -> bool:
-        """checks whether tags list is valid or not.
-
-        Args:
-            tags: List[str]. The list of all tags in exploration.
-
-        Returns:
-            bool. If the list containing tags have length more than 10 or
-            individual tag have length more than 30, then it returns True
-            otherwise False.
-        """
-        if len(tags) > 10:
-            return True
-        if len(set(tags)) < len(tags):
-            return True
-        for tag in tags:
-            if tag.strip() == '':
-                return True
-            elif len(tag) > 30:
-                return True
-        return False
-
-    def _get_description_of_wrong_exp(self, tags: List[str]) -> str:
-        """Returns the description of invalid tags property.
+    def _check_tags_are_valid(
+        self, exp: exp_models.ExplorationModel
+    ) -> result.Result[
+        exp_models.ExplorationModel, str
+    ]:
+        """Returns the Result object based on the validity of tags
+        in the exploration model.
 
         Args:
-            tags: List[str]. The list of all tag in exlporation.
+            exp: exp_models.ExplorationModel. The model of exploration
+                from which tags are fetched.
 
         Returns:
-            str. Description of invalid tags property.
+            Result[exp_models.ExplorationModel, str]. Result object that
+            contains ExplorationModel when the operation is successful
+            and str (containing error message) when invalid tags occurs.
         """
-        output_string = ''
+        tags = exp.tags
+        tags_are_valid = True
+        output_string = 'The exp of id %s contains' % exp.id
         visited = set()
         dup: List[str] = []
         empty_tag = max_length_exceed_tag = 0
 
         if len(tags) > 10:
+            tags_are_valid = False
             output_string += ' tags length more than 10,'
         if len(set(tags)) < len(tags):
+            tags_are_valid = False
             for ele in tags:
                 if ele.strip() != '':
                     if ele in visited or (visited.add(ele)):
@@ -83,8 +74,10 @@ class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
 
         for tag in tags:
             if tag.strip() == '':
+                tags_are_valid = False
                 empty_tag += 1
             elif len(tag) > 30:
+                tags_are_valid = False
                 max_length_exceed_tag += 1
 
         if (empty_tag != 0) or (max_length_exceed_tag != 0):
@@ -97,15 +90,18 @@ class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
             output_string[:last_comma_index] + '.'
             + output_string[last_comma_index + 1:])
 
-        return output_string.strip()
+        if tags_are_valid:
+            return result.Ok(exp)
+        else:
+            return result.Err(output_string)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns PCollection of invalid explorations with their id and
-        actual tags list.
+        """Returns PCollection of explorations having invalid tags list
+        with the respective exploration id.
 
         Returns:
-            PCollection. Returns PCollection of invalid explorations with
-            their id and actual tags list.
+            PCollection. Returns PCollection of explorations having invalid
+            tags list with the respective exploration id.
         """
         total_explorations = (
             self.pipeline
@@ -117,41 +113,11 @@ class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
 
         exp_ids_with_invalid_tags = (
             total_explorations
-            | 'Combine exploration tags and ids' >> beam.Map(
-                lambda exp: (exp.id, exp.tags))
-            | 'Filter exploraton with tags length greater than 10' >>
-                beam.Filter(lambda exp: self._check_tags_validity(exp[1]))
-        )
-
-        report_number_of_exps_queried = (
-            total_explorations
-            | 'Report count of exp models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('EXPS'))
-        )
-
-        report_number_of_invalid_exps = (
-            exp_ids_with_invalid_tags
-            | 'Report count of invalid exp models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('INVALID'))
-        )
-
-        report_invalid_ids_and_their_actual_len = (
-            exp_ids_with_invalid_tags
-            | 'Save info on invalid exps' >> beam.Map(
-                lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The exp of id %s contains %s'
-                    % (
-                        objects[0],
-                        self._get_description_of_wrong_exp(objects[1])
-                    )
-                ))
+            | beam.Map(lambda exp: self._check_tags_are_valid(exp))
         )
 
         return (
-            (
-                report_number_of_exps_queried,
-                report_number_of_invalid_exps,
-                report_invalid_ids_and_their_actual_len
-            )
-            | 'Combine results' >> beam.Flatten()
+            exp_ids_with_invalid_tags
+            | 'Transform Results to JobRunResults' >> (
+                job_result_transforms.ResultsToJobRunResults())
         )

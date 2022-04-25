@@ -29,7 +29,7 @@ from core.platform import models
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 
-class GetNumberOfExpExceedsMaxTagsLengthJobTests(
+class GetNumberOfExpHavingInvalidTagsListJobTests(
     job_test_utils.JobTestBase):
 
     JOB_CLASS = (
@@ -99,9 +99,9 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
             states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_2}
         )
 
-        # This is an invalid model with tags length greater than 10,
-        # 3 empty values, 1 tag having length greater than 30 and 2
-        # duplicate values.
+        # This is an invalid model with tags length greater than 10, and
+        # tags having 3 empty values, 1 tag having length greater than 30
+        # and 2 duplicate values.
         self.exp_3 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_3,
@@ -142,6 +142,8 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
             states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_4}
         )
 
+        # This is an invalid model with tags having a tag with length
+        # more than 30.
         self.exp_5 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_5,
@@ -162,6 +164,7 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
             states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_5}
         )
 
+        # This is an invalid model with tags having duplicate values.
         self.exp_6 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_6,
@@ -187,72 +190,62 @@ class GetNumberOfExpExceedsMaxTagsLengthJobTests(
     def test_run_with_single_valid_model(self) -> None:
         self.put_multi([self.exp_4])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1')
+            job_run_result.JobRunResult.as_stdout('SUCCESS: 1')
         ])
 
     def test_run_with_single_invalid_model1(self) -> None:
         self.put_multi([self.exp_1])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The exp of id 1 contains'
-                + ' 1 empty tag and 0 tag having length more than 30.'),
+                'ERROR: \"The exp of id 1 contains 1 empty tag and'
+                + ' 0 tag having length more than 30. \": 1'),
         ])
 
     def test_run_with_single_invalid_model2(self) -> None:
         self.put_multi([self.exp_2])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The exp of id 2 contains tags length more than 10,'
-                + ' 0 empty tag and 1 tag having length more than 30.'),
+                'ERROR: \"The exp of id 2 contains tags length more than 10,'
+                + ' 0 empty tag and 1 tag having length more than 30. \": 1'),
         ])
 
     def test_run_with_single_invalid_model3(self) -> None:
         self.put_multi([self.exp_3])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The exp of id 3 contains tags length more than 10,'
-                + ' 2 duplicate values [\'10\', \'11\'], 3 empty tag and'
-                + ' 1 tag having length more than 30.'),
+                'ERROR: \"The exp of id 3 contains tags length more than 10, 2'
+                + ' duplicate values [\'10\', \'11\'], 3 empty tag and 1 tag'
+                + ' having length more than 30. \": 1'),
         ])
 
     def test_run_with_single_invalid_model5(self) -> None:
         self.put_multi([self.exp_5])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The exp of id 5 contains 0 empty tag and 1 tag having'
-                + ' length more than 30.'),
+                'ERROR: \"The exp of id 5 contains 0 empty tag and 1 tag'
+                + ' having length more than 30. \": 1'),
         ])
 
     def test_run_with_single_invalid_model6(self) -> None:
         self.put_multi([self.exp_6])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The exp of id 6 contains 1 duplicate values [\'topic2\'].'),
+                'ERROR: \"The exp of id 6 contains 1 duplicate'
+                + ' values [\'topic2\'].\": 1'),
         ])
 
     def test_run_with_mixed_models(self) -> None:
         self.put_multi([self.exp_1, self.exp_2, self.exp_3, self.exp_4])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 4'),
-            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 3'),
+            job_run_result.JobRunResult.as_stdout('SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The exp of id 1 contains'
-                + ' 1 empty tag and 0 tag having length more than 30.'),
+                'ERROR: \"The exp of id 1 contains 1 empty tag and'
+                + ' 0 tag having length more than 30. \": 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The exp of id 2 contains tags length more than 10,'
-                + ' 0 empty tag and 1 tag having length more than 30.'),
+                'ERROR: \"The exp of id 2 contains tags length more than 10,'
+                + ' 0 empty tag and 1 tag having length more than 30. \": 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The exp of id 3 contains tags length more than 10,'
-                + ' 2 duplicate values [\'10\', \'11\'], 3 empty tag and'
-                + ' 1 tag having length more than 30.'),
+                'ERROR: \"The exp of id 3 contains tags length more than 10, 2'
+                + ' duplicate values [\'10\', \'11\'], 3 empty tag and 1 tag'
+                + ' having length more than 30. \": 1'),
         ])
