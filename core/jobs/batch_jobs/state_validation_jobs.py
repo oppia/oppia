@@ -37,7 +37,7 @@ if MYPY:  # pragma: no cover
 
 class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
     """Job that returns exploration id and exploration states that have
-    filepath-with-value field as an empty string
+    filepath-with-value field as an empty string.
     """
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -88,14 +88,13 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
         )
 
     def get_states(self, states_dict):
-        """Returns the array of state content html field
+        """Returns the array of state content html field.
 
         Args:
-            states_dict: dict. A dictionary of states
+            states_dict: dict. A dictionary of states.
 
         Returns:
-            state_content_html: array. Array containing state
-            content html field
+            array. Array containing state content html field.
         """
         state_content_html = []
         for key, value in states_dict.items():
@@ -108,29 +107,27 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
         return state_content_html
 
     def check_invalid(self, states):
-        """Checks if the stat is valid or not
+        """Checks if the stat is valid or not.
 
         Args:
-            states: list[tuple]. Consist of state name and image value
+            states: list[tuple]. Consist of state name and image value.
 
         Returns:
-            boolean: bool. Returns True if the state is not valid
-            otherwise False
+            bool. Returns True if the state is not valid otherwise False.
         """
         return any(state[1] == '' for state in states)
 
     def extract_name(self, states):
-        """Extract the state name
+        """Extract the state name.
 
         Args:
-            states: list[tuple]. Consist of state name and empty string
+            states: list[tuple]. Consist of state name and empty string.
 
         Returns:
-            states_list: list. All the erroneous states name
+            list. All the erroneous states name.
         """
         states_list = []
         for state in states:
             states_list.append(state[0])
 
         return states_list
-        

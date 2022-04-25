@@ -19,18 +19,19 @@
 from __future__ import annotations
 
 from core import feconf
+from core.domain import state_domain
+from core.constants import constants
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import state_validation_jobs
-from core.domain import state_domain
 from core.jobs.types import job_run_result
 from core.platform import models
-from core.constants import constants
 
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 
 class GetNumberOfExpStatesHavingEmptyImageFieldJobTest(
     job_test_utils.JobTestBase):
+    """Tests for GetNumberOfExpStatesHavingEmptyImageFieldJob."""
 
     JOB_CLASS = (
         state_validation_jobs.GetNumberOfExpStatesHavingEmptyImageFieldJob
@@ -116,7 +117,7 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJobTest(
             job_run_result.JobRunResult.as_stdout('STATES SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
                 f'The id of exp is {self.EXPLORATION_ID_2} and the '
-                + 'erroneous states are %s' %(['Introduction'])
+                + 'erroneous states are %s' % (['Introduction'])
             )
         ])
 
@@ -126,6 +127,6 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJobTest(
             job_run_result.JobRunResult.as_stdout('STATES SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
                 f'The id of exp is {self.EXPLORATION_ID_2} and the '
-                + 'erroneous states are %s' %(['Introduction'])
+                + 'erroneous states are %s' % (['Introduction'])
             )
         ])
