@@ -1582,6 +1582,9 @@ pre.oppia-pre-wrapped-text {
   padding: 6px 12px 6px 12px;
   text-transform: uppercase;
 }
+.oppia-language-dropdown-button {
+  border: 2px solid white;
+}
 .btn.oppia-navbar-button:hover,
 .btn.oppia-navbar-button:focus {
   background-color: #fff;

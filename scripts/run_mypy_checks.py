@@ -209,12 +209,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/python_utils.py',
     'core/python_utils_test.py',
     'extensions/',
-    'scripts/build.py',
-    'scripts/build_test.py',
-    'scripts/check_e2e_tests_are_captured_in_ci.py',
-    'scripts/check_e2e_tests_are_captured_in_ci_test.py',
-    'scripts/check_frontend_test_coverage.py',
-    'scripts/check_frontend_test_coverage_test.py',
     'scripts/check_if_pr_is_low_risk.py',
     'scripts/check_if_pr_is_low_risk_test.py',
     'scripts/common.py',
@@ -256,8 +250,6 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/servers_test.py',
     'scripts/setup.py',
     'scripts/setup_test.py',
-    'scripts/typescript_checks.py',
-    'scripts/typescript_checks_test.py',
     'scripts/linters/',
     'scripts/release_scripts/'
 ]

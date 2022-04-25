@@ -254,13 +254,14 @@ export class StoryEditorStateService {
   changeStoryPublicationStatus(
       newStoryStatusIsPublic: boolean,
       successCallback: (value?: Object) => void): boolean {
-    if (!this._storyIsInitialized) {
+    const storyId = this._story.getId();
+    if (!storyId || !this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot publish a story before one is loaded.');
+      return false;
     }
-
     this.editableStoryBackendApiService.changeStoryPublicationStatusAsync(
-      this._story.getId(), newStoryStatusIsPublic).then(
+      storyId, newStoryStatusIsPublic).then(
       (storyBackendObject) => {
         this._setStoryPublicationStatus(newStoryStatusIsPublic);
         if (successCallback) {
