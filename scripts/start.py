@@ -152,7 +152,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             build_args.append('--maintenance_mode')
         if parsed_args.source_maps:
             build_args.append('--source_maps')
-        build.main(args=build_args)  # type: ignore[no-untyped-call]
+        build.main(args=build_args)
         stack.callback(build.set_constants_to_default)
 
         stack.enter_context(servers.managed_redis_server())

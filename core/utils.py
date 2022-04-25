@@ -39,8 +39,8 @@ from core import feconf
 from core.constants import constants
 
 from typing import (
-    IO, Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple,
-    TypeVar, Union, overload)
+    IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
+    TextIO, Tuple, TypeVar, Union, overload)
 from typing_extensions import Literal
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
@@ -101,7 +101,7 @@ def open_file(
     mode: TextModeTypes,
     encoding: str = 'utf-8',
     newline: Union[str, None] = None
-) -> IO[str]: ...
+) -> TextIO: ...
 
 
 @overload
@@ -110,7 +110,7 @@ def open_file(
     mode: BinaryModeTypes,
     encoding: Union[str, None] = 'utf-8',
     newline: Union[str, None] = None
-) -> IO[bytes]: ...
+) -> BinaryIO: ...
 
 
 def open_file(

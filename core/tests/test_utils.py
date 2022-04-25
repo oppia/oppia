@@ -29,7 +29,9 @@ import itertools
 import json
 import logging
 import os
+import random
 import re
+import string
 import unittest
 
 from core import feconf
@@ -199,6 +201,17 @@ def get_storage_model_classes():
                         clazz)]
                 if 'Model' in all_base_classes:
                     yield clazz
+
+
+def generate_random_hexa_str():
+    """Generate 32 character random string that looks like hex number.
+
+    Returns:
+        str. A random string.
+    """
+    uppercase = 'ABCDEF'
+    lowercase = 'abcdef'
+    return ''.join(random.choices(uppercase + lowercase + string.digits, k=32))
 
 
 class ElasticSearchStub:
