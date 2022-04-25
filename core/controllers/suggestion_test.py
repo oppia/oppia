@@ -2217,6 +2217,33 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_suggestion_not_included_when_exploration_is_not_editable(self):
+        self.login(self.AUTHOR_EMAIL)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
+        self.assertEqual(len(response['suggestions']), 1)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'edits_allowed',
+                    'old_value': True,
+                    'new_value': False
+                })], 'Add content')
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
+
+        self.assertEqual(len(response['suggestions']), 0)
+
     def test_exploration_handler_returns_data(self):
         self.login(self.AUTHOR_EMAIL)
 
