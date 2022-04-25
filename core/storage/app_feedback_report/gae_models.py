@@ -43,26 +43,21 @@ PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-
 # The model field names that can be filtered / sorted for when maintainers
 # triage feedback reports.
-class FILTER_FIELD_NAMES(enum.Enum): # pylint: disable=invalid-name
+class FilterFieldNames(enum.Enum):
     """Enum for the model field names that can be filtered"""
 
-    platform = 'platform' # pylint: disable=invalid-name
-    report_type = 'report_type' # pylint: disable=invalid-name
-    entry_point = 'entry_point' # pylint: disable=invalid-name
-    submitted_on = 'submitted_on' # pylint: disable=invalid-name
-    android_device_model = 'android_device_model' # pylint: disable=invalid-name
-    android_sdk_version = 'android_sdk_version' # pylint: disable=invalid-name
-    text_language_code = 'text_language_code' # pylint: disable=invalid-name
-    audio_language_code = 'audio_language_code' # pylint: disable=invalid-name
-    platform_version = 'platform_version' # pylint: disable=invalid-name
-    android_device_country_locale_code = 'android_device_country_locale_code' # pylint: disable=invalid-name
+    PLATFORM = 'PLATFORM'
+    REPORTTYPE = 'REPORTTYPE'
+    ENTRYPOINT = 'ENTRYPOINT'
+    SUBMITTEDON = 'SUBMITTEDON'
+    ANDROIDDEVICEMODEL = 'ANDROIDDEVICEMODEL'
+    ANDROIDSDKVERSION = 'ANDROIDSDKVERSION'
+    TEXTLANGUAGECODE = 'TEXTLANGUAGECODE'
+    AUDIOLANGUAGECODE = 'AUDIOLANGUAGECODE'
+    PLATFORMVERSION = 'PLATFORMVERSION'
+    ANDROIDDEVICECOUNTRYLOCALECODE = 'ANDROIDDEVICECOUNTRYLOCALECODE'
 
 
 # An ID used for stats model entities tracking all unticketed reports.
@@ -328,7 +323,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def get_filter_options_for_field(
-        cls, filter_field: FILTER_FIELD_NAMES
+        cls, filter_field: FilterFieldNames
     ) -> List[str]:
         """Fetches values that can be used to filter reports by.
 
@@ -341,26 +336,26 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """
         query = cls.query(projection=[filter_field.name], distinct=True)
         filter_values = []
-        if filter_field == FILTER_FIELD_NAMES.report_type:
+        if filter_field == FilterFieldNames.REPORTTYPE:
             filter_values = [model.report_type for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.platform:
+        elif filter_field == FilterFieldNames.PLATFORM:
             filter_values = [model.platform for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.entry_point:
+        elif filter_field == FilterFieldNames.ENTRYPOINT:
             filter_values = [model.entry_point for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.submitted_on:
+        elif filter_field == FilterFieldNames.SUBMITTEDON:
             filter_values = [model.submitted_on.date() for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.android_device_model:
+        elif filter_field == FilterFieldNames.ANDROIDDEVICEMODEL:
             filter_values = [model.android_device_model for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.android_sdk_version:
+        elif filter_field == FilterFieldNames.ANDROIDSDKVERSION:
             filter_values = [model.android_sdk_version for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.text_language_code:
+        elif filter_field == FilterFieldNames.TEXTLANGUAGECODE:
             filter_values = [model.text_language_code for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.audio_language_code:
+        elif filter_field == FilterFieldNames.AUDIOLANGUAGECODE:
             filter_values = [model.audio_language_code for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.platform_version:
+        elif filter_field == FilterFieldNames.PLATFORMVERSION:
             filter_values = [model.platform_version for model in query]
         elif filter_field == (
-                FILTER_FIELD_NAMES.android_device_country_locale_code):
+                FilterFieldNames.ANDROIDDEVICECOUNTRYLOCALECODE):
             filter_values = [
                 model.android_device_country_locale_code for model in query]
         else:
