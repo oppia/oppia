@@ -704,7 +704,7 @@
 # QA team.
 # TODO(#15381): Add @nithusha21 as owner after 2022-05-01, lines 706-708
 /core/tests/ @oppia/automated-qa-reviewers
-/assets/ @oppia/automated-qa-reviewers
+/assets/ @kevintab95
 /data/ @oppia/automated-qa-reviewers
 /core/templates/karma.module.ts @vojtechjelinek
 /core/tests/protractor_utils/ @oppia/automated-qa-reviewers
