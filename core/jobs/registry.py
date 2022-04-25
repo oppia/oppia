@@ -57,7 +57,8 @@ from core.jobs.batch_jobs import suggestion_stats_computation_jobs   # pylint: d
 from core.jobs.batch_jobs import user_stats_computation_jobs         # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import math_interactions_audit_jobs        # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import mailchimp_population_jobs           # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import story_validation_jobs
+from core.jobs.batch_jobs import story_validation_jobs               # pylint: disable=unused-import  # isort: skip
+
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
     """Returns all jobs that have inherited from the JobBase class.
