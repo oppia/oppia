@@ -507,7 +507,7 @@ def update_version_in_config_files():
 
 
 def inform_server_errors_team(release_rota_url, server_error_playbook_url):
-    """Asks the release co-ordinator to inform the server errors team
+    """Asks the release coordinator to inform the server errors team
     that the release will be deployed to production.
 
     Args:
@@ -523,7 +523,8 @@ def inform_server_errors_team(release_rota_url, server_error_playbook_url):
         'that the release will be deployed on the production server and '
         'send them the Playbook for the Server Errors Team: %s.'
         'Wait for them to confirm they have done all the stuff that was needed '
-        'before doing the deployment.' % (
+        'before doing the deployment. If there is no response in 24 hours '
+        'then go ahead with the deployment.' % (
             release_rota_url, server_error_playbook_url))
 
 

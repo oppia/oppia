@@ -672,7 +672,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 unused_github_username, unused_current_release_version_number):
             check_function_calls['create_branch_gets_called'] = True
         def mock_inform_server_errors_team(
-                unused_release_rota_url, unused_server_error_playbook_url):
+                unused_release_rota_url, unused_server_error_playbook_url
+            ):
             check_function_calls['inform_server_errors_team_gets_called'] = True
         def mock_input():
             return 'y'
