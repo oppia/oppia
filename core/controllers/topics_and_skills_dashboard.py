@@ -403,7 +403,6 @@ class NewSkillHandler(base.BaseHandler):
         }
     }
 
-
     @acl_decorators.can_create_skill
     def post(self):
         description = self.normalized_payload.get('description')
