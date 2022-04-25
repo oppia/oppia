@@ -19,8 +19,8 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import state_domain
 from core.constants import constants
+from core.domain import state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import state_validation_jobs
 from core.jobs.types import job_run_result
