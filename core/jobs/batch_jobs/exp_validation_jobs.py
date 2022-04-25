@@ -26,8 +26,8 @@ from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
-import result
 import apache_beam as beam
+import result
 from typing import List
 
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
@@ -113,7 +113,7 @@ class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
 
         exp_ids_with_invalid_tags = (
             total_explorations
-            | beam.Map(lambda exp: self._check_tags_are_valid(exp))
+            | beam.Map(self._check_tags_are_valid)
         )
 
         return (
