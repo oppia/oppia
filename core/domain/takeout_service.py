@@ -91,7 +91,7 @@ def export_data_for_user(user_id):
         user_id_match_object = re.search(
             feconf.USER_ID_REGEX, exported_data_json_string)
         if user_id_match_object:
-            logging.exception(
+            logging.error(
                 '[TAKEOUT] User ID (%s) found in the JSON generated '
                 'for %s and user with ID %s' % (
                     user_id_match_object.group(0), model.__name__, user_id
