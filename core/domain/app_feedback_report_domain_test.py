@@ -1532,7 +1532,7 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
         # "InvalidFieldName" to the class filter field name.
         # This is done to make sure that the type checker does
         # not complain about the type of the filter field name.
-        self.filter.filter_field = InvalidFieldName.INVALID_FILTER_FIELD 
+        self.filter.filter_field = InvalidFieldName.INVALID_FILTER_FIELD
         self._assert_validation_error(
             self.filter,
             'The filter field should be one of ')
