@@ -21,7 +21,8 @@ from __future__ import annotations
 import base64
 import logging
 
-from core import android_validation_constants, feconf
+from core import android_validation_constants
+from core import feconf
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
