@@ -30,9 +30,9 @@ export class ExplorationEditsAllowedBackendApiService {
   ) {}
 
   async setEditsAllowed(
-    editsAreAllowed: boolean,
-    explorationId: string,
-    callback: () => void
+      editsAreAllowed: boolean,
+      explorationId: string,
+      callback: () => void
   ): Promise<void> {
     return this.http.put(`/editsallowedhandler/${explorationId}`, {
       edits_are_allowed: editsAreAllowed
