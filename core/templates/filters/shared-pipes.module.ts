@@ -35,7 +35,8 @@ import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-
     LimitToPipe
   ],
   exports: [
-    LimitToPipe
+    LimitToPipe,
+    StringUtilityPipesModule
   ],
 })
 
