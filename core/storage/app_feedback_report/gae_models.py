@@ -429,10 +429,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         for report_model in report_models:
             submitted_on_msec = utils.get_time_in_millisecs(
                 report_model.submitted_on)
-            if (
-                    report_model.scrubbed_by is not None and
-                    utils.is_user_id_valid(report_model.scrubbed_by)
-            ):
+            if utils.is_user_id_valid(report_model.scrubbed_by):
                 scrubbed_by_user_model = user_models.UserSettingsModel.get(
                     report_model.scrubbed_by)
                 # Ruling out the possibility of None for mypy type checking.
