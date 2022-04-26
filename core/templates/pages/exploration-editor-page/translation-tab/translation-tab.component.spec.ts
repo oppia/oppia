@@ -84,7 +84,7 @@ describe('Translation tab component', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    contextService = TestBed.inject(ContextService);
+    contextService = TestBed.get(ContextService);
     loaderService = TestBed.get(LoaderService);
     siteAnalyticsService = TestBed.get(SiteAnalyticsService);
     userExplorationPermissionsService = TestBed.get(
@@ -126,6 +126,11 @@ describe('Translation tab component', function() {
         return {
           result: Promise.resolve()
         };
+      }
+    });
+    $provide.value('ContextService', {
+      getExplorationId: () => {
+        return 'exp1';
       }
     });
   }));
