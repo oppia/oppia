@@ -81,6 +81,12 @@ module.exports = function(config) {
       'extensions/interactions/*.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
+    client: {
+      jasmine: {
+        random: true,
+        seed: 976,
+      },
+    },
     reporters: ['progress', 'coverage-istanbul'],
     coverageIstanbulReporter: {
       reports: ['html', 'json', 'lcovonly'],

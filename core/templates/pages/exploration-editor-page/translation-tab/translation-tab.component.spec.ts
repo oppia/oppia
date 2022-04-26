@@ -84,7 +84,7 @@ describe('Translation tab component', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    contextService = TestBed.get(ContextService);
+    contextService = TestBed.inject(ContextService);
     loaderService = TestBed.get(LoaderService);
     siteAnalyticsService = TestBed.get(SiteAnalyticsService);
     userExplorationPermissionsService = TestBed.get(
@@ -126,11 +126,6 @@ describe('Translation tab component', function() {
         return {
           result: Promise.resolve()
         };
-      }
-    });
-    $provide.value('ContextService', {
-      getExplorationId: () => {
-        return 'exp1';
       }
     });
   }));
@@ -402,6 +397,10 @@ describe('Translation tab component', function() {
 
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', fakeAsync(() => {
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue($q.resolve({
+        canVoiceover: true
+      }));
     ctrl.$onInit();
 
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished')
