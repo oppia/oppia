@@ -935,6 +935,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'display_alias': None,
+            'has_viewed_lesson_info_modal_once': False,
         }
         skill_data = {}
         stats_data = {}
