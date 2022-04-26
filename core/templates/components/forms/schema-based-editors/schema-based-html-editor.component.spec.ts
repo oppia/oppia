@@ -58,7 +58,7 @@ describe('Schema Based Html Editor Component', () => {
     expect(component.onChange).toEqual(mockFunction);
   }));
 
-  it('should get empty object on validating', () => {
+  it('should test the case when the input isn\'t valid', () => {
     expect(component.validate(null)).toEqual({});
   });
 
@@ -72,7 +72,7 @@ describe('Schema Based Html Editor Component', () => {
     expect(component.localValue).toEqual('true');
   });
 
-  it('should update local value', () => {
+  it('should check the final value of the component', () => {
     spyOn(component, 'onChange');
 
     component.updateValue('<p> HTML </p>');

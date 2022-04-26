@@ -98,20 +98,16 @@ implements ControlValueAccessor, OnInit, Validator {
 
   private _validate(
       localValue: number | string,
-      customizationArg: {checkRequireNonnegativeInput: unknown}
-  ): boolean {
+      customizationArg: {checkRequireNonnegativeInput: unknown}): boolean {
     let { checkRequireNonnegativeInput } = customizationArg || {};
-    let checkRequireNonnegativeInputValue = (
-    checkRequireNonnegativeInput === undefined ? false :
-    checkRequireNonnegativeInput);
+
     return (
       localValue !== undefined &&
       localValue !== null &&
       localValue !== '' &&
       this.numericInputValidationService.validateNumber(
-        +localValue, checkRequireNonnegativeInputValue as boolean
-      ) === undefined)
-    ;
+        +localValue, Boolean(checkRequireNonnegativeInput || false)
+      ) === undefined);
   }
 
   updateLocalValue(value: number): void {
@@ -135,20 +131,20 @@ implements ControlValueAccessor, OnInit, Validator {
       this.localStringValue = '';
     }
     // To check checkRequireNonnegativeInput customization argument
-    // Value of numeric input interaction.
+    // value of numeric input interaction.
     let { checkRequireNonnegativeInput } = this.uiConfig || {};
     this.checkRequireNonnegativeInputValue = (
-            checkRequireNonnegativeInput === undefined ? false :
-            checkRequireNonnegativeInput);
-    // If customization argument of numeric input interaction is true
-    // Set Min value as 0 to not let down key go below 0.
+      checkRequireNonnegativeInput === undefined ? false :
+      checkRequireNonnegativeInput);
+    // If customization argument of numeric input interaction is true,
+    // set Min value as 0 to not let down key go below 0.
     this.minValue = checkRequireNonnegativeInput && 0;
     // So that focus is applied after all the functions in
     // main thread have executed.
     setTimeout(() => {
       this.focusManagerService.setFocusWithoutScroll(this.labelForFocusTarget);
     }, 50);
-    // This prevents the red 'invalid input' warning message from
+    // This timeout prevents the red 'invalid input' warning message from
     // flashing at the outset.
     setTimeout(() => {
       this.hasLoaded = true;
@@ -222,7 +218,7 @@ implements ControlValueAccessor, OnInit, Validator {
     if (this.localStringValue === '') {
       this.localValue = null;
       // Clear errors if input is empty.
-      this.errorStringI18nKey = undefined;
+      this.errorStringI18nKey = null;
     } else {
       // Make sure number is in a correct format.
       let error = this.numericInputValidationService
@@ -232,8 +228,8 @@ implements ControlValueAccessor, OnInit, Validator {
       if (error !== undefined) {
         this.localValue = null;
         this.errorStringI18nKey = error;
-      } else { // Parse number if the string is in proper format.
-        // Exploration Player.
+      } else {
+        // Parse number if the string is in proper format.
         this.localValue = this.numberConversionService
           .convertToEnglishDecimal(this.localStringValue);
 

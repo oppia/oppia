@@ -15,6 +15,7 @@
 /**
  * @fileoverview Component for a schema-based editor for multiple choice.
  */
+
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';

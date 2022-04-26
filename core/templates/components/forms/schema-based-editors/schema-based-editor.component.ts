@@ -20,7 +20,8 @@ import { Input, Output, EventEmitter, Component, forwardRef, AfterViewInit, View
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors, NgForm } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Schema } from 'services/schema-default-value.service';
-const INVALID = 'INVALID';
+
+const VALIDATION_STATUS_INVALID = 'INVALID';
 
 @Component({
   selector: 'schema-based-editor',
@@ -86,16 +87,19 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   }
 
   ngAfterViewInit(): void {
-    let form: angular.IFormController = angular.element(
+    let angularJsFormController: angular.IFormController = angular.element(
       this.elementRef.nativeElement).controller('form');
-    this.form.statusChanges.subscribe((x) => {
-      if (form === null || form === undefined) {
+    this.form.statusChanges.subscribe((validationStatus) => {
+      if (angularJsFormController === null ||
+        angularJsFormController === undefined) {
         return;
       }
-      if (x === INVALID) {
-        form.$setValidity('schema', false, form);
+      if (validationStatus === VALIDATION_STATUS_INVALID) {
+        angularJsFormController.$setValidity(
+          'schema', false, angularJsFormController);
       } else {
-        form.$setValidity('schema', true, form);
+        angularJsFormController.$setValidity(
+          'schema', true, angularJsFormController);
       }
     });
   }

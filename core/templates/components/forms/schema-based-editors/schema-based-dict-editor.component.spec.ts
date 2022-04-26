@@ -96,27 +96,31 @@ describe('Schema Based Dict Editor Component', () => {
   });
 
   it('should update value when local value change', () => {
-    component.localValue = {
+    let localValue = {
       first: 'true'
     };
 
-    expect(component.localValue.first).toEqual('true');
+    component.localValue = localValue;
+
+    expect(component.localValue).toEqual(localValue);
 
     component.updateValue('false', 'first');
 
-    expect(component.localValue.first).toEqual('false');
+    expect(component.localValue).toEqual(localValue);
   });
 
   it('should not update value when local value not change', () => {
-    component.localValue = {
+    let localValue = {
       first: 'true'
     };
 
-    expect(component.localValue.first).toEqual('true');
+    component.localValue = localValue;
+
+    expect(component.localValue).toEqual(localValue);
 
     component.updateValue('true', 'first');
 
-    expect(component.localValue.first).toEqual('true');
+    expect(component.localValue).toEqual(localValue);
   });
 
   it('should get empty object on validating', () => {
@@ -124,14 +128,18 @@ describe('Schema Based Dict Editor Component', () => {
   });
 
   it('should get schema', () => {
+    const HTML_SCHEMA = {
+      type: 'html'
+    };
+
     component.propertySchemas = [
       {
         name: 'id1',
-        schema: 'schema'
+        schema: HTML_SCHEMA
       }
     ];
 
-    expect(component.getSchema(0)).toBe('schema');
+    expect(component.getSchema(0)).toBe(HTML_SCHEMA);
   });
 
   it('should get label for focus target', () => {

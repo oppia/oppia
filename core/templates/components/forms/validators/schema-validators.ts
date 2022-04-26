@@ -32,7 +32,7 @@ export class SchemaValidators {
       }
       if (!(typeof value === 'string' || Array.isArray(value))) {
         throw new Error(
-          'Not valid value passed in control. Expecting a string or Array');
+          'Invalid value passed in control. Expecting a string or Array');
       }
       if (value.length >= args.minValue) {
         return null;
@@ -56,7 +56,7 @@ export class SchemaValidators {
       }
       if (!(typeof value === 'string' || Array.isArray(value))) {
         throw new Error(
-          'Not valid value passed in control. Expecting a string or Array');
+          'Invalid value passed in control. Expecting a string or Array');
       }
       if (value.length <= args.maxValue) {
         return null;
