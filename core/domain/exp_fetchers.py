@@ -182,7 +182,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.correctness_feedback_enabled,
         exploration_model.edits_allowed,
         created_on=exploration_model.created_on,
-        last_updated=exploration_model.last_updated,)
+        last_updated=exploration_model.last_updated)
 
 
 def get_exploration_summary_by_id(exploration_id):
