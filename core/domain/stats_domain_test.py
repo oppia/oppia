@@ -1342,7 +1342,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
             playthrough1.actions[0].action_type, 'ExplorationQuit')
 
     def test_cannot_update_learner_action_from_invalid_schema_version_model(
-            self
+        self
     ) -> None:
         learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 4)
         learner_action_dict = learner_action.to_dict()
@@ -1539,7 +1539,8 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
             self.state_answers, 'Expected schema_version to be an integer')
 
     def test_schema_version_must_be_between_one_and_current_version(
-        self) -> None:
+        self
+    ) -> None:
         self.state_answers.schema_version = 0
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             self.state_answers, 'schema_version < 1: 0')
@@ -1654,7 +1655,8 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             })
 
     def test_requires_classification_categ_to_be_created_from_dict(
-        self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegex(KeyError, 'classification_categorization'):  # type: ignore[no-untyped-call]
             stats_domain.SubmittedAnswer.from_dict({
                 'answer': 'Text',
@@ -1733,7 +1735,8 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(submitted_answer.answer_str, 'answer str')
 
     def test_can_be_created_from_dict_missing_rule_spec_and_answer(
-        self) -> None:
+        self
+    ) -> None:
         submitted_answer = stats_domain.SubmittedAnswer.from_dict({
             'answer': 'Text',
             'interaction_id': 'TextInput',
@@ -2088,7 +2091,8 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
             'Expected calculation output to be one of')
 
     def test_calculation_output_must_be_less_than_one_million_bytes(
-        self) -> None:
+        self
+    ) -> None:
         occurred_answer = stats_domain.AnswerOccurrence(
             'This is not a long sentence.', 1)
         self.state_answers_calc_output.calculation_output = (
@@ -2408,8 +2412,11 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
             self.learner_answer_info,
             'The answer submitted by the learner cannot be empty')
 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[assignment] is used to test
+    # that answer is not an empty dict.
     def test_answer_must_not_be_empty_dict(self) -> None:
-        self.learner_answer_info.answer = {}
+        self.learner_answer_info.answer = {} # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.learner_answer_info,
             'The answer submitted cannot be an empty dict')

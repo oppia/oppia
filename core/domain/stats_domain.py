@@ -69,22 +69,26 @@ MAX_ANSWER_DETAILS_BYTE_SIZE = 10000
 class SubmittedAnswerDict(TypedDict, total=False):
     """Dictionary representing the SubmittedAnswer object."""
 
-    answer: str
+    answer: Optional[str]
     interaction_id: str
     answer_group_index: int
     rule_spec_index: int
     classification_categorization: str
+    # Type Dict[str, Any] is used here because the type of the params value is 
+    # not specified at all callsites.
     params: Dict[str, Any]
     session_id: str
     time_spent_in_sec: float
-    rule_spec_str: Optional[str]
-    answer_str: Optional[str]
+    rule_spec_str: str
+    answer_str: str
 
 
 class ExplorationIssueDict(TypedDict):
     """Dictionary representing the ExplorationIssue object."""
 
     issue_type: str
+    # Type Dict[str, Dict[str, Any]] is used here because the default value of 
+    # the customization arg is * in the file customization_args_util.py.
     issue_customization_args: Dict[str, Dict[str, Any]]
     playthrough_ids: List[str]
     schema_version: int
@@ -97,6 +101,8 @@ class PlaythroughDict(TypedDict):
     exp_id: str
     exp_version: int
     issue_type: str
+    # Type Dict[str, Dict[str, Any]] is used here because the default value of 
+    # the customization arg is * in the file customization_args_util.py.
     issue_customization_args: Dict[str, Any]
     actions: List[LearnerActionDict]
 
@@ -150,6 +156,8 @@ class LearnerActionDict(TypedDict):
     """Dictionary representing the LearnerAction object."""
 
     action_type: str
+    # Type Dict[str, Dict[str, Any]] is used here because the default value of 
+    # the customization arg is * in the file customization_args_util.py.
     action_customization_args: Dict[str, Any]
     schema_version: int
 
@@ -157,7 +165,7 @@ class LearnerActionDict(TypedDict):
 class AnswerOccurrenceDict(TypedDict):
     """Dictionary representing the AnswerOccurrence object."""
 
-    answer: Any
+    answer: str
     frequency: int
 
 
@@ -165,7 +173,7 @@ class LearnerAnswerInfoDict(TypedDict):
     """Dictionary representing LearnerAnswerInfo object."""
 
     id: str
-    answer: Any
+    answer: Optional[str]
     answer_details: str
     created_on: str
 
@@ -590,7 +598,9 @@ class StateStats:
             self.__class__.__name__,
             ', '.join('%s=%r' % (prop, getattr(self, prop)) for prop in props))
 
-    def __eq__(self, other: object) -> bool:
+    # NOTE: Needs to return Any because of:
+    # https://github.com/python/mypy/issues/363#issue-39383094
+    def __eq__(self, other: Any) -> Any:
         """Implements == comparison between two StateStats instances, returning
         whether they both hold the same values.
 
@@ -601,7 +611,8 @@ class StateStats:
             bool. Whether the two instances have the same values.
         """
         if not isinstance(other, StateStats):
-            return NotImplemented # https://stackoverflow.com/a/44575926
+            # https://docs.python.org/2/library/constants.html#NotImplemented.
+            return NotImplemented 
         return (
             self.total_answers_count_v1,
             self.total_answers_count_v2,
@@ -748,7 +759,9 @@ class SessionStateStats:
         }
         return session_state_stats_dict
 
-    def __eq__(self, other: object) -> bool:
+    # NOTE: Needs to return Any because of:
+    # https://github.com/python/mypy/issues/363#issue-39383094
+    def __eq__(self, other: Any) -> Any:
         """Implements == comparison between two SessionStateStats instances,
         returning whether they hold the same values.
 
@@ -759,7 +772,8 @@ class SessionStateStats:
             bool. Whether the two instances have the same values.
         """
         if not isinstance(other, SessionStateStats):
-            return NotImplemented # https://stackoverflow.com/a/44575926
+            # https://docs.python.org/2/library/constants.html#NotImplemented.
+            return NotImplemented
         return (
             self.total_answers_count,
             self.useful_feedback_count,
@@ -900,6 +914,8 @@ class Playthrough:
         exp_id: str,
         exp_version: int,
         issue_type: str,
+        # Type Dict[str, Dict[str, Any]] is used here because the default value of 
+        # the customization arg is * in the file customization_args_util.py.
         issue_customization_args: Dict[str, Any],
         actions: List[LearnerAction]
     ):
@@ -1018,6 +1034,8 @@ class ExplorationIssue:
     def __init__(
         self,
         issue_type: str,
+        # Type Dict[str, Dict[str, Any]] is used here because the default value of 
+        # the customization arg is * in the file customization_args_util.py.
         issue_customization_args: Dict[str, Dict[str, Any]],
         playthrough_ids: List[str],
         schema_version: int,
@@ -1042,8 +1060,11 @@ class ExplorationIssue:
         self.schema_version = schema_version
         self.is_valid = is_valid
 
-    def __eq__(self, other: object) -> bool:
+    # NOTE: Needs to return Any because of:
+    # https://github.com/python/mypy/issues/363#issue-39383094
+    def __eq__(self, other: Any) -> Any:
         if not isinstance(other, ExplorationIssue):
+            # https://docs.python.org/2/library/constants.html#NotImplemented.
             return NotImplemented
         return (
             self.issue_type == other.issue_type and
@@ -1120,8 +1141,10 @@ class ExplorationIssue:
 
     @classmethod
     def _convert_issue_v1_dict_to_v2_dict(
-        cls, issue_dict: Dict[str, Union[str, Dict[str, Dict[str, str]],
-        list[str], int, bool]]
+        cls,
+        issue_dict: Dict[
+            str, Union[str, Dict[str, Dict[str, str]],list[str], int, bool]
+        ]
     ) -> None:
         """Converts a v1 issue dict to a v2 issue dict. This function is now
         implemented only for testing purposes and must be rewritten when an
@@ -1172,6 +1195,8 @@ class LearnerAction:
     def __init__(
         self,
         action_type: str,
+        # Type Dict[str, Dict[str, Any]] is used here because the default value of 
+        # the customization arg is * in the file customization_args_util.py.
         action_customization_args: Dict[str, Dict[str, Any]],
         schema_version: int
     ):
@@ -1237,7 +1262,7 @@ class LearnerAction:
 
     @classmethod
     def _convert_action_v1_dict_to_v2_dict(
-        cls, action_dict: Dict[str, Dict[str, Any]]
+        cls, action_dict: LearnerActionDict
     ) -> None:
         """Converts a v1 action dict to a v2 action dict. This function is now
         implemented only for testing purposes and must be rewritten when an
@@ -1373,16 +1398,18 @@ class SubmittedAnswer:
 
     def __init__(
         self,
-        answer: Any,
+        answer: Optional[str],
         interaction_id: str,
         answer_group_index: int,
         rule_spec_index: int,
         classification_categorization: str,
+        # Type Dict[str, Any] is used here because the type of the params value is 
+        # not specified at all callsites.
         params: Dict[str, Any],
         session_id: str,
         time_spent_in_sec: float,
-        rule_spec_str: Optional[str]=None,
-        answer_str: Optional[str]=None
+        rule_spec_str: Optional[str] = None,
+        answer_str: Optional[str] = None
     ) -> None:
         self.answer = answer
         self.interaction_id = interaction_id
@@ -1526,7 +1553,7 @@ class AnswerOccurrence:
     of times.
     """
 
-    def __init__(self, answer: Any, frequency: int) -> None:
+    def __init__(self, answer: str, frequency: int) -> None:
         """Initialize domain object for answer occurrences."""
         self.answer = answer
         self.frequency = frequency
@@ -1582,7 +1609,7 @@ class AnswerFrequencyList(AnswerCalculationOutput):
     """Domain object that represents an output list of AnswerOccurrences."""
 
     def __init__(
-        self, answer_occurrences: Optional[List[AnswerOccurrence]]=None
+        self, answer_occurrences: Optional[List[AnswerOccurrence]] = None
     ) -> None:
         """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
@@ -1637,8 +1664,10 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
     """
 
     def __init__(
-        self, categorized_answer_freq_lists:
-        Optional[Dict[str, AnswerFrequencyList]]=None
+        self,
+        categorized_answer_freq_lists: Optional[
+            Dict[str, AnswerFrequencyList]
+        ] = None
     ) -> None:
         """Initialize domain object for categorized answer frequency lists for
         a given dict (default is empty).
@@ -1933,7 +1962,8 @@ class LearnerAnswerDetails:
                 'received %s' % self.accumulated_answer_info_json_size_bytes)
 
     def add_learner_answer_info(
-        self, learner_answer_info: LearnerAnswerInfo) -> None:
+        self, learner_answer_info: LearnerAnswerInfo
+    ) -> None:
         """Adds new learner answer info in the learner_answer_info_list.
 
         Args:
@@ -1990,7 +2020,7 @@ class LearnerAnswerInfo:
     def __init__(
         self,
         learner_answer_info_id: str,
-        answer: Any,
+        answer: Optional[str],
         answer_details: str,
         created_on: datetime.datetime
     ) -> None:
