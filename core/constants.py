@@ -79,7 +79,8 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         str. The contents of the file.
     """
     with io.open(
-        os.path.join(package, filepath), 'r', encoding='utf-8') as file:
+        os.path.join(package, filepath), 'r', encoding='utf-8'
+    ) as file:
         return file.read()
 
 
