@@ -87,7 +87,7 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
             | 'Combine results' >> beam.Flatten()
         )
 
-    def get_states(self, states_dict: dict) -> list[tuple]:
+    def get_states(self, states_dict: dict[str, str]) -> list[tuple]:
         """Returns the array of state content html field.
 
         Args:
