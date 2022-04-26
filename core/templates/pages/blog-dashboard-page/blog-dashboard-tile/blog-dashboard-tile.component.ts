@@ -29,9 +29,12 @@ import { AlertsService } from 'services/alerts.service';
   templateUrl: './blog-dashboard-tile.component.html'
 })
 export class BlogDashboardTileComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() blogPostSummary!: BlogPostSummary;
-  @Input() blogPostIsPublished: boolean;
-  @Input() activeView: string;
+  @Input() activeView!: string;
+  @Input() blogPostIsPublished: boolean = false;
   lastUpdatedDateString: string = '';
   @Output() unpublisedBlogPost: EventEmitter<void> = new EventEmitter();
   @Output() deletedBlogPost: EventEmitter<void> = new EventEmitter();
@@ -43,8 +46,8 @@ export class BlogDashboardTileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.lastUpdatedDateString = this.getDateStringInWords(
-      this.blogPostSummary.lastUpdated);
+    const lastUpdated = this.blogPostSummary.lastUpdated;
+    this.lastUpdatedDateString = this.getDateStringInWords(lastUpdated);
   }
 
   getDateStringInWords(naiveDate: string): string {
