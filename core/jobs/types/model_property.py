@@ -21,7 +21,7 @@ from __future__ import annotations
 from core.jobs import job_utils
 from core.platform import models
 
-from typing import Any, Iterator, Tuple, Type, cast
+from typing import Any, Callable, Iterator, Tuple, Type, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -38,13 +38,13 @@ class ModelProperty:
 
     __slots__ = ('_model_kind', '_property_name')
 
-    # Here, argument property_obj accepts a property of a model and the
-    # property of a model can be a object of str, int, datetime and other
-    # objects too. So, Any type has to be used for property_obj argument.
     def __init__(
         self,
         model_class: Type[base_models.BaseModel],
-        property_obj: Any
+        property_obj: Union[
+            datastore_services.Property,
+            Callable[[base_models.BaseModel], str]
+        ]
     ) -> None:
         """Initializes a new ModelProperty instance.
 
@@ -76,9 +76,7 @@ class ModelProperty:
             raise ValueError(
                 '%r is not a property of %s' % (property_obj, self._model_kind))
         else:
-            # Here, ignore [attr-defined] is added because, mypy is not
-            # able to recognize '_name' attribute of ndb's models.
-            property_name = property_obj._name  # type: ignore[attr-defined]  # pylint: disable=protected-access
+            property_name = property_obj._name  # pylint: disable=protected-access
 
         self._property_name = property_name
 
@@ -137,24 +135,34 @@ class ModelProperty:
             type(BaseModel). The model type.
         """
         # Here, get_model_class() returns the value of type
-        # Type[datastore_services.Model] but expected return value from this
-        # method is Type[base_models.BaseModel]. So, that's why we used cast
-        # here.
+        # Type[datastore_services.Model] but the expected return value from
+        # this method is Type[base_models.BaseModel]. So, that's why we used
+        # cast here.
         return cast(
             Type[base_models.BaseModel],
             job_utils.get_model_class(self._model_kind)
         )
 
-    # This method returns the property of a model and that property of a model
-    # can be a object of str, int, datetime and other objects too. So, that's
-    # why Any type is used as a return value type.
-    def _to_property(self) -> Any:
+    def _to_property(
+        self
+    ) -> Union[
+        datastore_services.Property,
+        Callable[[base_models.BaseModel], str]
+    ]:
         """Returns the Property object associated with this instance.
 
         Returns:
             *. A property instance.
         """
-        return getattr(self._to_model_class(), self._property_name)
+        # Using a cast here because the return value of getattr() method is
+        # dynamic and mypy will assume it to be Any type otherwise.
+        return cast(
+            Union[
+                datastore_services.Property,
+                Callable[[base_models.BaseModel], str]
+            ],
+            getattr(self._to_model_class(), self._property_name)
+        )
 
     def _is_repeated_property(self) -> bool:
         """Returns whether the property is repeated.
@@ -162,7 +170,13 @@ class ModelProperty:
         Returns:
             bool. Whether the property is repeated.
         """
-        return self._property_name != 'id' and self._to_property()._repeated # pylint: disable=protected-access
+        model_property = self._to_property()
+        # We used assert here, because this method checks repetition only
+        # for those properties which belongs to datastore_services.Property
+        # and id is not one of them. Because id is a python property and it
+        # does not contain '_repeated' attribute.
+        assert isinstance(model_property, datastore_services.Property)
+        return self._property_name != 'id' and model_property._repeated # pylint: disable=protected-access
 
     def __getstate__(self) -> Tuple[str, str]:
         """Called by pickle to get the value that uniquely defines self.
