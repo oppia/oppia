@@ -79,7 +79,8 @@ from . import setup  # isort:skip  pylint: disable=wrong-import-position, wrong-
 from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
-    description='Installation script for Oppia third-party libraries.')
+    description='Installation script for Oppia third-party libraries.'
+)
 
 # Download locations for buf binary.
 BUF_BASE_URL = 'https://github.com/bufbuild/buf/releases/download/v0.29.0/'
@@ -166,14 +167,16 @@ def compile_protobuf_files(filepaths: List[str]) -> None:
     proto_env['PATH'] += '%s%s/bin' % (os.pathsep, PROTOC_GEN_TS_PATH)
     buf_path = os.path.join(
         BUF_DIR,
-        BUF_DARWIN_FILES[0] if common.is_mac_os() else BUF_LINUX_FILES[0])  # type: ignore[no-untyped-call]
+        BUF_DARWIN_FILES[0] if common.is_mac_os() else BUF_LINUX_FILES[0]  # type: ignore[no-untyped-call]
+    )
     for path in filepaths:
         command = [buf_path, 'generate', path]
         process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            env=proto_env)
+            env=proto_env
+        )
         stderr = process.communicate()[1]
         if process.returncode != 0:
             print(stderr)

@@ -71,77 +71,76 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'setup_gae_main_is_called': True,
             'pre_commit_hook_main_is_called': True
         }
-        def mock_check_call(args: List[str], **kwargs: Union[int, None]) -> Ret:  # type: ignore[name-defined] # pylint: disable=unused-argument,undefined-variable
-            self.check_function_calls['check_call_is_called'] = True
-            class Ret:
-                """Return object with required attributes."""
+        class MockCheckCallReturn:
+            """Return object with required attributes."""
 
-                def __init__(self) -> None:
-                    self.returncode = 0
-                def communicate(self) -> Tuple[bytes, bytes]:
-                    """Return required method."""
-                    return b'', b''
-            return Ret()
+            def __init__(self, returncode: int, message: bytes) -> None:
+                self.returncode = returncode
+                self.message = message
+            def communicate(self) -> Tuple[bytes, bytes]:
+                """Return required method."""
+                return b'', self.message
+        def mock_check_call(
+            _args: List[str],
+            **_kwargs: Union[int, None]
+        ) -> MockCheckCallReturn:
+            self.check_function_calls['check_call_is_called'] = True
+            return MockCheckCallReturn(0, b'')
         def mock_check_call_error(
-                args: List[str], **kwargs: Union[int, None]) -> None: # pylint: disable=unused-argument
+                args: List[str], **_kwargs: Union[int, None]) -> None:
             """Raise the Exception resulting from a failed check_call()"""
             self.check_function_calls['check_call_is_called'] = True
             raise subprocess.CalledProcessError(-1, args[0])
         def mock_popen_error_call(
-            args: List[str], **kwargs: Union[int, None]) -> Ret:  # type: ignore[name-defined] # pylint: disable=unused-argument,undefined-variable
-            class Ret:
-                """Return object that gives user-prefix error."""
-
-                def __init__(self) -> None:
-                    self.returncode = 1
-                def communicate(self) -> Tuple[bytes, bytes]:
-                    """Return user-prefix error as stderr."""
-                    return b'', b'can\'t combine user with prefix'
-            return Ret()
-        def mock_ensure_directory_exists(path: str) -> None:  # pylint: disable=unused-argument
+            _args: List[str],
+            **_kwargs: Union[int, None]
+        ) -> MockCheckCallReturn:
+            return MockCheckCallReturn(
+                1, b'can\'t combine user with prefix')
+        def mock_ensure_directory_exists(_path: str) -> None:
             pass
         class MockZipFile(zipfile.ZipFile):
-            def __init__(self, path: str, mode: str) -> None:  # pylint: disable=unused-argument, super-init-not-called
+            def __init__(self, _path: str, _mode: str) -> None:  # pylint: disable=super-init-not-called
                 pass
-        def mock_extractall(file: zipfile.ZipFile, **kwargs: str) -> None:  # pylint: disable=unused-argument
+        def mock_extractall(_file: zipfile.ZipFile, **_kwargs: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
         def mock_extractall_raises_exception(
-                file: zipfile.ZipFile, **kwargs: str) -> None:  # pylint: disable=unused-argument
+                _file: zipfile.ZipFile, **_kwargs: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
             raise Exception()
-        def mock_isfile_true(filename: str) -> bool:  # pylint: disable=unused-argument
+        def mock_isfile_true(_filename: str) -> bool:
             return True
-        def mock_isfile_false(filename: str) -> bool:  # pylint: disable=unused-argument
+        def mock_isfile_false(_filename: str) -> bool:
             return False
         def mock_ensure_pip_library_is_installed(
-                package: str, version: str, path: str) -> None:  # pylint: disable=unused-argument
+                _package: str, _version: str, _path: str) -> None:
             self.check_main_function_calls[
                 'ensure_pip_library_is_installed_is_called'] = True
-        def mock_check_call_pass(unused_cmd_tokens: List[str]) -> None:  # pylint: disable=unused-argument
+        def mock_check_call_pass(_args: List[str]) -> None:
             pass
-        def mock_main_for_install_third_party(args: List[str]) -> None:  # pylint: disable=unused-argument
+        def mock_main_for_install_third_party(**_kwargs: str) -> None:
             self.check_main_function_calls[
                 'install_third_party_main_is_called'] = True
-        def mock_main_for_setup(args: List[str]) -> None:  # pylint: disable=unused-argument
+        def mock_main_for_setup(**_kwargs: str) -> None:
             self.check_main_function_calls['setup_main_is_called'] = True
-        def mock_main_for_setup_gae(args: List[str]) -> None:  # pylint: disable=unused-argument
+        def mock_main_for_setup_gae(**_kwargs: str) -> None:
             self.check_main_function_calls['setup_gae_main_is_called'] = True
-        def mock_main_for_pre_commit_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
+        def mock_main_for_pre_commit_hook(**_kwargs: str) -> None:
             self.check_main_function_calls[
                 'pre_commit_hook_main_is_called'] = True
-        def mock_main_for_pre_push_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
+        def mock_main_for_pre_push_hook(**_kwargs: str) -> None:
             self.check_function_calls['pre_push_hook_main_is_called'] = True
         def mock_tweak_yarn_executable() -> None:
             self.check_function_calls['tweak_yarn_executable_is_called'] = True
         def mock_rename(origin_name: str, new_name: str) -> None:
             self.assertEqual(origin_name + '.sh', new_name)
             self.check_function_calls['mock_rename_called'] = True
-        def mock_recursive_chmod(path: str, mode: int) -> None: # pylint: disable=unused-argument
+        def mock_recursive_chmod(_path: str, mode: int) -> None:
             self.assertEqual(mode, 0o744)
             self.check_function_calls['recursive_chmod_is_called'] = True
-        def mock_remove(path: str) -> None:  # pylint: disable=unused-argument
+        def mock_remove(_path: str) -> None:
             pass
-        def mock_url_retrieve(url: str, filename: str) -> None: # pylint: disable=unused-argument
+        def mock_url_retrieve(_url: str, **_kwargs: str) -> None:
             self.check_function_calls['url_retrieve_is_called'] = True
 
         self.ensure_pip_install_swap = self.swap(
@@ -250,7 +249,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
     def test_buf_installation_on_linux(self) -> None:
 
-        def mock_url_retrieve_linux(url: str, filename: str) -> None: # pylint: disable=unused-argument
+        def mock_url_retrieve_linux(url: str, **_kwargs: str) -> None:
             # Check that correct platform is used bufbuild.
             if 'bufbuild' in url:
                 self.assertTrue('Linux-x86_64' in url.split('/')[-1])
@@ -279,7 +278,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
     def test_buf_installation_on_mac(self) -> None:
 
-        def mock_url_retrieve_mac(url: str, filename: str) -> None: # pylint: disable=unused-argument
+        def mock_url_retrieve_mac(url: str, **_kwargs: str) -> None:
             if 'bufbuild' in url:
                 self.assertTrue('Darwin-x86_64' in url.split('/')[-1])
                 self.check_function_calls['url_retrieve_is_called'] = True
@@ -307,7 +306,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
     def test_buf_is_not_reinstalled(self) -> None:
 
-        def mock_exists(path: str) -> bool: # pylint: disable=unused-argument
+        def mock_exists(_path: str) -> bool:
             return True
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
