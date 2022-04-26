@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -120,7 +120,7 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_exp_with_no_refresher_exp_id(self) -> None:
-        # Test is initialized by setup()
+        # This test is initialized by setUp().
         self.assert_job_output_is([])
 
     def test_community_owned_exp(self) -> None:
@@ -143,7 +143,8 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
                             'contentId': 'rule_input_4',
                             'normalizedStrSet': ['Input1', 'Input2']
                             }
-                    })
+                    }
+                )
             ],
             [],
             None
@@ -204,7 +205,8 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
                             'contentId': 'rule_input_4',
                             'normalizedStrSet': ['Input1', 'Input2']
                             }
-                    })
+                    }
+                )
             ],
             [],
             None
@@ -265,7 +267,8 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
                             'contentId': 'rule_input_4',
                             'normalizedStrSet': ['Input1', 'Input2']
                             }
-                    })
+                    }
+                )
             ],
             [],
             None
@@ -287,7 +290,8 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
                 'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state2'
                 ).to_dict()
-            })
+            }
+        )
         exp.update_timestamps()
         self.put_multi([exp])
 
@@ -319,7 +323,8 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
                             'contentId': 'rule_input_4',
                             'normalizedStrSet': ['Input1', 'Input2']
                             }
-                    })
+                    }
+                )
             ],
             [],
             None
@@ -336,7 +341,8 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
             language_code='en',
             init_state_name='state with ref',
             states_schema_version=48,
-            states={'state with ref': state1.to_dict()})
+            states={'state with ref': state1.to_dict()}
+        )
         exp.update_timestamps()
         self.put_multi([exp])
 
@@ -372,7 +378,8 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
                             'contentId': 'rule_input_4',
                             'normalizedStrSet': ['Input1', 'Input2']
                             }
-                    })
+                    }
+                )
             ],
             [],
             None
@@ -394,7 +401,8 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
                 'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state2'
                 ).to_dict()
-            })
+            }
+        )
         exp.update_timestamps()
         self.put_multi([exp])
 
@@ -428,7 +436,8 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
                             'contentId': 'rule_input_4',
                             'normalizedStrSet': ['Input1', 'Input2']
                             }
-                    })
+                    }
+                )
             ],
             [],
             None
@@ -463,7 +472,8 @@ class FilterRefresherExplorationIdJobTests(job_test_utils.JobTestBase):
                 'state2': state2.to_dict(),
                 'state3': state3.to_dict(),
                 'state4': state4.to_dict(),
-            })
+            }
+        )
         exp1.update_timestamps()
         exp2 = self.create_model(
             exp_models.ExplorationModel,
