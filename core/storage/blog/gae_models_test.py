@@ -40,12 +40,12 @@ if MYPY: # pragma: no cover
 class BlogPostModelTest(test_utils.GenericTestBase):
     """Tests for the BlogPostModel class."""
 
-    NONEXISTENT_USER_ID: Final = 'id_x'
-    USER_ID: Final = 'user_1'
-    CONTENT: Final = 'Dummy Content'
-    TITLE: Final = 'Dummy Title'
-    TAGS: Final = ['tag1', 'tag2', 'tag3']
-    THUMBNAIL: Final = 'xyzabc'
+    NONEXISTENT_USER_ID: Final[str] = 'id_x'
+    USER_ID: Final[str] = 'user_1'
+    CONTENT: Final[str] = 'Dummy Content'
+    TITLE: Final[str] = 'Dummy Title'
+    TAGS: Final[List[str]] = ['tag1', 'tag2', 'tag3']
+    THUMBNAIL: Final[str] = 'xyzabc'
 
     def setUp(self) -> None:
         """Set up blog post models in datastore for use in testing."""
@@ -152,11 +152,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         user_data = blog_models.BlogPostModel.export_data(
             self.NONEXISTENT_USER_ID
         )
-        # For testing purpose, test_data is kept empty but since it is a type
-        # of BlogPostModelDataDict mypy expecting it's keys to be defined and
-        # without keys mypy throws an error. Thus to silent mypy error, we
-        # added ignore here.
-        test_data: blog_models.BlogPostModelDataDict = {}  # type: ignore[typeddict-item]
+        test_data: Dict[str, blog_models.BlogPostModelDataDict] = {}
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self) -> None:
@@ -179,12 +175,12 @@ class BlogPostModelTest(test_utils.GenericTestBase):
 class BlogPostSummaryModelTest(test_utils.GenericTestBase):
     """Tests for the BlogPostSummaryModel class."""
 
-    NONEXISTENT_USER_ID: Final = 'id_x'
-    USER_ID: Final = 'user_1'
-    SUMMARY: Final = 'Dummy Summary'
-    TITLE: Final = 'Dummy Title'
-    TAGS: Final = ['tag1', 'tag2', 'tag3']
-    THUMBNAIL: Final = 'xyzabc'
+    NONEXISTENT_USER_ID: Final[str] = 'id_x'
+    USER_ID: Final[str] = 'user_1'
+    SUMMARY: Final[str] = 'Dummy Summary'
+    TITLE: Final[str] = 'Dummy Title'
+    TAGS: Final[List[str]] = ['tag1', 'tag2', 'tag3']
+    THUMBNAIL: Final[str] = 'xyzabc'
 
     def setUp(self) -> None:
         """Set up models in datastore for use in testing."""
@@ -268,12 +264,12 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
 class BlogPostRightsModelTest(test_utils.GenericTestBase):
     """Tests for the BlogPostRightsModel class."""
 
-    NONEXISTENT_USER_ID: Final = 'id_x'
-    USER_ID: Final = 'user_1'
-    USER_ID_NEW: Final = 'user_2'
-    USER_ID_OLD: Final = 'user_3'
-    BLOG_POST_ID_NEW: Final = 'blog_post_id'
-    BLOG_POST_ID_OLD: Final = 'blog_post_old_id'
+    NONEXISTENT_USER_ID: Final[str] = 'id_x'
+    USER_ID: Final[str] = 'user_1'
+    USER_ID_NEW: Final[str] = 'user_2'
+    USER_ID_OLD: Final[str] = 'user_3'
+    BLOG_POST_ID_NEW: Final[str] = 'blog_post_id'
+    BLOG_POST_ID_OLD: Final[str] = 'blog_post_old_id'
 
     def setUp(self) -> None:
         super(BlogPostRightsModelTest, self).setUp()
