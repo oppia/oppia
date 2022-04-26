@@ -62,9 +62,14 @@ from core.domain import user_services
 from core.platform import models
 
 datastore_services = models.Registry.import_datastore_services()
-(exp_models, feedback_models, user_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
-])
+(base_models, exp_models, feedback_models, user_models) = (
+    models.Registry.import_models([
+        models.NAMES.base_model,
+        models.NAMES.exploration,
+        models.NAMES.feedback,
+        models.NAMES.user
+    ])
+)
 
 # Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
@@ -2047,3 +2052,48 @@ def get_interaction_id_for_state(exp_id, state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
+
+def rollback_exploration_to_safe_state(exp_id):
+    """Rolls back exploration to the latest state where related meta models are
+    valid.
+
+    Args:
+        exp_id: str. The ID of the exp.
+
+    Returns:
+        str. The version of the exploration.
+    """
+    exploration_model = exp_models.ExplorationModel.get(exp_id)
+    current_version_in_exp_model = exploration_model.version
+    last_known_safe_version = exploration_model.version
+    snapshot_content_model = None
+    snapshot_metadata_model = None
+    for version in range(current_version_in_exp_model, 1, -1):
+        snapshot_content_model = (
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-%s' % (exp_id, version), strict=False))
+        snapshot_metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-%s' % (exp_id, version), strict=False))
+        if snapshot_content_model == None and snapshot_metadata_model == None:
+            last_known_safe_version = version - 1
+        elif snapshot_content_model == None and snapshot_metadata_model != None:
+            snapshot_metadata_model.delete()
+            last_known_safe_version = version - 1
+        elif snapshot_content_model != None and snapshot_metadata_model == None:
+            snapshot_content_model.delete()
+            last_known_safe_version = version - 1
+        else:
+            break
+
+    if last_known_safe_version != current_version_in_exp_model:
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
+        exp_summary_model.version = last_known_safe_version
+        exploration_model.version = last_known_safe_version
+        base_models.BaseModel.update_timestamps_multi(
+            [exploration_model, exp_summary_model])
+        base_models.BaseModel.put_multi([exploration_model, exp_summary_model])
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exp_id])
+    return last_known_safe_version

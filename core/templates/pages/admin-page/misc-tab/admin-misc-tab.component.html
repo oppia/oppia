@@ -79,6 +79,25 @@
 </mat-card>
 
 <mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Rollback exploration to latest known safe state:</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="rollbackExploration()">
+      <div class="form-group row">
+        <label>Exploration ID:</label>
+        <input type="text"
+               [(ngModel)]="expIdToRollback"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Rollback Exploration">
+        <input type="reset" value="reset">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Send a Test Mail to Admin</h3>
   <div class="oppia-query-form">
     <form class="form" (submit)="sendDummyMailToAdmin()">
