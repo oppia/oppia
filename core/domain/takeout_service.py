@@ -87,9 +87,9 @@ def export_data_for_user(user_id):
         # Join the split name with underscores and add _data for final name.
 
         exported_model_data = model.export_data(user_id)
-        exported_data_json_string = json.dumps(exported_model_data)
+        exported_model_data_json_string = json.dumps(exported_model_data)
         user_id_match_object = re.search(
-            feconf.USER_ID_REGEX, exported_data_json_string)
+            feconf.USER_ID_REGEX, exported_model_data_json_string)
         if user_id_match_object:
             logging.error(
                 '[TAKEOUT] User ID (%s) found in the JSON generated '
