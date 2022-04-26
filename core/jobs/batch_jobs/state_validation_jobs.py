@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validation Jobs for exploration state"""
+"""Validation Jobs for exploration state."""
 
 from __future__ import annotations
 
@@ -87,7 +87,7 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
             | 'Combine results' >> beam.Flatten()
         )
 
-    def get_states(self, states_dict):
+    def get_states(self, states_dict) -> list:
         """Returns the array of state content html field.
 
         Args:
@@ -106,7 +106,7 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
                 )
         return state_content_html
 
-    def check_invalid(self, states):
+    def check_invalid(self, states) -> bool:
         """Checks if the stat is valid or not.
 
         Args:
@@ -117,7 +117,7 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
         """
         return any(state[1] == '' for state in states)
 
-    def extract_name(self, states):
+    def extract_name(self, states) -> list:
         """Extract the state name.
 
         Args:
@@ -126,8 +126,4 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
         Returns:
             list. All the erroneous states name.
         """
-        states_list = []
-        for state in states:
-            states_list.append(state[0])
-
-        return states_list
+        return [state[0] for state in states]
