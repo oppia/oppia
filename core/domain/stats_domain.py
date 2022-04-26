@@ -74,7 +74,7 @@ class SubmittedAnswerDict(TypedDict, total=False):
     answer_group_index: int
     rule_spec_index: int
     classification_categorization: str
-    # Type Dict[str, Any] is used here because the type of the params value is 
+    # Type Dict[str, Any] is used here because the type of the params value is
     # not specified at all callsites.
     params: Dict[str, Any]
     session_id: str
@@ -87,7 +87,7 @@ class ExplorationIssueDict(TypedDict):
     """Dictionary representing the ExplorationIssue object."""
 
     issue_type: str
-    # Type Dict[str, Dict[str, Any]] is used here because the default value of 
+    # Type Dict[str, Dict[str, Any]] is used here because the default value of
     # the customization arg is * in the file customization_args_util.py.
     issue_customization_args: Dict[str, Dict[str, Any]]
     playthrough_ids: List[str]
@@ -101,7 +101,7 @@ class PlaythroughDict(TypedDict):
     exp_id: str
     exp_version: int
     issue_type: str
-    # Type Dict[str, Dict[str, Any]] is used here because the default value of 
+    # Type Dict[str, Dict[str, Any]] is used here because the default value of
     # the customization arg is * in the file customization_args_util.py.
     issue_customization_args: Dict[str, Any]
     actions: List[LearnerActionDict]
@@ -156,7 +156,7 @@ class LearnerActionDict(TypedDict):
     """Dictionary representing the LearnerAction object."""
 
     action_type: str
-    # Type Dict[str, Dict[str, Any]] is used here because the default value of 
+    # Type Dict[str, Dict[str, Any]] is used here because the default value of
     # the customization arg is * in the file customization_args_util.py.
     action_customization_args: Dict[str, Any]
     schema_version: int
@@ -612,7 +612,7 @@ class StateStats:
         """
         if not isinstance(other, StateStats):
             # https://docs.python.org/2/library/constants.html#NotImplemented.
-            return NotImplemented 
+            return NotImplemented
         return (
             self.total_answers_count_v1,
             self.total_answers_count_v2,
@@ -914,8 +914,8 @@ class Playthrough:
         exp_id: str,
         exp_version: int,
         issue_type: str,
-        # Type Dict[str, Dict[str, Any]] is used here because the default value of 
-        # the customization arg is * in the file customization_args_util.py.
+        # Type Dict[str, Dict[str, Any]] is used here because the default value
+        # of the customization arg is * in the file customization_args_util.py.
         issue_customization_args: Dict[str, Any],
         actions: List[LearnerAction]
     ):
@@ -1034,8 +1034,8 @@ class ExplorationIssue:
     def __init__(
         self,
         issue_type: str,
-        # Type Dict[str, Dict[str, Any]] is used here because the default value of 
-        # the customization arg is * in the file customization_args_util.py.
+        # Type Dict[str, Dict[str, Any]] is used here because the default value
+        # of the customization arg is * in the file customization_args_util.py.
         issue_customization_args: Dict[str, Dict[str, Any]],
         playthrough_ids: List[str],
         schema_version: int,
@@ -1143,7 +1143,7 @@ class ExplorationIssue:
     def _convert_issue_v1_dict_to_v2_dict(
         cls,
         issue_dict: Dict[
-            str, Union[str, Dict[str, Dict[str, str]],list[str], int, bool]
+            str, Union[str, Dict[str, Dict[str, str]], list[str], int, bool]
         ]
     ) -> None:
         """Converts a v1 issue dict to a v2 issue dict. This function is now
@@ -1195,8 +1195,8 @@ class LearnerAction:
     def __init__(
         self,
         action_type: str,
-        # Type Dict[str, Dict[str, Any]] is used here because the default value of 
-        # the customization arg is * in the file customization_args_util.py.
+        # Type Dict[str, Dict[str, Any]] is used here because the default value
+        # of the customization arg is * in the file customization_args_util.py.
         action_customization_args: Dict[str, Dict[str, Any]],
         schema_version: int
     ):
@@ -1403,8 +1403,8 @@ class SubmittedAnswer:
         answer_group_index: int,
         rule_spec_index: int,
         classification_categorization: str,
-        # Type Dict[str, Any] is used here because the type of the params value is 
-        # not specified at all callsites.
+        # Type Dict[str, Any] is used here because the type of the params value
+        # is not specified at all callsites.
         params: Dict[str, Any],
         session_id: str,
         time_spent_in_sec: float,
