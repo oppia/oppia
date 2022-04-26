@@ -116,6 +116,70 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.UserSettingsModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_get_field_names_for_takeout(self) -> None:
+        expected_results = {
+            'last_agreed_to_terms': 'last_agreed_to_terms_msec',
+            'last_started_state_editor_tutorial':
+            'last_started_state_editor_tutorial_msec',
+            'last_started_state_translation_tutorial':
+            'last_started_state_translation_tutorial_msec',
+            'last_logged_in': 'last_logged_in_msec',
+            'last_edited_an_exploration': 'last_edited_an_exploration_msec',
+            'last_created_an_exploration': 'last_created_an_exploration_msec'
+        }
+        self.assertEqual(
+            user_models.UserSettingsModel.get_field_names_for_takeout(),
+            expected_results)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.UserSettingsModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'email': base_models.EXPORT_POLICY.EXPORTED,
+                'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
+                'roles': base_models.EXPORT_POLICY.EXPORTED,
+                'banned': base_models.EXPORT_POLICY.EXPORTED,
+                'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
+                'display_alias': base_models.EXPORT_POLICY.EXPORTED,
+                'user_bio': base_models.EXPORT_POLICY.EXPORTED,
+                'profile_picture_data_url':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
+                'preferred_language_codes':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'preferred_site_language_code':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'preferred_audio_language_code':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'username': base_models.EXPORT_POLICY.EXPORTED,
+                'normalized_username': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_started_state_editor_tutorial':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'last_started_state_translation_tutorial':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'last_edited_an_exploration':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'last_created_an_exploration':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'default_dashboard': base_models.EXPORT_POLICY.EXPORTED,
+                'creator_dashboard_display_pref':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'first_contribution_msec':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'role': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'has_viewed_lesson_info_modal_once':
+                    base_models.EXPORT_POLICY.EXPORTED
+            }
+        )
+
     def test_apply_deletion_policy_for_registered_users_deletes_them(
             self
     ) -> None:
@@ -173,6 +237,29 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
+    def test_get_by_normalized_username_valid_username(self) -> None:
+        actual_user = user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
+        self.assertEqual(
+            user_models.UserSettingsModel.get_by_normalized_username(
+                self.GENERIC_USERNAME), actual_user)
+
+    def test_get_normalized_username_invalid_username(self) -> None:
+        invalid_username = 'user_x'
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_normalized_username(
+                invalid_username))
+
+    def test_get_by_email_valid_user(self) -> None:
+        actual_user = user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
+        self.assertEqual(
+            user_models.UserSettingsModel
+                .get_by_email(self.USER_3_EMAIL), actual_user)
+
+    def test_get_by_email_invalid_user(self) -> None:
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_email(
+                'invalid_user@example.com'))
+
     def test_get_by_role_for_admin_returns_admin_users(self) -> None:
         actual_users = [
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID),
@@ -189,8 +276,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.export_data('fake_user')
 
     def test_export_data_for_trivial_case_returns_data_correctly(self) -> None:
-        user = user_models.UserSettingsModel.get_by_id(self.USER_1_ID)
-        user_data = user.export_data(user.id)
+        user_model = user_models.UserSettingsModel.get_by_id(self.USER_1_ID)
+        user_data = user_model.export_data(user_model.id)
         expected_user_data = {
             'email': 'user@example.com',
             'roles': [feconf.ROLE_ID_CURRICULUM_ADMIN],
@@ -220,8 +307,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     def test_export_data_for_nontrivial_case_returns_data_correctly(
             self
     ) -> None:
-        user = user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
-        user_data = user.export_data(user.id)
+        user_model = user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
+        user_data = user_model.export_data(user_model.id)
         expected_user_data = {
             'email': self.USER_3_EMAIL,
             'roles': [feconf.ROLE_ID_CURRICULUM_ADMIN],
@@ -318,6 +405,26 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.CompletedActivitiesModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.CompletedActivitiesModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'story_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'mastered_topic_ids': base_models.EXPORT_POLICY.EXPORTED
+            }
+        )
+
     def test_apply_deletion_policy(self) -> None:
         user_models.CompletedActivitiesModel.apply_deletion_policy(
             self.USER_1_ID)
@@ -398,6 +505,28 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             user_models.IncompleteActivitiesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.IncompleteActivitiesModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.IncompleteActivitiesModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'story_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'partially_learnt_topic_ids':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'partially_mastered_topic_ids': (
+                    base_models.EXPORT_POLICY.EXPORTED)
+            }
+        )
+
     def test_apply_deletion_policy(self) -> None:
         user_models.IncompleteActivitiesModel.apply_deletion_policy(
             self.USER_1_ID)
@@ -470,6 +599,22 @@ class LearnerGoalsModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_models.LearnerGoalsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.LearnerGoalsModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.LearnerGoalsModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'topic_ids_to_learn': base_models.EXPORT_POLICY.EXPORTED,
+                'topic_ids_to_master': base_models.EXPORT_POLICY.EXPORTED,
+            }
+        )
 
     def test_apply_deletion_policy(self) -> None:
         user_models.LearnerGoalsModel.apply_deletion_policy(
@@ -563,6 +708,27 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             user_models.ExpUserLastPlaythroughModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.ExpUserLastPlaythroughModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.ExpUserLastPlaythroughModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_id':
+                    base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_played_exp_version':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'last_played_state_name': base_models.EXPORT_POLICY.EXPORTED
+            }
+        )
+
     def test_apply_deletion_policy(self) -> None:
         user_models.ExpUserLastPlaythroughModel.apply_deletion_policy(
             self.USER_ID_1)
@@ -616,7 +782,6 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     def test_get_failure(self) -> None:
         retrieved_object = user_models.ExpUserLastPlaythroughModel.get(
             self.USER_ID_1, 'unknown_exp_id')
-
         self.assertEqual(retrieved_object, None)
 
     def test_export_data_none(self) -> None:
@@ -684,6 +849,22 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_models.LearnerPlaylistModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.LearnerPlaylistModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.LearnerPlaylistModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            }
+        )
 
     def test_apply_deletion_policy(self) -> None:
         user_models.LearnerPlaylistModel.apply_deletion_policy(self.USER_ID_1)
@@ -779,6 +960,22 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
             user_models.UserContributionsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.UserContributionsModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.UserContributionsModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'created_exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'edited_exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
+
     def test_apply_deletion_policy(self) -> None:
         user_models.UserContributionsModel.apply_deletion_policy(self.user_a_id)
         self.assertIsNone(
@@ -859,6 +1056,26 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
             user_models.UserEmailPreferencesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.UserEmailPreferencesModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.UserEmailPreferencesModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'site_updates': base_models.EXPORT_POLICY.EXPORTED,
+                'editor_role_notifications': base_models.EXPORT_POLICY.EXPORTED,
+                'feedback_message_notifications':
+                 base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'subscription_notifications': base_models.EXPORT_POLICY.EXPORTED
+            }
+        )
+
     def test_apply_deletion_policy(self) -> None:
         user_models.UserEmailPreferencesModel.apply_deletion_policy(
             self.USER_ID_1)
@@ -908,6 +1125,11 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
                 'subscription_notifications': False
             }
         )
+
+    def test_export_data_empty(self) -> None:
+        user_data = user_models.UserEmailPreferencesModel.export_data(
+            'fake_user_id')
+        self.assertFalse(user_data)
 
 
 class UserSubscriptionsModelTests(test_utils.GenericTestBase):
@@ -966,6 +1188,35 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_models.UserSubscriptionsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.UserSubscriptionsModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.UserSubscriptionsModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'general_feedback_thread_ids':
+                 base_models.EXPORT_POLICY.EXPORTED,
+                'creator_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_checked': base_models.EXPORT_POLICY.EXPORTED
+            }
+        )
+
+    def test_get_field_names_for_takeout(self) -> None:
+        self.assertEqual(
+            user_models.UserSubscriptionsModel.get_field_names_for_takeout(), {
+                'creator_ids': 'creator_usernames',
+                'last_checked': 'last_checked_msec'
+            }
+        )
 
     def test_apply_deletion_policy(self) -> None:
         user_models.UserSubscriptionsModel.apply_deletion_policy(self.USER_ID_1)
@@ -1097,6 +1348,22 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.UserSubscribersModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.UserSubscribersModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'subscriber_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
+
 
 class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
     """Tests for the UserRecentChangesBatchModel."""
@@ -1142,6 +1409,23 @@ class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
         self.assertFalse(
             user_models.UserRecentChangesBatchModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.UserRecentChangesBatchModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.UserRecentChangesBatchModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'output': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'job_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
         )
 
 
@@ -1220,6 +1504,36 @@ class UserStatsModelTest(test_utils.GenericTestBase):
             weekly_creator_stats_list=self.USER_2_WEEKLY_CREATOR_STATS_LIST,
             deleted=True
         ).put()
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.UserStatsModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_get_or_create_user_stats_model_success(self) -> None:
+        actual_user_existing = user_models.UserStatsModel.get_or_create(
+            self.USER_ID_1)
+        actual_user_new = user_models.UserStatsModel.get_or_create(
+            'new_user_id')
+        self.assertEqual(actual_user_existing.id, self.USER_ID_1)
+        self.assertEqual(
+            actual_user_existing.impact_score, self.USER_1_IMPACT_SCORE)
+        self.assertEqual(actual_user_new.id, 'new_user_id')
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.UserStatsModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'impact_score': base_models.EXPORT_POLICY.EXPORTED,
+                'total_plays': base_models.EXPORT_POLICY.EXPORTED,
+                'average_ratings': base_models.EXPORT_POLICY.EXPORTED,
+                'num_ratings': base_models.EXPORT_POLICY.EXPORTED,
+                'weekly_creator_stats_list': base_models.EXPORT_POLICY.EXPORTED,
+                'schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -1356,6 +1670,54 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         user_models.ExplorationUserDataModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.ExplorationUserDataModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
+    def test_get_field_names_for_takeout(self) -> None:
+        self.assertEqual(
+            user_models.ExplorationUserDataModel
+            .get_field_names_for_takeout(), {
+                'rated_on': 'rated_on_msec',
+                'draft_change_list_last_updated':
+                    'draft_change_list_last_updated_msec'
+                }
+        )
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.ExplorationUserDataModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_id':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+                'rating': base_models.EXPORT_POLICY.EXPORTED,
+                'rated_on': base_models.EXPORT_POLICY.EXPORTED,
+                'draft_change_list': base_models.EXPORT_POLICY.EXPORTED,
+                'draft_change_list_last_updated':
+                base_models.EXPORT_POLICY.EXPORTED,
+                'draft_change_list_exp_version':
+                base_models.EXPORT_POLICY.EXPORTED,
+                'draft_change_list_id': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'mute_suggestion_notifications':
+                base_models.EXPORT_POLICY.EXPORTED,
+                'mute_feedback_notifications':
+                base_models.EXPORT_POLICY.EXPORTED,
+                'furthest_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.EXPORTED,
+                'furthest_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.EXPORTED,
+                'most_recently_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.EXPORTED,
+                'most_recently_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.EXPORTED
+            }
+        )
+
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
             user_models.ExplorationUserDataModel
@@ -1402,6 +1764,26 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             self.USER_1_ID, 'unknown_exp_id')
 
         self.assertEqual(retrieved_object, None)
+
+    def test_get_multiple_exploration_model_success(self) -> None:
+        retrieved_object = user_models.ExplorationUserDataModel.get_multi(
+            [self.USER_1_ID, self.USER_2_ID], self.EXP_ID_ONE)
+        # Mypy Type checking for None.
+        assert retrieved_object[0] is not None
+        assert retrieved_object[1] is not None
+        self.assertEqual(len(retrieved_object), 2)
+        self.assertEqual(retrieved_object[0].user_id, self.USER_1_ID)
+        self.assertEqual(
+            retrieved_object[0].id,
+            '%s.%s' % (self.USER_1_ID, self.EXP_ID_ONE))
+        self.assertEqual(
+            retrieved_object[0].exploration_id, self.EXP_ID_ONE)
+        self.assertEqual(retrieved_object[1].user_id, self.USER_2_ID)
+        self.assertEqual(
+            retrieved_object[1].id,
+            '%s.%s' % (self.USER_2_ID, self.EXP_ID_ONE))
+        self.assertEqual(
+            retrieved_object[1].exploration_id, self.EXP_ID_ONE)
 
     def test_export_data_nonexistent_user(self) -> None:
         user_data = user_models.ExplorationUserDataModel.export_data(
@@ -1551,6 +1933,24 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             user_models.CollectionProgressModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.CollectionProgressModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.CollectionProgressModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'collection_id':
+                    base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+                'completed_explorations': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
+
     def test_apply_deletion_policy(self) -> None:
         user_models.CollectionProgressModel.apply_deletion_policy(
             self.USER_ID_1)
@@ -1581,6 +1981,71 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             user_models.CollectionProgressModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+    def test_create_collection_progress_model_success(self) -> None:
+        retrieved_object = user_models.CollectionProgressModel.create(
+            self.USER_ID_1, self.COLLECTION_ID_1)
+        self.assertEqual(retrieved_object.user_id, self.USER_ID_1)
+        self.assertEqual(
+            retrieved_object.id,
+            '%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_1))
+        self.assertEqual(retrieved_object.collection_id, self.COLLECTION_ID_1)
+
+    def test_get_collection_progress_model_success(self) -> None:
+        retrieved_object = user_models.CollectionProgressModel.get(
+            self.USER_ID_1, self.COLLECTION_ID_2)
+        assert retrieved_object is not None
+        self.assertEqual(
+            retrieved_object.id,
+            '%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_2))
+        self.assertEqual(
+            retrieved_object.user_id, self.USER_ID_1)
+        self.assertEqual(
+            retrieved_object.collection_id, self.COLLECTION_ID_2)
+        self.assertEqual(
+            retrieved_object.completed_explorations,
+            self.COMPLETED_EXPLORATION_IDS_2
+        )
+
+    def test_get_collection_progress_model_failure(self) -> None:
+        retrieved_object = user_models.CollectionProgressModel.get(
+            self.USER_ID_1, 'fake_exp_id')
+        self.assertIsNone(retrieved_object)
+
+    def test_get_multiple_collection_progress_model_success(self) -> None:
+        retrieved_object = user_models.CollectionProgressModel.get_multi(
+            self.USER_ID_1, [self.COLLECTION_ID_1, self.COLLECTION_ID_2])
+        # Mypy checking for None.
+        assert retrieved_object[0] is not None
+        assert retrieved_object[1] is not None
+        self.assertEqual(len(retrieved_object), 2)
+        self.assertEqual(retrieved_object[0].user_id, self.USER_ID_1)
+        self.assertEqual(
+            retrieved_object[0].id,
+            '%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_1))
+        self.assertEqual(
+            retrieved_object[0].collection_id, self.COLLECTION_ID_1)
+        self.assertEqual(
+            retrieved_object[1].collection_id, self.COLLECTION_ID_2)
+        self.assertEqual(
+            retrieved_object[1].id,
+            '%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_2))
+        self.assertEqual(retrieved_object[1].user_id, self.USER_ID_1)
+
+    def test_get_or_create_collection_progress_model_success(self) -> None:
+        retrieved_object = user_models.CollectionProgressModel.get_or_create(
+            self.USER_ID_1, self.COLLECTION_ID_1)
+        self.assertIsNotNone(retrieved_object)
+        self.assertEqual(retrieved_object.user_id, self.USER_ID_1)
+        self.assertEqual(
+            retrieved_object.id,
+            '%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_1))
+        user_data_new = user_models.CollectionProgressModel.get_or_create(
+            'new_user_id', 'new_coll_id')
+        self.assertIsNotNone(user_data_new)
+        self.assertEqual(user_data_new.user_id, 'new_user_id')
+        self.assertEqual(
+            user_data_new.id, 'new_user_id.new_coll_id')
 
     def test_export_data_on_nonexistent_user(self) -> None:
         """Test export data on nonexistent user."""
@@ -1660,6 +2125,24 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             user_models.StoryProgressModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.StoryProgressModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.StoryProgressModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'story_id':
+                    base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+                'completed_node_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
+
     def test_apply_deletion_policy(self) -> None:
         user_models.StoryProgressModel.apply_deletion_policy(self.USER_ID_2)
         self.assertIsNone(
@@ -1719,6 +2202,25 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_data, user_data)
 
+    def test_get_story_progress_model_success(self) -> None:
+        retrieved_object = user_models.StoryProgressModel.get(
+            self.USER_ID_1, self.STORY_ID_1)
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_object is not None
+        self.assertEqual(retrieved_object.user_id, self.USER_ID_1)
+        self.assertEqual(retrieved_object.story_id, self.STORY_ID_1)
+        self.assertEqual(
+            retrieved_object.id, '%s.%s' % (self.USER_ID_1, self.STORY_ID_1))
+        self.assertEqual(
+            retrieved_object.completed_node_ids, self.COMPLETED_NODE_IDS_1)
+
+    def test_get_story_progress_model_failure(self) -> None:
+        retrieved_object = user_models.StoryProgressModel.get(
+            'unknown_user_id',
+            'unknown_story_id', strict=False)
+        self.assertEqual(retrieved_object, None)
+
     def test_get_multi(self) -> None:
         model = user_models.StoryProgressModel.create(
             'user_id', 'story_id_1')
@@ -1741,6 +2243,21 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
 
         self.assertEqual(story_progress_models[1].user_id, 'user_id')
         self.assertEqual(story_progress_models[1].story_id, 'story_id_2')
+
+    def test_get_or_create_story_progress_model(self) -> None:
+        story_progress_model = user_models.StoryProgressModel.get_or_create(
+            self.USER_ID_1, self.STORY_ID_1)
+        self.assertIsNotNone(story_progress_model)
+        self.assertEqual(story_progress_model.user_id, self.USER_ID_1)
+        self.assertEqual(
+            story_progress_model.id,
+            '%s.%s' % (self.USER_ID_1, self.STORY_ID_1))
+        story_progress_model_new = user_models.StoryProgressModel.get_or_create(
+            'new_user_id', 'new_story_id')
+        self.assertIsNotNone(story_progress_model_new)
+        self.assertEqual(story_progress_model_new.user_id, 'new_user_id')
+        self.assertEqual(
+            story_progress_model_new.id, 'new_user_id.new_story_id')
 
 
 class UserQueryModelTests(test_utils.GenericTestBase):
@@ -1775,6 +2292,38 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_models.UserQueryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.UserQueryModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.UserQueryModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'inactive_in_last_n_days':
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'has_not_logged_in_for_n_days':
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'created_at_least_n_exps':
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'created_fewer_than_n_exps':
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'edited_at_least_n_exps':
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'edited_fewer_than_n_exps':
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'created_collection': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'submitter_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'sent_email_model_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'query_status': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
 
     def test_apply_deletion_policy(self) -> None:
         user_models.UserQueryModel.apply_deletion_policy(self.USER_ID_1)
@@ -1965,6 +2514,21 @@ class UserBulkEmailsModelTests(test_utils.GenericTestBase):
         user_models.UserBulkEmailsModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.UserBulkEmailsModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.UserBulkEmailsModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'sent_email_model_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
+
 
 class UserSkillMasteryModelTests(test_utils.GenericTestBase):
     """Tests for UserSkillMasteryModel."""
@@ -2005,6 +2569,24 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_models.UserSkillMasteryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.UserSkillMasteryModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.UserSkillMasteryModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'skill_id':
+                    base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+                'degree_of_mastery': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
 
     def test_apply_deletion_policy(self) -> None:
         user_models.UserSkillMasteryModel.apply_deletion_policy(self.USER_1_ID)
@@ -2161,6 +2743,26 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
             }
         }
         self.assertEqual(user_data, expected_data)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.UserContributionProficiencyModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.UserContributionProficiencyModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'score_category':
+                    base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+                'score': base_models.EXPORT_POLICY.EXPORTED,
+                'onboarding_email_sent': base_models.EXPORT_POLICY.EXPORTED
+            }
+        )
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -2400,6 +3002,27 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         }
         self.assertEqual(user_data, expected_data)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.UserContributionRightsModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.UserContributionRightsModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'can_review_translation_for_language_codes':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'can_review_voiceover_for_language_codes':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'can_review_questions': base_models.EXPORT_POLICY.EXPORTED,
+                'can_submit_questions': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
+
     def test_get_translation_reviewer_user_ids(self) -> None:
         translation_reviewer_ids = (
             user_models.UserContributionRightsModel
@@ -2498,6 +3121,17 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         self.assertFalse(self.USER_ID_1 in question_submitter_ids)
         self.assertTrue(self.USER_ID_2 in question_submitter_ids)
 
+    def test_apply_deletion_policy(self) -> None:
+        user_models.UserContributionRightsModel.apply_deletion_policy(
+            self.USER_ID_1)
+        self.assertFalse(
+            user_models.UserContributionRightsModel.has_reference_to_user_id(
+                self.USER_ID_1)
+        )
+        # Check if passing a non-existent user_id does not fail.
+        user_models.UserContributionRightsModel.apply_deletion_policy(
+            'fake_user_id')
+
 
 class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     """Tests for PendingDeletionRequestModel."""
@@ -2538,6 +3172,27 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         user_models.PendingDeletionRequestModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.PendingDeletionRequestModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.PendingDeletionRequestModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'normalized_long_term_username': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'pseudonymizable_entity_mappings': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
+
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
             user_models.PendingDeletionRequestModel
@@ -2552,10 +3207,41 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
 class DeletedUserModelTests(test_utils.GenericTestBase):
     """Tests for DeletedUserModel."""
 
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_1_ID = 'user_1_id'
+
+    def setUp(self) -> None:
+        super(DeletedUserModelTests, self).setUp()
+        user_models.DeletedUserModel(
+            id=self.USER_1_ID
+        ).put()
+
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             user_models.DeletedUserModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.DeletedUserModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.DeletedUserModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
+
+    def test_has_reference_to_user_id(self) -> None:
+        self.assertTrue(
+            user_models.DeletedUserModel.has_reference_to_user_id(
+                self.USER_1_ID))
+        self.assertFalse(
+            user_models.DeletedUserModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID))
 
 
 class PseudonymizedUserModelTests(test_utils.GenericTestBase):
@@ -2563,8 +3249,13 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE_AT_END)
+            user_models.PseudonymizedUserModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.PseudonymizedUserModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
         # Swap dependent method get_by_id to simulate collision every time.
@@ -2578,6 +3269,35 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
         with assert_raises_regexp_context_manager, get_by_id_swap:
             user_models.PseudonymizedUserModel.get_new_id('exploration')
 
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.PseudonymizedUserModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
+
+    def test_get_new_id_normal_behaviour_returns_unique_ids(self) -> None:
+        ids: Set[str] = set()
+        for _ in range(100):
+            new_id = user_models.PseudonymizedUserModel.get_new_id('')
+            self.assertNotIn(new_id, ids)
+            user_models.PseudonymizedUserModel(
+                id=new_id).put()
+            ids.add(new_id)
+
+    def test_get_new_id_simulate_collisions(self) -> None:
+        get_by_id_swap = self.swap(
+            user_models.PseudonymizedUserModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, user_models.PseudonymizedUserModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            user_models.PseudonymizedUserModel.get_new_id('exploration')
+
 
 class DeletedUsernameModelTests(test_utils.GenericTestBase):
     """Tests for DeletedUsernameModel."""
@@ -2586,3 +3306,17 @@ class DeletedUsernameModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_models.DeletedUsernameModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.DeletedUsernameModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.DeletedUsernameModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
