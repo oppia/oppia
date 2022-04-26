@@ -24,6 +24,8 @@ import sys
 
 from core import utils
 
+from typing import List
+
 LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 EXCLUDED_DIRECTORIES = [
@@ -68,7 +70,7 @@ NOT_FULLY_COVERED_FILENAMES = [
 class LcovStanzaRelevantLines:
     """Gets the relevant lines from a lcov stanza."""
 
-    def __init__(self, stanza):
+    def __init__(self, stanza: str) -> None:
         """Initialize the object which provides relevant data of a lcov
         stanza in order to calculate any decrease in frontend test coverage.
 
@@ -107,7 +109,7 @@ class LcovStanzaRelevantLines:
         self.covered_lines = int(match.group(1))
 
 
-def get_stanzas_from_lcov_file():
+def get_stanzas_from_lcov_file() -> List[LcovStanzaRelevantLines]:
     """Get all stanzas from a lcov file. The lcov file gather all the frontend
     files that has tests and each one has the following structure:
     TN: test name
@@ -135,7 +137,7 @@ def get_stanzas_from_lcov_file():
     return stanzas_list
 
 
-def check_not_fully_covered_filenames_list_is_sorted():
+def check_not_fully_covered_filenames_list_is_sorted() -> None:
     """Check if NOT_FULLY_COVERED_FILENAMES list is in alphabetical order."""
     if NOT_FULLY_COVERED_FILENAMES != sorted(
             NOT_FULLY_COVERED_FILENAMES, key=lambda s: s.lower()):
@@ -145,7 +147,7 @@ def check_not_fully_covered_filenames_list_is_sorted():
         sys.exit(1)
 
 
-def check_coverage_changes():
+def check_coverage_changes() -> None:
     """Checks if the denylist for not fully covered files needs to be changed
     by:
     - File renaming
@@ -213,7 +215,7 @@ def check_coverage_changes():
     check_not_fully_covered_filenames_list_is_sorted()
 
 
-def main():
+def main() -> None:
     """Runs all the steps for checking if there is any decrease of 100% covered
     files in the frontend.
     """
