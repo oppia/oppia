@@ -30,15 +30,20 @@ require('cropperjs/dist/cropper.min.css');
   templateUrl: './upload-blog-post-thumbnail.component.html'
 })
 export class UploadBlogPostThumbnailComponent implements OnInit {
-  uploadedImage: SafeResourceUrl;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  croppedFilename!: string;
+  cropper!: Cropper;
+  @ViewChild('croppableImage') croppableImageRef!: ElementRef;
+  invalidTagsAndAttributes!: { tags: string[]; attrs: string[] };
+  // This property will be null when the SVG uploaded is not valid or when
+  // the image is not yet uploaded.
+  uploadedImage: SafeResourceUrl | null = null;
+  windowIsNarrow: boolean = false;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
-  invalidTagsAndAttributes: { tags: string[]; attrs: string[] };
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
-  croppedFilename: string;
-  windowIsNarrow: boolean;
-  cropper;
-  @ViewChild('croppableImage') croppableImageRef: ElementRef;
   @Output() imageLocallySaved: EventEmitter<string> = new EventEmitter();
   @Output() cancelThumbnailUpload: EventEmitter<void> = new EventEmitter();
   constructor(
@@ -121,7 +126,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   }
 
   cancel(): void {
-    this.uploadedImage = false;
+    this.uploadedImage = null;
     this.invalidTagsAndAttributes = {
       tags: [],
       attrs: []
