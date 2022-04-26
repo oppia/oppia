@@ -122,11 +122,11 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if parsed_args.run_minified_tests:
         print('Running test in production environment')
 
-        build.main(args=['--prod_env', '--minify_third_party_libs_only'])  # type: ignore[no-untyped-call]
+        build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
         cmd.append('--prodEnv')
     else:
-        build.main(args=[])  # type: ignore[no-untyped-call]
+        build.main(args=[])
 
     if parsed_args.verbose:
         cmd.append('--terminalEnabled')
@@ -167,7 +167,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 'The frontend tests failed. Please fix it before running the'
                 ' test coverage check.')
         else:
-            check_frontend_test_coverage.main()  # type: ignore[no-untyped-call]
+            check_frontend_test_coverage.main()
     elif task.returncode:
         sys.exit(task.returncode)
 
