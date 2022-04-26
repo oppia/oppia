@@ -87,7 +87,7 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
             | 'Combine results' >> beam.Flatten()
         )
 
-    def get_states(self, states_dict) -> list:
+    def get_states(self, states_dict: dict) -> list[tuple]:
         """Returns the array of state content html field.
 
         Args:
@@ -106,7 +106,7 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
                 )
         return state_content_html
 
-    def check_invalid(self, states) -> bool:
+    def check_invalid(self, states: list[tuple]) -> bool:
         """Checks if the stat is valid or not.
 
         Args:
@@ -117,7 +117,7 @@ class GetNumberOfExpStatesHavingEmptyImageFieldJob(base_jobs.JobBase):
         """
         return any(state[1] == '' for state in states)
 
-    def extract_name(self, states) -> list:
+    def extract_name(self, states: list[tuple]) -> list[str]:
         """Extract the state name.
 
         Args:
