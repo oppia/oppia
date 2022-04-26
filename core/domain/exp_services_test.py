@@ -4946,7 +4946,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'property_name': 'content'
             })], 'Update 4')
 
-        version = exp_services.rollback_exploration_to_safe_state('0');
+        version = exp_services.rollback_exploration_to_safe_state('0')
         self.assertEqual(version, 5)
 
         snapshot_content_model = (
@@ -4954,7 +4954,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 '0-5', strict=False))
         snapshot_content_model.delete()
 
-        version = exp_services.rollback_exploration_to_safe_state('0');
+        version = exp_services.rollback_exploration_to_safe_state('0')
         self.assertEqual(version, 4)
 
     def test_reverts_exp_to_safe_state_when_metadata_model_is_missing(self):
@@ -5016,7 +5016,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'property_name': 'content'
             })], 'Update 4')
 
-        version = exp_services.rollback_exploration_to_safe_state('0');
+        version = exp_services.rollback_exploration_to_safe_state('0')
         self.assertEqual(version, 5)
 
         snapshot_metadata_model = (
@@ -5024,7 +5024,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 '0-5', strict=False))
         snapshot_metadata_model.delete()
 
-        version = exp_services.rollback_exploration_to_safe_state('0');
+        version = exp_services.rollback_exploration_to_safe_state('0')
         self.assertEqual(version, 4)
 
     def test_reverts_exp_to_safe_state_when_both_models_are_missing(self):
@@ -5086,7 +5086,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'property_name': 'content'
             })], 'Update 4')
 
-        version = exp_services.rollback_exploration_to_safe_state('0');
+        version = exp_services.rollback_exploration_to_safe_state('0')
         self.assertEqual(version, 5)
 
         snapshot_content_model = (
@@ -5099,7 +5099,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 '0-5', strict=False))
         snapshot_metadata_model.delete()
 
-        version = exp_services.rollback_exploration_to_safe_state('0');
+        version = exp_services.rollback_exploration_to_safe_state('0')
         self.assertEqual(version, 4)
 
     def test_does_not_revert_exp_when_no_models_are_missing(self):
@@ -5161,7 +5161,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'property_name': 'content'
             })], 'Update 4')
 
-        version = exp_services.rollback_exploration_to_safe_state('0');
+        version = exp_services.rollback_exploration_to_safe_state('0')
 
         self.assertEqual(version, 5)
 

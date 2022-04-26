@@ -2076,12 +2076,18 @@ def rollback_exploration_to_safe_state(exp_id):
         snapshot_metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get(
                 '%s-%s' % (exp_id, version), strict=False))
-        if snapshot_content_model == None and snapshot_metadata_model == None:
+        if snapshot_content_model is None and snapshot_metadata_model is None:
             last_known_safe_version = version - 1
-        elif snapshot_content_model == None and snapshot_metadata_model != None:
+        elif (
+            snapshot_content_model is None and
+            snapshot_metadata_model is not None
+        ):
             snapshot_metadata_model.delete()
             last_known_safe_version = version - 1
-        elif snapshot_content_model != None and snapshot_metadata_model == None:
+        elif (
+            snapshot_content_model is not None and
+            snapshot_metadata_model is None
+        ):
             snapshot_content_model.delete()
             last_known_safe_version = version - 1
         else:
