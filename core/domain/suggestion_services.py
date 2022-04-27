@@ -1446,13 +1446,6 @@ def update_translation_suggestion(suggestion_id, translation_html, user_id):
     """
     suggestion = get_suggestion_by_id(suggestion_id)
 
-    # Clean the translation HTML if not a list of strings.
-    suggestion.change.translation_html = (
-        html_cleaner.clean(translation_html)
-        if isinstance(translation_html, str)
-        else translation_html
-    )
-
     if suggestion.author_id != user_id:
         suggestion.edited_by_reviewer = True
 
@@ -1466,7 +1459,7 @@ def update_translation_suggestion(suggestion_id, translation_html, user_id):
         create_suggestion(
             suggestion.suggestion_type, suggestion.target_type, suggestion.target_id,
             suggestion.target_version_at_submission, user_id,
-            suggestion.change.to_dict(), 'Adds translation'
+            change_dict, 'Adds translation'
         )
         suggestion.edited_after_rejecting = True
         _update_suggestion(suggestion)
@@ -1518,7 +1511,6 @@ def update_question_suggestion(
             'skill_difficulty': skill_difficulty
         })
     suggestion.pre_update_validate(new_change_obj)
-    suggestion.change = new_change_obj
     if suggestion.author_id != user_id:
         suggestion.edited_by_reviewer = True
 
@@ -1526,10 +1518,14 @@ def update_question_suggestion(
         create_suggestion(
             suggestion.suggestion_type, suggestion.target_type, suggestion.target_id,
             suggestion.target_version_at_submission, user_id,
-            suggestion.change.to_dict(), 'Adds question'
+            new_change_obj.to_dict(), 'Adds question'
         )
         suggestion.edited_after_rejecting = True
 
-    _update_suggestion(suggestion)
+        _update_suggestion(suggestion)
+
+    else:
+        suggestion.change = new_change_obj
+        _update_suggestion(suggestion)
 
     return suggestion
