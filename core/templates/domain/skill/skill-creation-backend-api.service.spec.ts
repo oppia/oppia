@@ -26,8 +26,7 @@ import {
 } from 'domain/skill/skill-creation-backend-api.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Skill creation backend api service', () => {
+describe('Skill creation backend api service', () => {
   let httpTestingController: HttpTestingController;
   let skillCreationBackendApiService: SkillCreationBackendApiService;
   let rubricDict: RubricBackendDict;
