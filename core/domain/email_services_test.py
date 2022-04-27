@@ -74,12 +74,14 @@ class EmailServicesTest(test_utils.EmailTestBase):
             recipients is in allowlist.
         """
         msg_list = []
-        def mock_info(msg):
+        def mock_info(msg: str) -> None:
             msg_list.append(msg)
         constants_swap = self.swap(constants, 'DEV_MODE', False)
         info_swap = self.swap(logging, 'info', mock_info)
         allowlist_swap = self.swap(
-            feconf, 'EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING', [feconf.ADMIN_EMAIL_ADDRESS])
+            feconf, 'EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING',
+            [feconf.ADMIN_EMAIL_ADDRESS]
+        )
         with constants_swap, info_swap, allowlist_swap:
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
@@ -89,7 +91,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             '[\'testadmin@example.com\']\nSubject: subject\nBody:\n    '
             'Content-type: text/plain\n    Data: body\nBody:\n    '
             'Content-type: text/html\n    Data: html\n\nBcc: None\n'
-            'Reply_to: None\nRecipient Variables: None\n', 
+            'Reply_to: None\nRecipient Variables: None\n',
             'You are not currently sending out real emails since this is a '
             'sending emails is not enabled on this server.'
         ]
@@ -129,7 +131,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             recipients is in allowlist.
         """
         msg_list = []
-        def mock_info(msg):
+        def mock_info(msg: str) -> None:
             msg_list.append(msg)
         constants_swap = self.swap(constants, 'DEV_MODE', False)
         info_swap = self.swap(logging, 'info', mock_info)
@@ -147,7 +149,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             '[\'m1@example.com\', \'m2@example.com\']\nSubject: subject\n'
             'Body:\n    Content-type: text/plain\n    Data: body\nBody:\n    '
             'Content-type: text/html\n    Data: html\n\nBcc: None\n'
-            'Reply_to: None\nRecipient Variables: None\n', 
+            'Reply_to: None\nRecipient Variables: None\n',
             'You are not currently sending out real emails since this is a '
             'sending emails is not enabled on this server.'
         ]

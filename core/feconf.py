@@ -582,7 +582,7 @@ NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 CAN_SEND_EMAILS = False
 # Allowlist defining recipients for whom emails should be logged if sending
 # emails is disabled.
-EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING = []
+EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING: List[str] = []
 # If you want to turn on this facility please check the email templates in the
 # send_role_notification_email() function in email_manager.py and modify them
 # accordingly.

@@ -23,7 +23,7 @@ import textwrap
 from core import feconf
 from core.platform import models
 
-from typing import List
+from typing import Dict, List, Optional, Union
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
@@ -217,7 +217,7 @@ def _log_email(
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
             Dict[str, Dict[str, Union[str, float]]]] = None
-):
+) -> None:
     """Logs sent emails in order to model sending an email.
 
     Args:
@@ -247,7 +247,7 @@ def _log_email(
                 subject = 'Hey, %recipient.first%’
             More info about this format at:
             https://documentation.mailgun.com/en/
-                latest/user_manual.html#batch-sending
+                latest/user_manual.html#batch-sending.
     """
     msg = (
         """
