@@ -96,6 +96,9 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
             $rootScope.$applyAsync();
+          },
+          (failure) => {
+            AlertsService.addInfoMessage('Question update failed.');
           });
       } else {
         QuestionSuggestionBackendApiService.submitSuggestionAsync(

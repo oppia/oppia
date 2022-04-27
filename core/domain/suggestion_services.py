@@ -133,7 +133,7 @@ def create_suggestion(
             suggestion_type])
     suggestion = suggestion_domain_class(
         thread_id, target_id, target_version_at_submission, status, author_id,
-        None, change, score_category, language_code, False)
+        None, change, score_category, language_code, False, False)
     suggestion.validate()
 
     suggestion_models.GeneralSuggestionModel.create(
@@ -167,7 +167,8 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
         suggestion_model.score_category, suggestion_model.language_code,
-        suggestion_model.edited_by_reviewer, suggestion_model.last_updated)
+        suggestion_model.edited_by_reviewer,
+        suggestion_model.edited_after_rejecting, suggestion_model.last_updated)
 
 
 def get_suggestion_by_id(suggestion_id):
@@ -296,6 +297,7 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_model.score_category = suggestion.score_category
         suggestion_model.language_code = suggestion.language_code
         suggestion_model.edited_by_reviewer = suggestion.edited_by_reviewer
+        suggestion_model.edited_after_rejecting = suggestion.edited_after_rejecting
 
     suggestion_models.GeneralSuggestionModel.update_timestamps_multi(
         suggestion_models_to_update,
@@ -1434,7 +1436,7 @@ def _update_suggestion_counts_in_community_contribution_stats(
         suggestions, amount)
 
 
-def update_translation_suggestion(suggestion_id, translation_html):
+def update_translation_suggestion(suggestion_id, translation_html, user_id):
     """Updates the translation_html of a suggestion with the given
     suggestion_id.
 
@@ -1450,13 +1452,33 @@ def update_translation_suggestion(suggestion_id, translation_html):
         if isinstance(translation_html, str)
         else translation_html
     )
-    suggestion.edited_by_reviewer = True
-    suggestion.pre_update_validate(suggestion.change)
-    _update_suggestion(suggestion)
+
+    if suggestion.author_id != user_id:
+        suggestion.edited_by_reviewer = True
+
+    if suggestion.status == suggestion_models.STATUS_REJECTED:
+        create_suggestion(
+            suggestion.suggestion_type, suggestion.target_type, suggestion.target_id,
+            suggestion.target_version_at_submission, user_id,
+            suggestion.change.to_dict(), 'Adds translation'
+        )
+        suggestion.edited_after_rejecting = True
+        _update_suggestion(suggestion)
+
+    else:
+        # Clean the translation HTML if not a list of strings.
+        suggestion.change.translation_html = (
+            html_cleaner.clean(translation_html)
+            if isinstance(translation_html, str)
+            else translation_html
+        )
+
+        suggestion.pre_update_validate(suggestion.change)
+        _update_suggestion(suggestion)
 
 
 def update_question_suggestion(
-        suggestion_id, skill_difficulty, question_state_data):
+        suggestion_id, skill_difficulty, question_state_data, user_id):
     """Updates skill_difficulty and question_state_data of a suggestion with
     the given suggestion_id.
 
@@ -1490,8 +1512,17 @@ def update_question_suggestion(
             'skill_difficulty': skill_difficulty
         })
     suggestion.pre_update_validate(new_change_obj)
-    suggestion.edited_by_reviewer = True
     suggestion.change = new_change_obj
+    if suggestion.author_id != user_id:
+        suggestion.edited_by_reviewer = True
+
+    if suggestion.status == suggestion_models.STATUS_REJECTED:
+        create_suggestion(
+            suggestion.suggestion_type, suggestion.target_type, suggestion.target_id,
+            suggestion.target_version_at_submission, user_id,
+            suggestion.change.to_dict(), 'Adds question'
+        )
+        suggestion.edited_after_rejecting = True
 
     _update_suggestion(suggestion)
 

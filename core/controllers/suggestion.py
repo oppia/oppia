@@ -34,6 +34,10 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
+from core.platform import models
+
+(suggestion_models,) = models.Registry.import_models([
+    models.NAMES.suggestion])
 
 
 class SuggestionHandler(base.BaseHandler):
@@ -515,9 +519,13 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
                 string.
         """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        if suggestion.is_handled:
+
+        if suggestion.edited_after_rejecting:
+            raise self.InvalidInputException('Rejected suggestions can be edited only once')
+
+        if suggestion.status == suggestion_models.STATUS_ACCEPTED:
             raise self.InvalidInputException(
-                'The suggestion with id %s has been accepted or rejected'
+                'The suggestion with id %s has been already accepted'
                 % (suggestion_id)
             )
 
@@ -536,7 +544,7 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
             )
 
         suggestion_services.update_translation_suggestion(
-            suggestion_id, self.payload.get('translation_html'))
+            suggestion_id, self.payload.get('translation_html'), self.user_id)
 
         self.render_json(self.values)
 
@@ -558,10 +566,14 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
                 invalid.
         """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        if suggestion.is_handled:
+
+        if suggestion.edited_after_rejecting:
+            raise self.InvalidInputException('Rejected suggestions can be edited only once')
+
+        if suggestion.status == suggestion_models.STATUS_ACCEPTED:
             raise self.InvalidInputException(
-                'The suggestion with id %s has been accepted or rejected'
-                % suggestion_id
+                'The suggestion with id %s has been already accepted'
+                % (suggestion_id)
             )
 
         if self.payload.get('skill_difficulty') is None:
@@ -586,7 +598,8 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
         suggestion_services.update_question_suggestion(
             suggestion_id,
             self.payload.get('skill_difficulty'),
-            self.payload.get('question_state_data'))
+            self.payload.get('question_state_data'),
+            self.user_id)
 
         self.render_json(self.values)
 

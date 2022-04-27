@@ -32,6 +32,8 @@ import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { TranslateTextService } from '../services/translate-text.service';
 
 interface HTMLSchema {
   'type': string;
@@ -133,11 +135,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     public activeModal: NgbActiveModal,
     private alertsService: AlertsService,
     private contextService: ContextService,
+    private readonly imageLocalStorageService: ImageLocalStorageService,
     private contributionAndReviewService: ContributionAndReviewService,
     private contributionOpportunitiesService: ContributionOpportunitiesService,
     private languageUtilService: LanguageUtilService,
     private siteAnalyticsService: SiteAnalyticsService,
     private threadDataBackendApiService: ThreadDataBackendApiService,
+    private readonly translateTextService: TranslateTextService,
     private userService: UserService,
     private validatorsService: ValidatorsService,
   ) {}
@@ -185,7 +189,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
             .can_review_translation_for_language_codes);
         this.canEditTranslation = (
           this.userCanReviewTranslationSuggestionsInLanguages.includes(
-            this.languageCode) && this.username !== this.activeSuggestion.
+            this.languageCode) || this.username === this.activeSuggestion.
             author_name
         );
       });
@@ -237,7 +241,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.contributionOpportunitiesService.
           reloadOpportunitiesEventEmitter.emit();
       },
-      this.showTranslationSuggestionUpdateError);
+      (failure) => {
+        this.showTranslationSuggestionUpdateError(failure.error)
+      });
   }
 
   // The length of the commit message should not exceed 375 characters,
@@ -385,8 +391,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.activeModal.close(this.resolvedSuggestionIds);
   }
 
-  showTranslationSuggestionUpdateError(error: Error): void {
-    this.errorMessage = 'Invalid Suggestion: ' + error.message;
+  showTranslationSuggestionUpdateError(failure: any): void {
+    this.errorMessage = 'Invalid Suggestion: ' + failure.error;
     this.errorFound = true;
     this.startedEditing = true;
     this.translationHtml = this.preEditTranslationHtml;

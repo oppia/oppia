@@ -160,6 +160,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # A flag that indicates whether the suggestion is edited by the reviewer.
     edited_by_reviewer = datastore_services.BooleanProperty(
         default=False, indexed=True)
+    # A flag that indicates whether the suggestion is rejected and a new
+    # suggestion is submitted.
+    edited_after_rejecting = datastore_services.BooleanProperty(
+        default=False, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -193,7 +197,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
             'score_category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.EXPORTED,
-            'edited_by_reviewer': base_models.EXPORT_POLICY.EXPORTED
+            'edited_by_reviewer': base_models.EXPORT_POLICY.EXPORTED,
+            'edited_after_rejecting': base_models.EXPORT_POLICY.EXPORTED,
         })
 
     @classmethod
@@ -771,7 +776,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 'status': suggestion_model.status,
                 'change_cmd': suggestion_model.change_cmd,
                 'language_code': suggestion_model.language_code,
-                'edited_by_reviewer': suggestion_model.edited_by_reviewer
+                'edited_by_reviewer': suggestion_model.edited_by_reviewer,
+                'edited_after_rejecting': suggestion_model.edited_after_rejecting
             }
 
         return user_data

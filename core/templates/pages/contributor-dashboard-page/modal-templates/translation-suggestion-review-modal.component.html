@@ -33,7 +33,7 @@
     <div class="oppia-suggestion-review-panel-container float-right">
       <div dir="auto" class="oppia-suggestion-review-panel-header-container">
         <strong> Translation:</strong>
-        <button class="btn btn-sm btn-secondary float-right" *ngIf="!startedEditing && status === 'review' && canEditTranslation" (click)="editSuggestion()">Edit</button>
+        <button class="btn btn-sm btn-secondary float-right" *ngIf="!startedEditing && status !== 'accepted' && canEditTranslation" (click)="editSuggestion()">Edit</button>
       </div>
       <div class="oppia-suggestion-review-panel">
         <div>

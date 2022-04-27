@@ -90,7 +90,8 @@ class BaseSuggestion:
             'score_category': self.score_category,
             'language_code': self.language_code,
             'last_updated': utils.get_time_in_millisecs(self.last_updated),
-            'edited_by_reviewer': self.edited_by_reviewer
+            'edited_by_reviewer': self.edited_by_reviewer,
+            'edited_after_rejecting': self.edited_after_rejecting
         }
 
     def get_score_type(self):
@@ -341,7 +342,7 @@ class SuggestionEditStateContent(BaseSuggestion):
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
             change, score_category, language_code, edited_by_reviewer,
-            last_updated=None):
+            edited_after_rejecting, last_updated=None):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
@@ -359,6 +360,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.language_code = language_code
         self.last_updated = last_updated
         self.edited_by_reviewer = edited_by_reviewer
+        self.edited_after_rejecting = edited_after_rejecting
         # Currently, we don't allow adding images in the "edit state content"
         # suggestion, so the image_context is None.
         self.image_context = None
@@ -529,7 +531,7 @@ class SuggestionTranslateContent(BaseSuggestion):
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
             change, score_category, language_code, edited_by_reviewer,
-            last_updated=None):
+            edited_after_rejecting, last_updated=None):
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
@@ -548,6 +550,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.last_updated = last_updated
         self.edited_by_reviewer = edited_by_reviewer
         self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
+        self.edited_after_rejecting = edited_after_rejecting
 
     def validate(self):
         """Validates a suggestion object of type SuggestionTranslateContent.
@@ -730,7 +733,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
             change, score_category, language_code, edited_by_reviewer,
-            last_updated=None):
+            edited_after_rejecting, last_updated=None):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
@@ -748,6 +751,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
         self._update_change_to_latest_state_schema_version()
         self.edited_by_reviewer = edited_by_reviewer
+        self.edited_after_rejecting = edited_after_rejecting
 
     def _update_change_to_latest_state_schema_version(self):
         """Holds the responsibility of performing a step-by-step, sequential
