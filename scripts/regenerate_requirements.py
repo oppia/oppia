@@ -35,7 +35,7 @@ sys.path.insert(0, PIP_TOOLS_PATH)
 from piptools.scripts import compile  # isort:skip pylint: disable=redefined-builtin, wrong-import-position, wrong-import-order
 
 
-def main():
+def main() -> None:
     """Regenerates the 'requirements.txt' file using the 'requirements.in'
     file to produce a deterministic list of all the dependencies that should be
     in the 'third_party/python_libs' folder.
