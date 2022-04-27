@@ -402,6 +402,10 @@ describe('Translation tab component', function() {
 
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', fakeAsync(() => {
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue($q.resolve({
+        canVoiceover: true
+      }));
     ctrl.$onInit();
 
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished')
