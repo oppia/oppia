@@ -1044,7 +1044,11 @@ def deassign_user_from_all_topics(committer, user_id):
         })]
         save_topic_rights(
             topic_rights, committer.user_id,
-            'Removed all assigned topics from %s' % (user_id), commit_cmds)
+            'Removed all assigned topics from %s' % (
+                user_services.get_username(user_id)
+            ),
+            commit_cmds
+        )
 
 
 def deassign_manager_role_from_topic(committer, user_id, topic_id):
@@ -1069,8 +1073,13 @@ def deassign_manager_role_from_topic(committer, user_id, topic_id):
         'removed_user_id': user_id
     })]
     save_topic_rights(
-        topic_rights, committer.user_id,
-        'Removed all assigned topics from %s' % (user_id), commit_cmds)
+        topic_rights,
+        committer.user_id,
+        'Removed all assigned topics from %s' % (
+            user_services.get_username(user_id)
+        ),
+        commit_cmds
+    )
 
 
 def assign_role(committer, assignee, new_role, topic_id):

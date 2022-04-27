@@ -32,8 +32,10 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
+    from mypy_imports import user_models
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.user])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -427,8 +429,16 @@ class AppFeedbackReportModel(base_models.BaseModel):
         for report_model in report_models:
             submitted_on_msec = utils.get_time_in_millisecs(
                 report_model.submitted_on)
+            if utils.is_user_id_valid(report_model.scrubbed_by):
+                scrubbed_by_user_model = user_models.UserSettingsModel.get(
+                    report_model.scrubbed_by)
+                # Ruling out the possibility of None for mypy type checking.
+                assert scrubbed_by_user_model is not None
+                scrubbed_by_username = scrubbed_by_user_model.username
+            else:
+                scrubbed_by_username = None
             user_data[report_model.id] = {
-                'scrubbed_by': report_model.scrubbed_by,
+                'scrubbed_by': scrubbed_by_username,
                 'platform': report_model.platform,
                 'ticket_id': report_model.ticket_id,
                 'submitted_on': utils.get_human_readable_time_string(

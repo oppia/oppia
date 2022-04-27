@@ -1683,7 +1683,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
     """Tests the TranslationContributionStatsModel class."""
 
     LANGUAGE_CODE = 'es'
-    CONTRIBUTOR_USER_ID = 'user_id'
+    CONTRIBUTOR_USER_ID = 'uid_01234567890123456789012345678912'
     TOPIC_ID = 'topic_id'
     SUBMITTED_TRANSLATIONS_COUNT = 2
     SUBMITTED_TRANSLATION_WORD_COUNT = 100
@@ -1862,8 +1862,14 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
         )
         dates_in_iso_format = [
             date.isoformat() for date in self.CONTRIBUTION_DATES]
+        model_1_id_without_user_id = model_1_id.replace(
+            '.%s.' % self.CONTRIBUTOR_USER_ID, '.'
+        )
+        model_2_id_without_user_id = model_2_id.replace(
+            '.%s.' % self.CONTRIBUTOR_USER_ID, '.'
+        )
         expected_data = {
-            model_1_id: {
+            model_1_id_without_user_id: {
                 'language_code': self.LANGUAGE_CODE,
                 'topic_id': self.TOPIC_ID,
                 'submitted_translations_count': (
@@ -1882,7 +1888,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
                     self.REJECTED_TRANSLATION_WORD_COUNT),
                 'contribution_dates': dates_in_iso_format
             },
-            model_2_id: {
+            model_2_id_without_user_id: {
                 'language_code': self.LANGUAGE_CODE,
                 'topic_id': topic_id_2,
                 'submitted_translations_count': (

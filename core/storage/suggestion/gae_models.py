@@ -1263,7 +1263,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls, user_id: str
+        cls, user_id: str
     ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
         """Exports the data from TranslationContributionStatsModel into dict
         format for Takeout.
@@ -1278,7 +1278,9 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         stats_models: Sequence[TranslationContributionStatsModel] = (
             cls.get_all().filter(cls.contributor_user_id == user_id).fetch())
         for model in stats_models:
-            user_data[model.id] = {
+            splitted_id = model.id.split('.')
+            id_without_user_id = '%s.%s' % (splitted_id[0], splitted_id[2])
+            user_data[id_without_user_id] = {
                 'language_code': model.language_code,
                 'topic_id': model.topic_id,
                 'submitted_translations_count': (
