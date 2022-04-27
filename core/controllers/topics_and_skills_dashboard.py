@@ -397,8 +397,7 @@ class NewSkillHandler(base.BaseHandler):
                         domain_objects_validator.
                             validate_suggestion_images
                     )
-                },
-                'default_value': None
+                }
             }
         }
     }
@@ -438,7 +437,6 @@ class NewSkillHandler(base.BaseHandler):
             'the image.' % skill.id)
         for filename in image_filenames:
             image = files.get(filename)
-            image = base64.decodebytes(image.encode('utf-8'))
             if not image:
                 logging.exception(
                     'Image not provided for file with name %s when the skill '
@@ -446,6 +444,7 @@ class NewSkillHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'No image data provided for file with name %s. %s'
                     % (filename, image_validation_error_message_suffix))
+            image = base64.decodebytes(image.encode('utf-8'))
             try:
                 file_format = (
                     image_validation_services.validate_image_and_filename(

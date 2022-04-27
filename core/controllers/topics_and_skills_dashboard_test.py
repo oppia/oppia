@@ -876,7 +876,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'linked_topic_ids': [self.topic_id],
             'rubrics': 'invalid',
             'explanation_dict': state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>').to_dict()
+                '1', '<p>Explanation</p>').to_dict(),
+            'files': {}
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -904,7 +905,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': [],
             'explanation_dict': {
                 'explanation': 'Explanation'
-            }
+            },
+            'files': {}
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -930,7 +932,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'linked_topic_ids': [self.topic_id],
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>').to_dict()
+                '1', '<p>Explanation</p>').to_dict(),
+            'files': {}
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token)
@@ -962,7 +965,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'linked_topic_ids': []
+            'linked_topic_ids': [],
+            'files': {}
         }
 
         # No errors when we publish the skill description for the first time.
