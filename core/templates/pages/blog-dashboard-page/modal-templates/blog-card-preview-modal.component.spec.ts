@@ -23,7 +23,7 @@ import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blo
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { Pipe } from '@angular/core';
-import { BlogPostData } from 'domain/blog/blog-post.model';
+import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -53,7 +53,7 @@ describe('Blog Card Preview Modal Component', () => {
   let blogDashboardPageService: BlogDashboardPageService;
   let fixture: ComponentFixture<BlogCardPreviewModalComponent>;
   let blogPostData: BlogPostData;
-  let sampleBlogPostBackendDict = {
+  let sampleBlogPostBackendDict: BlogPostBackendDict = {
     id: 'sampleBlogId',
     author_username: 'test_user',
     title: 'sample_title',
@@ -62,7 +62,7 @@ describe('Blog Card Preview Modal Component', () => {
     tags: ['learners', 'news'],
     url_fragment: 'sample#url',
     last_updated: '11/21/2014, 09:45:00',
-    published_on: null,
+    published_on: '',
   };
 
   beforeEach(waitForAsync(() => {
@@ -96,7 +96,7 @@ describe('Blog Card Preview Modal Component', () => {
   }));
 
   it('should initialize correctly when blog post is not published', () => {
-    sampleBlogPostBackendDict.published_on = null;
+    sampleBlogPostBackendDict.published_on = '';
     blogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
     let expectedBlogPostSummary = new BlogPostSummary (
