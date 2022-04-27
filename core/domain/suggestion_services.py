@@ -1457,6 +1457,12 @@ def update_translation_suggestion(suggestion_id, translation_html, user_id):
         suggestion.edited_by_reviewer = True
 
     if suggestion.status == suggestion_models.STATUS_REJECTED:
+        change_dict = suggestion.change.to_dict()
+        change_dict['translation_html'] = (
+            html_cleaner.clean(translation_html)
+            if isinstance(translation_html, str)
+            else translation_html
+        )
         create_suggestion(
             suggestion.suggestion_type, suggestion.target_type, suggestion.target_id,
             suggestion.target_version_at_submission, user_id,
