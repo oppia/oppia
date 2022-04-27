@@ -405,7 +405,7 @@ export class ExplorationEngineService {
     return this.version;
   }
 
-  getAuthorRecommendedExpIds(stateName: string): string[] {
+  getAuthorRecommendedExpIdsByStateName(stateName: string): string[] {
     return this.exploration.getAuthorRecommendedExpIds(stateName);
   }
 

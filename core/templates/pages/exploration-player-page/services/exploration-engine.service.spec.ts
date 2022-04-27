@@ -722,30 +722,29 @@ describe('Exploration engine service ', () => {
   });
 
   it('should return author recommended exploration id\'s ' +
-    'when calling \'getAuthorRecommendedExpIds\'', () => {
+    'when calling \'getAuthorRecommendedExpIdsByStateName\'', () => {
     let initSuccessCb = jasmine.createSpy('success');
 
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
 
     expect(() => {
-      explorationEngineService.getAuthorRecommendedExpIds('Start');
+      explorationEngineService.getAuthorRecommendedExpIdsByStateName('Start');
     }).toThrowError(
       'Cannot read properties of undefined ' +
-      '(reading \'getAuthorRecommendedExpIds\')');
+      '(reading \'getAuthorRecommendedExpIdsByStateName\')');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
 
     expect(() => {
-      explorationEngineService.getAuthorRecommendedExpIds('Start');
+      explorationEngineService.getAuthorRecommendedExpIdsByStateName('Start');
     }).toThrowError(
       'Tried to get recommendations for a non-terminal state: Start');
 
     // Please note that in order to get author recommended exploration id's
     // current should be the last state.
-    const recommendedId = explorationEngineService.getAuthorRecommendedExpIds(
-      'End'
-    );
+    const recommendedId = explorationEngineService
+      .getAuthorRecommendedExpIdsByStateName('End');
     expect(recommendedId).toContain('recommnendedExplorationId');
   });
 

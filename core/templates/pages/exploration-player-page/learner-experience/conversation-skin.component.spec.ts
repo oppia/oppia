@@ -1312,7 +1312,7 @@ describe('Conversation skin component', () => {
     spyOn(playerPositionService, 'changeCurrentQuestion');
     spyOn(componentInstance, 'showPendingCard');
     spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue([]);
-    spyOn(explorationEngineService, 'getAuthorRecommendedExpIds')
+    spyOn(explorationEngineService, 'getAuthorRecommendedExpIdsByStateName')
       .and.returnValue([]);
     spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
       .and.returnValue(true);
@@ -1480,7 +1480,7 @@ describe('Conversation skin component', () => {
       spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
       spyOn(playerPositionService, 'changeCurrentQuestion');
       spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue([]);
-      spyOn(explorationEngineService, 'getAuthorRecommendedExpIds')
+      spyOn(explorationEngineService, 'getAuthorRecommendedExpIdsByStateName')
         .and.returnValue([]);
       spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
         .and.returnValue(false);
