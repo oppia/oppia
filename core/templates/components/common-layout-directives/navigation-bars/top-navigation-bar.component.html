@@ -322,7 +322,7 @@
         autofocus>
       <div class="oppia-navbar-button-container dropdown">
         <button ngbDropdownToggle
-                class="btn dropdown-toggle oppia-navbar-button protractor-test-language-dropdown"
+                class="btn dropdown-toggle oppia-navbar-button oppia-language-dropdown-button protractor-test-language-dropdown"
                 (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})">
           <i class="material-icons language-icon"> &#xE894; </i>
           <span class="mobile-view-language-code" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
