@@ -75,7 +75,7 @@
       In addition, if the exploration is iframed, the terminal card will
       have no learner input section, so we do not show it.
     -->
-    <div *ngIf="!isDisplayedCardCompletedInPreviousSession() && isInteractionInline() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
+    <div *ngIf="!displayedCardWasCompletedInPrevSession && isInteractionInline() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
     ((displayedCard.getInteractionHtml() && !displayedCard.isCompleted()) || displayedCard.isCompleted()) &&
     (!isOnTerminalCard() || !isIframed || displayedCard.isCompleted())">
       <div class="conversation-skin-inline-interaction">
@@ -111,7 +111,7 @@
       </div>
     </div>
 
-    <div *ngIf="isDisplayedCardCompletedInPreviousSession() && !conceptCardIsBeingShown">
+    <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown">
       <div class="conversation-skin-oppia-feedback-container conversation-skin-oppia-completed-state-card">
         <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
            [href]="OPPIA_AVATAR_LINK_URL"

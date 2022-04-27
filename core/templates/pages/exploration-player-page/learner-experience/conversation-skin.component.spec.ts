@@ -1514,4 +1514,19 @@ describe('Conversation skin component', () => {
       componentInstance.isHackyExpTitleTranslationDisplayed(expId);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
   });
+
+  it('should check if current card was completed in a previous session',
+    () => {
+      let mockStateCard = new StateCard(
+        'Temp2', '', '', new Interaction([], [], null, null, [], null, null)
+        , [], null, null, '', null);
+      componentInstance.displayedCard = mockStateCard;
+      componentInstance.prevSessionStatesProgress = ['Temp1', 'Temp2'];
+      expect(componentInstance.isDisplayedCardCompletedInPrevSession()).
+        toBeTrue();
+      componentInstance.prevSessionStatesProgress = ['Temp1'];
+      expect(componentInstance.isDisplayedCardCompletedInPrevSession()).
+        toBeFalse();
+    }
+  );
 });

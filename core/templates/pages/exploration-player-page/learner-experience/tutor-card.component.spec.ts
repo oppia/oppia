@@ -329,19 +329,4 @@ describe('Tutor card component', () => {
     expect(componentInstance.getInputResponsePairId(1)).toEqual(
       'input-response-pair-1');
   });
-
-  it('should check if current card was completed in a previous session',
-    () => {
-      let mockStateCard = new StateCard(
-        'Temp2', '', '', new Interaction([], [], null, null, [], null, null)
-        , [], null, null, '', null);
-      componentInstance.displayedCard = mockStateCard;
-      componentInstance.prevSessionStatesProgress = ['Temp1', 'Temp2'];
-      expect(componentInstance.isDisplayedCardCompletedInPreviousSession()).
-        toBeTrue();
-      componentInstance.prevSessionStatesProgress = ['Temp1'];
-      expect(componentInstance.isDisplayedCardCompletedInPreviousSession()).
-        toBeFalse();
-    }
-  );
 });

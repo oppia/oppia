@@ -570,7 +570,7 @@ export class ExplorationEngineService {
   }
 
   getStateCardByName(stateName: string): StateCard {
-    let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
+    const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let interactionHtml = null;
     if (this.exploration.getInteraction(stateName).id) {
       interactionHtml = (
@@ -580,20 +580,18 @@ export class ExplorationEngineService {
       );
     }
     let contentHtml = (
-      this.exploration.getState(stateName).content.html
+      this.exploration.getState(stateName).content.html +
+      this._getRandomSuffix()
     );
-    contentHtml = contentHtml + this._getRandomSuffix();
     interactionHtml = interactionHtml + this._getRandomSuffix();
 
-    let stateCard = StateCard.createNewCard(
+    return StateCard.createNewCard(
       stateName, contentHtml, interactionHtml,
       this.exploration.getInteraction(stateName),
       this.exploration.getState(stateName).recordedVoiceovers,
       this.exploration.getState(stateName).writtenTranslations,
       this.exploration.getState(stateName).content.contentId,
       this.audioTranslationLanguageService);
-
-    return stateCard;
   }
 
   getShortestPathToState(
@@ -602,7 +600,7 @@ export class ExplorationEngineService {
     let stateGraphLinks: { source: string; target: string }[] = [];
 
     // Create a list of all possible links between states.
-    for (var stateName of Object.keys(allStates)) {
+    for (let stateName of Object.keys(allStates)) {
       let interaction = this.exploration.getState(stateName).interaction;
       if (interaction.id) {
         let groups = interaction.answerGroups;
@@ -622,20 +620,20 @@ export class ExplorationEngineService {
       }
     }
 
-    let shortestPathToState: string[] = [];
-    let queue: string[] = [];
-    let seen: Record<string, boolean> = {};
-    let parent: Record<string, string> = {};
-    seen[this.exploration.initStateName] = true;
-    queue.push(this.exploration.initStateName);
+    let shortestPathToStateInReverse: string[] = [];
+    let pathsQueue: string[] = [];
+    let visitedNodes: Record<string, boolean> = {};
+    let nodeToParentMap: Record<string, string> = {};
+    visitedNodes[this.exploration.initStateName] = true;
+    pathsQueue.push(this.exploration.initStateName);
     // 1st state does not have a parent
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    parent[this.exploration.initStateName] = null;
-    while (queue.length > 0) {
+    nodeToParentMap[this.exploration.initStateName] = null;
+    while (pathsQueue.length > 0) {
       // '.shift()' here can return an undefined value, but we're already
-      // checking for queue.length > 0, so this is safe.
+      // checking for pathsQueue.length > 0, so this is safe.
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      let currStateName = queue.shift()!;
+      let currStateName = pathsQueue.shift()!;
 
       if (currStateName === destStateName) {
         break;
@@ -644,23 +642,25 @@ export class ExplorationEngineService {
       for (let e = 0; e < stateGraphLinks.length; e++) {
         let edge = stateGraphLinks[e];
         let dest = edge.target;
-        if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
-          seen[dest] = true;
-          parent[dest] = currStateName;
-          queue.push(dest);
+        if (edge.source === currStateName &&
+          !visitedNodes.hasOwnProperty(dest)) {
+          visitedNodes[dest] = true;
+          nodeToParentMap[dest] = currStateName;
+          pathsQueue.push(dest);
         }
       }
     }
 
-    // Reconstruct the shortest path from the parent map.
+    // Reconstruct the shortest path from node to parent map.
     let currStateName = destStateName;
     while (currStateName !== null) {
-      shortestPathToState.push(currStateName);
-      currStateName = parent[currStateName];
+      shortestPathToStateInReverse.push(currStateName);
+      currStateName = nodeToParentMap[currStateName];
     }
-    // Reverse the path to go initStateName to destStateName.
-    shortestPathToState = shortestPathToState.reverse();
-    return shortestPathToState;
+    // Actual shortest path in order is reverse of the path retrieved
+    // from parent map, hence we return the reversed path that goes
+    // from initStateName to destStateName.
+    return shortestPathToStateInReverse.reverse();
   }
 }
 

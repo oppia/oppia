@@ -475,8 +475,8 @@ describe('ExplorationFooterComponent', () => {
     fixture.detectChanges();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.completedCheckpoints).toEqual(2);
-    expect(component.isLastCheckpointReached).toEqual(true);
+    expect(component.completedCheckpointsCount).toEqual(2);
+    expect(component.lastCheckpointWasCompleted).toEqual(true);
     expect(component.completedWidth).toEqual(100);
   }));
 

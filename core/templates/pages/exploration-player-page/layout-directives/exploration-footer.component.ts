@@ -62,8 +62,8 @@ export class ExplorationFooterComponent {
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth: number = 0;
   expStates: StateObjectsBackendDict;
-  completedCheckpoints: number = 0;
-  isLastCheckpointReached: boolean = false;
+  completedCheckpointsCount: number = 0;
+  lastCheckpointWasCompleted: boolean = false;
   userIsLoggedIn: boolean = false;
 
   constructor(
@@ -150,7 +150,7 @@ export class ExplorationFooterComponent {
       this.getMostRecentlyReachedCheckpointIndex()
     );
 
-    this.completedCheckpoints = mostRecentlyReachedCheckpointIndex - 1;
+    this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
 
     let displayedCardIndex = (
       this.playerPositionService.getDisplayedCardIndex()
@@ -160,19 +160,19 @@ export class ExplorationFooterComponent {
       let stateCard = this.explorationEngineService.getStateCardByName(
         state.name);
       if (stateCard.isTerminal()) {
-        this.completedCheckpoints += 1;
+        this.completedCheckpointsCount += 1;
       }
     }
 
-    if (this.completedCheckpoints === this.checkpointCount) {
-      this.isLastCheckpointReached = true;
+    if (this.completedCheckpointsCount === this.checkpointCount) {
+      this.lastCheckpointWasCompleted = true;
     }
 
     this.completedWidth = (
-      (100 / (this.checkpointCount)) * this.completedCheckpoints
+      (100 / (this.checkpointCount)) * this.completedCheckpointsCount
     );
 
-    if (this.isLastCheckpointReached) {
+    if (this.lastCheckpointWasCompleted) {
       this.completedWidth = 100;
     }
 

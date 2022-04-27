@@ -115,6 +115,7 @@ export class ConversationSkinComponent {
   recommendedExplorationSummaries = [];
   answerIsCorrect = false;
   nextCard;
+  alertMessage = {};
   pendingCardWasSeenBefore: boolean = false;
   OPPIA_AVATAR_IMAGE_URL: string;
   displayedCard: StateCard;
@@ -656,10 +657,15 @@ export class ConversationSkinComponent {
           this.prevSessionStatesProgress.pop();
 
           if (indexToRedirectTo > 0) {
-            this.alertsService.addInfoMessage(
-              'Welcome back! Continuing this lesson from where ' +
-              'you left off.', 6000
-            );
+            setTimeout(() => {
+              let alertInfoElement = document.querySelector(
+                '.oppia-exploration-checkpoints-message');
+
+              // Remove the alert message after 6 sec.
+              if (alertInfoElement) {
+                alertInfoElement.remove();
+              }
+            }, 6000);
           }
 
           // Move to most recently reached checkpoint card.
@@ -898,7 +904,8 @@ export class ConversationSkinComponent {
       this.nextCard.getStateName());
 
     // We do not store checkpoints progress for iframes hence we do not
-    // need to consider redirecting in that case.
+    // need to consider redirecting the user to the most recently
+    // reached checkpoint on exploration initial load in that case.
     if (!this.isIframed && this.isLoggedIn) {
       // Navigate the learner to the most recently reached checkpoint state.
       this._navigateToMostRecentlyReachedCheckpoint();
@@ -1329,6 +1336,15 @@ export class ConversationSkinComponent {
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
         recommendedExpTitleTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isDisplayedCardCompletedInPrevSession(): boolean {
+    return (
+      this.displayedCard.getInteraction() &&
+      (this.prevSessionStatesProgress.indexOf(
+        this.displayedCard.getStateName()) !== -1
+      )
     );
   }
 }

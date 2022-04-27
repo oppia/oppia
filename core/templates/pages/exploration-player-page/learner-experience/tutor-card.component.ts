@@ -78,7 +78,7 @@ import { animate, keyframes, state, style, transition, trigger } from '@angular/
 })
 export class TutorCardComponent {
   @Input() displayedCard: StateCard;
-  @Input() prevSessionStatesProgress: string[];
+  @Input() displayedCardWasCompletedInPrevSession: boolean;
   @Input() startCardChangeAnimation: boolean;
   @Input() avatarImageIsShown: boolean;
   directiveSubscriptions = new Subscription();
@@ -277,15 +277,6 @@ export class TutorCardComponent {
 
   getInputResponsePairId(index: number): string {
     return 'input-response-pair-' + index;
-  }
-
-  isDisplayedCardCompletedInPreviousSession(): boolean {
-    return (
-      this.displayedCard.getInteraction() &&
-      (this.prevSessionStatesProgress.indexOf(
-        this.displayedCard.getStateName()) !== -1
-      )
-    );
   }
 }
 
