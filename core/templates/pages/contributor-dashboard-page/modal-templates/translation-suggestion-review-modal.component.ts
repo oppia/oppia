@@ -32,8 +32,6 @@ import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { TranslateTextService } from '../services/translate-text.service';
 import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
 
 interface HTMLSchema {
@@ -141,13 +139,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     public activeModal: NgbActiveModal,
     private alertsService: AlertsService,
     private contextService: ContextService,
-    private readonly imageLocalStorageService: ImageLocalStorageService,
     private contributionAndReviewService: ContributionAndReviewService,
     private contributionOpportunitiesService: ContributionOpportunitiesService,
     private languageUtilService: LanguageUtilService,
     private siteAnalyticsService: SiteAnalyticsService,
     private threadDataBackendApiService: ThreadDataBackendApiService,
-    private readonly translateTextService: TranslateTextService,
     private userService: UserService,
     private validatorsService: ValidatorsService,
   ) {}
