@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from urllib.parse import urlparse  # pylint: disable-msg=C0003
+from urllib.parse import urlparse   # pylint: disable=import-only-modules
 
 from core.domain import exp_fetchers
 from core.jobs import base_jobs
@@ -88,6 +88,23 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
 
         return invalid_links
 
+    def truncate_links(self, links: List[str]) -> str:
+        """Returns the string representation of a list
+
+            Returns:
+                str. Returns the string representation of a string.
+            """
+
+        string = str(links)
+        # If the string representation of the list is greater than 1400
+        # characters, the string is truncated and the '.. truncated' label
+        # is added.
+        if len(string) > 1400:
+            string = string[:1401]
+            string += '... truncated'
+
+        return string
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid explorations
 
@@ -128,7 +145,7 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
             | 'Save info on invalid exps' >> beam.MapTuple(
                 lambda exp_id, exp_link: job_run_result.JobRunResult.as_stderr(
                     'The id of exp is %s and the invalid links are %s'
-                    % (exp_id, exp_link)
+                    % (exp_id, self.truncate_links(exp_link))
                 ))
         )
 

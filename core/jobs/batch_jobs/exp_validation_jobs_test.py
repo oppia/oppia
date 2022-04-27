@@ -42,6 +42,8 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
     def setUp(self):
         super().setUp()
 
+        long_link = 'http:' + 'a' * 1400 + '.com'
+
         # This is an invalid model.
         self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
@@ -66,7 +68,7 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
                         'html': '<p><oppia-noninteractive-link ' +
                                 'text-with-value="&amp;quot;&amp;quot;"' +
                                 ' url-with-value=' +
-                                '"&amp;quot;http://google.com&amp;quot;">' +
+                                f'"&amp;quot;{long_link}amp;quot;">' +
                                 '</oppia-noninteractive-link></p>',
                     },
                     'param_changes': [],
@@ -180,8 +182,12 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
         )
 
     def test_run_with_single_invalid_model(self) -> None:
-        invalid_links = ['None', 'http://google.com',
+
+        long_link = 'http:' + 'a' * 1400 + '.com'
+        invalid_links = ['None', long_link,
                          'mailto:example@example.com']
+        error_string = str(invalid_links)[:1401] + '... truncated'
+
         self.put_multi([self.exp_1])
         self.assert_job_output_is(
             [
@@ -189,14 +195,18 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
                 job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
                 job_run_result.JobRunResult.as_stderr(
                     f'The id of exp is {self.EXPLORATION_ID_1} and the invalid'
-                    f' links are {invalid_links}'
+                    f' links are {error_string}'
                 ),
             ]
         )
 
     def test_run_with_mixed_models(self) -> None:
-        invalid_links = ['None', 'http://google.com',
+
+        long_link = 'http:' + 'a' * 1400 + '.com'
+        invalid_links = ['None', long_link,
                          'mailto:example@example.com']
+        error_string = str(invalid_links)[:1401] + '... truncated'
+
         self.put_multi([self.exp_1, self.exp_2])
         self.assert_job_output_is(
             [
@@ -204,7 +214,7 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
                 job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
                 job_run_result.JobRunResult.as_stderr(
                     f'The id of exp is {self.EXPLORATION_ID_1} and the invalid'
-                    + f' links are {invalid_links}'
+                    + f' links are {error_string}'
                 ),
             ]
         )
