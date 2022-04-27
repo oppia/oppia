@@ -19,7 +19,11 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Question } from 'domain/question/QuestionObjectFactory';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
@@ -62,9 +66,21 @@ describe('Question Suggestion Backend Api Service', () => {
         return {};
       }
     };
+
+    const conceptCard = new ConceptCard(
+      SubtitledHtml.createDefault(
+        'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
+      [],
+      RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {
+          COMPONENT_NAME_EXPLANATION: {}
+        }
+      })
+    );
+
     let associatedSkill = new Skill(
       'test_skill', 'description', [], [],
-      null, 'en', 1, null, 'test_id', false, []);
+      conceptCard, 'en', 1, 0, 'test_id', false, []);
 
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
