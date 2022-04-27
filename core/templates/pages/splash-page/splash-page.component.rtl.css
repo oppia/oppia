@@ -465,6 +465,8 @@
   }
 
   .splash-page .oppia-splash-section-three {
+    display: flex;
+    flex-direction: column;
     padding-bottom: 50px;
     padding-top: 15px;
   }
@@ -472,6 +474,10 @@
   .splash-page .oppia-splash-section-three-left {
     display: block;
     width: 100%;
+  }
+
+  .splash-page .oppia-splash-section-three-right {
+    align-self: center;
   }
 
   .splash-page .oppia-splash-section-five-image {
@@ -571,7 +577,6 @@
   @media screen and (max-width: 768px) {
     .splash-page .oppia-splash-icon-3-container {
       display: block;
-      margin-right: 12vw;
     }
   }
 }
