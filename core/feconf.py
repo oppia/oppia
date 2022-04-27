@@ -580,6 +580,9 @@ NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 # SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
 # address cannot be sent. If True then emails can be sent to any user.
 CAN_SEND_EMAILS = False
+# Allowlist defining recipients for whom emails should be logged if sending
+# emails is disabled.
+EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING = []
 # If you want to turn on this facility please check the email templates in the
 # send_role_notification_email() function in email_manager.py and modify them
 # accordingly.

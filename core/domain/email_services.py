@@ -16,7 +16,9 @@
 
 from __future__ import annotations
 
+import logging
 import re
+import textwrap
 
 from core import feconf
 from core.platform import models
@@ -110,7 +112,10 @@ def send_mail(
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
-    if not feconf.CAN_SEND_EMAILS:
+    recipient_email_in_allowlist = recipient_email in (
+        feconf.EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING)
+
+    if not feconf.CAN_SEND_EMAILS and not recipient_email_in_allowlist:
         raise Exception('This app cannot send emails to users.')
 
     if not _is_email_valid(recipient_email):
@@ -121,6 +126,14 @@ def send_mail(
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
     bcc = [feconf.ADMIN_EMAIL_ADDRESS] if bcc_admin else None
+
+    if not feconf.CAN_SEND_EMAILS:
+        _log_email(
+            sender_email, [recipient_email], subject,
+            plaintext_body, html_body, bcc, '', None
+        )
+        return
+
     response = email_services.send_email_to_recipients(
         sender_email, [recipient_email], subject,
         plaintext_body, html_body, bcc, '', None)
@@ -164,7 +177,11 @@ def send_bulk_mail(
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
-    if not feconf.CAN_SEND_EMAILS:
+    recipient_emails_in_allowlist = [
+        recipient_email for recipient_email in recipient_emails
+        if recipient_email in feconf.EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING]
+
+    if not feconf.CAN_SEND_EMAILS and not recipient_emails_in_allowlist:
         raise Exception('This app cannot send emails to users.')
 
     for recipient_email in recipient_emails:
@@ -176,9 +193,88 @@ def send_bulk_mail(
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
 
+    if not feconf.CAN_SEND_EMAILS:
+        _log_email(
+            sender_email, recipient_emails_in_allowlist, subject,
+            plaintext_body, html_body
+        )
+
     response = email_services.send_email_to_recipients(
         sender_email, recipient_emails, subject, plaintext_body, html_body)
     if not response:
         raise Exception(
             'Bulk email failed to send. Please try again later or contact us ' +
             'to report a bug at https://www.oppia.org/contact.')
+
+
+def _log_email(
+        sender_email: str,
+        recipient_emails: List[str],
+        subject: str,
+        plaintext_body: str,
+        html_body: str,
+        bcc: Optional[List[str]] = None,
+        reply_to: Optional[str] = None,
+        recipient_variables: Optional[
+            Dict[str, Dict[str, Union[str, float]]]] = None
+):
+    """Logs sent emails in order to model sending an email.
+
+    Args:
+        sender_email: str. The email address of the sender. This should be in
+            the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+            'SENDER_EMAIL_ADDRESS. Format must be utf-8.
+        recipient_emails: list(str). The email addresses of the recipients.
+            Format must be utf-8.
+        subject: str. The subject line of the email. Format must be utf-8.
+        plaintext_body: str. The plaintext body of the email. Format must
+            be utf-8.
+        html_body: str. The HTML body of the email. Must fit in a datastore
+            entity. Format must be utf-8.
+        bcc: list(str)|None. Optional argument. List of bcc emails. Format must
+            be utf-8.
+        reply_to: str|None. Optional argument. Reply address formatted like
+            “reply+<reply_id>@<incoming_email_domain_name>
+            reply_id is the unique id of the sender. Format must be utf-8.
+        recipient_variables: dict|None. Optional argument. If batch sending
+            requires differentiating each email based on the recipient, we
+            assign a unique id to each recipient, including info relevant to
+            that recipient so that we can reference it when composing the
+            email like so:
+                recipient_variables =
+                    {"bob@example.com": {"first":"Bob", "id":1},
+                     "alice@example.com": {"first":"Alice", "id":2}}
+                subject = 'Hey, %recipient.first%’
+            More info about this format at:
+            https://documentation.mailgun.com/en/
+                latest/user_manual.html#batch-sending
+    """
+    msg = (
+        """
+        EmailService.SendMail
+        From: %s
+        To: %s
+        Subject: %s
+        Body:
+            Content-type: text/plain
+            Data: %s
+        Body:
+            Content-type: text/html
+            Data: %s
+        """ % (
+            sender_email, recipient_emails, subject,
+            plaintext_body, html_body))
+    optional_msg_description = (
+        """
+        Bcc: %s
+        Reply_to: %s
+        Recipient Variables: %s
+        """ % (
+            bcc if bcc else 'None',
+            reply_to if reply_to else 'None',
+            recipient_variables if recipient_variables else 'None'))
+    logging.info(
+        textwrap.dedent(msg) + textwrap.dedent(optional_msg_description))
+    logging.info(
+        'You are not currently sending out real emails since this is a' +
+        ' sending emails is not enabled on this server.')

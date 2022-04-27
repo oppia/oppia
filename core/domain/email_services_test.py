@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
 from core.constants import constants
 from core.domain import email_services
@@ -67,6 +69,32 @@ class EmailServicesTest(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
 
+    def test_send_mail_logs_email_for_recipient_in_allowlist(self) -> None:
+        """Tests that email is logged when sending email is disabled and
+            recipients is in allowlist.
+        """
+        msg_list = []
+        def mock_info(msg):
+            msg_list.append(msg)
+        constants_swap = self.swap(constants, 'DEV_MODE', False)
+        info_swap = self.swap(logging, 'info', mock_info)
+        allowlist_swap = self.swap(
+            feconf, 'EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING', [feconf.ADMIN_EMAIL_ADDRESS])
+        with constants_swap, info_swap, allowlist_swap:
+            email_services.send_mail(
+                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+                'subject', 'body', 'html', bcc_admin=False)
+        expected_msgs = [
+            '\nEmailService.SendMail\nFrom: system@example.com\nTo: '
+            '[\'testadmin@example.com\']\nSubject: subject\nBody:\n    '
+            'Content-type: text/plain\n    Data: body\nBody:\n    '
+            'Content-type: text/html\n    Data: html\n\nBcc: None\n'
+            'Reply_to: None\nRecipient Variables: None\n', 
+            'You are not currently sending out real emails since this is a '
+            'sending emails is not enabled on this server.'
+        ]
+        self.assertEqual(msg_list, expected_msgs)
+
     def test_send_bulk_mail_exception_for_invalid_permissions(self) -> None:
         """Tests the send_bulk_mail exception raised for invalid user
            permissions.
@@ -95,6 +123,35 @@ class EmailServicesTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].to, recipients)
+
+    def test_send_bulk_mail_logs_email_for_recipient_in_allowlist(self) -> None:
+        """Tests that email is logged when sending email is disabled and
+            recipients is in allowlist.
+        """
+        msg_list = []
+        def mock_info(msg):
+            msg_list.append(msg)
+        constants_swap = self.swap(constants, 'DEV_MODE', False)
+        info_swap = self.swap(logging, 'info', mock_info)
+        allowlist_swap = self.swap(
+            feconf,
+            'EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING',
+            ['m1@example.com', 'm2@example.com'])
+        with constants_swap, info_swap, allowlist_swap:
+            email_services.send_bulk_mail(
+                feconf.SYSTEM_EMAIL_ADDRESS,
+                ['m1@example.com', 'm2@example.com'],
+                'subject', 'body', 'html')
+        expected_msgs = [
+            '\nEmailService.SendMail\nFrom: system@example.com\nTo: '
+            '[\'m1@example.com\', \'m2@example.com\']\nSubject: subject\n'
+            'Body:\n    Content-type: text/plain\n    Data: body\nBody:\n    '
+            'Content-type: text/html\n    Data: html\n\nBcc: None\n'
+            'Reply_to: None\nRecipient Variables: None\n', 
+            'You are not currently sending out real emails since this is a '
+            'sending emails is not enabled on this server.'
+        ]
+        self.assertEqual(msg_list, expected_msgs)
 
     def test_email_not_sent_if_email_addresses_are_malformed(self) -> None:
         """Tests that email is not sent if recipient email address is
