@@ -171,12 +171,13 @@ class ModelProperty:
             bool. Whether the property is repeated.
         """
         model_property = self._to_property()
-        # We used assert here, because this method checks repetition only
-        # for those properties which belongs to datastore_services.Property
-        # and id is not one of them. Because id is a python property and it
-        # does not contain '_repeated' attribute.
-        assert isinstance(model_property, datastore_services.Property)
-        return self._property_name != 'id' and model_property._repeated # pylint: disable=protected-access
+        if (
+            self._property_name != 'id' and
+            isinstance(model_property, datastore_services.Property)
+        ):
+            return model_property._repeated  # pylint: disable=protected-access
+        else:
+            return False
 
     def __getstate__(self) -> Tuple[str, str]:
         """Called by pickle to get the value that uniquely defines self.
