@@ -1675,15 +1675,6 @@ pre.oppia-pre-wrapped-text {
   top: 0;
 }
 
-.top-section .heading {
-  align-items: flex-start;
-  display: flex;
-}
-
-.top-section .heading-text {
-  display: inline-block;
-}
-
 /* Line-height is set to 1.846 to ensure that the line-spacing inside
    a paragraph is consistent both in the editor mode while editing and
    after saving. The value 1.846 came from

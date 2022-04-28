@@ -106,6 +106,7 @@
 }
 
 .top-section .heading-text {
+  display: inline-block;
   margin-right: 7px;
 }
 
