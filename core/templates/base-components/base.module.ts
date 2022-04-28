@@ -46,6 +46,7 @@ import {
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 
 @NgModule({
   imports: [
@@ -67,6 +68,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
+    OppiaAngularRootComponent,
     OppiaFooterComponent,
     PromoBarComponent,
     SideNavigationBarComponent,
@@ -80,6 +82,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BaseContentComponent,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
+    OppiaAngularRootComponent,
     OppiaFooterComponent,
     PromoBarComponent,
     SideNavigationBarComponent,
@@ -103,6 +106,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
+    OppiaAngularRootComponent,
     OppiaFooterComponent,
     SideNavigationBarComponent,
     SocialButtonsComponent,

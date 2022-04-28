@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,31 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the shared pipes.
+ * @fileoverview Module for the background banner component.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 
-import { LimitToPipe } from './limit-to.pipe';
-import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
+import { BackgroundBannerComponent } from 'components/common-layout-directives/common-elements/background-banner.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    StringUtilityPipesModule
-  ],
   declarations: [
-    LimitToPipe
+    BackgroundBannerComponent
+  ],
+  entryComponents: [
+    BackgroundBannerComponent
   ],
   exports: [
-    LimitToPipe,
-    StringUtilityPipesModule
-  ],
+    BackgroundBannerComponent
+  ]
 })
-
-export class SharedPipesModule { }
+export class BackgroundBannerModule {}

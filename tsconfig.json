@@ -23,6 +23,7 @@
       "google-analytics.initializer": ["core/templates/google-analytics.initializer"],
       "hybrid-router-module-provider": ["core/templates/hybrid-router-module-provider"],
       "app-events/*": ["core/templates/app-events/*"],
+      "base-components/*": ["core/templates/base-components/*"],
       "components/*": ["core/templates/components/*"],
       "directives/*": ["core/templates/directives/*"],
       "domain/*": ["core/templates/domain/*"],
