@@ -2227,14 +2227,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             })
         self.assertEqual(len(response['suggestions']), 1)
 
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'edits_allowed',
-                    'old_value': True,
-                    'new_value': False
-                })], 'Add content')
+        exp_services.set_exploration_edits_allowed(self.EXP_ID, False)
 
         response = self.get_json(
             '/getsubmittedsuggestions/exploration/translate_content', {
