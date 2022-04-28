@@ -404,6 +404,9 @@ import { FaviconService } from './favicon.service';
 import { StalenessDetectionService } from './staleness-detection.service';
 import { ExplorationImprovementsService } from './exploration-improvements.service';
 import { PlaythroughIssuesService } from './playthrough-issues.service';
+import { ParameterMetadataService } from 'pages/exploration-editor-page/services/parameter-metadata.service';
+import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
+import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -835,5 +838,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['QuestionValidationService', QuestionValidationService],
   ['CollectionEditorStateService', CollectionEditorStateService],
   ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
-  ['NumberConversionService', NumberConversionService]
+  ['NumberConversionService', NumberConversionService],
+  ['ParameterMetadataService', ParameterMetadataService],
+  ['ExplorationWarningsService', ExplorationWarningsService],
+  ['TranslationStatusService', TranslationStatusService]
 ];

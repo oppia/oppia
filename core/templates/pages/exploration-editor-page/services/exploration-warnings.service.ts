@@ -314,10 +314,11 @@ export class ExplorationWarningsService {
     }
 
     let initStateName = this.explorationInitStateNameService.displayed;
-    let initState = _states.getState(initStateName);
+    let initState = _states.getState(initStateName as string);
     if (initState && !initState.cardIsCheckpoint) {
       this._extendStateWarnings(
-        initStateName, AppConstants.CHECKPOINT_ERROR_MESSAGES.INIT_CARD);
+        initStateName as string,
+        AppConstants.CHECKPOINT_ERROR_MESSAGES.INIT_CARD);
     }
 
     let nonInitialCheckpointStateNames = [];
