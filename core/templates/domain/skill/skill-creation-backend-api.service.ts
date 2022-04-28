@@ -52,33 +52,63 @@ export class SkillCreationBackendApiService {
     private imageLocalStorageService: ImageLocalStorageService
   ) {}
 
-  async createSkillAsync(
-      description: string, rubrics: RubricBackendDict,
-      explanation: string, linkedTopicIds: string[], imagesData: ImageData[]
-  ): Promise<SkillCreationBackendResponse> {
+  /**
+   * Sends POST request to create skill.
+   * @param {Promise} successCallback - Callback invoked on successful creation
+   *  of skill.
+   * @param {Promise} errorCallback - Callback invoked when skill creation
+   *  fails.
+   * @param {string} description - Description of the new skill.
+   * @param {Object[]} rubrics - Rubrics for the new skill.
+   * @param {string} rubric.difficulty - Difficulty of the rubric.
+   * @param {string[]} rubric.explanations - Explanations for the difficulty.
+   * @param {string} explanation - Explanation of the skill.
+   * @param {string[]} linkedTopicIds - Topic ids linked to the new skill.
+   * @param {Object[]} imagesData - Represents the images added to the skill.
+   * @param {string} imageData.filename - Filename of the image.
+   * @param {Blob} imageData.imageBlob - Image data represented as a Blob.
+   */
+  _createSkill(
+      successCallback: (value: SkillCreationBackendResponse) => void,
+      errorCallback: (reason: string) => void,
+      description: string, rubrics: RubricBackendDict, explanation: string,
+      linkedTopicIds: string[], files: Record<string, unknown>): void {
     let postData: SkillCreationBackendDict = {
       description: description,
       linked_topic_ids: linkedTopicIds,
       explanation_dict: explanation,
       rubrics: rubrics,
-      files: (
-        await this.imageLocalStorageService
-          .getFilenameToBase64MappingAsync(imagesData))
+      files: files
     };
     let body = new FormData();
     body.append('payload', JSON.stringify(postData));
 
-    return this.http.post<SkillCreationBackendResponse>(
-      '/skill_editor_handler/create_new', body
-    ).toPromise()
+    this.http.post<SkillCreationBackendResponse>(
+      '/skill_editor_handler/create_new', body).toPromise()
       .then(response => {
-        return {
-          skillId: response.skillId
-        };
-      })
-      .catch((errorResponse) => {
-        return errorResponse.error.error;
+        if (successCallback) {
+          successCallback({
+            skillId: response.skillId
+          });
+        }
+      }, (errorResponse) => {
+        if (errorCallback) {
+          errorCallback(errorResponse.error.error);
+        }
       });
+  }
+
+  async createSkillAsync(
+      description: string, rubrics: RubricBackendDict,
+      explanation: string, linkedTopicIds: string[], imagesData: ImageData[]
+  ): Promise<SkillCreationBackendResponse> {
+    const files = await this.imageLocalStorageService
+      .getFilenameToBase64MappingAsync(imagesData);
+    return new Promise((resolve, reject) => {
+      this._createSkill(
+        resolve, reject, description, rubrics, explanation, linkedTopicIds,
+        files);
+    });
   }
 }
 

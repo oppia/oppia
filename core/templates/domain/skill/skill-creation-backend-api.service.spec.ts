@@ -16,6 +16,7 @@
  * @fileoverview Unit test for SkillCreationBackendApiService.
  */
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
@@ -91,5 +92,40 @@ describe('Skill creation backend api service', () => {
       flushMicrotasks();
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should fail to create a new skill and call the fail handler',
+    fakeAsync(() => {
+      spyOn(
+        imageLocalStorageService, 'getFilenameToBase64MappingAsync'
+      ).and.returnValue(Promise.resolve({}));
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      let postData = {
+        description: 'test-description',
+        linked_topic_ids: ['test_id'],
+        explanation_dict: 'test_dictionary',
+        rubrics: rubricDict,
+        files: {}
+      };
+      skillCreationBackendApiService.createSkillAsync(
+        'test-description', rubricDict, 'test_dictionary', ['test_id'], []
+      ).then(successHandler, failHandler);
+      flushMicrotasks();
+      let errorResponse = new HttpErrorResponse({
+        error: 'test 404 error',
+        status: 404,
+        statusText: 'Not Found'
+      });
+      let req = httpTestingController.expectOne(
+        '/skill_editor_handler/create_new');
+      req.error(new ErrorEvent('Error'), errorResponse);
+
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
+      flushMicrotasks();
+      expect(failHandler).toHaveBeenCalled();
+      expect(successHandler).not.toHaveBeenCalled();
     }));
 });
