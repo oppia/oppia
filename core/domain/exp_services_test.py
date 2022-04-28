@@ -1579,6 +1579,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: Introduction
 language_code: en
 objective: ''
@@ -1822,6 +1823,7 @@ title: Title
         blurb: ''
         category: Category
         correctness_feedback_enabled: false
+        edits_allowed: true
         init_state_name: Introduction
         language_code: en
         objective: ''
@@ -2155,6 +2157,7 @@ auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -2263,6 +2266,7 @@ auto_tts_enabled: false
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -5701,6 +5705,7 @@ auto_tts_enabled: true
 blurb: ''
 category: category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: %s
 language_code: en
 objective: Old objective
