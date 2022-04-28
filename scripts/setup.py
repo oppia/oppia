@@ -72,7 +72,7 @@ def test_python_version():
     # app_devserver. See the Google Cloud docs:
     # https://cloud.google.com/appengine/docs/standard/python3/testing-and-deploying-your-app#local-dev-server
     return_code = subprocess.call(
-        'python2 -V', stderr=subprocess.DEVNULL, shell=True
+        '/Users/iamprayush/.pyenv/shims/python2 -V', stderr=subprocess.DEVNULL, shell=True
     )
     if return_code != 0:
         print(
