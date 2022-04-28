@@ -72,7 +72,8 @@ def get_user_query(
         strict: bool. Whether to raise an error if the user query doesn't exist.
 
     Returns:
-        UserQuery. The user query.
+        UserQuery|None. Returns the user query domain object. Can be None if
+        there is no user query model.
     """
     user_query_model = user_models.UserQueryModel.get(query_id, strict=strict)
     return (
@@ -166,6 +167,7 @@ def archive_user_query(user_query_id: str) -> None:
         user_query_id: str. The ID of the user query to delete.
     """
     user_query = get_user_query(user_query_id, strict=True)
+    # Ruling out the possibility of None for mypy type checking.
     assert user_query is not None
     user_query.archive()
     _save_user_query(user_query)
@@ -188,6 +190,7 @@ def send_email_to_qualified_users(
         max_recipients: int. Maximum number of recipients send emails to.
     """
     user_query = get_user_query(query_id, strict=True)
+    # Ruling out the possibility of None for mypy type checking.
     assert user_query is not None
     recipient_ids = user_query.user_ids
 

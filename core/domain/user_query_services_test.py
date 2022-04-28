@@ -70,6 +70,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
     def test_get_user_query_returns_user_query(self) -> None:
         user_query = user_query_services.get_user_query(self.USER_QUERY_1_ID)
 
+        # Ruling out the possibility of None for mypy type checking.
         assert user_query is not None
         self.assertEqual(self.user_query_model_1.id, user_query.id)
         self.assertEqual(
@@ -130,6 +131,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
 
         query_model = user_models.UserQueryModel.get(user_query_id)
 
+        # Ruling out the possibility of None for mypy type checking.
         assert query_model is not None
         self.assertEqual(query_model.submitter_id, self.admin_user_id)
         self.assertEqual(
@@ -148,6 +150,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
     def test_archive_user_query_archives_user_query(self) -> None:
         original_user_query = (
             user_query_services.get_user_query(self.USER_QUERY_1_ID))
+        # Ruling out the possibility of None for mypy type checking.
         assert original_user_query is not None
         user_query_services.archive_user_query(original_user_query.id)
 
@@ -198,6 +201,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
 
         new_user_bulk_email_model = user_models.UserBulkEmailsModel.get(
             self.new_user_id)
+        # Ruling out the possibility of None for mypy type checking.
         assert new_user_bulk_email_model is not None
         self.assertIsNotNone(
             email_models.BulkEmailModel.get(
