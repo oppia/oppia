@@ -138,7 +138,7 @@ describe('Subtopic viewer page', function() {
   });
 
   it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toEqual(true);
+    expect(component.isLanguageRTL()).toBeTrue();
   });
 
   it('should succesfully get subtopic data and set context with next subtopic' +
