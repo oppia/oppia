@@ -4358,6 +4358,16 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name, 'written_translations',
                     [1, 2]), 'Added fake text translations.')
 
+    def test_set_edits_allowed(self):
+        """Test update edits allowed field in an exploration."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEquals(exploration.edits_allowed, True)
+
+        exp_services.set_exploration_edits_allowed(self.EXP_0_ID, False)
+
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEquals(exploration.edits_allowed, False)
+
     def test_migrate_exp_to_latest_version_migrates_to_version(self):
         """Test migrate exploration state schema to the latest version."""
         latest_schema_version = str(feconf.CURRENT_STATE_SCHEMA_VERSION)
