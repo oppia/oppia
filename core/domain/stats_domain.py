@@ -74,8 +74,8 @@ class SubmittedAnswerDict(TypedDict, total=False):
     answer_group_index: int
     rule_spec_index: int
     classification_categorization: str
-    # Type Dict[str, Any] is used here because the type of the params value is
-    # not specified at all callsites.
+    # Type Dict[str, Any] is used here because the type of the params values can
+    # differ.
     params: Dict[str, Any]
     session_id: str
     time_spent_in_sec: float
@@ -87,8 +87,8 @@ class ExplorationIssueDict(TypedDict):
     """Dictionary representing the ExplorationIssue object."""
 
     issue_type: str
-    # Type Dict[str, Dict[str, Any]] is used here because the default value of
-    # the customization arg is * in the file customization_args_util.py.
+    # Type Dict[str, Dict[str, Any]] is used here because the type of the args
+    # value can differ.
     issue_customization_args: Dict[str, Dict[str, Any]]
     playthrough_ids: List[str]
     schema_version: int
@@ -101,8 +101,8 @@ class PlaythroughDict(TypedDict):
     exp_id: str
     exp_version: int
     issue_type: str
-    # Type Dict[str, Dict[str, Any]] is used here because the default value of
-    # the customization arg is * in the file customization_args_util.py.
+    # Type Dict[str, Dict[str, Any]] is used here because the type of the args
+    # value can differ.
     issue_customization_args: Dict[str, Any]
     actions: List[LearnerActionDict]
 
@@ -156,8 +156,8 @@ class LearnerActionDict(TypedDict):
     """Dictionary representing the LearnerAction object."""
 
     action_type: str
-    # Type Dict[str, Dict[str, Any]] is used here because the default value of
-    # the customization arg is * in the file customization_args_util.py.
+    # Type Dict[str, Dict[str, Any]] is used here because the type of the value
+    # of the args can differ.
     action_customization_args: Dict[str, Any]
     schema_version: int
 
@@ -914,8 +914,8 @@ class Playthrough:
         exp_id: str,
         exp_version: int,
         issue_type: str,
-        # Type Dict[str, Dict[str, Any]] is used here because the default value
-        # of the customization arg is * in the file customization_args_util.py.
+        # Type Dict[str, Dict[str, Any]] is used here because the type of the
+        # args value can differ.
         issue_customization_args: Dict[str, Any],
         actions: List[LearnerAction]
     ):
@@ -1034,8 +1034,8 @@ class ExplorationIssue:
     def __init__(
         self,
         issue_type: str,
-        # Type Dict[str, Dict[str, Any]] is used here because the default value
-        # of the customization arg is * in the file customization_args_util.py.
+        # Type Dict[str, Dict[str, Any]] is used here because the type of the
+        # value of the args can differ.
         issue_customization_args: Dict[str, Dict[str, Any]],
         playthrough_ids: List[str],
         schema_version: int,
@@ -1195,8 +1195,8 @@ class LearnerAction:
     def __init__(
         self,
         action_type: str,
-        # Type Dict[str, Dict[str, Any]] is used here because the default value
-        # of the customization arg is * in the file customization_args_util.py.
+        # Type Dict[str, Dict[str, Any]] is used here because the type of the
+        # value of the args can differ.
         action_customization_args: Dict[str, Dict[str, Any]],
         schema_version: int
     ):
@@ -1404,7 +1404,7 @@ class SubmittedAnswer:
         rule_spec_index: int,
         classification_categorization: str,
         # Type Dict[str, Any] is used here because the type of the params value
-        # is not specified at all callsites.
+        # can differ.
         params: Dict[str, Any],
         session_id: str,
         time_spent_in_sec: float,
@@ -1736,7 +1736,7 @@ class StateAnswersCalcOutput:
         state_name: str,
         interaction_id: str,
         calculation_id: str,
-        calculation_output: object
+        calculation_output: AnswerCalculationOutput
     ) -> None:
         """Initialize domain object for state answers calculation output.
 

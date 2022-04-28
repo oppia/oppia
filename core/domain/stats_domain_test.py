@@ -447,14 +447,16 @@ class StateStatsTests(test_utils.GenericTestBase):
     # type-annotated. Here ignore[assignment] is used to test method
     # validate() input type.
     def test_validation_for_state_stats_with_string_total_answers_count(
-        self) -> None:
+        self
+    ) -> None:
         self.state_stats.total_answers_count_v2 = '10' # type: ignore[assignment]
         with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
             'Expected total_answers_count_v2 to be an int')):
             self.state_stats.validate()
 
     def test_validation_for_state_stats_with_negative_total_answers_count(
-        self) -> None:
+        self
+    ) -> None:
         self.state_stats.total_answers_count_v2 = -5
         with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
             '%s cannot have negative values' % ('total_answers_count_v2'))):
@@ -1100,7 +1102,8 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             'MultipleIncorrectSubmissions')
 
     def test_cannot_update_exp_issue_from_invalid_schema_version_model(
-        self) -> None:
+        self
+    ) -> None:
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 4, True)
         exp_issue_dict = exp_issue.to_dict()
         stats_models.ExplorationIssuesModel.create(
@@ -2083,9 +2086,12 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
             self.state_answers_calc_output,
             'Expected calculation_id to be a string')
 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[assignment] is used to test
+    # that calculation_output is a known type.
     def test_calculation_output_must_be_known_type(self) -> None:
         self.state_answers_calc_output.calculation_output = (
-            self.MockCalculationOutputObjectWithUnknownType())
+            self.MockCalculationOutputObjectWithUnknownType()) # type: ignore[assignment]
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.state_answers_calc_output,
             'Expected calculation output to be one of')
@@ -2294,7 +2300,8 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             'soliciting answer details')
 
     def test_end_exploration_interaction_cannot_solicit_answer_details(
-        self) -> None:
+        self
+    ) -> None:
         self.learner_answer_details.interaction_id = 'EndExploration'
         self._assert_validation_error( # type: ignore[no-untyped-call]
             self.learner_answer_details,
