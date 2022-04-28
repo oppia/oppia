@@ -36,7 +36,7 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
-_MAX_ID_GENERATION_ATTEMPTS: Final[int] = 5
+_MAX_ID_GENERATION_ATTEMPTS: Final = 5
 
 
 def _get_new_model_id(model_class: Type[base_models.BaseModel]) -> str:
