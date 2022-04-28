@@ -273,6 +273,27 @@ class EditorTests(BaseEditorControllerTests):
 
         self.logout()
 
+    def test_lock_exploration(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(
+            exp_id, self.admin_id, end_state_name='end state')
+        csrf_token = self.get_new_csrf_token()
+        edits_allowed_url = '/editsallowedhandler/%s' % exp_id
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, True)
+
+        self.put_json(
+            edits_allowed_url,
+            {'edits_are_allowed': False},
+            csrf_token=csrf_token)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, False)
+
+        self.logout()
+
 
 class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
