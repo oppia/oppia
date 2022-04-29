@@ -54,7 +54,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     # Run frontend unit tests.
     print('Running frontend unit tests')
-    run_frontend_tests.main(args=[])  # type: ignore[no-untyped-call]
+    run_frontend_tests.main(args=[])
     print('Frontend tests passed.')
 
     # Run backend tests.
