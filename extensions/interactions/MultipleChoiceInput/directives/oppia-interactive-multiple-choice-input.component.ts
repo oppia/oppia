@@ -131,23 +131,25 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     // Setup voiceover.
     this.displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
-    this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
+    if (this.displayedCard) {
+      this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
 
-    // Combine labels for voiceover.
-    let combinedChoiceLabels = '';
-    for (const choice of choices.value) {
-      // If the labels are in html format, remove the tags and leave the
-      // content only.
-      const cleanChoiceLabel = choice.html.replace(/<[^>]+>/g, '');
+      // Combine labels for voiceover.
+      let combinedChoiceLabels = '';
+      for (const choice of choices.value) {
+        // If the labels are in html format, remove the tags and leave the
+        // content only.
+        const cleanChoiceLabel = choice.html.replace(/<[^>]+>/g, '');
 
-      combinedChoiceLabels += cleanChoiceLabel + '. ';
+        combinedChoiceLabels += cleanChoiceLabel + '. ';
+      }
+      // Say the choices aloud if autoplay is enabled.
+      this.audioTranslationManagerService.setSequentialAudioTranslations(
+        this.recordedVoiceovers.getBindableVoiceovers(
+          choices.value[0]._contentId),
+        combinedChoiceLabels, this.COMPONENT_NAME_RULE_INPUT
+      );
     }
-    // Say the choices aloud if autoplay is enabled.
-    this.audioTranslationManagerService.setSequentialAudioTranslations(
-      this.recordedVoiceovers.getBindableVoiceovers(
-        choices.value[0]._contentId),
-      combinedChoiceLabels, this.COMPONENT_NAME_RULE_INPUT
-    );
 
     this.answer = null;
     this.currentInteractionService.registerCurrentInteraction(
