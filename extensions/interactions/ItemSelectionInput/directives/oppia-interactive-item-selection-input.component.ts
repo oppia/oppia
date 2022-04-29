@@ -55,8 +55,8 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
   preventAdditionalSelections: boolean;
   selectionCount: number;
   userSelections: {[key: string]: boolean};
-  displayedCard!: StateCard;
-  recordedVoiceovers!: RecordedVoiceovers;
+  displayedCard: StateCard;
+  recordedVoiceovers: RecordedVoiceovers;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
