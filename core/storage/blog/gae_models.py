@@ -355,7 +355,7 @@ class BlogPostRightsModel(base_models.BaseModel):
     def get_published_models_by_user(
         cls,
         user_id: str,
-        limit: Optional[int]=None
+        limit: Optional[int] = None
     ) -> List[BlogPostRightsModel]:
         """Retrieves the blog post rights objects for published blog posts for
         which the given user is an editor.
@@ -382,7 +382,7 @@ class BlogPostRightsModel(base_models.BaseModel):
     def get_draft_models_by_user(
         cls,
         user_id: str,
-        limit: Optional[int]=None
+        limit: Optional[int] = None
     ) -> List[BlogPostRightsModel]:
         """Retrieves the blog post rights objects for draft blog posts for which
         the given user is an editor.
@@ -417,9 +417,7 @@ class BlogPostRightsModel(base_models.BaseModel):
             list(BlogPostRightsModel). The list of BlogPostRightsModel objects
             in which the given user is an editor.
         """
-        return list(
-            cls.query(cls.editor_ids == user_id).fetch()
-        )
+        return list(cls.query(cls.editor_ids == user_id).fetch())
 
     @staticmethod
     def get_model_association_to_user(
