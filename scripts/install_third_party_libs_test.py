@@ -29,6 +29,7 @@ from core import utils
 from core.tests import test_utils
 
 from typing import List, Optional, Tuple
+from typing_extensions import Literal
 
 from . import common
 from . import install_backend_python_libs
@@ -118,10 +119,10 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             self.check_function_calls['extractall_is_called'] = True
             raise Exception()
 
-        def mock_isfile_true(_filename: str) -> bool:
+        def mock_isfile_true(_filename: str) -> Literal[True]:
             return True
 
-        def mock_isfile_false(_filename: str) -> bool:
+        def mock_isfile_false(_filename: str) -> Literal[False]:
             return False
 
         def mock_ensure_pip_library_is_installed(
@@ -331,7 +332,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
     def test_buf_is_not_reinstalled(self) -> None:
 
-        def mock_exists(_path: str) -> bool:
+        def mock_exists(_path: str) -> Literal[True]:
             return True
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
