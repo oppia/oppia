@@ -77,7 +77,7 @@ describe('QuestionEditorComponent', () => {
         content: {
           html: 'Question 1',
           content_id: 'content_1',
-          image_list: [],
+          image_filenames_in_html: [],
         },
         interaction: {
           answer_groups: [{
@@ -86,7 +86,7 @@ describe('QuestionEditorComponent', () => {
               feedback: {
                 content_id: 'content_5',
                 html: '',
-                image_list: [],
+                image_filenames_in_html: [],
               },
               labelled_as_correct: true,
               param_changes: [],
@@ -112,7 +112,7 @@ describe('QuestionEditorComponent', () => {
             feedback: {
               html: 'Correct Answer',
               content_id: 'content_2',
-              image_list: [],
+              image_filenames_in_html: [],
             },
             param_changes: [],
             labelled_as_correct: true,
@@ -123,7 +123,7 @@ describe('QuestionEditorComponent', () => {
             hint_content: {
               html: 'Hint 1',
               content_id: 'content_3',
-              image_list: [],
+              image_filenames_in_html: [],
             }
           }],
           solution: {
@@ -132,7 +132,7 @@ describe('QuestionEditorComponent', () => {
             explanation: {
               html: 'Solution explanation',
               content_id: 'content_4',
-              image_list: []
+              image_filenames_in_html: []
             }
           },
           id: 'TextInput'
@@ -303,7 +303,7 @@ describe('QuestionEditorComponent', () => {
       .toEqual(SubtitledHtml.createFromBackendDict({
         html: 'Question 1',
         content_id: 'content_1',
-        image_list: [],
+        image_filenames_in_html: [],
       }));
 
     ctrl.saveStateContent('New content');

@@ -222,7 +222,7 @@ describe('Topic editor state service', () => {
         subtitled_html: {
           content_id: 'content_id',
           html: 'html',
-          image_list: []
+          image_filenames_in_html: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {}

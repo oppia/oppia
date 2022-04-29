@@ -81,7 +81,7 @@ describe('Topic update service', function() {
       subtitled_html: {
         html: 'test content',
         content_id: 'content',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -996,7 +996,7 @@ describe('Topic update service', function() {
     var newSampleSubtitledHtmlDict = {
       html: 'new content',
       content_id: 'content',
-      image_list: [],
+      image_filenames_in_html: [],
     };
     var newSampleSubtitledHtml =
       SubtitledHtml.createFromBackendDict(
@@ -1025,7 +1025,7 @@ describe('Topic update service', function() {
       subtitled_html: {
         html: 'new content',
         content_id: 'content',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -1046,7 +1046,7 @@ describe('Topic update service', function() {
       subtitled_html: {
         html: 'test content',
         content_id: 'content',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -1068,7 +1068,7 @@ describe('Topic update service', function() {
     let newSampleSubtitledHtmlDict = {
       html: 'new content',
       content_id: 'content',
-      image_list: [],
+      image_filenames_in_html: [],
     };
     let newSampleSubtitledHtml =
       SubtitledHtml.createFromBackendDict(
@@ -1083,7 +1083,7 @@ describe('Topic update service', function() {
       old_value: {
         html: 'test content',
         content_id: 'content',
-        image_list: []
+        image_filenames_in_html: []
       }
     }]);
   }
@@ -1109,7 +1109,7 @@ describe('Topic update service', function() {
       subtitled_html: {
         html: 'test content',
         content_id: 'content',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -1131,7 +1131,7 @@ describe('Topic update service', function() {
       subtitled_html: {
         html: 'test content',
         content_id: 'content',
-        image_list: []
+        image_filenames_in_html: []
       },
       recorded_voiceovers: newRecordedVoiceoversDict
     });
@@ -1141,7 +1141,7 @@ describe('Topic update service', function() {
       subtitled_html: {
         html: 'test content',
         content_id: 'content',
-        image_list: []
+        image_filenames_in_html: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {

@@ -52,7 +52,7 @@ describe('Read only exploration backend API service', () => {
           content: {
             html: '',
             content_id: 'content',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           interaction: {
             customization_args: {},
@@ -65,7 +65,7 @@ describe('Read only exploration backend API service', () => {
               feedback: {
                 html: '',
                 content_id: 'content',
-                image_list: [],
+                image_filenames_in_html: [],
               },
               labelled_as_correct: true,
               refresher_exploration_id: 'exp',

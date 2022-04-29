@@ -61,7 +61,7 @@ describe('Interaction object factory', () => {
       feedback: {
         content_id: 'default_outcome',
         html: '',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -75,7 +75,7 @@ describe('Interaction object factory', () => {
         feedback: {
           content_id: 'outcome_1',
           html: '',
-          image_list: [],
+          image_filenames_in_html: [],
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -90,14 +90,14 @@ describe('Interaction object factory', () => {
         hint_content: {
           html: '<p>First Hint</p>',
           content_id: 'content_id1',
-          image_list: [],
+          image_filenames_in_html: [],
         }
       },
       {
         hint_content: {
           html: '<p>Second Hint</p>',
           content_id: 'content_id2',
-          image_list: [],
+          image_filenames_in_html: [],
         }
       }
     ];
@@ -108,7 +108,7 @@ describe('Interaction object factory', () => {
       explanation: {
         content_id: 'solution',
         html: 'This is the explanation to the answer',
-        image_list: []
+        image_filenames_in_html: []
       }
     };
 
@@ -483,7 +483,7 @@ describe('Interaction object factory', () => {
         feedback: {
           content_id: 'outcome_3',
           html: '',
-          image_list: [],
+          image_filenames_in_html: [],
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -500,7 +500,7 @@ describe('Interaction object factory', () => {
         feedback: {
           content_id: 'outcome_1',
           html: '',
-          image_list: [],
+          image_filenames_in_html: [],
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -524,7 +524,7 @@ describe('Interaction object factory', () => {
       feedback: {
         content_id: 'default_outcome_new',
         html: '',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -538,7 +538,7 @@ describe('Interaction object factory', () => {
         feedback: {
           content_id: 'default_outcome',
           html: '',
-          image_list: [],
+          image_filenames_in_html: [],
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -577,7 +577,7 @@ describe('Interaction object factory', () => {
       explanation: {
         content_id: 'solution_new',
         html: 'This is the new explanation to the answer',
-        image_list: []
+        image_filenames_in_html: []
       }
     };
     const newSolution = sof.createFromBackendDict(newSolutionDict);
@@ -588,7 +588,7 @@ describe('Interaction object factory', () => {
         explanation: {
           content_id: 'solution',
           html: 'This is the explanation to the answer',
-          image_list: []
+          image_filenames_in_html: []
         }
       }));
     testInteraction.setSolution(newSolution);
@@ -602,7 +602,7 @@ describe('Interaction object factory', () => {
       hint_content: {
         html: '<p>New Hint</p>',
         content_id: 'content_id_new',
-        image_list: [],
+        image_filenames_in_html: [],
       }
     };
     const newHint = hof.createFromBackendDict(newHintDict);
@@ -625,7 +625,7 @@ describe('Interaction object factory', () => {
         feedback: {
           content_id: 'outcome_1_new',
           html: '',
-          image_list: [],
+          image_filenames_in_html: [],
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -640,7 +640,7 @@ describe('Interaction object factory', () => {
       feedback: {
         content_id: 'default_outcome_new',
         html: '',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -652,7 +652,7 @@ describe('Interaction object factory', () => {
         hint_content: {
           html: '<p>New Hint</p>',
           content_id: 'content_id1_new',
-          image_list: [],
+          image_filenames_in_html: [],
         }
       }
     ];
@@ -662,7 +662,7 @@ describe('Interaction object factory', () => {
       explanation: {
         content_id: 'solution_new',
         html: 'This is the new explanation to the answer',
-        image_list: []
+        image_filenames_in_html: []
       }
     };
     const otherInteractionDict = {
@@ -676,11 +676,11 @@ describe('Interaction object factory', () => {
           value: [{
             html: '<p>Choice 1</p>',
             content_id: 'ca_choices_0',
-            image_list: [],
+            image_filenames_in_html: [],
           }, {
             html: '<p>Choice 2</p>',
             content_id: 'ca_choices_1',
-            image_list: [],
+            image_filenames_in_html: [],
           }]
         }
       },
@@ -707,11 +707,11 @@ describe('Interaction object factory', () => {
           value: [{
             html: '<p>Choice 1</p>',
             content_id: 'ca_choices_0',
-            image_list: [],
+            image_filenames_in_html: [],
           }, {
             html: '<p>Choice 2</p>',
             content_id: 'ca_choices_1',
-            image_list: [],
+            image_filenames_in_html: [],
           }]
         }
       },

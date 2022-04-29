@@ -411,13 +411,13 @@ describe('Exploration editor tab component', function() {
       SubtitledHtml.createFromBackendDict({
         content_id: 'content',
         html: 'First State Content',
-        image_list: [],
+        image_filenames_in_html: [],
       }));
 
     var displayedValue = SubtitledHtml.createFromBackendDict({
       content_id: 'content',
       html: 'First State Content Changed',
-      image_list: [],
+      image_filenames_in_html: [],
     });
     ctrl.saveStateContent(displayedValue);
 

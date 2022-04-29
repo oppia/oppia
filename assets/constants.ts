@@ -5949,7 +5949,7 @@ export default {
     "content": {
       "html": "",
       "content_id": "content",
-      "image_list": []
+      "image_filenames_in_html": []
     },
     "interaction": {
       "id": null,
@@ -5960,7 +5960,7 @@ export default {
         "feedback": {
           "content_id": "default_outcome",
           "html": "",
-          "image_list": []
+          "image_filenames_in_html": []
         },
         "labelled_as_correct": false,
         "param_changes": [],

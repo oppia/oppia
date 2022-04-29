@@ -93,7 +93,7 @@ describe('Exploration improvements task registrar service', () => {
       content: {
         content_id: 'content',
         html: '',
-        image_list: []
+        image_filenames_in_html: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -118,7 +118,7 @@ describe('Exploration improvements task registrar service', () => {
           feedback: {
             content_id: 'default_outcome',
             html: '',
-            image_list: []
+            image_filenames_in_html: []
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -132,7 +132,7 @@ describe('Exploration improvements task registrar service', () => {
           explanation: {
             content_id: 'solution',
             html: '<p>This is an explanation.</p>',
-            image_list: []
+            image_filenames_in_html: []
           }
         },
         id: 'TextInput'

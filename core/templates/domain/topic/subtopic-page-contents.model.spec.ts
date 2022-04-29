@@ -42,7 +42,7 @@ describe('Subtopic page contents object factory', () => {
     subtitled_html: {
       html: 'test content',
       content_id: 'content',
-      image_list: []
+      image_filenames_in_html: []
     },
     recorded_voiceovers: {
       voiceovers_mapping: {
@@ -116,7 +116,7 @@ describe('Subtopic page contents object factory', () => {
       SubtitledHtml.createFromBackendDict({
         html: 'test content',
         content_id: 'content',
-        image_list: []
+        image_filenames_in_html: []
       }));
 
     sampleSubtopicPageContents.setSubtitledHtml(
@@ -126,7 +126,7 @@ describe('Subtopic page contents object factory', () => {
       SubtitledHtml.createFromBackendDict({
         html: 'new html content',
         content_id: 'new id',
-        image_list: []
+        image_filenames_in_html: []
       }));
   });
 

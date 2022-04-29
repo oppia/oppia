@@ -43,7 +43,7 @@ describe('Hint object factory', () => {
       hint_content: {
         html: '<p>Some Hint</p>',
         content_id: 'content_id',
-        image_list: [],
+        image_filenames_in_html: [],
       }
     })).toEqual(hof.createNew('content_id', '<p>Some Hint</p>', []));
   }));
@@ -54,7 +54,7 @@ describe('Hint object factory', () => {
         hint_content: {
           html: '<p>Some Hint</p>',
           content_id: 'content_id',
-          image_list: [],
+          image_filenames_in_html: [],
         }
       })
     );

@@ -26,7 +26,7 @@ describe('SubtitledHtml model', () => {
     subtitledHtml = SubtitledHtml.createFromBackendDict({
       content_id: 'content_id',
       html: '<p>some html</p>',
-      image_list: [],
+      image_filenames_in_html: [],
     });
   });
 
@@ -56,7 +56,7 @@ describe('SubtitledHtml model', () => {
     expect(subtitledHtml.toBackendDict()).toEqual({
       content_id: 'content_id',
       html: '<p>some html</p>',
-      image_list: [],
+      image_filenames_in_html: [],
     });
   });
 

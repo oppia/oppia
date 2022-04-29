@@ -74,7 +74,7 @@ describe('NumericInputValidationService', () => {
       feedback: {
         content_id: '',
         html: '',
-        image_list: []
+        image_filenames_in_html: []
       },
       labelled_as_correct: false,
       param_changes: [],

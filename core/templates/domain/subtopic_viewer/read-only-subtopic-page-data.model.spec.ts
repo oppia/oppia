@@ -38,7 +38,7 @@ describe('Subtopic data object factory', () => {
           subtitled_html: {
             html: 'test content',
             content_id: 'content',
-            image_list: []
+            image_filenames_in_html: []
           },
           recorded_voiceovers: {
             voiceovers_mapping: {
@@ -69,7 +69,7 @@ describe('Subtopic data object factory', () => {
           subtitled_html: {
             html: 'test content',
             content_id: 'content',
-            image_list: []
+            image_filenames_in_html: []
           },
           recorded_voiceovers: {
             voiceovers_mapping: {

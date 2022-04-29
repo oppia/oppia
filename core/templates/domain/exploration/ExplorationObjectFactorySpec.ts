@@ -54,7 +54,7 @@ describe('Exploration object factory', () => {
       content: {
         content_id: 'content',
         html: 'content',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -116,7 +116,7 @@ describe('Exploration object factory', () => {
       content: {
         content_id: 'content',
         html: 'more content',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       recorded_voiceovers: {
         voiceovers_mapping: {

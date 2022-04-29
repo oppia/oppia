@@ -79,7 +79,7 @@ describe('Editor state service', () => {
             feedback: {
               html: '',
               content_id: 'This is a new feedback text',
-              image_list: [],
+              image_filenames_in_html: [],
             },
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
@@ -96,7 +96,7 @@ describe('Editor state service', () => {
         feedback: {
           content_id: '',
           html: '',
-          image_list: [],
+          image_filenames_in_html: [],
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -122,7 +122,7 @@ describe('Editor state service', () => {
         explanation: {
           content_id: '2',
           html: 'test_explanation1',
-          image_list: []
+          image_filenames_in_html: []
         },
       },
     });
@@ -487,7 +487,7 @@ describe('Editor state service', () => {
       explanation: {
         content_id: '2',
         html: 'test_explanation1_new',
-        image_list: []
+        image_filenames_in_html: []
       },
     });
     ecs.setInteraction(mockInteraction);
@@ -497,7 +497,7 @@ describe('Editor state service', () => {
       explanation: {
         content_id: '2',
         html: 'test_explanation1',
-        image_list: []
+        image_filenames_in_html: []
       },
     }));
     ecs.setInteractionSolution(newSolution);
@@ -509,7 +509,7 @@ describe('Editor state service', () => {
       hint_content: {
         content_id: '',
         html: 'This is a hint',
-        image_list: [],
+        image_filenames_in_html: [],
       }
     })];
     ecs.setInteraction(mockInteraction);

@@ -106,7 +106,7 @@ describe('Skill editor main tab Component', () => {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
-        image_list: []
+        image_filenames_in_html: []
       },
       worked_examples: [],
       recorded_voiceovers: {

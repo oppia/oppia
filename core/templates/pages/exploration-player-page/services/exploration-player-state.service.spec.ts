@@ -98,7 +98,7 @@ describe('Exploration Player State Service', () => {
       content: {
         content_id: '1',
         html: 'Question 1',
-        image_list: []
+        image_filenames_in_html: []
       },
       written_translations: {
         translations_mapping: {
@@ -116,7 +116,7 @@ describe('Exploration Player State Service', () => {
             feedback: {
               content_id: 'feedback_1',
               html: '<p>Try Again.</p>',
-              image_list: []
+              image_filenames_in_html: []
             },
             param_changes: [],
             refresher_exploration_id: null,
@@ -136,7 +136,7 @@ describe('Exploration Player State Service', () => {
             feedback: {
               content_id: 'feedback_2',
               html: '<p>Try Again.</p>',
-              image_list: []
+              image_filenames_in_html: []
             },
             param_changes: [],
             refresher_exploration_id: null,
@@ -159,7 +159,7 @@ describe('Exploration Player State Service', () => {
           feedback: {
             content_id: 'feedback_id',
             html: '<p>Dummy Feedback</p>',
-            image_list: []
+            image_filenames_in_html: []
           }
         },
         id: 'TextInput',
@@ -180,7 +180,7 @@ describe('Exploration Player State Service', () => {
             hint_content: {
               content_id: 'hint_1',
               html: '<p>This is a hint.</p>',
-              image_list: []
+              image_filenames_in_html: []
             }
           }
         ],
@@ -189,7 +189,7 @@ describe('Exploration Player State Service', () => {
           explanation: {
             content_id: 'solution',
             html: '<p>This is a solution.</p>',
-            image_list: []
+            image_filenames_in_html: []
           },
           answer_is_exclusive: false
         }

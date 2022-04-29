@@ -78,7 +78,7 @@ describe('State card object factory', () => {
         feedback: {
           content_id: 'default_outcome',
           html: '',
-          image_list: [],
+          image_filenames_in_html: [],
         },
         param_changes: [],
         labelled_as_correct: false,
@@ -89,7 +89,7 @@ describe('State card object factory', () => {
         hint_content: {
           content_id: 'abc',
           html: 'hint 1',
-          image_list: [],
+          image_filenames_in_html: [],
         }
       }],
       id: 'TextInput',
@@ -99,7 +99,7 @@ describe('State card object factory', () => {
         explanation: {
           content_id: 'pqr',
           html: 'solution explanation',
-          image_list: [],
+          image_filenames_in_html: [],
         }
       }
     };
@@ -289,7 +289,7 @@ describe('State card object factory', () => {
         hint_content: {
           content_id: 'abc',
           html: 'hint 1',
-          image_list: [],
+          image_filenames_in_html: [],
         }
       })
     ];
@@ -304,7 +304,7 @@ describe('State card object factory', () => {
       explanation: {
         content_id: 'pqr',
         html: 'solution explanation',
-        image_list: [],
+        image_filenames_in_html: [],
       }
     });
 

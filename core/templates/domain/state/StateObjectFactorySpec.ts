@@ -28,7 +28,7 @@ describe('State Object Factory', () => {
     content: {
       html: '',
       content_id: 'content',
-      image_list: []
+      image_filenames_in_html: []
     },
     interaction: {
       id: 'TextInput',
@@ -49,7 +49,7 @@ describe('State Object Factory', () => {
         feedback: {
           content_id: 'default_outcome',
           html: '',
-          image_list: []
+          image_filenames_in_html: []
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -98,7 +98,7 @@ describe('State Object Factory', () => {
       content: {
         content_id: 'content',
         html: '',
-        image_list: []
+        image_filenames_in_html: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -125,7 +125,7 @@ describe('State Object Factory', () => {
           feedback: {
             content_id: 'default_outcome',
             html: '',
-            image_list: []
+            image_filenames_in_html: []
           },
           param_changes: [],
           labelled_as_correct: false,

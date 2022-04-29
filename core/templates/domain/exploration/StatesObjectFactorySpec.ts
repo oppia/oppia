@@ -47,7 +47,7 @@ describe('States Object Factory', () => {
       content: {
         content_id: 'content',
         html: '',
-        image_list: []
+        image_filenames_in_html: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -71,7 +71,7 @@ describe('States Object Factory', () => {
           feedback: {
             content_id: 'default_outcome',
             html: '',
-            image_list: []
+            image_filenames_in_html: []
           },
           param_changes: [],
           labelled_as_correct: false,
@@ -99,7 +99,7 @@ describe('States Object Factory', () => {
       content: {
         content_id: 'content',
         html: '',
-        image_list: []
+        image_filenames_in_html: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -119,7 +119,7 @@ describe('States Object Factory', () => {
           feedback: {
             content_id: 'default_outcome',
             html: '',
-            image_list: []
+            image_filenames_in_html: []
           },
           param_changes: [],
           labelled_as_correct: false,
@@ -145,7 +145,7 @@ describe('States Object Factory', () => {
       content: {
         content_id: 'content',
         html: '',
-        image_list: []
+        image_filenames_in_html: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -169,7 +169,7 @@ describe('States Object Factory', () => {
           feedback: {
             content_id: 'default_outcome',
             html: '',
-            image_list: []
+            image_filenames_in_html: []
           },
           param_changes: [],
           labelled_as_correct: false,
@@ -195,7 +195,7 @@ describe('States Object Factory', () => {
       content: {
         content_id: 'content',
         html: 'more content',
-        image_list: []
+        image_filenames_in_html: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -235,7 +235,7 @@ describe('States Object Factory', () => {
           feedback: {
             content_id: 'default_outcome',
             html: '',
-            image_list: []
+            image_filenames_in_html: []
           },
           labelled_as_correct: false,
           param_changes: []
@@ -247,7 +247,7 @@ describe('States Object Factory', () => {
           explanation: {
             content_id: 'solution',
             html: '<p>This is an explanation.</p>',
-            image_list: []
+            image_filenames_in_html: []
           }
         },
         id: 'TextInput'
@@ -274,7 +274,7 @@ describe('States Object Factory', () => {
         content: {
           content_id: 'content',
           html: 'content',
-          image_list: []
+          image_filenames_in_html: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -295,7 +295,7 @@ describe('States Object Factory', () => {
               feedback: {
                 content_id: 'feedback_1',
                 html: '',
-                image_list: []
+                image_filenames_in_html: []
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -311,7 +311,7 @@ describe('States Object Factory', () => {
             feedback: {
               content_id: 'default_outcome',
               html: '',
-              image_list: []
+              image_filenames_in_html: []
             },
             labelled_as_correct: false,
             param_changes: []
@@ -333,7 +333,7 @@ describe('States Object Factory', () => {
         content: {
           content_id: 'content',
           html: 'content',
-          image_list: []
+          image_filenames_in_html: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -354,7 +354,7 @@ describe('States Object Factory', () => {
               feedback: {
                 content_id: 'feedback_1',
                 html: '',
-                image_list: []
+                image_filenames_in_html: []
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -370,7 +370,7 @@ describe('States Object Factory', () => {
             feedback: {
               content_id: 'default_outcome',
               html: '',
-              image_list: []
+              image_filenames_in_html: []
             },
             labelled_as_correct: false,
             param_changes: []
@@ -395,7 +395,7 @@ describe('States Object Factory', () => {
         content: {
           content_id: 'content',
           html: 'content',
-          image_list: []
+          image_filenames_in_html: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -466,7 +466,7 @@ describe('States Object Factory', () => {
               feedback: {
                 content_id: 'feedback_1',
                 html: '<p>Good.</p>',
-                image_list: []
+                image_filenames_in_html: []
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -492,7 +492,7 @@ describe('States Object Factory', () => {
             feedback: {
               content_id: 'default_outcome',
               html: '<p>Feedback</p>',
-              image_list: []
+              image_filenames_in_html: []
             },
             labelled_as_correct: false,
             param_changes: []
@@ -501,13 +501,13 @@ describe('States Object Factory', () => {
             hint_content: {
               content_id: 'hint_1',
               html: '<p>Here is a hint.</p>',
-              image_list: []
+              image_filenames_in_html: []
             }
           }, {
             hint_content: {
               content_id: 'hint_2',
               html: '<p>Here is another hint.</p>',
-              image_list: []
+              image_filenames_in_html: []
             }
           }],
           id: 'TextInput'
@@ -614,7 +614,7 @@ describe('States Object Factory', () => {
         content: {
           content_id: 'content',
           html: 'content',
-          image_list: []
+          image_filenames_in_html: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -635,7 +635,7 @@ describe('States Object Factory', () => {
               feedback: {
                 content_id: 'feedback_1',
                 html: '',
-                image_list: []
+                image_filenames_in_html: []
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -651,7 +651,7 @@ describe('States Object Factory', () => {
             feedback: {
               content_id: 'default_outcome',
               html: '',
-              image_list: []
+              image_filenames_in_html: []
             },
             labelled_as_correct: false,
             param_changes: []
@@ -806,7 +806,7 @@ describe('States Object Factory', () => {
           content: {
             content_id: 'content',
             html: '',
-            image_list: []
+            image_filenames_in_html: []
           },
           recorded_voiceovers: {
             voiceovers_mapping: {
@@ -821,7 +821,7 @@ describe('States Object Factory', () => {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '<p>Correct!</p>',
-                  image_list: []
+                  image_filenames_in_html: []
                 },
                 labelled_as_correct: false,
                 missing_prerequisite_skill_id: null,
@@ -854,7 +854,7 @@ describe('States Object Factory', () => {
               feedback: {
                 content_id: 'default_outcome',
                 html: '',
-                image_list: []
+                image_filenames_in_html: []
               },
               param_changes: [],
               labelled_as_correct: false,

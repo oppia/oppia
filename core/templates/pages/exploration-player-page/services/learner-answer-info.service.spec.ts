@@ -50,7 +50,7 @@ describe('Learner answer info service', () =>{
       content: {
         content_id: 'content',
         html: 'content',
-        image_list: []
+        image_filenames_in_html: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -77,7 +77,7 @@ describe('Learner answer info service', () =>{
             feedback: {
               content_id: 'feedback_1',
               html: '',
-              image_list: []
+              image_filenames_in_html: []
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -101,7 +101,7 @@ describe('Learner answer info service', () =>{
             feedback: {
               content_id: 'feedback_2',
               html: '',
-              image_list: []
+              image_filenames_in_html: []
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -141,7 +141,7 @@ describe('Learner answer info service', () =>{
           feedback: {
             content_id: 'default_outcome',
             html: '',
-            image_list: []
+            image_filenames_in_html: []
           },
           labelled_as_correct: false,
           param_changes: [],

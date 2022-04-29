@@ -119,7 +119,7 @@ describe('Exploration engine service ', () => {
                   feedback: {
                     content_id: 'feedback_1',
                     html: '<p>Good Job</p>',
-                    image_list: []
+                    image_filenames_in_html: []
                   },
                   param_changes: [],
                   dest: 'Mid'
@@ -148,7 +148,7 @@ describe('Exploration engine service ', () => {
               feedback: {
                 content_id: 'default_outcome',
                 html: '<p>Try again.</p>',
-                image_list: []
+                image_filenames_in_html: []
               },
               param_changes: [],
               dest: 'Start'
@@ -161,7 +161,7 @@ describe('Exploration engine service ', () => {
           content: {
             content_id: 'content',
             html: '<p>First Question</p>',
-            image_list: []
+            image_filenames_in_html: []
           }
         },
         End: {
@@ -197,7 +197,7 @@ describe('Exploration engine service ', () => {
           content: {
             content_id: 'content',
             html: 'Congratulations, you have finished!',
-            image_list: []
+            image_filenames_in_html: []
           }
         },
         Mid: {
@@ -246,7 +246,7 @@ describe('Exploration engine service ', () => {
                   feedback: {
                     content_id: 'feedback_1',
                     html: ' <p>Good Job</p>',
-                    image_list: []
+                    image_filenames_in_html: []
                   },
                   param_changes: [],
                   dest: 'End'
@@ -275,7 +275,7 @@ describe('Exploration engine service ', () => {
               feedback: {
                 content_id: 'default_outcome',
                 html: '<p>try again.</p>',
-                image_list: []
+                image_filenames_in_html: []
               },
               param_changes: [],
               dest: 'Mid'
@@ -288,7 +288,7 @@ describe('Exploration engine service ', () => {
           content: {
             content_id: 'content',
             html: '<p>Second Question</p>',
-            image_list: []
+            image_filenames_in_html: []
           }
         }
       },
@@ -463,7 +463,7 @@ describe('Exploration engine service ', () => {
           feedback: {
             content_id: 'feedback_1',
             html: 'Answer is correct!',
-            image_list: []
+            image_filenames_in_html: []
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -504,7 +504,7 @@ describe('Exploration engine service ', () => {
           feedback: {
             content_id: 'feedback_1',
             html: 'Answer is correct!',
-            image_list: []
+            image_filenames_in_html: []
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -545,7 +545,7 @@ describe('Exploration engine service ', () => {
           feedback: {
             content_id: 'feedback_1',
             html: null,
-            image_list: []
+            image_filenames_in_html: []
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -587,7 +587,7 @@ describe('Exploration engine service ', () => {
           feedback: {
             content_id: 'feedback_1',
             html: 'feedback',
-            image_list: []
+            image_filenames_in_html: []
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -632,7 +632,7 @@ describe('Exploration engine service ', () => {
           feedback: {
             content_id: 'feedback_1',
             html: 'feedback',
-            image_list: []
+            image_filenames_in_html: []
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -768,7 +768,7 @@ describe('Exploration engine service ', () => {
         feedback: {
           content_id: 'feedback_1',
           html: 'Answer is correct!',
-          image_list: []
+          image_filenames_in_html: []
         },
         labelled_as_correct: true,
         param_changes: [],

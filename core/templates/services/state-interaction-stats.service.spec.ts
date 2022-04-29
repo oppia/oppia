@@ -66,7 +66,7 @@ describe('State Interaction Stats Service', () => {
       content: {
         content_id: 'content',
         html: 'content',
-        image_list: []
+        image_filenames_in_html: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {}
@@ -86,7 +86,7 @@ describe('State Interaction Stats Service', () => {
               feedback: {
                 content_id: 'feedback_1',
                 html: '¡Buen trabajo!',
-                image_list: []
+                image_filenames_in_html: []
               },
               labelled_as_correct: true,
               param_changes: [],
@@ -109,7 +109,7 @@ describe('State Interaction Stats Service', () => {
               feedback: {
                 content_id: 'feedback_1',
                 html: '¡Buen trabajo!',
-                image_list: []
+                image_filenames_in_html: []
               },
               labelled_as_correct: true,
               param_changes: [],
@@ -132,7 +132,7 @@ describe('State Interaction Stats Service', () => {
               feedback: {
                 content_id: 'feedback_1',
                 html: '¡Buen trabajo!',
-                image_list: []
+                image_filenames_in_html: []
               },
               labelled_as_correct: true,
               param_changes: [],
@@ -155,7 +155,7 @@ describe('State Interaction Stats Service', () => {
         },
         default_outcome: {
           dest: 'Hola',
-          feedback: {content_id: 'default_outcome', html: '', image_list: []},
+          feedback: {content_id: 'default_outcome', html: '', image_filenames_in_html: []},
           labelled_as_correct: true,
           param_changes: [],
           refresher_exploration_id: null,
@@ -169,7 +169,7 @@ describe('State Interaction Stats Service', () => {
           explanation: {
             content_id: '',
             html: '',
-            image_list: []
+            image_filenames_in_html: []
           }
         }
       },

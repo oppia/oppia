@@ -51,7 +51,7 @@ describe('Solution object factory', () => {
         explanation: {
           content_id: 'solution',
           html: 'This is the explanation to the answer',
-          image_list: []
+          image_filenames_in_html: []
         }
       });
     });
@@ -176,7 +176,7 @@ describe('Solution object factory', () => {
         explanation: {
           content_id: 'solution',
           html: 'This is the explanation to the answer',
-          image_list: [],
+          image_filenames_in_html: [],
         }
       });
 

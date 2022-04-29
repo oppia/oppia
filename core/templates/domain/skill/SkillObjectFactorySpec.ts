@@ -101,7 +101,7 @@ describe('Skill object factory', () => {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
-        image_list: []
+        image_filenames_in_html: []
       },
       worked_examples: [example1, example2],
       recorded_voiceovers: {

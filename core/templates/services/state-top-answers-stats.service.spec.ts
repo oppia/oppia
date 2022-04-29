@@ -60,7 +60,7 @@ describe('StateTopAnswersStatsService', () => {
     content: {
       content_id: 'content',
       html: 'Say "hello" in Spanish!',
-      image_list: []
+      image_filenames_in_html: []
     },
     linked_skill_id: null,
     next_content_id_index: 0,
@@ -79,7 +79,7 @@ describe('StateTopAnswersStatsService', () => {
           feedback: {
             content_id: 'feedback_1',
             html: '¡Buen trabajo!',
-            image_list: []
+            image_filenames_in_html: []
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -94,7 +94,7 @@ describe('StateTopAnswersStatsService', () => {
         feedback: {
           content_id: 'default_outcome',
           html: 'Try again!',
-          image_list: []
+          image_filenames_in_html: []
         },
         labelled_as_correct: false,
         param_changes: [],

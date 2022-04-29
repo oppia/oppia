@@ -40,7 +40,7 @@ describe('Graph Data Service', () => {
 
     explorationStatesService.init({
       Hola: {
-        content: {content_id: 'content', html: '', image_list: []},
+        content: {content_id: 'content', html: '', image_filenames_in_html: []},
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},
@@ -67,7 +67,7 @@ describe('Graph Data Service', () => {
               feedback: {
                 content_id: 'feedback_1',
                 html: 'buen trabajo!',
-                image_list: []
+                image_filenames_in_html: []
               },
               labelled_as_correct: true,
               param_changes: [],
@@ -91,7 +91,7 @@ describe('Graph Data Service', () => {
             feedback: {
               content_id: 'default_outcome',
               html: 'try again!',
-              image_list: []
+              image_filenames_in_html: []
             },
             labelled_as_correct: true,
             param_changes: [],

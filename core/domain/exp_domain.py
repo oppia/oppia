@@ -738,7 +738,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state = exploration.states[state_name]
 
             state.content = state_domain.SubtitledHtml(
-                sdict['content']['content_id'], sdict['content']['html'], [])
+                sdict['content']['content_id'],
+                sdict['content']['html'],
+                sdict['content']['image_filenames_in_html'])
             state.content.validate()
 
             state.param_changes = [param_domain.ParamChange(
@@ -2026,7 +2028,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_states_v49_dict_to_v50_dict(cls, states_dict):
-        """Converts from version 49 to 50. Version 50 adds image_list attribute
+        """Converts from version 49 to 50. Version 50 adds image_filenames_in_html attribute
         to the SubtitledHtml structure in states dict, to allow storing of
         rich text image filenames as a list.
 
@@ -2267,7 +2269,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
         """Converts a v54 exploration dict into a v55 exploration dict.
-        Adds a new attribute image_list to the SubtitledHtml structure,
+        Adds a new attribute image_filenames_in_html to the SubtitledHtml structure,
         which allows the list of rich text image filenames to be stored
         as a list.
 

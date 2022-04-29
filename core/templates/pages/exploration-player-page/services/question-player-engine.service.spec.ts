@@ -59,7 +59,7 @@ describe('Question player engine service ', () => {
         content: {
           content_id: '1',
           html: 'Question 1',
-          image_list: []
+          image_filenames_in_html: []
         },
         written_translations: {
           translations_mapping: {
@@ -77,7 +77,7 @@ describe('Question player engine service ', () => {
               feedback: {
                 content_id: 'feedback_1',
                 html: '<p>Try Again.</p>',
-                image_list: []
+                image_filenames_in_html: []
               },
               param_changes: [],
               refresher_exploration_id: null,
@@ -97,7 +97,7 @@ describe('Question player engine service ', () => {
               feedback: {
                 content_id: 'feedback_2',
                 html: '<p>Try Again.</p>',
-                image_list: []
+                image_filenames_in_html: []
               },
               param_changes: [],
               refresher_exploration_id: null,
@@ -120,7 +120,7 @@ describe('Question player engine service ', () => {
             feedback: {
               content_id: 'feedback_id',
               html: '<p>Dummy Feedback</p>',
-              image_list: []
+              image_filenames_in_html: []
             }
           },
           id: 'TextInput',
@@ -141,7 +141,7 @@ describe('Question player engine service ', () => {
               hint_content: {
                 content_id: 'hint_1',
                 html: '<p>This is a hint.</p>',
-                image_list: []
+                image_filenames_in_html: []
               }
             }
           ],
@@ -150,7 +150,7 @@ describe('Question player engine service ', () => {
             explanation: {
               content_id: 'solution',
               html: '<p>This is a solution.</p>',
-              image_list: []
+              image_filenames_in_html: []
             },
             answer_is_exclusive: false
           }
@@ -184,7 +184,7 @@ describe('Question player engine service ', () => {
         content: {
           content_id: '1',
           html: 'Question 1',
-          image_list: []
+          image_filenames_in_html: []
         },
         written_translations: {
           translations_mapping: {
@@ -206,7 +206,7 @@ describe('Question player engine service ', () => {
             feedback: {
               content_id: 'feedback_id',
               html: '<p>Dummy Feedback</p>',
-              image_list: []
+              image_filenames_in_html: []
             }
           },
           id: 'TextInput',
@@ -227,7 +227,7 @@ describe('Question player engine service ', () => {
               hint_content: {
                 content_id: 'hint_1',
                 html: '<p>This is a hint.</p>',
-                image_list: []
+                image_filenames_in_html: []
               }
             }
           ],
@@ -236,7 +236,7 @@ describe('Question player engine service ', () => {
             explanation: {
               content_id: 'solution',
               html: '<p>This is a solution.</p>',
-              image_list: []
+              image_filenames_in_html: []
             },
             answer_is_exclusive: false
           }
@@ -269,7 +269,7 @@ describe('Question player engine service ', () => {
         content: {
           content_id: '2',
           html: 'Question 2',
-          image_list: []
+          image_filenames_in_html: []
         },
         written_translations: {
           translations_mapping: {
@@ -291,7 +291,7 @@ describe('Question player engine service ', () => {
             feedback: {
               content_id: 'feedback_id',
               html: '<p>Dummy Feedback</p>',
-              image_list: []
+              image_filenames_in_html: []
             }
           },
           id: 'TextInput',
@@ -312,7 +312,7 @@ describe('Question player engine service ', () => {
               hint_content: {
                 content_id: 'hint_1',
                 html: '<p>This is a hint.</p>',
-                image_list: []
+                image_filenames_in_html: []
               }
             }
           ],
@@ -321,7 +321,7 @@ describe('Question player engine service ', () => {
             explanation: {
               content_id: 'solution',
               html: '<p>This is a solution.</p>',
-              image_list: []
+              image_filenames_in_html: []
             },
             answer_is_exclusive: false
           }
@@ -354,7 +354,7 @@ describe('Question player engine service ', () => {
         content: {
           content_id: '3',
           html: 'Question 3',
-          image_list: []
+          image_filenames_in_html: []
         },
         written_translations: {
           translations_mapping: {
@@ -376,7 +376,7 @@ describe('Question player engine service ', () => {
             feedback: {
               content_id: 'feedback_id',
               html: '<p>Dummy Feedback</p>',
-              image_list: []
+              image_filenames_in_html: []
             }
           },
           id: 'TextInput',
@@ -397,7 +397,7 @@ describe('Question player engine service ', () => {
               hint_content: {
                 content_id: 'hint_1',
                 html: '<p>This is a hint.</p>',
-                image_list: []
+                image_filenames_in_html: []
               }
             }
           ],
@@ -406,7 +406,7 @@ describe('Question player engine service ', () => {
             explanation: {
               content_id: 'solution',
               html: '<p>This is a solution.</p>',
-              image_list: []
+              image_filenames_in_html: []
             },
             answer_is_exclusive: false
           }

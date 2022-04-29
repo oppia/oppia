@@ -52,7 +52,7 @@ describe('CodeReplValidationService', () => {
       feedback: {
         html: '',
         content_id: '',
-        image_list: []
+        image_filenames_in_html: []
       },
       labelled_as_correct: false,
       param_changes: [],

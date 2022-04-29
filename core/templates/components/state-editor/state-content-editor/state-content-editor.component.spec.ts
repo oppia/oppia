@@ -45,7 +45,7 @@ describe('StateHintsEditorComponent', () => {
     return SubtitledHtml.createFromBackendDict({
       content_id: contentId,
       html: contentString,
-      image_list: []
+      image_filenames_in_html: []
     });
   };
 

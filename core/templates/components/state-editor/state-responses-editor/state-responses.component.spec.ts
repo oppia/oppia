@@ -55,7 +55,7 @@ describe('StateResponsesComponent', () => {
       feedback: {
         content_id: 'feedback_1',
         html: '',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       param_changes: [],
       refresher_exploration_id: null,
@@ -67,7 +67,7 @@ describe('StateResponsesComponent', () => {
       feedback: {
         content_id: 'feedback_2',
         html: "Let's go to state 5 ImageAndRegion",
-        image_list: [],
+        image_filenames_in_html: [],
       },
       param_changes: [],
       refresher_exploration_id: null,
@@ -125,7 +125,7 @@ describe('StateResponsesComponent', () => {
               feedback: {
                 html: '',
                 content_id: 'This is a new feedback text',
-                image_list: [],
+                image_filenames_in_html: [],
               },
               refresher_exploration_id: 'test',
               missing_prerequisite_skill_id: 'test_skill_id',
@@ -148,7 +148,7 @@ describe('StateResponsesComponent', () => {
           feedback: {
             content_id: '',
             html: '',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -171,7 +171,7 @@ describe('StateResponsesComponent', () => {
           explanation: {
             content_id: '2',
             html: 'test_explanation1',
-            image_list: []
+            image_filenames_in_html: []
           },
         },
       });
@@ -190,7 +190,7 @@ describe('StateResponsesComponent', () => {
             feedback: {
               html: '',
               content_id: 'This is a new feedback text',
-              image_list: [],
+              image_filenames_in_html: [],
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -206,7 +206,7 @@ describe('StateResponsesComponent', () => {
         feedback: {
           content_id: '',
           html: '',
-          image_list: [],
+          image_filenames_in_html: [],
         },
         labelled_as_correct: true,
         param_changes: [],
@@ -625,7 +625,7 @@ describe('StateResponsesComponent', () => {
       feedback: {
         content_id: '',
         html: '',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       labelled_as_correct: true,
       param_changes: [],
@@ -650,7 +650,7 @@ describe('StateResponsesComponent', () => {
       feedback: {
         content_id: '',
         html: '',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       labelled_as_correct: true,
       param_changes: [],
@@ -713,7 +713,7 @@ describe('StateResponsesComponent', () => {
       feedback: {
         content_id: '',
         html: '',
-        image_list: [],
+        image_filenames_in_html: [],
       },
       labelled_as_correct: true,
       param_changes: [],

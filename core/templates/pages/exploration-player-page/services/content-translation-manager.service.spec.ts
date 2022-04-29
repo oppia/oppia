@@ -63,7 +63,7 @@ describe('Content translation manager service', () => {
       feedback: {
         content_id: 'default_outcome',
         html: '<p>en default outcome</p>',
-        image_list: []
+        image_filenames_in_html: []
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -85,7 +85,7 @@ describe('Content translation manager service', () => {
         feedback: {
           content_id: 'outcome_1',
           html: '<p>en feedback</p>',
-          image_list: []
+          image_filenames_in_html: []
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -100,7 +100,7 @@ describe('Content translation manager service', () => {
         hint_content: {
           html: '<p>en hint</p>',
           content_id: 'hint_0',
-          image_list: []
+          image_filenames_in_html: []
         }
       }
     ];
@@ -111,7 +111,7 @@ describe('Content translation manager service', () => {
       explanation: {
         content_id: 'solution',
         html: '<p>en solution</p>',
-        image_list: []
+        image_filenames_in_html: []
       }
     };
 
@@ -438,7 +438,7 @@ describe('Content translation manager service', () => {
           feedback: {
             content_id: 'outcome_1',
             html: '<p>en feedback</p>',
-            image_list: []
+            image_filenames_in_html: []
           },
           labelled_as_correct: false,
           param_changes: [],

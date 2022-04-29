@@ -69,7 +69,7 @@ describe('Outcome object factory', () => {
         feedback: {
           html: '<p>Hey</p>',
           content_id: 'feedback_1',
-          image_list: [],
+          image_filenames_in_html: [],
         },
         labelled_as_correct: true,
         param_changes: [],
@@ -82,7 +82,7 @@ describe('Outcome object factory', () => {
         feedback: {
           html: '<p>Hey</p>',
           content_id: 'feedback_1',
-          image_list: [],
+          image_filenames_in_html: [],
         },
         labelled_as_correct: true,
         param_changes: [],

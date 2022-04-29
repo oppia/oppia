@@ -32,12 +32,12 @@ describe('Worked example object factory', () => {
       question: {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1',
-        image_list: []
+        image_filenames_in_html: []
       },
       explanation: {
         html: 'worked example explanation 1',
         content_id: 'worked_example_e_1',
-        image_list: []
+        image_filenames_in_html: []
       }
     };
   });

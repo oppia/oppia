@@ -103,7 +103,7 @@ describe('State Solution Editor Component', () => {
       explanation: {
         content_id: 'solution',
         html: 'This is the explanation to the answer',
-        image_list: []
+        image_filenames_in_html: []
       }
     });
 

@@ -55,7 +55,7 @@ describe('Subtopic page Model', () => {
         subtitled_html: {
           html: '<p>Data</p>',
           content_id: 'content',
-          image_list: []
+          image_filenames_in_html: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -73,7 +73,7 @@ describe('Subtopic page Model', () => {
         subtitled_html: {
           html: '<p>Data2</p>',
           content_id: 'content',
-          image_list: []
+          image_filenames_in_html: []
         },
         recorded_voiceovers: {
           voiceovers_mapping: {

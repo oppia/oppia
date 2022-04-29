@@ -87,7 +87,7 @@ describe('ExplorationStatesService', () => {
         feedback: {
           content_id: 'feedback_1',
           html: 'buen trabajo!',
-          image_list: [],
+          image_filenames_in_html: [],
         },
         labelled_as_correct: true,
         param_changes: [],
@@ -100,7 +100,7 @@ describe('ExplorationStatesService', () => {
 
     explorationStatesService.init({
       Hola: {
-        content: {content_id: 'content', html: '', image_list: []},
+        content: {content_id: 'content', html: '', image_filenames_in_html: []},
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},
@@ -127,7 +127,7 @@ describe('ExplorationStatesService', () => {
             feedback: {
               content_id: 'feedback_1',
               html: 'buen trabajo!',
-              image_list: [],
+              image_filenames_in_html: [],
             },
             labelled_as_correct: true,
             param_changes: [],

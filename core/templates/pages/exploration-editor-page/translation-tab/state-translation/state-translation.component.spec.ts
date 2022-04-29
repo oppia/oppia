@@ -747,7 +747,7 @@ describe('State translation component', function() {
       var subtitledObject = SubtitledHtml.createFromBackendDict({
         content_id: 'content_1',
         html: 'This is the html',
-        image_list: []
+        image_filenames_in_html: []
       });
       expect($scope.getRequiredHtml(subtitledObject)).toBe('Translation');
       expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
@@ -941,7 +941,7 @@ describe('State translation component', function() {
       var subtitledObject = SubtitledHtml.createFromBackendDict({
         content_id: 'content_1',
         html: 'This is the html',
-        image_list: []
+        image_filenames_in_html: []
       });
       expect($scope.getRequiredHtml(subtitledObject)).toBe('This is the html');
       expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
@@ -982,7 +982,7 @@ describe('State translation component', function() {
           content: {
             content_id: 'content_1',
             html: 'Introduction Content',
-            image_list: []
+            image_filenames_in_html: []
           },
           interaction: {
             id: 'TextInput',
@@ -1005,7 +1005,7 @@ describe('State translation component', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
-                  image_list: []
+                  image_filenames_in_html: []
                 },
                 labelled_as_correct: false,
                 param_changes: [],
@@ -1017,7 +1017,7 @@ describe('State translation component', function() {
               feedback: {
                 content_id: 'default_outcome',
                 html: 'Default Outcome',
-                image_list: []
+                image_filenames_in_html: []
               },
             },
             solution: {
@@ -1026,20 +1026,20 @@ describe('State translation component', function() {
               explanation: {
                 html: 'Solution explanation',
                 content_id: 'solution_1',
-                image_list: []
+                image_filenames_in_html: []
               }
             },
             hints: [{
               hint_content: {
                 html: 'Hint 1',
                 content_id: 'hint_1',
-                image_list: []
+                image_filenames_in_html: []
               }
             }, {
               hint_content: {
                 html: 'Hint 2',
                 content_id: 'hint_2',
-                image_list: []
+                image_filenames_in_html: []
               }
             }]
           },

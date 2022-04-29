@@ -208,7 +208,7 @@ describe('ExplorationFooterComponent', () => {
         content: {
           html: '',
           content_id: 'content',
-          image_list: []
+          image_filenames_in_html: []
         },
         interaction: {
           id: 'FractionInput',
@@ -227,7 +227,7 @@ describe('ExplorationFooterComponent', () => {
             feedback: {
               content_id: 'default_outcome',
               html: '',
-              image_list: []
+              image_filenames_in_html: []
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -296,7 +296,7 @@ describe('ExplorationFooterComponent', () => {
         content: {
           html: '',
           content_id: 'content',
-          image_list: []
+          image_filenames_in_html: []
         },
         interaction: {
           id: 'FractionInput',
@@ -315,7 +315,7 @@ describe('ExplorationFooterComponent', () => {
             feedback: {
               content_id: 'default_outcome',
               html: '',
-              image_list: []
+              image_filenames_in_html: []
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -436,7 +436,7 @@ describe('ExplorationFooterComponent', () => {
             content: {
               html: '',
               content_id: 'content',
-              image_list: []
+              image_filenames_in_html: []
             },
             interaction: {
               customization_args: {},
@@ -449,7 +449,7 @@ describe('ExplorationFooterComponent', () => {
                 feedback: {
                   html: '',
                   content_id: 'content',
-                  image_list: []
+                  image_filenames_in_html: []
                 },
                 labelled_as_correct: true,
                 refresher_exploration_id: 'exp',

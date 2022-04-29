@@ -44,7 +44,7 @@ describe('ImprovementsService', () => {
         content: {
           html: '',
           content_id: 'content',
-          image_list: []
+          image_filenames_in_html: []
         },
         interaction: {
           id: 'TextInput',
@@ -65,7 +65,7 @@ describe('ImprovementsService', () => {
             feedback: {
               content_id: 'default_outcome',
               html: '',
-              image_list: []
+              image_filenames_in_html: []
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -110,7 +110,7 @@ describe('ImprovementsService', () => {
         content: {
           html: '',
           content_id: 'content',
-          image_list: []
+          image_filenames_in_html: []
         },
         interaction: {
           id: 'FractionInput',
@@ -129,7 +129,7 @@ describe('ImprovementsService', () => {
             feedback: {
               content_id: 'default_outcome',
               html: '',
-              image_list: []
+              image_filenames_in_html: []
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -174,7 +174,7 @@ describe('ImprovementsService', () => {
         content: {
           html: '',
           content_id: 'content',
-          image_list: []
+          image_filenames_in_html: []
         },
         interaction: {
           id: null,
@@ -193,7 +193,7 @@ describe('ImprovementsService', () => {
             feedback: {
               content_id: 'default_outcome',
               html: '',
-              image_list: []
+              image_filenames_in_html: []
             },
             labelled_as_correct: false,
             param_changes: [],

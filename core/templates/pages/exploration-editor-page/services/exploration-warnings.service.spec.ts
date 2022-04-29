@@ -93,7 +93,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -107,7 +107,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -118,7 +118,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
-                image_list: [],
+                image_filenames_in_html: [],
               },
             },
             customization_args: {
@@ -178,7 +178,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -192,7 +192,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -203,7 +203,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -214,7 +214,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
-                image_list: [],
+                image_filenames_in_html: [],
               },
             },
             customization_args: {
@@ -293,7 +293,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -304,7 +304,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
-                image_list: [],
+                image_filenames_in_html: [],
               },
             },
             customization_args: {},
@@ -356,7 +356,7 @@ describe('Exploration Warnings Service', function() {
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}',
-              image_list: [],
+              image_filenames_in_html: [],
             },
             recorded_voiceovers: {
               voiceovers_mapping: {},
@@ -369,7 +369,7 @@ describe('Exploration Warnings Service', function() {
                 answer_is_exclusive: false,
                 explanation: {
                   html: 'Solution explanation',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 }
               },
               answer_groups: [{
@@ -378,7 +378,7 @@ describe('Exploration Warnings Service', function() {
                   feedback: {
                     content_id: 'feedback_1',
                     html: '',
-                    image_list: [],
+                    image_filenames_in_html: [],
                   },
                 },
                 rule_specs: [],
@@ -389,7 +389,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: '',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               customization_args: {
@@ -453,7 +453,7 @@ describe('Exploration Warnings Service', function() {
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}',
-              image_list: [],
+              image_filenames_in_html: [],
             },
             recorded_voiceovers: {
               voiceovers_mapping: {},
@@ -466,7 +466,7 @@ describe('Exploration Warnings Service', function() {
                 answer_is_exclusive: false,
                 explanation: {
                   html: 'Solution explanation',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 }
               },
               answer_groups: [{
@@ -475,7 +475,7 @@ describe('Exploration Warnings Service', function() {
                   feedback: {
                     content_id: 'feedback_1',
                     html: '',
-                    image_list: [],
+                    image_filenames_in_html: [],
                   },
                 },
                 rule_specs: [],
@@ -486,7 +486,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: '',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               customization_args: {
@@ -560,7 +560,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -573,7 +573,7 @@ describe('Exploration Warnings Service', function() {
               answer_is_exclusive: false,
               explanation: {
                 html: 'Solution explanation',
-                image_list: [],
+                image_filenames_in_html: [],
               }
             },
             answer_groups: [{
@@ -582,7 +582,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -593,7 +593,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
-                image_list: [],
+                image_filenames_in_html: [],
               },
             },
             customization_args: {
@@ -653,7 +653,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -666,7 +666,7 @@ describe('Exploration Warnings Service', function() {
               answer_is_exclusive: false,
               explanation: {
                 html: 'Solution explanation',
-                image_list: [],
+                image_filenames_in_html: [],
               }
             },
             answer_groups: [{
@@ -675,7 +675,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -686,7 +686,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
-                image_list: [],
+                image_filenames_in_html: [],
               },
             },
             customization_args: {
@@ -711,7 +711,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -724,7 +724,7 @@ describe('Exploration Warnings Service', function() {
               answer_is_exclusive: false,
               explanation: {
                 html: 'Solution explanation',
-                image_list: [],
+                image_filenames_in_html: [],
               }
             },
             answer_groups: [{
@@ -743,7 +743,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
-                image_list: [],
+                image_filenames_in_html: [],
               },
             },
             customization_args: {
@@ -810,7 +810,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -824,7 +824,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -835,7 +835,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
-                image_list: [],
+                image_filenames_in_html: [],
               },
             },
             customization_args: {
@@ -879,7 +879,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -893,7 +893,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -904,7 +904,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
-                image_list: [],
+                image_filenames_in_html: [],
               },
             },
             customization_args: {
@@ -929,7 +929,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -943,7 +943,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_2',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -991,7 +991,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1006,7 +1006,7 @@ describe('Exploration Warnings Service', function() {
                   feedback: {
                     content_id: 'feedback_1',
                     html: '',
-                    image_list: [],
+                    image_filenames_in_html: [],
                   },
                 },
                 rule_specs: [],
@@ -1018,7 +1018,7 @@ describe('Exploration Warnings Service', function() {
                   feedback: {
                     content_id: 'feedback_2',
                     html: '',
-                    image_list: [],
+                    image_filenames_in_html: [],
                   },
                 },
                 rule_specs: [],
@@ -1030,7 +1030,7 @@ describe('Exploration Warnings Service', function() {
                   feedback: {
                     content_id: 'feedback_3',
                     html: '',
-                    image_list: [],
+                    image_filenames_in_html: [],
                   },
                 },
                 rule_specs: [],
@@ -1059,7 +1059,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1073,7 +1073,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_2',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -1102,7 +1102,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1116,7 +1116,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_2',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -1145,7 +1145,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1159,7 +1159,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_2',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -1188,7 +1188,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1202,7 +1202,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_2',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -1231,7 +1231,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1245,7 +1245,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_2',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -1274,7 +1274,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1288,7 +1288,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_2',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -1317,7 +1317,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1331,7 +1331,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_2',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -1360,7 +1360,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1374,7 +1374,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_2',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
               },
               rule_specs: [],
@@ -1474,7 +1474,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: 'content',
             html: '',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {},
@@ -1488,7 +1488,7 @@ describe('Exploration Warnings Service', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
-                  image_list: [],
+                  image_filenames_in_html: [],
                 },
                 labelled_as_correct: false,
                 missing_prerequisite_skill_id: null,
@@ -1510,7 +1510,7 @@ describe('Exploration Warnings Service', function() {
               feedback: {
                 content_id: '',
                 html: '',
-                image_list: [],
+                image_filenames_in_html: [],
               },
               labelled_as_correct: false,
               missing_prerequisite_skill_id: null,
@@ -1537,7 +1537,7 @@ describe('Exploration Warnings Service', function() {
                 html: 'placeholder value',
                 unicode_str: 'placeholder value',
                 content_id: '',
-                image_list: []
+                image_filenames_in_html: []
               }
             }
           },
@@ -1558,7 +1558,7 @@ describe('Exploration Warnings Service', function() {
           content: {
             content_id: '',
             html: '',
-            image_list: [],
+            image_filenames_in_html: [],
           },
           recorded_voiceovers: {
             voiceovers_mapping: {

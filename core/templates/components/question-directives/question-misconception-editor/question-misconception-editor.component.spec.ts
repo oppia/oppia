@@ -43,7 +43,7 @@ describe('Question Misconception Editor Component', () => {
     feedback: {
       content_id: null,
       html: '',
-      image_list: [],
+      image_filenames_in_html: [],
     }
   };
 
@@ -182,7 +182,7 @@ describe('Question Misconception Editor Component', () => {
     component.outcome.feedback = {
       html: null,
       content_id: null,
-      image_list: [],
+      image_filenames_in_html: [],
     };
     component.editMisconception();
 

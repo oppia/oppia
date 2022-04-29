@@ -564,8 +564,8 @@ def apply_change_list(exploration_id, change_list):
                 # to make sure that the version that the user is trying to
                 # migrate to is the latest version.
                 target_version_is_current_state_schema_version = (
-                        change.to_version ==
-                        str(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                    change.to_version ==
+                    str(feconf.CURRENT_STATE_SCHEMA_VERSION))
                 if not target_version_is_current_state_schema_version:
                     raise Exception(
                         'Expected to migrate to the latest state schema '

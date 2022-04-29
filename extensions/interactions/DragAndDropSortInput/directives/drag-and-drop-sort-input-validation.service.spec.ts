@@ -66,7 +66,7 @@ describe('DragAndDropSortInputValidationService', () => {
       feedback: {
         html: '',
         content_id: '',
-        image_list: []
+        image_filenames_in_html: []
       },
       missing_prerequisite_skill_id: null,
       labelled_as_correct: false,
@@ -79,7 +79,7 @@ describe('DragAndDropSortInputValidationService', () => {
       feedback: {
         html: '<p>great job!</p>',
         content_id: '',
-        image_list: []
+        image_filenames_in_html: []
       },
       labelled_as_correct: true,
       param_changes: [],

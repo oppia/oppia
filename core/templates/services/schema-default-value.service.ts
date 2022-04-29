@@ -119,7 +119,7 @@ export class SchemaDefaultValueService {
       return schema.choices[0];
     } else if (schemaIsSubtitledHtml) {
       return SubtitledHtml.createFromBackendDict({
-        html: '', content_id: null, image_list: []
+        html: '', content_id: null, image_filenames_in_html: []
       });
     } else if (schemaIsSubtitledUnicode) {
       return this.subtitledUnicodeObjectFactory.createFromBackendDict({
