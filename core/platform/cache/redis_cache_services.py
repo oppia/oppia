@@ -22,7 +22,7 @@ from core import feconf
 from core.domain import caching_domain
 
 import redis
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, Optional
 
 # Redis client for our own implementation of caching.
 OPPIA_REDIS_CLIENT = redis.StrictRedis(
@@ -52,9 +52,10 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     """
     redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats()
     memory_stats = caching_domain.MemoryCacheStats(
-        redis_full_profile.get('total.allocated'),
-        redis_full_profile.get('peak.allocated'),
-        redis_full_profile.get('keys.count'))
+        redis_full_profile['total.allocated'],
+        redis_full_profile['peak.allocated'],
+        redis_full_profile['keys.count']
+    )
 
     return memory_stats
 
@@ -76,14 +77,7 @@ def get_multi(keys: List[str]) -> List[Optional[str]]:
         that are passed in.
     """
     assert isinstance(keys, list)
-    # The internal implementation of mget() method returns ResponseT which
-    # is a type of Union[Awaitable, Any]. But from the usage of this method
-    # we know it returns List[Optional[str]] type. So for the strict typing
-    # we used cast here.
-    return cast(
-        List[Optional[str]],
-        OPPIA_REDIS_CLIENT.mget(keys)
-    )
+    return OPPIA_REDIS_CLIENT.mget(keys)
 
 
 def set_multi(key_value_mapping: Dict[str, str]) -> bool:
@@ -98,13 +92,7 @@ def set_multi(key_value_mapping: Dict[str, str]) -> bool:
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
-    # The internal implementation of mset() method returns ResponseT which
-    # is a type of Union[Awaitable, Any]. But from the usage of this method
-    # we know it returns bool type. So for the strict typing we used cast here.
-    return cast(
-        bool,
-        OPPIA_REDIS_CLIENT.mset(key_value_mapping)
-    )
+    return OPPIA_REDIS_CLIENT.mset(key_value_mapping)
 
 
 def delete_multi(keys: List[str]) -> int:
@@ -118,10 +106,4 @@ def delete_multi(keys: List[str]) -> int:
     """
     for key in keys:
         assert isinstance(key, str)
-    # The internal implementation of delete() method returns ResponseT which
-    # is a type of Union[Awaitable, Any]. But from the usage of this method
-    # we know it returns int type. So for the strict typing we used cast here.
-    return cast(
-        int,
-        OPPIA_REDIS_CLIENT.delete(*keys)
-    )
+    return OPPIA_REDIS_CLIENT.delete(*keys)
