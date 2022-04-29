@@ -534,8 +534,14 @@ URLS = [
         r'/explorehandler/state_hit_event/<exploration_id>',
         reader.StateHitEventHandler),
     get_redirect_route(
-        r'/explorehandler/state_complete_event/<exploration_id>',
-        reader.StateCompleteEventHandler),
+        r'/explorehandler/state_hit_event/<exploration_id>',
+        reader.StateHitEventHandler),
+    get_redirect_route(
+        r'/explorehandler/states_completed_by_logged_out_user/<exploration_id>',
+        reader.SaveProgressEventHandler),
+    get_redirect_route(
+        r'/progress/<unique_progress_id>',
+        reader.TransientCheckpointUrlHandler),
     get_redirect_route(
         r'/explorehandler/leave_for_refresher_exp_event/<exploration_id>',
         reader.LeaveForRefresherExpEventHandler),

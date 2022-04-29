@@ -1288,6 +1288,53 @@ class QuestionPlayerHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
+class TransientCheckpointUrlHandler(base.BaseHandler):
+    """Responsible for redirecting a logged-out learner."""
+
+    @acl_decorators.can_play_exploration
+    def get(self, unique_progress_url_id):
+        """Handles GET requests. Fetches the logged-out learner's progress."""
+        logged_out_user_data =  (
+            exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
+
+        self.values.update({
+            'furthest_reached_checkpoint_exp_version': (
+                logged_out_user_data.furthest_reached_checkpoint_exp_version),
+            'furthest_reached_checkpoint_state_name': (
+                logged_out_user_data.furthest_reached_checkpoint_state_name),
+            'most_recently_reached_checkpoint_state_name': (
+                logged_out_user_data.
+                    most_recently_reached_checkpoint_state_name)
+        })
+
+        self.render_json(self.values)
+
+
+class SaveProgressEventHandler(base.BaseHandler):
+    """Responsible for storing progress of a logged-out learner."""
+
+    @acl_decorators.can_play_exploration
+    def put(self):
+        """"Handles the PUT requests. Saves the logged-out user's progress."""
+        exploration_id = (
+            self.normalized_payload.get('exploration_id'))
+        unique_progress_url_id = (
+            self.normalized_payload.get('unique_progress_url_id'))
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'))
+        most_recently_reached_checkpoint_exp_version = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_exp_version'))
+
+        exp_services.update_logged_out_user_progress(
+            exploration_id,
+            unique_progress_url_id,
+            most_recently_reached_checkpoint_state_name,
+            most_recently_reached_checkpoint_exp_version)
+
+        self.render_json(self.values)
+
 
 class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
     """Handles the learner answer details submission."""

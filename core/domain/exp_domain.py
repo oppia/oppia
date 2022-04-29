@@ -359,6 +359,86 @@ class ExplorationChange(change_domain.BaseChange):
         'delete_gadget', 'rename_gadget']
 
 
+class TransientCheckpointUrl:
+    """Domain object representing the progress of a logged-out user."""
+
+    def __init__(
+            self, exploration_id, unique_progress_url_id,
+            furthest_reached_checkpoint_state_name,
+            furthest_reached_checkpoint_exp_version,
+            most_recently_reached_checkpoint_state_name,
+            most_recently_reached_checkpoint_exp_version,
+            creation_timestamp):
+        """Initializes a TransientCheckpointUrl domain object.
+
+        Args:
+            exploration_id: str. Id of the exploration.
+            unique_progress_url_id: str. Unique 6-digit url to track a
+                logged-out user's progress.
+            furthest_reached_checkpoint_state_name: str. State name of the
+                furthest reached checkpoint in the exploration.
+            furthest_reached_checkpoint_exp_version: int. Exploration version
+                in which the user has completed most checkpoints.
+            most_recently_reached_checkpoint_state_name: str. State name of
+                the most recently reached checkpoint in the exploration.
+            most_recently_reached_checkpoint_exp_version: int. Exploration
+                version in which a checkpoint was most recently reached.
+            creation_timestamp: datetime.datetime. Date and time when the model
+                was created.
+        """
+        self.exploration_id = exploration_id
+        self.unique_progress_url_id = unique_progress_url_id
+        self.furthest_reached_checkpoint_state_name = (
+            furthest_reached_checkpoint_state_name)
+        self.furthest_reached_checkpoint_exp_version = (
+            furthest_reached_checkpoint_exp_version)
+        self.most_recently_reached_checkpoint_state_name = (
+            most_recently_reached_checkpoint_state_name)
+        self.most_recently_reached_checkpoint_exp_version = (
+            most_recently_reached_checkpoint_exp_version)
+        self.creation_timestamp = creation_timestamp
+
+
+    def validate(self):
+        """Validates properties of the TransientCheckpointUrl object.
+
+        Raises:
+        ValidationError. One or more attributes of the TransientCheckpointUrl
+        are invalid.
+        """
+        if not isinstance(self.exploration_id, str):
+            raise utils.ValidationError(
+            'Expected exploration_id to be a str, received %s'
+                % self.exploration_id)
+
+        if not isinstance(self.unique_progress_url_id, str):
+            raise utils.ValidationError(
+            'Expected unique_progress_url_id to be a str, received %s'
+                % self.unique_progress_url_id)
+
+        if not isinstance(self.furthest_reached_checkpoint_state_name, str):
+            raise utils.ValidationError(
+            'Expected furthest_reached_checkpoint_state_name to be a str, received %s' # pylint: disable=line-too-long
+                % self.furthest_reached_checkpoint_state_name)
+
+        if not isinstance(self.furthest_reached_checkpoint_exp_version, int):
+            raise utils.ValidationError(
+            'Expected furthest_reached_checkpoint_exp_version to be an int, received %s' # pylint: disable=line-too-long
+                % self.furthest_reached_checkpoint_exp_version)
+
+        if not isinstance(self.most_recently_reached_checkpoint_state_name,
+            str):
+            raise utils.ValidationError(
+            'Expected most_recently_reached_checkpoint_state_name to be a str, received %s' # pylint: disable=line-too-long
+                % self.most_recently_reached_checkpoint_state_name)
+
+        if not isinstance(self.most_recently_reached_checkpoint_exp_version,
+            int):
+            raise utils.ValidationError(
+            'Expected most_recently_reached_checkpoint_exp_version to be an int, received %s' # pylint: disable=line-too-long
+                % self.most_recently_reached_checkpoint_exp_version)
+
+
 class ExplorationCommitLogEntry:
     """Value object representing a commit to an exploration."""
 

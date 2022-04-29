@@ -2047,3 +2047,152 @@ def get_interaction_id_for_state(exp_id, state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
+def _get_checkpoints_in_order(init_state_name, states):
+    """Returns the checkpoints of an exploration in sequential order by a
+    BFS traversal.
+
+    Args:
+        init_state_name: str. The name of the first state of the exploration.
+        states: dict(state). All states of the exploration.
+
+    Returns:
+        list(str). List of all checkpoints of the exploration in sequential
+        order.
+    """
+    queue = [init_state_name]
+    checkpoint_state_names = []
+    visited_state_names = []
+    while len(queue) > 0:
+        current_state_name = queue.pop()
+        if current_state_name not in visited_state_names:
+            visited_state_names.append(current_state_name)
+            current_state = states[current_state_name]
+            if (
+                current_state.card_is_checkpoint and
+                current_state_name not in checkpoint_state_names
+            ):
+                checkpoint_state_names.append(current_state_name)
+            for answer_group in current_state.interaction.answer_groups:
+                queue.append(answer_group.outcome.dest)
+
+    return checkpoint_state_names
+
+
+def _get_most_distant_reached_checkpoint_in_current_exploration(
+    checkpoints_in_current_exploration,
+    checkpoints_in_older_exploration,
+    most_distant_reached_checkpoint_state_name_in_older_exploration
+):
+    """Returns the most distant reached checkpoint in current exploration after
+    comparing current exploration with older exploration.
+
+    Args:
+        checkpoints_in_current_exploration: list(str). The checkpoints of
+            current exploration in sequential order.
+        checkpoints_in_older_exploration: list(str). The checkpoints
+            of older exploration in sequential order.
+        most_distant_reached_checkpoint_state_name_in_older_exploration: str.
+            The state name of the most distant reached checkpoint in the older
+            exploration.
+
+    Returns:
+        str or None. The most distant checkpoint in current exploration or
+        None if most distant reached checkpoint of older exploration is not
+        present in current exploration.
+    """
+    # Index of the most_distant_reached_checkpoint in the older exploration.
+    mdrc_index = (
+        checkpoints_in_older_exploration.index(
+            most_distant_reached_checkpoint_state_name_in_older_exploration))
+
+    # Loop through checkpoints of furthest_reached_exploration backwards until
+    # a checkpoint is found that exists in current_exploration too.
+    while mdrc_index >= 0:
+        checkpoint_in_old_exp = checkpoints_in_older_exploration[mdrc_index]
+        if checkpoint_in_old_exp in checkpoints_in_current_exploration:
+            return checkpoint_in_old_exp
+        mdrc_index -= 1
+
+    return None
+
+
+def update_logged_out_user_progress(
+    exploration_id,
+    unique_progress_url_id,
+    state_name,
+    exp_version,
+    ) -> None:
+    """Updates the logged-out user's progress in the
+        associated TransientCheckpointUrlModel.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        unique_progress_url_id: str. Unique 6-digit url to track a
+            logged-out user's progress.
+        state_name: str. State name of the most recently
+            reached checkpoint in the exploration.
+        exp_version: int. Exploration version in which a
+            checkpoint was most recently reached.
+    """
+    # Fetch the model associated with the unique_progress_url_id.
+    model = exp_models.TransientCheckpointUrlModel.get(unique_progress_url_id)
+
+    # Create a model if it doesn't already exist.
+    if model is None:
+        model = exp_models.TransientCheckpointUrlModel.create(
+            exploration_id, unique_progress_url_id)
+
+    current_exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, True, exp_version)
+
+    # If the exploration is being visited the first time.
+    if model.furthest_reached_checkpoint_state_name is None:
+        model.furthest_reached_checkpoint_exp_version = exp_version
+        model.furthest_reached_checkpoint_state_name = state_name
+    elif model.furthest_reached_checkpoint_exp_version < exp_version:
+        furthest_reached_checkpoint_exp = (
+            exp_fetchers.get_exploration_by_id(
+                exploration_id,
+                strict=True,
+                version=model.furthest_reached_checkpoint_exp_version
+            )
+        )
+        checkpoints_in_current_exp = _get_checkpoints_in_order(
+            current_exploration.init_state_name, current_exploration.states)
+        checkpoints_in_older_exp = _get_checkpoints_in_order(
+            furthest_reached_checkpoint_exp.init_state_name,
+            furthest_reached_checkpoint_exp.states)
+
+        # Get the furthest reached checkpoint in current exploration.
+        furthest_reached_checkpoint_in_current_exp = (
+            _get_most_distant_reached_checkpoint_in_current_exploration(
+                checkpoints_in_current_exp,
+                checkpoints_in_older_exp,
+                model.furthest_reached_checkpoint_state_name
+            )
+        )
+
+        # If the furthest reached checkpoint doesn't exist in current
+        # exploration.
+        if furthest_reached_checkpoint_in_current_exp is None:
+            model.furthest_reached_checkpoint_exp_version = (
+                exp_version)
+            model.furthest_reached_checkpoint_state_name = state_name
+        else:
+            # Index of the furthest reached checkpoint.
+            frc_index = checkpoints_in_current_exp.index(
+                furthest_reached_checkpoint_in_current_exp)
+            # If furthest reached checkpoint is behind most recently
+            # reached checkpoint.
+            if frc_index <= checkpoints_in_current_exp.index(state_name):
+                model.furthest_reached_checkpoint_exp_version = (
+                    exp_version)
+                model.furthest_reached_checkpoint_state_name = (
+                    state_name)
+
+    model.most_recently_reached_checkpoint_exp_version = exp_version
+    model.most_recently_reached_checkpoint_state_name = state_name
+    model.creation_timestamp = datetime.datetime.utcnow()
+    model.update_timestamps()
+    model.put()

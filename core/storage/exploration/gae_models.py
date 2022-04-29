@@ -860,6 +860,107 @@ class ExplorationRightsModel(base_models.VersionedModel):
         }
 
 
+class TransientCheckpointUrlModel(base_models.BaseModel):
+    """Model for storing the progress of a logged-out user."""
+
+    # The exploration id.
+    exploration_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
+    # The 6 digit unique id assigned to progress made by a logged-out user.
+    unique_progress_url_id = (
+        datastore_services.StringProperty(required=True))
+    # The state name of the furthest reached checkpoint.
+    furthest_reached_checkpoint_state_name = datastore_services.StringProperty(
+        default=None)
+    # The exploration version of the furthest reached checkpoint.
+    furthest_reached_checkpoint_exp_version = (
+        datastore_services.IntegerProperty(default=None))
+    # The state name of the most recently reached checkpoint.
+    most_recently_reached_checkpoint_state_name = (
+        datastore_services.StringProperty(default=None))
+    # The exploration version of the most recently reached checkpoint.
+    most_recently_reached_checkpoint_exp_version = (
+        datastore_services.IntegerProperty(default=None))
+    # Timestamp to store the creation time of the model.
+    creation_timestamp = (
+       datastore_services.DateTimeProperty(default=None))
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a logged-out user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'unique_progress_url_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'furthest_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'furthest_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'most_recently_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'most_recently_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'creation_timestamp':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
+    @classmethod
+    def get( # type: ignore[override]
+        cls, unique_progress_url_id: str
+    ) -> Optional[TransientCheckpointUrlModel]:
+        """Gets TransientCheckpointUrlModel for given unique_progress_url_id.
+
+        Args:
+            unique_progress_url_id: str. The 6 digit long unique id
+            assigned to the progress made by a logged-out user.
+
+        Returns:
+            TransientCheckpointUrlModel|None. The TransientCheckpointUrlModel
+            instance which matches with the given unique_progress_url_id.
+        """
+        return super(TransientCheckpointUrlModel, cls).get(
+            unique_progress_url_id, strict=False)
+
+    @classmethod
+    def create(
+        cls,
+        exploration_id: str,
+        unique_progress_url_id: str
+    ) -> TransientCheckpointUrlModel:
+        """Creates a new TransientCheckpointUrlModel instance and returns it.
+
+        Note that the client is responsible for actually saving this entity to
+        the datastore.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            unique_progress_url_id: str. The 6 digit long unique id
+            assigned to the progress made by a logged-out user.
+
+        Returns:
+            TransientCheckpointUrlModel. The newly created
+            TransientCheckpointUrlModel instance.
+        """
+        return cls(
+            id=unique_progress_url_id,
+            exploration_id = exploration_id,
+            unique_progress_url_id = unique_progress_url_id)
+
+
 class ExpSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia exploration.
 
