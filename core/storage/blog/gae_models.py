@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import utils
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, cast
+from typing import Dict, List, Optional, Sequence
 from typing_extensions import Literal, TypedDict
 
 MYPY = False
@@ -353,7 +353,8 @@ class BlogPostRightsModel(base_models.BaseModel):
 
     @classmethod
     def get_published_models_by_user(
-        cls, user_id: str,
+        cls,
+        user_id: str,
         limit: Optional[int]=None
     ) -> List[BlogPostRightsModel]:
         """Retrieves the blog post rights objects for published blog posts for
@@ -373,17 +374,14 @@ class BlogPostRightsModel(base_models.BaseModel):
         query = cls.query(
             cls.editor_ids == user_id, cls.blog_post_is_published == True # pylint: disable=singleton-comparison
         ).order(-cls.last_updated)
-        # The value returned by query.fetch() is of Sequence type but the
-        # expected returned value from this function is of type List. So
-        # that's why cast is used here.
-        return cast(
-            List[BlogPostRightsModel],
+        return list(
             query.fetch(limit) if limit is not None else query.fetch()
         )
 
     @classmethod
     def get_draft_models_by_user(
-        cls, user_id: str,
+        cls,
+        user_id: str,
         limit: Optional[int]=None
     ) -> List[BlogPostRightsModel]:
         """Retrieves the blog post rights objects for draft blog posts for which
@@ -403,11 +401,7 @@ class BlogPostRightsModel(base_models.BaseModel):
         query = cls.query(
             cls.editor_ids == user_id, cls.blog_post_is_published == False # pylint: disable=singleton-comparison
         ).order(-cls.last_updated)
-        # The value returned by query.fetch() is of Sequence type but the
-        # expected returned value from this function is of type List. So
-        # that's why cast is used here.
-        return cast(
-            List[BlogPostRightsModel],
+        return list(
             query.fetch(limit) if limit is not None else query.fetch()
         )
 
@@ -423,11 +417,7 @@ class BlogPostRightsModel(base_models.BaseModel):
             list(BlogPostRightsModel). The list of BlogPostRightsModel objects
             in which the given user is an editor.
         """
-        # The value returned by query.fetch() is of Sequence type but the
-        # expected returned value from this function is of type List. So
-        # that's why cast is used here.
-        return cast(
-            List[BlogPostRightsModel],
+        return list(
             cls.query(cls.editor_ids == user_id).fetch()
         )
 
