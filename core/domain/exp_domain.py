@@ -1473,14 +1473,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
-    def update_edits_allowed(self, edits_allowed):
-        """Update whether edits are allowed.
-
-        Args:
-            edits_allowed: bool. Whether edits are allowed.
-        """
-        self.edits_allowed = edits_allowed
-
     # Methods relating to states.
     def add_states(self, state_names):
         """Adds multiple states to the exploration.
