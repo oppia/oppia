@@ -49,7 +49,7 @@ def install_prerequisite(package: Tuple[str, str, str]) -> None:
     Raises:
         Exception. If the package fails to install due to issues with --prefix.
     """
-    (package_name, version_number, target_path) = package
+    package_name, version_number, target_path = package
     command_text = [
         sys.executable, '-m', 'pip', 'install', '%s==%s'
         % (package_name, version_number), '--target', target_path]
@@ -195,7 +195,8 @@ def compile_protobuf_files(filepaths: List[str]) -> None:
 
 
 def ensure_pip_library_is_installed(
-        package: str, version: str, path: str) -> None:
+    package: str, version: str, path: str
+) -> None:
     """Installs the pip library after ensuring its not already installed.
 
     Args:

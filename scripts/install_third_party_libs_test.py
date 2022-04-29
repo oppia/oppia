@@ -28,7 +28,7 @@ import zipfile
 from core import utils
 from core.tests import test_utils
 
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple
 
 from . import common
 from . import install_backend_python_libs
@@ -71,75 +71,99 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'setup_gae_main_is_called': True,
             'pre_commit_hook_main_is_called': True
         }
+
         class MockCheckCallReturn:
             """Return object with required attributes."""
 
             def __init__(self, returncode: int, message: bytes) -> None:
                 self.returncode = returncode
                 self.message = message
+
             def communicate(self) -> Tuple[bytes, bytes]:
                 """Return required method."""
                 return b'', self.message
+
         def mock_check_call(
-            _args: List[str],
-            **_kwargs: Union[int, None]
+            _args: List[str], **_kwargs: Optional[int]
         ) -> MockCheckCallReturn:
             self.check_function_calls['check_call_is_called'] = True
             return MockCheckCallReturn(0, b'')
+
         def mock_check_call_error(
-                args: List[str], **_kwargs: Union[int, None]) -> None:
+            args: List[str], **_kwargs: Optional[int]
+        ) -> None:
             """Raise the Exception resulting from a failed check_call()"""
             self.check_function_calls['check_call_is_called'] = True
             raise subprocess.CalledProcessError(-1, args[0])
+
         def mock_popen_error_call(
-            _args: List[str],
-            **_kwargs: Union[int, None]
+            _args: List[str], **_kwargs: Optional[int]
         ) -> MockCheckCallReturn:
             return MockCheckCallReturn(
                 1, b'can\'t combine user with prefix')
+
         def mock_ensure_directory_exists(_path: str) -> None:
             pass
+
         class MockZipFile(zipfile.ZipFile):
             def __init__(self, _path: str, _mode: str) -> None:  # pylint: disable=super-init-not-called
                 pass
+
         def mock_extractall(_file: zipfile.ZipFile, **_kwargs: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
+
         def mock_extractall_raises_exception(
-                _file: zipfile.ZipFile, **_kwargs: str) -> None:
+            _file: zipfile.ZipFile, **_kwargs: str
+        ) -> None:
             self.check_function_calls['extractall_is_called'] = True
             raise Exception()
+
         def mock_isfile_true(_filename: str) -> bool:
             return True
+
         def mock_isfile_false(_filename: str) -> bool:
             return False
+
         def mock_ensure_pip_library_is_installed(
-                _package: str, _version: str, _path: str) -> None:
+            _package: str, _version: str, _path: str
+        ) -> None:
             self.check_main_function_calls[
                 'ensure_pip_library_is_installed_is_called'] = True
+
         def mock_check_call_pass(_args: List[str]) -> None:
             pass
+
         def mock_main_for_install_third_party(**_kwargs: str) -> None:
             self.check_main_function_calls[
                 'install_third_party_main_is_called'] = True
+
         def mock_main_for_setup(**_kwargs: str) -> None:
             self.check_main_function_calls['setup_main_is_called'] = True
+
         def mock_main_for_setup_gae(**_kwargs: str) -> None:
             self.check_main_function_calls['setup_gae_main_is_called'] = True
+
         def mock_main_for_pre_commit_hook(**_kwargs: str) -> None:
             self.check_main_function_calls[
                 'pre_commit_hook_main_is_called'] = True
+
         def mock_main_for_pre_push_hook(**_kwargs: str) -> None:
             self.check_function_calls['pre_push_hook_main_is_called'] = True
+
         def mock_tweak_yarn_executable() -> None:
             self.check_function_calls['tweak_yarn_executable_is_called'] = True
+
         def mock_rename(origin_name: str, new_name: str) -> None:
             self.assertEqual(origin_name + '.sh', new_name)
             self.check_function_calls['mock_rename_called'] = True
+
         def mock_recursive_chmod(_path: str, mode: int) -> None:
             self.assertEqual(mode, 0o744)
             self.check_function_calls['recursive_chmod_is_called'] = True
+
         def mock_remove(_path: str) -> None:
             pass
+
         def mock_url_retrieve(_url: str, **_kwargs: str) -> None:
             self.check_function_calls['url_retrieve_is_called'] = True
 
@@ -214,7 +238,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_install_prerequisite_raises_exception_if_prefix_fix_fails(
-            self) -> None:
+        self
+    ) -> None:
         self.check_function_calls['check_call_is_called'] = False
         prerequisite = install_third_party_libs.PREREQUISITES[0]
 
@@ -323,8 +348,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             self.check_function_calls['recursive_chmod_is_called'])
 
     def test_installing_protoc_raises_exception_if_fails_to_extract(
-            self) -> None:
-
+        self
+    ) -> None:
         self.check_function_calls['url_retrieve_is_called'] = False
         self.check_function_calls['extractall_is_called'] = False
 
@@ -347,7 +372,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_proto_file_compilation_raises_exception_on_compile_errors(
-            self) -> None:
+        self
+    ) -> None:
         with self.Popen_error_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 Exception, 'Error compiling proto files at mock_path'):
             install_third_party_libs.compile_protobuf_files(['mock_path'])
@@ -365,7 +391,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 'package', '1.1.0', 'path')
 
     def test_ensure_pip_library_is_installed_with_git_repo_package(
-            self) -> None:
+        self
+    ) -> None:
         pip_install_swap = self.swap_with_checks(
             install_backend_python_libs,
             'pip_install',
