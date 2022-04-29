@@ -40,10 +40,10 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(InstallThirdPartyLibsImportTests, self).setUp()
         self.commands: List[str] = []
-        class Ret(test_utils.GenericTestBase):
+        class Ret:
             """Return object that gives user-prefix error."""
 
-            def __init__(self) -> None:  # pylint: disable=super-init-not-called
+            def __init__(self) -> None:
                 self.returncode = 1
 
             def communicate(self) -> Tuple[bytes, bytes]:

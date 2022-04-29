@@ -82,8 +82,7 @@ class SetupTests(test_utils.GenericTestBase):
             self.check_function_calls['test_python_version_is_called'] = True
 
         def mock_download_and_install_package(
-            url: str,
-            unused_filename: str
+            url: str, unused_filename: str
         ) -> None:
             self.urls.append(url)
 
@@ -91,9 +90,7 @@ class SetupTests(test_utils.GenericTestBase):
             return True
 
         def mock_recursive_chown(
-            unused_path: str,
-            unused_uid: int,
-            unused_gid: int
+            unused_path: str, unused_uid: int, unused_gid: int
         ) -> None:
             self.check_function_calls['recursive_chown_is_called'] = True
 
