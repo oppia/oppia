@@ -331,7 +331,7 @@ class EditorTests(BaseEditorControllerTests):
 
         self.assertEqual(
             response_dict['error'],
-            'This exploration cannot be edited. Please contact the admin')
+            'This exploration cannot be edited. Please contact the admin.')
         self.logout()
 
 
