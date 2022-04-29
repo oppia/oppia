@@ -32,23 +32,25 @@ import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interactio
 })
 export class InteractionAttributesExtractorService {
   private readonly migratedInteractions: string[] = [
+    'CodeRepl',
     'Continue',
+    'EndExploration',
     'DragAndDropSortInput',
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
-    'CodeRepl',
+    'InteractiveMap',
+    'ItemSelectionInput',
+    'MathEquationInput',
+    'MultipleChoiceInput',
+    'MusicNotesInput',
     'NumberWithUnits',
     'NumericExpressionInput',
     'NumericInput',
-    'InteractiveMap',
-    'MultipleChoiceInput',
-    'ItemSelectionInput',
+    'PencilCodeEditor',
+    'RatioExpressionInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput',
-    'RatioExpressionInput',
-    'PencilCodeEditor',
   ];
 
   constructor(
@@ -78,20 +80,7 @@ export class InteractionAttributesExtractorService {
 
     const ca = this.interactionFactory.convertFromCustomizationArgsBackendDict(
       interactionId, caBackendDict);
-    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
-      return ca;
-    }
-    const caValues: InteractionCustomizationArgs = {};
-    const caKeys = Object.keys(ca) as (keyof InteractionCustomizationArgs)[];
-    caKeys.forEach(caName => {
-      const attr = ca[caName] as { value: Object };
-      Object.defineProperty(caValues, caName, {
-        value: attr.value,
-        enumerable: true
-      });
-    });
-
-    return caValues;
+    return ca;
   }
 }
 angular.module('oppia').factory(

@@ -191,7 +191,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
             FooModel(id='abc', project=feconf.OPPIA_PROJECT_ID, prop='123'),
             job_utils.get_ndb_model_from_beam_entity(beam_entity))
 
-    def test_get_beam_key_from_ndb_key(self):
+    def test_get_beam_key_from_ndb_key(self) -> None:
         beam_key = beam_datastore_types.Key(
             ('FooModel', 'abc'),
             project=feconf.OPPIA_PROJECT_ID,

@@ -35,12 +35,12 @@ import { StoryNode } from 'domain/story/story-node.model';
 })
 export class StorySummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and component interactions, therefore we need to do non-null assertion,
-  // for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() classroomUrlFragment!: string;
   @Input() storySummary!: StorySummary;
   @Input() topicUrlFragment!: string;
+  @Input() allChaptersAreShown!: boolean;
   initialCount!: number;
   chaptersDisplayed!: number;
   nodeCount!: number;
@@ -195,16 +195,19 @@ export class StorySummaryTileComponent implements OnInit {
     this.storyProgress = Math.floor(
       (this.completedStoriesCount / this.nodeCount) * 100);
 
-    this.chaptersDisplayed = 3;
+    this.chaptersDisplayed = this.allChaptersAreShown ? this.nodeCount : 3;
     if (this.windowDimensionsService.getWidth() <= 768 &&
-      this.windowDimensionsService.getWidth() > 500) {
+      this.windowDimensionsService.getWidth() > 500 &&
+      !this.allChaptersAreShown) {
       this.chaptersDisplayed = 2;
     }
-    if (this.windowDimensionsService.getWidth() <= 500) {
+    if (this.windowDimensionsService.getWidth() <= 500 &&
+      !this.allChaptersAreShown) {
       this.chaptersDisplayed = 1;
     }
     this.showButton = false;
-    if (this.chaptersDisplayed !== this.nodeCount) {
+    if (!this.allChaptersAreShown &&
+      this.chaptersDisplayed !== this.nodeCount) {
       this.showButton = true;
     }
 

@@ -260,7 +260,7 @@ describe('Story node editor directive', function() {
     'add a prerequisite skill id which already exists', fakeAsync(function() {
     spyOn(storyUpdateService, 'addPrerequisiteSkillIdToNode')
       .and.callFake(() => {
-        throw new Error('skill id already exist.');
+        throw new Error('Given skill is already a prerequisite skill');
       });
     let alertsSpy = spyOn(AlertsService, 'addInfoMessage')
       .and.returnValue(null);

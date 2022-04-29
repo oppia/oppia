@@ -21,34 +21,32 @@ import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { BackgroundBannerComponent } from 'components/common-layout-directives/common-elements/background-banner.component';
+import { BackgroundBannerModule } from 'components/common-layout-directives/common-elements/background-banner.module';
 import { BaseModule } from 'base-components/base.module';
 import { ClassroomPageComponent } from './classroom-page.component';
 import { ClassroomPageRootComponent } from './classroom-page-root.component';
 import { ClassroomPageRoutingModule } from './classroom-page-routing.module';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
-import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
+import { SearchBarModule } from 'pages/library-page/search-bar/search-bar.module';
+import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
 import { TopicSummaryTileComponent } from 'components/summary-tile/topic-summary-tile.component';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 
 @NgModule({
   imports: [
+    BackgroundBannerModule,
     BaseModule,
     CommonModule,
     ClassroomPageRoutingModule,
     FormsModule,
     RichTextComponentsModule,
+    SearchBarModule,
+    StringUtilityPipesModule,
     TranslateModule,
   ],
   declarations: [
-    BackgroundBannerComponent,
     ClassroomPageComponent,
     ClassroomPageRootComponent,
-    OppiaAngularRootComponent,
-    SearchBarComponent,
     TopicSummaryTileComponent,
-    TruncatePipe
   ],
   entryComponents: [
     ClassroomPageComponent,

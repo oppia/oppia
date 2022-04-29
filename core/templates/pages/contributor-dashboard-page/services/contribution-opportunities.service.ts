@@ -48,7 +48,7 @@ export class ContributionOpportunitiesService {
   private _reloadOpportunitiesEventEmitter = new EventEmitter<void>();
   private _removeOpportunitiesEventEmitter = new EventEmitter<string[]>();
   // These properties are initialized using async methods
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _skillOpportunitiesCursor!: string;
   private _translationOpportunitiesCursor!: string;
@@ -101,13 +101,16 @@ export class ContributionOpportunitiesService {
   async getTranslationOpportunitiesAsync(
       languageCode: string, topicName: string):
   Promise<ExplorationOpportunitiesDict> {
-    return this._getTranslationOpportunitiesAsync(languageCode, topicName, '');
+    return this._getTranslationOpportunitiesAsync(
+      languageCode, topicName, '');
   }
 
-  async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
+  async getMoreSkillOpportunitiesAsync():
+      Promise<SkillOpportunitiesDict> {
     if (this._moreSkillOpportunitiesAvailable) {
       return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
     }
+    throw new Error('No more skill opportunities available.');
   }
 
   async getMoreTranslationOpportunitiesAsync(
@@ -117,6 +120,7 @@ export class ContributionOpportunitiesService {
       return this._getTranslationOpportunitiesAsync(
         languageCode, topicName, this._translationOpportunitiesCursor);
     }
+    throw new Error('No more translation opportunities available.');
   }
 
   async getAllTopicNamesAsync(): Promise<string[]> {
