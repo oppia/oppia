@@ -76,7 +76,7 @@ class GetNumberOfStoryNotesExceedsMaxLengthJobTests(
         # This is valid model with story notes length greater than 5000.
         self.story_2 = self.create_model(
             story_models.StoryModel,
-            id=self.STORY_ID_1,
+            id=self.STORY_ID_2,
             story_contents_schema_version=4,
             title='title',
             language_code='cs',
