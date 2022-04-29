@@ -48,6 +48,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
         process_success = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
         def mock_popen_success(
             unused_cmd: str,  # pylint: disable=unused-argument
             stdout: Optional[str] = None,  # pylint: disable=unused-argument
@@ -59,6 +60,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
         process_failure = subprocess.Popen(
             ['test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
         def mock_popen_failure(
             unused_cmd: str,  # pylint: disable=unused-argument
             stdout: Optional[str] = None,  # pylint: disable=unused-argument
@@ -157,6 +159,9 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         ]
         with self.files_swap:
             with self.directories_swap:
+                # TODO(#13528): Remove this test after the backend is fully
+                # type-annotated. Here ignore[arg-type] is used to test
+                # function get_mypy_cmd() for invalid input type.
                 cmd = run_mypy_checks.get_mypy_cmd(
                     None, self.mypy_cmd_path, False) # type: ignore[arg-type]
                 self.assertEqual(cmd, expected_cmd)
@@ -164,6 +169,9 @@ class MypyScriptChecks(test_utils.GenericTestBase):
     def test_get_mypy_cmd_for_ci(self) -> None:
         with self.files_swap:
             with self.directories_swap:
+                # TODO(#13528): Remove this test after the backend is fully
+                # type-annotated. Here ignore[arg-type] is used to test
+                # function get_mypy_cmd() for invalid input type.
                 cmd = run_mypy_checks.get_mypy_cmd(
                     None, self.mypy_cmd_path, True) # type: ignore[arg-type]
                 self.assertEqual(cmd[0], 'mypy')

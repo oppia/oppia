@@ -73,33 +73,44 @@ class SetupTests(test_utils.GenericTestBase):
             'delete_file_is_called': False
         }
         self.urls: List[str] = []
+
         def mock_create_directory(unused_path: str) -> None:
             self.check_function_calls['create_directory_is_called'] = True
+
         def mock_test_python_version() -> None:
             self.check_function_calls['test_python_version_is_called'] = True
+
         def mock_download_and_install_package(
             url: str,
             unused_filename: str
         ) -> None:
             self.urls.append(url)
+
         def mock_exists(unused_path: str) -> Literal[True]:
             return True
+
         def mock_recursive_chown(
             unused_path: str,
             unused_uid: int,
             unused_gid: int
         ) -> None:
             self.check_function_calls['recursive_chown_is_called'] = True
+
         def mock_recursive_chmod(unused_path: str, unused_mode: int) -> None:
             self.check_function_calls['recursive_chmod_is_called'] = True
+
         def mock_uname() -> List[str]:
             return ['Linux']
+
         def mock_rename(unused_path1: str, unused_path2: str) -> None:
             self.check_function_calls['rename_is_called'] = True
+
         def mock_isfile(unused_path: str) -> Literal[True]:
             return True
+
         def mock_delete_file(unused_path: str) -> None:
             self.check_function_calls['delete_file_is_called'] = True
+
         def mock_get(unused_var: str) -> None:
             return None
 
@@ -142,8 +153,10 @@ class SetupTests(test_utils.GenericTestBase):
         check_function_calls = {
             'makedirs_is_called': False
         }
+
         def mock_makedirs(unused_path: str) -> None:
             check_function_calls['makedirs_is_called'] = True
+
         def mock_exists(unused_path: str) -> Literal[False]:
             return False
         makedirs_swap = self.swap(os, 'makedirs', mock_makedirs)
@@ -156,8 +169,10 @@ class SetupTests(test_utils.GenericTestBase):
         check_function_calls = {
             'makedirs_is_called': False
         }
+
         def mock_makedirs(unused_path: str) -> None:
             check_function_calls['makedirs_is_called'] = True
+
         def mock_exists(unused_path: str) -> Literal[True]:
             return True
         makedirs_swap = self.swap(os, 'makedirs', mock_makedirs)
@@ -245,16 +260,21 @@ class SetupTests(test_utils.GenericTestBase):
             'close_is_called': True,
             'remove_is_called': True
         }
+
         def mock_url_retrieve(unused_url: str, filename: str) -> None:  # pylint: disable=unused-argument
             check_function_calls['url_retrieve_is_called'] = True
         temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
+
         def mock_open(name: str) -> tarfile.TarFile:  # pylint: disable=unused-argument
             check_function_calls['open_is_called'] = True
             return temp_file
+
         def mock_extractall(unused_self: str, path: str) -> None:  # pylint: disable=unused-argument
             check_function_calls['extractall_is_called'] = True
+
         def mock_close(unused_self: str) -> None:
             check_function_calls['close_is_called'] = True
+
         def mock_remove(unused_path: str) -> None:
             check_function_calls['remove_is_called'] = True
 
@@ -281,9 +301,11 @@ class SetupTests(test_utils.GenericTestBase):
         os.rmdir(target)
 
     def test_invalid_dir(self) -> None:
+
         def mock_getcwd() -> str:
             return 'invalid'
         print_arr = []
+
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
 
@@ -299,6 +321,7 @@ class SetupTests(test_utils.GenericTestBase):
             self.check_function_calls['test_python_version_is_called'])
 
     def test_package_install_with_darwin_x64(self) -> None:
+
         def mock_exists(unused_path: str) -> Literal[False]:
             return False
 
@@ -325,14 +348,17 @@ class SetupTests(test_utils.GenericTestBase):
                     common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_package_install_with_darwin_x86(self) -> None:
+
         def mock_exists(unused_path: str) -> Literal[False]:
             return False
+
         def mock_is_x64() -> Literal[False]:
             return False
         os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
         architecture_swap = self.swap(
             common, 'is_x64_architecture', mock_is_x64)
         all_cmd_tokens = []
+
         def mock_check_call(cmd_tokens: List[str]) -> None:
             all_cmd_tokens.extend(cmd_tokens)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -355,8 +381,10 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
     def test_package_install_with_linux_x64(self) -> None:
+
         def mock_exists(unused_path: str) -> Literal[False]:
             return False
+
         def mock_is_x64() -> Literal[True]:
             return True
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
@@ -381,14 +409,17 @@ class SetupTests(test_utils.GenericTestBase):
                     common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_package_install_with_linux_x86(self) -> None:
+
         def mock_exists(unused_path: str) -> Literal[False]:
             return False
+
         def mock_is_x64() -> Literal[False]:
             return False
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
         architecture_swap = self.swap(
             common, 'is_x64_architecture', mock_is_x64)
         all_cmd_tokens = []
+
         def mock_check_call(cmd_tokens: List[str]) -> None:
             all_cmd_tokens.extend(cmd_tokens)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -411,6 +442,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
     def test_package_install_with_windows_x86(self) -> None:
+
         def mock_exists(unused_path: str) -> Literal[False]:
             return False
 
@@ -458,6 +490,7 @@ class SetupTests(test_utils.GenericTestBase):
                     common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_package_install_with_windows_x64(self) -> None:
+
         def mock_exists(unused_path: str) -> Literal[False]:
             return False
 
@@ -506,6 +539,7 @@ class SetupTests(test_utils.GenericTestBase):
                     common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_chrome_bin_setup_with_google_chrome(self) -> None:
+
         def mock_isfile(path: str) -> bool:
             return path == '/usr/bin/google-chrome'
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
@@ -516,6 +550,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/google-chrome')
 
     def test_chrome_bin_setup_with_brave_browser(self) -> None:
+
         def mock_isfile(path: str) -> bool:
             return path == '/usr/bin/brave'
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
@@ -526,6 +561,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/brave')
 
     def test_chrome_bin_setup_with_chromium_browser(self) -> None:
+
         def mock_isfile(path: str) -> bool:
             return path == '/usr/bin/chromium-browser'
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
@@ -536,6 +572,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/chromium-browser')
 
     def test_chrome_bin_setup_with_chromium_browser_arch(self) -> None:
+
         def mock_isfile(path: str) -> bool:
             return path == '/usr/bin/chromium'
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
@@ -546,6 +583,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/chromium')
 
     def test_chrome_bin_setup_with_chrome_exe_c_files(self) -> None:
+
         def mock_isfile(path: str) -> bool:
             return (
                 path == (
@@ -561,6 +599,7 @@ class SetupTests(test_utils.GenericTestBase):
             '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
 
     def test_chrome_bin_setup_with_windows_chrome(self) -> None:
+
         def mock_isfile(path: str) -> bool:
             return path == (
                 'c:\\Program Files (x86)\\Google\\Chrome\\' +
@@ -575,6 +614,7 @@ class SetupTests(test_utils.GenericTestBase):
             'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe')
 
     def test_chrome_bin_setup_with_chrome_exe_mnt_files(self) -> None:
+
         def mock_isfile(path: str) -> bool:
             return (
                 path == (
@@ -590,6 +630,7 @@ class SetupTests(test_utils.GenericTestBase):
             '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
 
     def test_chrome_bin_setup_with_mac_google_chrome(self) -> None:
+
         def mock_isfile(path: str) -> bool:
             return (
                 path == (
@@ -605,9 +646,11 @@ class SetupTests(test_utils.GenericTestBase):
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
 
     def test_chrome_bin_setup_with_error(self) -> None:
+
         def mock_isfile(unused_path: str) -> Literal[False]:
             return False
         print_arr = []
+
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)

@@ -49,6 +49,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
             def communicate(self) -> Tuple[bytes, bytes]:
                 """Return user-prefix error as stderr."""
                 return b'', b'can\'t combine user with prefix'
+
         def mock_popen_error_call(
             unused_cmd_tokens: List[str], # pylint: disable=unused-argument
             *args: Tuple[Any], # pylint: disable=unused-argument
@@ -64,6 +65,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
             subprocess, 'check_call', mock_check_call)
 
     def test_import_with_missing_packages(self) -> None:
+
         def mock_exists(unused_path: str) -> Literal[False]:
             return False
         exists_swap = self.swap(os.path, 'exists', mock_exists)
