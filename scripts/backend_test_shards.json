@@ -147,7 +147,6 @@
         "core.jobs.jobs_manager_test",
         "core.schema_utils_test",
         "core.domain.story_services_test",
-        "core.domain.fs_domain_test",
         "core.domain.taskqueue_services_test",
         "core.domain.email_services_test",
         "core.domain.wipeout_service_test",

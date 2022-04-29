@@ -23,8 +23,10 @@ import logging
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import feedback_services
+from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import role_services
@@ -38,6 +40,8 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
+
+from typing import Optional
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
@@ -267,7 +271,7 @@ def apply_change_list(topic_id, change_list):
                     topic.update_language_code(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
-                    topic.update_thumbnail_filename(change.new_value)
+                    update_thumbnail_filename(topic, change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_thumbnail_bg_color(change.new_value)
@@ -315,8 +319,8 @@ def apply_change_list(topic_id, change_list):
                         change.subtopic_id, change.new_value)
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME):
-                    topic.update_subtopic_thumbnail_filename(
-                        change.subtopic_id, change.new_value)
+                    update_subtopic_thumbnail_filename(
+                        topic, change.subtopic_id, change.new_value)
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_subtopic_thumbnail_bg_color(
@@ -1158,3 +1162,62 @@ def get_story_titles_in_topic(topic):
     stories = story_fetchers.get_stories_by_ids(story_ids)
     story_titles = [story.title for story in stories if story is not None]
     return story_titles
+
+
+def update_thumbnail_filename(
+    topic: topic_domain.Topic, new_thumbnail_filename: Optional[str]
+) -> None:
+    """Updates the thumbnail filename and file size in a topic object.
+
+    Args:
+        topic: topic_domain.Topic. The topic domain object whose thumbnail
+            is to be updated.
+        new_thumbnail_filename: str|None. The updated thumbnail filename
+            for the topic.
+
+    Raises:
+        Exception. The thumbnail does not exist for expected topic in
+            the filesystem.
+    """
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic.id)
+    filepath = '%s/%s' % (
+        constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+    if fs.isfile(filepath):  # type: ignore[no-untyped-call]
+        thumbnail_size_in_bytes = len(fs.get(filepath))
+        topic.update_thumbnail_filename_and_size(
+            new_thumbnail_filename, thumbnail_size_in_bytes)
+    else:
+        raise Exception(
+            'The thumbnail %s for topic with id %s does not exist'
+            ' in the filesystem.' % (new_thumbnail_filename, topic.id))
+
+
+def update_subtopic_thumbnail_filename(
+    topic: topic_domain.Topic,
+    subtopic_id: int,
+    new_thumbnail_filename: str
+) -> None:
+    """Updates the thumbnail filename and file size in a subtopic.
+
+    Args:
+        topic: topic_domain.Topic. The topic domain object containing
+            the subtopic whose thumbnail is to be updated.
+        subtopic_id: int. The id of the subtopic to edit.
+        new_thumbnail_filename: str. The new thumbnail filename for the
+            subtopic.
+
+    Raises:
+        Exception. The thumbnail does not exist for expected topic in
+            the filesystem.
+    """
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic.id)
+    filepath = '%s/%s' % (
+        constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+    if fs.isfile(filepath):  # type: ignore[no-untyped-call]
+        thumbnail_size_in_bytes = len(fs.get(filepath))
+        topic.update_subtopic_thumbnail_filename_and_size(
+            subtopic_id, new_thumbnail_filename, thumbnail_size_in_bytes)
+    else:
+        raise Exception(
+            'The thumbnail %s for subtopic with topic_id %s does not exist'
+            ' in the filesystem.' % (new_thumbnail_filename, topic.id))
