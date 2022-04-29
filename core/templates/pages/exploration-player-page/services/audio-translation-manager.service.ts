@@ -76,7 +76,7 @@ export class AudioTranslationManagerService {
   // This needs to be called *after* setContentAudioTranslations; e.g. inside
   // ngOnInit() of the component.
   setSequentialAudioTranslations(
-      audioTranslations: AudioTranslations, 
+      audioTranslations: AudioTranslations,
       html: string,
       componentName: string
   ): void {
