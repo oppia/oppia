@@ -489,7 +489,7 @@ class ExportAccountHandler(base.BaseHandler):
         # Ensure that the exported data does not contain a user ID.
         user_data_json_string = json.dumps(user_data)
         if re.search(feconf.USER_ID_REGEX, user_data_json_string):
-            logging.exception(
+            logging.error(
                 '[TAKEOUT] User ID found in the JSON generated for user %s'
                 % self.user_id)
             user_data_json_string = (

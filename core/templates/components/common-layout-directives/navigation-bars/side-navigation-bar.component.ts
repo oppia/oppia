@@ -120,7 +120,6 @@ export class SideNavigationBarComponent {
   togglegetinvolvedSubmenu(): void {
     this.getinvolvedSubmenuIsShown =
     !this.getinvolvedSubmenuIsShown;
-    this.learnSubmenuIsShown = false;
   }
 
   navigateToClassroomPage(classroomUrl: string): void {
