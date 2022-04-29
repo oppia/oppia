@@ -123,8 +123,8 @@ class GetNumberOfStoryNotesExceedsMaxLengthJobTests(
     def test_run_with_mixed_models(self) -> None:
         self.put_multi([self.story_1, self.story_2, self.story_3])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('Stories SUCCESS: 2'),
-            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('Stories SUCCESS: 3'),
+            job_run_result.JobRunResult.as_stdout('INVALID SUCCESS: 2'),
             job_run_result.JobRunResult.as_stderr(
                 f'The id of story is {self.STORY_ID_1} and its actual '
                 + f'length is {len(self.story_1.notes)}'),
