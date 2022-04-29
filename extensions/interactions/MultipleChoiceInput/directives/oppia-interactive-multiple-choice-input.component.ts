@@ -134,19 +134,19 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
 
     // Combine labels for voiceover.
-    let combinedChoceLabels = '';
+    let combinedChoiceLabels = '';
     for (const choice of choices.value) {
       // If the labels are in html format, remove the tags and leave the
       // content only.
       const cleanChoiceLabel = choice.html.replace(/<[^>]+>/g, '');
 
-      combinedChoceLabels += cleanChoiceLabel + '. ';
+      combinedChoiceLabels += cleanChoiceLabel + '. ';
     }
     // Say the choices aloud if autoplay is enabled.
     this.audioTranslationManagerService.setSequentialAudioTranslations(
       this.recordedVoiceovers.getBindableVoiceovers(
         choices.value[0]._contentId),
-      combinedChoceLabels, this.COMPONENT_NAME_RULE_INPUT
+      combinedChoiceLabels, this.COMPONENT_NAME_RULE_INPUT
     );
 
     this.answer = null;

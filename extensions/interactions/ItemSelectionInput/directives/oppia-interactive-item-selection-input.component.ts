@@ -105,19 +105,19 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
 
     // Combine labels for voiceover.
-    let combinedChoceLabels = '';
+    let combinedChoiceLabels = '';
     for (const choiceLabel of this.choices) {
       // If the labels are in html format, remove the tags and leave the
       // content only.
       const cleanChoiceLabel = choiceLabel.replace(/<[^>]+>/g, '');
 
-      combinedChoceLabels += cleanChoiceLabel + '. ';
+      combinedChoiceLabels += cleanChoiceLabel + '. ';
     }
     // Say the choices aloud if autoplay is enabled.
     this.audioTranslationManagerService.setSequentialAudioTranslations(
       this.recordedVoiceovers.getBindableVoiceovers(
         this.choicesValue[0]._contentId),
-      combinedChoceLabels, this.COMPONENT_NAME_RULE_INPUT
+      combinedChoiceLabels, this.COMPONENT_NAME_RULE_INPUT
     );
 
     this.displayCheckboxes = this.maxAllowableSelectionCount > 1;
