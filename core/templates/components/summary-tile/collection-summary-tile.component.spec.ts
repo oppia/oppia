@@ -217,6 +217,8 @@ describe('Collection Summary Tile Component', () => {
     const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow')
       .and.returnValue('a few seconds ago');
 
+    // Date.now() returns the current time in milliseconds since the
+    // Epoch.
     component.getLastUpdatedMsec = Date.now();
     let relativeLastUpdatedDateTime =
       component.getRelativeLastUpdatedDateTime();
