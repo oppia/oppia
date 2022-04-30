@@ -1288,23 +1288,44 @@ class QuestionPlayerHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
+
 class TransientCheckpointUrlHandler(base.BaseHandler):
     """Responsible for redirecting a logged-out learner."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'unique_progress_url_id': {
+            'schema': {
+                    'type': 'basestring',
+                }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_play_exploration
     def get(self, unique_progress_url_id):
         """Handles GET requests. Fetches the logged-out learner's progress."""
-        logged_out_user_data =  (
+        logged_out_user_data = (
             exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
 
+        # VERIFY.
+        if logged_out_user_data is None:
+            raise self.PageNotFoundException()
+
         self.values.update({
+            'exploration_id': (
+                logged_out_user_data.exploration_id),
             'furthest_reached_checkpoint_exp_version': (
                 logged_out_user_data.furthest_reached_checkpoint_exp_version),
             'furthest_reached_checkpoint_state_name': (
                 logged_out_user_data.furthest_reached_checkpoint_state_name),
+            'most_recently_reached_checkpoint_exp_version': (
+                logged_out_user_data.
+                    most_recently_reached_checkpoint_exp_version),
             'most_recently_reached_checkpoint_state_name': (
                 logged_out_user_data.
-                    most_recently_reached_checkpoint_state_name)
+                    most_recently_reached_checkpoint_state_name),
         })
 
         self.render_json(self.values)
@@ -1312,6 +1333,36 @@ class TransientCheckpointUrlHandler(base.BaseHandler):
 
 class SaveProgressEventHandler(base.BaseHandler):
     """Responsible for storing progress of a logged-out learner."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+                'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'exploration_id': {
+                'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+            },
+            'unique_progress_url_id': {
+                'schema': {
+                    'type': 'basestring',
+                    }
+            },
+            'most_recently_reached_checkpoint_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'most_recently_reached_checkpoint_exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            }
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def put(self):

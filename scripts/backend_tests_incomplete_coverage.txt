@@ -45,3 +45,7 @@ core.storage.feedback.gae_models_test
 core.domain.user_domain_test
 core.storage.exploration.gae_models_test
 scripts.docstrings_checker_test
+core.domain.exp_services_test
+core.controllers.reader_test
+core.storage.exploration.gae_models_test
+core.domain.exp_fetchers_test

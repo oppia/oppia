@@ -2032,7 +2032,7 @@ def get_interaction_id_for_state(exp_id, state_name):
     """Returns the interaction id for the given state name.
 
     Args:
-        exp_id: str. The ID of the exp.
+        exp_id: str. The ID of the exploration.
         state_name: str. The name of the state.
 
     Returns:
@@ -2047,6 +2047,7 @@ def get_interaction_id_for_state(exp_id, state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
 
 def _get_checkpoints_in_order(init_state_name, states):
     """Returns the checkpoints of an exploration in sequential order by a
@@ -2118,10 +2119,10 @@ def _get_most_distant_reached_checkpoint_in_current_exploration(
 
 
 def update_logged_out_user_progress(
-    exploration_id,
-    unique_progress_url_id,
-    state_name,
-    exp_version,
+    exploration_id: str,
+    unique_progress_url_id: str,
+    state_name: str,
+    exp_version: int,
     ) -> None:
     """Updates the logged-out user's progress in the
         associated TransientCheckpointUrlModel.

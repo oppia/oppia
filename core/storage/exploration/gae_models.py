@@ -926,7 +926,7 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
 
         Args:
             unique_progress_url_id: str. The 6 digit long unique id
-            assigned to the progress made by a logged-out user.
+                assigned to the progress made by a logged-out user.
 
         Returns:
             TransientCheckpointUrlModel|None. The TransientCheckpointUrlModel
@@ -949,16 +949,17 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
         Args:
             exploration_id: str. The ID of the exploration.
             unique_progress_url_id: str. The 6 digit long unique id
-            assigned to the progress made by a logged-out user.
+                assigned to the progress made by a logged-out user.
 
         Returns:
             TransientCheckpointUrlModel. The newly created
             TransientCheckpointUrlModel instance.
         """
         return cls(
+            # VERIFY.
             id=unique_progress_url_id,
-            exploration_id = exploration_id,
-            unique_progress_url_id = unique_progress_url_id)
+            exploration_id=exploration_id,
+            unique_progress_url_id=unique_progress_url_id)
 
 
 class ExpSummaryModel(base_models.BaseModel):

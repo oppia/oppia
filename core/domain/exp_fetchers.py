@@ -451,12 +451,13 @@ def get_exploration_user_data(user_id, exp_id):
         exp_user_data_model.most_recently_reached_checkpoint_state_name
     )
 
-def get_logged_out_user_progress(unique_progress_url_id):
+
+def get_logged_out_user_progress(unique_progress_url_id: str):
     """Returns an TransientCheckpointUrl domain object.
 
     Args:
         unique_progress_url_id: str. The 6 digit long unique id
-        assigned to the progress made by a logged-out user.
+            assigned to the progress made by a logged-out user.
 
     Returns:
         TransientCheckpointUrl or None. The domain object corresponding to the
