@@ -568,7 +568,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id')
         ]
-        self.topic.canonical_story_references[0].story_is_published = 'no'
+        self.topic.canonical_story_references[0].story_is_published = 'no' # type: ignore
         self._assert_validation_error(
             'strory_is_published value should be boolean type')
 
