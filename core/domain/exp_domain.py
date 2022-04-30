@@ -403,8 +403,8 @@ class TransientCheckpointUrl:
         """Validates properties of the TransientCheckpointUrl object.
 
         Raises:
-        ValidationError. One or more attributes of the TransientCheckpointUrl
-        are invalid.
+            ValidationError. One or more attributes of the TransientCheckpointUrl
+                are invalid.
         """
         if not isinstance(self.exploration_id, str):
             raise utils.ValidationError(
