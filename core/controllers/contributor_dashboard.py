@@ -150,7 +150,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
             classroom_topic_ids.extend(classroom_dict['topic_ids'])
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
         # Associate each skill with one classroom topic name.
-        # TODO(#8912): Associate each skill/skill opportunity with  all linked
+        # TODO(#8912): Associate each skill/skill opportunity with all linked
         # topics.
         classroom_topic_skill_id_to_topic_name = {}
         for topic in classroom_topics:
@@ -506,8 +506,8 @@ class FeaturedTranslationLanguagesHandler(base.BaseHandler):
         })
 
 
-class AllTopicNamesHandler(base.BaseHandler):
-    """Provides names of all existing topics in the datastore."""
+class TranslatableTopicNamesHandler(base.BaseHandler):
+    """Provides names of all translatable topics in the datastore."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
@@ -517,7 +517,8 @@ class AllTopicNamesHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        topic_summaries = topic_fetchers.get_all_topic_summaries()
+        # Only published topics are translatable.
+        topic_summaries = topic_fetchers.get_published_topic_summaries()
         topic_names = [summary.name for summary in topic_summaries]
         self.values = {
             'topic_names': topic_names

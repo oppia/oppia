@@ -282,23 +282,23 @@ describe('Contribution Opportunities Service', () => {
     expect(failHandler).toHaveBeenCalled();
   }));
 
-  it('should return all topic names when calling \'getAllTopicNamesAsync\'',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
+  it('should return topic names when calling ' +
+    '\'getTranslatableTopicNamesAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-      let topicNamesDict = ['Topic 1', 'Topic 2'];
+    let topicNamesDict = ['Topic 1', 'Topic 2'];
 
-      let getAllTopicNamesSpy = spyOn(
-        contributionOpportunitiesBackendApiService,
-        'fetchAllTopicNamesAsync')
-        .and.returnValue(Promise.resolve(topicNamesDict));
+    let getTranslatableTopicNamesSpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'fetchTranslatableTopicNamesAsync')
+      .and.returnValue(Promise.resolve(topicNamesDict));
 
-      contributionOpportunitiesService.getAllTopicNamesAsync()
-        .then(successHandler, failHandler);
-      tick();
+    contributionOpportunitiesService.getTranslatableTopicNamesAsync()
+      .then(successHandler, failHandler);
+    tick();
 
-      expect(getAllTopicNamesSpy).toHaveBeenCalled();
-      expect(successHandler).toHaveBeenCalledWith(topicNamesDict);
-    }));
+    expect(getTranslatableTopicNamesSpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(topicNamesDict);
+  }));
 });

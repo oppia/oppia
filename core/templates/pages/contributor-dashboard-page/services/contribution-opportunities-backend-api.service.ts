@@ -203,11 +203,11 @@ export class ContributionOpportunitiesBackendApiService {
     }
   }
 
-  async fetchAllTopicNamesAsync():
+  async fetchTranslatableTopicNamesAsync():
   Promise<string[]> {
     try {
       const response = await this.http
-        .get<TopicNamesBackendDict>('/getalltopicnames').toPromise();
+        .get<TopicNamesBackendDict>('/gettranslatabletopicnames').toPromise();
       response.topic_names.unshift('All');
 
       return response.topic_names;

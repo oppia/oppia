@@ -908,11 +908,11 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
         )
 
 
-class AllTopicNamesHandlerTest(test_utils.GenericTestBase):
-    """Test for the AllTopicNamesHandler."""
+class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
+    """Test for the TranslatableTopicNamesHandler."""
 
     def setUp(self):
-        super(AllTopicNamesHandlerTest, self).setUp()
+        super(TranslatableTopicNamesHandlerTest, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -921,8 +921,8 @@ class AllTopicNamesHandlerTest(test_utils.GenericTestBase):
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-    def test_get_all_topic_names(self):
-        response = self.get_json('/getalltopicnames')
+    def test_get_translatable_topic_names(self):
+        response = self.get_json('/gettranslatabletopicnames')
         self.assertEqual(
             response,
             {'topic_names': []}
@@ -940,9 +940,14 @@ class AllTopicNamesHandlerTest(test_utils.GenericTestBase):
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
+
+        # Unpublished topics should not be returned.
+        response = self.get_json('/gettranslatabletopicnames')
+        self.assertEqual(len(response['topic_names']), 0)
+
         topic_services.publish_topic(topic_id, self.admin_id)
 
-        response = self.get_json('/getalltopicnames')
+        response = self.get_json('/gettranslatabletopicnames')
         self.assertEqual(
             response,
             {'topic_names': ['topic']}

@@ -68,7 +68,7 @@ describe('Contributor dashboard page', function() {
     focusManagerService = $injector.get('FocusManagerService');
     ctrl = $componentController('contributorDashboardPage');
 
-    spyOn(ContributionOpportunitiesService, 'getAllTopicNamesAsync')
+    spyOn(ContributionOpportunitiesService, 'getTranslatableTopicNamesAsync')
       .and.returnValue($q.resolve(['Topic 1', 'Topic 2']));
     spyOn(LocalStorageService, 'getLastSelectedTranslationLanguageCode').and
       .returnValue('');
