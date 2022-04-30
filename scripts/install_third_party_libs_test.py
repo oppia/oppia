@@ -100,8 +100,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_popen_error_call(
             _args: List[str], **_kwargs: Optional[int]
         ) -> MockCheckCallReturn:
-            return MockCheckCallReturn(
-                1, b'can\'t combine user with prefix')
+            return MockCheckCallReturn(1, b'can\'t combine user with prefix')
 
         def mock_ensure_directory_exists(_path: str) -> None:
             pass
@@ -129,14 +128,16 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             _package: str, _version: str, _path: str
         ) -> None:
             self.check_main_function_calls[
-                'ensure_pip_library_is_installed_is_called'] = True
+                'ensure_pip_library_is_installed_is_called'
+            ] = True
 
         def mock_check_call_pass(_args: List[str]) -> None:
             pass
 
         def mock_main_for_install_third_party(**_kwargs: str) -> None:
             self.check_main_function_calls[
-                'install_third_party_main_is_called'] = True
+                'install_third_party_main_is_called'
+            ] = True
 
         def mock_main_for_setup(**_kwargs: str) -> None:
             self.check_main_function_calls['setup_main_is_called'] = True
@@ -146,7 +147,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         def mock_main_for_pre_commit_hook(**_kwargs: str) -> None:
             self.check_main_function_calls[
-                'pre_commit_hook_main_is_called'] = True
+                'pre_commit_hook_main_is_called'
+            ] = True
 
         def mock_main_for_pre_push_hook(**_kwargs: str) -> None:
             self.check_function_calls['pre_push_hook_main_is_called'] = True
@@ -169,43 +171,56 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             self.check_function_calls['url_retrieve_is_called'] = True
 
         self.ensure_pip_install_swap = self.swap(
-            install_third_party_libs, 'ensure_pip_library_is_installed',
-            mock_ensure_pip_library_is_installed)
+            install_third_party_libs,
+            'ensure_pip_library_is_installed',
+            mock_ensure_pip_library_is_installed
+        )
         self.check_call_pass_swap = self.swap(
-            subprocess, 'check_call', mock_check_call_pass)
+            subprocess, 'check_call', mock_check_call_pass
+        )
         self.install_third_party_main_swap = self.swap(
-            install_third_party, 'main', mock_main_for_install_third_party)
+            install_third_party, 'main', mock_main_for_install_third_party
+        )
         self.setup_main_swap = self.swap(setup, 'main', mock_main_for_setup)
         self.setup_gae_main_swap = self.swap(
-            setup_gae, 'main', mock_main_for_setup_gae)
+            setup_gae, 'main', mock_main_for_setup_gae
+        )
         self.pre_commit_hook_main_swap = self.swap(
-            pre_commit_hook, 'main', mock_main_for_pre_commit_hook)
+            pre_commit_hook, 'main', mock_main_for_pre_commit_hook
+        )
         self.pre_push_hook_main_swap = self.swap(
-            pre_push_hook, 'main', mock_main_for_pre_push_hook)
+            pre_push_hook, 'main', mock_main_for_pre_push_hook
+        )
         self.tweak_yarn_executable_swap = self.swap(
-            install_third_party_libs, 'tweak_yarn_executable',
-            mock_tweak_yarn_executable)
+            install_third_party_libs,
+            'tweak_yarn_executable',
+            mock_tweak_yarn_executable
+        )
         self.check_call_swap = self.swap(
-            subprocess, 'check_call', mock_check_call)
-        self.Popen_swap = self.swap(
-            subprocess, 'Popen', mock_check_call)
+            subprocess, 'check_call', mock_check_call
+        )
+        self.Popen_swap = self.swap(subprocess, 'Popen', mock_check_call)
         self.check_call_error_swap = self.swap(
-            subprocess, 'check_call', mock_check_call_error)
+            subprocess, 'check_call', mock_check_call_error
+        )
         self.Popen_error_swap = self.swap(
-            subprocess, 'Popen', mock_popen_error_call)
+            subprocess, 'Popen', mock_popen_error_call
+        )
         self.dir_exists_swap = self.swap(
-            common, 'ensure_directory_exists', mock_ensure_directory_exists)
+            common, 'ensure_directory_exists', mock_ensure_directory_exists
+        )
         self.zipfile_swap = self.swap(zipfile, 'ZipFile', MockZipFile)
         self.extractall_swap = self.swap(
-            zipfile.ZipFile, 'extractall', mock_extractall)
+            zipfile.ZipFile, 'extractall', mock_extractall
+        )
         self.extractall_exception_swap = self.swap(
-            zipfile.ZipFile, 'extractall', mock_extractall_raises_exception)
+            zipfile.ZipFile, 'extractall', mock_extractall_raises_exception
+        )
         self.os_name_linux_swap = self.swap(common, 'OS_NAME', 'Linux')
         self.os_name_windows_swap = self.swap(common, 'OS_NAME', 'Windows')
         self.os_name_mac_swap = self.swap(common, 'OS_NAME', 'Darwin')
         self.isfile_true_swap = self.swap(os.path, 'isfile', mock_isfile_true)
-        self.isfile_false_swap = self.swap(
-            os.path, 'isfile', mock_isfile_false)
+        self.isfile_false_swap = self.swap(os.path, 'isfile', mock_isfile_false)
         self.library_exists_swap = self.swap_with_checks(
             os.path,
             'exists',
@@ -214,10 +229,12 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         )
         self.rename_swap = self.swap(os, 'rename', mock_rename)
         self.recursive_chmod_swap = self.swap(
-            common, 'recursive_chmod', mock_recursive_chmod)
+            common, 'recursive_chmod', mock_recursive_chmod
+        )
         self.remove_swap = self.swap(os, 'remove', mock_remove)
         self.url_retrieve_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve)
+            urlrequest, 'urlretrieve', mock_url_retrieve
+        )
 
     def test_install_prerequisite(self) -> None:
         self.check_function_calls['check_call_is_called'] = False
@@ -247,7 +264,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         with self.Popen_error_swap:
             with self.check_call_error_swap:
                 with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-                        Exception, 'Error installing prerequisite'):
+                    Exception, 'Error installing prerequisite'
+                ):
                     install_third_party_libs.install_prerequisite(prerequisite)
 
         self.assertTrue(self.check_function_calls['check_call_is_called'])
@@ -284,7 +302,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 self.assertTrue('linux' in url.split('/')[-1])
                 self.check_function_calls['url_retrieve_is_called'] = True
         url_retrieve_linux_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve_linux)
+            urlrequest, 'urlretrieve', mock_url_retrieve_linux
+        )
 
         self.check_function_calls['extractall_is_called'] = False
         self.check_function_calls['recursive_chmod_is_called'] = False
@@ -296,11 +315,9 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                     with self.zipfile_swap, self.extractall_swap:
                         install_third_party_libs.install_buf_and_protoc()
 
-        self.assertTrue(
-            self.check_function_calls['url_retrieve_is_called'])
+        self.assertTrue(self.check_function_calls['url_retrieve_is_called'])
         self.assertTrue(self.check_function_calls['extractall_is_called'])
-        self.assertTrue(
-            self.check_function_calls['recursive_chmod_is_called'])
+        self.assertTrue(self.check_function_calls['recursive_chmod_is_called'])
 
     def test_buf_installation_on_mac(self) -> None:
 
@@ -324,11 +341,9 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 with self.zipfile_swap, self.extractall_swap, self.remove_swap:
                     install_third_party_libs.install_buf_and_protoc()
 
-        self.assertTrue(
-            self.check_function_calls['url_retrieve_is_called'])
+        self.assertTrue(self.check_function_calls['url_retrieve_is_called'])
         self.assertTrue(self.check_function_calls['extractall_is_called'])
-        self.assertTrue(
-            self.check_function_calls['recursive_chmod_is_called'])
+        self.assertTrue(self.check_function_calls['recursive_chmod_is_called'])
 
     def test_buf_is_not_reinstalled(self) -> None:
 
@@ -343,10 +358,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             with self.dir_exists_swap, exists_swap:
                 install_third_party_libs.install_buf_and_protoc()
 
-        self.assertFalse(
-            self.check_function_calls['url_retrieve_is_called'])
-        self.assertFalse(
-            self.check_function_calls['recursive_chmod_is_called'])
+        self.assertFalse(self.check_function_calls['url_retrieve_is_called'])
+        self.assertFalse(self.check_function_calls['recursive_chmod_is_called'])
 
     def test_installing_protoc_raises_exception_if_fails_to_extract(
         self
@@ -358,7 +371,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             with self.dir_exists_swap, self.isfile_false_swap:
                 with self.zipfile_swap, self.extractall_exception_swap:
                     with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-                            Exception, 'Error installing protoc binary'):
+                        Exception, 'Error installing protoc binary'
+                    ):
                         install_third_party_libs.install_buf_and_protoc()
 
         self.assertTrue(self.check_function_calls['url_retrieve_is_called'])
@@ -376,7 +390,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.Popen_error_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-                Exception, 'Error compiling proto files at mock_path'):
+            Exception, 'Error compiling proto files at mock_path'
+        ):
             install_third_party_libs.compile_protobuf_files(['mock_path'])
 
     def test_ensure_pip_library_is_installed_with_regular_package(self) -> None:
@@ -389,7 +404,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         with self.library_exists_swap, pip_install_swap:
             install_third_party_libs.ensure_pip_library_is_installed(
-                'package', '1.1.0', 'path')
+                'package', '1.1.0', 'path'
+            )
 
     def test_ensure_pip_library_is_installed_with_git_repo_package(
         self
@@ -405,7 +421,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         with self.library_exists_swap, pip_install_swap:
             install_third_party_libs.ensure_pip_library_is_installed(
-                'git+https://aaa.com/package.git', '1.1.0', 'path')
+                'git+https://aaa.com/package.git', '1.1.0', 'path'
+            )
 
     def test_function_calls(self) -> None:
         for function_call in self.check_main_function_calls:
@@ -413,7 +430,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.check_function_calls['pre_push_hook_main_is_called'] = False
         self.check_function_calls['tweak_yarn_executable_is_called'] = False
         correct_google_path = os.path.join(
-            common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+            common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google'
+        )
         initialized_directories = []
         copied_src_dst_tuples = []
 
@@ -434,12 +452,16 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         correct_copied_src_dst_tuples = [
             (
                 os.path.join(
-                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
-                os.path.join(correct_google_path, 'appengine')),
+                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'
+                ),
+                os.path.join(correct_google_path, 'appengine')
+            ),
             (
                 os.path.join(
-                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
-                os.path.join(correct_google_path, 'net')),
+                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'
+                ),
+                os.path.join(correct_google_path, 'net')
+            ),
             (
                 os.path.join(
                     common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
@@ -461,20 +483,20 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             self.check_main_function_calls,
-            self.expected_check_main_function_calls)
+            self.expected_check_main_function_calls
+        )
 
-        self.assertEqual(
-            copied_src_dst_tuples, correct_copied_src_dst_tuples)
+        self.assertEqual(copied_src_dst_tuples, correct_copied_src_dst_tuples)
 
-        self.assertEqual(
-            initialized_directories,
-            [correct_google_path])
+        self.assertEqual(initialized_directories, [correct_google_path])
 
         self.assertTrue(
-            self.check_function_calls['pre_push_hook_main_is_called'])
+            self.check_function_calls['pre_push_hook_main_is_called']
+        )
 
         self.assertFalse(
-            self.check_function_calls['tweak_yarn_executable_is_called'])
+            self.check_function_calls['tweak_yarn_executable_is_called']
+        )
 
     def test_function_calls_on_windows(self) -> None:
         for function_call in self.check_main_function_calls:
@@ -485,13 +507,13 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         py_actual_text = (
             'ConverterMapping,\nLine ending with '
-            '"ConverterMapping",\nOther Line\n')
+            '"ConverterMapping",\nOther Line\n'
+        )
         temp_py_config_file = tempfile.NamedTemporaryFile(prefix='py').name
         with utils.open_file(temp_py_config_file, 'w') as f:
             f.write(py_actual_text)
 
-        pq_actual_text = (
-            'ConverterMapping,\n"ConverterMapping",\nOther Line\n')
+        pq_actual_text = 'ConverterMapping,\n"ConverterMapping",\nOther Line\n'
         temp_pq_config_file = tempfile.NamedTemporaryFile(prefix='pq').name
         with utils.open_file(temp_pq_config_file, 'w') as f:
             f.write(pq_actual_text)
@@ -505,10 +527,13 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             self.check_main_function_calls,
-            self.expected_check_main_function_calls)
+            self.expected_check_main_function_calls
+        )
 
         self.assertTrue(
-            self.check_function_calls['tweak_yarn_executable_is_called'])
+            self.check_function_calls['tweak_yarn_executable_is_called']
+        )
 
         self.assertFalse(
-            self.check_function_calls['pre_push_hook_main_is_called'])
+            self.check_function_calls['pre_push_hook_main_is_called']
+        )

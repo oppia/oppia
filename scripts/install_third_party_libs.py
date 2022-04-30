@@ -51,11 +51,13 @@ def install_prerequisite(package: Tuple[str, str, str]) -> None:
     """
     package_name, version_number, target_path = package
     command_text = [
-        sys.executable, '-m', 'pip', 'install', '%s==%s'
-        % (package_name, version_number), '--target', target_path]
+        sys.executable, '-m', 'pip', 'install',
+        '%s==%s' % (package_name, version_number), '--target', target_path
+    ]
     uextention_text = ['--user', '--prefix=', '--system']
     current_process = subprocess.Popen(
-        command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     output_stderr = current_process.communicate()[1]  # pylint: disable=invalid-name
     if b'can\'t combine user with prefix' in output_stderr:
         try:
@@ -87,15 +89,18 @@ BUF_BASE_URL = 'https://github.com/bufbuild/buf/releases/download/v0.29.0/'
 
 BUF_LINUX_FILES = [
     'buf-Linux-x86_64', 'protoc-gen-buf-check-lint-Linux-x86_64',
-    'protoc-gen-buf-check-breaking-Linux-x86_64']
+    'protoc-gen-buf-check-breaking-Linux-x86_64'
+]
 BUF_DARWIN_FILES = [
     'buf-Darwin-x86_64', 'protoc-gen-buf-check-lint-Darwin-x86_64',
-    'protoc-gen-buf-check-breaking-Darwin-x86_64']
+    'protoc-gen-buf-check-breaking-Darwin-x86_64'
+]
 
 # Download URL of protoc compiler.
 PROTOC_URL = (
     'https://github.com/protocolbuffers/protobuf/releases/download/v%s' %
-    common.PROTOC_VERSION)
+    common.PROTOC_VERSION
+)
 PROTOC_LINUX_FILE = 'protoc-%s-linux-x86_64.zip' % (common.PROTOC_VERSION)
 PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common.PROTOC_VERSION)
 
@@ -104,7 +109,8 @@ BUF_DIR = os.path.join(common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
 PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
 # Path of files which needs to be compiled by protobuf.
 PROTO_FILES_PATHS = [
-    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
+    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')
+]
 # Path to typescript plugin required to compile ts compatible files from proto.
 PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
@@ -133,7 +139,8 @@ def install_buf_and_protoc() -> None:
     """
     buf_files = BUF_DARWIN_FILES if common.is_mac_os() else BUF_LINUX_FILES  # type: ignore[no-untyped-call]
     protoc_file = (
-        PROTOC_DARWIN_FILE if common.is_mac_os() else PROTOC_LINUX_FILE)  # type: ignore[no-untyped-call]
+        PROTOC_DARWIN_FILE if common.is_mac_os() else PROTOC_LINUX_FILE  # type: ignore[no-untyped-call]
+    )
     buf_path = os.path.join(BUF_DIR, buf_files[0])
     protoc_path = os.path.join(PROTOC_DIR, 'bin', 'protoc')
 
@@ -142,10 +149,14 @@ def install_buf_and_protoc() -> None:
 
     common.ensure_directory_exists(BUF_DIR)  # type: ignore[no-untyped-call]
     for bin_file in buf_files:
-        urlrequest.urlretrieve('%s/%s' % (
-            BUF_BASE_URL, bin_file), filename=os.path.join(BUF_DIR, bin_file))
-    urlrequest.urlretrieve('%s/%s' % (
-        PROTOC_URL, protoc_file), filename=os.path.join(BUF_DIR, protoc_file))
+        urlrequest.urlretrieve(
+            '%s/%s' % (BUF_BASE_URL, bin_file),
+            filename=os.path.join(BUF_DIR, bin_file)
+        )
+    urlrequest.urlretrieve(
+        '%s/%s' % (PROTOC_URL, protoc_file),
+        filename=os.path.join(BUF_DIR, protoc_file)
+    )
     try:
         with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:
             zfile.extractall(path=PROTOC_DIR)
@@ -186,12 +197,14 @@ def compile_protobuf_files(filepaths: List[str]) -> None:
     # generate Python files we need to manually fix the imports.
     # See: https://github.com/protocolbuffers/protobuf/issues/1491
     compiled_protobuf_dir = (
-        pathlib.Path(os.path.join(common.CURR_DIR, 'proto_files')))
+        pathlib.Path(os.path.join(common.CURR_DIR, 'proto_files'))
+    )
     for p in compiled_protobuf_dir.iterdir():
         if p.suffix == '.py':
             common.inplace_replace_file(  # type: ignore[no-untyped-call]
                 p.absolute(),
-                r'^import (\w*_pb2 as)', r'from proto_files import \1')
+                r'^import (\w*_pb2 as)', r'from proto_files import \1'
+            )
 
 
 def ensure_pip_library_is_installed(
@@ -220,14 +233,17 @@ def ensure_pip_library_is_installed(
         print('Installing %s' % package)
         if package.startswith('git+'):
             install_backend_python_libs.pip_install(  # type: ignore[no-untyped-call]
-                '%s@%s' % (package, version), exact_lib_path)
+                '%s@%s' % (package, version), exact_lib_path
+            )
         else:
             install_backend_python_libs.pip_install(  # type: ignore[no-untyped-call]
-                '%s==%s' % (package, version), exact_lib_path)
+                '%s==%s' % (package, version), exact_lib_path
+            )
 
 
 def ensure_system_python_libraries_are_installed(
-        package: str, version: str) -> None:
+    package: str, version: str
+) -> None:
     """Installs the pip library with the corresponding version to the system
     globally. This is necessary because the development application server
     requires certain libraries on the host machine.
@@ -291,27 +307,30 @@ def main() -> None:
     # module directory in the 'third_party/python_libs' directory.
     print('Copying Google Cloud SDK modules to third_party/python_libs...')
     correct_google_path = os.path.join(
-        common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google'
+    )
     if not os.path.isdir(correct_google_path):
         os.mkdir(correct_google_path)
 
     if not os.path.isdir(os.path.join(correct_google_path, 'appengine')):
         shutil.copytree(
             os.path.join(
-                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
-            os.path.join(correct_google_path, 'appengine'))
+                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'
+            ),
+            os.path.join(correct_google_path, 'appengine')
+        )
 
     if not os.path.isdir(os.path.join(correct_google_path, 'net')):
         shutil.copytree(
-            os.path.join(
-                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
-            os.path.join(correct_google_path, 'net'))
+            os.path.join(common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
+            os.path.join(correct_google_path, 'net')
+        )
 
     if not os.path.isdir(os.path.join(correct_google_path, 'pyglib')):
         shutil.copytree(
-            os.path.join(
-                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
-            os.path.join(correct_google_path, 'pyglib'))
+            os.path.join(common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
+            os.path.join(correct_google_path, 'pyglib')
+        )
 
     # The following for loop populates all of the google modules with
     # the correct __init__.py files if they do not exist. This solves the bug
@@ -324,8 +343,7 @@ def main() -> None:
     for path_list in os.walk(correct_google_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
-            with utils.open_file(
-                os.path.join(root_path, '__init__.py'), 'a'):
+            with utils.open_file(os.path.join(root_path, '__init__.py'), 'a'):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.
                 pass
