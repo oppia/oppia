@@ -17,10 +17,11 @@
  */
 
 import { Component } from '@angular/core';
+import { Subscription } from 'rxjs';
+
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Subscription } from 'rxjs';
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';

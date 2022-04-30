@@ -17,6 +17,9 @@
  */
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
+
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -26,13 +29,11 @@ import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { UserService } from 'services/user.service';
 import { CollectionNode } from 'domain/collection/collection-node.model';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 export interface IconParametersArray {

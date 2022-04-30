@@ -18,13 +18,13 @@
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ViewEncapsulation } from '@angular/core';
-import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 
+import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
 import { PageTitleService } from 'services/page-title.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
 
 
 @Component({

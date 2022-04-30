@@ -18,6 +18,7 @@
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
 import { ReadOnlyTopic } from
@@ -40,7 +41,6 @@ import { PageTitleService } from 'services/page-title.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'topic-viewer-page',

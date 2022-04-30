@@ -18,12 +18,12 @@
 
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { PageTitleService } from 'services/page-title.service';
 import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'error-page',

@@ -20,6 +20,7 @@ require('base-components/base-content.component.ts');
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -30,7 +31,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { PageTitleService } from 'services/page-title.service';
 import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
 
 import constants from 'assets/constants';
 
