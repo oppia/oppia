@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import copy
-from core.domain import topic_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import topic_validation_jobs
 from core.jobs.types import job_run_result
@@ -32,7 +30,8 @@ class GetNumberOfTopicsWhereStoryIsPublishedNotBoolJobTests(
     job_test_utils.JobTestBase
 ):
 
-    JOB_CLASS = topic_validation_jobs.GetNumberOfTopicsWhereStoryIsPublishedNotBoolJob
+    JOB_CLASS = (
+        topic_validation_jobs.GetNumberOfTopicsWhereStoryIsPublishedNotBoolJob)
 
     TOPIC_ID_1 = 'topic_id_1'
     TOPIC_ID_2 = 'topic_id_2'
@@ -110,16 +109,23 @@ class GetNumberOfTopicsWhereStoryIsPublishedNotBoolJobTests(
             job_run_result.JobRunResult.as_stdout('Topics SUCCESS: 1'),
             job_run_result.JobRunResult.as_stdout('Invalid SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                f"The id of topic is {self.TOPIC_ID_3} and the type is <class 'int'>"),
+                'The id of topic which has non boolean value ' +
+                f'is {self.TOPIC_ID_3}'),
         ])
 
     def test_run_with_mixed_models(self) -> None:
-        self.put_multi([self.topic_model_1, self.topic_model_2, self.topic_model_3])
+        self.put_multi([
+            self.topic_model_1,
+            self.topic_model_2,
+            self.topic_model_3
+        ])
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('Topics SUCCESS: 3'),
             job_run_result.JobRunResult.as_stdout('Invalid SUCCESS: 2'),
             job_run_result.JobRunResult.as_stderr(
-                f"The id of topic is {self.TOPIC_ID_1} and the type is <class 'str'>"),
+                'The id of topic which has non boolean value ' +
+                f'is {self.TOPIC_ID_1}'),
             job_run_result.JobRunResult.as_stderr(
-                f"The id of topic is {self.TOPIC_ID_3} and the type is <class 'int'>"),
+                'The id of topic which has non boolean value ' +
+                f'is {self.TOPIC_ID_3}'),
         ])

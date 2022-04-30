@@ -36,11 +36,11 @@ class GetNumberOfTopicsWhereStoryIsPublishedNotBoolJob(base_jobs.JobBase):
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid topics which have story_is_published
-        value is not bool with their id and its type.
+        value is not bool with their id.
 
         Returns:
             PCollection. Returns PCollection of invalid topics which have
-            story_is_published value is not bool with their id and its type
+            story_is_published value is not bool with their id.
         """
         total_topics = (
             self.pipeline
@@ -50,19 +50,18 @@ class GetNumberOfTopicsWhereStoryIsPublishedNotBoolJob(base_jobs.JobBase):
                 topic_fetchers.get_topic_from_model)
         )
 
-        def checkingBoolValues(references):
+        def checking_bool_values(references):
             for reference in references:
-                if(type(reference.story_is_published)!=bool):
-                    return {'boolValue':True,'type':type(reference.story_is_published)}
-            return {'boolValue':False,'type':type(True)}
+                if not isinstance(reference.story_is_published, bool):
+                    return True
+            return False
 
         topics_with_story_is_published_value_not_bool = (
             total_topics
             | 'Combine topic ids and story_is_published' >> beam.Map(
-                lambda topic: (topic.id,
-                    topic.canonical_story_references))
+                lambda topic: (topic.id, topic.canonical_story_references))
             | 'Filter topics with story_is_published value not Bool' >>
-                beam.Filter(lambda topic: checkingBoolValues(topic[1])['boolValue'])
+                beam.Filter(lambda topic: checking_bool_values(topic[1]))
         )
 
         report_number_of_topics_queried = (
@@ -81,8 +80,8 @@ class GetNumberOfTopicsWhereStoryIsPublishedNotBoolJob(base_jobs.JobBase):
             topics_with_story_is_published_value_not_bool
             | 'Save info on invalid topics' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                    'The id of topic is %s and the type is %s'
-                    % (objects[0], checkingBoolValues(objects[1])['type'])
+                    'The id of topic which has non boolean value is %s'
+                    % (objects[0])
                 ))
         )
 
