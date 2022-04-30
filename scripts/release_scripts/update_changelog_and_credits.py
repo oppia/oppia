@@ -506,6 +506,28 @@ def update_version_in_config_files():
     )
 
 
+def inform_server_errors_team(release_rota_url, server_error_playbook_url):
+    """Asks the release coordinator to inform the server errors team
+    that the release will be deployed to production.
+
+    Args:
+        release_rota_url: str. URL pointing to the page which lists the rota
+            to be followed for release coordinators.
+        server_error_playbook_url: str. URL pointing to the server error team
+            playbook.
+    """
+    common.open_new_tab_in_browser_if_possible(release_rota_url)
+    common.open_new_tab_in_browser_if_possible(server_error_playbook_url)
+    common.ask_user_to_confirm(
+        'Ping the Server errors team coordinator (you can find them here: %s) '
+        'that the release will be deployed on the production server and '
+        'send them the Playbook for the Server Errors Team: %s.'
+        'Wait for them to confirm they have done all the stuff that was needed '
+        'before doing the deployment. If there is no response in 24 hours '
+        'then go ahead with the deployment.' % (
+            release_rota_url, server_error_playbook_url))
+
+
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = common.get_current_branch_name()
@@ -601,6 +623,9 @@ def main():
     create_branch(
         repo, repo_fork, target_branch, github_username,
         current_release_version_number)
+    inform_server_errors_team(
+        constants.release_constants.RELEASE_ROTA_URL,
+        constants.release_constants.SERVER_ERROR_PLAYBOOK_URL)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
