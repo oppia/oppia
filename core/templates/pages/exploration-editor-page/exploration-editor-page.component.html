@@ -34,8 +34,8 @@
         </div>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'translation', 'oppia-disabled-tab': !$ctrl.connectedToInternet || !$ctrl.EditabilityService.isEditable()}" id="tutorialTranslationTab" class="nav-item icon nav-list-item protractor-test-translation-tab"
-          ng-click="!$ctrl.connectedToInternet || !$ctrl.EditabilityService.isEditable() || $ctrl.selectTranslationTab()" uib-tooltip="Translations does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'translation', 'oppia-disabled-tab': !$ctrl.connectedToInternet || $ctrl.EditabilityService.isLockedByAdmin()}" id="tutorialTranslationTab" class="nav-item icon nav-list-item protractor-test-translation-tab"
+          ng-click="!$ctrl.connectedToInternet || $ctrl.EditabilityService.isLockedByAdmin() || $ctrl.selectTranslationTab()" uib-tooltip="Translations does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
         <a class="nav-link navbar-tab" uib-tooltip="Translations" tooltip-placement="bottom" tabindex="0" tooltip-enable="$ctrl.connectedToInternet">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'translation'}">&#xE029;</i>
         </a>
