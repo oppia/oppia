@@ -2096,10 +2096,12 @@ def rollback_exploration_to_safe_state(exp_id):
     if last_known_safe_version != current_version_in_exp_model:
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
         exp_summary_model.version = last_known_safe_version
-        exploration_model.version = last_known_safe_version
+        safe_exp_model = exp_models.ExplorationModel.get(
+            exp_id, strict=False, version=last_known_safe_version)
+        safe_exp_model.version = last_known_safe_version
         base_models.BaseModel.update_timestamps_multi(
-            [exploration_model, exp_summary_model])
-        base_models.BaseModel.put_multi([exploration_model, exp_summary_model])
+            [safe_exp_model, exp_summary_model])
+        base_models.BaseModel.put_multi([safe_exp_model, exp_summary_model])
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exp_id])
     return last_known_safe_version
