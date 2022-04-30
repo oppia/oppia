@@ -73,6 +73,12 @@ class GetNumberOfTopicsWhereStoryIsPublishedNotBoolJobTests(
             url_fragment='topic',
             canonical_story_references=[{
                 'story_id': self.STORY_2_ID,
+                'story_is_published': False},
+                {
+                'story_id': self.STORY_1_ID,
+                'story_is_published': True},
+                {
+                'story_id': self.STORY_3_ID,
                 'story_is_published': False
             }]
         )

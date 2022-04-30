@@ -1,4 +1,3 @@
-
 # coding: utf-8
 #
 # Copyright 2022 The Oppia Authors. All Rights Reserved.
@@ -15,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validation Jobs for topic"""
+"""Validation jobs for topic models"""
 
 from __future__ import annotations
 
@@ -34,6 +33,20 @@ import apache_beam as beam
 class GetNumberOfTopicsWhereStoryIsPublishedNotBoolJob(base_jobs.JobBase):
     """Job that returns topics where story_is_published value is not bool."""
 
+    def checking_bool_values(self, references) -> bool:
+        """Returns True if the value is not bool.
+
+        Args:
+            references: list. List of all canonical_story_references.
+
+        Returns:
+            Boolean value. True if the value of story_is_published is not bool.
+        """
+        for reference in references:
+            if not isinstance(reference.story_is_published, bool):
+                return True
+        return False
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid topics which have story_is_published
         value is not bool with their id.
@@ -50,18 +63,12 @@ class GetNumberOfTopicsWhereStoryIsPublishedNotBoolJob(base_jobs.JobBase):
                 topic_fetchers.get_topic_from_model)
         )
 
-        def checking_bool_values(references):
-            for reference in references:
-                if not isinstance(reference.story_is_published, bool):
-                    return True
-            return False
-
         topics_with_story_is_published_value_not_bool = (
             total_topics
             | 'Combine topic ids and story_is_published' >> beam.Map(
                 lambda topic: (topic.id, topic.canonical_story_references))
             | 'Filter topics with story_is_published value not Bool' >>
-                beam.Filter(lambda topic: checking_bool_values(topic[1]))
+                beam.Filter(lambda topic: self.checking_bool_values(topic[1]))
         )
 
         report_number_of_topics_queried = (
