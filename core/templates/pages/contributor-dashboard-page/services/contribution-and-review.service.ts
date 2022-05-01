@@ -67,8 +67,11 @@ interface FetchSuggestionsResponse {
   providedIn: 'root',
 })
 export class ContributionAndReviewService {
-  private activeTabType: string = null;
-  private activeSuggestionType: string = null;
+  // This property is initialized using async methods
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private activeTabType!: string;
+  private activeSuggestionType!: string;
 
   constructor(
     private contributionAndReviewBackendApiService:
@@ -195,17 +198,14 @@ export class ContributionAndReviewService {
 
   reviewExplorationSuggestion(
       targetId: string, suggestionId: string, action: string,
-      reviewMessage: string, commitMessage: string,
+      reviewMessage: string, commitMessage: string | null,
       onSuccess: (suggestionId: string) => void,
-      onFailure: (error) => void
+      onFailure: (error: Error) => void
   ): Promise<void> {
     const requestBody = {
       action: action,
       review_message: reviewMessage,
-      commit_message: (
-        action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
-        commitMessage : null
-      )
+      commit_message: commitMessage
     };
 
     return this.contributionAndReviewBackendApiService
@@ -243,7 +243,7 @@ export class ContributionAndReviewService {
   async updateTranslationSuggestionAsync(
       suggestionId: string, translationHtml: string,
       onSuccess: () => void,
-      onFailure: (error) => void
+      onFailure: (error: Error) => void
   ): Promise<void> {
     const requestBody = {
       translation_html: translationHtml

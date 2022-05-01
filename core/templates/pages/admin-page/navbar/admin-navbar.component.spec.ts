@@ -17,7 +17,8 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { UserInfo } from 'domain/user/user-info.model';
 import { MockRouterModule } from 'hybrid-router-module-provider';
 
 import { UserService } from 'services/user.service';
@@ -26,8 +27,8 @@ import { AdminNavbarComponent } from './admin-navbar.component';
 
 describe('Admin Navbar component', () => {
   let component: AdminNavbarComponent;
-  let userService = null;
-  let adminRouterService = null;
+  let userService: UserService;
+  let adminRouterService: AdminRouterService;
   let userProfileImage = 'profile-data-url';
   let userInfo = {
     isModerator: () => true,
@@ -55,13 +56,15 @@ describe('Admin Navbar component', () => {
 
     spyOn(userService, 'getProfileImageDataUrlAsync')
       .and.resolveTo(userProfileImage);
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo);
-
-    component.ngOnInit();
   }));
 
-  it('should initialize component properties correctly', () => {
+  it('should initialize component properties correctly', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     expect(component.profilePictureDataUrl).toBe(userProfileImage);
     expect(component.getStaticImageUrl(imagePath)).toBe(
       '/assets/images/path/to/image.png');
@@ -72,17 +75,44 @@ describe('Admin Navbar component', () => {
     expect(component.logoutUrl).toEqual('/logout');
     expect(component.profileDropdownIsActive).toBe(false);
     expect(component.dropdownMenuIsActive).toBe(false);
-  });
+  }));
 
-  it('should be routed to the activities tab by default', () => {
+  it('should throw error if username is invalid', fakeAsync(() => {
+    let userInfo = {
+      isModerator: () => true,
+      getUsername: () => null,
+      isSuperAdmin: () => true
+    };
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    expect(() => {
+      component.ngOnInit();
+      tick();
+    }).not.toThrowError('Cannot fetch username.');
+  }));
+
+  it('should be routed to the activities tab by default', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     expect(component.isActivitiesTabOpen()).toBe(true);
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
-  });
+  }));
 
-  it('should be routed to the config tab', () => {
+  it('should be routed to the config tab', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     expect(component.isActivitiesTabOpen()).toBe(true);
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(false);
@@ -96,9 +126,15 @@ describe('Admin Navbar component', () => {
     expect(component.isFeaturesTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
-  });
+  }));
 
-  it('should be routed to the features tab', () => {
+  it('should be routed to the features tab', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     expect(component.isActivitiesTabOpen()).toBe(true);
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(false);
@@ -112,9 +148,15 @@ describe('Admin Navbar component', () => {
     expect(component.isFeaturesTabOpen()).toBe(true);
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
-  });
+  }));
 
-  it('should be routed to the roles tab', () => {
+  it('should be routed to the roles tab', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     expect(component.isActivitiesTabOpen()).toBe(true);
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(false);
@@ -128,9 +170,15 @@ describe('Admin Navbar component', () => {
     expect(component.isFeaturesTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(true);
     expect(component.isMiscTabOpen()).toBe(false);
-  });
+  }));
 
-  it('should be routed to the misc tab', () => {
+  it('should be routed to the misc tab', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     expect(component.isActivitiesTabOpen()).toBe(true);
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(false);
@@ -144,17 +192,29 @@ describe('Admin Navbar component', () => {
     expect(component.isFeaturesTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(true);
-  });
+  }));
 
-  it('should set profileDropdownIsActive to true', () => {
+  it('should set profileDropdownIsActive to true', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     expect(component.profileDropdownIsActive).toBe(false);
 
     component.activateProfileDropdown();
 
     expect(component.profileDropdownIsActive).toBe(true);
-  });
+  }));
 
-  it('should set profileDropdownIsActive to false', () => {
+  it('should set profileDropdownIsActive to false', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     component.profileDropdownIsActive = true;
 
     expect(component.profileDropdownIsActive).toBe(true);
@@ -162,17 +222,29 @@ describe('Admin Navbar component', () => {
     component.deactivateProfileDropdown();
 
     expect(component.profileDropdownIsActive).toBe(false);
-  });
+  }));
 
-  it('should set dropdownMenuIsActive to true', () => {
+  it('should set dropdownMenuIsActive to true', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     expect(component.dropdownMenuIsActive).toBe(false);
 
     component.activateDropdownMenu();
 
     expect(component.dropdownMenuIsActive).toBe(true);
-  });
+  }));
 
-  it('should set dropdownMenuIsActive to false', () => {
+  it('should set dropdownMenuIsActive to false', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    component.ngOnInit();
+    tick();
+
     component.dropdownMenuIsActive = true;
 
     expect(component.dropdownMenuIsActive).toBe(true);
@@ -180,5 +252,5 @@ describe('Admin Navbar component', () => {
     component.deactivateDropdownMenu();
 
     expect(component.dropdownMenuIsActive).toBe(false);
-  });
+  }));
 });

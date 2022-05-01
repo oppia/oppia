@@ -595,6 +595,31 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             write_to_file(MOCK_PACKAGE_JSON_PATH, package_json_content)
             write_to_file(MOCK_FECONF_PATH, feconf_content)
 
+    def test_inform_server_errors_team(self):
+        check_function_calls = {
+            'ask_user_to_confirm_gets_called': False,
+            'open_new_tab_in_browser_if_possible_gets_called': False
+        }
+        expected_check_function_calls = {
+            'ask_user_to_confirm_gets_called': True,
+            'open_new_tab_in_browser_if_possible_gets_called': True
+        }
+        def mock_open_new_tab_in_browser_if_possible(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_gets_called'] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_gets_called'] = True
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible',
+            mock_open_new_tab_in_browser_if_possible)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        with open_tab_swap, ask_user_swap:
+            update_changelog_and_credits.inform_server_errors_team(
+                'rota-url', 'server-error-playbook-url')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
     def test_function_calls(self):
         check_function_calls = {
             'check_prs_for_current_release_are_released_gets_called': False,
@@ -605,7 +630,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_developer_names_gets_called': False,
             'get_release_summary_lines_gets_called': False,
             'create_branch_gets_called': False,
-            'update_package_json_gets_called': False
+            'update_package_json_gets_called': False,
+            'inform_server_errors_team_gets_called': False,
         }
         expected_check_function_calls = {
             'check_prs_for_current_release_are_released_gets_called': True,
@@ -616,7 +642,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_developer_names_gets_called': True,
             'get_release_summary_lines_gets_called': True,
             'create_branch_gets_called': True,
-            'update_package_json_gets_called': True
+            'update_package_json_gets_called': True,
+            'inform_server_errors_team_gets_called': True,
         }
         def mock_get_organization(unused_self, unused_name):
             return github.Organization.Organization(
@@ -644,6 +671,10 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 unused_repo, unused_repo_fork, unused_target_branch,
                 unused_github_username, unused_current_release_version_number):
             check_function_calls['create_branch_gets_called'] = True
+        def mock_inform_server_errors_team(
+                unused_release_rota_url, unused_server_error_playbook_url
+            ):
+            check_function_calls['inform_server_errors_team_gets_called'] = True
         def mock_input():
             return 'y'
         def mock_get_repo(unused_self, unused_repo_name):
@@ -676,6 +707,9 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             mock_get_release_summary_lines)
         create_branch_swap = self.swap(
             update_changelog_and_credits, 'create_branch', mock_create_branch)
+        inform_server_errors_team_swap = self.swap(
+            update_changelog_and_credits, 'inform_server_errors_team',
+            mock_inform_server_errors_team)
         input_swap = self.swap(builtins, 'input', mock_input)
         get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
         get_org_repo_swap = self.swap(
@@ -691,6 +725,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                         with update_developer_names_swap, get_lines_swap:
                             with create_branch_swap, get_repo_swap, update_swap:
                                 with get_org_swap, get_org_repo_swap:
-                                    update_changelog_and_credits.main()
+                                    with inform_server_errors_team_swap:
+                                        update_changelog_and_credits.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
