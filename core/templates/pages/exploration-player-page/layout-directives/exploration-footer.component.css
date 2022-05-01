@@ -201,6 +201,10 @@
   margin: 10px 0 10px 0;
 }
 
+.oppia-lesson-info-card .oppia-non-story-mode .oppia-exploration-header{
+  margin: unset;
+}
+
 .oppia-lesson-info-card {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -219,6 +223,10 @@
 .oppia-lesson-info-card .oppia-lesson-info-content {
   padding: 12px;
   padding-bottom: 0;
+}
+
+.oppia-lesson-info-card .oppia-lesson-info-content hr{
+  margin-top: 8px;
 }
 
 .oppia-lesson-info-card .oppia-exploration-description {
