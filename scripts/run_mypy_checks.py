@@ -163,8 +163,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/user_services_test.py',
     'core/domain/visualization_registry.py',
     'core/domain/visualization_registry_test.py',
-    'core/domain/voiceover_services.py',
-    'core/domain/voiceover_services_test.py',
     'core/domain/wipeout_service.py',
     'core/domain/wipeout_service_test.py',
     'core/platform/storage/cloud_storage_emulator.py',
