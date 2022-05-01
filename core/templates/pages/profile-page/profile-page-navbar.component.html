@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/profile-page/profile-page-navbar.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/profile-page/profile-page-navbar.component.rtl.css" as="style">
+
 <ul class="nav navbar-nav oppia-navbar-breadcrumb">
   <li>
     <span class="oppia-navbar-breadcrumb-separator"></span>
@@ -6,8 +9,7 @@
     <h1 class="oppia-profile-h1">{{ username }}</h1>
   </li>
 </ul>
-<style>
-  .oppia-username-text {
-    padding-left: 10px;
-  }
-</style>
+
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/profile-page/profile-page-navbar.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/profile-page/profile-page-navbar.component.rtl.css">
