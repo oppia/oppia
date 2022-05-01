@@ -534,29 +534,31 @@ describe('MathInteractionsService', () => {
   });
 
   it('should correctly match terms', function() {
-    expect(mathInteractionsService.termsMatch('4*5', '5*4')).toBeTrue();
-    expect(mathInteractionsService.termsMatch(
-      '3*10^2', '3/10^(-2)')).toBeTrue();
-    expect(mathInteractionsService.termsMatch('1/3', '1*3^(-1)')).toBeTrue();
-    expect(mathInteractionsService.termsMatch('sqrt(4)', '2')).toBeTrue();
-    expect(mathInteractionsService.termsMatch('abs(-4)', '4')).toBeTrue();
-    expect(mathInteractionsService.termsMatch(
-      'sqrt(x^2)', 'abs(x)')).toBeTrue();
-    expect(mathInteractionsService.termsMatch('(x^2)/2', '(x*x)/2')).toBeTrue();
-    expect(mathInteractionsService.termsMatch('2*pi*r', 'r*pi*2')).toBeTrue();
-    expect(mathInteractionsService.termsMatch('x*(y+z)', '(y+z)*x')).toBeTrue();
-    expect(mathInteractionsService.termsMatch(
+    expect(mathInteractionsService.doTermsMatch('4*5', '5*4')).toBeTrue();
+    expect(mathInteractionsService.doTermsMatch('2*pi*r', 'r*pi*2')).toBeTrue();
+    expect(mathInteractionsService.doTermsMatch(
+      'x*(y+z)', '(y+z)*x')).toBeTrue();
+    expect(mathInteractionsService.doTermsMatch(
       'x*(y+z)*(3-alpha)/2', '(3-alpha)/2*(z+y)*x')).toBeTrue();
-    expect(mathInteractionsService.termsMatch('2*4.5', '(9/2)*2')).toBeTrue();
 
-    expect(mathInteractionsService.termsMatch('4*5', '20')).toBeFalse();
-    expect(mathInteractionsService.termsMatch('3*10^2', '300')).toBeFalse();
-    expect(mathInteractionsService.termsMatch('1/3', '3^(-1)')).toBeFalse();
-    expect(mathInteractionsService.termsMatch(
+    expect(mathInteractionsService.doTermsMatch('4*5', '20')).toBeFalse();
+    expect(mathInteractionsService.doTermsMatch('3*10^2', '300')).toBeFalse();
+    expect(mathInteractionsService.doTermsMatch('1/3', '3^(-1)')).toBeFalse();
+    expect(mathInteractionsService.doTermsMatch(
       'pi*r^2', '(pi*r^3)/r')).toBeFalse();
-    expect(mathInteractionsService.termsMatch('1/3', '0.333')).toBeFalse();
-    expect(mathInteractionsService.termsMatch('4*(5+3)', '32')).toBeFalse();
-    expect(mathInteractionsService.termsMatch('sqrt(x^2)', 'x')).toBeFalse();
+    expect(mathInteractionsService.doTermsMatch('1/3', '0.333')).toBeFalse();
+    expect(mathInteractionsService.doTermsMatch('4*(5+3)', '32')).toBeFalse();
+    expect(mathInteractionsService.doTermsMatch('sqrt(x^2)', 'x')).toBeFalse();
+    expect(mathInteractionsService.doTermsMatch(
+      '3*10^2', '3/10^(-2)')).toBeFalse();
+    expect(mathInteractionsService.doTermsMatch('sqrt(4)', '2')).toBeFalse();
+    expect(mathInteractionsService.doTermsMatch('abs(-4)', '4')).toBeFalse();
+    expect(mathInteractionsService.doTermsMatch(
+      'sqrt(x^2)', 'abs(x)')).toBeFalse();
+    expect(mathInteractionsService.doTermsMatch(
+      '(x^2)/2', '(x*x)/2')).toBeFalse();
+    expect(mathInteractionsService.doTermsMatch(
+      '2*4.5', '(9/2)*2')).toBeFalse();
   });
 
   it('should correctly match terms with placeholders', function() {

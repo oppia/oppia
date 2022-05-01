@@ -1563,6 +1563,10 @@ COMMIT_TYPE_REVERT = 'revert'
 COMMIT_TYPE_EDIT = 'edit'
 COMMIT_TYPE_DELETE = 'delete'
 
+# Interaction IDs of math related interactions.
+MATH_INTERACTION_IDS = [
+    'NumericExpressionInput', 'AlgebraicExpressionInput', 'MathEquationInput']
+
 # The task entry ID template used by the task entry model.
 TASK_ENTRY_ID_TEMPLATE = '%s.%s.%d.%s.%s.%s'
 
