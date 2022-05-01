@@ -731,7 +731,7 @@ describe('Exploration engine service ', () => {
       explorationEngineService.getAuthorRecommendedExpIdsByStateName('Start');
     }).toThrowError(
       'Cannot read properties of undefined ' +
-      '(reading \'getAuthorRecommendedExpIdsByStateName\')');
+      '(reading \'getAuthorRecommendedExpIds\')');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
