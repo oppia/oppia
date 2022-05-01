@@ -53,7 +53,7 @@ class MockWindowRef {
   };
 }
 
-fdescribe('Tutor card component', () => {
+describe('Tutor card component', () => {
   let fixture: ComponentFixture<TutorCardComponent>;
   let componentInstance: TutorCardComponent;
 
