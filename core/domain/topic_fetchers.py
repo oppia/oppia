@@ -336,6 +336,21 @@ def get_multi_topic_summaries(topic_ids):
     return topic_summaries
 
 
+def get_published_topic_summaries():
+    """Returns the summaries of all published topics present in the datastore.
+
+    Returns:
+        list(TopicSummary). The list of summaries of all published topics
+        present in the datastore.
+    """
+    topic_id_to_topic_rights = get_all_topic_rights()
+    published_topic_ids = [
+        topic_id
+        for topic_id, topic_rights in topic_id_to_topic_rights.items()
+        if topic_rights.topic_is_published]
+    return get_multi_topic_summaries(published_topic_ids)
+
+
 def get_all_skill_ids_assigned_to_some_topic():
     """Returns the ids of all the skills that are linked to some topics.
 
