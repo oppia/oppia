@@ -87,7 +87,7 @@ class MockWindowRef {
   };
 }
 
-describe('Conversation skin component', () => {
+fdescribe('Conversation skin component', () => {
   let fixture: ComponentFixture<ConversationSkinComponent>;
   let componentInstance: ConversationSkinComponent;
   let alertsService: AlertsService;
@@ -748,6 +748,9 @@ describe('Conversation skin component', () => {
         [], null, null, 'content', null)
       );
     }
+    let alertMessageElement = document.createElement('div');
+    alertMessageElement.className =
+      'oppia-exploration-checkpoints-message';
     const expResponse = explorationResponse;
     expResponse.exploration.states.Mid.card_is_checkpoint = true;
 
@@ -789,11 +792,15 @@ describe('Conversation skin component', () => {
       .and.returnValue(stateObjectFactory.createFromBackendDict(
         'Mid', expResponse.exploration.states.Mid
       ));
+    spyOn(document, 'querySelector').withArgs(
+      '.oppia-exploration-checkpoints-message')
+      .and.returnValue(alertMessageElement);
 
     componentInstance.explorationId = expResponse.exploration_id;
     componentInstance.displayedCard = displayedCard;
     componentInstance.isLoggedIn = true;
     componentInstance.isIframed = false;
+    componentInstance.alertMessageTimeout = 5;
 
     componentInstance.initializePage();
     tick(100);

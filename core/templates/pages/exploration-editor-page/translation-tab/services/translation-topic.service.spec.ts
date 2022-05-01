@@ -48,7 +48,7 @@ describe('Translation topic service', () => {
     translationTopicService = TestBed.get(TranslationTopicService);
     contributionOpportunitiesService = TestBed.get(
       ContributionOpportunitiesService);
-    spyOn(contributionOpportunitiesService, 'getAllTopicNamesAsync')
+    spyOn(contributionOpportunitiesService, 'getTranslatableTopicNamesAsync')
       .and.returnValue($q.resolve(['Topic 1', 'Topic 2']));
   }));
 
