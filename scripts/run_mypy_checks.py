@@ -107,8 +107,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/question_fetchers_test.py',
     'core/domain/question_services.py',
     'core/domain/question_services_test.py',
-    'core/domain/rating_services.py',
-    'core/domain/rating_services_test.py',
     'core/domain/recommendations_services.py',
     'core/domain/recommendations_services_test.py',
     'core/domain/rights_manager.py',
