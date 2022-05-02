@@ -225,7 +225,7 @@
   padding-bottom: 0;
 }
 
-.oppia-lesson-info-card .oppia-lesson-info-content hr {
+.oppia-lesson-info-card .oppia-non-story-mode hr {
   margin-top: 8px;
 }
 

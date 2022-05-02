@@ -30,6 +30,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
+import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 
  @Component({
    selector: 'oppia-lesson-information-card-modal',
@@ -71,7 +72,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private windowRef: WindowRef,
     private editableExplorationBackendApiService:
-      EditableExplorationBackendApiService
+      EditableExplorationBackendApiService,
+    private explorationPlayerStateService: ExplorationPlayerStateService
   ) {
     super(ngbActiveModal);
   }
@@ -80,13 +82,9 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     this.explorationId = this.expInfo.id;
     this.expTitle = this.expInfo.title;
     this.expDesc = this.expInfo.objective;
-    this.storyId = this.urlService.getUrlParams().story_id;
-    this.storyTitleIsPresent = !!this.storyId;
-
-    this.storyTitleTranslationKey = (
-      this.i18nLanguageCodeService
-        .getStoryTranslationKey(
-          this.storyId, TranslationKeyType.TITLE));
+    this.storyTitleIsPresent = (
+      this.explorationPlayerStateService.isInStoryChapterMode()
+    );
 
     this.expTitleTranslationKey = (
       this.i18nLanguageCodeService.
@@ -113,6 +111,11 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
         this.storyUrlFragment).then(
         (storyDataDict) => {
           this.storyTitle = storyDataDict.title;
+          this.storyId = storyDataDict.id;
+          this.storyTitleTranslationKey = (
+            this.i18nLanguageCodeService
+              .getStoryTranslationKey(
+                this.storyId, TranslationKeyType.TITLE));
         });
     }
 

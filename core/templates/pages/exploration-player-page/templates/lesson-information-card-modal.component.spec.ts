@@ -29,6 +29,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { LessonInformationCardModalComponent } from './lesson-information-card-modal.component';
 
@@ -76,13 +77,13 @@ describe('Lesson Information card modal component', () => {
   EditableExplorationBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
+  let explorationPlayerStateService: ExplorationPlayerStateService
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
   let expDesc = 'Exploration Objective';
   let rating: ExplorationRatings;
   let storyId = 'storyId';
-  let nodeId = 'nodeId';
 
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
@@ -145,6 +146,8 @@ describe('Lesson Information card modal component', () => {
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService);
+    explorationPlayerStateService = TestBed.inject(
+      ExplorationPlayerStateService);
 
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValues(true, true, false);
@@ -156,10 +159,8 @@ describe('Lesson Information card modal component', () => {
 
   it('should initialize the component and set values' +
     ' when storyId is present', fakeAsync(() => {
-    spyOn(urlService, 'getUrlParams').and.returnValue({
-      story_id: storyId,
-      node_id: nodeId
-    });
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
       .and.returnValue('');
@@ -215,10 +216,8 @@ describe('Lesson Information card modal component', () => {
   it('should correctly set story title' +
       ' when storyId is not present',
   fakeAsync(() => {
-    spyOn(urlService, 'getUrlParams').and.returnValue({
-      story_id: undefined,
-      node_id: undefined
-    });
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(false);
     expect(componentInstance.storyId).toEqual(undefined);
     expect(componentInstance.storyTitleIsPresent).toEqual(undefined);
 

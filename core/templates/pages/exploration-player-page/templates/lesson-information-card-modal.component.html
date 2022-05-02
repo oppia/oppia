@@ -2,18 +2,18 @@
 <link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/templates/lesson-information-card-modal.component.rtl.css" as="style">
 
 <mat-card class="oppia-lesson-info-card">
-  <div class="oppia-lesson-info-content" [ngClass]="{'oppia-non-story-mode' : !hasStoryTitle}">
-    <p class="oppia-story-title" *ngIf="hasStoryTitle && !isHackyStoryTitleTranslationDisplayed()">
+  <div class="oppia-lesson-info-content" [ngClass]="{'oppia-non-story-mode' : !storyTitleIsPresent}">
+    <p class="oppia-story-title" *ngIf="storyTitleIsPresent && !isHackyStoryTitleTranslationDisplayed()">
       {{ storyTitle }}
     </p>
-    <p class="oppia-story-title" *ngIf="hasStoryTitle && isHackyStoryTitleTranslationDisplayed()">
+    <p class="oppia-story-title" *ngIf="storyTitleIsPresent && isHackyStoryTitleTranslationDisplayed()">
       {{ storyTitleTranslationKey | translate}}
     </p>
-    <hr *ngIf="hasStoryTitle">
+    <hr *ngIf="storyTitleIsPresent">
     <h3 class="oppia-exploration-header" *ngIf="!isHackyExpTitleTranslationDisplayed()">
       {{ expTitle }}
     </h3>
-    <hr *ngIf="!hasStoryTitle">
+    <hr *ngIf="!storyTitleIsPresent">
     <h3 class="oppia-exploration-header" *ngIf="isHackyExpTitleTranslationDisplayed()">
       {{ expTitleTranslationKey | translate }}
     </h3>
