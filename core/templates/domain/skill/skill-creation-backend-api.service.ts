@@ -31,7 +31,7 @@ export interface SkillCreationBackendDict {
   'explanation_dict': string;
   'linked_topic_ids': string[];
   'rubrics': RubricBackendDict;
-  files?: Record<string, unknown>;
+  files: Record<string, unknown>;
 }
 
 export interface ImageData {
