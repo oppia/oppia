@@ -121,7 +121,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   status: string;
   subheading: string;
   suggestionIdToContribution: Object;
-  suggestionIsRejected: boolean;
   translationHtml: string;
   translationUpdated: boolean = false;
   UNICODE_SCHEMA: UnicodeSchema = { type: 'unicode' };
@@ -215,11 +214,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     );
     this.reviewMessage = '';
     if (!this.reviewable) {
-      this.suggestionIsRejected = (
-        this.activeSuggestion.status === 'rejected');
-      if (this.suggestionIsRejected) {
-        this._getThreadMessagesAsync(this.activeSuggestionId);
-      }
+      this._getThreadMessagesAsync(this.activeSuggestionId);
     }
   }
 

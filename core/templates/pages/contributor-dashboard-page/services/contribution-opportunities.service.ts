@@ -85,9 +85,9 @@ export class ContributionOpportunitiesService {
       });
   }
 
-  private async _getAllTopicNamesAsync() {
+  private async _getTranslatableTopicNamesAsync() {
     return this.contributionOpportunitiesBackendApiService
-      .fetchAllTopicNamesAsync();
+      .fetchTranslatableTopicNamesAsync();
   }
 
   showRequiresLoginModal(): void {
@@ -119,8 +119,8 @@ export class ContributionOpportunitiesService {
     }
   }
 
-  async getAllTopicNamesAsync(): Promise<string[]> {
-    return this._getAllTopicNamesAsync();
+  async getTranslatableTopicNamesAsync(): Promise<string[]> {
+    return this._getTranslatableTopicNamesAsync();
   }
 
   get reloadOpportunitiesEventEmitter(): EventEmitter<void> {
