@@ -2461,10 +2461,11 @@ def clear_learner_checkpoint_progress(user_id, exploration_id):
     """
     exp_user_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
-    exp_user_model.most_recently_reached_checkpoint_exp_version = None
-    exp_user_model.most_recently_reached_checkpoint_state_name = None
-    exp_user_model.update_timestamps()
-    exp_user_model.put()
+    if exp_user_model is not None:
+        exp_user_model.most_recently_reached_checkpoint_exp_version = None
+        exp_user_model.most_recently_reached_checkpoint_state_name = None
+        exp_user_model.update_timestamps()
+        exp_user_model.put()
 
 
 def sync_learner_checkpoint_progress_with_current_exp_version(
