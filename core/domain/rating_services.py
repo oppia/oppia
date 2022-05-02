@@ -63,6 +63,9 @@ def assign_rating_to_exploration(
         ValueError. The exploration does not exist.
     """
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     if not isinstance(new_rating, int):
         raise ValueError(
             'Expected the rating to be an integer, received %s' % new_rating)
