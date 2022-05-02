@@ -1,10 +1,10 @@
 from typing import (
-    Any, Awaitable, Dict, Generic, Iterable, Iterator, Mapping, Optional,
-    TypeVar, Union
+    Any, Awaitable, Dict, Generic, Iterable, Iterator, List, Mapping,
+    Optional, TypeVar, Union
 )
 
 _Key = Union[str, bytes]
-_Value = Union[bytes,float,int,str]
+_Value = Union[bytes, float, int, str]
 _StrType = TypeVar("_StrType", bound = Union[str, bytes])
 
 
@@ -14,13 +14,13 @@ class BasicKeyCommands(Generic[_StrType]):
     def mset(self, mapping: Dict[str, str]) -> bool: ...
     def mget(
         self,
-        keys: _Key | Iterable[_Key],
+        keys: Union[_Key, Iterable[_Key]],
         *args: _Key
-    ) -> list[Optional[str]]: ...
+    ) -> List[Optional[str]]: ...
 
 
 class HashCommands(Generic[_StrType]):
-    def hgetall(self, name: _Key) -> dict[_StrType, _StrType]: ...
+    def hgetall(self, name: _Key) -> Dict[_StrType, _StrType]: ...
     def hset(
         self,
         name: str,
@@ -32,15 +32,15 @@ class HashCommands(Generic[_StrType]):
 
 class ManagementCommands:
     def flushdb(self, asynchronous: bool = ..., **kwargs: Any) -> bool: ...
-    def memory_stats(self, **kwargs: Any) -> dict[str, int]: ...
+    def memory_stats(self, **kwargs: Any) -> Dict[str, int]: ...
 
 
 class ScanCommands(Generic[_StrType]):
     def scan_iter(
         self,
-        match: _Key | None = ...,
-        count: int | None = ...,
-        _type: str | None = ...,
+        match: Optional[_Key] = ...,
+        count: Optional[int] = ...,
+        _type: Optional[str] = ...,
         **kwargs: Any
     ) -> Iterator[_StrType]: ...
 
