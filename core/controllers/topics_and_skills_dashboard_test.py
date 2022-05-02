@@ -231,7 +231,8 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             description='Description1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id],
-            subtopics=[], next_subtopic_id=1)
+            subtopics=[], next_subtopic_id=1,
+            page_title_fragment_for_web='testing')
         subtopic = topic_domain.Subtopic.from_dict({
             'id': 1,
             'title': 'subtopic1',
@@ -247,7 +248,8 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             description='Description2', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
-            subtopics=[subtopic], next_subtopic_id=2)
+            subtopics=[subtopic], next_subtopic_id=2,
+            page_title_fragment_for_web='testing')
 
         json_response = self.get_json(
             '%s/%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
@@ -630,7 +632,8 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Topic description',
             'filename': 'test_svg.svg',
             'thumbnailBgColor': '#C6DCDA',
-            'url_fragment': 'name-one'
+            'url_fragment': 'name-one',
+            'page_title_fragment': 'testing'
         }
 
         with utils.open_file(
@@ -668,7 +671,8 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Topic description',
             'filename': 'cafe.flac',
             'thumbnailBgColor': '#C6DCDA',
-            'url_fragment': 'name-three'
+            'url_fragment': 'name-three',
+            'page_title_fragment': 'testing'
         }
 
         with utils.open_file(

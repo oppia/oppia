@@ -48,6 +48,18 @@
       </div>
     </div>
     <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Web Title Fragment for Web*</span></div>
+      <input class="protractor-test-new-topic-web-title-fragment-field required"
+             [(ngModel)]="newlyCreatedTopic.pageTitleFragment"
+             [ngModelOptions]="{standalone: true}">
+      <div class="oppia-input-box-subtitle">
+        <em>
+          Enter the middle component of the page title. For example, if you enter "Add, Subtract, Multiply and Divide" it will show up in the browser tab as "Learn {{ newlyCreatedTopic.name }} | Add, Subtract, Multiply and Divide | Oppia".
+          It should be at least {{ min_web_title_frag }} and at most {{ max_web_title_frag }} characters.
+        </em>
+      </div>
+    </div>
+    <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Description*</span></div>
       <textarea class="protractor-test-new-topic-description-field required"
                 rows="4" cols="50" placeholder="Enter description"

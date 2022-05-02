@@ -30,6 +30,7 @@ describe('Newly Created Topic Model', () => {
   it('should create a new default topic for the topics dashboard', () => {
     expect(topic.description).toEqual('');
     expect(topic.name).toEqual('');
+    expect(topic.pageTitleFragment).toEqual('');
   });
 
   it('should validate the new topic fields', () => {
@@ -48,6 +49,16 @@ describe('Newly Created Topic Model', () => {
     expect(topic.isValid()).toBe(false);
 
     topic.description = 'Topic description';
+    expect(topic.isValid()).toBe(true);
+
+    topic.pageTitleFragment = '';
+    expect(topic.isValid()).toBe(false);
+
+    // eslint-disable-next-line max-len
+    topic.pageTitleFragment = 'testatestatestatestatestatestatestatestatestatesta';
+    expect(topic.isValid()).toBe(false);
+
+    topic.pageTitleFragment = 'testing';
     expect(topic.isValid()).toBe(true);
   });
 });
