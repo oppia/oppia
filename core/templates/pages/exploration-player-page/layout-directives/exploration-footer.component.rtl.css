@@ -218,6 +218,7 @@
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 13px;
   margin-bottom: -10px;
+  text-align: right;
 }
 
 .oppia-lesson-info-card .oppia-lesson-info-content {

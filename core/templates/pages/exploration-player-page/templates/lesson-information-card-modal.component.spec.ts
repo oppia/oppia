@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
@@ -77,7 +77,7 @@ describe('Lesson Information card modal component', () => {
   EditableExplorationBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
-  let explorationPlayerStateService: ExplorationPlayerStateService
+  let explorationPlayerStateService: ExplorationPlayerStateService;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -181,13 +181,14 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.storyTitleTranslationKey).toEqual(undefined);
 
     componentInstance.ngOnInit();
+    tick(1000);
 
-    expect(componentInstance.storyId).toEqual(storyId);
     expect(componentInstance.storyTitleIsPresent).toEqual(true);
     expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
     expect(urlService.getClassroomUrlFragmentFromLearnerUrl).toHaveBeenCalled();
     expect(urlService.getStoryUrlFragmentFromLearnerUrl).toHaveBeenCalled();
     expect(storyViewerBackendApiService.fetchStoryDataAsync).toHaveBeenCalled();
+    expect(componentInstance.storyId).toEqual(storyId);
     expect(componentInstance.storyTitleTranslationKey).toEqual(
       'I18N_STORY_storyId_TITLE');
 
