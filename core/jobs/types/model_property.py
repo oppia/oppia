@@ -201,7 +201,8 @@ class ModelProperty:
     def __repr__(self) -> str:
         return 'ModelProperty(%s, %s)' % (self._model_kind, self)
 
-    # NOTE: Needs to return Any because of:
+    # NOTE: Needs to return Any because the function could also return
+    # NotImplemented:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         return (
@@ -209,7 +210,8 @@ class ModelProperty:
                 other._model_kind, other._property_name) # pylint: disable=protected-access
             if self.__class__ is other.__class__ else NotImplemented)
 
-    # NOTE: Needs to return Any because of:
+    # NOTE: Needs to return Any because the function could also return
+    # NotImplemented:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __ne__(self, other: Any) -> Any:
         return (
