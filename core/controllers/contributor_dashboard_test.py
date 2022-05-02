@@ -80,7 +80,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         self.topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'topic', 'abbrev', 'description')
+            self.topic_id, 'topic', 'abbrev', 'description', 'fragm')
         self.skill_id_0 = 'skill_id_0'
         self.skill_id_1 = 'skill_id_1'
         self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1])
@@ -273,7 +273,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         topic_id = '1'
         topic_name = 'topic1'
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, topic_name, 'url-fragment', 'description')
+            topic_id, topic_name, 'url-fragment', 'description', 'fragm')
         skill_id_2 = 'skill_id_2'
         skill_id_3 = 'skill_id_3'
         skill_id_4 = 'skill_id_4'
@@ -477,7 +477,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            '0', 'topic', 'abbrev', 'description')
+            '0', 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -930,7 +930,7 @@ class AllTopicNamesHandlerTest(test_utils.GenericTestBase):
 
         topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, 'topic', 'abbrev', 'description')
+            topic_id, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
