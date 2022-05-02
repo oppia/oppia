@@ -54,6 +54,7 @@ export class NewlyCreatedTopic {
       this.name && this.description && this.urlFragment &&
       validUrlFragmentRegex.test(this.urlFragment) &&
       this.urlFragment.length <= urlFragmentCharLimit &&
+      this.pageTitleFragment &&
       this.pageTitleFragment.length >= titleFragMinLimit &&
       this.pageTitleFragment.length <= titleFragMaxLimit
     );

@@ -36,29 +36,26 @@ describe('Newly Created Topic Model', () => {
   it('should validate the new topic fields', () => {
     expect(topic.isValid()).toBe(false);
 
-    topic.description = 'Topic description';
-    expect(topic.isValid()).toBe(false);
-
-    topic.name = 'TopicName1';
-    expect(topic.isValid()).toBe(false);
-
-    topic.urlFragment = 'url-fragment';
-    expect(topic.isValid()).toBe(true);
-
     topic.description = '';
     expect(topic.isValid()).toBe(false);
-
-    topic.description = 'Topic description';
-    expect(topic.isValid()).toBe(true);
 
     topic.pageTitleFragment = '';
     expect(topic.isValid()).toBe(false);
 
-    // eslint-disable-next-line max-len
-    topic.pageTitleFragment = 'testatestatestatestatestatestatestatestatestatesta';
+    topic.description = 'Topic description';
+    expect(topic.isValid()).toBe(false);
+
+    topic.urlFragment = 'url-fragment';
     expect(topic.isValid()).toBe(false);
 
     topic.pageTitleFragment = 'testing';
+    expect(topic.isValid()).toBe(false);
+
+    topic.name = 'TopicName1';
     expect(topic.isValid()).toBe(true);
+
+    // eslint-disable-next-line max-len
+    topic.pageTitleFragment = 'testatestatestatestatestatestatestatestatestatestatestatesta';
+    expect(topic.isValid()).toBe(false);
   });
 });
