@@ -403,8 +403,8 @@ class TransientCheckpointUrl:
         form with its keys as the attributes of this class.
 
         Returns:
-            dict. A dictionary containing the TransientCheckpointUrl class information
-            in a dictionary form.
+            dict. A dictionary containing the TransientCheckpointUrl class
+            information in a dictionary form.
         """
 
         return {
@@ -456,7 +456,7 @@ class TransientCheckpointUrl:
         if not isinstance(self.most_recently_reached_checkpoint_exp_version,
             int):
             raise utils.ValidationError(
-            'Expected most_recently_reached_checkpoint_exp_version to be an int')
+            'Expected most_recently_reached_checkpoint_exp_version to be an int') # pylint: disable=line-too-long
 
 
 class ExplorationCommitLogEntry:
