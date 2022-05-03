@@ -398,6 +398,29 @@ class TransientCheckpointUrl:
             most_recently_reached_checkpoint_exp_version)
         self.creation_timestamp = creation_timestamp
 
+    def to_dict(self):
+        """Convert the TransientCheckpointUrl domain instance into a dictionary
+        form with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the TransientCheckpointUrl class information
+            in a dictionary form.
+        """
+
+        return {
+            'exploration_id': self.exploration_id,
+            'unique_progress_url_id': self.unique_progress_url_id,
+            'furthest_reached_checkpoint_exp_version': (
+                self.furthest_reached_checkpoint_exp_version),
+            'furthest_reached_checkpoint_state_name': (
+                self.furthest_reached_checkpoint_state_name),
+            'most_recently_reached_checkpoint_exp_version': (
+                self.most_recently_reached_checkpoint_exp_version),
+            'most_recently_reached_checkpoint_state_name': (
+                self.most_recently_reached_checkpoint_state_name),
+            'creation_timestamp': self.creation_timestamp
+        }
+
     def validate(self):
         """Validates properties of the TransientCheckpointUrl object.
 
@@ -422,8 +445,7 @@ class TransientCheckpointUrl:
 
         if not isinstance(self.furthest_reached_checkpoint_exp_version, int):
             raise utils.ValidationError(
-            'Expected furthest_reached_checkpoint_exp_version to be an int, received %s' # pylint: disable=line-too-long
-                % self.furthest_reached_checkpoint_exp_version)
+            'Expected furthest_reached_checkpoint_exp_version to be an int')
 
         if not isinstance(self.most_recently_reached_checkpoint_state_name,
             str):
@@ -434,8 +456,7 @@ class TransientCheckpointUrl:
         if not isinstance(self.most_recently_reached_checkpoint_exp_version,
             int):
             raise utils.ValidationError(
-            'Expected most_recently_reached_checkpoint_exp_version to be an int, received %s' # pylint: disable=line-too-long
-                % self.most_recently_reached_checkpoint_exp_version)
+            'Expected most_recently_reached_checkpoint_exp_version to be an int')
 
 
 class ExplorationCommitLogEntry:
