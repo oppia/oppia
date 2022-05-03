@@ -18,21 +18,22 @@
  */
 
 var waitFor = require('./waitFor.js');
-var GetStartedPage = function() {
+
+var GetStartedPage = () => {
   var GET_STARTED_PAGE_URL = '/get-started';
 
-  this.get = async function() {
+  this.get = async() => {
     await browser.url(GET_STARTED_PAGE_URL);
     await waitFor.pageToFullyLoad();
   };
 
-  this.getMetaTagContent = async function(name, type) {
+  this.getMetaTagContent = async(name, type) => {
     if (type === 'itemprop') {
-      var tag = $('meta[itemprop="' + name + '"]');
+      var tag = await $('meta[itemprop="' + name + '"]');
     } else if (type === 'og') {
-      var tag = $('meta[property="og:' + name + '"]');
+      var tag = await $('meta[property="og:' + name + '"]');
     } else if (type === 'name') {
-      var tag = $('meta[name="' + name + '"]');
+      var tag = await $('meta[name="' + name + '"]');
     } else {
       throw new Error('Unsupported tag type specified: ' + type);
     }

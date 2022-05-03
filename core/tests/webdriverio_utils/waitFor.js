@@ -21,7 +21,7 @@ var until = require('wdio-wait-for');
 
 var DEFAULT_WAIT_TIME_MSECS = 10000;
 
-var alertToBePresent = async function() {
+var alertToBePresent = async() => {
   await browser.waitUntil(
     until.alertIsPresent(),
     {
@@ -33,8 +33,8 @@ var alertToBePresent = async function() {
 /**
  * Consider adding this method after each browser.get() call.
  */
-var pageToFullyLoad = async function() {
-  var loadingMessage = $('.protractor-test-loading-fullpage');
+var pageToFullyLoad = async() => {
+  var loadingMessage = await $('.protractor-test-loading-fullpage');
   await browser.waitUntil(
     until.invisibilityOf(loadingMessage),
     {
@@ -48,7 +48,7 @@ var pageToFullyLoad = async function() {
  *                           This does not mean that the element is visible.
  * @param {string} errorMessage - Error message when element is not present.
  */
-var presenceOf = async function(element, errorMessage) {
+var presenceOf = async(element, errorMessage) => {
   await browser.waitUntil(
     await until.presenceOf(element),
     {
@@ -62,7 +62,7 @@ var presenceOf = async function(element, errorMessage) {
  *                           height and width that is greater than 0.
  * @param {string} errorMessage - Error message when element is invisible.
  */
-var visibilityOf = async function(element, errorMessage) {
+var visibilityOf = async(element, errorMessage) => {
   await browser.waitUntil(
     await until.visibilityOf(element),
     {

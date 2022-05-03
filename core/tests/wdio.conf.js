@@ -57,7 +57,7 @@ exports.config = {
     capabilities: [{
         browserName: 'chrome',
         'wdio:devtoolsOptions': {
-            headless: true
+            headless: false
         }
     }],
     // First, you can define how many instances should be started at the same time. Let's
@@ -72,10 +72,6 @@ exports.config = {
     // If you have trouble getting all important capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
     // https://saucelabs.com/platform/platform-configurator
-    //
-    capabilities: [{
-        browserName: 'chrome',
-    }],
     //
     // ===================
     // Test Configurations
@@ -145,14 +141,17 @@ exports.config = {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter
-    reporters: ['spec'],
+    reporters: [
+      ['spec', {
+        showPreface: false,
+      }]],
 
 
     //
     // Options to be passed to Jasmine.
     jasmineOpts: {
         // Jasmine default timeout
-        defaultTimeoutInterval: 60000,
+        defaultTimeoutInterval: 1200000,
         //
         // The Jasmine framework allows interception of each assertion in order to log the state of the application
         // or website depending on the result. For example, it is pretty handy to take a screenshot every time
@@ -175,7 +174,13 @@ exports.config = {
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      */
-    // onPrepare: function (config, capabilities) {
+    // onPrepare: function() {
+    //     // Set a wide enough window size for the navbar in the library pages to
+    //     // display fully.
+    //     browser.setWindowSize(1285, 1000);
+
+    //     // Navigate to the splash page so that tests can begin on an Angular page.
+    //     browser.url('http://localhost:9001');
     // },
     /**
      * Gets executed before a worker process is spawned and can be used to initialise specific service

@@ -18,7 +18,7 @@
 
 var waitFor = require('./waitFor.js');
 
-var click = async function(elementName, clickableElement) {
+var click = async(elementName, clickableElement) => {
   await waitFor.visibilityOf(
     clickableElement, `${elementName} is not visible.`);
   await waitFor.elementToBeClickable(

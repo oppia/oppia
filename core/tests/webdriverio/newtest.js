@@ -7,10 +7,9 @@ describe('Oppia HomePage', () => {
         browserName: 'chrome'
       }
     });
-    await browser.url('https//localhost:8181');
+    await browser.url('www.webdriver.io');
     await expect(browser).toHaveTitle(
       'WebdriverIO · Next-gen browser and mobile' +
       'automation test framework for Node.js | WebdriverIO');
-    await browser.deleteSession();
   });
 });

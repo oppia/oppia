@@ -183,7 +183,7 @@ PROTRACTOR_BIN_PATH = (
 PROTRACTOR_CONFIG_FILE_PATH = (
     os.path.join('core', 'tests', 'protractor.conf.js'))
 WEBDRIVERIO_CONFIG_FILE_PATH = (
-    os.path.join('core', 'tests', 'wdio.config.js'))
+    os.path.join('core', 'tests', 'wdio.conf.js'))
 NODEMODULES_BIN_PATH = (
     os.path.join(NODE_MODULES_PATH, '.bin', 'wdio'))
 

@@ -17,48 +17,7 @@
  * with protractor.
  */
 
-const { remote } = require('webdriverio');
-// The minimum log level we will report as an error.
-// var CONSOLE_LOG_THRESHOLD = 900;
-// var CONSOLE_ERRORS_TO_IGNORE = [
-//   // These "localhost:9099" are errors related to communicating with the
-//   // Firebase emulator, which would never occur in production, so we just ignore
-//   // them.
-//   _.escapeRegExp(
-//     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
-//     'relyingparty/getAccountInfo?key=fake-api-key'),
-//   _.escapeRegExp(
-//     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
-//     'relyingparty/verifyPassword?key=fake-api-key'),
-//   // This error covers the case when the PencilCode site uses an
-//   // invalid SSL certificate (which can happen when it expires).
-//   // In such cases, we ignore the error since it is out of our control.
-//   _.escapeRegExp(
-//     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
-//     'load resource: net::ERR_CERT_DATE_INVALID'),
-// ];
-
-// var isInDevMode = function() {
-//   return browser.params.devMode === 'true';
-// };
-
-// var checkForConsoleErrors = async function(
-//     errorsToIgnore, skipDebugging = true) {
-//   const browser = await remote({
-//     capabilities: {
-//       browserName: 'chrome'
-//     }
-//   });
-//   errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
-
-//   var browserLogs = await browser.log('browser');
-//   var browserErrors = browserLogs.filter(logEntry => (
-//     logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
-//     errorsToIgnore.every(e => logEntry.message.match(e) === null)));
-//   expect(browserErrors).toEqual([]);
-// };
-
-var expectErrorPage = async function(errorNum) {
+var expectErrorPage = async(errorNum) => {
   var errorContainer = $('.protractor-test-error-container');
   await waitFor.visibilityOf(
     errorContainer,
@@ -67,6 +26,4 @@ var expectErrorPage = async function(errorNum) {
     toMatch(`Error ${errorNum}`);
 };
 
-// exports.checkForConsoleErrors = checkForConsoleErrors;
 exports.expectErrorPage = expectErrorPage;
-// exports.isInDevMode = isInDevMode;

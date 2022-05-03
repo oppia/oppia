@@ -665,7 +665,7 @@ def managed_protractor_server(
 
 @contextlib.contextmanager
 def managed_webdriverIO_server(
-        suite_name='full', **kwargs):
+        suite_name='full', debug_mode=False, sharding_instances=1, **kwargs):
     """Returns context manager to start/stop the WebdriverIO server gracefully.
 
     Args:
@@ -680,12 +680,19 @@ def managed_webdriverIO_server(
     Raises:
         ValueError. Number of sharding instances are less than 0.
     """
+    if sharding_instances <= 0:
+        raise ValueError('Sharding instance should be larger than 0')
 
     webdriverIO_args = [
         common.NODE_BIN_PATH2,
         common.NODEMODULES_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
         '--suite', suite_name,
     ]
+
+    if debug_mode:
+        # NOTE: This is a flag for Node.js, not Protractor, so we insert it
+        # immediately after NODE_BIN_PATH.
+        webdriverIO_args.insert(0, 'DEBUG=true')
 
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.

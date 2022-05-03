@@ -267,15 +267,30 @@ def run_tests(args):
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 
-        if args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
-            print("/**Starting running of webdriverIO tests**/")
+        if args.suite == 'full':
+            stack.enter_context(servers.managed_webdriver_server(
+            chrome_version=args.chrome_driver_version))
+
+            proc = stack.enter_context(servers.managed_protractor_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
+
             proc =  stack.enter_context(servers.managed_webdriverIO_server(
                 suite_name=args.suite,
+                debug_mode=args.debug_mode,
+                stdout=subprocess.PIPE))
+            
+        elif args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
+            proc =  stack.enter_context(servers.managed_webdriverIO_server(
+                suite_name=args.suite,
+                debug_mode=args.debug_mode,
                 stdout=subprocess.PIPE))
         else:
             stack.enter_context(servers.managed_webdriver_server(
             chrome_version=args.chrome_driver_version))
-            print("/**Protractor tests**/")
             proc = stack.enter_context(servers.managed_protractor_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
