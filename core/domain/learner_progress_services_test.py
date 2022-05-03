@@ -252,7 +252,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_3, 'topic 3', 'abbrev-three', 'description 3', 'fragm')
+            self.TOPIC_ID_3, 'topic 3', 'abbrev-three', 'description 3',
+            'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
