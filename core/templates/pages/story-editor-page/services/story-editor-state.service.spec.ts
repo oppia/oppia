@@ -276,7 +276,7 @@ describe('Story editor state service', () => {
 
       storyEditorStateService.saveStory(
         'Commit message', successCallback, errorCallback);
-    }).toThrowError('Cannot save a story before one is loaded.');
+    }).toThrowError();
   });
 
   it('should not save the story if there are no pending changes',
