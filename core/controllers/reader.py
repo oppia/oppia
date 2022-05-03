@@ -532,10 +532,10 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
                         }
                     },
                     'values': {
-                         'schema': {
+                        'schema': {
                             'type': 'weak_multiple',
                             'options': ['int', 'basestring', 'dict']
-                         }
+                        }
                     }
                 },
                 'default_value': {}
@@ -768,7 +768,7 @@ class ExplorationStartEventHandler(base.BaseHandler):
                         }
                     },
                     'values': {
-                         'schema': {
+                        'schema': {
                             'type': 'weak_multiple',
                             'options': ['int', 'basestring']
                         }
@@ -978,10 +978,10 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
                         }
                     },
                     'values': {
-                         'schema': {
+                        'schema': {
                             'type': 'weak_multiple',
                             'options': ['int', 'basestring', 'dict']
-                         }
+                        }
                     }
                 }
             },
@@ -1091,10 +1091,10 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
                         }
                     },
                     'values': {
-                         'schema': {
+                        'schema': {
                             'type': 'weak_multiple',
                             'options': ['int', 'basestring', 'dict']
-                         }
+                        }
                     }
                 }
             },
