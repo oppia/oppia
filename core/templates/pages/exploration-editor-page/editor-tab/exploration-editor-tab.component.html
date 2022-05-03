@@ -11,7 +11,8 @@
       <div>
         <md-checkbox class="checkpoint-selection-checkbox protractor-test-checkpoint-selection-checkbox"
                      ng-change="$ctrl.onChangeCardIsCheckpoint()"
-                     ng-model="$ctrl.stateCardIsCheckpointService.displayed">
+                     ng-model="$ctrl.stateCardIsCheckpointService.displayed"
+                     ng-disabled="!$ctrl.isEditable()">
           Set as a checkpoint for learners
         </md-checkbox>
       </div>

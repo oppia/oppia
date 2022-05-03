@@ -33,11 +33,11 @@
 
   <li class="nav-item d-none d-sm-block" ng-if="isEditableOutsideTutorialMode()">
     <div uib-dropdown class="btn-group oppia-publish-button-container"
-         title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !connectedToInternet || !isExplorationSaveable()}">
+         title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !connectedToInternet || !isExplorationSaveable() || !isEditable}">
       <button id="tutorialSaveButton"
               class="btn btn-light oppia-save-draft-button protractor-test-save-changes"
-              ng-class="{'btn-success': connectedToInternet && isExplorationSaveable()}"
-              ng-click="saveChanges()" ng-disabled="!connectedToInternet || !isExplorationSaveable()">
+              ng-class="{'btn-success': connectedToInternet && isExplorationSaveable() && isEditable()}"
+              ng-click="saveChanges()" ng-disabled="!connectedToInternet || !isExplorationSaveable() || !isEditable()">
         <span ng-if="!saveIsInProcess">
           <span class="oppia-draft-label-container" ng-if="isPrivate()">
             <i class="material-icons md-18 oppia-save-publish-button-icon"

@@ -149,6 +149,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             }
         },
         'correctness_feedback_enabled': False,
+        'edits_allowed': True,
         'last_updated': '08/17/2020, 18:04:57:799687',
         'language_code': 'en',
         'blurb': ''
@@ -184,9 +185,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'ations": {"translations_mapping": {"feedback_2": {}, "rule_input_4": {'
         '}, "content": {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder'
         '_0": {}}}, "next_content_id_index": 5, "solicit_answer_details": false'
-        '}}, "version": 0, "correctness_feedback_enabled": false, "language_cod'
-        'e": "en", "objective": "", "init_state_name": "Introduction", "blurb":'
-        ' "", "author_notes": ""}'
+        '}}, "version": 0, "correctness_feedback_enabled": false, "edits_allowe'
+        'd": true, "language_code": "en", "objective": "", "init_state_name": "'
+        'Introduction", "blurb": "", "author_notes": ""}'
     )
 
     def test_retrieved_memory_profile_contains_correct_elements(self) -> None:

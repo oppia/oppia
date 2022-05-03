@@ -17,7 +17,7 @@
         </div>
         <div class="state-solution-content-container oppia-mobile-collapsible-card-content" *ngIf="solutionCardIsShown">
           <div class="oppia-add-solution-button-container">
-            <div *ngIf="isEditableOutsideTutorialMode()">
+            <div *ngIf="isEditable()">
               <button *ngIf="!savedMemento()"
                       type="button"
                       class="btn btn-secondary oppia-add-hint-button protractor-test-oppia-add-solution-button"

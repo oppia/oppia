@@ -118,8 +118,10 @@ export class StateSolutionEditorComponent implements OnInit {
     return this.stateEditorService.isCurrentSolutionValid();
   }
 
-  isEditableOutsideTutorialMode(): boolean {
-    return this.editabilityService.isEditableOutsideTutorialMode();
+  isEditable(): boolean {
+    return (
+      this.editabilityService.isEditable() &&
+      this.editabilityService.isEditableOutsideTutorialMode());
   }
 
   toggleInlineSolutionEditorIsActive(): void {

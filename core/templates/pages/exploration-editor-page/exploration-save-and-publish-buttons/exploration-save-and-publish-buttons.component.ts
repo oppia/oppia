@@ -55,6 +55,10 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         return ExplorationRightsService.isPrivate();
       };
 
+      $scope.isEditable = function() {
+        return EditabilityService.isEditable();
+      };
+
       $scope.isExplorationLockedForEditing = function() {
         return ChangeListService.isExplorationLockedForEditing();
       };

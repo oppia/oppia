@@ -108,6 +108,10 @@ angular.module('oppia').component('explorationEditorTab', {
       $templateCache.put(
         'ng-joyride-title-tplv1.html', ngJoyrideTemplate);
 
+      ctrl.isEditable = function() {
+        return EditabilityService.isEditable();
+      };
+
       ctrl.getStateContentPlaceholder = function() {
         if (
           StateEditorService.getActiveStateName() ===

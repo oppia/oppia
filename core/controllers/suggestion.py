@@ -663,7 +663,8 @@ def _construct_exploration_suggestions(suggestions):
 
     suggestion_dicts = []
     for suggestion in suggestions:
-        available_states = exp_id_to_exp[suggestion.target_id].states
+        exploration = exp_id_to_exp[suggestion.target_id]
+        available_states = exploration.states
         content_id_exists = False
 
         # Checks whether the state name within change object of the suggestion
@@ -675,8 +676,8 @@ def _construct_exploration_suggestions(suggestions):
                 suggestion.change.state_name].has_content_id(
                     suggestion.change.content_id)
 
-        if content_id_exists:
-            content_html = exp_id_to_exp[suggestion.target_id].get_content_html(
+        if content_id_exists and exploration.edits_allowed:
+            content_html = exploration.get_content_html(
                 suggestion.change.state_name, suggestion.change.content_id)
             suggestion_dict = suggestion.to_dict()
             suggestion_dict['exploration_content_html'] = content_html

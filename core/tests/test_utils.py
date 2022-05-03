@@ -1763,6 +1763,7 @@ auto_tts_enabled: false
 blurb: ''
 category: Category
 correctness_feedback_enabled: true
+edits_allowed: true
 init_state_name: %s
 language_code: en
 objective: ''
