@@ -306,9 +306,13 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
 
     def test_get_logged_out_user_progress(self):
 
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertIsNone(logged_out_user_data)
+
         exp_services.update_logged_out_user_progress(
             self.EXP_1_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 1)
-        
+
         expected_progress_dict = {
             'exploration_id': self.EXP_1_ID,
             'unique_progress_url_id': self.UNIQUE_PROGRESS_URL_ID,
@@ -321,18 +325,25 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
         logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
             self.UNIQUE_PROGRESS_URL_ID)
         self.assertIsNotNone(logged_out_user_data)
-        self.assertEqual(expected_progress_dict['exploration_id'],
+        self.assertEqual(
+            expected_progress_dict['exploration_id'],
             logged_out_user_data.exploration_id)
-        self.assertEqual(expected_progress_dict['unique_progress_url_id'],
+        self.assertEqual(
+            expected_progress_dict['unique_progress_url_id'],
             logged_out_user_data.unique_progress_url_id)
-        self.assertEqual(expected_progress_dict['furthest_reached_checkpoint_state_name'],
+        self.assertEqual(
+            expected_progress_dict['furthest_reached_checkpoint_state_name'],
             logged_out_user_data.furthest_reached_checkpoint_state_name)
-        self.assertEqual(expected_progress_dict['furthest_reached_checkpoint_exp_version'],
+        self.assertEqual(
+            expected_progress_dict['furthest_reached_checkpoint_exp_version'],
             logged_out_user_data.furthest_reached_checkpoint_exp_version)
-        self.assertEqual(expected_progress_dict['most_recently_reached_checkpoint_state_name'],
+        self.assertEqual(
+            expected_progress_dict['most_recently_reached_checkpoint_state_name'], # pylint: disable=line-too-long
             logged_out_user_data.most_recently_reached_checkpoint_state_name)
-        self.assertEqual(expected_progress_dict['most_recently_reached_checkpoint_exp_version'],
+        self.assertEqual(
+            expected_progress_dict['most_recently_reached_checkpoint_exp_version'], # pylint: disable=line-too-long
             logged_out_user_data.most_recently_reached_checkpoint_exp_version)
+
 
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     """Tests the exploration model -> exploration conversion pipeline."""
