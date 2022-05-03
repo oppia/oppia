@@ -577,6 +577,9 @@ URLS = [
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
     get_redirect_route(
+        r'/editsallowedhandler/<exploration_id>',
+        editor.ExplorationEditsAllowedHandler),
+    get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),
     get_redirect_route(

@@ -189,6 +189,7 @@ describe('Exploration editor page component', function() {
     param_changes: [],
     auto_tts_enabled: {},
     correctness_feedback_enabled: {},
+    edits_allowed: true,
     state_classifier_mapping: [],
     user: {},
     version: '1',
