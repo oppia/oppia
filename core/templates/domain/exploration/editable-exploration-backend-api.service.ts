@@ -147,6 +147,13 @@ export class EditableExplorationBackendApiService {
     }).toPromise();
   }
 
+  async recordLearnerHasViewedLessonInfoModalOnce(): Promise<void> {
+    const requestUrl = '/userinfohandler/data';
+    return this.httpClient.put<void>(requestUrl, {
+      user_has_viewed_lesson_info_modal_once: true
+    }).toPromise();
+  }
+
   /**
    * Deletes an exploration in the backend with the provided exploration
    * ID. If successful, the exploration will also be deleted from the

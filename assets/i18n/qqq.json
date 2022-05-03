@@ -569,6 +569,7 @@
 	"I18N_LEARN_TOPIC": "Text displayed on the learner dashboard that prompts user to start a topic.",
 	"I18N_LESSON_AUTHORS_DROPDOWN_TITLE": "Text displayed on the lesson authors dropdown menu in the lesson info modal.",
 	"I18N_LESSON_INFO_HEADER": "The name of a button in exploration player. On clicking it, the lesson information modal opens up.",
+	"I18N_LESSON_INFO_TOOLTIP_MESSAGE": "The message in the tooltip pointing to lesson info button. Appears when learner reaches second checkpoint in an exploration for the first time in his/her whole lifetime.",
 	"I18N_LIBRARY_ACTIVITY_COMPLETED_ICON": "Text that appears on hovering over the completed icon that appears on top of the activity cards. It indicates to the user that he/she has completed the activity.",
 	"I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST": "Text that appears on hovering over the playlist icon that appears on top of the activity cards. It indicates to the user that the activity is already there on his/her list of activities to play later.",
 	"I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST": "Text that appears when the user hovers over a clock icon that appears on top of the activities in the library section. The clock icon indicates to the user that he/she can add the activity to his/her learner playlist which he/she can then play later.",

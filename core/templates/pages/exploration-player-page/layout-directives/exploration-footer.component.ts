@@ -21,6 +21,7 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
@@ -64,6 +65,7 @@ export class ExplorationFooterComponent {
   expStates: StateObjectsBackendDict;
   completedCheckpointsCount: number = 0;
   lastCheckpointWasCompleted: boolean = false;
+  learnerHasViewedLessonInfoTooltip: boolean = false;
   userIsLoggedIn: boolean = false;
 
   constructor(
@@ -82,7 +84,9 @@ export class ExplorationFooterComponent {
     private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
     private explorationEngineService: ExplorationEngineService,
-    private userService: UserService
+    private userService: UserService,
+    private editableExplorationBackendApiService:
+      EditableExplorationBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -129,6 +133,8 @@ export class ExplorationFooterComponent {
       }
       // Fetching the number of checkpoints.
       this.getCheckpointCount(this.explorationId);
+
+      this.setLearnerHasViewedLessonInfoTooltip();
     } catch (err) { }
 
     if (this.contextService.isInQuestionPlayerMode()) {
@@ -194,6 +200,12 @@ export class ExplorationFooterComponent {
     let includePrivateExplorations = JSON.stringify(true);
     if (this.expInfo) {
       this.openInformationCardModal();
+
+      // Update user has viewed lesson info modal once if
+      // lesson info modal button is clicked.
+      if (!this.learnerHasViewedLessonInfoTooltip) {
+        this.learnerHasViewedLessonInfo();
+      }
     } else {
       this.learnerViewInfoBackendApiService.fetchLearnerInfoAsync(
         stringifiedExpIds,
@@ -246,6 +258,21 @@ export class ExplorationFooterComponent {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  async setLearnerHasViewedLessonInfoTooltip(): Promise<void> {
+    return this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(this.explorationId, null).then(
+        (response: FetchExplorationBackendResponse) => {
+          this.learnerHasViewedLessonInfoTooltip = (
+            response.has_viewed_lesson_info_modal_once);
+        });
+  }
+
+  learnerHasViewedLessonInfo(): void {
+    this.learnerHasViewedLessonInfoTooltip = true;
+    this.editableExplorationBackendApiService
+      .recordLearnerHasViewedLessonInfoModalOnce();
   }
 }
 
