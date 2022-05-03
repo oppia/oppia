@@ -489,7 +489,7 @@ class ExportAccountHandler(base.BaseHandler):
         # Ensure that the exported data does not contain a user ID.
         user_data_json_string = json.dumps(user_data)
         if re.search(feconf.USER_ID_REGEX, user_data_json_string):
-            logging.exception(
+            logging.error(
                 '[TAKEOUT] User ID found in the JSON generated for user %s'
                 % self.user_id)
             user_data_json_string = (
@@ -566,7 +566,14 @@ class UserInfoHandler(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
+        'GET': {},
+        'PUT': {
+            'user_has_viewed_lesson_info_modal_once': {
+                'schema': {
+                    'type': 'bool'
+                },
+            }
+        }
     }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -603,6 +610,16 @@ class UserInfoHandler(base.BaseHandler):
             self.render_json({
                 'user_is_logged_in': False
             })
+
+    @acl_decorators.open_access
+    def put(self):
+        """Handles PUT requests."""
+        user_has_viewed_lesson_info_modal_once = self.normalized_payload.get(
+            'user_has_viewed_lesson_info_modal_once')
+        if user_has_viewed_lesson_info_modal_once:
+            user_services.set_user_has_viewed_lesson_info_modal_once(
+                self.user_id)
+        self.render_json({'success': True})
 
 
 class UrlHandler(base.BaseHandler):

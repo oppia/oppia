@@ -26,7 +26,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { TopicsAndSkillsDashboardBackendApiService, CategorizedAndUntriagedSkillsData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { AlertsService } from 'services/alerts.service';
-import {WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { StateLinkedSkillIdService } from '../state-editor-properties-services/state-skill.service';
 import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -46,15 +46,15 @@ export class StateSkillEditorComponent implements OnInit {
   @Output() onSaveStateContent: EventEmitter<string> = (
     new EventEmitter<string>());
 
-  categorizedSkills: SkillsCategorizedByTopics = null;
-  untriagedSkillSummaries: ShortSkillSummary[] = null;
+  categorizedSkills!: SkillsCategorizedByTopics;
+  untriagedSkillSummaries!: ShortSkillSummary[];
+  skillName!: string;
   skillEditorIsShown: boolean = true;
-  skillName: string = null;
   userCanEditSkills: boolean = false;
 
   constructor(
-    private topicsAndSkillsDashboardBackendApiService: (
-      TopicsAndSkillsDashboardBackendApiService),
+    private topicsAndSkillsDashboardBackendApiService:
+      TopicsAndSkillsDashboardBackendApiService,
     private storyEditorStateService: StoryEditorStateService,
     private alertsService: AlertsService,
     private windowDimensionsService: WindowDimensionsService,
@@ -127,7 +127,7 @@ export class StateSkillEditorComponent implements OnInit {
       DeleteStateSkillModalComponent, {
         backdrop: true,
       }).result.then(() => {
-      this.stateLinkedSkillIdService.displayed = null;
+      this.stateLinkedSkillIdService.displayed = undefined;
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(this.stateLinkedSkillIdService.displayed);
     }, () => {
@@ -144,6 +144,7 @@ export class StateSkillEditorComponent implements OnInit {
           skill_id: this.stateLinkedSkillIdService.displayed
         });
     }
+    throw new Error('Expected a skill id to be displayed');
   }
 
   toggleSkillEditor(): void {
