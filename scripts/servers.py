@@ -662,3 +662,36 @@ def managed_protractor_server(
         **kwargs)
     with managed_protractor_proc as proc:
         yield proc
+
+@contextlib.contextmanager
+def managed_webdriverIO_server(
+        suite_name='full', **kwargs):
+    """Returns context manager to start/stop the WebdriverIO server gracefully.
+
+    Args:
+        suite_name: str. The suite name whose tests should be run. If the value
+            is `full`, all tests will run.
+        dev_mode: bool. Whether the test is running on dev_mode.
+        **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
+
+    Yields:
+        psutil.Process. The webdriverio process.
+
+    Raises:
+        ValueError. Number of sharding instances are less than 0.
+    """
+
+    webdriverIO_args = [
+        common.NODE_BIN_PATH2,
+        common.NODEMODULES_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
+        '--suite', suite_name,
+    ]
+
+    # OK to use shell=True here because we are passing string literals and
+    # constants, so there is no risk of a shell-injection attack.
+    managed_webdribverIO_proc = managed_process(
+        webdriverIO_args, human_readable_name='WebdriverIO Server', shell=True,
+        **kwargs)
+
+    with managed_webdribverIO_proc as proc:
+        yield proc

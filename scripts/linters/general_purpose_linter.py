@@ -51,6 +51,7 @@ CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.ts',
+    'core/tests/wdio.conf.js',
     'core/templates/mathjaxConfig.ts',
     'assets/constants.ts',
     'assets/rich_text_components_definitions.ts',

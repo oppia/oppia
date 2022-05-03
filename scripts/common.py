@@ -182,6 +182,11 @@ PROTRACTOR_BIN_PATH = (
     os.path.join(NODE_MODULES_PATH, 'protractor', 'bin', 'protractor'))
 PROTRACTOR_CONFIG_FILE_PATH = (
     os.path.join('core', 'tests', 'protractor.conf.js'))
+WEBDRIVERIO_CONFIG_FILE_PATH = (
+    os.path.join('core', 'tests', 'wdio.config.js'))
+NODEMODULES_BIN_PATH = (
+    os.path.join(NODE_MODULES_PATH, '.bin', 'wdio'))
+
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
@@ -222,6 +227,8 @@ def is_x64_architecture():
 
 NODE_BIN_PATH = os.path.join(
     NODE_PATH, '' if is_windows_os() else 'bin', 'node')
+NODE_BIN_PATH2 = os.path.join(
+    NODE_PATH, '' if is_windows_os() else 'bin', 'npx')
 
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = os.pathsep.join([

@@ -142,11 +142,17 @@ RERUN_POLICIES = {
     'topicsandskillsdashboard': RERUN_POLICY_NEVER,
     'users': RERUN_POLICY_NEVER,
     'wipeout': RERUN_POLICY_NEVER,
+    'navigation': RERUN_POLICY_NEVER,
+    'test': RERUN_POLICY_NEVER,
     # The suite name is `full` when no --suite argument is passed. This
     # indicates that all the tests should be run.
     'full': RERUN_POLICY_NEVER,
 }
 
+SUITES_MIGRATED_TO_WEBDRIVERIO = [
+   'navigation',
+   'test'
+]
 
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
@@ -261,15 +267,21 @@ def run_tests(args):
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 
-        stack.enter_context(servers.managed_webdriver_server(
+        if args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
+            print("/**Starting running of webdriverIO tests**/")
+            proc =  stack.enter_context(servers.managed_webdriverIO_server(
+                suite_name=args.suite,
+                stdout=subprocess.PIPE))
+        else:
+            stack.enter_context(servers.managed_webdriver_server(
             chrome_version=args.chrome_driver_version))
-
-        proc = stack.enter_context(servers.managed_protractor_server(
-            suite_name=args.suite,
-            dev_mode=dev_mode,
-            debug_mode=args.debug_mode,
-            sharding_instances=args.sharding_instances,
-            stdout=subprocess.PIPE))
+            print("/**Protractor tests**/")
+            proc = stack.enter_context(servers.managed_protractor_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
 
         print(
             'Servers have come up.\n'
