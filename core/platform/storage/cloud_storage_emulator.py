@@ -42,7 +42,7 @@ class EmulatorBlob:
             name: str,
             data: Union[bytes, str],
             content_type: Optional[str]
-    ):
+    ) -> None:
         """Initialize blob.
 
         Args:
