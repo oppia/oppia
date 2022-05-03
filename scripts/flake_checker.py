@@ -20,6 +20,9 @@ import datetime
 import os
 
 import requests
+from typing import Dict, List, Optional, Tuple
+from typing_extensions import TypedDict
+
 
 FLAKE_CHECK_AND_REPORT_URL = (
     'https://oppia-e2e-test-results-logger.herokuapp.com'
@@ -29,7 +32,7 @@ PASS_REPORT_URL = (
     '/report-pass')
 REPORT_API_KEY = '7Ccp062JVjv9LUYwnLMqcm5Eu5gYqqhpl3zQmcO3cDQ'
 
-CI_INFO = {
+CI_INFO: Dict[str, CommonCIInfoDict] = {
     'githubActions': {
         'env': {
             'identifier': 'GITHUB_ACTIONS',
@@ -64,7 +67,23 @@ RERUN_NO = 'rerun no'
 RERUN_UNKNOWN = 'rerun unknown'
 
 
-def _print_color_message(message):
+class EnvDict(TypedDict):
+    """Dictionary that represents env dict."""
+
+    identifier: str
+    user_info: str
+    branch: str
+    build_url_template_vars: List[str]
+
+
+class CommonCIInfoDict(TypedDict):
+    """Dictionary that represents common Ci info dictionary."""
+
+    env: EnvDict
+    build_url_template: str
+
+
+def _print_color_message(message: str) -> None:
     """Prints the given message in red color.
 
     Args:
@@ -74,21 +93,21 @@ def _print_color_message(message):
     print('\033[92m' + message + '\033[0m\n')
 
 
-def check_if_on_ci():
+def check_if_on_ci() -> bool:
     """Check if the script is running on a CI server.
 
     Returns: bool. Whether we are running on a CI server.
     """
     for info in CI_INFO.values():
-        ci_identifier = info['env']['identifier']
+        ci_identifier: str = info['env']['identifier']
         if os.getenv(ci_identifier):
             return True
     return False
 
 
-def _get_build_info():
+def _get_build_info() -> Dict[str, Optional[str]]:
     """Returns the info related to the build container."""
-    build_info = {}
+    build_info: Dict[str, Optional[str]] = {}
 
     for info in CI_INFO.values():
         ci_env = info['env']
@@ -96,9 +115,9 @@ def _get_build_info():
         if not os.getenv(ci_env['identifier']):
             continue
 
-        template_values = []
+        template_values: List[str] = []
         for template_var in ci_env['build_url_template_vars']:
-            value = os.getenv(template_var)
+            value: Optional[str] = os.getenv(template_var)
             if value is None:
                 raise RuntimeError(
                     'Expected environment variable %s missing' %
@@ -117,7 +136,7 @@ def _get_build_info():
     raise Exception('Unknown build environment.')
 
 
-def report_pass(suite_name):
+def report_pass(suite_name: str) -> None:
     """Report a passing test to the logging server."""
     metadata = _get_build_info()
     payload = {
@@ -139,7 +158,9 @@ def report_pass(suite_name):
             PASS_REPORT_URL))
 
 
-def is_test_output_flaky(output_lines, suite_name):
+def is_test_output_flaky(
+    output_lines: List[str], suite_name: str
+) -> Tuple[bool, str]:
     """Returns whether the test output matches any flaky test log."""
     build_info = _get_build_info()
     payload = {
