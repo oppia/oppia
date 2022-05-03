@@ -26,7 +26,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import fs_domain
 
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -1100,9 +1099,7 @@ class Story:
         Returns:
             dict. The converted story_contents_dict.
         """
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_STORY, story_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)
         for index in range(len(story_contents_dict['nodes'])):
             filepath = '%s/%s' % (
                 constants.ASSET_TYPE_THUMBNAIL,
@@ -1158,9 +1155,7 @@ class Story:
         Raises:
             Exception. The subtopic with the given id doesn't exist.
         """
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_STORY, self.id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)
 
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
@@ -1351,9 +1346,7 @@ class Story:
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_STORY, self.id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)
 
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
