@@ -134,14 +134,12 @@ class ModelProperty:
         Returns:
             type(BaseModel). The model type.
         """
-        # Here, get_model_class() returns the value of type
-        # Type[datastore_services.Model] but the expected return value from
-        # this method is Type[base_models.BaseModel]. So, that's why we used
-        # cast here.
-        return cast(
-            Type[base_models.BaseModel],
-            job_utils.get_model_class(self._model_kind)
-        )
+        model_class = job_utils.get_model_class(self._model_kind)
+
+        # To narrow down the type from datastore_services.Model to
+        # base_models.BaseModel, we used assert statement here.
+        assert issubclass(model_class, base_models.BaseModel)
+        return model_class
 
     def _to_property(
         self
