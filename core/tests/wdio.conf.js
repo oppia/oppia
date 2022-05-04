@@ -1,5 +1,3 @@
-const { remote } = require('webdriverio');
-
 var suites = {
     // The tests on Travis are run individually to parallelize
     // them. Therefore, we mention the complete directory

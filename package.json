@@ -67,7 +67,7 @@
     "eslint": "^8.4.1",
     "eslint-plugin-angular": "^4.0.1",
     "eslint-plugin-html": "^6.0.0",
-    "chromedriver": "^99.0.0",
+    "chromedriver": "^89.0.0",
     "eslint-plugin-oppia": "file:./scripts/linters/custom_eslint_checks",
     "eslint-plugin-unused-imports": "^2.0.0",
     "file-loader": "^6.0.0",

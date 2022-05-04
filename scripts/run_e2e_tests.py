@@ -150,8 +150,7 @@ RERUN_POLICIES = {
 }
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
-   'navigation',
-   'test'
+   'navigation'
 ]
 
 def is_oppia_server_already_running():
@@ -267,10 +266,10 @@ def run_tests(args):
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 
-        if args.suite == 'full':
-            stack.enter_context(servers.managed_webdriver_server(
+        stack.enter_context(servers.managed_webdriver_server(
             chrome_version=args.chrome_driver_version))
 
+        if args.suite == 'full':
             proc = stack.enter_context(servers.managed_protractor_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
@@ -289,8 +288,6 @@ def run_tests(args):
                 debug_mode=args.debug_mode,
                 stdout=subprocess.PIPE))
         else:
-            stack.enter_context(servers.managed_webdriver_server(
-            chrome_version=args.chrome_driver_version))
             proc = stack.enter_context(servers.managed_protractor_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
