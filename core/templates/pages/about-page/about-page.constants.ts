@@ -147,6 +147,7 @@ export const AboutPageConstants = {
     'Denis Samokhvalov',
     'Devi Sandeep',
     'Dharmesh Poddar',
+    'Dhruv Rishishwar',
     'Diana Chen',
     'Dipto Chakrabarty',
     'Divyadeep Singh',

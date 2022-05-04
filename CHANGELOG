@@ -1,5 +1,79 @@
 This file contains a summary of changes to the Oppia code base.
 
+v3.2.5 (04 May 2022)
+------------------------
+Contributor Pages
+* Fix #15321: Show review message for accepted suggestions (#15405)
+* Fix #14715 Stop update requests when no changes are detected (#15053)
+* Support legacy translation command in the translation suggestion review edit flow (#15333)
+
+Learner/Creator Pages
+* fix few learner exp quality issues and add 'more' button for feedback updates in the learner dashboard (#15273)
+* Fix #15253: update skill editor when state changes; Add discard button in SVG editor (#15254)
+* fix change detection issue in skill review editor (#15247)
+* Update index.yaml and fix change detection issues in skill / topic editor (#15242)
+* Fix #15234: Fixed issue with slider (#15237)
+* Fix #15023, #15037: Hide learner suggestions in the feedback tab and show correct open feedback count; Fix errors in skill questions tab (#15220)
+* Fixed some UI issues in sidenav and topnav (#15218)
+* Removed unnecessary calls to analytics service (#15154)
+* Fix part of #14702: Add favicon and staleness detection services and add some functions in local storage service. (#15100)
+* Fix #11560: Add "Lesson Info" Modal. (#15065)
+* Goals tab based on learner dashboard doc (#14987)
+* Fix part of #14085: Added MatchesUpToTrivialManipulations rule for math interactions. (#14977)
+* Add logs to debug server error in rte parser (#14897)
+* Fix stacking issue with "tag misconceotion modal" (#15267)
+
+Dev Workflow
+* Upgrade Beam to 2.38.0 (#15400)
+* Use group in codeowners and remove Hardik (#15276)
+* Fail noisily if a process crashes. (#15250)
+* Upgrade frontend and backend libs (#15243)
+* Update comments of non-null assertion. (#15236)
+* Fix #15225: Skip pylint cyclic import check (#15229)
+* Transfer code ownership from @DubeySandeep (#15219)
+* Use our fork of pylint-quotes (#15216)
+* Fix #13991: Fix flaky build tests (#15187)
+* Update PR template (#15054)
+* Fix part of #7450: Replaced private methods in SuggestionServicesUnitTests (#15001)
+* Revert "Fix part of #10474: Make typescript checks strict for some files." (#15252)
+* fix race condition causing fe test to be flaky (#15230)
+
+Release team
+* Add step to inform server errors team before deploying release (#15383)
+* Update branch protection rule prompt (#15281)
+* Update maintenance mode to return status code as 200 instead of 503 (#15210)
+
+Data handling
+* Fix part of #15311: Fix takeout in app feedback and add more granular debugging (#15359)
+* Fix part of #13822: Add backend validation check for question state schema version. (#15264)
+* Fix part of #13341: Type annotate create_expression_parser.py, create_topological_sort_of_all_services.py, install_chrome_for_ci.py (#15186)
+* Fix part of #13341: Type annotate clean.py, run_tests.py, scripts_test_utils.py (#15181)
+* Fix part of #14351: Enforce normalized data (#15044)
+* Fix part of #13822: Added beam jobs for skill misconception ID validation (#15039)
+* Fix part of #14085: Added audit job for math interactions. (#14952)
+* Fix part of #14537: Refactor improvements domain (#14866)
+
+Speed improvement
+* Improve speed of splash and learn/math (#15275)
+* Improve speed of splash and learn/math (#15142)
+* Revert "Improve speed of splash and learn/math" (#15223)
+
+Typing
+* Removing all annotated files from core/jobs. (#15228)
+* Fix part of #14033: Added Mypy type annotations to some files. (#15119)
+* Fix part of #14033: Type annotate translatable_object_registry (#15118)
+* Fix part of #10474: Make typescript checks strict for few more files (#15085)
+* Fix part of of #14033: Type annotate email_services file (#15062)
+* Fix part of #14033: Added Mypy type annotations to `user_domain.py` (#15057)
+* Fix part of #10474: Make typescript checks strict for some files. (#15049)
+* Fix part of #14033: Added Mypy type annotations to `collection_domain.py` (#14958)
+
+Angular Migration
+* Fix part of #11329: oppia-interactive-music-notes-input.directive (remove addClass) (#15151)
+* Fix Part of #9749: Migrates Music-Notes Input Interaction to Angular (#14841)
+* Fix Part of #9749: Migrate End exploration interaction with separate backend-api-service. (#14766)
+
+
 v3.2.4 (29 Mar 2022)
 ------------------------
 Learner/Creator Pages
