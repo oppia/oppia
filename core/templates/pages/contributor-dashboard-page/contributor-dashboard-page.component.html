@@ -57,29 +57,41 @@
           </div>
         </div>
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName !== 'myContributionTab'">
-          <div class="oppia-mascot-avatar-container">
-            <a ng-class="{'oppia-disabled-image-link': ($ctrl.OPPIA_AVATAR_LINK_URL === null)}"
-               ng-href="<[$ctrl.OPPIA_AVATAR_LINK_URL]>"
-               rel="noopener"
-               target="_blank">
-              <img class="oppia-mascot-avatar"
-                   ng-src="<[$ctrl.OPPIA_AVATAR_IMAGE_URL]>" alt="">
-            </a>
-          </div>
-          <div class="oppia-opportunities-tabs-explanation" data-tab-name="<[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]>">
-            <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
-          </div>
-          <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
-            <span class="oppia-dashboard-language-container-label">Translate to</span>
-            <translation-language-selector class="oppia-language-selector" [active-language-code]="$ctrl.languageCode"
-                                           (set-active-language-code)="$ctrl.onChangeLanguage($event)">
-            </translation-language-selector>
-          </div>
-          <div class="oppia-dashboard-topic-container" ng-if="$ctrl.showTopicSelector()">
-            <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
-            <translation-topic-selector class="oppia-topic-selector" [active-topic-name]="$ctrl.topicName"
-                                        (set-active-topic-name)="$ctrl.onChangeTopic($event)">
-            </translation-topic-selector>
+          <div class="outer-container">
+            <div class="mascot-container">
+              <div class="oppia-mascot-avatar-container">
+                <a ng-class="{'oppia-disabled-image-link': ($ctrl.OPPIA_AVATAR_LINK_URL === null)}"
+                   ng-href="<[$ctrl.OPPIA_AVATAR_LINK_URL]>"
+                   rel="noopener"
+                   target="_blank">
+                  <img class="oppia-mascot-avatar"
+                       ng-src="<[$ctrl.OPPIA_AVATAR_IMAGE_URL]>" alt="">
+                </a>
+              </div>
+              <div class="explanation-container">
+                <div class="oppia-opportunities-tabs-explanation" data-tab-name="<[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]>">
+                  <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
+                </div>
+              </div>
+            </div>
+            <div class="dropdown-container">
+              <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
+                <span class="oppia-dashboard-language-container-label">Translate to</span>
+                <div>
+                  <translation-language-selector class="oppia-language-selector" [active-language-code]="$ctrl.languageCode"
+                                                 (set-active-language-code)="$ctrl.onChangeLanguage($event)">
+                  </translation-language-selector>
+                </div>
+              </div>
+              <div class="oppia-dashboard-topic-container" ng-if="$ctrl.showTopicSelector()">
+                <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
+                <div>
+                  <translation-topic-selector class="oppia-topic-selector" [active-topic-name]="$ctrl.topicName"
+                                              (set-active-topic-name)="$ctrl.onChangeTopic($event)">
+                  </translation-topic-selector>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -159,21 +171,31 @@
   </div>
 </div>
 <style>
+  .outer-container {
+    display: flex;
+    margin-top: 20px;
+    width: 100vw;
+  }
+  .mascot-container {
+    display: flex;
+  }
+  .dropdown-container {
+    display: flex;
+    margin-bottom: 20px;
+  }
   button.oppia-autofocus:focus {
     outline: 0;
   }
   .oppia-collapsed-language-selector-button {
     margin-bottom: 15px;
   }
-  .oppia-dashboard-language-container-label {
+  .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
     color: #4a4a4a;
-    font-size: 18px;
-    margin-top: 10px;
+    font-size: 20px;
   }
   .oppia-collapsed-dashboard-language-container-label {
     color: #4a4a4a;
     font-size: 12px;
-    margin-top: 10px;
   }
   .oppia-dashboard-language-container {
     display: flex;
@@ -196,6 +218,7 @@
     content: attr(data-tab-name);
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
+    margin-bottom: 10px;
     position: absolute;
   }
   .oppia-contributor-username-container {
@@ -366,7 +389,6 @@
     display: flex;
     height: 75px;
     margin-bottom: 10px;
-    width: 100%;
   }
   .oppia-contributor-dashboard-header {
     display: none;
@@ -379,14 +401,14 @@
       -moz-animation: translate-y 0.5s ease-out alternate;
       animation: translate-y 0.5s ease-out alternate;
   }
-  .oppia-language-selector {
-    padding-bottom: 10px;
-  }
   .oppia-topic-selector {
     padding-bottom: 10px;
   }
   .oppia-dashboard-topic-container {
+    display: flex;
+    flex-direction: column;
     margin-left: 10px;
+    width: 200px;
   }
   .oppia-collapsed-language-selector {
     padding-bottom: 15px;
@@ -403,7 +425,38 @@
       from { transform: translateY(-100%); }
       to { transform: translateY(0); }
   }
-  @media only screen and (max-width: 600px) {
+  @media only screen and (max-width: 880px) {
+    .oppia-opportunities-tab-header {
+      margin: 0;
+      width: 100vw;
+    }
+    .outer-container {
+      flex-direction: column;
+      width: 100vw;
+    }
+    .mascot-container {
+      border-bottom: 1px solid #4a4a4a;
+      padding-left: 10%;
+      padding-right: 10%;
+      padding-bottom: 10px;
+      width: 100%;
+    }
+    .dropdown-container {
+      flex-direction: column;
+      margin-top: 10px;      
+      width: 100%;
+    }
+    .oppia-dashboard-language-container, .oppia-dashboard-topic-container {
+      flex-direction: row;
+      justify-content: center;
+      margin: 0;
+      margin-top: 10px;
+      width: 100%;
+    }
+    .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
+      padding-top: 10px;
+      width: 150px;
+    }
     .oppia-opportunities-tabs-list {
       width: 100%;
     }
@@ -433,8 +486,25 @@
       left: 20%;
     }
     .oppia-opportunities-tab-customization-container {
-      margin-bottom: 0;
+      margin-bottom: 20px;
       padding-top: 1%;
+    }
+  }
+  @media only screen and (max-width: 420px) {
+    .mascot-container {
+      border-bottom: 1px solid #4a4a4a;
+      padding-left: 10px;
+      padding-right: 10px;
+      padding-bottom: 10px;
+      width: 100%;
+    }
+    .dropdown-container {
+      flex-direction: column;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      margin-left: 10px;
+      margin-right: 10px;
+      width: 100%;
     }
   }
 </style>
