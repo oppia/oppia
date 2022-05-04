@@ -9,6 +9,12 @@ if (argv.prodEnv) {
     'third_party/generated/js/third_party.min.js');
 }
 
+// Generate a random number between 0 and 999 to use as the seed for the
+// frontend test execution order.
+let jasmineSeed = Math.floor(Math.random() * 1000);
+// eslint-disable-next-line no-console
+console.log(`Seed for Frontend Test Execution Order ${jasmineSeed}`);
+
 module.exports = function(config) {
   config.set({
     basePath: '../../',
@@ -80,6 +86,12 @@ module.exports = function(config) {
       'extensions/interactions/**/*.component.html': ['ng-html2js'],
       'extensions/interactions/*.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
+    },
+    client: {
+      jasmine: {
+        random: true,
+        seed: jasmineSeed,
+      },
     },
     reporters: ['progress', 'coverage-istanbul'],
     coverageIstanbulReporter: {
