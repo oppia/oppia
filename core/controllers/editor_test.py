@@ -272,6 +272,67 @@ class EditorTests(BaseEditorControllerTests):
 
         self.logout()
 
+    def test_lock_exploration(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(
+            exp_id, self.admin_id, end_state_name='end state')
+        csrf_token = self.get_new_csrf_token()
+        edits_allowed_url = '/editsallowedhandler/%s' % exp_id
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, True)
+
+        self.put_json(
+            edits_allowed_url,
+            {'edits_are_allowed': False},
+            csrf_token=csrf_token)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, False)
+
+        self.logout()
+
+    def test_cannot_update_exploration_when_locked(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(
+            exp_id, self.admin_id, end_state_name='end state')
+        csrf_token = self.get_new_csrf_token()
+        edits_allowed_url = '/editsallowedhandler/%s' % exp_id
+        self.put_json(
+            edits_allowed_url,
+            {'edits_are_allowed': False},
+            csrf_token=csrf_token)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, False)
+
+        response_dict = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'dummy update',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State 4'
+                }, {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State 4',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+
+        self.assertEqual(
+            response_dict['error'],
+            'This exploration cannot be edited. Please contact the admin.')
+        self.logout()
+
 
 class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
