@@ -17,6 +17,8 @@
  * with protractor.
  */
 
+var waitFor = require('./waitFor.js');
+
 var expectErrorPage = async(errorNum) => {
   var errorContainer = $('.protractor-test-error-container');
   await waitFor.visibilityOf(

@@ -71,7 +71,20 @@ var visibilityOf = async(element, errorMessage) => {
     });
 };
 
+/**
+ * @param {Object} element - Clickable element such as button, link or tab.
+ * @param {string} errorMessage - Error message when element is not clickable.
+ */
+var elementToBeClickable = async function(element, errorMessage) {
+  await element.waitForClickable(
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg: errorMessage
+    });
+};
+
 exports.alertToBePresent = alertToBePresent;
 exports.pageToFullyLoad = pageToFullyLoad;
 exports.presenceOf = presenceOf;
 exports.visibilityOf = visibilityOf;
+exports.elementToBeClickable = elementToBeClickable;

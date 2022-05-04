@@ -7,6 +7,7 @@ describe('Oppia HomePage', () => {
         browserName: 'chrome'
       }
     });
+    browser.fullscreenWindow();
     await browser.url('www.webdriver.io');
     await expect(browser).toHaveTitle(
       'WebdriverIO · Next-gen browser and mobile' +

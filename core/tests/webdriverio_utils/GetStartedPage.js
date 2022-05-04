@@ -19,12 +19,11 @@
 
 var waitFor = require('./waitFor.js');
 
-var GetStartedPage = () => {
+var GetStartedPage = function() {
   var GET_STARTED_PAGE_URL = '/get-started';
 
   this.get = async() => {
     await browser.url(GET_STARTED_PAGE_URL);
-    await waitFor.pageToFullyLoad();
   };
 
   this.getMetaTagContent = async(name, type) => {

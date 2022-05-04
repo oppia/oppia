@@ -1,3 +1,5 @@
+const { remote } = require('webdriverio');
+
 var suites = {
     // The tests on Travis are run individually to parallelize
     // them. Therefore, we mention the complete directory
@@ -175,12 +177,6 @@ exports.config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      */
     // onPrepare: function() {
-    //     // Set a wide enough window size for the navbar in the library pages to
-    //     // display fully.
-    //     browser.setWindowSize(1285, 1000);
-
-    //     // Navigate to the splash page so that tests can begin on an Angular page.
-    //     browser.url('http://localhost:9001');
     // },
     /**
      * Gets executed before a worker process is spawned and can be used to initialise specific service
@@ -219,8 +215,11 @@ exports.config = {
      * @param {Array.<String>} specs        List of spec file paths that are to be run
      * @param {Object}         browser      instance of created browser/device session
      */
-    // before: function (capabilities, specs) {
-    // },
+    before: function() {
+        // Set a wide enough window size for the navbar in the library pages to
+        // display fully.
+        browser.maximizeWindow();
+    },
     /**
      * Runs before a WebdriverIO command gets executed.
      * @param {String} commandName hook command name
