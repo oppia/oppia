@@ -179,7 +179,7 @@ var ExplorationPlayerPage = function() {
       await action.click(
         'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
     }
-  }
+  };
 
   this.clickConfirmRedirectionButton = async function() {
     await waitFor.elementToBeClickable(confirmRedirectionButton);
