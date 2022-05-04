@@ -108,7 +108,7 @@ interface AllowedInteractionCategories {
   interaction_ids: string[];
 }
 
-const INTERACTION_SERVICE_MAPPING = {
+export const INTERACTION_SERVICE_MAPPING = {
   AlgebraicExpressionInputValidationService:
     AlgebraicExpressionInputValidationService,
   CodeReplValidationService: CodeReplValidationService,

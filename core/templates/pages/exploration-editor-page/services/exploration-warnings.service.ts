@@ -31,6 +31,7 @@ import { ExplorationInitStateNameService } from './exploration-init-state-name.s
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Warning } from 'interactions/base-interaction-validation.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { INTERACTION_SERVICE_MAPPING } from '../editor-tab/templates/modal-templates/customize-interaction-modal.component';
 
 export interface WarningsList {
   type: string;
@@ -243,7 +244,8 @@ export class ExplorationWarningsService {
       if (interaction.id) {
         let validatorServiceName =
             _states.getState(stateName).interaction.id + 'ValidationService';
-        let validatorService = this.injector.get(validatorServiceName);
+        let validatorService = (
+          this.injector.get(INTERACTION_SERVICE_MAPPING[validatorServiceName]));
         let interactionWarnings = validatorService.getAllWarnings(
           stateName, interaction.customizationArgs,
           interaction.answerGroups, interaction.defaultOutcome);
