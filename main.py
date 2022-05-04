@@ -534,8 +534,8 @@ URLS = [
         r'/explorehandler/state_hit_event/<exploration_id>',
         reader.StateHitEventHandler),
     get_redirect_route(
-        r'/explorehandler/state_hit_event/<exploration_id>',
-        reader.StateHitEventHandler),
+        r'/explorehandler/state_complete_event/<exploration_id>',
+        reader.StateCompleteEventHandler),
     get_redirect_route(
         r'/explorehandler/states_completed_by_logged_out_user/<exploration_id>',
         reader.SaveProgressEventHandler),
