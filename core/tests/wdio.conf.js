@@ -11,10 +11,6 @@ var suites = {
     navigation: [
         './core/tests/webdriverio/navigation.js'
     ],
-
-    test: [
-        './core/tests/webdriverio/newtest.js'
-    ],
 }
 
 exports.config = {
