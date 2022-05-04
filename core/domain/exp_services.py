@@ -2290,6 +2290,8 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
         model.put()
 
     return exp_fetchers.get_logged_out_user_progress(unique_progress_url_id)
+
+
 def set_exploration_edits_allowed(exp_id, edits_are_allowed):
     """Toggled edits allowed field in the exploration.
 
