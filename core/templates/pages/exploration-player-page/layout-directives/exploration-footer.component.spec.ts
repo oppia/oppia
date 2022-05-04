@@ -442,7 +442,7 @@ describe('ExplorationFooterComponent', () => {
       auto_tts_enabled: true,
       correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
-      user_has_viewed_lesson_info_modal_once: false,
+      has_viewed_lesson_info_modal_once: false,
       furthest_completed_checkpoint_exp_version: 1,
       furthest_completed_checkpoint_state_name: 'Mid',
       most_recently_reached_checkpoint_state_name: 'Mid',
@@ -646,7 +646,7 @@ describe('ExplorationFooterComponent', () => {
       correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
-      user_has_viewed_lesson_info_modal_once: false,
+      has_viewed_lesson_info_modal_once: false,
       furthest_completed_checkpoint_exp_version: 1,
       furthest_completed_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
@@ -663,6 +663,87 @@ describe('ExplorationFooterComponent', () => {
     expect(component.expStates).toEqual(sampleDataResults.exploration.states);
     expect(component.checkpointCount).toEqual(1);
   }));
+
+  it('should check if user has viewed lesson info once', fakeAsync(() => {
+    let sampleDataResults: FetchExplorationBackendResponse = {
+      exploration_id: 'expId',
+      is_logged_in: true,
+      session_id: 'KERH',
+      exploration: {
+        init_state_name: 'Introduction',
+        param_changes: [],
+        param_specs: null,
+        title: 'Exploration',
+        language_code: 'en',
+        correctness_feedback_enabled: true,
+        objective: 'To learn',
+        states: {
+          Introduction: {
+            param_changes: [],
+            classifier_model_id: null,
+            recorded_voiceovers: null,
+            solicit_answer_details: true,
+            card_is_checkpoint: true,
+            written_translations: null,
+            linked_skill_id: null,
+            next_content_id_index: null,
+            content: {
+              html: '',
+              content_id: 'content'
+            },
+            interaction: {
+              customization_args: {},
+              answer_groups: [],
+              solution: null,
+              hints: [],
+              default_outcome: {
+                param_changes: [],
+                dest: 'Introduction',
+                feedback: {
+                  html: '',
+                  content_id: 'content'
+                },
+                labelled_as_correct: true,
+                refresher_exploration_id: 'exp',
+                missing_prerequisite_skill_id: null
+              },
+              confirmed_unclassified_answers: [],
+              id: null
+            }
+          }
+        }
+      },
+      version: 1,
+      can_edit: true,
+      preferred_audio_language_code: 'en',
+      preferred_language_codes: [],
+      auto_tts_enabled: true,
+      correctness_feedback_enabled: true,
+      record_playthrough_probability: 1,
+      draft_change_list_id: 0,
+      has_viewed_lesson_info_modal_once: false,
+      furthest_completed_checkpoint_exp_version: 1,
+      furthest_completed_checkpoint_state_name: 'State B',
+      most_recently_reached_checkpoint_state_name: 'State A',
+      most_recently_reached_checkpoint_exp_version: 1
+    };
+
+    spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
+      .and.returnValue(Promise.resolve(sampleDataResults));
+
+    component.explorationId = 'expId';
+
+    component.setLearnerHasViewedLessonInfoTooltip();
+    tick();
+
+    expect(component.learnerHasViewedLessonInfoTooltip).toBeFalse();
+  }));
+
+  it('should correctly mark lesson info tooltip as viewed', () => {
+    expect(component.learnerHasViewedLessonInfoTooltip).toBeFalse();
+    component.learnerHasViewedLessonInfo();
+    expect(component.learnerHasViewedLessonInfoTooltip).toBeTrue();
+  });
 
   it('should show hints when initialized in question player when user is' +
   ' going through the practice session and should add subscription.', () => {

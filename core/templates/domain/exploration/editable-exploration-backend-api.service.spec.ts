@@ -350,6 +350,32 @@ describe('Editable exploration backend API service', function() {
     })
   );
 
+  it('should mark lesson info viewed once by the learner',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      let payload = {
+        user_has_viewed_lesson_info_modal_once: true
+      };
+
+      editableExplorationBackendApiService
+        .recordLearnerHasViewedLessonInfoModalOnce()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/userinfohandler/data');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { status: 200 });
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
   it('should use the rejection handler if the backend ' +
     'request failed', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');

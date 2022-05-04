@@ -256,6 +256,7 @@ describe('Full exploration editor', function() {
       await explorationPlayerPage.submitAnswer('NumericInput', 21);
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 2 with previous answer 21'));
+      await explorationPlayerPage.clickCloseLessonInfoTooltipIfPresent();
       await explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 1'));
@@ -301,6 +302,7 @@ describe('Full exploration editor', function() {
       await forms.toRichText('What language is Oppia?'));
     await explorationPlayerPage.submitAnswer('TextInput', 'Roman');
     await explorationPlayerPage.viewHint();
+    await explorationPlayerPage.clickCloseLessonInfoTooltipIfPresent();
     await explorationPlayerPage.submitAnswer('TextInput', 'Greek');
 
     await explorationPlayerPage.viewSolution();

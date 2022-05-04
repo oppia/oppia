@@ -128,6 +128,98 @@
   padding-left: 20px;
 }
 
+.close-tooltip {
+  background-color: black;
+  height: 100vh;
+  right: 0;
+  opacity: 0.4;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+}
+
+.lesson-info-tooltip-add-ons {
+  right: 5px;
+}
+
+.lesson-info-tooltip-add-ons::after {
+  margin-left: 163px;
+}
+
+.lesson-info-tooltip-add-ons::before {
+  margin-left: 161px;
+}
+
+.lesson-info-tooltip {
+  -webkit-animation: bounce 4s infinite;
+  animation: bounce 4s infinite;
+  background-color: #f5701b;
+  border: none;
+  border-radius: 5px;
+  bottom: 65px;
+  color: white;
+  display: flex;
+  font-size: 15px;
+  height: auto;
+  line-height: 1.2;
+  max-width: 340px;
+  min-width: 200px;
+  padding: 10px;
+  position: absolute;
+  z-index: 2;
+}
+
+.lesson-info-tooltip::after,
+.lesson-info-tooltip::before {
+  border: solid transparent;
+  content: " ";
+  right: 5%;
+  position: absolute;
+  top: 100%;
+}
+
+.lesson-info-tooltip::after {
+  border-right: 2px solid transparent;
+  border-left: 15px solid transparent;
+  border-top: 20px solid #f5701b;
+}
+
+.lesson-info-tooltip::before {
+  border-right: 7px solid transparent;
+  border-left: 7px solid transparent;
+  border-top: 10px solid #f5701b;
+}
+
+@keyframes bounce {
+  0% {
+    -webkit-transform: translateY(0);
+  }
+  8% {
+    -webkit-transform: translateY(-75px);
+  }
+  10% {
+    -webkit-transform: translateY(0);
+  }
+  15% {
+    -webkit-transform: translateY(-13px);
+  }
+  20% {
+    -webkit-transform: translateY(0);
+  }
+  25% {
+    -webkit-transform: translateY(-5px);
+  }
+  30% {
+    -webkit-transform: translateY(0);
+  }
+  35% {
+    -webkit-transform: translateY(-2px);
+  }
+  40% {
+    -webkit-transform: translateY(0);
+  }
+}
+
 @media (max-width: 650px) {
   .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
     margin: 0 -8px;
@@ -302,6 +394,13 @@
 @media (max-width: 475px) {
   .oppia-exploration-footer-sharing-links {
     display: none;
+  }
+
+  .lesson-info-tooltip {
+    font-size: 14px;
+    height: auto;
+    margin-left: 10px;
+    padding: 16px 8px 16px 8px;
   }
 }
 
