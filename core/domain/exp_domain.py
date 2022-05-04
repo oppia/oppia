@@ -2077,6 +2077,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 # Renaming cust arg.
                 customization_args = state_dict[
                     'interaction']['customization_args']
+                customization_args['allowedVariables'] = []
                 if 'customOskLetters' in customization_args:
                     customization_args['allowedVariables'] = copy.deepcopy(
                         customization_args['customOskLetters'])
