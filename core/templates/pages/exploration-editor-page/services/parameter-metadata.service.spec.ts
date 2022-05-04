@@ -16,268 +16,279 @@
  * @fileoverview Unit tests for ParameterMetadataService.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { ExplorationParamChangesService } from './exploration-param-changes.service';
+import { ExplorationStatesService } from './exploration-states.service';
+import { GraphDataService } from './graph-data.service';
+import { ParameterMetadataService } from './parameter-metadata.service';
 
-require('pages/exploration-editor-page/services/parameter-metadata.service');
-require('expressions/expression-interpolation.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-param-changes.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('pages/exploration-editor-page/services/graph-data.service.ts');
-
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
-
-describe('Parameter Metadata Service', function() {
-  var ParameterMetadataService = null;
-  var StatesObjectFactory = null;
-
-  beforeEach(angular.mock.module('oppia'));
-
-  importAllAngularServices();
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationParamChangesService', {
-      savedMemento: [{
-        customizationArgs: {
-          parse_with_jinja: false,
-          value: '5'
-        },
-        generatorId: 'Copier',
-        name: 'ParamChange1'
+class MockGraphDataService {
+  getGraphData() {
+    return {
+      links: [{
+        source: 'Hola',
+        target: 'Hola'
       }, {
-        customizationArgs: {
-          parse_with_jinja: true,
-          value: '{{ParamChange2}}'
-        },
-        generatorId: 'Copier',
+        source: 'State2',
+        target: 'State3'
       }, {
-        customizationArgs: {
-          parse_with_jinja: true,
-          value: '5'
-        },
-        generatorId: 'RandomSelector',
-        name: 'ParamChange3'
+        source: 'State',
+        target: 'State'
+      }, {
+        source: 'State3',
+        target: 'State'
       }]
-    });
-    $provide.value('ExplorationStatesService', {
-      getStates: function() {
-        return StatesObjectFactory.createFromBackendDict({
-          Hola: {
-            content: {
-              content_id: 'content',
-              html: '{{HtmlValue}}'
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content: {},
-                default_outcome: {},
-              },
-            },
-            param_changes: [],
-            interaction: {
-              id: null,
-              answer_groups: [{
-                rule_specs: [],
-                outcome: {
-                  dest: '',
-                  feedback: {
-                    content_id: 'feedback_1',
-                    html: '{{FeedbackValue}}'
-                  },
-                },
-              }],
-              default_outcome: {
-                dest: 'Hola',
-                feedback: {
-                  content_id: '',
-                  html: '',
-                },
-              },
-              hints: [],
-            },
-            written_translations: {
-              translations_mapping: {
-                content: {},
-                default_outcome: {},
-              },
+    };
+  }
+}
+
+class MockExplorationParamChangesService {
+  savedMemento = [{
+    customizationArgs: {
+      parse_with_jinja: false,
+      value: '5'
+    },
+    generatorId: 'Copier',
+    name: 'ParamChange1'
+  }, {
+    customizationArgs: {
+      parse_with_jinja: true,
+      value: '{{ParamChange2}}'
+    },
+    generatorId: 'Copier',
+  }, {
+    customizationArgs: {
+      parse_with_jinja: true,
+      value: '5'
+    },
+    generatorId: 'RandomSelector',
+    name: 'ParamChange3'
+  }];
+}
+
+describe('Parameter Metadata Service', () => {
+  let parameterMetadataService: ParameterMetadataService;
+  let stateObjectFactory: StateObjectFactory;
+
+  class MockExplorationStatesService {
+    getStates() {
+      return stateObjectFactory.createFromBackendDict('', {
+        Hola: {
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
             },
           },
-          State: {
-            content: {
-              content_id: 'content',
-              html: 'content'
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content: {},
-                default_outcome: {},
-              }
-            },
-            param_changes: [],
-            interaction: {
-              id: null,
-              answer_groups: [{
-                rule_specs: [],
-                outcome: {
-                  dest: '',
-                  feedback: {
-                    content_id: 'feedback_1',
-                    html: '{{StateFeedbackValue}}'
-                  },
-                },
-              }],
-              default_outcome: {
-                dest: 'State',
+          param_changes: [],
+          interaction: {
+            id: null,
+            answer_groups: [{
+              rule_specs: [],
+              outcome: {
+                dest: '',
                 feedback: {
-                  content_id: 'default_outcome',
-                  html: ''
+                  content_id: 'feedback_1',
+                  html: '{{FeedbackValue}}'
                 },
               },
-              hints: []
+            }],
+            default_outcome: {
+              dest: 'Hola',
+              feedback: {
+                content_id: '',
+                html: '',
+              },
             },
-            written_translations: {
-              translations_mapping: {
-                content: {},
-                default_outcome: {},
-              }
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        },
+        State: {
+          content: {
+            content_id: 'content',
+            html: 'content'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
             }
           },
-          State2: {
-            content: {
-              content_id: 'content',
-              html: 'content'
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content: {},
-                default_outcome: {},
-              }
-            },
-            param_changes: [],
-            interaction: {
-              id: null,
-              answer_groups: [{
-                rule_specs: [],
-                outcome: {
-                  dest: '',
-                  feedback: {
-                    content_id: '',
-                    html: ''
-                  }
-                }
-              }],
-              default_outcome: {
-                dest: 'State2',
+          param_changes: [],
+          interaction: {
+            id: null,
+            answer_groups: [{
+              rule_specs: [],
+              outcome: {
+                dest: '',
                 feedback: {
-                  content_id: 'default_outcome',
-                  html: ''
+                  content_id: 'feedback_1',
+                  html: '{{StateFeedbackValue}}'
                 },
               },
-              hints: []
+            }],
+            default_outcome: {
+              dest: 'State',
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
             },
-            written_translations: {
-              translations_mapping: {
-                content: {},
-                default_outcome: {},
-              }
-            }
+            hints: []
           },
-          State3: {
-            content: {
-              content_id: 'content',
-              html: 'content'
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content: {},
-                default_outcome: {},
-              }
-            },
-            param_changes: [],
-            interaction: {
-              id: null,
-              answer_groups: [{
-                rule_specs: [],
-                outcome: {
-                  dest: '',
-                  feedback: {
-                    content_id: '',
-                    html: ''
-                  }
-                }
-              }],
-              default_outcome: {
-                dest: 'State2',
-                feedback: {
-                  content_id: '',
-                  html: ''
-                },
-              },
-              hints: []
-            },
-            written_translations: {
-              translations_mapping: {
-                content: {},
-                default_outcome: {},
-              }
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
             }
           }
-        });
-      }
-    });
-    $provide.value('GraphDataService', {
-      getGraphData: function() {
-        return {
-          links: [{
-            source: 'Hola',
-            target: 'Hola'
-          }, {
-            source: 'State2',
-            target: 'State3'
-          }, {
-            source: 'State',
-            target: 'State'
-          }, {
-            source: 'State3',
-            target: 'State'
-          }]
-        };
-      }
-    });
-  }));
-  beforeEach(angular.mock.inject(function($injector) {
-    ParameterMetadataService = $injector.get(
-      'ParameterMetadataService');
-    StatesObjectFactory = $injector.get('StatesObjectFactory');
-  }));
+        },
+        State2: {
+          content: {
+            content_id: 'content',
+            html: 'content'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+            }
+          },
+          param_changes: [],
+          interaction: {
+            id: null,
+            answer_groups: [{
+              rule_specs: [],
+              outcome: {
+                dest: '',
+                feedback: {
+                  content_id: '',
+                  html: ''
+                }
+              }
+            }],
+            default_outcome: {
+              dest: 'State2',
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
+            },
+            hints: []
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            }
+          }
+        },
+        State3: {
+          content: {
+            content_id: 'content',
+            html: 'content'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+            }
+          },
+          param_changes: [],
+          interaction: {
+            id: null,
+            answer_groups: [{
+              rule_specs: [],
+              outcome: {
+                dest: '',
+                feedback: {
+                  content_id: '',
+                  html: ''
+                }
+              }
+            }],
+            default_outcome: {
+              dest: 'State2',
+              feedback: {
+                content_id: '',
+                html: ''
+              },
+            },
+            hints: []
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            }
+          }
+        }
+      } as unknown as StateBackendDict);
+    }
+  }
 
-  it('should get unset parameters info', function() {
-    expect(ParameterMetadataService.getUnsetParametersInfo(
-      ['Hola', 'State2']))
-      .toEqual([{
-        paramName: 'ParamChange2',
-        stateName: null
-      }, {
-        paramName: 'HtmlValue',
-        stateName: 'Hola',
-      }, {
-        paramName: 'FeedbackValue',
-        stateName: 'Hola'
-      }, {
-        paramName: 'StateFeedbackValue',
-        stateName: 'State'
-      }]);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: ExplorationParamChangesService,
+          useClass: MockExplorationParamChangesService
+        },
+        {
+          provide: GraphDataService,
+          useClass: MockGraphDataService
+        },
+        {
+          provide: ExplorationStatesService,
+          useClass: MockExplorationStatesService
+        }
+      ]
+    });
 
-    expect(ParameterMetadataService.getUnsetParametersInfo(
-      ['State', 'State3']))
-      .toEqual([{
-        paramName: 'ParamChange2',
-        stateName: null
-      }, {
-        paramName: 'StateFeedbackValue',
-        stateName: 'State'
-      }]);
+    beforeEach(() => {
+      parameterMetadataService = TestBed.inject(ParameterMetadataService);
+      stateObjectFactory = TestBed.inject(StateObjectFactory);
+    });
+
+    it('should get unset parameters info', () => {
+      expect(parameterMetadataService.getUnsetParametersInfo(
+        ['Hola', 'State2']))
+        .toEqual([{
+          paramName: 'ParamChange2',
+          stateName: null
+        }, {
+          paramName: 'HtmlValue',
+          stateName: 'Hola',
+        }, {
+          paramName: 'FeedbackValue',
+          stateName: 'Hola'
+        }, {
+          paramName: 'StateFeedbackValue',
+          stateName: 'State'
+        }]);
+
+      expect(parameterMetadataService.getUnsetParametersInfo(
+        ['State', 'State3']))
+        .toEqual([{
+          paramName: 'ParamChange2',
+          stateName: null
+        }, {
+          paramName: 'StateFeedbackValue',
+          stateName: 'State'
+        }]);
+    });
   });
 });

@@ -25,12 +25,12 @@ import { ExplorationEditorPageConstants } from '../exploration-editor-page.const
 import { ExplorationStatesService } from './exploration-states.service';
 import { GraphDataService } from './graph-data.service';
 import { ParameterMetadataService } from './parameter-metadata.service';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { State } from 'domain/state/StateObjectFactory';
 import { GraphLink, GraphNodes } from 'services/compute-graph.service';
 import { ExplorationInitStateNameService } from './exploration-init-state-name.service';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Warning } from 'interactions/base-interaction-validation.service';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 export interface WarningsList {
   type: string;
@@ -57,8 +57,8 @@ export class ExplorationWarningsService {
     private injector: Injector
   ) {}
 
-  _warningsList: WarningsList[];
-  stateWarnings;
+  _warningsList: WarningsList[] = [];
+  stateWarnings = {};
   checkpointCountWarning = '';
   hasCriticalStateWarning = false;
 
