@@ -142,7 +142,7 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
 
     def setUp(self):
         super().setUp()
-        
+
         self.STATE_2.update({
             'classifier_model_id': '1'
         })
@@ -325,8 +325,9 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
         ])
 
     def test_run_with_mixed_models(self) -> None:
-        self.put_multi([self.exp_1, self.exp_2, self.exp_3,
-            self.opportunity_1, self.opportunity_2, self.opportunity_3])
+        self.put_multi(
+            [self.exp_1, self.exp_2, self.exp_3,
+                self.opportunity_1, self.opportunity_2, self.opportunity_3])
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 3'),
             job_run_result.JobRunResult.as_stdout(

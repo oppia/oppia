@@ -45,7 +45,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
       d) The exploration is curated and has non-empty training data.
     """
 
-    def get_states_having_invalid_state_classifier_model_id(self, states):
+    def get_states_having_invalid_state_classifier_id(self, states):
         """Returns a list of state names that have not None
         classifier model id.
 
@@ -113,7 +113,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of details of explorations which are invalid.
-        
+
         Returns:
             PCollection[JobRunResult]. A PCollection of details of explorations
             which are invalid.
@@ -170,8 +170,9 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     lambda exp: job_run_result.JobRunResult.as_stderr(
                         'The id of exp is %s and the states having not None '
                         'classifier model id are %s'
-                        % (exp.id, self
-                            .get_states_having_invalid_state_classifier_model_id(
+                        % (
+                            exp.id,
+                            self.get_states_having_invalid_state_classifier_id(
                                 exp.states
                             ))
                     ))
@@ -183,7 +184,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                 job_result_transforms.CountObjectsToJobRunResult(
                     'INVALID PARAM CHANGES'))
         )
-        
+
         report_details_of_exps_having_invalid_param_changes = (
             curated_exps_having_non_empty_param_changes
             | 'Save info on exps having invalid param changes' >>
@@ -218,7 +219,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                         % (exp.id, len(exp.param_specs))
                     ))
         )
-        
+
         curated_exps_having_invalid_training_data = (
             curated_explorations
             | 'Filter explorations having non-empty training data' >>
