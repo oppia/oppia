@@ -303,6 +303,7 @@ auto_tts_enabled: false
 blurb: ''
 category: Algebra
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: Introduction
 language_code: en
 objective: An objective
