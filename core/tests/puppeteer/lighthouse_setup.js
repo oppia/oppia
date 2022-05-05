@@ -50,6 +50,8 @@ var createTopicButtonSelector = '.protractor-test-create-topic-button';
 var topicNameField = '.protractor-test-new-topic-name-field';
 var topicUrlFragmentField = '.protractor-test-new-topic-url-fragment-field';
 var topicDescriptionField = '.protractor-test-new-topic-description-field';
+// eslint-disable-next-line max-len
+var topicPageTitleFragmentField = '.protractor-test-new-topic-web-title-fragment-field';
 var topicThumbnailButton = '.protractor-test-photo-button';
 var topicUploadButton = '.protractor-test-photo-upload-input';
 var topicPhotoSubmit = '.protractor-test-photo-upload-submit';
@@ -194,6 +196,7 @@ const getTopicEditorUrl = async function(browser, page) {
     await page.type(topicNameField, 'Topic1 TASD');
     await page.type(topicUrlFragmentField, 'topic-tasd-one');
     await page.type(topicDescriptionField, 'Topic 1 description');
+    await page.type(topicPageTitleFragmentField, 'page-fragment');
     await page.click(topicThumbnailButton);
     await page.waitForSelector(topicUploadButton, {visible: true});
 
