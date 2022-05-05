@@ -72,16 +72,12 @@
 
 .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
   display: grid;
-  grid-gap: 2vw;
+  gap: 24px;
   grid-template-columns: 210px 210px 210px;
   justify-content: center;
   margin-top: 40px;
   overflow-y: auto;
   padding-bottom: 18vh;
-}
-
-.oppia-classroom-viewer-container .oppia-topic-summary-tile {
-  padding-bottom: 40px;
 }
 
 .oppia-classroom-viewer-container .classroom-name {
@@ -123,10 +119,6 @@ classroom-page .oppia-classroom-page-subheading-text {
 }
 
 @media (max-width: 850px) {
-  .oppia-classroom-viewer-container .oppia-topic-summary-tile {
-    padding-bottom: 80px;
-  }
-
   .oppia-classroom-viewer-container .classroom-header {
     margin-top: -3vh;
   }
@@ -184,7 +176,7 @@ classroom-page .oppia-classroom-page-subheading-text {
   }
 }
 
-@media(max-width: 500px) {
+@media(max-width: 600px) {
   .oppia-classroom-viewer-container {
     width: 85vw;
   }
@@ -204,6 +196,5 @@ classroom-page .oppia-classroom-page-subheading-text {
   .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
     display: grid;
     grid-template-columns: 150px 150px;
-    justify-content: space-between;
   }
 }
