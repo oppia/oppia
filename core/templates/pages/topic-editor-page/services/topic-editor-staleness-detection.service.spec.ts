@@ -36,8 +36,7 @@ class MockWindowRef {
   };
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Topic editor staleness detection service', () => {
+describe('Topic editor staleness detection service', () => {
   let topicEditorStalenessDetectionService:
     TopicEditorStalenessDetectionService;
   let topicDict: TopicBackendDict;
@@ -47,13 +46,14 @@ fdescribe('Topic editor staleness detection service', () => {
   let ngbModal: NgbModal;
   let faviconService: FaviconService;
   let mockWindowRef: MockWindowRef;
+  let undoRedoService: UndoRedoService;
+  let stalenessDetectionService: StalenessDetectionService;
 
   beforeEach(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        NgbModal,
         StalenessDetectionService,
         TopicEditorStateService,
         FaviconService,
@@ -73,6 +73,8 @@ fdescribe('Topic editor staleness detection service', () => {
     localStorageService = TestBed.inject(LocalStorageService);
     ngbModal = TestBed.inject(NgbModal);
     faviconService = TestBed.inject(FaviconService);
+    undoRedoService = TestBed.inject(UndoRedoService);
+    stalenessDetectionService = TestBed.inject(StalenessDetectionService);
   });
 
   beforeEach(() => {
@@ -106,26 +108,73 @@ fdescribe('Topic editor staleness detection service', () => {
       localStorageService, 'getEntityEditorBrowserTabsInfo'
     ).and.returnValue(topicEditorBrowserTabsInfo);
     spyOn(mockWindowRef.nativeWindow.location, 'reload');
-    spyOn(faviconService, 'setFavicon').and.callThrough();
-    spyOn(ngbModal, 'dismissAll').and.callThrough();
-
-    class MockComponentInstance {
-      compoenentInstance: {};
+    spyOn(faviconService, 'setFavicon').and.callFake(() => {});
+    spyOn(
+      topicEditorStalenessDetectionService, 'showStaleTabInfoModal'
+    ).and.callThrough();
+    class MockNgbModalRef {
+      result = Promise.resolve();
+      componentInstance = {};
     }
-    let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
-      return ({
-        componentInstance: MockComponentInstance,
-        result: Promise.resolve()
-      }) as NgbModalRef;
-    });
+    const ngbModalRef = new MockNgbModalRef() as NgbModalRef;
+    spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
 
     topicEditorStalenessDetectionService.init();
     topicEditorStalenessDetectionService.staleTabEventEmitter.emit();
 
-    // expect(spyObj).toHaveBeenCalled();
-    // expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
-    expect(ngbModal.dismissAll).toHaveBeenCalled();
+    expect(
+      topicEditorStalenessDetectionService.showStaleTabInfoModal
+    ).toHaveBeenCalled();
     expect(faviconService.setFavicon).toHaveBeenCalledWith(
       '/assets/images/favicon_alert/favicon_alert.ico');
+    expect(ngbModal.open).toHaveBeenCalled();
+
+    topicEditorStateService.onTopicInitialized.emit();
+
+    expect(
+      topicEditorStalenessDetectionService.showStaleTabInfoModal
+    ).toHaveBeenCalled();
+  });
+
+  it('should open or close presence of unsaved changes info modal ' +
+  'depending on the presence of unsaved changes on some other tab', () => {
+    let topic = topicObjectFactory.create(topicDict, {});
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    let topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'topic', 'topic_id', 2, 2, true);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(topicEditorBrowserTabsInfo);
+    spyOn(mockWindowRef.nativeWindow.location, 'reload');
+    spyOn(
+      topicEditorStalenessDetectionService, 'showPresenceOfUnsavedChangesModal'
+    ).and.callThrough();
+    class MockNgbModalRef {
+      result = Promise.resolve();
+      componentInstance = {};
+      dismiss() {}
+    }
+    const ngbModalRef = new MockNgbModalRef() as NgbModalRef;
+    spyOn(ngbModalRef, 'dismiss');
+    spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
+    spyOn(
+      stalenessDetectionService,
+      'doesSomeOtherEntityEditorPageHaveUnsavedChanges'
+    ).and.returnValues(true, false);
+
+    topicEditorStalenessDetectionService.init();
+    topicEditorStalenessDetectionService
+      .presenceOfUnsavedChangesEventEmitter.emit();
+
+    expect(
+      topicEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal
+    ).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
+
+    topicEditorStalenessDetectionService
+      .presenceOfUnsavedChangesEventEmitter.emit();
+
+    expect(ngbModalRef.dismiss).toHaveBeenCalled();
   });
 });

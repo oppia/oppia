@@ -36,6 +36,7 @@ import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 export class TopicEditorStalenessDetectionService {
   _staleTabEventEmitter = new EventEmitter<void>();
   _presenceOfUnsavedChangesEventEmitter = new EventEmitter<void>();
+  unsavedChangesWarningModalRef: NgbModalRef = null;
 
   constructor(
     private ngbModal: NgbModal,
@@ -69,7 +70,6 @@ export class TopicEditorStalenessDetectionService {
     if (
       topicEditorBrowserTabsInfo.getLatestVersion() !== topic.getVersion()
     ) {
-      console.log('versions: ' + topic.getVersion() + ' ' + topicEditorBrowserTabsInfo.getLatestVersion());
       this.faviconService.setFavicon(
         '/assets/images/favicon_alert/favicon_alert.ico');
       this.ngbModal.dismissAll();
@@ -94,7 +94,6 @@ export class TopicEditorStalenessDetectionService {
       this.undoRedoService.getChangeCount() === 0 &&
       topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
     ) {
-      let unsavedChangesWarningModalRef: NgbModalRef = null;
       if (
         this.stalenessDetectionService
           .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
@@ -103,14 +102,14 @@ export class TopicEditorStalenessDetectionService {
             this.topicEditorStateService.getTopic().getId())
       ) {
         this.ngbModal.dismissAll();
-        unsavedChangesWarningModalRef = this.ngbModal.open(
+        this.unsavedChangesWarningModalRef = this.ngbModal.open(
           UnsavedChangesStatusInfoModalComponent, {
             backdrop: 'static',
           });
-        unsavedChangesWarningModalRef.result.then(() => {}, () => {});
+        this.unsavedChangesWarningModalRef.result.then(() => {}, () => {});
       } else {
-        if (unsavedChangesWarningModalRef) {
-          unsavedChangesWarningModalRef.dismiss();
+        if (this.unsavedChangesWarningModalRef) {
+          this.unsavedChangesWarningModalRef.dismiss();
         }
       }
     }
