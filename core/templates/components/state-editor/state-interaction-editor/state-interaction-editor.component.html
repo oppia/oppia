@@ -19,7 +19,8 @@
          *ngIf="!interactionId">
       <button type="button"
               class="btn btn-secondary oppia-add-interaction-button protractor-test-open-add-interaction-modal"
-              (click)="openInteractionCustomizerModal()">
+              (click)="openInteractionCustomizerModal()"
+              *ngIf="editabilityService.isEditable()">
         + ADD INTERACTION
       </button>
     </div>
