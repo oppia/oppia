@@ -24,19 +24,19 @@ A clear and concise description of what you have observed.
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Screenshots / Videos**
+If applicable, add screenshots or videos to help explain your problem.
 
 **Desktop (please complete the following information; delete this section if the issue does not arise on desktop):**
  - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Browser-version [e.g. 22]
+ - Browser: [e.g. chrome, safari]
+ - Browser-version: [e.g. 22]
 
 **Smartphone (please complete the following information; delete this section if the issue does not arise on smartphones):**
  - Device: [e.g. iPhone6]
  - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Browser-version [e.g. 22]
+ - Browser: [e.g. stock browser, safari]
+ - Browser-version: [e.g. 22]
 
 **Additional context**
 Add any other context about the problem here.
