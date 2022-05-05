@@ -19,6 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
 export interface RubricBackendDict {
@@ -31,7 +32,7 @@ export interface SkillCreationBackendDict {
   'explanation_dict': string;
   'linked_topic_ids': string[];
   'rubrics': RubricBackendDict;
-  files: Record<string, unknown>;
+  files: Record<string, string>;
 }
 
 export interface ImageData {
@@ -72,7 +73,7 @@ export class SkillCreationBackendApiService {
       successCallback: (value: SkillCreationBackendResponse) => void,
       errorCallback: (reason: string) => void,
       description: string, rubrics: RubricBackendDict, explanation: string,
-      linkedTopicIds: string[], files: Record<string, unknown>): void {
+      linkedTopicIds: string[], files: Record<string, string>): void {
     let postData: SkillCreationBackendDict = {
       description: description,
       linked_topic_ids: linkedTopicIds,
