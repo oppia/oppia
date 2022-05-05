@@ -118,8 +118,7 @@ def assign_rating_to_exploration(
 
 
 def get_user_specific_rating_for_exploration(
-    user_id: str,
-    exploration_id: str
+    user_id: str, exploration_id: str
 ) -> Optional[int]:
     """Fetches a rating for the specified exploration from the specified user
     if one exists.
@@ -138,8 +137,7 @@ def get_user_specific_rating_for_exploration(
 
 
 def get_when_exploration_rated(
-    user_id: str,
-    exploration_id: str
+    user_id: str, exploration_id: str
 ) -> Optional[datetime.datetime]:
     """Fetches the datetime the exploration was last rated by this user, or
     None if no rating has been awarded.
