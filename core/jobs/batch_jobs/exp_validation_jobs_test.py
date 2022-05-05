@@ -158,6 +158,7 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
         self.INVALID_STATE_2.interaction.answer_groups = (
             self.STATE_ANSWER_GROUPS_2)
 
+        # Valid exploration model for all cases.
         self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_1,
@@ -179,6 +180,7 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
             }
         )
 
+        # Invalid exploration model.
         self.exp_2 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_2,
@@ -203,6 +205,7 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
             }
         )
 
+        # Invalid exploration model.
         self.exp_3 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXPLORATION_ID_3,
@@ -224,6 +227,7 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
             correctness_feedback_enabled=False,
             states={
                 feconf.DEFAULT_INIT_STATE_NAME: self.STATE_3,
+                'second state': self.STATE_4,
                 'state 1': self.INVALID_STATE_1.to_dict(),
                 'state 2': self.INVALID_STATE_2.to_dict(),
             }
@@ -337,7 +341,7 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
                 'classifier model id are %s' % (
                     self.EXPLORATION_ID_3, [
                         feconf.DEFAULT_INIT_STATE_NAME,
-                        'Second State'
+                        'second state'
                     ])
             ),
             job_run_result.JobRunResult.as_stdout(
