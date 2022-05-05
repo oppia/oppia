@@ -408,6 +408,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             next_subtopic_id=1,
             language_code='cs',
             url_fragment='topic',
+            page_title_fragment_for_web='fragm',
             canonical_story_references=[{
                 'story_id': self.STORY_1_ID,
                 'story_is_published': False
@@ -591,6 +592,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             next_subtopic_id=1,
             language_code='cs',
             url_fragment='topic',
+            page_title_framgent_for_web='fragm',
             canonical_story_references=[{
                 'story_id': self.STORY_2_ID,
                 'story_is_published': False
@@ -744,6 +746,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             next_subtopic_id=1,
             language_code='cs',
             url_fragment='topic',
+            page_title_fragment_for_web='fragm',
             canonical_story_references=[{
                 'story_id': self.STORY_2_ID,
                 'story_is_published': False
