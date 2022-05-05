@@ -53,8 +53,6 @@ def is_exploration_available_for_contribution(exp_id):
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(
         exp_id, strict=False)
 
-    print('Model is not none:', model is not None)
-
     return model is not None
 
 

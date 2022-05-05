@@ -225,7 +225,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
             | 'Filter explorations having non-empty training data' >>
                 beam.Filter(self.filter_exps_having_invalid_training_data)
         )
-        
+
         report_number_of_exps_having_invalid_training_data = (
             curated_exps_having_invalid_training_data
             | 'Count explorations having non-empty training data' >> (
