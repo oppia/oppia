@@ -26,7 +26,7 @@ require('pages/topic-editor-page/topic-editor-page.component.ts');
 import { EventEmitter } from '@angular/core';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoDict } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 class MockWindowRef {
@@ -274,17 +274,19 @@ describe('Topic editor page', function() {
     ).and.returnValues(topicEditorBrowserTabsInfo, null);
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
-    ctrl.$onInit();
 
+    // Opening the first tab.
+    ctrl.$onInit();
     expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
 
+    // Opening the second tab.
     TopicEditorStateService.onTopicInitialized.emit();
-
     expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
     expect(topicEditorBrowserTabsInfo.setLatestVersion).toHaveBeenCalled();
 
+    // Opening another tab of a different topic. Here, localStorageService
+    // will return null no other tab of the same url was opened before.
     TopicEditorStateService.onTopicInitialized.emit();
-
     expect(EntityEditorBrowserTabsInfo.create).toHaveBeenCalled();
   });
 
@@ -310,31 +312,19 @@ describe('Topic editor page', function() {
     expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(0);
   });
 
-  it('should check if a tab is stale and emit the corresponding event', () => {
+  it('should emit stale tab and unsaved changes events when the ' +
+  '\'storage\' event is triggered', () => {
     spyOn(
       TopicEditorStalenessDetectionService.staleTabEventEmitter, 'emit'
     ).and.callThrough();
-    let oldValue: EntityEditorBrowserTabsInfoDict = {
-      topic_1: {
-        entityType: 'topic',
-        latestVersion: 1,
-        numberOfOpenedTabs: 2,
-        someTabHasUnsavedChanges: false
-      }
-    };
-    let newValue: EntityEditorBrowserTabsInfoDict = {
-      topic_1: {
-        entityType: 'topic',
-        latestVersion: 2,
-        numberOfOpenedTabs: 2,
-        someTabHasUnsavedChanges: true
-      }
-    };
+    spyOn(
+      TopicEditorStalenessDetectionService
+        .presenceOfUnsavedChangesEventEmitter, 'emit'
+    ).and.callThrough();
+
     let storageEvent = new StorageEvent('storage', {
       key: EntityEditorBrowserTabsInfoDomainConstants
-        .OPENED_TOPIC_EDITOR_BROWSER_TABS,
-      oldValue: JSON.stringify(oldValue),
-      newValue: JSON.stringify(newValue)
+        .OPENED_TOPIC_EDITOR_BROWSER_TABS
     });
 
     ctrl.onCreateOrUpdateTopicEditorBrowserTabsInfo(storageEvent);
@@ -342,39 +332,6 @@ describe('Topic editor page', function() {
     expect(
       TopicEditorStalenessDetectionService.staleTabEventEmitter.emit
     ).toHaveBeenCalled();
-  });
-
-  it('should check if there is unsaved changes on another tab ' +
-  'and emit the corresponding event', () => {
-    spyOn(
-      TopicEditorStalenessDetectionService
-        .presenceOfUnsavedChangesEventEmitter, 'emit'
-    ).and.callThrough();
-    let oldValue: EntityEditorBrowserTabsInfoDict = {
-      topic_1: {
-        entityType: 'topic',
-        latestVersion: 1,
-        numberOfOpenedTabs: 2,
-        someTabHasUnsavedChanges: false
-      }
-    };
-    let newValue: EntityEditorBrowserTabsInfoDict = {
-      topic_1: {
-        entityType: 'topic',
-        latestVersion: 2,
-        numberOfOpenedTabs: 2,
-        someTabHasUnsavedChanges: true
-      }
-    };
-    let storageEvent = new StorageEvent('storage', {
-      key: EntityEditorBrowserTabsInfoDomainConstants
-        .OPENED_TOPIC_EDITOR_BROWSER_TABS,
-      oldValue: JSON.stringify(oldValue),
-      newValue: JSON.stringify(newValue)
-    });
-
-    ctrl.onCreateOrUpdateTopicEditorBrowserTabsInfo(storageEvent);
-
     expect(
       TopicEditorStalenessDetectionService
         .presenceOfUnsavedChangesEventEmitter.emit
