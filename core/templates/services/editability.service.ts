@@ -31,12 +31,16 @@ export class EditabilityService {
   static isEditable: boolean = false;
   static isTranslatable: boolean = false;
   static inTutorialMode: boolean = false;
+  static isLockedByAdmin: boolean = false;
 
   /**
    * @return {boolean} Whether the service is editable.
    */
   isEditable(): boolean {
-    return EditabilityService.isEditable && !EditabilityService.inTutorialMode;
+    return (
+      EditabilityService.isEditable &&
+      !EditabilityService.inTutorialMode &&
+      !EditabilityService.isLockedByAdmin);
   }
 
   /**
@@ -94,6 +98,14 @@ export class EditabilityService {
    */
   onStartTutorial(): void {
     EditabilityService.inTutorialMode = true;
+  }
+
+  lockExploration(explorationIsLocked: boolean): void {
+    EditabilityService.isLockedByAdmin = explorationIsLocked;
+  }
+
+  isLockedByAdmin(): boolean {
+    return EditabilityService.isLockedByAdmin;
   }
 }
 

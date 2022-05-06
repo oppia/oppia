@@ -46,7 +46,7 @@ export class TranslationTopicService {
   }
 
   setActiveTopicName(newActiveTopicName: string): void {
-    this.ContributionOpportunitiesService.getAllTopicNamesAsync()
+    this.ContributionOpportunitiesService.getTranslatableTopicNamesAsync()
       .then((data) => {
         if (newActiveTopicName !== 'All' &&
             data.indexOf(newActiveTopicName) < 0) {
