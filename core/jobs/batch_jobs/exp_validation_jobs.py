@@ -119,7 +119,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
 
     def is_exploration_curated(self, exploration):
         """Returns True if exploration is curated.
-        
+
         Args:
             exploration: Exploration. Exploration to be checked.
 
