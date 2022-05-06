@@ -29,8 +29,8 @@ import apache_beam as beam
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models
     from mypy_imports import datastore_services
+    from mypy_imports import exp_models
     from mypy_imports import opportunity_models
 
 (exp_models, opportunity_models) = models.Registry.import_models([
