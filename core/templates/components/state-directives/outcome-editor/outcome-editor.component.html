@@ -68,9 +68,9 @@
   </div>
 
   <div class="oppia-rule-save-cancel-buttons">
-    <div class="modal-footer">
+    <div class="float-right">
       <button type="button"
-              class="btn btn-secondary"
+              class="btn btn-secondary mr-2"
               (click)="cancelThisFeedbackEdit()">
         Cancel
       </button>
@@ -101,7 +101,7 @@
         </i>
       </div>
 
-      <div *ngIf="outcome && outcome.dest !== stateEditorService.getActiveStateName()">
+      <div>
         <strong *ngIf="displayFeedback">And afterwards, directs the learner
         to...</strong>
         <strong *ngIf="!displayFeedback">Oppia directs the learner to...</strong>
@@ -114,7 +114,7 @@
             (try again, with refresher exploration "{{ outcome.refresherExplorationId }}")
           </span>
         </span>
-        <div class="oppia-prerequisite-skill-text" *ngIf="outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
+        <div class="oppia-prerequisite-skill-text" *ngIf="outcome && outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
           <strong> Attached prerequisite skill for the current state: </strong>
           {{ outcome.missingPrerequisiteSkillId }}
         </div>
@@ -135,9 +135,9 @@
   </form>
 
   <div class="oppia-rule-save-cancel-buttons">
-    <div class="modal-footer">
+    <div class="float-right">
       <button type="button"
-              class="btn btn-secondary protractor-test-cancel-outcome-dest"
+              class="btn btn-secondary mr-2 protractor-test-cancel-outcome-dest"
               (click)="cancelThisDestinationEdit()">
         Cancel
       </button>
@@ -182,6 +182,6 @@
 
   <div *ngIf="isEditable">
     <strong>The answers in this group are correct</strong>
-    <input class="protractor-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
+    <input class="ml-2 protractor-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
   </div>
 </div>

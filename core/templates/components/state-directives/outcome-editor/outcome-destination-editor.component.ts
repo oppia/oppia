@@ -41,6 +41,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   @Input() outcome: Outcome;
   @Input() outcomeHasFeedback: boolean;
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();
+  @Output() getChanges: EventEmitter<void> = new EventEmitter();
   directiveSubscriptions: Subscription = new Subscription();
   canAddPrerequisiteSkill: boolean;
   canEditRefresherExplorationId: boolean;
@@ -76,11 +77,14 @@ export class OutcomeDestinationEditorComponent implements OnInit {
 
   updateChanges($event: string): void {
     this.outcomeNewStateName = $event;
+    this.getChanges.emit();
   }
 
   onDestSelectorChange(): void {
     if (this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST) {
       this.focusManagerService.setFocus('newStateNameInputField');
+    } else {
+      this.getChanges.emit();
     }
   }
 

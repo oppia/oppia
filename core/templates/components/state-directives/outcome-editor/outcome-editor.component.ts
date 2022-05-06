@@ -226,8 +226,6 @@ export class OutcomeEditorComponent implements OnInit {
     this.feedbackEditorIsOpen = false;
     this.destinationEditorIsOpen = false;
     this.correctnessLabelEditorIsOpen = false;
-    // TODO(sll): Investigate whether this line can be removed, due to
-    // ctrl.savedOutcome now being set in onExternalSave().
     this.savedOutcome = cloneDeep(this.outcome);
   }
 
