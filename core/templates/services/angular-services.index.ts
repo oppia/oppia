@@ -405,6 +405,7 @@ import { FaviconService } from './favicon.service';
 import { StalenessDetectionService } from './staleness-detection.service';
 import { ExplorationImprovementsService } from './exploration-improvements.service';
 import { PlaythroughIssuesService } from './playthrough-issues.service';
+import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/services/skill-editor-staleness-detection.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -729,6 +730,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['SkillCreationService', SkillCreationService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
   ['SkillCreationService', SkillCreationService],
+  ['SkillEditorStalenessDetectionService',
+    SkillEditorStalenessDetectionService],
   ['SkillEditorStateService', SkillEditorStateService],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
   ['SkillObjectFactory', SkillObjectFactory],

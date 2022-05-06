@@ -19,6 +19,8 @@
 import { Subscription } from 'rxjs';
 import { SkillEditorSaveModalComponent } from '../modal-templates/skill-editor-save-modal.component';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -34,6 +36,7 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 require('services/ngb-modal.service.ts');
+require('services/local-storage.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
@@ -44,11 +47,13 @@ angular.module('oppia').directive('skillEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
-        '$rootScope', '$scope', 'AlertsService', 'NgbModal',
+        '$rootScope', '$scope', 'AlertsService',
+        'LocalStorageService', 'NgbModal',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'SkillUpdateService', 'UndoRedoService', 'UrlService',
         function(
-            $rootScope, $scope, AlertsService, NgbModal,
+            $rootScope, $scope, AlertsService,
+            LocalStorageService, NgbModal,
             SkillEditorRoutingService, SkillEditorStateService,
             SkillUpdateService, UndoRedoService, UrlService) {
           var ctrl = this;
@@ -81,7 +86,29 @@ angular.module('oppia').directive('skillEditorNavbar', [
             return SkillEditorStateService.getSkillValidationIssues().length;
           };
 
+          $scope.updateSkillEditorBrowserTabsUnsavedChangesStatus = function() {
+            var skill = SkillEditorStateService.getSkill();
+
+            var skillEditorBrowserTabsInfo:
+              EntityEditorBrowserTabsInfo = (
+                LocalStorageService.getEntityEditorBrowserTabsInfo(
+                  EntityEditorBrowserTabsInfoDomainConstants
+                    .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+
+            if (skillEditorBrowserTabsInfo &&
+                  UndoRedoService.getChangeCount() > 0 &&
+                    !skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+            ) {
+              skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+              LocalStorageService.updateEntityEditorBrowserTabsInfo(
+                skillEditorBrowserTabsInfo,
+                EntityEditorBrowserTabsInfoDomainConstants
+                  .OPENED_SKILL_EDITOR_BROWSER_TABS);
+            }
+          };
+
           $scope.isSkillSaveable = function() {
+            $scope.updateSkillEditorBrowserTabsUnsavedChangesStatus();
             return (
               $scope.getChangeListCount() > 0 &&
               $scope.getWarningsCount() === 0

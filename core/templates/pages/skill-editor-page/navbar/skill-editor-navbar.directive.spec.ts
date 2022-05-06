@@ -32,6 +32,7 @@ import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -52,6 +53,7 @@ describe('Skill Editor Navbar Directive', function() {
   let undoRedoService: UndoRedoService = null;
   let urlService: UrlService = null;
   let skillUpdateService: SkillUpdateService = null;
+  let localStorageService = null;
 
   let sampleSkill: Skill = null;
   let mockEventEmitter = new EventEmitter();
@@ -83,6 +85,7 @@ describe('Skill Editor Navbar Directive', function() {
     $uibModal = $injector.get('$uibModal');
     ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
+    localStorageService = $injector.get('LocalStorageService');
     ngbModal = $injector.get('NgbModal');
     directive = $injector.get('skillEditorNavbarDirective')[0];
     skillEditorStateService = $injector.get('SkillEditorStateService');
@@ -327,5 +330,28 @@ describe('Skill Editor Navbar Directive', function() {
 
       expect(navigateToQuestionsTabSpy).toHaveBeenCalled();
     });
+  });
+
+  it('should set presence of unsaved changes status to true if there ' +
+  'are unsaved changes in the topic editor', () => {
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
+    var skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'skill', 'skill_id', 1, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(skillEditorBrowserTabsInfo);
+    spyOn(
+      localStorageService, 'updateEntityEditorBrowserTabsInfo'
+    ).and.callFake(() => {});
+
+    expect(
+      skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeFalse();
+
+    $scope.updateSkillEditorBrowserTabsUnsavedChangesStatus();
+
+    expect(
+      skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeTrue();
   });
 });
