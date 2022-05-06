@@ -302,7 +302,6 @@ describe('Full exploration editor', function() {
       await forms.toRichText('What language is Oppia?'));
     await explorationPlayerPage.submitAnswer('TextInput', 'Roman');
     await explorationPlayerPage.viewHint();
-    await explorationPlayerPage.clickCloseLessonInfoTooltipIfPresent();
     await explorationPlayerPage.submitAnswer('TextInput', 'Greek');
 
     await explorationPlayerPage.viewSolution();

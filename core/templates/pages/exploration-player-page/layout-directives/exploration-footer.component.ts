@@ -67,6 +67,7 @@ export class ExplorationFooterComponent {
   lastCheckpointWasCompleted: boolean = false;
   learnerHasViewedLessonInfoTooltip: boolean = false;
   userIsLoggedIn: boolean = false;
+  footerIsInQuestionPlayerMode: boolean = false;
 
   constructor(
     private contextService: ContextService,
@@ -130,11 +131,14 @@ export class ExplorationFooterComponent {
               );
             }
           });
-      }
-      // Fetching the number of checkpoints.
-      this.getCheckpointCount(this.explorationId);
 
-      this.setLearnerHasViewedLessonInfoTooltip();
+        this.footerIsInQuestionPlayerMode = true;
+
+        // Fetching the number of checkpoints.
+        this.getCheckpointCount(this.explorationId);
+
+        this.setLearnerHasViewedLessonInfoTooltip();
+      }
     } catch (err) { }
 
     if (this.contextService.isInQuestionPlayerMode()) {
