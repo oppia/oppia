@@ -68,6 +68,7 @@ export class TopicEditorStalenessDetectionService {
           .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
 
     if (
+      topicEditorBrowserTabsInfo &&
       topicEditorBrowserTabsInfo.getLatestVersion() !== topic.getVersion()
     ) {
       this.faviconService.setFavicon(
@@ -84,16 +85,7 @@ export class TopicEditorStalenessDetectionService {
   }
 
   showPresenceOfUnsavedChangesModal(): void {
-    const topic = this.topicEditorStateService.getTopic();
-    const topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
-      this.localStorageService.getEntityEditorBrowserTabsInfo(
-        EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
-
-    if (
-      this.undoRedoService.getChangeCount() === 0 &&
-      topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-    ) {
+    if (this.undoRedoService.getChangeCount() === 0) {
       if (
         this.stalenessDetectionService
           .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
