@@ -19,7 +19,6 @@ are created.
 from __future__ import annotations
 
 import base64
-import logging
 
 from core import android_validation_constants
 from core import feconf
