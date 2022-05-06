@@ -722,7 +722,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         for filter_obj in filter_options:
             self.assertTrue(filter_obj.filter_field in filter_fields)
             if filter_obj.filter_field == (
-                    filter_field_names.REPORTTYPE):
+                    filter_field_names.REPORT_TYPE):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.REPORT_TYPE_SUGGESTION.name)
@@ -731,39 +731,39 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.PLATFORM_ANDROID)
             elif filter_obj.filter_field == (
-                    filter_field_names.ENTRYPOINT):
+                    filter_field_names.ENTRY_POINT):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.ENTRY_POINT_NAVIGATION_DRAWER.name)
             elif filter_obj.filter_field == (
-                    filter_field_names.SUBMITTEDON):
+                    filter_field_names.SUBMITTED_ON):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.REPORT_SUBMITTED_TIMESTAMP.date())
             elif filter_obj.filter_field == (
-                    filter_field_names.ANDROIDDEVICEMODEL):
+                    filter_field_names.ANDROID_DEVICE_MODEL):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_DEVICE_MODEL)
             elif filter_obj.filter_field == (
-                    filter_field_names.ANDROIDSDKVERSION):
+                    filter_field_names.ANDROID_SDK_VERSION):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_SDK_VERSION)
             elif filter_obj.filter_field == (
-                    filter_field_names.TEXTLANGUAGECODE):
+                    filter_field_names.TEXT_LANGUAGE_CODE):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.TEXT_LANGUAGE_CODE_ENGLISH)
             elif filter_obj.filter_field == (
-                    filter_field_names.AUDIOLANGUAGECODE):
+                    filter_field_names.AUDIO_LANGUAGE_CODE):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.AUDIO_LANGUAGE_CODE_ENGLISH)
             elif filter_obj.filter_field == (
-                    filter_field_names.PLATFORMVERSION):
+                    filter_field_names.PLATFORM_VERSION):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_PLATFORM_VERSION)
             elif filter_obj.filter_field == (
-                    filter_field_names.ANDROIDDEVICECOUNTRYLOCALECODE): # pylint: disable=line-too-long
+                    filter_field_names.ANDROID_DEVICE_COUNTRY_LOCALE_CODE): # pylint: disable=line-too-long
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.COUNTRY_LOCALE_CODE_INDIA)
