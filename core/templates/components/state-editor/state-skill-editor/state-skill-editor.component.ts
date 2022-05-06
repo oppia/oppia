@@ -48,9 +48,8 @@ export class StateSkillEditorComponent implements OnInit {
 
   categorizedSkills!: SkillsCategorizedByTopics;
   untriagedSkillSummaries!: ShortSkillSummary[];
-  skillEditorIsShown: boolean = true;
-  skillIsSelected = false;
   skillName!: string;
+  skillEditorIsShown: boolean = true;
   userCanEditSkills: boolean = false;
 
   constructor(
@@ -78,13 +77,16 @@ export class StateSkillEditorComponent implements OnInit {
       .then((canUserAccessTopicsAndSkillsDashboard) => {
         this.userCanEditSkills = canUserAccessTopicsAndSkillsDashboard;
       });
-    if (this.stateLinkedSkillIdService.displayed) {
-      this.skillBackendApiService.fetchSkillAsync(
-        this.stateLinkedSkillIdService.displayed
-      ).then((skill) => {
-        this.skillName = skill.skill.getDescription();
+    this.stateLinkedSkillIdService.onStateLinkedSkillIdInitialized.subscribe(
+      () => {
+        if (this.stateLinkedSkillIdService.displayed) {
+          this.skillBackendApiService.fetchSkillAsync(
+            this.stateLinkedSkillIdService.displayed
+          ).then((skill) => {
+            this.skillName = skill.skill.getDescription();
+          });
+        }
       });
-    }
   }
 
   addSkill(): void {
@@ -125,7 +127,7 @@ export class StateSkillEditorComponent implements OnInit {
       DeleteStateSkillModalComponent, {
         backdrop: true,
       }).result.then(() => {
-      this.skillIsSelected = false;
+      this.stateLinkedSkillIdService.displayed = undefined;
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(this.stateLinkedSkillIdService.displayed);
     }, () => {
@@ -136,10 +138,13 @@ export class StateSkillEditorComponent implements OnInit {
   }
 
   getSkillEditorUrl(): string {
-    return this.urlInterpolationService.interpolateUrl(
-      '/skill_editor/<skill_id>', {
-        skill_id: this.stateLinkedSkillIdService.displayed
-      });
+    if (this.stateLinkedSkillIdService.displayed) {
+      return this.urlInterpolationService.interpolateUrl(
+        '/skill_editor/<skill_id>', {
+          skill_id: this.stateLinkedSkillIdService.displayed
+        });
+    }
+    throw new Error('Expected a skill id to be displayed');
   }
 
   toggleSkillEditor(): void {

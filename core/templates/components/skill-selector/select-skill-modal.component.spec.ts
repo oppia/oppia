@@ -50,8 +50,9 @@ describe('Select Skill Modal', () => {
       Subtopic1: [shortSkillSummary]
     }
   };
-  let untriagedSkillSummaries: SkillSummaryBackendDict[] = (
-    [skillSummaryBackendDict]);
+  let untriagedSkillSummaries: SkillSummaryBackendDict[] = [
+    skillSummaryBackendDict
+  ];
   let skillSummaries: SkillSummaryBackendDict[] = [skillSummaryBackendDict];
 
   beforeEach(waitForAsync(() => {

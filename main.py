@@ -295,8 +295,8 @@ URLS = [
         r'/retrivefeaturedtranslationlanguages',
         contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
-        r'/getalltopicnames',
-        contributor_dashboard.AllTopicNamesHandler),
+        r'/gettranslatabletopicnames',
+        contributor_dashboard.TranslatableTopicNamesHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
@@ -495,6 +495,7 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
     get_redirect_route(r'/userinfohandler', profile.UserInfoHandler),
+    get_redirect_route(r'/userinfohandler/data', profile.UserInfoHandler),
     get_redirect_route(r'/url_handler', profile.UrlHandler),
     get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(
@@ -542,6 +543,12 @@ URLS = [
         r'/explorehandler/answer_submitted_event/<exploration_id>',
         reader.AnswerSubmittedEventHandler),
     get_redirect_route(
+        r'/explorehandler/checkpoint_reached/<exploration_id>',
+        reader.CheckpointReachedEventHandler),
+    get_redirect_route(
+        r'/explorehandler/restart/<exploration_id>',
+        reader.ExplorationRestartEventHandler),
+    get_redirect_route(
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler),
     get_redirect_route(
@@ -576,6 +583,9 @@ URLS = [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
+    get_redirect_route(
+        r'/editsallowedhandler/<exploration_id>',
+        editor.ExplorationEditsAllowedHandler),
     get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),

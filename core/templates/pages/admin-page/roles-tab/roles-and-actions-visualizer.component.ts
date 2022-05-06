@@ -27,19 +27,22 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
   templateUrl: './roles-and-actions-visualizer.component.html'
 })
 export class RolesAndActionsVisualizerComponent implements OnInit {
-  @Input() roleToActions;
-  @Input() viewableRoles;
-  @Input() humanReadableRoles;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() roleToActions!: {[role: string]: string[]};
+  @Input() viewableRoles!: string[];
+  @Input() humanReadableRoles!: Object;
 
+  activeRole!: string;
+  activeTab!: string;
+  avatarPictureUrl!: string;
+  roles!: string[];
+  assignUsersToActiveRole!: string[];
+  loadingAssignedUsernames: boolean = false;
   TAB_ACTIONS: string = 'TAB_ACTIONS';
   TAB_ASSIGNED_USERS: string = 'TAB_ASSIGNED_USERS';
-  activeRole: string;
-  activeTab: string;
-  avatarPictureUrl: string;
-  loadingAssignedUsernames: boolean;
-  roles: string[];
-  roleToReadableActions = {};
-  assignUsersToActiveRole: string[];
+  roleToReadableActions: Record<string, string[]> = {};
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -66,7 +69,7 @@ export class RolesAndActionsVisualizerComponent implements OnInit {
     this.activeTab = this.TAB_ACTIONS;
 
     let getSortedReadableTexts = (texts: string[]): string[] => {
-      let readableTexts = [];
+      let readableTexts: string[] = [];
       texts.forEach(text => {
         readableTexts.push(
           text.toLowerCase().split('_').join(' ').replace(
