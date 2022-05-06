@@ -307,39 +307,6 @@ def add_mailchimp_api_key(release_feconf_path):
             f.write(line)
 
 
-def add_release_tester_email_ids(release_feconf_path):
-    """Asks user to provide email ids of release testers which
-    should be added to email allowlist in feconf for enabling
-    logging of emails.
-
-    Args:
-        release_feconf_path: str. The path to feconf file in release
-            directory.
-    """
-    with utils.open_file(release_feconf_path, 'r') as f:
-        feconf_lines = f.readlines()
-
-    assert (
-        'EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING: List[str] = []\n'
-        in feconf_lines
-    ), 'Missing email allowlist key'
-
-    print(
-        'Please enter a comma separated list of email ids of release '
-        'testers in the format: m1@example.com,m2@example.com')
-    release_tester_mail_ids = input().strip()
-    release_tester_mail_id_list = release_tester_mail_ids.split(',')
-    release_tester_mail_id_str = ', '.join(
-        ['\'%s\'' % mail_id for mail_id in release_tester_mail_id_list])
-
-    with utils.open_file(release_feconf_path, 'w') as f:
-        for line in feconf_lines:
-            if line == (
-                'EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING: List[str] = []\n'):
-                line = line.replace('[]', '[%s]' % release_tester_mail_id_str)
-            f.write(line)
-
-
 def main(args=None):
     """Updates the files corresponding to LOCAL_FECONF_PATH and
     LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
@@ -368,10 +335,6 @@ def main(args=None):
         add_mailchimp_api_key(release_feconf_path)
         check_updates_to_terms_of_service(
             release_feconf_path, options.personal_access_token)
-    # This is only done for test and backup server where mails are not
-    # enabled.
-    else:
-        add_release_tester_email_ids(release_feconf_path)
 
     apply_changes_based_on_config(
         release_feconf_path, feconf_config_path, FECONF_REGEX)

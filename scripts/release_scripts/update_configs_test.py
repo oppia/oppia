@@ -191,25 +191,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             AssertionError, 'Missing mailchimp API key'):
             update_configs.add_mailchimp_api_key(temp_feconf_path)
 
-    def test_missing_allowlist_key_line(self):
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
-        with utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
-
-        with self.assertRaisesRegex(
-            AssertionError, 'Missing email allowlist key'):
-            update_configs.add_release_tester_email_ids(temp_feconf_path)
-
     def test_invalid_mailgun_api_key(self):
         check_prompts = {
             'Enter mailgun api key from the release process doc.': False,
@@ -391,43 +372,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
 
         with getpass_swap:
             update_configs.add_mailchimp_api_key(temp_feconf_path)
-        with utils.open_file(temp_feconf_path, 'r') as f:
-            self.assertEqual(f.read(), expected_feconf_text)
-
-    def test_addition_of_email_ids_in_allowlist(self):
-        def mock_input():
-            return 'm1@example.com,m2@example.com'
-
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            'EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING: List[str] = []\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        expected_feconf_text = (
-            'REDISHOST = \'192.13.2.1\'\n'
-            'EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING: List[str] = '
-            '[\'m1@example.com\', \'m2@example.com\']\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        with utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
-
-        with self.swap(builtins, 'input', mock_input):
-            update_configs.add_release_tester_email_ids(temp_feconf_path)
-
         with utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
 
@@ -650,7 +594,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             with utils.open_file(MOCK_LOCAL_FECONF_PATH, 'w') as f:
                 f.write(original_text)
 
-    def test_function_calls_with_prompt_for_mailgun_api_and_terms_updates(self):
+    def test_function_calls_with_prompt_for_feconf_and_terms_update(self):
         check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': False,
             'add_mailgun_api_key_gets_called': False,
@@ -659,8 +603,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'verify_config_files_gets_called': False,
             'update_app_yaml_gets_called': False,
             'mailgun_api_key_is_to_be_verified': False,
-            'mailchimp_api_key_is_to_be_verified': False,
-            'add_release_tester_email_ids_gets_called': False
+            'mailchimp_api_key_is_to_be_verified': False
         }
         expected_check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': True,
@@ -670,8 +613,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'verify_config_files_gets_called': True,
             'update_app_yaml_gets_called': True,
             'mailgun_api_key_is_to_be_verified': True,
-            'mailchimp_api_key_is_to_be_verified': True,
-            'add_release_tester_email_ids_gets_called': False
+            'mailchimp_api_key_is_to_be_verified': True
         }
         def mock_check_updates(
                 unused_release_feconf_path, unused_personal_access_token):
@@ -729,24 +671,20 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                         ])
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_function_calls_without_prompt_for_mailgun_api_and_terms_updates(
-            self
-        ):
+    def test_function_calls_without_prompt_for_feconf_and_terms_update(self):
         check_function_calls = {
             'apply_changes_based_on_config_gets_called': False,
             'verify_config_files_gets_called': False,
             'update_app_yaml_gets_called': False,
             'mailgun_api_key_is_to_be_verified': False,
-            'mailchimp_api_key_is_to_be_verified': False,
-            'add_release_tester_email_ids_gets_called': False
+            'mailchimp_api_key_is_to_be_verified': False
         }
         expected_check_function_calls = {
             'apply_changes_based_on_config_gets_called': True,
             'verify_config_files_gets_called': True,
             'update_app_yaml_gets_called': True,
             'mailgun_api_key_is_to_be_verified': False,
-            'mailchimp_api_key_is_to_be_verified': False,
-            'add_release_tester_email_ids_gets_called': True
+            'mailchimp_api_key_is_to_be_verified': False
         }
         def mock_apply_changes(
             unused_local_filepath,
@@ -772,9 +710,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             unused_feconf_config_path
         ):
             check_function_calls['update_app_yaml_gets_called'] = True
-        def mock_add_release_tester_email_ids(unused_release_feconf_path):
-            check_function_calls[
-                'add_release_tester_email_ids_gets_called'] = True
 
         apply_changes_swap = self.swap(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
@@ -782,16 +717,12 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             update_configs, 'verify_config_files', mock_verify_config_files)
         update_app_yaml_swap = self.swap(
             update_configs, 'update_app_yaml', mock_update_app_yaml)
-        add_email_ids_swap = self.swap(
-            update_configs, 'add_release_tester_email_ids',
-            mock_add_release_tester_email_ids)
         with apply_changes_swap, verify_config_files_swap, update_app_yaml_swap:
-            with add_email_ids_swap:
-                update_configs.main(
-                    args=[
-                        '--release_dir_path', 'test-release-dir',
-                        '--deploy_data_path', 'test-deploy-dir',
-                        '--personal_access_token', 'test-token'
-                    ]
-                )
+            update_configs.main(
+                args=[
+                    '--release_dir_path', 'test-release-dir',
+                    '--deploy_data_path', 'test-deploy-dir',
+                    '--personal_access_token', 'test-token'
+                ]
+            )
         self.assertEqual(check_function_calls, expected_check_function_calls)
