@@ -740,16 +740,10 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         payload = {
             'description': 'Skill Description',
             'rubrics': [],
-            'linked_topic_ids': ['topic'],
+            'linked_topic_ids': [topic_fetchers.get_new_topic_id()],
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'files': {
-                'image.svg': (
-                    base64.b64encode(
-                        self.original_image_content
-                    ).decode('utf-8')
-                )
-            }
+            'files': {}
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
