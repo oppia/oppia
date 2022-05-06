@@ -568,9 +568,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id')
         ]
-        self.topic.canonical_story_references[0].story_is_published = 'no' # type: ignore
+        # Here, a bool value is expected but for test purpose we're assigning it
+        # a string type. Thus to avoid MyPy error, we added an ignore here.
+        self.topic.canonical_story_references[0].story_is_published = 'no' # type: ignore[assignment]
         self._assert_validation_error(
-            'strory_is_published value should be boolean type')
+            'story_is_published value should be boolean type')
 
     def test_validation_fails_with_empty_url_fragment(self) -> None:
         self.topic.url_fragment = ''
