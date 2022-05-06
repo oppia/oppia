@@ -85,7 +85,7 @@ module.exports = {
             'uses-rel-preload': ['error', {'minScore': 1}],
             'deprecations': ['error', {'minScore': 1}],
             'redirects': ['error', {'minScore': 1}],
-            'uses-responsive-images': ['error', {'minScore': 1}]
+            'uses-responsive-images': ['error', {'minScore': 0.8}]
           }
         },
         {
