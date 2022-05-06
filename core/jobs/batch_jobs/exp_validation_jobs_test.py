@@ -233,6 +233,7 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
             }
         )
 
+        # Valid opportunity model.
         self.opportunity_1 = self.create_model(
             opportunity_models.ExplorationOpportunitySummaryModel,
             id=self.EXPLORATION_ID_1,
@@ -248,6 +249,7 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
             language_codes_with_assigned_voice_artists=[]
         )
 
+        # Valid opportunity model.
         self.opportunity_2 = self.create_model(
             opportunity_models.ExplorationOpportunitySummaryModel,
             id=self.EXPLORATION_ID_2,
@@ -263,6 +265,7 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
             language_codes_with_assigned_voice_artists=[]
         )
 
+        # Valid opportunity model.
         self.opportunity_3 = self.create_model(
             opportunity_models.ExplorationOpportunitySummaryModel,
             id=self.EXPLORATION_ID_3,
