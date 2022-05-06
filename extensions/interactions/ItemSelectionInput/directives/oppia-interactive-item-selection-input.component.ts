@@ -108,11 +108,8 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
       // Combine labels for voiceover.
       let combinedChoiceLabels = '';
       for (const choiceLabel of this.choices) {
-        // If the labels are in html format, remove the tags and leave the
-        // content only.
-        const cleanChoiceLabel = choiceLabel.replace(/<[^>]+>/g, '');
-
-        combinedChoiceLabels += cleanChoiceLabel + '. ';
+        combinedChoiceLabels += this.audioTranslationManagerService
+          .cleanUpHTMLforVoiceover(choiceLabel);
       }
       // Say the choices aloud if autoplay is enabled.
       this.audioTranslationManagerService.setSequentialAudioTranslations(

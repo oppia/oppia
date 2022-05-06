@@ -125,6 +125,15 @@ export class AudioTranslationManagerService {
     }
     return this._currentPrimaryComponentName;
   }
+
+  cleanUpHTMLforVoiceover(html: string): string {
+    // If the labels are in html format, remove the tags and leave the
+    // content only.
+    const cleanChoiceLabel = html.replace(/<[^>]+>/g, '');
+
+    // Add a stop for the voiceover with a dot. Useful for multiple choices.
+    return cleanChoiceLabel + '. ';
+  }
 }
 
 angular.module('oppia').factory(
