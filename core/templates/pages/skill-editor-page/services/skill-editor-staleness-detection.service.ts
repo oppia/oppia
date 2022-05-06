@@ -65,6 +65,7 @@ export class SkillEditorStalenessDetectionService {
           .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
 
     if (
+      skillEditorBrowserTabsInfo &&
       skillEditorBrowserTabsInfo.getLatestVersion() !== skill.getVersion()
     ) {
       this.faviconService.setFavicon(
@@ -81,16 +82,7 @@ export class SkillEditorStalenessDetectionService {
   }
 
   showPresenceOfUnsavedChangesModal(): void {
-    const skill = this.skillEditorStateService.getSkill();
-    const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
-      this.localStorageService.getEntityEditorBrowserTabsInfo(
-        EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
-
-    if (
-      this.undoRedoService.getChangeCount() === 0 &&
-      skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-    ) {
+    if (this.undoRedoService.getChangeCount() === 0) {
       if (
         this.stalenessDetectionService
           .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
