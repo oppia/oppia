@@ -93,7 +93,7 @@ export class StoryUpdateService {
 
   private _updateStoryEditorBrowserTabsUnsavedChangesStatus(story: Story) {
     var storyEditorBrowserTabsInfo:
-      EntityEditorBrowserTabsInfo = (
+      EntityEditorBrowserTabsInfo | null = (
         this._localStorageService.getEntityEditorBrowserTabsInfo(
           EntityEditorBrowserTabsInfoDomainConstants
             .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
