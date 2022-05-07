@@ -117,7 +117,7 @@
                         [outcome]="$ctrl.outcome"
                         [add-state]="$ctrl.addState"
                         [are-warnings-suppressed]="$ctrl.suppressWarnings()"
-                        (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
+                        (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
   </oppia-outcome-editor>
   <oppia-question-misconception-editor [is-editable]="$ctrl.isEditable"
                                        ng-if="$ctrl.isInQuestionMode()"
