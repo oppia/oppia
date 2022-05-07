@@ -1439,7 +1439,7 @@ class TransientCheckpointUrlHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SaveProgressEventHandler(base.BaseHandler):
+class SaveTransientCheckpointProgressHandler(base.BaseHandler):
     """Responsible for storing progress of a logged-out learner."""
 
     URL_PATH_ARGS_SCHEMAS = {

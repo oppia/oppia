@@ -538,7 +538,7 @@ URLS = [
         reader.StateCompleteEventHandler),
     get_redirect_route(
         r'/explorehandler/states_completed_by_logged_out_user/<exploration_id>',
-        reader.SaveProgressEventHandler),
+        reader.SaveTransientCheckpointProgressHandler),
     get_redirect_route(
         r'/progress/<unique_progress_id>',
         reader.TransientCheckpointUrlHandler),
