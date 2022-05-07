@@ -23,7 +23,7 @@ import copy
 from core import feconf
 from core import utils
 
-from typing import Dict, Union
+from typing import Any, Dict
 
 
 def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
@@ -127,7 +127,7 @@ class BaseChange:
 
     def __init__(
         self,
-        change_dict: Dict[str, Union[str, None, Dict[str, str]]]
+        change_dict: Dict[str, Any]
     ) -> None:
         """Initializes a BaseChange object from a dict.
 
@@ -158,7 +158,7 @@ class BaseChange:
 
     def validate_dict(
         self,
-        change_dict: Dict[str, Union[str, None, Dict[str, str]]]
+        change_dict: Dict[str, Any]
     ) -> None:
         """Checks that the command in change dict is valid for the domain
         object.
@@ -203,7 +203,7 @@ class BaseChange:
         validate_cmd(
             cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes)
 
-    def to_dict(self) -> Dict[str, Union[str, None, Dict[str, str]]]:
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing the BaseChange domain object.
 
         Returns:
