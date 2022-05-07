@@ -199,7 +199,6 @@ angular.module('oppia').directive('topicEditorPage', [
             if (topicEditorBrowserTabsInfo) {
               topicEditorBrowserTabsInfo.setLatestVersion(topic.getVersion());
               topicEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
-              topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
             } else {
               topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
                 'topic', topic.getId(), topic.getVersion(), 1, false);
@@ -255,8 +254,6 @@ angular.module('oppia').directive('topicEditorPage', [
             ) {
               TopicEditorStalenessDetectionService
                 .staleTabEventEmitter.emit();
-              $rootScope.$applyAsync();
-
               TopicEditorStalenessDetectionService
                 .presenceOfUnsavedChangesEventEmitter.emit();
               $rootScope.$applyAsync();

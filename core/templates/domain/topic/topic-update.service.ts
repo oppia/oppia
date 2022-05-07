@@ -36,6 +36,9 @@ import { SubtitledHtml } from 'core/templates/domain/exploration/subtitled-html.
 import { SubtopicPage } from 'core/templates/domain/topic/subtopic-page.model';
 import { RecordedVoiceovers } from 'core/templates/domain/exploration/recorded-voiceovers.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
+import { LocalStorageService } from 'services/local-storage.service';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 type TopicUpdateApply = (topicChange: TopicChange, topic: Topic) => void;
 type TopicUpdateReverse = (topicChange: TopicChange, topic: Topic) => void;
@@ -48,7 +51,11 @@ type SubtopicUpdateReverse = (
   providedIn: 'root'
 })
 export class TopicUpdateService {
-  constructor(private undoRedoService: UndoRedoService) {}
+  constructor(
+    private undoRedoService: UndoRedoService,
+    private localStorageService: LocalStorageService
+  ) {}
+
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // topic.
@@ -62,6 +69,35 @@ export class TopicUpdateService {
     changeDict.cmd = command;
     let changeObj = new Change(changeDict, apply, reverse);
     this.undoRedoService.applyChange(changeObj, entity);
+    this._updateTopicEditorBrowserTabUnsavedChangesStatus(entity);
+  }
+
+  private _updateTopicEditorBrowserTabUnsavedChangesStatus(entity) {
+    let topicId: string = null;
+    try {
+      // If the entity is a SubtopicPage, then the corresponding topic
+      // id is given by getTopicId().
+      topicId = entity.getTopicId();
+    } catch (e) {
+      // Otherwise, the topic id can be accessed via entity.getId().
+      topicId = entity.getId();
+    }
+    const topicEditorBrowserTabsInfo:
+      EntityEditorBrowserTabsInfo = (
+        this.localStorageService.getEntityEditorBrowserTabsInfo(
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_TOPIC_EDITOR_BROWSER_TABS, topicId));
+    if (
+      this.undoRedoService.getChangeCount() > 0 &&
+      topicEditorBrowserTabsInfo &&
+      !topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ) {
+      topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+      this.localStorageService.updateEntityEditorBrowserTabsInfo(
+        topicEditorBrowserTabsInfo,
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_TOPIC_EDITOR_BROWSER_TABS);
+    }
   }
 
   private _getParameterFromChangeDict(changeDict, paramName: string) {

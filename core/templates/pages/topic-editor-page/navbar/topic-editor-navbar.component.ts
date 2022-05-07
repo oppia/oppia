@@ -149,7 +149,7 @@ angular.module('oppia').component('topicEditorNavbar', {
       };
 
       $scope.isTopicSaveable = function() {
-        $scope.updateTopicEditorBrowserTabsUnsavedChangesStatus();
+        // $scope.updateTopicEditorBrowserTabsUnsavedChangesStatus();
         return (
           $scope.getChangeListLength() > 0 &&
               $scope.getWarningsCount() === 0 && (

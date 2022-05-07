@@ -57,6 +57,7 @@ export class TopicEditorStalenessDetectionService {
     });
     this.topicEditorStateService.onTopicInitialized.subscribe(() => {
       this.showStaleTabInfoModal();
+      this.showPresenceOfUnsavedChangesModal();
     });
   }
 
