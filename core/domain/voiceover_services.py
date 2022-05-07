@@ -352,12 +352,12 @@ def get_text_to_create_voiceover_application(
         init_state_name = exploration.init_state_name
         state = exploration.states[init_state_name]
         if exploration.language_code == language_code:
-            # After adding type annotations in state domain, we can remove
-            # this ignore.
+            # TODO(#13059): After fully type annotate the codebase, we plan to
+            # get rid of these errors.
             return state.content.html  # type: ignore[no-any-return]
         else:
-            # After adding type annotations in state domain, we can remove
-            # this ignore.
+            # TODO(#13059): After fully type annotate the codebase, we plan to
+            # get rid of these errors.
             return state.written_translations.get_translated_content(  # type: ignore[no-any-return]
                 state.content.content_id, language_code)
     else:

@@ -99,12 +99,6 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
         story_services.update_story(  # type: ignore[no-untyped-call]
-
-            # For the parent class BaseChange, StoryChange class is
-            # expecting a dictionary of type Dict[str, str]. To fix this
-            # probably we need to override the __init__ method
-            # in `story_domain.StoryChange` and after that we can remove
-            # this ignore.
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
                 'node_id': 'node_1',
@@ -113,7 +107,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': 'update_story_node_property',
                 'property_name': 'exploration_id',
                 'node_id': 'node_1',
-                'old_value': None,   # type: ignore[dict-item]
+                'old_value': None,
                 'new_value': '0'
             })], 'Changes.')
 
@@ -391,17 +385,12 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
     def test_get_text_to_create_voiceover_application(self) -> None:
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.owner_id, '0', [
-                # For the parent class BaseChange, StoryChange class is
-                # expecting a dictionary of type Dict[str, str]. To fix this
-                # probably we need to override the __init__ method
-                # in `story_domain.StoryChange` and after that we can remove
-                # this ignore.
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_CONTENT),
                     'state_name': 'Introduction',
-                    'new_value': {   # type: ignore[dict-item]
+                    'new_value': {
                         'content_id': 'content',
                         'html': '<p>The new content to voiceover</p>'
                     }
@@ -416,17 +405,12 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.owner_id, '0', [
-                # For the parent class BaseChange, StoryChange class is
-                # expecting a dictionary of type Dict[str, str]. To fix this
-                # probably we need to override the __init__ method
-                # in `story_domain.StoryChange` and after that we can remove
-                # this ignore.
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_CONTENT),
                     'state_name': 'Introduction',
-                    'new_value': {   # type: ignore[dict-item]
+                    'new_value': {
                         'content_id': 'content',
                         'html': '<p>The new content to voiceover</p>'
                     }
