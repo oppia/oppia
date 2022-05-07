@@ -16,7 +16,8 @@
     <i class="material-icons oppia-hide-card-height-warning-icon protractor-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
     <span [innerHTML]="'I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE' | translate"></span>
   </div>
-  <div class="protractor-test-edit-content oppia-editable-section"
+  <div *ngIf="isContentEditable()"
+       class="protractor-test-edit-content oppia-editable-section"
        (click)="openStateContentEditor()">
     <i class="material-icons oppia-editor-edit-icon protractor-test-edit-content-pencil-button"
        title="Edit Card Content">&#xE254;
@@ -34,6 +35,20 @@
     </div>
     <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
     <div class="oppia-editable-section-mask protractor-test-state-edit-content">
+    </div>
+  </div>
+  <div *ngIf="!isContentEditable()"
+       class="protractor-test-edit-content">
+    <div class="oppia-prevent-selection oppia-state-content-display oppia-transition-200"
+         title="Card Content">
+      <span [hidden]="!stateContentService.savedMemento.isEmpty()" class="oppia-placeholder">
+        {{ stateContentPlaceholder }}
+      </span>
+      <span>
+        <oppia-rte-output-display [rteString]="stateContentService.savedMemento.html"
+                                  class="oppia-rte-editor protractor-test-state-content-display">
+        </oppia-rte-output-display>
+      </span>
     </div>
   </div>
 </div>
