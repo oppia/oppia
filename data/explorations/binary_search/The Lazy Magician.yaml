@@ -3,6 +3,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Algorithms
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: Introduction
 language_code: en
 objective: discover the binary search algorithm
