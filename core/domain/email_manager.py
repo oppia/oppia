@@ -372,6 +372,30 @@ SENDER_VALIDATORS = {
 }
 
 
+def can_send_or_log_emails(feconf_email_config_var, recipient_emails):
+    """Checks if email can be sent or logged for a given list of recipients.
+
+    Email can be sent if the the feconf email config var is true.
+    Email can be logged if any of the reipient email in the list is present
+    in feconf allowlist.
+
+    Args:
+        feconf_email_config_var: str. The feconf var to enable emails.
+        recipient_emails: List(str). The list of recipient email ids.
+
+    Returns:
+        List(str). List of recipient email ids for which email can be sent
+        or logged.
+    """
+    if feconf_email_config_var:
+        return recipient_emails
+
+    allowed_recipient_emails = [
+        email for email in recipient_emails
+        if email in feconf.EMAIL_RECIPIENT_ALLOWLIST_FOR_LOGGING]
+    return allowed_recipient_emails
+
+
 def require_sender_id_is_valid(intent, sender_id):
     """Ensure that the sender ID is valid, based on the email's intent.
 
