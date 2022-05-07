@@ -191,6 +191,9 @@ class ExplorationHandler(EditorHandler):
                 'Trying to update version %s of exploration from version %s, '
                 'which is not possible. Please reload the page and try again.'
                 % (exploration.version, version))
+        if not exploration.edits_allowed:
+            raise base.BaseHandler.InvalidInputException(
+                'This exploration cannot be edited. Please contact the admin.')
 
         commit_message = self.normalized_payload.get('commit_message')
         change_list = self.normalized_payload.get('change_list')
@@ -1137,6 +1140,34 @@ class TopUnresolvedAnswersHandler(EditorHandler):
         """Handles GET requests for unresolved answers."""
         # TODO(#11475): Return visualizations info based on Apache Beam job.
         self.render_json({'unresolved_answers': []})
+
+
+class ExplorationEditsAllowedHandler(EditorHandler):
+    """Toggles whether exploration can be edited."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'edits_are_allowed': {
+                'schema': {
+                    'type': 'bool',
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self, exploration_id):
+        """Handles PUT request to set whether exploration can be edited."""
+        exp_services.set_exploration_edits_allowed(
+            exploration_id,
+            self.normalized_payload.get('edits_are_allowed'))
+        self.render_json({})
 
 
 class LearnerAnswerInfoHandler(EditorHandler):

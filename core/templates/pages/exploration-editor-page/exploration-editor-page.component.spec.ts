@@ -189,6 +189,7 @@ describe('Exploration editor page component', function() {
     param_changes: [],
     auto_tts_enabled: {},
     correctness_feedback_enabled: {},
+    edits_allowed: true,
     state_classifier_mapping: [],
     user: {},
     version: '1',
@@ -434,7 +435,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should load change list by draft changes successfully', () => {
-      const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.callThrough();
+      const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
       $scope.$apply();
 
       expect(loadSpy).toHaveBeenCalledWith(
