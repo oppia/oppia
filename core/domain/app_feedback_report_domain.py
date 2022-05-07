@@ -342,7 +342,7 @@ class AppFeedbackReport:
             category_name: str. The name of the report type.
 
         Returns:
-            CATEGORY. The enum representing this category.
+            Category. The enum representing this category.
         """
         for category_type in app_feedback_report_constants.ALLOWED_CATEGORIES:
             if category_name == category_type.name:
@@ -519,7 +519,7 @@ class UserSuppliedFeedback:
         """Checks whether the category is valid.
 
         Args:
-            category: CATEGORY. The category enum to validate.
+            category: Category. The category enum to validate.
 
         Raises:
             ValidationError. No category supplied.
@@ -1105,7 +1105,7 @@ class EntryPoint:
         """Constructs an EntryPoint domain object.
 
         Args:
-            entry_point: ENTRY_POINT. The enum type for entry point used.
+            entry_point: EntryPoint. The enum type for entry point used.
             topic_id: str|None. The id for the current topic if the report was
                 sent during a topic in a lesson or revision session.
             story_id: str|None. The id for the current story if the report was
@@ -1565,7 +1565,7 @@ class AppFeedbackReportDailyStats:
             total_reports_submitted: int. The total number of reports submitted
                 on this date for this ticket.
             daily_param_stats: dict. A dict representing the statistics on this
-                date. Keys in this dict correpond to STATS_PARAMETER_NAMES
+                date. Keys in this dict correpond to StatsParameterNames
                 enums, while values are ReportStatsParameterValueCounts objects.
         """
         self.stats_id = stats_id
