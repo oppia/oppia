@@ -26,17 +26,24 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './delete-account-modal.component.html'
 })
 export class DeleteAccountModalComponent implements OnInit {
-  expectedUsername: string;
-  username: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  expectedUsername!: string;
+  username!: string;
   constructor(
     private userService: UserService,
     private ngbActiveModal: NgbActiveModal,
   ) {}
 
   ngOnInit(): void {
-    this.expectedUsername = null;
     this.userService.getUserInfoAsync().then((userInfo) => {
-      this.expectedUsername = userInfo.getUsername();
+      const expectedUsername = userInfo.getUsername();
+
+      if (expectedUsername === null) {
+        throw new Error('Cannot fetch username.');
+      }
+      this.expectedUsername = expectedUsername;
     });
   }
 
