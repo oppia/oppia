@@ -111,9 +111,9 @@
 
   <oppia-outcome-editor [is-editable]="$ctrl.isEditable"
                         [display-feedback]="$ctrl.displayFeedback"
-                        (save-dest)="$ctrl.getOnSaveAnswerGroupDestFn()"
-                        (save-feedback)="$ctrl.getOnSaveAnswerGroupFeedbackFn()"
-                        (save-correctness-label)="$ctrl.getOnSaveAnswerGroupCorrectnessLabelFn()"
+                        (save-dest)="$ctrl.getOnSaveAnswerGroupDestFn()($event)"
+                        (save-feedback)="$ctrl.getOnSaveAnswerGroupFeedbackFn()($event)"
+                        (save-correctness-label)="$ctrl.getOnSaveAnswerGroupCorrectnessLabelFn()($event)"
                         [outcome]="$ctrl.outcome"
                         [add-state]="$ctrl.addState"
                         [are-warnings-suppressed]="$ctrl.suppressWarnings()"
