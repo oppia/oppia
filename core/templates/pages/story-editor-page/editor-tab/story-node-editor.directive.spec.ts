@@ -127,6 +127,20 @@ describe('Story node editor directive', function() {
         return deferred.promise;
       }
     };
+
+    var MockSkillBackendApiService = {
+      fetchMultiSkillsAsync: () => {
+        var deferred = $q.defer();
+        deferred.resolve([
+          {
+            _id: '1',
+            _description: 'test'
+          }
+        ]);
+        return deferred.promise;
+      }
+    };
+
     $scope.getId = () => 'node_1';
     $scope.getOutline = () => 'This is outline';
     $scope.getDescription = () => 'Chapter description';
@@ -141,6 +155,8 @@ describe('Story node editor directive', function() {
       $scope: $scope,
       TopicsAndSkillsDashboardBackendApiService:
       MockTopicsAndSkillsDashboardBackendApiService,
+      SkillBackendApiService:
+      MockSkillBackendApiService,
       NgbModal: ngbModal
     });
     ctrl.$onInit();
@@ -161,6 +177,14 @@ describe('Story node editor directive', function() {
   it('should return skill editor URL', function() {
     expect($scope.getSkillEditorUrl('skill_1')).toEqual(
       '/skill_editor/skill_1');
+  });
+
+  it('should fetch the descriptions for prerequisite skills', function() {
+    spyOn($scope, 'getPrerequisiteSkillIds').and.returnValue('1');
+
+    $scope.getPrerequisiteSkillsDescription();
+
+    expect($scope.skillIdToSummaryMap).toEqual({1: 'test'});
   });
 
   it('should check if exploration can be saved', function() {
