@@ -673,8 +673,7 @@ describe('Admin backend api service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
 
   it('should report failure when rolling back exploration', fakeAsync(() => {
     let action = 'rollback_exploration_to_safe_state';
@@ -699,8 +698,7 @@ describe('Admin backend api service', () => {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
-  }
-  ));
+  }));
 
   it('should upload topic similarities when calling' +
     'uploadTopicSimilaritiesAsync', fakeAsync(() => {

@@ -80,6 +80,9 @@
 
 <mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Rollback exploration to latest known safe state:</h3>
+  <em>Safe state here refers to the version of the exploration that contains
+    the snapshot content and snapshot metadata models.
+  </em>
   <div class="oppia-query-form">
     <form class="form" (submit)="rollbackExploration()">
       <div class="form-group row">

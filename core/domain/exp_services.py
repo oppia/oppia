@@ -2055,8 +2055,8 @@ def get_interaction_id_for_state(exp_id, state_name):
 
 
 def rollback_exploration_to_safe_state(exp_id):
-    """Rolls back exploration to the latest state where related meta models are
-    valid.
+    """Rolls back exploration to the latest state where related metadata
+    models are valid.
 
     Args:
         exp_id: str. The ID of the exp.
@@ -2069,6 +2069,7 @@ def rollback_exploration_to_safe_state(exp_id):
     last_known_safe_version = exploration_model.version
     snapshot_content_model = None
     snapshot_metadata_model = None
+    models_to_delete = []
     for version in range(current_version_in_exp_model, 1, -1):
         snapshot_content_model = (
             exp_models.ExplorationSnapshotContentModel.get(
@@ -2082,19 +2083,19 @@ def rollback_exploration_to_safe_state(exp_id):
             snapshot_content_model is None and
             snapshot_metadata_model is not None
         ):
-            snapshot_metadata_model.delete()
+            models_to_delete.append(snapshot_metadata_model)
             last_known_safe_version = version - 1
         elif (
             snapshot_content_model is not None and
             snapshot_metadata_model is None
         ):
-            snapshot_content_model.delete()
+            models_to_delete.append(snapshot_content_model)
             last_known_safe_version = version - 1
         else:
             break
 
     if last_known_safe_version != current_version_in_exp_model:
-        exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel.get(exp_id)
         exp_summary_model.version = last_known_safe_version
         safe_exp_model = exp_models.ExplorationModel.get(
             exp_id, strict=False, version=last_known_safe_version)
@@ -2102,6 +2103,7 @@ def rollback_exploration_to_safe_state(exp_id):
         base_models.BaseModel.update_timestamps_multi(
             [safe_exp_model, exp_summary_model])
         base_models.BaseModel.put_multi([safe_exp_model, exp_summary_model])
+        base_models.BaseModel.delete_multi(models_to_delete)
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exp_id])
     return last_known_safe_version

@@ -114,7 +114,8 @@ export class AdminMiscTabComponent {
     this.setStatusMessage.emit(
       `Rollingback exploration ${this.expIdToRollback}...`);
     this.adminBackendApiService.rollbackExplorationToSafeState(
-      this.expIdToRollback).then(response => {
+      this.expIdToRollback
+    ).then(response => {
       this.setStatusMessage.emit(
         'Exploration rolledback to version: ' + response);
     }, errorResponse => {
