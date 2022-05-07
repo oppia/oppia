@@ -55,6 +55,10 @@ export class SkillEditorStalenessDetectionService {
     this.presenceOfUnsavedChangesEventEmitter.subscribe(() => {
       this.showPresenceOfUnsavedChangesModal();
     });
+    this.skillEditorStateService.onSkillInitialized.subscribe(() => {
+      this.showStaleTabInfoModal();
+      this.showPresenceOfUnsavedChangesModal();
+    });
   }
 
   showStaleTabInfoModal(): void {

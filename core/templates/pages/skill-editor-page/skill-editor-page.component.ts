@@ -115,7 +115,6 @@ angular.module('oppia').component('skillEditorPage', {
         if (skillEditorBrowserTabsInfo) {
           skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
           skillEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
-          skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
         } else {
           skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
             'skill', skill.getId(), skill.getVersion(), 1, false);
@@ -171,8 +170,6 @@ angular.module('oppia').component('skillEditorPage', {
         ) {
           SkillEditorStalenessDetectionService
             .staleTabEventEmitter.emit();
-          $rootScope.$applyAsync();
-
           SkillEditorStalenessDetectionService
             .presenceOfUnsavedChangesEventEmitter.emit();
           $rootScope.$applyAsync();
