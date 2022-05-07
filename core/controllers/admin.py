@@ -1049,11 +1049,8 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def post(self):
         username = self.username
-        if feconf.CAN_SEND_EMAILS:
-            email_manager.send_dummy_mail_to_admin(username)
-            self.render_json({})
-        else:
-            raise self.InvalidInputException('This app cannot send emails.')
+        email_manager.send_dummy_mail_to_admin(username)
+        self.render_json({})
 
 
 class UpdateUsernameHandler(base.BaseHandler):
