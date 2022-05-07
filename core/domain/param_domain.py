@@ -28,10 +28,6 @@ from core.domain import value_generators_domain
 class ParamSpec:
     """Value object for an exploration parameter specification."""
 
-    SUPPORTED_OBJ_TYPES = {
-        'UnicodeString',
-    }
-
     def __init__(self, obj_type):
         """Initializes a ParamSpec object with the specified object type.
 
@@ -71,11 +67,11 @@ class ParamSpec:
         """Validate the existence of the object class."""
 
         # Ensure the obj_type is among the supported ParamSpec types.
-        if self.obj_type not in self.SUPPORTED_OBJ_TYPES:
+        if self.obj_type not in feconf.SUPPORTED_OBJ_TYPES:
             raise utils.ValidationError(
                 '%s is not among the supported object types for parameters:'
                 ' {%s}.' %
-                (self.obj_type, ', '.join(sorted(self.SUPPORTED_OBJ_TYPES))))
+                (self.obj_type, ', '.join(sorted(feconf.SUPPORTED_OBJ_TYPES))))
 
 
 class ParamChange:

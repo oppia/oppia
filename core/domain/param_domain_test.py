@@ -18,7 +18,9 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core import utils
+from core.domain import object_registry
 from core.domain import param_domain
 from core.tests import test_utils
 
@@ -28,6 +30,11 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
 
     def test_param_spec_validation(self):
         """Test validation of param specs."""
+
+        # Ensure that this object class exists.
+        for obj_type in feconf.SUPPORTED_OBJ_TYPES:
+            object_registry.Registry.get_object_class_by_type(obj_type)
+
         param_spec = param_domain.ParamSpec('Real')
         with self.assertRaisesRegex(
             utils.ValidationError, 'is not among the supported object types'
