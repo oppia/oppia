@@ -48,14 +48,18 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
-    StoryPreviewTabComponent
+    StoryPreviewTabComponent,
+    StaleTabInfoModalComponent,
+    UnsavedChangesStatusInfoModalComponent
   ],
   entryComponents: [
     StoryEditorNavbarBreadcrumbComponent,
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
-    StoryPreviewTabComponent
+    StoryPreviewTabComponent,
+    StaleTabInfoModalComponent,
+    UnsavedChangesStatusInfoModalComponent
   ],
   providers: [
     {
@@ -83,6 +87,8 @@ class StoryEditorPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
+import { StaleTabInfoModalComponent } from './modal-templates/stale-tab-info-modal.component';
+import { UnsavedChangesStatusInfoModalComponent } from './modal-templates/unsaved-changes-status-info-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
