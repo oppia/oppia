@@ -218,13 +218,15 @@ angular.module('oppia').directive('topicEditorPage', [
                 EntityEditorBrowserTabsInfoDomainConstants
                   .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
 
-            topicEditorBrowserTabsInfo.setLatestVersion(topic.getVersion());
-            topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+            if (topicEditorBrowserTabsInfo) {
+              topicEditorBrowserTabsInfo.setLatestVersion(topic.getVersion());
+              topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
 
-            LocalStorageService.updateEntityEditorBrowserTabsInfo(
-              topicEditorBrowserTabsInfo,
-              EntityEditorBrowserTabsInfoDomainConstants
-                .OPENED_TOPIC_EDITOR_BROWSER_TABS);
+              LocalStorageService.updateEntityEditorBrowserTabsInfo(
+                topicEditorBrowserTabsInfo,
+                EntityEditorBrowserTabsInfoDomainConstants
+                  .OPENED_TOPIC_EDITOR_BROWSER_TABS);
+            }
           };
 
           ctrl.onClosingTopicEditorBrowserTab = function() {
