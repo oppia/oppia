@@ -53,38 +53,55 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
             else:
                 yield (key, value)
 
-    def get_invalid_links(self, dictionary: Dict[str, str]) -> List[str]:
+    def extract_cards_info(self, dictionary: Dict[str, str]) -> List[Tuple[str, Dict[str, str]]]:
+        """Returns list of tuples
+
+            Returns:
+                list. Returns list of tuples containing card name and content.
+            """
+        output_list = []
+        for i in dictionary:
+            output_list.append((i, dictionary[i]))
+
+        return output_list
+
+    def get_invalid_links(self, dictionary: Dict[str, str]) -> List[Tuple[str, str]]:
         """Returns list of invalid links
 
             Returns:
                 list. Returns list of invalid links.
             """
-        string = ''
-        for key, value in self.recursive_items(dictionary):
-            if key == 'html':
-                string += value
 
-        soup = bs4.BeautifulSoup(string, 'html.parser')
-        # Extract links.
-        links = soup.find_all('oppia-noninteractive-link')
+        cards_info = self.extract_cards_info(dictionary)
+
         invalid_links = []
-        cleaned_links = []
-        for link in links:
-            # Remove &quot; from the links.
-            link_text = link.get('url-with-value')
-            if link_text is None:
-                # If the link is None, it is considered to be invalid.
-                invalid_links.append('None')
-            else:
-                cleaned_links.append(
-                    link_text.replace('&quot;', ''))
 
-        for link in cleaned_links:
-            link_info = urlparse(link)
-            # Protocols other than 'https' are invalid.
-            # If a protocol is an empty string, it is assumed to be HTTPS.
-            if link_info.scheme not in ('https', ''):
-                invalid_links.append(link)
+        for card_name, card_dict in cards_info:
+            string = ''
+            for key, value in self.recursive_items(card_dict):
+                if key == 'html':
+                    string += value
+
+            soup = bs4.BeautifulSoup(string, 'html.parser')
+            # Extract links.
+            links = soup.find_all('oppia-noninteractive-link')
+            cleaned_links = []
+            for link in links:
+                # Remove &quot; from the links.
+                link_text = link.get('url-with-value')
+                if link_text is None:
+                    # If the link is None, it is considered to be invalid.
+                    invalid_links.append('None')
+                else:
+                    cleaned_links.append(
+                        link_text.replace('&quot;', ''))
+
+            for link in cleaned_links:
+                link_info = urlparse(link)
+                # Protocols other than 'https' are invalid.
+                # If a protocol is an empty string, it is assumed to be HTTPS.
+                if link_info.scheme not in ('https', ''):
+                    invalid_links.append((card_name, link))
 
         return invalid_links
 
@@ -101,7 +118,7 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
         # is added.
         if len(string) > 1400:
             string = string[:1401]
-            string += '... truncated'
+            string += '...[Truncated]...'
 
         return string
 
