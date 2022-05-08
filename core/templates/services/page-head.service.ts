@@ -17,6 +17,7 @@
  */
 
 import { Injectable } from '@angular/core';
+
 import { PageTitleService } from 'services/page-title.service';
 import { MetaAttribute, MetaTagCustomizationService } from './contextual/meta-tag-customization.service';
 
