@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -141,7 +141,8 @@ describe('Outcome Editor Component', () => {
 
     // Post-check.
     expect(component.feedbackEditorIsOpen).toBeFalse();
-    expect(component.outcome.feedback).toBe('Saved Outcome');
+    expect(component.outcome.feedback).toEqual(
+      new SubtitledHtml('<p>Outcome</p>', 'Id'));
   });
 
   it('should save destination on interaction change when edit destination' +
@@ -173,22 +174,10 @@ describe('Outcome Editor Component', () => {
 
     // Setup. No pre-check as we are setting up values below.
     component.destinationEditorIsOpen = true;
-    component.savedOutcome = new Outcome(
-      'Introduction',
-      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
-      true,
-      [],
-      'ExpId',
-      'SkillId',
-    );
-    component.outcome = new Outcome(
-      'Introduction',
-      new SubtitledHtml('<p>Outcome</p>', 'Id'),
-      true,
-      [],
-      '',
-      '',
-    );
+    component.savedOutcome = outcomeObjectFactory.createNew(
+      'Introduction', '', '', []);
+    component.outcome = outcomeObjectFactory.createNew(
+      'Saved Dest', '', '', []);
 
     // Action.
     onInteractionIdChangedEmitter.emit();
@@ -196,8 +185,8 @@ describe('Outcome Editor Component', () => {
     // Post-check.
     expect(component.destinationEditorIsOpen).toBeFalse();
     expect(component.outcome.dest).toBe('Saved Dest');
-    expect(component.outcome.refresherExplorationId).toBe('ExpId');
-    expect(component.outcome.missingPrerequisiteSkillId).toBe('SkillId');
+    expect(component.outcome.refresherExplorationId).toBeNull();
+    expect(component.outcome.missingPrerequisiteSkillId).toBeNull();
   });
 
   it('should check if state is in question mode', () => {
@@ -253,20 +242,17 @@ describe('Outcome Editor Component', () => {
   });
 
   it('should check if state if of self loop with no feedback', () => {
-    let outcome = new Outcome(
-      'Introduction',
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
-      true,
-      [],
-      null,
-      null,
-    );
-    component.outcome = outcome;
     spyOn(stateEditorService, 'getActiveStateName')
       .and.returnValue('State Name');
+    let outcome = outcomeObjectFactory.createNew(
+      'State Name', '1', '', []);
 
-    expect(component.isSelfLoopWithNoFeedback(outcome)).toBeTrue();
-    expect(component.isSelfLoopWithNoFeedback(outcome)).toBeFalse();
+    expect(component.isSelfLoopWithNoFeedback(outcome)).toBe(true);
+
+    outcome = outcomeObjectFactory.createNew(
+      '', '', '', []);
+
+    expect(component.isSelfLoopWithNoFeedback(outcome)).toBe(false);
   });
 
   it('should check if state will become invalid after feedback' +
@@ -295,6 +281,7 @@ describe('Outcome Editor Component', () => {
 
   it('should open feedback editor if it is editable', () => {
     component.feedbackEditorIsOpen = false;
+    component.isEditable = true;
 
     component.openFeedbackEditor();
 
@@ -303,6 +290,7 @@ describe('Outcome Editor Component', () => {
 
   it('should open destination editor if it is editable', () => {
     component.destinationEditorIsOpen = false;
+    component.isEditable = true;
 
     component.openDestinationEditor();
 
@@ -351,12 +339,12 @@ describe('Outcome Editor Component', () => {
       '',
     );
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
-    spyOn(component, 'showMarkAllAudioAsNeedingUpdateModalIfRequired');
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
 
     component.saveThisFeedback(true);
 
     expect(component.savedOutcome.dest).toBe(null);
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired)
+    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
       .toHaveBeenCalledWith(['contentId']);
   });
 
