@@ -17,6 +17,7 @@
  */
 
 import { Component } from '@angular/core';
+
 import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
 
