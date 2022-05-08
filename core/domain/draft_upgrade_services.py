@@ -212,7 +212,8 @@ class DraftUpgradeUtil:
         """Converts draft change list from state version 49 to 50. State
         version 50 removes rules from explorations that use one of the following
         rules: [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also
-        renames `customOskLetters` cust arg to `allowedVariables`.
+        renames `customOskLetters` cust arg to `allowedVariables`. This should
+        not affect drafts.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
