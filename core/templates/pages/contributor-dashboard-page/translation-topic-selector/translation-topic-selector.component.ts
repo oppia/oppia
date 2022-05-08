@@ -48,7 +48,7 @@ export class TranslationTopicSelectorComponent implements OnInit {
 
   ngOnInit(): void {
     this.contributionOpportunitiesBackendApiService
-      .fetchAllTopicNamesAsync()
+      .fetchTranslatableTopicNamesAsync()
       .then((topicNames) => {
         this.options = topicNames;
       });
