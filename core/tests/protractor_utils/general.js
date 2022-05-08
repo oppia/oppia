@@ -293,6 +293,14 @@ var goOffline = async function() {
     });
 };
 
+var switchToTab = async function(handleNumber) {
+  var handles = await browser.getAllWindowHandles();
+  if (handleNumber < 0 || handleNumber >= handles.length) {
+    throw new Error('Invalid handle number: ' + handleNumber);
+  }
+  await browser.switchTo().window(handles[handleNumber]);
+};
+
 exports.acceptAlert = acceptAlert;
 exports.acceptPrompt = acceptPrompt;
 exports.scrollToTop = scrollToTop;
@@ -317,6 +325,7 @@ exports.moveToEditor = moveToEditor;
 exports.expectErrorPage = expectErrorPage;
 exports.closeCurrentTabAndSwitchTo = closeCurrentTabAndSwitchTo;
 exports.dragAndDrop = dragAndDrop;
+exports.switchToTab = switchToTab;
 
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
 

@@ -149,12 +149,23 @@ var TopicEditorPage = function() {
   var storyPublicationStatusLocator = by.css(
     '.protractor-test-story-publication-status');
 
+  var staleTabInfoModal = element(
+    by.css('.protractor-test-stale-tab-info-modal'));
+  var unsavedChangesStatusInfoModal = element(
+    by.css('.protractor-test-unsaved-changes-info-modal'));
+
   this.togglePracticeTab = async function() {
     await action.click('Practice tab checkbox', practiceTabCheckbox);
   };
 
   this.get = async function(topicId) {
     await browser.get(EDITOR_URL_PREFIX + topicId);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.openEditorInNewTab = async function(topicId) {
+    await browser.executeScript(
+      'window.open("' + EDITOR_URL_PREFIX + topicId + '")');
     await waitFor.pageToFullyLoad();
   };
 
@@ -542,6 +553,18 @@ var TopicEditorPage = function() {
     await action.click('Close save modal button', closeSaveModalButton);
     await waitFor.visibilityOfSuccessToast(
       'Success toast for saving topic takes too long to appear.');
+  };
+
+  this.expectStaleTabInfoModalToBeVisible = async function() {
+    await waitFor.visibilityOf(
+      staleTabInfoModal,
+      'Stale tab info modal is taking too long to display');
+  };
+
+  this.expectUnsavedChangesStatusInfoModalToBeVisible = async function() {
+    await waitFor.visibilityOf(
+      unsavedChangesStatusInfoModal,
+      'Unsaved changes status info modal is taking too long to display');
   };
 };
 
