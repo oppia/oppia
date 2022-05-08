@@ -53,7 +53,9 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
             else:
                 yield (key, value)
 
-    def extract_cards_info(self, dictionary: Dict[str, str]) -> List[Tuple[str, Dict[str, str]]]:
+    def extract_cards_info(
+        self, dictionary: Dict[str, str]
+        ) -> List[Tuple[str, Dict[str, str]]]:
         """Returns list of tuples
 
             Returns:
@@ -65,7 +67,9 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
 
         return output_list
 
-    def get_invalid_links(self, dictionary: Dict[str, str]) -> List[Tuple[str, str]]:
+    def get_invalid_links(
+        self, dictionary: Dict[str, str]
+        ) -> List[Tuple[str, str]]:
         """Returns list of invalid links
 
             Returns:
