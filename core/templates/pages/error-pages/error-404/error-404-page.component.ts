@@ -17,12 +17,12 @@
  */
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { PageTitleService } from 'services/page-title.service';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'oppia-error-404-page',

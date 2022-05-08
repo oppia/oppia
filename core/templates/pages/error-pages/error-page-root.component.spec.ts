@@ -18,10 +18,11 @@
 
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PageTitleService } from 'services/page-title.service';
 import { ErrorPageRootComponent } from './error-page-root.component';
-import { TranslateService } from '@ngx-translate/core';
 
 class MockWindowRef {
   nativeWindow = {

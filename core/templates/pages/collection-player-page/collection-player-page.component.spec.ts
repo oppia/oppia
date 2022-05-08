@@ -17,7 +17,11 @@
  */
 
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/compiler';
 import { EventEmitter } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+
 import { AlertsService } from 'services/alerts.service';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
@@ -30,10 +34,7 @@ import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.
 import { UserInfo } from 'domain/user/user-info.model';
 import { CollectionPlayerPageComponent, IconParametersArray } from './collection-player-page.component';
 import { CollectionNodeBackendDict } from 'domain/collection/collection-node.model';
-import { NO_ERRORS_SCHEMA } from '@angular/compiler';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { PageTitleService } from 'services/page-title.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 

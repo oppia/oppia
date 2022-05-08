@@ -18,11 +18,12 @@
 
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
+
 import { VolunteerPageComponent } from './volunteer-page.component';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService } from '@ngx-translate/core';
 import { PageTitleService } from 'services/page-title.service';
 
 class MockTranslateService {

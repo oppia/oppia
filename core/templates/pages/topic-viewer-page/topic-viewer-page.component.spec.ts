@@ -20,6 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
 
 import { TopicViewerPageComponent } from
   'pages/topic-viewer-page/topic-viewer-page.component';
@@ -31,7 +32,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { PageTitleService } from 'services/page-title.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from '@ngx-translate/core';
 
 class MockWindowRef {
   _window = {

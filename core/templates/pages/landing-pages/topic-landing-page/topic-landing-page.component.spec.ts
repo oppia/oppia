@@ -19,6 +19,7 @@
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed, async, tick, fakeAsync }
   from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -27,7 +28,6 @@ import { TopicLandingPageComponent } from
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { TranslateService } from '@ngx-translate/core';
 
 import constants from 'assets/constants';
 

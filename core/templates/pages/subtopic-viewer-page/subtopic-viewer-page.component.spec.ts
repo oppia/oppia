@@ -17,11 +17,13 @@
  */
 
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TranslateService } from '@ngx-translate/core';
 
 import { PageTitleService } from 'services/page-title.service';
 import { ReadOnlySubtopicPageData } from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 import { SubtopicViewerPageComponent } from './subtopic-viewer-page.component';
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { LoaderService } from 'services/loader.service';
@@ -29,9 +31,7 @@ import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from '@ngx-translate/core';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();

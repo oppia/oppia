@@ -17,6 +17,7 @@
  */
 
 import { Component } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
@@ -35,7 +36,6 @@ import { LibraryPageConstants } from './library-page.constants';
 import { ActivityDict,
   LibraryPageBackendApiService,
   SummaryDict } from './services/library-page-backend-api.service';
-import { TranslateService } from '@ngx-translate/core';
 
 interface MobileLibraryGroupProperties {
   inCollapsedState: boolean;

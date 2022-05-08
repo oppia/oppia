@@ -19,11 +19,11 @@
 // This error page is used for status codes 400, 401 and 500.
 
 import { Component, OnDestroy } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PageTitleService } from 'services/page-title.service';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'oppia-error-page-root',

@@ -18,6 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 import { EventEmitter } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+
 import { DonatePageComponent } from './donate-page.component';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
@@ -26,7 +28,6 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { TranslateService } from '@ngx-translate/core';
 import { PageTitleService } from 'services/page-title.service';
 
 class MockTranslateService {

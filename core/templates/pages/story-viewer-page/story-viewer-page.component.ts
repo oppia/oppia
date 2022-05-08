@@ -18,6 +18,7 @@
 
 import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
@@ -33,7 +34,6 @@ import { AlertsService } from 'services/alerts.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
-import { TranslateService } from '@ngx-translate/core';
 
 interface IconParametersArray {
   thumbnailIconUrl: string;

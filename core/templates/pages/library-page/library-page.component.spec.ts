@@ -19,6 +19,9 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
@@ -37,8 +40,6 @@ import { UserService } from 'services/user.service';
 import { MockTranslateModule } from 'tests/unit-test-utils';
 import { LibraryPageComponent } from './library-page.component';
 import { ActivityDict, LibraryIndexData, LibraryPageBackendApiService } from './services/library-page-backend-api.service';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
 
 class MockWindowRef {
   nativeWindow = {

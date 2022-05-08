@@ -19,13 +19,14 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+
 import { Collection } from 'domain/collection/collection.model';
 import { UrlService } from 'services/contextual/url.service';
 import { PageTitleService } from 'services/page-title.service';
 import { CollectionEditorPageComponent } from './collection-editor-page.component';
 import { CollectionEditorRoutingService } from './services/collection-editor-routing.service';
 import { CollectionEditorStateService } from './services/collection-editor-state.service';
-import { TranslateService } from '@ngx-translate/core';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();

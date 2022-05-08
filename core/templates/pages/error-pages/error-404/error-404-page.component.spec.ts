@@ -17,6 +17,7 @@
  */
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, TestBed, ComponentFixture } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
 
 import { Error404PageComponent } from './error-404-page.component';
 import { UrlInterpolationService } from
@@ -24,7 +25,6 @@ import { UrlInterpolationService } from
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PageTitleService } from 'services/page-title.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { TranslateService } from '@ngx-translate/core';
 
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
