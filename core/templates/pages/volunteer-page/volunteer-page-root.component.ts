@@ -31,6 +31,7 @@ export class VolunteerPageRootComponent {
 
   ngOnInit(): void {
     this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.META);
   }
 }

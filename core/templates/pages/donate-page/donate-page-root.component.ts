@@ -31,6 +31,7 @@ export class DonatePageRootComponent {
 
   ngOnInit(): void {
     this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.META);
   }
 }

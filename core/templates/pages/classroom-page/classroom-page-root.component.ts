@@ -31,6 +31,7 @@ export class ClassroomPageRootComponent {
 
   ngOnInit(): void {
     this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.META);
   }
 }

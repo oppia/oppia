@@ -31,6 +31,7 @@ export class PartnershipsPageRootComponent {
 
   ngOnInit(): void {
     this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.META);
   }
 }
