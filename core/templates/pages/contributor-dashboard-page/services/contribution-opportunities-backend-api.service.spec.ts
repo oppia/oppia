@@ -326,15 +326,15 @@ describe('Contribution Opportunities backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should successfully fetch all topic names', fakeAsync(() => {
+  it('should successfully fetch translatable topic names', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .fetchAllTopicNamesAsync()
+      .fetchTranslatableTopicNamesAsync()
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne('/getalltopicnames');
+    const req = httpTestingController.expectOne('/gettranslatabletopicnames');
     expect(req.request.method).toEqual('GET');
     req.flush({ topic_names: ['Topic 1', 'Topic 2'] });
 
@@ -346,22 +346,22 @@ describe('Contribution Opportunities backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should fail to fetch all topic names when calling \'getalltopicnames',
+  it('should return empty response if \'gettranslatabletopicnames call fails',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
       const emptyResponse: string [] = [];
 
       contributionOpportunitiesBackendApiService
-        .fetchAllTopicNamesAsync()
+        .fetchTranslatableTopicNamesAsync()
         .then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
-        '/getalltopicnames'
+        '/gettranslatabletopicnames'
       );
       expect(req.request.method).toEqual('GET');
       req.flush({
-        error: 'Failed to fetch all topic names.'
+        error: 'Failed to fetch translatable topic names.'
       }, {
         status: 500, statusText: 'Internal Server Error'
       });
