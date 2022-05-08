@@ -32,6 +32,15 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
+# The ModelProperty class can accept `id` python property and all other
+# properties that are derived from datastore_services.Property. Thus
+# to generalize the type of properties that ModelProperty can accept,
+# we defined a type variable here.
+PropertyType = Union[
+    datastore_services.Property,
+    Callable[[base_models.BaseModel], str]
+]
+
 
 class ModelProperty:
     """Represents a Property in a BaseModel subclass."""
@@ -41,10 +50,7 @@ class ModelProperty:
     def __init__(
         self,
         model_class: Type[base_models.BaseModel],
-        property_obj: Union[
-            datastore_services.Property,
-            Callable[[base_models.BaseModel], str]
-        ]
+        property_obj: PropertyType
     ) -> None:
         """Initializes a new ModelProperty instance.
 
@@ -141,12 +147,7 @@ class ModelProperty:
         assert issubclass(model_class, base_models.BaseModel)
         return model_class
 
-    def _to_property(
-        self
-    ) -> Union[
-        datastore_services.Property,
-        Callable[[base_models.BaseModel], str]
-    ]:
+    def _to_property(self) -> PropertyType:
         """Returns the Property object associated with this instance.
 
         Returns:
@@ -155,10 +156,7 @@ class ModelProperty:
         # Using a cast here because the return value of getattr() method is
         # dynamic and mypy will assume it to be Any type otherwise.
         return cast(
-            Union[
-                datastore_services.Property,
-                Callable[[base_models.BaseModel], str]
-            ],
+            PropertyType,
             getattr(self._to_model_class(), self._property_name)
         )
 
