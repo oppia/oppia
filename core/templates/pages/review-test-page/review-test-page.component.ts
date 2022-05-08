@@ -49,7 +49,7 @@ angular.module('oppia').component('reviewTestPage', {
     ) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      var setPageTitle = function() {
+      ctrl.setPageTitle = function() {
         $translate.use(I18nLanguageCodeService.getCurrentI18nLanguageCode())
           .then(() => {
             const translatedTitle = $translate.instant(
@@ -60,10 +60,10 @@ angular.module('oppia').component('reviewTestPage', {
             PageTitleService.setDocumentTitle(translatedTitle);
           });
       };
-      var subscribeToOnLangChange = function() {
+      ctrl.subscribeToOnLanguageCodeChange = function() {
         ctrl.directiveSubscriptions.add(
           I18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
-            setPageTitle();
+            ctrl.setPageTitle();
           })
         );
       };
@@ -95,8 +95,8 @@ angular.module('oppia').component('reviewTestPage', {
             var skillIdList = [];
             var skillDescriptions = [];
             ctrl.storyName = result.storyName;
-            setPageTitle();
-            subscribeToOnLangChange();
+            ctrl.setPageTitle();
+            ctrl.subscribeToOnLanguageCodeChange();
             for (var skillId in result.skillDescriptions) {
               skillIdList.push(skillId);
               skillDescriptions.push(

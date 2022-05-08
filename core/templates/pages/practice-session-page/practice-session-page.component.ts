@@ -49,7 +49,7 @@ angular.module('oppia').component('practiceSessionPage', {
         TOTAL_QUESTIONS) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      var setPageTitle = function() {
+      ctrl.setPageTitle = function() {
         $translate.use(I18nLanguageCodeService.getCurrentI18nLanguageCode())
           .then(() => {
             const translatedTitle = $translate.instant(
@@ -60,10 +60,10 @@ angular.module('oppia').component('practiceSessionPage', {
             PageTitleService.setDocumentTitle(translatedTitle);
           });
       };
-      var subscribeToOnLangChange = function() {
+      ctrl.subscribeToOnLanguageCodeChange = function() {
         ctrl.directiveSubscriptions.add(
           I18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
-            setPageTitle();
+            ctrl.setPageTitle();
           })
         );
       };
@@ -123,8 +123,8 @@ angular.module('oppia').component('practiceSessionPage', {
           };
           ctrl.questionPlayerConfig = questionPlayerConfig;
           ctrl.topicName = result.data.topic_name;
-          setPageTitle();
-          subscribeToOnLangChange();
+          ctrl.setPageTitle();
+          ctrl.subscribeToOnLanguageCodeChange();
           LoaderService.hideLoadingScreen();
         });
       };
