@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -113,7 +113,7 @@ describe('Outcome Editor Component', () => {
     let onExternalSaveEmitter = new EventEmitter();
     spyOnProperty(externalSaveService, 'onExternalSave')
       .and.returnValue(onExternalSaveEmitter);
-    spyOn(component, 'invalidStateAfterFeedbackSave').and.returnValue(false);
+    spyOn(component, 'invalidStateAfterFeedbackSave').and.returnValue(true);
 
     component.ngOnInit();
 
@@ -142,7 +142,7 @@ describe('Outcome Editor Component', () => {
     // Post-check.
     expect(component.feedbackEditorIsOpen).toBeFalse();
     expect(component.outcome.feedback).toEqual(
-      new SubtitledHtml('<p>Outcome</p>', 'Id'));
+      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'));
   });
 
   it('should save destination on interaction change when edit destination' +
@@ -168,25 +168,37 @@ describe('Outcome Editor Component', () => {
     let onInteractionIdChangedEmitter = new EventEmitter();
     spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
-    spyOn(component, 'invalidStateAfterDestinationSave').and.returnValue(false);
+    spyOn(component, 'invalidStateAfterDestinationSave').and.returnValue(true);
 
     component.ngOnInit();
 
     // Setup. No pre-check as we are setting up values below.
     component.destinationEditorIsOpen = true;
-    component.savedOutcome = outcomeObjectFactory.createNew(
-      'Introduction', '', '', []);
-    component.outcome = outcomeObjectFactory.createNew(
-      'Saved Dest', '', '', []);
+    component.savedOutcome = new Outcome(
+      'Introduction',
+      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+      true,
+      [],
+      'ExpId',
+      'SkillId',
+    );
+    component.outcome = new Outcome(
+      'Saved Outcome',
+      new SubtitledHtml('<p>Outcome</p>', 'Id'),
+      true,
+      [],
+      '',
+      '',
+    );
 
     // Action.
     onInteractionIdChangedEmitter.emit();
 
     // Post-check.
     expect(component.destinationEditorIsOpen).toBeFalse();
-    expect(component.outcome.dest).toBe('Saved Dest');
-    expect(component.outcome.refresherExplorationId).toBeNull();
-    expect(component.outcome.missingPrerequisiteSkillId).toBeNull();
+    expect(component.outcome.dest).toBe('Introduction');
+    expect(component.outcome.refresherExplorationId).toBe('ExpId');
+    expect(component.outcome.missingPrerequisiteSkillId).toBe('SkillId');
   });
 
   it('should check if state is in question mode', () => {

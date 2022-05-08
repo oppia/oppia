@@ -114,13 +114,9 @@ export class OutcomeEditorComponent implements OnInit {
   }
 
   isSelfLoopWithNoFeedback(outcome: Outcome): boolean {
-    if (outcome && typeof outcome === 'object' &&
-      outcome.constructor.name === 'Outcome') {
-      return Boolean (
-        this.isSelfLoop(outcome) &&
-        !outcome.hasNonemptyFeedback());
-    }
-    return false;
+    return Boolean (
+      this.isSelfLoop(outcome) &&
+      !outcome.hasNonemptyFeedback());
   }
 
   invalidStateAfterFeedbackSave(): boolean {
