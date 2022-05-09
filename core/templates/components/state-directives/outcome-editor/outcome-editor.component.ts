@@ -32,11 +32,11 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
   templateUrl: './outcome-editor.component.html'
 })
 export class OutcomeEditorComponent implements OnInit {
+  @Input() areWarningsSuppressed: boolean;
   @Input() displayFeedback: boolean;
   @Input() isEditable: boolean;
   @Input() outcome: Outcome;
   @Input() addState: (value: string) => void;
-  @Input() areWarningsSuppressed: boolean;
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
   EventEmitter<string[]> = new EventEmitter();
 
@@ -46,9 +46,9 @@ export class OutcomeEditorComponent implements OnInit {
   directiveSubscriptions = new Subscription();
   ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
   canAddPrerequisiteSkill: boolean;
-  feedbackEditorIsOpen: boolean;
-  destinationEditorIsOpen: boolean;
   correctnessLabelEditorIsOpen: boolean;
+  destinationEditorIsOpen: boolean;
+  feedbackEditorIsOpen: boolean;
   savedOutcome: Outcome;
 
   constructor(
