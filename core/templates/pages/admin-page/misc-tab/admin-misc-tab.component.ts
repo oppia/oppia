@@ -66,10 +66,10 @@ export class AdminMiscTabComponent {
   ) {}
 
   clearSearchIndex(): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-    if (!this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)) {
+    if (
+      this.adminTaskManagerService.isTaskRunning() ||
+      !this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)
+    ) {
       return;
     }
 
@@ -87,10 +87,10 @@ export class AdminMiscTabComponent {
   }
 
   regenerateOpportunitiesRelatedToTopic(): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-    if (!this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)) {
+    if (
+      this.adminTaskManagerService.isTaskRunning() ||
+      !this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)
+    ) {
       return;
     }
     this.setStatusMessage.emit('Regenerating opportunities...');
@@ -105,10 +105,10 @@ export class AdminMiscTabComponent {
   }
 
   rollbackExploration(): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-    if (!this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)) {
+    if (
+      this.adminTaskManagerService.isTaskRunning() ||
+      !this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)
+    ) {
       return;
     }
     this.setStatusMessage.emit(
