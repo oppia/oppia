@@ -256,6 +256,7 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
     await explorationPlayerPage.clickThroughToNextCard();
 
+    await explorationPlayerPage.clickCloseLessonInfoTooltipIfPresent();
     await explorationPlayerPage.submitAnswer.apply(
       null, ['MultipleChoiceInput', 'Wrong!']);
     await explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');

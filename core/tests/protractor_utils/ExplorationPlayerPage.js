@@ -174,11 +174,16 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickCloseLessonInfoTooltipIfPresent = async function() {
-    await waitFor.elementToBeClickable(
-      closeLessonInfoTooltipElement,
-      'Close Lesson Info Tooltip button takes too long to appear.');
-    await action.click(
-      'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
+    let closeLessonInfoTooltipElementIsPresent = (
+      await closeLessonInfoTooltipElement.isPresent()
+    );
+    if (closeLessonInfoTooltipElementIsPresent) {
+      await waitFor.elementToBeClickable(
+        closeLessonInfoTooltipElement,
+        'Close Lesson Info Tooltip button takes too long to appear.');
+      await action.click(
+        'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
+    }
   };
 
   this.clickConfirmRedirectionButton = async function() {
