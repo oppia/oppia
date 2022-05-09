@@ -16,25 +16,27 @@
     <div class="oppia-editor-card-body oppia-editor-concept-container" ng-if="conceptCardIsShown">
       <img ng-if="!windowIsNarrow" ng-src="<[oppiaBlackImgUrl]>" alt="" class="oppia-editor-card-avatar">
       <div id="tutorialStateContent" class="oppia-editor-card-section state-content-editor-parent-container">
-        <state-content-editor on-save-state-content="$ctrl.onSaveStateContent"
-                              show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired"
-                              state-content-placeholder="$ctrl.getStateContentPlaceholder()"
-                              state-content-save-button-placeholder="$ctrl.getStateContentSaveButtonPlaceholder()">
-        </state-content-editor>
+        <oppia-state-content-editor class="protractor-test-state-content-editor"
+                                    (save-state-content)="$ctrl.onSaveStateContent($event)"
+                                    (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
+                                    (intialize)="$applyAsync()"
+                                    [state-content-placeholder]="$ctrl.getStateContentPlaceholder()"
+                                    [state-content-save-button-placeholder]="$ctrl.getStateContentSaveButtonPlaceholder()">
+        </oppia-state-content-editor>
       </div>
     </div>
   </div>
 </md-card>
 
 <div ng-show="$ctrl.isInteractionShown()">
-  <state-interaction-editor on-save-state-content="$ctrl.onSaveStateContent"
-                            on-save-interaction-id="$ctrl.onSaveInteractionId"
-                            on-save-interaction-customization-args="$ctrl.onSaveInteractionCustomizationArgs"
-                            on-save-next-content-id-index="$ctrl.onSaveNextContentIdIndex"
-                            on-save-solution="$ctrl.onSaveSolution"
-                            recompute-graph="$ctrl.recomputeGraph"
-                            show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
-  </state-interaction-editor>
+  <oppia-state-interaction-editor (on-save-state-content)="$ctrl.onSaveStateContent($event)"
+                                  (on-save-interaction-id)="$ctrl.onSaveInteractionId($event)"
+                                  (on-save-interaction-customization-args)="$ctrl.onSaveInteractionCustomizationArgs($event)"
+                                  (on-save-next-content-id-index)="$ctrl.onSaveNextContentIdIndex($event)"
+                                  (on-save-solution)="$ctrl.onSaveSolution($event)"
+                                  (recompute-graph)="$ctrl.recomputeGraph()"
+                                  (mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+  </oppia-state-interaction-editor>
 </div>
 
 <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">

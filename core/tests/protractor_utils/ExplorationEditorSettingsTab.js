@@ -57,7 +57,7 @@ var ExplorationEditorSettingsTab = function() {
     by.css('.protractor-test-delete-exploration-button'));
   var confirmDeleteExplorationButton = element(
     by.css('.protractor-test-really-delete-exploration-button'));
-  var enableCorrectnessFeedbackButton = element(
+  var disableCorrectnessFeedbackButton = element(
     by.css('.protractor-test-enable-mark-correctness-feedback'));
 
   /*
@@ -77,11 +77,11 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.enableCorrectnessFeedback = async function() {
+  this.disableCorrectnessFeedback = async function() {
     await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
     await action.click(
-      'Enable Correctness Feedback Button', enableCorrectnessFeedbackButton);
+      'Disable Correctness Feedback Button', disableCorrectnessFeedbackButton);
     await action.click('Neutral element', neutralElement);
   };
 

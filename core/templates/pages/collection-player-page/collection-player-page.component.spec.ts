@@ -32,6 +32,7 @@ import { CollectionNodeBackendDict } from 'domain/collection/collection-node.mod
 import { NO_ERRORS_SCHEMA } from '@angular/compiler';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('Collection player page component', () => {
   let alertsService: AlertsService;
@@ -50,6 +51,7 @@ describe('Collection player page component', () => {
   let sampleCollectionBackendObject: CollectionBackendDict;
   let collectionNodesList: IconParametersArray[];
   let collectionNodeBackendObject: CollectionNodeBackendDict;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   const userInfoForCollectionCreator = new UserInfo(
     ['USER_ROLE'], true, false, false, false, true,
@@ -79,6 +81,7 @@ describe('Collection player page component', () => {
       GuestCollectionProgressService);
     readOnlyCollectionBackendApiService = TestBed.inject(
       ReadOnlyCollectionBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     fixture = TestBed.createComponent(CollectionPlayerPageComponent);
     component = fixture.componentInstance;
 
@@ -142,7 +145,7 @@ describe('Collection player page component', () => {
       },
       {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
-        left: '395px',
+        left: '390px',
         top: '145px',
         thumbnailBgColor: '#cd672b'
       },
@@ -154,7 +157,7 @@ describe('Collection player page component', () => {
       },
       {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
-        left: '55px',
+        left: '60px',
         top: '365px',
         thumbnailBgColor: '#cd672b'
       },
@@ -166,7 +169,7 @@ describe('Collection player page component', () => {
       },
       {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
-        left: '395px',
+        left: '390px',
         top: '585px',
         thumbnailBgColor: '#cd672b'
       }
@@ -185,6 +188,8 @@ describe('Collection player page component', () => {
       }));
     spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('collectionId');
     alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue(null);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should throw warning message when an invalid collection ' +
@@ -214,15 +219,15 @@ describe('Collection player page component', () => {
     'when calling \'getExplorationTitlePosition\'', () => {
     // Case 1.
     let result = component.getExplorationTitlePosition(2);
-    expect(result).toBe('8px');
+    expect(result).toBe('-13px');
 
     // Case 2.
     result = component.getExplorationTitlePosition(1);
-    expect(result).toBe('30px');
+    expect(result).toBe('40px');
 
     // Case 3.
     result = component.getExplorationTitlePosition(3);
-    expect(result).toBe('-40px');
+    expect(result).toBe('-55px');
   });
 
   it('should return exploration url given exploration id', () => {
@@ -495,4 +500,8 @@ describe('Collection player page component', () => {
     expect(component.scrollToLocation).toHaveBeenCalled();
     expect(component.explorationCardIsShown).toBeFalse();
   }));
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toBeTrue();
+  });
 });

@@ -46,7 +46,7 @@ from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
-from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import opportunity_services
@@ -62,9 +62,14 @@ from core.domain import user_services
 from core.platform import models
 
 datastore_services = models.Registry.import_datastore_services()
-(exp_models, feedback_models, user_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
-])
+(base_models, exp_models, feedback_models, user_models) = (
+    models.Registry.import_models([
+        models.NAMES.base_model,
+        models.NAMES.exploration,
+        models.NAMES.feedback,
+        models.NAMES.user
+    ])
+)
 
 # Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
@@ -115,7 +120,8 @@ def get_exploration_titles_and_categories(exp_ids):
     """
     explorations = [
         (exp_fetchers.get_exploration_from_model(e) if e else None)
-        for e in exp_models.ExplorationModel.get_multi(exp_ids)]
+        for e in exp_models.ExplorationModel.get_multi(
+            exp_ids, include_deleted=True)]
 
     result = {}
     for exploration in explorations:
@@ -305,9 +311,8 @@ def export_to_zip_file(exploration_id, version=None):
         else:
             zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         html_string_list = exploration.get_all_html_content_strings()
         image_filenames = (
             html_cleaner.get_image_filenames_from_html_strings(
@@ -1037,14 +1042,15 @@ def validate_exploration_for_story(exp, strict):
             android_validation_constants.SUPPORTED_LANGUAGES):
         error_string = (
             'Invalid language %s found for exploration '
-            'with ID %s.' % (exp.language_code, exp.id))
+            'with ID %s. This language is not supported for explorations '
+            'in a story on the mobile app.' % (exp.language_code, exp.id))
         if strict:
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
 
     if exp.param_specs or exp.param_changes:
         error_string = (
-            'Expected no exploration to have parameter '
+            'Expected no exploration in a story to have parameter '
             'values in it. Invalid exploration: %s' % exp.id)
         if strict:
             raise utils.ValidationError(error_string)
@@ -1052,7 +1058,8 @@ def validate_exploration_for_story(exp, strict):
 
     if not exp.correctness_feedback_enabled:
         error_string = (
-            'Expected all explorations to have correctness feedback '
+            'Expected all explorations in a story to '
+            'have correctness feedback '
             'enabled. Invalid exploration: %s' % exp.id)
         if strict:
             raise utils.ValidationError(error_string)
@@ -1063,7 +1070,9 @@ def validate_exploration_for_story(exp, strict):
         if not state.interaction.is_supported_on_android_app():
             error_string = (
                 'Invalid interaction %s in exploration '
-                'with ID: %s.' % (state.interaction.id, exp.id))
+                'with ID: %s. This interaction is not supported for '
+                'explorations in a story on the '
+                'mobile app.' % (state.interaction.id, exp.id))
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
@@ -1071,8 +1080,8 @@ def validate_exploration_for_story(exp, strict):
         if not state.is_rte_content_supported_on_android():
             error_string = (
                 'RTE content in state %s of exploration '
-                'with ID %s is not supported on mobile.'
-                % (state_name, exp.id))
+                'with ID %s is not supported on mobile for explorations '
+                'in a story.' % (state_name, exp.id))
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
@@ -1083,9 +1092,10 @@ def validate_exploration_for_story(exp, strict):
                     'recommendedExplorationIds'].value)
             if len(recommended_exploration_ids) != 0:
                 error_string = (
-                    'Exploration with ID: %s contains exploration '
-                    'recommendations in its EndExploration interaction.'
-                    % (exp.id))
+                    'Explorations in a story are not expected to contain '
+                    'exploration recommendations. Exploration with ID: '
+                    '%s contains exploration recommendations in its '
+                    'EndExploration interaction.' % (exp.id))
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
@@ -1185,10 +1195,14 @@ def regenerate_exploration_summary_with_new_contributor(
         contributor_id: str. ID of the contributor to be added to
             the exploration summary.
     """
-    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = _compute_summary_of_exploration(exploration)
-    exp_summary.add_contribution_by_user(contributor_id)
-    save_exploration_summary(exp_summary)
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=False)
+    if exploration is not None:
+        exp_summary = _compute_summary_of_exploration(exploration)
+        exp_summary.add_contribution_by_user(contributor_id)
+        save_exploration_summary(exp_summary)
+    else:
+        logging.error('Could not find exploration with ID %s', exploration_id)
 
 
 def regenerate_exploration_and_contributors_summaries(exploration_id):
@@ -1482,9 +1496,8 @@ def save_new_exploration_from_yaml_and_assets(
     # images. So we need to have images in the datastore before we could
     # perform the migration.
     for (asset_filename, asset_content) in assets_list:
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         fs.commit(asset_filename, asset_content)
 
     exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)
@@ -1739,6 +1752,9 @@ def get_composite_change_list(exp_id, from_version, to_version):
     Returns:
         list(ExplorationChange). List of ExplorationChange domain objects
         consisting of changes from from_version to to_version.
+
+    Raises:
+        Exception. From version is higher than to version.
     """
     if from_version > to_version:
         raise Exception(
@@ -1881,6 +1897,7 @@ def get_user_exploration_data(
         'is_version_of_draft_valid': is_valid_draft_version,
         'draft_changes': draft_changes,
         'email_preferences': exploration_email_preferences.to_dict(),
+        'edits_allowed': exploration.edits_allowed
     }
 
     return editor_dict
@@ -1946,8 +1963,12 @@ def get_exp_with_draft_applied(exp_id, user_id):
         Exploration or None. Returns the exploration domain object with draft
         applied, or None if draft can not be applied.
     """
+    # TODO(#15075): Refactor this function.
+
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    draft_change_list = None
+    draft_change_list_exp_version = None
     if exp_user_data:
         if exp_user_data.draft_change_list:
             draft_change_list_exp_version = (
@@ -2030,3 +2051,20 @@ def get_interaction_id_for_state(exp_id, state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
+
+def set_exploration_edits_allowed(exp_id, edits_are_allowed):
+    """Toggled edits allowed field in the exploration.
+
+    Args:
+        exp_id: str. The ID of the exp.
+        edits_are_allowed: boolean. Whether exploration edits are allowed.
+    """
+    exploration_model = exp_models.ExplorationModel.get(exp_id)
+    exploration_model.edits_allowed = edits_are_allowed
+    # Updating the edits_allowed field in an exploration should not result in a
+    # version update. So put_multi is used instead of a commit.
+    base_models.BaseModel.update_timestamps_multi([exploration_model])
+    base_models.BaseModel.put_multi([exploration_model])
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exp_id])

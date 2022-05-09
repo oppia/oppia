@@ -1,0 +1,32 @@
+<div class="skill-preview-modal">
+  <h3 class="skill-preview-modal-title">{{ skillDescription }}</h3>
+  <div class="skill-preview-modal-content">
+    <angular-html-bind-wrapper [htmlData]="skillExplanation"></angular-html-bind-wrapper>
+  </div>
+  <div *ngIf="skillWorkedExamples.length">
+    <h3>Worked Examples: </h3>
+    <div *ngFor="let example of skillWorkedExamples" class="skill-preview-examples">
+      <angular-html-bind-wrapper classStr="worked-example-question" [htmlData]="example.getQuestion().html"></angular-html-bind-wrapper>
+      <angular-html-bind-wrapper [htmlData]="example.getExplanation().html"></angular-html-bind-wrapper>
+    </div>
+  </div>
+</div>
+
+<style>
+  .skill-preview-modal {
+    background-color: #f0ffff;
+    padding: 30px 35px;
+  }
+  .skill-preview-modal .skill-preview-modal-title {
+    font-size: 28px;
+  }
+  .skill-preview-modal .skill-preview-modal-content {
+    margin-top: 15px;
+  }
+  .skill-preview-modal .skill-preview-examples {
+    margin-bottom: 10px;
+  }
+  .skill-preview-modal .worked-example-question {
+    font-weight: bold;
+  }
+</style>

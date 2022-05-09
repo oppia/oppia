@@ -115,7 +115,7 @@
           </ul>
         </div>
         <div class="oppia-add-response-button-container">
-          <div ng-if="EditabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
+          <div ng-if="EditabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear() && EditabilityService.isEditable()">
             <button type="button" class="btn btn-secondary oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
               + ADD RESPONSE
             </button>
@@ -123,7 +123,7 @@
         </div>
         <div ng-if="!isInQuestionMode()" class="solicit-answer-checkbox">
           <span ng-if="!isCurrentInteractionTrivial()" ng-hide="!enableSolicitAnswerDetailsFeature" class="solicit-answer-details-span">
-            <input id="label-target-solicit-answer-details-checkbox" type="checkbox" class="protractor-test-solicit-answer-details-checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed">
+            <input id="label-target-solicit-answer-details-checkbox" type="checkbox" class="protractor-test-solicit-answer-details-checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed" ng-disabled="!EditabilityService.isEditable()">
             <label for="label-target-solicit-answer-details-checkbox">Solicit Answer Details</label>
           </span>
         </div>

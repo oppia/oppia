@@ -55,6 +55,7 @@ class MockWindowRef {
       onLine: true
     }
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -68,6 +69,7 @@ class MockExplorationDataService1 {
       is_version_of_draft_valid: false,
     });
   }
+
   discardDraftAsync() {
     return;
   }
@@ -81,6 +83,7 @@ class MockExplorationDataService2 {
       is_version_of_draft_valid: false,
     });
   }
+
   discardDraftAsync() {
     return;
   }
@@ -91,6 +94,7 @@ class MockExplorationDataService3 {
   autosaveChangeListAsync(changeList, successCb, errorCb) {
     errorCb();
   }
+
   discardDraftAsync() {
     return;
   }

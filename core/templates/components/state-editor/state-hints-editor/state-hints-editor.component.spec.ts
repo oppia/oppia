@@ -71,8 +71,10 @@ class MockStateHintsService {
   getActiveHintIndex(): number {
     return 1;
   }
+
   saveDisplayedValue(): void {
   }
+
   savedMemento = [
     {
       hintContent: {

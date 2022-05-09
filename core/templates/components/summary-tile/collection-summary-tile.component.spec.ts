@@ -57,6 +57,7 @@ class MockWindowDimensionsService {
   getResizeEvent() {
     return of(new Event('resize'));
   }
+
   getWidth(): number {
     return 530;
   }

@@ -30,6 +30,7 @@ import { AddOrUpdateSolutionModalComponent } from './add-or-update-solution-moda
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 
 class MockActiveModal {
   close(): void {
@@ -53,6 +54,7 @@ describe('Add Or Update Solution Modal Component', () => {
   let stateSolutionService: StateSolutionService;
 
   let answerEditorHtml: Solution;
+  let mockInteractionRule: InteractionRulesService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -94,7 +96,7 @@ describe('Add Or Update Solution Modal Component', () => {
 
       spyOn(contextService, 'getEntityType').and.returnValue('question');
       spyOn(explorationHtmlFormatterService, 'getInteractionHtml')
-        .and.returnValue(null);
+        .and.returnValue('<p>Interaction Html</p>');
 
       answerEditorHtml = {
         ehfs: explorationHtmlFormatterService,
@@ -151,16 +153,17 @@ describe('Add Or Update Solution Modal Component', () => {
     it('should initialize properties after component is initialized', () => {
       stateSolutionService.init('', answerEditorHtml);
 
-      expect(component.correctAnswerEditorHtml).toBe(null);
+      expect(component.correctAnswerEditorHtml).toEqual(
+        '<p>Interaction Html</p>');
       expect(component.EMPTY_SOLUTION_DATA).toEqual({
         answerIsExclusive: false,
-        correctAnswer: null,
+        correctAnswer: undefined,
         explanationHtml: '',
         explanationContentId: 'solution'
       });
       expect(component.data).toEqual({
         answerIsExclusive: true,
-        correctAnswer: null,
+        correctAnswer: undefined,
         explanationHtml: 'Explanation html',
         explanationContentId: 'cont_1'
       });
@@ -199,7 +202,7 @@ describe('Add Or Update Solution Modal Component', () => {
 
     it('should update correct answer when submitting current interaction',
       () => {
-        currentInteractionService.onSubmit('answer', null);
+        currentInteractionService.onSubmit('answer', mockInteractionRule);
 
         expect(component.data.correctAnswer).toEqual('answer');
       });
@@ -234,7 +237,7 @@ describe('Add Or Update Solution Modal Component', () => {
     it('should save solution when closing the modal', () => {
       spyOn(ngbActiveModal, 'close');
       stateSolutionService.init('', answerEditorHtml);
-      currentInteractionService.onSubmit('answer', null);
+      currentInteractionService.onSubmit('answer', mockInteractionRule);
 
       component.saveSolution();
 

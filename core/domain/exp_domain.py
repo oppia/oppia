@@ -36,6 +36,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import param_domain
 from core.domain import state_domain
+from core.domain import translation_domain
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -273,7 +274,8 @@ class ExplorationChange(change_domain.BaseChange):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
+        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
+        'edits_allowed')
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -550,7 +552,7 @@ class VersionedExplorationInteractionIdsMapping:
         self.state_interaction_ids_dict = state_interaction_ids_dict
 
 
-class Exploration:
+class Exploration(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia exploration."""
 
     def __init__(
@@ -558,7 +560,7 @@ class Exploration:
             language_code, tags, blurb, author_notes,
             states_schema_version, init_state_name, states_dict,
             param_specs_dict, param_changes_list, version,
-            auto_tts_enabled, correctness_feedback_enabled,
+            auto_tts_enabled, correctness_feedback_enabled, edits_allowed,
             created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
@@ -587,6 +589,7 @@ class Exploration:
                 enabled.
             correctness_feedback_enabled: bool. True if correctness feedback is
                 enabled.
+            edits_allowed: bool. True when edits to the exploration is allowed.
             created_on: datetime.datetime. Date and time when the exploration
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
@@ -620,6 +623,26 @@ class Exploration:
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
+        self.edits_allowed = edits_allowed
+
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields/objects in the exploration.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        for state in self.states.values():
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(state)
+            )
+        return translatable_contents_collection
 
     @classmethod
     def create_default_exploration(
@@ -660,7 +683,8 @@ class Exploration:
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED, False)
+            feconf.DEFAULT_AUTO_TTS_ENABLED,
+            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED, True)
 
     @classmethod
     def from_dict(
@@ -680,6 +704,10 @@ class Exploration:
 
         Returns:
             Exploration. The corresponding Exploration domain object.
+
+        Raises:
+            Exception. Some parameter was used in a state but not declared
+                in the Exploration dict.
         """
         # NOTE TO DEVELOPERS: It is absolutely ESSENTIAL this conversion to and
         # from an ExplorationModel/dictionary MUST be exhaustive and complete.
@@ -695,6 +723,7 @@ class Exploration:
         exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
         exploration.correctness_feedback_enabled = exploration_dict[
             'correctness_feedback_enabled']
+        exploration.edits_allowed = exploration_dict['edits_allowed']
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
@@ -924,6 +953,11 @@ class Exploration:
             raise utils.ValidationError(
                 'Expected correctness_feedback_enabled to be a bool, received '
                 '%s' % self.correctness_feedback_enabled)
+
+        if not isinstance(self.edits_allowed, bool):
+            raise utils.ValidationError(
+                'Expected edits_allowed to be a bool, received '
+                '%s' % self.edits_allowed)
 
         for param_name in self.param_specs:
             if not isinstance(param_name, str):
@@ -1406,6 +1440,9 @@ class Exploration:
 
         Args:
             init_state_name: str. The new name of the initial state.
+
+        Raises:
+            Exception. Invalid initial state name.
         """
         old_init_state_name = self.init_state_name
         if init_state_name not in self.states:
@@ -2352,6 +2389,7 @@ class Exploration:
             'tags': self.tags,
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
+            'edits_allowed': self.edits_allowed,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })
@@ -2670,6 +2708,14 @@ class ExplorationSummary:
                 raise utils.ValidationError(
                     'Expected each id in viewer_ids to '
                     'be string, received %s' % viewer_id)
+
+        all_user_ids_with_rights = (
+            self.owner_ids + self.editor_ids + self.voice_artist_ids +
+            self.viewer_ids)
+        if len(all_user_ids_with_rights) != len(set(all_user_ids_with_rights)):
+            raise utils.ValidationError(
+                'Users should not be assigned to multiple roles at once, '
+                'received users: %s' % ', '.join(all_user_ids_with_rights))
 
         if not isinstance(self.contributor_ids, list):
             raise utils.ValidationError(

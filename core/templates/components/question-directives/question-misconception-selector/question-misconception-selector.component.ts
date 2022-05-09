@@ -34,6 +34,7 @@ interface UpdatedValues {
 export class QuestionMisconceptionSelectorComponent implements OnInit {
   @Output() updateMisconceptionValues:
   EventEmitter<UpdatedValues> = (new EventEmitter());
+
   @Input() selectedMisconception: Misconception;
   @Input() selectedMisconceptionSkillId: string;
   @Input() misconceptionFeedbackIsUsed: boolean;

@@ -43,6 +43,7 @@ class MockWindowRef {
     },
     gtag: () => {}
   };
+
   get nativeWindow() {
     return this._window;
   }

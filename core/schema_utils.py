@@ -54,6 +54,7 @@ SCHEMA_KEY_VALIDATORS = 'validators'
 SCHEMA_KEY_DEFAULT_VALUE = 'default_value'
 SCHEMA_KEY_OBJECT_CLASS = 'object_class'
 SCHEMA_KEY_VALIDATION_METHOD = 'validation_method'
+SCHEMA_KEY_OPTIONS = 'options'
 
 SCHEMA_TYPE_BOOL = 'bool'
 SCHEMA_TYPE_CUSTOM = 'custom'
@@ -67,9 +68,22 @@ SCHEMA_TYPE_UNICODE = 'unicode'
 SCHEMA_TYPE_BASESTRING = 'basestring'
 SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
 SCHEMA_TYPE_OBJECT_DICT = 'object_dict'
+SCHEMA_TYPE_WEAK_MULTIPLE = 'weak_multiple'
 
 SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
 SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
+ALL_SCHEMAS: Dict[str, type] = {
+    SCHEMA_TYPE_BOOL: bool,
+    SCHEMA_TYPE_DICT: dict,
+    SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS: dict,
+    SCHEMA_TYPE_FLOAT: float,
+    SCHEMA_TYPE_HTML: str,
+    SCHEMA_TYPE_INT: int,
+    SCHEMA_TYPE_LIST: list,
+    SCHEMA_TYPE_UNICODE: str,
+    SCHEMA_TYPE_BASESTRING: str,
+    SCHEMA_TYPE_UNICODE_OR_NONE: str
+}
 
 EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 
@@ -98,11 +112,19 @@ def normalize_against_schema(
         *. The normalized object.
 
     Raises:
-        AssertionError. The object fails to validate against the schema.
+        Exception. The object fails to validate against the schema.
     """
     normalized_obj: Any = None
 
-    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
+    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_WEAK_MULTIPLE:
+        for i in schema[SCHEMA_KEY_OPTIONS]:
+            if isinstance(obj, ALL_SCHEMAS[i]):
+                normalized_obj = obj
+                break
+        if normalized_obj is None:
+            raise Exception(
+                'Type of %s is not present in options' % obj)
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_CUSTOM:
@@ -154,18 +176,18 @@ def normalize_against_schema(
             raise Exception('Expected float, received %s' % obj)
         try:
             obj = float(obj)
-        except Exception:
+        except Exception as e:
             raise Exception('Could not convert %s to float: %s' % (
-                type(obj).__name__, obj))
+                type(obj).__name__, obj)) from e
         assert isinstance(obj, numbers.Real), (
             'Expected float, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_INT:
         try:
             obj = int(obj)
-        except Exception:
+        except Exception as e:
             raise Exception('Could not convert %s to int: %s' % (
-                type(obj).__name__, obj))
+                type(obj).__name__, obj)) from e
         assert isinstance(obj, numbers.Integral), (
             'Expected int, received %s' % obj)
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
@@ -401,6 +423,9 @@ class _Validators:
         Returns:
             function. The validator method corresponding to the specified
             validator_id.
+
+        Raises:
+            Exception. Given validator method is invalid.
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)

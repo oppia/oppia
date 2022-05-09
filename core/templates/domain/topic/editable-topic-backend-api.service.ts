@@ -16,7 +16,7 @@
  * @fileoverview Service to send changes to a topic to the backend.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
@@ -242,7 +242,7 @@ export class EditableTopicBackendApiService {
   private _doesTopicWithUrlFragmentExist(
       topicUrlFragment: string,
       successCallback: (value: boolean) => void,
-      errorCallback: (reason: string) => void
+      errorCallback: (errorResponse: HttpErrorResponse) => void
   ): void {
     let topicUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
@@ -254,7 +254,7 @@ export class EditableTopicBackendApiService {
         successCallback(response.topic_url_fragment_exists);
       }
     }, (errorResponse) => {
-      errorCallback(errorResponse.error);
+      errorCallback(errorResponse);
     });
   }
 

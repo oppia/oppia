@@ -31,6 +31,7 @@ import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 export interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -102,7 +103,8 @@ export class CollectionPlayerPageComponent implements OnInit {
     private pageTitleService: PageTitleService,
     private userService: UserService,
     private collectionPlayerBackendApiService:
-      CollectionPlayerBackendApiService
+      CollectionPlayerBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -248,11 +250,11 @@ export class CollectionPlayerPageComponent implements OnInit {
 
   getExplorationTitlePosition(index: number): string {
     if (index % 2 === 0) {
-      return '8px';
+      return '-13px';
     } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
-      return '30px';
+      return '40px';
     } else if ((index + 1) % 4 === 0) {
-      return '-40px';
+      return '-55px';
     }
   }
 
@@ -302,6 +304,10 @@ export class CollectionPlayerPageComponent implements OnInit {
     }
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
     this.collection = null;
@@ -317,8 +323,8 @@ export class CollectionPlayerPageComponent implements OnInit {
     this.ICON_Y_INITIAL_PX = 35;
     this.ICON_Y_INCREMENT_PX = 110;
     this.ICON_X_MIDDLE_PX = 225;
-    this.ICON_X_LEFT_PX = 55;
-    this.ICON_X_RIGHT_PX = 395;
+    this.ICON_X_LEFT_PX = 60;
+    this.ICON_X_RIGHT_PX = 390;
     this.svgHeight = this.MIN_HEIGHT_FOR_PATH_SVG_PX;
     this.nextExplorationId = null;
     this.whitelistedCollectionIdsForGuestProgress = (

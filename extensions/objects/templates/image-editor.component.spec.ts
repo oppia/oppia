@@ -29,6 +29,7 @@ import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { SimpleChanges } from '@angular/core';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 let gifshot = require('gifshot');
 
 declare global {
@@ -330,6 +331,7 @@ describe('ImageEditor', () => {
         return 'Fake onload executed';
       };
     }
+
     readAsDataURL(file) {
       this.onload();
       return 'The file is loaded';
@@ -344,9 +346,11 @@ describe('ImageEditor', () => {
         return 'Fake onload executed';
       };
     }
+
     set src(url) {
       this.onload();
     }
+
     addEventListener(txt, func, bool) {
       func();
     }
@@ -356,7 +360,10 @@ describe('ImageEditor', () => {
     TestBed.configureTestingModule(
       {
         imports: [HttpClientTestingModule],
-        declarations: [ImageEditorComponent],
+        declarations: [
+          ImageEditorComponent,
+          MockTranslatePipe
+        ],
         providers: [
           {
             provide: ImageUploadHelperService,
@@ -1510,16 +1517,12 @@ describe('ImageEditor', () => {
     expect(component.userIsResizingCropArea).toBe(false);
   });
 
-  it('should get dynamic styles for the main container when called', () => {
-    expect(component.getMainContainerDynamicStyles()).toBe('width: 490px');
-  });
-
   it('should show border for the image container when user has not' +
   ' uploaded a file', () => {
     component.data.mode = component.MODE_EMPTY;
 
     expect(component.getImageContainerDynamicStyles())
-      .toBe('border: 1px dotted #888');
+      .toBe('border: 1px dotted #888; width: 100%');
   });
 
   it('should not show border for the image container when user has' +
@@ -1528,7 +1531,7 @@ describe('ImageEditor', () => {
     expect(component.data.mode).toBe(component.MODE_UPLOADED);
 
     expect(component.getImageContainerDynamicStyles())
-      .toBe('border: none');
+      .toBe('border: none; width: 490px');
   });
 
   it('should not show tool bar when the user is cropping', () => {
@@ -1648,6 +1651,10 @@ describe('ImageEditor', () => {
     component.data = { mode: component.MODE_EMPTY, metadata: {}, crop: true };
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
       dataSvg.uploadedImageData);
+    spyOn(svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri')
+      .and.returnValue({ tags: [], attrs: [] });
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes')
+      .and.returnValue(dataSvg.uploadedImageData.toString());
 
     component.onFileChanged(dataSvg.uploadedFile);
 

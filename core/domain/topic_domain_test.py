@@ -19,13 +19,10 @@
 from __future__ import annotations
 
 import datetime
-import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
-from core.domain import fs_domain
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
@@ -692,17 +689,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_get_subtopic_index(self) -> None:
         self.assertEqual(self.topic.get_subtopic_index(1), 0)
 
-    def test_to_dict(self) -> None:
-        user_ids = [self.user_id_a, self.user_id_b]
-        topic_rights = topic_domain.TopicRights(self.topic_id, user_ids, False)
-        expected_dict = {
-            'topic_id': self.topic_id,
-            'manager_names': ['A', 'B'],
-            'topic_is_published': False
-        }
-
-        self.assertEqual(expected_dict, topic_rights.to_dict())
-
     def test_is_manager(self) -> None:
         user_ids = [self.user_id_a, self.user_id_b]
         assert user_ids[0] is not None
@@ -745,32 +731,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_abbreviated_name('abbrev')
         self.assertEqual(self.topic.abbreviated_name, 'abbrev')
 
-    def test_update_thumbnail_filename(self) -> None:
-        self.assertEqual(self.topic.thumbnail_filename, None)
-        # Test exception when thumbnail is not found on filesystem.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception,
-            'The thumbnail img.svg for topic with id %s does not exist'
-            ' in the filesystem.' % (self.topic_id)):
-            self.topic.update_thumbnail_filename('img.svg')
-
-        # Save the dummy image to the filesystem to be used as thumbnail.
-        with python_utils.open_file(  # type: ignore[no-untyped-call]
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-            'rb', encoding=None) as f:
-            raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(  # type: ignore[no-untyped-call]
-            fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
-                feconf.ENTITY_TYPE_TOPIC, self.topic.id))
-        fs.commit(  # type: ignore[no-untyped-call]
-            '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
-            mimetype='image/svg+xml')
-
-        # Test successful update of thumbnail present in the filesystem.
-        self.topic.update_thumbnail_filename('img.svg')
-        self.assertEqual(self.topic.thumbnail_filename, 'img.svg')
-        self.assertEqual(self.topic.thumbnail_size_in_bytes, len(raw_image))
-
     def test_update_thumbnail_bg_color(self) -> None:
         self.assertEqual(self.topic.thumbnail_bg_color, None)
         self.topic.update_thumbnail_bg_color('#C6DCDA')
@@ -792,37 +752,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
         self.topic.update_subtopic_title(1, 'new title')
         self.assertEqual(self.topic.subtopics[0].title, 'new title')
-
-    def test_update_subtopic_thumbnail_filename(self) -> None:
-        self.assertEqual(len(self.topic.subtopics), 1)
-        self.assertEqual(
-            self.topic.subtopics[0].thumbnail_filename, 'image.svg')
-        self.assertEqual(
-            self.topic.subtopics[0].thumbnail_size_in_bytes, 21131)
-
-        # Test Exception when the thumbnail is not found in filesystem.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception, 'The thumbnail %s for subtopic with topic_id %s does'
-            ' not exist in the filesystem.' % (
-                'new_image.svg', self.topic_id)):
-            self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')
-
-        # Test successful update of thumbnail_filename when the thumbnail
-        # is found in the filesystem.
-        with python_utils.open_file(  # type: ignore[no-untyped-call]
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-            encoding=None) as f:
-            raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(  # type: ignore[no-untyped-call]
-            fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
-                feconf.ENTITY_TYPE_TOPIC, self.topic_id))
-        fs.commit(  # type: ignore[no-untyped-call]
-            'thumbnail/new_image.svg', raw_image, mimetype='image/svg+xml')
-        self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')
-        self.assertEqual(
-            self.topic.subtopics[0].thumbnail_filename, 'new_image.svg')
-        self.assertEqual(
-            self.topic.subtopics[0].thumbnail_size_in_bytes, len(raw_image))
 
     def test_update_subtopic_url_fragment(self) -> None:
         self.assertEqual(len(self.topic.subtopics), 1)
@@ -1353,18 +1282,9 @@ class TopicRightsTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'B')
         self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
         self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
-        self.topic_summary_dict = {
-            'topic_id': 'topic_id',
-            'manager_names': ['A'],
-            'topic_is_published': False,
-        }
 
         self.topic_summary = topic_domain.TopicRights(
             'topic_id', [self.user_id_a], False)
-
-    def test_topic_summary_gets_created(self) -> None:
-        self.assertEqual(
-            self.topic_summary.to_dict(), self.topic_summary_dict)
 
     def test_is_manager(self) -> None:
         self.assertTrue(self.topic_summary.is_manager(self.user_id_a))

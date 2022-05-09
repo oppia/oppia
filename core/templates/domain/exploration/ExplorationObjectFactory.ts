@@ -59,7 +59,7 @@ export interface ExplorationBackendDict {
   'states': StateObjectsBackendDict;
   'title': string;
   'language_code': string;
-  'draft_change_list_id'?: number;
+  'draft_change_list_id': number;
   'version'?: number;
 }
 
@@ -155,6 +155,7 @@ export class Exploration {
         INTERACTION_SPECS[interactionId as InteractionSpecsKey].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
+
   getStates(): States {
     return cloneDeep(this.states);
   }

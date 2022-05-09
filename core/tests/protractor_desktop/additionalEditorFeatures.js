@@ -75,7 +75,8 @@ describe('Full exploration editor', function() {
       await waitFor.invisibilityOf(
         postTutorialPopover, 'Post-tutorial popover does not disappear.');
       await action.click('State Edit Button', stateEditButton);
-      var stateEditorTag = element(by.tagName('state-content-editor'));
+      var stateEditorTag = element(
+        by.css('.protractor-test-state-content-editor'));
       var stateContentEditor = stateEditorTag.element(
         by.css('.protractor-test-state-content-editor'));
       await waitFor.visibilityOf(

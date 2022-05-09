@@ -19,13 +19,12 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import question_domain
@@ -115,18 +114,16 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.update_meta_tag_content('tag')
         topic.update_page_title_fragment_for_web('page title for topic')
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_TOPIC, topic_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
         fs.commit(
             '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
         # Update thumbnail properties.
-        topic.update_thumbnail_filename('test_svg.svg')
+        topic_services.update_thumbnail_filename(topic, 'test_svg.svg')
         topic.update_thumbnail_bg_color('#C6DCDA')
 
         # Add other structures to the topic.
@@ -135,7 +132,8 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.add_subtopic(1, 'Test Subtopic Title')
 
         # Update and validate subtopic.
-        topic.update_subtopic_thumbnail_filename(1, 'test_svg.svg')
+        topic_services.update_subtopic_thumbnail_filename(
+            topic, 1, 'test_svg.svg')
         topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
         topic.update_subtopic_url_fragment(1, 'suburl')
         topic.move_skill_id_to_subtopic(None, 1, skill_id)
@@ -174,13 +172,11 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         )
 
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_STORY, story_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)
         fs.commit(
             '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -230,7 +226,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         AssetDevHandler.
         """
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             image_content = f.read()

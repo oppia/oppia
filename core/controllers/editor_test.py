@@ -25,14 +25,13 @@ import os
 import zipfile
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import question_services
 from core.domain import rights_domain
@@ -273,6 +272,67 @@ class EditorTests(BaseEditorControllerTests):
 
         self.logout()
 
+    def test_lock_exploration(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(
+            exp_id, self.admin_id, end_state_name='end state')
+        csrf_token = self.get_new_csrf_token()
+        edits_allowed_url = '/editsallowedhandler/%s' % exp_id
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, True)
+
+        self.put_json(
+            edits_allowed_url,
+            {'edits_are_allowed': False},
+            csrf_token=csrf_token)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, False)
+
+        self.logout()
+
+    def test_cannot_update_exploration_when_locked(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(
+            exp_id, self.admin_id, end_state_name='end state')
+        csrf_token = self.get_new_csrf_token()
+        edits_allowed_url = '/editsallowedhandler/%s' % exp_id
+        self.put_json(
+            edits_allowed_url,
+            {'edits_are_allowed': False},
+            csrf_token=csrf_token)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, False)
+
+        response_dict = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'dummy update',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State 4'
+                }, {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State 4',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+
+        self.assertEqual(
+            response_dict['error'],
+            'This exploration cannot be edited. Please contact the admin.')
+        self.logout()
+
 
 class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
@@ -476,6 +536,11 @@ written_translations:
         exp_services.update_exploration(
             owner_id, exp_id, [
                 exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'auto_tts_enabled',
+                    'new_value': True,
+                }),
+                exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State A',
                 }),
@@ -601,7 +666,7 @@ written_translations:
         golden_zip_filepath = os.path.join(
             feconf.TESTS_DATA_DIR,
             'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip')
-        with python_utils.open_file(
+        with utils.open_file(
             golden_zip_filepath, 'rb', encoding=None) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
@@ -3201,9 +3266,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
         # Check that the file is not already present.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(
-            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
 
@@ -3221,9 +3284,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertEqual(response['error'], error_msg)
 
         # Check that the file is not uploaded.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(
-            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
 
@@ -3248,21 +3309,19 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
         # Check that the file is not already present.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(
-            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
 
         # Read raw image for testing.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
             raw_image = f.read()
 
         get_image_exists_swap = self.swap_to_always_return(
-            fs_domain.GcsFileSystem, 'isfile', value=True)
+            fs_services.GcsFileSystem, 'isfile', value=True)
 
         with get_image_exists_swap:
             response = self.post_json(
@@ -3283,9 +3342,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertEqual(response['error'], error_msg)
 
         # Check that the file is not uploaded.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(
-            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
 
@@ -3308,13 +3365,11 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
         # Check that the file is not already present.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(
-            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
         # Read raw image for testing.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
@@ -3333,9 +3388,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertEqual(response['filename'], filename)
 
         # Check that the file is uploaded successfully.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(
-            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertTrue(fs.isfile(filepath))
 

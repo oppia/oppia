@@ -34,8 +34,10 @@ export class CreateFeedbackThreadModalComponent
   ) {
     super(ngbActiveModal);
   }
+
   ngOnInit(): void {
   }
+
   newThreadSubject = '';
   newThreadText = '';
 

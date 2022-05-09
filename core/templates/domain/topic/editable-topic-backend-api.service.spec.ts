@@ -189,7 +189,7 @@ describe('Editable topic backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       // 'topic' is initialized before it's value is fetched from backend,
-      // hence we need to do non-null assertion, for more information see
+      // hence we need to do non-null assertion. For more information, see
       // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
       let topic!: TopicBackendDict;
 
@@ -307,8 +307,9 @@ describe('Editable topic backend API service', () => {
   it('should use the rejection handler if the url fragment already exists',
     fakeAsync(() => {
       editableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
-        'topic-url-fragment').then(() => {}, error => {
-        expect(error).toEqual('Error: Failed to check topic url fragment.');
+        'topic-url-fragment').then(() => {}, errorResponse => {
+        expect(errorResponse.statusText).toEqual(
+          'Error: Failed to check topic url fragment.');
       });
       let req = httpTestingController.expectOne(
         '/topic_url_fragment_handler/topic-url-fragment');

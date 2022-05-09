@@ -29,11 +29,12 @@ import itertools
 import json
 import logging
 import os
+import random
 import re
+import string
 import unittest
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
@@ -45,7 +46,6 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import question_domain
@@ -71,7 +71,7 @@ import elasticsearch
 import requests_mock
 import webtest
 
-from typing import Any, Dict, Optional # isort: skip
+from typing import Any, Dict, List, Optional # isort: skip
 
 (
     auth_models, base_models, exp_models,
@@ -129,6 +129,9 @@ def get_filepath_from_filename(filename, rootdir):
     Returns:
         str | None. The path of the file if file is found otherwise
         None.
+
+    Raises:
+        Exception. Multiple files found with given file name.
     """
     # This is required since error files are served according to error status
     # code. The file served is error-page.mainpage.html but it is compiled and
@@ -161,7 +164,7 @@ def mock_load_template(filename):
     """
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'pages'))
-    with python_utils.open_file(filepath, 'r') as f:
+    with utils.open_file(filepath, 'r') as f:
         return f.read()
 
 
@@ -197,6 +200,17 @@ def get_storage_model_classes():
                         clazz)]
                 if 'Model' in all_base_classes:
                     yield clazz
+
+
+def generate_random_hexa_str():
+    """Generate 32 character random string that looks like hex number.
+
+    Returns:
+        str. A random string.
+    """
+    uppercase = 'ABCDEF'
+    lowercase = 'abcdef'
+    return ''.join(random.choices(uppercase + lowercase + string.digits, k=32))
 
 
 class ElasticSearchStub:
@@ -1039,8 +1053,9 @@ class TestBase(unittest.TestCase):
         for param_change in param_changes:
             try:
                 obj_type = exp_param_specs[param_change.name].obj_type
-            except:
-                raise Exception('Parameter %s not found' % param_change.name)
+            except Exception as e:
+                raise Exception(
+                    'Parameter %s not found' % param_change.name) from e
             new_param_dict[param_change.name] = (
                 param_change.get_normalized_value(obj_type, new_param_dict))
         return new_param_dict
@@ -1324,6 +1339,9 @@ class TestBase(unittest.TestCase):
 
         Returns:
             bool. Whether the code raised exception in the expected format.
+
+        Raises:
+            Exception. No Regex given.
         """
         if not expected_regex:
             raise Exception(
@@ -1741,10 +1759,11 @@ class GenericTestBase(AppEngineTestBase):
 
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
-auto_tts_enabled: true
+auto_tts_enabled: false
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
+edits_allowed: true
 init_state_name: %s
 language_code: en
 objective: ''
@@ -1926,6 +1945,9 @@ title: Title
 
         Yields:
             None. Empty yield statement.
+
+        Raises:
+            Exception. Given argument is not a datetime.
         """
         if not isinstance(mocked_now, datetime.datetime):
             raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
@@ -2007,6 +2029,7 @@ title: Title
 
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
+            self.assertNotIn('<oppia-maintenance-page>', response)
 
             response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
                 'csrf_token': self.get_new_csrf_token(),
@@ -2561,10 +2584,17 @@ title: Title
         state.update_next_content_id_index(next_content_id_index_dict['value'])
 
     def save_new_valid_exploration(
-            self, exploration_id, owner_id, title='A title',
-            category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE, end_state_name=None,
-            interaction_id='TextInput', correctness_feedback_enabled=False):
+        self,
+        exploration_id: str,
+        owner_id: str,
+        title: str = 'A title',
+        category: str = 'A category',
+        objective: str = 'An objective',
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        end_state_name: Optional[str] = None,
+        interaction_id: str = 'TextInput',
+        correctness_feedback_enabled: bool = False
+    ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration.
 
         Args:
@@ -2634,6 +2664,10 @@ title: Title
 
         Returns:
             Exploration. The exploration domain object.
+
+        Raises:
+            ValueError. Given list of state names is empty.
+            ValueError. Given list of interaction ids is empty.
         """
         if not state_names:
             raise ValueError('must provide at least one state name')
@@ -2743,11 +2777,16 @@ title: Title
         return collection
 
     def save_new_valid_collection(
-            self, collection_id, owner_id, title='A title',
-            category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            exploration_id='an_exploration_id',
-            end_state_name=DEFAULT_END_STATE_NAME):
+        self,
+        collection_id: str,
+        owner_id: str,
+        title: str = 'A title',
+        category: str = 'A category',
+        objective: str = 'An objective',
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        exploration_id: str = 'an_exploration_id',
+        end_state_name: str = DEFAULT_END_STATE_NAME
+    ) -> collection_domain.Collection:
         """Creates an Oppia collection and adds a node saving the exploration
         details.
 
@@ -3551,7 +3590,7 @@ class GenericEmailTestBase(GenericTestBase):
             self.emails_dict[recipient_email].append(new_email)
         return True
 
-    def _get_sent_email_messages(self, to):
+    def _get_sent_email_messages(self, to: str) -> List[EmailMessageMock]:
         """Gets messages to a single recipient email.
 
         Args:
@@ -3641,9 +3680,8 @@ class ClassifierTestBase(GenericEmailTestBase):
             FrozenModel. Protobuf object containing classifier data.
         """
         filename = classifier_training_job.classifier_data_filename
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id)
         classifier_data = utils.decompress_from_zlib(fs.get(filename))
         classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
         classifier_data_proto.ParseFromString(classifier_data)
@@ -3768,6 +3806,10 @@ class FailingFunction(FunctionWrapper):
                 exception, before a call succeeds. If this is 0, all calls will
                 succeed, if it is FailingFunction. INFINITY, all calls will
                 fail.
+
+        Raises:
+            ValueError. The number of times to raise an exception before a call
+                succeeds should be a non-negative interger or INFINITY.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception

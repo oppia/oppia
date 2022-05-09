@@ -22,14 +22,16 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 
 angular.module('oppia').constant(
-  'FRACTION_PARSING_ERRORS', ObjectsDomainConstants.FRACTION_PARSING_ERRORS);
+  'FRACTION_PARSING_ERROR_I18N_KEYS',
+  ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS);
 
 angular.module('oppia').constant(
-  'NUMBER_WITH_UNITS_PARSING_ERRORS',
-  ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS);
+  'NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS',
+  ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS);
 
 angular.module('oppia').constant(
   'CURRENCY_UNITS', ObjectsDomainConstants.CURRENCY_UNITS);
 
 angular.module('oppia').constant(
-  'RATIO_PARSING_ERRORS', ObjectsDomainConstants.RATIO_PARSING_ERRORS);
+  'RATIO_PARSING_ERROR_I18N_KEYS',
+  ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS);

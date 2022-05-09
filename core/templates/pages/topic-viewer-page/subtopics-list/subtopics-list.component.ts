@@ -44,6 +44,10 @@ export class SubtopicsListComponent implements OnInit {
       .getTopicTranslationKey(this.topicId, TranslationKeyType.TITLE);
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   isHackyTopicNameTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(

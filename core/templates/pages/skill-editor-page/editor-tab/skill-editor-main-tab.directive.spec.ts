@@ -157,10 +157,18 @@ describe('Skill editor main tab directive', function() {
     expect(focusSpy).toHaveBeenCalled();
   });
 
-  it('should update the changes', function() {
+  it('should update the changes for misconception', function() {
     spyOn($rootScope, '$applyAsync');
 
     $scope.getMisconceptionChange();
+
+    expect($rootScope.$applyAsync).toHaveBeenCalled();
+  });
+
+  it('should update the changes for concept card', function() {
+    spyOn($rootScope, '$applyAsync');
+
+    $scope.getConceptCardChange();
 
     expect($rootScope.$applyAsync).toHaveBeenCalled();
   });

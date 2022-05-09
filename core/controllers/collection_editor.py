@@ -24,7 +24,7 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import domain_objects_validator
+from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -106,8 +106,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            domain_objects_validator.validate_collection_change)
+                        'object_class': collection_domain.CollectionChange
                     }
                 }
             }
@@ -141,7 +140,11 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         change_list = self.normalized_payload.get('change_list')
 
         collection_services.update_collection(
-            self.user_id, collection_id, change_list, commit_message)
+            self.user_id,
+            collection_id,
+            [change.to_dict() for change in change_list],
+            commit_message
+        )
 
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(

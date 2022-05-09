@@ -51,6 +51,7 @@ export class ProgressTabComponent implements OnInit {
   width: number;
   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
+
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
 

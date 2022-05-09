@@ -53,6 +53,7 @@ export class SvgEditorComponent implements OnInit {
   @Input() value: string;
   @Output() valueChanged = new EventEmitter();
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
+  @Output() discardImage = new EventEmitter();
   // These constants are used to identify the tool that is currently being
   // used so that other tools can be disabled accordingly.
   STATUS_EDITING = 'editing';
@@ -82,10 +83,12 @@ export class SvgEditorComponent implements OnInit {
     lineCounter: 0,
     shape: null
   };
+
   // These sizes are used in the strokeWidth options dropdown.
   sizes = [
     '1px', '2px', '3px', '5px', '9px', '10px', '12px',
     '14px', '18px', '24px', '30px', '36px'];
+
   // These fonts are used in the font family options dropdown.
   fontFamily = [
     'Arial',
@@ -102,6 +105,7 @@ export class SvgEditorComponent implements OnInit {
     'Plaster',
     'Engagement'
   ];
+
   // Dynamically assign a unique id to each lc editor to avoid clashes
   // when there are multiple RTEs in the same page.
   randomId = Math.floor(Math.random() * 100000).toString();
@@ -123,6 +127,7 @@ export class SvgEditorComponent implements OnInit {
     savedSvgUrl?: SafeResourceUrl | string;
     savedSvgFileName?: string;
   } = {};
+
   // The diagramStatus stores the mode of the tool that is being used.
   diagramStatus = this.STATUS_EDITING;
   displayFontStyles = false;
@@ -147,6 +152,7 @@ export class SvgEditorComponent implements OnInit {
     bold: false,
     italic: false
   };
+
   objectIsSelected = false;
   pieChartDataLimit = 10;
   groupCount = 0;
@@ -162,11 +168,13 @@ export class SvgEditorComponent implements OnInit {
     color: '#00ff00',
     angle: 0
   }];
+
   allowedImageFormats = ['svg'];
   uploadedSvgDataUrl: {
     safeUrl: SafeResourceUrl;
     unsafeUrl: string;
   } = null;
+
   loadType = 'group';
   defaultTopCoordinate = 50;
   defaultLeftCoordinate = 50;
@@ -304,7 +312,8 @@ export class SvgEditorComponent implements OnInit {
             svgDataUrl as string),
           unsafeUrl: svgDataUrl as string
         };
-        this.savedSvgDiagram = atob(svgDataUrl.split(',')[1]);
+        this.savedSvgDiagram = this._base64DecodeUnicode(
+          svgDataUrl.split(',')[1]);
       } else {
         this.svgFileFetcherBackendApiService.fetchSvg(
           this.data.savedSvgUrl as string
@@ -315,6 +324,15 @@ export class SvgEditorComponent implements OnInit {
         );
       }
     }
+  }
+
+  private _base64DecodeUnicode(base64String: string) {
+    // Coverting base64 to unicode string. This technique converts bytestream
+    // to percent-encoding, to original string.
+    // See https://stackoverflow.com/a/30106551
+    return decodeURIComponent(atob(base64String).split('').map(char => {
+      return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
   }
 
   postSvgToServer(
@@ -392,6 +410,10 @@ export class SvgEditorComponent implements OnInit {
       throw new Error(errorText);
     }
     return true;
+  }
+
+  discardSvgFile(): void {
+    this.discardImage.emit();
   }
 
   saveSvgFile(): void {
@@ -1123,7 +1145,8 @@ export class SvgEditorComponent implements OnInit {
     } else {
       this.drawMode = this.DRAW_MODE_NONE;
       if (this.uploadedSvgDataUrl !== null) {
-        var svgString = atob(this.uploadedSvgDataUrl.unsafeUrl.split(',')[1]);
+        const svgString = this._base64DecodeUnicode(
+          this.uploadedSvgDataUrl.unsafeUrl.split(',')[1]);
         fabric.loadSVGFromString(svgString, (args) => this.loadSvgFile(args));
       }
       this.canvas.renderAll();

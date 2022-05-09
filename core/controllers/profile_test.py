@@ -1308,13 +1308,31 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
             'user_is_logged_in': False
         }, json_response)
 
+    def test_set_user_has_viewed_lesson_info_modal_once_to_true(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        user_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertEqual(
+            user_settings.has_viewed_lesson_info_modal_once, False)
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json('/userinfohandler/data', {
+            'user_has_viewed_lesson_info_modal_once': True
+        }, csrf_token=csrf_token)
+
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertEqual(
+            user_settings.has_viewed_lesson_info_modal_once, True)
+
 
 class UrlHandlerTests(test_utils.GenericTestBase):
 
     def test_login_url_is_none_for_signed_in_user(self):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
-        response = self.get_json('/url_handler')
+        response = self.get_json('/url_handler?current_url=login')
         self.assertIsNone(response['login_url'])
         self.logout()
 
@@ -1324,9 +1342,10 @@ class UrlHandlerTests(test_utils.GenericTestBase):
         self.assertTrue(response['login_url'].endswith('random_url'))
 
     def test_invalid_input_exception(self):
-        response = self.get_json('/url_handler', expected_status_int=400)
+        response = self.get_json(
+            '/url_handler', expected_status_int=400)
         error = {
-            'error': 'Incomplete or empty GET parameters passed',
+            'error': 'Missing key in handler args: current_url.',
             'status_code': 400
         }
         self.assertEqual(response, error)
