@@ -771,6 +771,8 @@ describe('Conversation skin component', () => {
       .and.callFake((config, callb, questionAreAvailable) => {
         callb(displayedCard, 'label');
       });
+    spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
+      .and.returnValue(false);
     spyOn(componentInstance, 'adjustPageHeight');
     spyOn(playerPositionService.onNewCardOpened, 'emit');
     componentInstance.isIframed = true;
