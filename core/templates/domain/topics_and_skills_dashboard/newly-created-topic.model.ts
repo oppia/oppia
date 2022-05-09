@@ -46,10 +46,10 @@ export class NewlyCreatedTopic {
     let validUrlFragmentRegex = new RegExp(
       AppConstants.VALID_URL_FRAGMENT_REGEX);
     let urlFragmentCharLimit = AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
-    let titleFragMaxLimit = AppConstants.
-      MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
-    let titleFragMinLimit = AppConstants.
-      MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
+    let titleFragMaxLimit = (
+      AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
+    let titleFragMinLimit = (
+      AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
     return Boolean(
       this.name && this.description && this.urlFragment &&
       validUrlFragmentRegex.test(this.urlFragment) &&
