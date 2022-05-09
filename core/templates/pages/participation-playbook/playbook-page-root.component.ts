@@ -22,6 +22,7 @@ import { Subscription } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
+
 @Component({
   selector: 'oppia-playbook-page-root',
   templateUrl: './playbook-page-root.component.html'
