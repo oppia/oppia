@@ -425,6 +425,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         ]
         self._assert_validation_error('Duplicate rubric found')
 
+        self._assert_validation_error(
+            'Expected at least one explanation in medium level rubrics')
+
     def test_valid_rubric_difficulty(self):
         self.skill.rubrics = [skill_domain.Rubric(
             'invalid_difficulty', ['<p>Explanation</p>'])]
@@ -441,16 +444,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.rubrics[0].explanations = [0]
         self._assert_validation_error(
             'Expected each explanation to be a string')
-
-    def test_rubric_present_for_medium_difficulty(self):
-        self.skill.rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 2</p>'])
-        ]
-        self._assert_validation_error(
-            'Expected at least one explanation in medium level rubrics')
 
     def test_rubric_present_for_all_difficulties(self):
         self.skill.validate()
