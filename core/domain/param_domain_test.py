@@ -41,7 +41,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         param_spec.obj_type = 'UnicodeString'
         param_spec.validate()
 
-    def test_supported_object_types(self):
+    def test_supported_object_types_exist_in_registry(self):
         """Test the supported object types of param specs."""
 
         # Ensure that this object class exists.
