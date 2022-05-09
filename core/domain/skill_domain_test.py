@@ -427,11 +427,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation</p>']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], []),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['<p>Another Explanation</p>'])
+                constants.SKILL_DIFFICULTIES[1], [])
         ]
         self._assert_validation_error(
             'Expected at least one explanation in medium level rubrics')
