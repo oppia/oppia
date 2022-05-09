@@ -50,6 +50,7 @@ export class AdminMiscTabComponent {
   stateName: string;
   numAnswers: number;
   expId: string;
+  expIdToRollback!: string;
   topicIdForRegeneratingOpportunities: string;
   blogPostId: string;
   authorUsername: string;
@@ -62,10 +63,10 @@ export class AdminMiscTabComponent {
   ) {}
 
   clearSearchIndex(): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-    if (!this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)) {
+    if (
+      this.adminTaskManagerService.isTaskRunning() ||
+      !this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)
+    ) {
       return;
     }
 
@@ -83,10 +84,10 @@ export class AdminMiscTabComponent {
   }
 
   regenerateOpportunitiesRelatedToTopic(): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-    if (!this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)) {
+    if (
+      this.adminTaskManagerService.isTaskRunning() ||
+      !this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)
+    ) {
       return;
     }
     this.setStatusMessage.emit('Regenerating opportunities...');
@@ -95,6 +96,25 @@ export class AdminMiscTabComponent {
       this.setStatusMessage.emit(
         'No. of opportunities model created: ' +
         response);
+    }, errorResponse => {
+      this.setStatusMessage.emit('Server error: ' + errorResponse);
+    });
+  }
+
+  rollbackExploration(): void {
+    if (
+      this.adminTaskManagerService.isTaskRunning() ||
+      !this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)
+    ) {
+      return;
+    }
+    this.setStatusMessage.emit(
+      `Rollingback exploration ${this.expIdToRollback}...`);
+    this.adminBackendApiService.rollbackExplorationToSafeState(
+      this.expIdToRollback
+    ).then(response => {
+      this.setStatusMessage.emit(
+        'Exploration rolledback to version: ' + response);
     }, errorResponse => {
       this.setStatusMessage.emit('Server error: ' + errorResponse);
     });

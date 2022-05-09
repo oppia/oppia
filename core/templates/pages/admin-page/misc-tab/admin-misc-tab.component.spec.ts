@@ -229,6 +229,65 @@ describe('Admin misc tab component ', () => {
     }));
   });
 
+  describe('when clicking on rollback exploration button ', () => {
+    it('should rollback exploration successfully', fakeAsync(() => {
+      confirmSpy.and.returnValue(true);
+      let regenerateTopicSpy = spyOn(
+        adminBackendApiService, 'rollbackExplorationToSafeState')
+        .and.returnValue(Promise.resolve(10));
+
+      component.rollbackExploration();
+      tick();
+
+      expect(regenerateTopicSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Exploration rolledback to version: 10');
+    }));
+
+    it('should not rollback exploration in case of backend ' +
+      'error', fakeAsync(() => {
+      confirmSpy.and.returnValue(true);
+      let regenerateTopicSpy = spyOn(
+        adminBackendApiService, 'rollbackExplorationToSafeState')
+        .and.rejectWith('Internal Server Error.');
+
+      component.rollbackExploration();
+      tick();
+
+      expect(regenerateTopicSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Internal Server Error.');
+    }));
+
+    it('should not request backend to rollback exploration if ' +
+      'a task is still running in the queue', fakeAsync(() => {
+      confirmSpy.and.returnValue(true);
+      let regenerateTopicSpy = spyOn(
+        adminBackendApiService, 'rollbackExplorationToSafeState');
+
+      // Setting task is still running to be true.
+      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+
+      component.rollbackExploration();
+      tick();
+
+      expect(regenerateTopicSpy).not.toHaveBeenCalled();
+    }));
+
+    it('should not request backend to rollback exploration if ' +
+      'cancel button is clicked in the alert', fakeAsync(() => {
+      confirmSpy.and.returnValue(false);
+      let regenerateTopicSpy = spyOn(
+        adminBackendApiService, 'rollbackExplorationToSafeState');
+      // Setting cancel button clicked to be true.
+
+      component.rollbackExploration();
+      tick();
+
+      expect(regenerateTopicSpy).not.toHaveBeenCalled();
+    }));
+  });
+
   describe('when clicking on upload csv button ', () => {
     it('should upload csv file successfully', fakeAsync(() => {
       let uploadCsvSpy = spyOn(
