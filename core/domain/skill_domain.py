@@ -362,8 +362,9 @@ class Rubric:
                     explanation)
 
         if (
-            self.difficulty == constants.SKILL_DIFFICULTIES[1]
-            and len(self.explanations) == 0):
+                self.difficulty == constants.SKILL_DIFFICULTIES[1] and 
+                len(self.explanations) == 0
+        ):
             raise utils.ValidationError(
                 'Expected at least one explanation in medium level rubrics')
 
