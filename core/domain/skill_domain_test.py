@@ -442,6 +442,16 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected each explanation to be a string')
 
+    def test_rubric_present_for_medium_difficulty(self):
+        self.skill.rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 2</p>'])
+        ]
+        self._assert_validation_error(
+            'Expected at least one explanation in medium level rubrics')
+
     def test_rubric_present_for_all_difficulties(self):
         self.skill.validate()
         self.skill.rubrics = [
