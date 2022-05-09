@@ -32,7 +32,7 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
-# The ModelProperty class can accept `id` python property and all other
+# The ModelProperty class can accept `id` Python property and all other
 # properties that are derived from datastore_services.Property. Thus
 # to generalize the type of properties that ModelProperty can accept,
 # we defined a type variable here.
