@@ -133,16 +133,21 @@ describe('Story node editor directive', function() {
     };
 
     var MockSkillBackendApiService = {
-      fetchMultiSkillsAsync: () => {
-        var deferred = $q.defer();
-        deferred.resolve([
-          new Skill(
-            '1', 'test', [], [],
-            new ConceptCard(
-              new SubtitledHtml('', '1'), [], RecordedVoiceovers.createEmpty()),
-            'en', 1, 1, '0', true, [])
-        ]);
-        return deferred.promise;
+      fetchMultiSkillsAsync: (skillIds) => {
+        if (skillIds[0] === '2') {
+          return $q.reject();
+        } else {
+          var deferred = $q.defer();
+          deferred.resolve([
+            new Skill(
+              '1', 'test', [], [],
+              new ConceptCard(
+                new SubtitledHtml(
+                  '', '1'), [], RecordedVoiceovers.createEmpty()),
+              'en', 1, 1, '0', true, [])
+          ]);
+          return deferred.promise;
+        }
       }
     };
 
@@ -188,8 +193,16 @@ describe('Story node editor directive', function() {
     spyOn($scope, 'getPrerequisiteSkillIds').and.returnValue('1');
 
     $scope.getPrerequisiteSkillsDescription();
-
+    $rootScope.$apply();
     expect($scope.skillIdToSummaryMap).toEqual({1: 'test'});
+  });
+
+  it('should call Alerts Service if getting skill desc. fails', function() {
+    spyOn($scope, 'getPrerequisiteSkillIds').and.returnValue('2');
+    var alertsSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
+    $scope.getPrerequisiteSkillsDescription();
+    $rootScope.$apply();
+    expect(alertsSpy).toHaveBeenCalled();
   });
 
   it('should check if exploration can be saved', function() {
