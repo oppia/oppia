@@ -173,12 +173,11 @@ var ExplorationPlayerPage = function() {
     await action.click('Got It Button', gotItButton);
   };
 
-  var clickCloseLessonInfoTooltipIfPresent = async function() {
-    if (closeLessonInfoTooltipElement) {
-      await waitFor.elementToBeClickable(closeLessonInfoTooltipElement);
-      await action.click(
-        'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
-    }
+  this.clickCloseLessonInfoTooltipIfPresent = async function() {
+    await waitFor.elementToBeClickable(closeLessonInfoTooltipElement,
+      'Close Lesson Info Tooltip button takes too long to appear.');
+    await action.click(
+      'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
   };
 
   this.clickConfirmRedirectionButton = async function() {
@@ -289,9 +288,6 @@ var ExplorationPlayerPage = function() {
   // corresponding interaction's protractor utilities.
   // Its definition and type are interaction-specific.
   this.submitAnswer = async function(interactionId, answerData) {
-    // Close the lesson info tooltip modal if it is present before submitting
-    // the answer.
-    await clickCloseLessonInfoTooltipIfPresent();
     // TODO(#11969): Move this wait to interactions submitAnswer function.
     await waitFor.presenceOf(
       conversationInput, 'Conversation input takes too long to appear.');
