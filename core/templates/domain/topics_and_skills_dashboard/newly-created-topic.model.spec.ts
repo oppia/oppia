@@ -55,7 +55,9 @@ describe('Newly Created Topic Model', () => {
     expect(topic.isValid()).toBe(true);
 
     // eslint-disable-next-line max-len
-    topic.pageTitleFragment = 'testatestatestatestatestatestatestatestatestatestatestatesta';
-    expect(topic.isValid()).toBe(false);
+    topic.pageTitleFragment = (
+      'testatestatestatestatestatestatestatestatestatestatestatesta'
+    );
+    expect(topic.isValid()).toBeFalse();
   });
 });
