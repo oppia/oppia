@@ -289,6 +289,9 @@ var ExplorationPlayerPage = function() {
   // corresponding interaction's protractor utilities.
   // Its definition and type are interaction-specific.
   this.submitAnswer = async function(interactionId, answerData) {
+    // Close the lesson info tooltip modal if it is present before submitting
+    // the answer.
+    await this.clickCloseLessonInfoTooltipIfPresent();
     // TODO(#11969): Move this wait to interactions submitAnswer function.
     await waitFor.presenceOf(
       conversationInput, 'Conversation input takes too long to appear.');
