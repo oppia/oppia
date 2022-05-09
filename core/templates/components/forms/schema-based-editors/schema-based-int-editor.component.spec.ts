@@ -97,7 +97,7 @@ describe('Schema Based Int Editor Component', () => {
     expect(component.localValue).toBe(1);
   });
 
-  it('should not update value when local value not change', () => {
+  it('should not update value when local value doesn\'t change', () => {
     component.localValue = 1;
 
     expect(component.localValue).toBe(1);
