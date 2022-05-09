@@ -132,8 +132,6 @@ export class ExplorationFooterComponent {
             }
           });
 
-        this.footerIsInQuestionPlayerMode = true;
-
         // Fetching the number of checkpoints.
         this.getCheckpointCount(this.explorationId);
 
@@ -146,6 +144,7 @@ export class ExplorationFooterComponent {
         .subscribe((resultsLoaded: boolean) => {
           this.hintsAndSolutionsAreSupported = !resultsLoaded;
         });
+      this.footerIsInQuestionPlayerMode = true;
     }
   }
 
