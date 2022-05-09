@@ -60,7 +60,6 @@ describe('Schema Based Int Editor Component', () => {
     component.registerOnTouched();
 
     expect(component).toBeDefined();
-    expect(component.validate(null)).toEqual({});
     expect(component.onChange).toEqual(mockFunction);
   }));
 
@@ -87,7 +86,7 @@ describe('Schema Based Int Editor Component', () => {
   });
 
   it('should update local value', () => {
-    component.localValue = false;
+    component.localValue = 4;
 
     component.updateValue(2);
 
@@ -96,16 +95,6 @@ describe('Schema Based Int Editor Component', () => {
     component.updateValue(1);
 
     expect(component.localValue).toBe(1);
-  });
-
-  it('should update value when local value change', () => {
-    component.localValue = 1;
-
-    expect(component.localValue).toBe(1);
-
-    component.updateValue(2);
-
-    expect(component.localValue).toBe(2);
   });
 
   it('should not update value when local value not change', () => {

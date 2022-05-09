@@ -40,7 +40,7 @@ import { IdGenerationService } from 'services/id-generation.service';
 
 export class SchemaBasedDictEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
-  localValue: Object;
+  localValue: unknown;
   @Input() disabled;
   @Input() propertySchemas;
   @Input() labelForFocusTarget;
@@ -54,7 +54,7 @@ implements ControlValueAccessor, OnInit, Validator {
   constructor(private idGenerationService: IdGenerationService) { }
 
   // Implemented as a part of ControlValueAccessor interface.
-  writeValue(value: Object): void {
+  writeValue(value: unknown): void {
     this.localValue = value;
   }
 

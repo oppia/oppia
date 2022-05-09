@@ -63,7 +63,8 @@ describe('Schema validators', () => {
           return;
         }
         expect(
-          errorsReturned.hasLengthAtLeast).toBeDefined(testCase.toString());
+          errorsReturned.hasLengthAtLeast
+        ).withContext(testCase.toString()).toBeDefined();
       });
     }
     );
@@ -96,7 +97,8 @@ describe('Schema validators', () => {
           return;
         }
         expect(
-          errorsReturned.hasLengthAtMost).toBeDefined(testCase.toString());
+          errorsReturned.hasLengthAtMost
+        ).withContext(testCase.toString()).toBeDefined();
       });
     }
     );
@@ -128,7 +130,8 @@ describe('Schema validators', () => {
           return;
         }
         expect(
-          errorsReturned.isAtLeast).toBeDefined(testCase.toString());
+          errorsReturned.isAtLeast
+        ).withContext(testCase.toString()).toBeDefined();
       });
     }
     );
@@ -160,7 +163,8 @@ describe('Schema validators', () => {
           return;
         }
         expect(
-          errorsReturned.isAtMost).toBeDefined(testCase.toString());
+          errorsReturned.isAtMost
+        ).withContext(testCase.toString()).toBeDefined();
       });
     }
     );
@@ -214,7 +218,8 @@ describe('Schema validators', () => {
           throw new Error(testCase.controlValue);
         }
         expect(
-          errorsReturned.isFloat).toBeDefined(testCase.toString());
+          errorsReturned.isFloat
+        ).withContext(testCase.toString()).toBeDefined();
       });
     }
     );
@@ -241,7 +246,8 @@ describe('Schema validators', () => {
           return;
         }
         expect(
-          errorsReturned.isInteger).toBeDefined(testCase.toString());
+          errorsReturned.isInteger
+        ).withContext(testCase.toString()).toBeDefined();
       });
     }
     );
@@ -266,7 +272,8 @@ describe('Schema validators', () => {
           return;
         }
         expect(
-          errorsReturned.isNonempty).toBeDefined(testCase.toString());
+          errorsReturned.isNonempty
+        ).withContext(testCase.toString()).toBeDefined();
       });
     }
     );

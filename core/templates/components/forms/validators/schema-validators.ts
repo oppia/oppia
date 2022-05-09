@@ -151,6 +151,18 @@ export class SchemaValidators {
     };
   }
 
+  static isRegexMatched(
+      args: {regexPattern: string}
+  ): (control: AbstractControl) => ValidationErrors | null {
+    const re = new RegExp(args.regexPattern);
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (control.value === null || re.test(control.value)) {
+        return null;
+      }
+      return {isRegexMatched: 'Control Value doesn\'t match given regex'};
+    };
+  }
+
   static isUrlFragment(
       args: {charLimit: number}
   ): (control: AbstractControl) => ValidationErrors | null {

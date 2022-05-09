@@ -92,7 +92,6 @@ describe('ListOfTabsEditorComponent', () => {
     ];
 
     component.updateValue(listOfTabs);
-    component.updateValue(listOfTabs);
 
     expect(component.value).toEqual(listOfTabs);
     expect(component.valueChanged.emit).toHaveBeenCalledOnceWith(listOfTabs);

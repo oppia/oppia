@@ -20,18 +20,12 @@ import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
+import { Validator as OppiaValidator } from 'interactions/TextInput/directives/text-input-validation.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { Schema, SchemaDefaultValue, SchemaDefaultValueService } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { SchemaUndefinedLastElementService } from 'services/schema-undefined-last-element.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-
-interface OppiaValidator {
-  id: string;
-  'min_value': number;
-  'max_value': number;
-}
-
 @Component({
   selector: 'schema-based-list-editor',
   templateUrl: './schema-based-list-editor.component.html',

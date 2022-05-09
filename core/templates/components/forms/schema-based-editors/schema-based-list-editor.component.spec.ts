@@ -22,6 +22,7 @@ import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
+import { Validator as OppiaValidator } from 'interactions/TextInput/directives/text-input-validation.service';
 import { SchemaDefaultValueService } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 
@@ -67,7 +68,6 @@ describe('Schema Based List Editor Component', () => {
       {
         id: 'has_length_at_most',
         max_value: 11,
-        min_value: 3
       }
     ];
     component.localValue = ['item1'];
@@ -128,8 +128,8 @@ describe('Schema Based List Editor Component', () => {
 
     component.addElement();
 
-    let value = ['item1', 'default'];
-    expect(component.localValue).toEqual(value);
+    let expectedValue = ['item1', 'default'];
+    expect(component.localValue).toEqual(expectedValue);
   });
 
   it('should check if the item list has duplicate values or not', () => {
@@ -177,7 +177,6 @@ describe('Schema Based List Editor Component', () => {
     component.validators = [
       {
         id: 'has_length_at_least',
-        max_value: 11,
         min_value: 3
       }
     ];
@@ -185,24 +184,25 @@ describe('Schema Based List Editor Component', () => {
 
     component.ngOnInit();
 
-    let value = ['item1', 'default', 'default'];
-    expect(component.localValue).toEqual(value);
+    let expectedValue = ['item1', 'default', 'default'];
+    expect(component.localValue).toEqual(expectedValue);
   });
 
-  it('should show duplicate warning if list is unique', () => {
-    component.showDuplicatesWarning = false;
-    component.validators = [
-      {
-        id: 'is_uniquified',
-        max_value: 3,
-        min_value: 3
-      }
-    ];
+  it(
+    'should show duplicate warning flag should be enabled if ' +
+    'the validators include "is_uniquified"',
+    () => {
+      component.showDuplicatesWarning = false;
+      component.validators = [
+        {
+          id: 'is_uniquified',
+        } as unknown as OppiaValidator
+      ];
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(component.showDuplicatesWarning).toBeTrue();
-  });
+      expect(component.showDuplicatesWarning).toBeTrue();
+    });
 
   it('should hide item button if last added element is empty', () => {
     component.isAddItemButtonPresent = true;
@@ -218,8 +218,8 @@ describe('Schema Based List Editor Component', () => {
 
     component.showAddItemButton();
 
-    let value = ['item'];
-    expect(component.localValue).toEqual(value);
+    let expectedValue = ['item'];
+    expect(component.localValue).toEqual(expectedValue);
   });
 
   it('should add element on child form submission when form submission' +
@@ -230,7 +230,6 @@ describe('Schema Based List Editor Component', () => {
     component.validators = [
       {
         id: 'has_length_at_least',
-        max_value: 11,
         min_value: 3
       }
     ];
@@ -242,8 +241,8 @@ describe('Schema Based List Editor Component', () => {
 
     onChildFormSubmitEmitter.emit();
 
-    let value = ['item', 'default'];
-    expect(component.localValue).toEqual(value);
+    let expectedValue = ['item', 'default'];
+    expect(component.localValue).toEqual(expectedValue);
   });
 
   it('should remove focus from element when form submission' +
@@ -264,7 +263,7 @@ describe('Schema Based List Editor Component', () => {
     expect(element.blur).toHaveBeenCalled();
   });
 
-  it('should throw error list editor length is invalid', () => {
+  it('should throw error when list editor length is invalid', () => {
     component.len = -1;
 
     expect(() => component.ngOnInit())
@@ -283,8 +282,8 @@ describe('Schema Based List Editor Component', () => {
 
     component.setValue('item4', 1);
 
-    let value = ['item1', 'item4', 'item3'];
-    expect(component.localValue).toEqual(value);
+    const expectedValue = ['item1', 'item4', 'item3'];
+    expect(component.localValue).toEqual(expectedValue);
   });
 
   it('should not change values when html is not updated', () => {
@@ -292,7 +291,7 @@ describe('Schema Based List Editor Component', () => {
 
     component.setValue(null, 2);
 
-    let value = ['item1', 'item2', 'item3'];
-    expect(component.localValue).toEqual(value);
+    let expectedValue = ['item1', 'item2', 'item3'];
+    expect(component.localValue).toEqual(expectedValue);
   });
 });

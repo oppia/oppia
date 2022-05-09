@@ -469,7 +469,10 @@ export class ImageWithRegionsEditorComponent implements OnInit {
           }
         };
         this.value.labeledRegions.push(newRegion);
-        // Emit a new object by using the spread operator for change detection.
+        // In order to trigger change detection, we emit a new object by
+        // using the spread operator. This is because adding/modifying
+        // properties in an Object/Array doesn't always trigger
+        // change-detection cycles.
         this.valueChanged.emit({...this.value});
         this.selectedRegion = (
           this.value.labeledRegions.length - 1);
@@ -617,7 +620,10 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       this.hoveredRegion--;
     }
     this.value.labeledRegions.splice(index, 1);
-    // Emit a new object by using the spread operator for change detection.
+    // In order to trigger change detection, we emit a new object by
+    // using the spread operator. This is because adding/modifying
+    // properties in an Object/Array doesn't always trigger
+    // change-detection cycles.
     this.valueChanged.emit({...this.value});
   }
 

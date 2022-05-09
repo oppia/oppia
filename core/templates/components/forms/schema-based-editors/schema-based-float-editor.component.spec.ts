@@ -144,8 +144,7 @@ describe('Schema based float editor component', function() {
     expect(component.userIsCurrentlyTyping).toBe(true);
   }));
 
-  it('should register keyboard event when user is not typing if there' +
-    'was as an error in form then set userTyping to false', fakeAsync(() => {
+  it('should not submit form if there is an error', fakeAsync(() => {
     let evt = new KeyboardEvent('', {
       keyCode: 13
     });
@@ -160,8 +159,7 @@ describe('Schema based float editor component', function() {
     expect(component.userIsCurrentlyTyping).toBe(false);
   }));
 
-  it('should register keyboard event when user is not typing if there' +
-    'was not an error emit value', fakeAsync(() => {
+  it('should not submit form if there is an error', fakeAsync(() => {
     spyOn(schemaFormSubmittedService.onSubmittedSchemaBasedForm, 'emit')
       .and.stub();
     let evt = new KeyboardEvent('', {
@@ -181,6 +179,7 @@ describe('Schema based float editor component', function() {
   }));
 
   it('should generate error for wrong input', fakeAsync(() => {
+    expect(component.errorStringI18nKey).toBe('');
     spyOn(numericInputValidationService, 'validateNumber')
       .and.returnValue('I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
     component.localValue = null;
@@ -190,14 +189,23 @@ describe('Schema based float editor component', function() {
       .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
   }));
 
-
   it('should validate value', () => {
     component.uiConfig = null;
 
-    expect(component.validate(new FormControl(2)))
-      .toEqual({});
     expect(component.validate(new FormControl(null)))
       .toEqual({error: 'invalid'});
+    expect(component.validate(new FormControl(undefined)))
+      .toEqual({error: 'invalid'});
+    expect(component.validate(new FormControl('')))
+      .toEqual({error: 'invalid'});
+
+    const numericInputValidationServiceSpy = spyOn(
+      numericInputValidationService, 'validateNumber');
+    expect(component.validate(new FormControl(2)))
+      .toEqual({});
+    expect(numericInputValidationServiceSpy).toHaveBeenCalledWith(
+      2, false
+    );
   });
 
   it('should get current decimal separator', () => {
@@ -229,14 +237,17 @@ describe('Schema based float editor component', function() {
     component.localStringValue = '';
     component.parseInput();
     expect(component.localValue).toEqual(null);
+    expect(component.errorStringI18nKey).toEqual('');
 
     component.localStringValue = '-12';
     component.parseInput();
     expect(component.localValue).toEqual(-12);
+    expect(component.errorStringI18nKey).toEqual('');
 
     component.localStringValue = '-12e1';
     component.parseInput();
     expect(component.localValue).toEqual(-120);
+    expect(component.errorStringI18nKey).toEqual('');
 
     spyOn(validator, 'validateNumericString').and.returnValue('Error');
     component.localStringValue = '--12';
