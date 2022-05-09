@@ -67,6 +67,7 @@ def install_prerequisite(package: Tuple[str]) -> None:
             raise Exception(
                 'Error installing prerequisite %s' % package_name) from e
 
+
 # Add third_party to path. Some scripts access the scripts layer even before
 # python_libs is added to path.
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
