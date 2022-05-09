@@ -67,7 +67,8 @@ class AudioUploadHandler(base.BaseHandler):
                         'id': 'should_end_with',
                         'choices': [
                             '.' + extension for extension in list(
-                                feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
+                                feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
+                            )
                         ]
                     }]
                 }

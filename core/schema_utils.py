@@ -727,7 +727,7 @@ class _Validators:
     def should_end_with(
         obj: str,
         choices: List[str],
-        match_case: Optional[bool] = False
+        match_case: bool = False
     ) -> bool:
         """Checks if the given obj (a string) ends with any one
         of the given choices.
