@@ -137,6 +137,8 @@ angular.module('oppia').directive('storyNodeEditor', [
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
                 skillSummaries[idx].description;
             }
+            $scope.getPrerequisiteSkillsDescription();
+
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             PageTitleService.setNavbarSubtitleForMobileView(
@@ -171,8 +173,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             SkillBackendApiService.fetchMultiSkillsAsync(skills).then(
               function(response) {
                 for (var idx in response) {
-                  $scope.skillIdToSummaryMap[response[idx]._id] =
-                  response[idx]._description;
+                  $scope.skillIdToSummaryMap[response[idx].getId()] =
+                  response[idx].getDescription();
                 }
                 $rootScope.$applyAsync();
               }
@@ -469,7 +471,6 @@ angular.module('oppia').directive('storyNodeEditor', [
             );
             _init();
 
-            $scope.getPrerequisiteSkillsDescription();
             // The $timeout is required because at execution time,
             // the element may not be present in the DOM yet.Thus it ensure
             // that the element is visible before focussing.

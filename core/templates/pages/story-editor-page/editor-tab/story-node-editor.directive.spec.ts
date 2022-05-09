@@ -18,6 +18,10 @@
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
@@ -132,10 +136,11 @@ describe('Story node editor directive', function() {
       fetchMultiSkillsAsync: () => {
         var deferred = $q.defer();
         deferred.resolve([
-          {
-            _id: '1',
-            _description: 'test'
-          }
+          new Skill(
+            '1', 'test', [], [],
+            new ConceptCard(
+              new SubtitledHtml('', '1'), [], RecordedVoiceovers.createEmpty()),
+            'en', 1, 1, '0', true, [])
         ]);
         return deferred.promise;
       }
