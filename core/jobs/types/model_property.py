@@ -21,7 +21,7 @@ from __future__ import annotations
 from core.jobs import job_utils
 from core.platform import models
 
-from typing import Any, Callable, Iterator, Tuple, Type, Union, cast
+from typing import Any, Callable, Iterator, Tuple, Type, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -153,12 +153,26 @@ class ModelProperty:
         Returns:
             *. A property instance.
         """
-        # Using a cast here because the return value of getattr() method is
-        # dynamic and mypy will assume it to be Any type otherwise.
-        return cast(
-            PropertyType,
-            getattr(self._to_model_class(), self._property_name)
-        )
+        property_obj = getattr(self._to_model_class(), self._property_name)
+
+        # The behavior of `id` Python property is different during type
+        # checking and during runtime. During type checking it is considered as
+        # `Callable[]` because a Python property is decorated using Python's
+        # property class, while during runtime a Python property is considered
+        # as instance of property class. So to split the assertion in both the
+        # cases, we use `if MYPY:` clause.
+        if MYPY: # pragma: no cover
+            assert (
+                isinstance(property_obj, datastore_services.Property) and
+                callable(property_obj)
+            )
+        else:
+            assert isinstance(
+                property_obj,
+                (datastore_services.Property, property)
+            )
+
+        return property_obj
 
     def _is_repeated_property(self) -> bool:
         """Returns whether the property is repeated.
