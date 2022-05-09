@@ -169,7 +169,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.getPrerequisiteSkillsDescription = function() {
-            let skills = $scope.getPrerequisiteSkillIds();
+            const skills = $scope.getPrerequisiteSkillIds();
             SkillBackendApiService.fetchMultiSkillsAsync(skills).then(
               function(response) {
                 for (var idx in response) {
