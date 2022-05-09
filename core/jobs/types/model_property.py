@@ -160,7 +160,7 @@ class ModelProperty:
         # `Callable[]` because a Python property is decorated using Python's
         # property class, while during runtime a Python property is considered
         # as instance of property class. So to split the assertion in both the
-        # cases, we use `if MYPY:` clause.
+        # cases, we used `if MYPY:` clause here.
         if MYPY: # pragma: no cover
             assert (
                 isinstance(property_obj, datastore_services.Property) and
