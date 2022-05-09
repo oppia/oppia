@@ -48,6 +48,8 @@ import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
 import { ExplorationDataService } from '../services/exploration-data.service';
+import { ExplorationEditsAllowedBackendApiService } from '../services/exploration-edits-allowed-backend-api.service';
+import { EditabilityService } from 'services/editability.service';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
@@ -85,6 +87,8 @@ describe('Settings Tab Component', () => {
   let routerService = null;
   let settingTabBackendApiService = null;
   let ngbModal: NgbModal = null;
+  let eeabas: ExplorationEditsAllowedBackendApiService = null;
+  let editabilityService: EditabilityService = null;
 
   let testSubscriptipns = null;
   let refreshGraphSpy = null;
@@ -142,6 +146,8 @@ describe('Settings Tab Component', () => {
     mockWindowDimensionsService = {
       isWindowNarrow: () => true
     };
+    eeabas = TestBed.inject(ExplorationEditsAllowedBackendApiService);
+    editabilityService = TestBed.inject(EditabilityService);
   });
 
   beforeEach(angular.mock.module('oppia', ($provide) => {
@@ -829,6 +835,28 @@ describe('Settings Tab Component', () => {
       ctrl.toggleCorrectnessFeedback();
       expect(ctrl.isCorrectnessFeedbackEnabled()).toBe(false);
     });
+
+    it('should evaluate when edits are allowed', fakeAsync(() => {
+      spyOn(eeabas, 'setEditsAllowed').and.callFake(
+        async(unusedValue, unusedId, cb) => cb());
+      spyOn(editabilityService, 'lockExploration');
+      ctrl.enableEdits();
+      tick();
+
+      expect(editabilityService.lockExploration).toHaveBeenCalledWith(false);
+      expect(ctrl.isExplorationEditable()).toEqual(true);
+    }));
+
+    it('should evaluate when edits are not allowed', fakeAsync(() => {
+      spyOn(eeabas, 'setEditsAllowed').and.callFake(
+        async(unusedValue, unusedId, cb) => cb());
+      spyOn(editabilityService, 'lockExploration');
+      ctrl.disableEdits();
+      tick();
+
+      expect(editabilityService.lockExploration).toHaveBeenCalledWith(true);
+      expect(ctrl.isExplorationEditable()).toEqual(false);
+    }));
 
     it('should check if exploration is locked for editing', () => {
       let changeListSpy = spyOn(
