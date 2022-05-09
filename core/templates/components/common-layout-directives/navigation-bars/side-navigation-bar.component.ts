@@ -106,8 +106,8 @@ export class SideNavigationBarComponent {
   }
 
   navigateToLearnerDashboard(): void {
-    this.sidebarStatusService.closeSidebar();
     if (this.currentUrl === '/learner-dashboard') {
+      this.sidebarStatusService.closeSidebar();
       return;
     }
     this.windowRef.nativeWindow.location.href = '/learner-dashboard';
