@@ -24,6 +24,7 @@ import { RatingComputationService } from 'components/ratings/rating-computation/
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -39,7 +40,7 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
 
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
 
   // Average rating will be 'null' if the ratings are less than the
@@ -64,6 +65,7 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
     private dateTimeFormatService: DateTimeFormatService,
     private ratingComputationService: RatingComputationService,
     private urlInterpolationService: UrlInterpolationService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {
     super(ngbActiveModal);
   }
@@ -136,5 +138,9 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }

@@ -26,9 +26,12 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
   templateUrl: './help-modal.component.html',
 })
 export class HelpModalComponent implements OnInit {
-  EDITOR_TUTORIAL_MODE: string;
-  TRANSLATION_TUTORIAL_MODE: string;
-  explorationId: string;
+  EDITOR_TUTORIAL_MODE: string = 'editor';
+  TRANSLATION_TUTORIAL_MODE: string = 'translation';
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  explorationId!: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -37,8 +40,6 @@ export class HelpModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.EDITOR_TUTORIAL_MODE = 'editor';
-    this.TRANSLATION_TUTORIAL_MODE = 'translation';
     this.explorationId = (
       this.contextService.getExplorationId());
   }

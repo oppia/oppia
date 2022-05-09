@@ -9,7 +9,7 @@
     -webkit-transform: translate3d(-100%, 0, 0);
     transform: translate3d(-100%, 0, 0);
     width: 100%;
-    z-index: 100;
+    z-index: 999;
   }
   .oppia-sidebar-menu-transition {
     -webkit-transition: all 0.5s;
@@ -53,8 +53,15 @@
     padding: 1em 0 0 0;
     text-decoration: none;
   }
+  .oppia-sidebar-expandable-button:hover {
+    cursor: pointer;
+  }
+  .oppia-sidebar-expandable-button:hover,
+  .oppia-sidebar-expandable-button:focus {
+    background: rgb(243, 248, 255);
+  }
   .oppia-sidebar-menu a,
-  .oppia-sidebar-expandalbe-button {
+  .oppia-sidebar-expandable-button {
     color: #333;
     display: block;
     padding: 1em 0 1em 18px;
@@ -107,6 +114,7 @@
   .oppia-sidebar-submenu-text {
     color: #767676;
     font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
     margin-left: 26px;
     margin-right: 26px;
   }
@@ -143,6 +151,9 @@
   }
   .learn-submenu-links {
     color: #00645c;
+  }
+  .oppia-sidebar-menu .oppia-sidebar-submenu-title {
+    font-size: 16px;
   }
   .oppia-sidebar-menu span {
     font-family: "Roboto", Arial, sans-serif;
@@ -192,7 +203,7 @@
     </li>
 
     <li [ngClass]="{'active': currentUrl === '/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}'}">
-      <div (click)="togglelearnSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandalbe-button protractor-mobile-test-learn" >
+      <div (click)="togglelearnSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button protractor-mobile-test-learn" >
         <i class="material-icons oppia-sidebar-menu-icon expand-icon oppia-sidebar-menu-icon-transition"
           [ngClass]="{'oppia-sidebar-menu-icon-transition': learnSubmenuIsShown}">expand_more
         </i>
@@ -216,7 +227,7 @@
           <span>{{ 'I18N_SIDEBAR_CLASSROOM_BASIC_MATHS' | translate }}</span>
           <p class="oppia-sidebar-learn-subtext mt-2">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</p>
         </a>
-        <div *ngIf="!userIsLoggedIn && classroomData.length > 0">
+        <div *ngIf="classroomData.length > 0">
           <div *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
             <div class="submenu-notop-margin">
               <a (click)="navigateToClassroomPage('/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/' + topicSummary.getUrlFragment())">
@@ -232,8 +243,7 @@
         </div>
         <div class="submenu-notop-margin">
           <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" routerLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link">
-            <span class="learn-submenu-links" *ngIf="!userIsLoggedIn">{{ 'I18N_SIDEBAR_SUBMENU_SEE_ALL_LESSONS' | translate }}</span>
-            <span class="learn-submenu-links" *ngIf="userIsLoggedIn">See All Lessons</span>
+            <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_SEE_ALL_LESSONS' | translate }}</span>
             <i class="material-icons oppia-sidebar-menu-icon float-none learn-submenu-links">arrow_forward</i>
           </a>
         </div>
@@ -247,7 +257,7 @@
       </div>
     </li>
 
-    <li [ngClass]="{'active': currentUrl === '/about'}" class="oppia-sidebar-rows" *ngIf="!userIsLoggedIn">
+    <li [ngClass]="{'active': currentUrl === '/about'}" class="oppia-sidebar-rows">
       <a href="/about"
          [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
          class="protractor-mobile-test-about-link text-uppercase">
@@ -255,8 +265,8 @@
       </a>
     </li>
 
-    <li class="oppia-sidebar-rows" *ngIf="!userIsLoggedIn">
-      <div (click)="togglegetinvolvedSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandalbe-button">
+    <li class="oppia-sidebar-rows">
+      <div (click)="togglegetinvolvedSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button">
         <span [ngClass]="{'oppia-sidebar-submenu-toggle': getinvolvedSubmenuIsShown}" class="text-uppercase">{{ 'I18N_SIDEBAR_GET_INVOLVED' | translate }}</span>
         <i [ngClass]="{'oppia-sidebar-menu-icon-transition': getinvolvedSubmenuIsShown}" class="material-icons oppia-sidebar-menu-icon expand-icon">
           expand_more
@@ -266,35 +276,35 @@
         <div class="oppia-sidebar-submenu-upperborder">
           <a href="/partnerships" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE">
             <i class="material-icons oppia-sidebar-submenu-icon partnerships-icon">language</i>
-            <span>{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
+            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_PARTNERSHIPS_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
           <a href="/volunteer" routerLink="/volunteer">
             <i class="material-icons oppia-sidebar-submenu-icon volunteer-icon">people</i>
-            <span>{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
+            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
           <a href="/donate" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE">
             <i class="material-icons oppia-sidebar-submenu-icon donate-icon">favorite</i>
-            <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
+            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_DONATE_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
           <a href="/contact" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE">
             <i class="material-icons oppia-sidebar-submenu-icon contact-icon">email</i>
-            <span>{{ 'I18N_SIDEBAR_CONTACT_US' | translate }}</span>
+            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_CONTACT_US' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_CONTACT_US_DESCRIPTION' | translate }}</p>
           </a>
         </div>
       </div>
     </li>
 
-    <li [ngClass]="{'active': currentUrl === '/about-foundation'}" class="oppia-sidebar-rows" *ngIf="!userIsLoggedIn">
+    <li [ngClass]="{'active': currentUrl === '/about-foundation'}" class="oppia-sidebar-rows">
       <a href="/about-foundation"
          [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
          class="protractor-mobile-test-about-link text-uppercase">

@@ -56,6 +56,13 @@ class MockWindowRef {
     gtag: () => {},
     history: {
       pushState(data: object, title: string, url?: string | null) {}
+    },
+    document: {
+      body: {
+        style: {
+          overflowY: 'auto',
+        }
+      }
     }
   };
 }
@@ -281,7 +288,8 @@ describe('TopNavigationBarComponent', () => {
 
   it('should toggle side bar', () => {
     const clickEvent = new CustomEvent('click');
-    spyOn(sidebarStatusService, 'isSidebarShown').and.returnValues(false, true);
+    spyOn(sidebarStatusService, 'isSidebarShown').and.returnValues(
+      false, true, true, false, false);
     spyOn(wds, 'isWindowNarrow').and.returnValue(true);
     spyOn(sidebarStatusService, 'toggleHamburgerIconStatus');
     spyOn(clickEvent, 'stopPropagation');
@@ -290,6 +298,8 @@ describe('TopNavigationBarComponent', () => {
     component.toggleSidebar(clickEvent);
     expect(sidebarStatusService.toggleHamburgerIconStatus).toHaveBeenCalled();
     expect(component.isSidebarShown()).toBe(true);
+    component.toggleSidebar(clickEvent);
+    expect(component.isSidebarShown()).toBe(false);
   });
 
   it('should navigate to classroom page when user clicks' +
@@ -300,15 +310,6 @@ describe('TopNavigationBarComponent', () => {
     tick(151);
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
-  }));
-
-  it('should navigate to a particular page', fakeAsync(()=>{
-    expect(mockWindowRef.nativeWindow.location.href).toBe('');
-
-    component.navigateToPage('/about');
-    tick();
-
-    expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
   }));
 
   it('should registers classroom header click event when user clicks' +
@@ -553,7 +554,6 @@ describe('TopNavigationBarComponent', () => {
       spyOn(
         classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.resolveTo(classroomData);
-      spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
 
       component.ngOnInit();
 
@@ -562,8 +562,6 @@ describe('TopNavigationBarComponent', () => {
       expect(component.classroomData).toEqual(array);
       expect(component.topicTitlesTranslationKeys).toEqual(
         topicTitlesTranslationKeys);
-      expect(siteAnalyticsService.registerClassroomPageViewed)
-        .toHaveBeenCalled();
     }));
 
   it('should check whether hacky translations are displayed or not', () => {

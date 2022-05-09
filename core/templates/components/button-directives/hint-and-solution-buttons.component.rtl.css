@@ -19,19 +19,19 @@
 }
 
 .hint-box-add-ons {
-  left: 5px;
+  right: -5.5px;
 }
 
 .hint-box-add-ons .close {
-  left: -5px;
+  right: 0;
 }
 
 .hint-box-add-ons::after {
-  margin-left: -173px;
+  margin-right: 163px;
 }
 
 .hint-box-add-ons::before {
-  margin-left: -175px;
+  margin-right: 161px;
 }
 
 .hint-box {
@@ -46,11 +46,12 @@
   display: flex;
   font-size: 17px;
   height: 40px;
+  min-width: 395px;
   padding: 20px 10px 20px 10px;
   position: relative;
   text-align: center;
   white-space: nowrap;
-  width: 395px;
+  width: max-content;
   z-index: 2;
 }
 
@@ -109,21 +110,21 @@
   .hint-box-add-ons .close {
     bottom: 10px;
     font-size: 22px;
-    left: -5px;
+    right: 295px;
     margin: 0 10px;
     position: fixed;
   }
 
   .hint-box-add-ons {
-    left: -58px;
+    right: -18px;
   }
 
   .hint-box-add-ons::before {
-    margin-left: -142px;
+    margin-right: 125px;
   }
 
   .hint-box-add-ons::after {
-    margin-left: -140px;
+    margin-right: 127px;
   }
 
   .hint-box {

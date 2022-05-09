@@ -31,7 +31,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 })
 export class ResponseItemSelectionInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: string;
   @Input() choices!: string;
@@ -40,9 +40,12 @@ export class ResponseItemSelectionInputComponent implements OnInit {
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    const answer = this.htmlEscaperService.escapedJsonToObj(
+    let answer = this.htmlEscaperService.escapedJsonToObj(
       this.answer
     ) as string[];
+    if (!answer) {
+      answer = [];
+    }
     const choices = this.htmlEscaperService.escapedJsonToObj(
       this.choices
     ) as { _html: string; _contentId: string }[];

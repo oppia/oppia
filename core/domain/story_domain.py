@@ -26,7 +26,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import fs_domain
 
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -698,6 +697,31 @@ class Story:
         self.meta_tag_content = meta_tag_content
 
     @classmethod
+    def require_valid_description(cls, description):
+        """Checks whether the description is a valid string.
+
+        Args:
+            description: str. The description to be checked.
+
+        Raises:
+            ValidationError. The description is not a valid string.
+        """
+        if not isinstance(description, str):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % description)
+        if description == '':
+            raise utils.ValidationError(
+                'Expected description field not to be empty')
+
+        description_length_limit = (
+            android_validation_constants.MAX_CHARS_IN_STORY_DESCRIPTION)
+        if len(description) > description_length_limit:
+            raise utils.ValidationError(
+                'Expected description to be less than %d chars, received %s'
+                % (description_length_limit, len(description)))
+
+    @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
         """Checks whether the thumbnail filename of the story is a valid
             one.
@@ -729,11 +753,7 @@ class Story:
             ValidationError. One or more attributes of story are invalid.
         """
         self.require_valid_title(self.title)
-
-        if not isinstance(self.description, str):
-            raise utils.ValidationError(
-                'Expected description to be a string, received %s'
-                % self.description)
+        self.require_valid_description(self.description)
 
         if self.url_fragment is not None:
             utils.require_valid_url_fragment(
@@ -1076,9 +1096,7 @@ class Story:
         Returns:
             dict. The converted story_contents_dict.
         """
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_STORY, story_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)
         for index in range(len(story_contents_dict['nodes'])):
             filepath = '%s/%s' % (
                 constants.ASSET_TYPE_THUMBNAIL,
@@ -1134,9 +1152,7 @@ class Story:
         Raises:
             Exception. The subtopic with the given id doesn't exist.
         """
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_STORY, self.id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)
 
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
@@ -1327,9 +1343,7 @@ class Story:
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_STORY, self.id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)
 
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)

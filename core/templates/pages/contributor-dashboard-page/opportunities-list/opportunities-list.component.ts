@@ -26,33 +26,41 @@ import { ExplorationOpportunity } from '../opportunities-list-item/opportunities
 import constants from 'assets/constants';
 import { Subscription } from 'rxjs';
 
+type ExplorationOpportunitiesFetcherFunction = () => Promise<{
+  opportunitiesDicts: ExplorationOpportunity[];
+  more: boolean;
+}>;
+
 @Component({
   selector: 'oppia-opportunities-list',
   templateUrl: './opportunities-list.component.html',
   styleUrls: []
 })
 export class OpportunitiesListComponent {
-  @Input() loadOpportunities: () => Promise<{
-    opportunitiesDicts: ExplorationOpportunity[]; more: boolean; }>;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() loadOpportunities!: ExplorationOpportunitiesFetcherFunction;
+  @Input() loadMoreOpportunities!: ExplorationOpportunitiesFetcherFunction;
+  @Input() opportunityHeadingTruncationLength!: number;
+  @Input() opportunityType!: string;
 
-  @Input() labelRequired: boolean;
-  @Input() progressBarRequired: boolean;
-  @Input() loadMoreOpportunities;
+  @Input() labelRequired: boolean = false;
+  @Input() progressBarRequired: boolean = false;
+
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter()
   );
 
-  @Input() opportunityHeadingTruncationLength: number;
-  @Input() opportunityType: string;
 
   loadingOpportunityData: boolean = true;
-  lastPageNumber: number = 1000;
   opportunities: ExplorationOpportunity[] = [];
-  visibleOpportunities = [];
+  visibleOpportunities: ExplorationOpportunity[] = [];
   directiveSubscriptions = new Subscription();
   activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
   more: boolean = false;
+  userIsOnLastPage: boolean = true;
 
   constructor(
     private zone: NgZone,
@@ -79,13 +87,19 @@ export class OpportunitiesListComponent {
     this.directiveSubscriptions.add(
       this.contributionOpportunitiesService
         .removeOpportunitiesEventEmitter.subscribe((opportunityIds) => {
+          if (opportunityIds.length === 0) {
+            return;
+          }
           this.opportunities = this.opportunities.filter((opportunity) => {
             return opportunityIds.indexOf(opportunity.id) < 0;
           });
           this.visibleOpportunities = this.opportunities.slice(
             0, this.OPPORTUNITIES_PAGE_SIZE);
-          this.lastPageNumber = Math.ceil(
-            this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
+          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+            this.opportunities,
+            this.OPPORTUNITIES_PAGE_SIZE,
+            this.activePageNumber,
+            this.more);
         }));
   }
 
@@ -95,6 +109,7 @@ export class OpportunitiesListComponent {
 
   ngOnInit(): void {
     this.loadingOpportunityData = true;
+    this.activePageNumber = 1;
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.
@@ -103,8 +118,11 @@ export class OpportunitiesListComponent {
         this.more = more;
         this.visibleOpportunities = this.opportunities.slice(
           0, this.OPPORTUNITIES_PAGE_SIZE);
-        this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
-          this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
+        this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+          this.opportunities,
+          this.OPPORTUNITIES_PAGE_SIZE,
+          this.activePageNumber,
+          this.more);
         this.loadingOpportunityData = false;
       });
     });
@@ -124,8 +142,11 @@ export class OpportunitiesListComponent {
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
-          this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
-            this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
+          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+            this.opportunities,
+            this.OPPORTUNITIES_PAGE_SIZE,
+            pageNumber,
+            this.more);
           this.loadingOpportunityData = false;
         });
     } else {
@@ -133,6 +154,15 @@ export class OpportunitiesListComponent {
         startIndex, endIndex);
     }
     this.activePageNumber = pageNumber;
+  }
+
+  calculateUserIsOnLastPage(
+      opportunities: ExplorationOpportunity[],
+      pageSize: number,
+      activePageNumber: number,
+      moreResults: boolean): boolean {
+    const lastPageNumber = Math.ceil(opportunities.length / pageSize);
+    return activePageNumber >= lastPageNumber && !moreResults;
   }
 }
 

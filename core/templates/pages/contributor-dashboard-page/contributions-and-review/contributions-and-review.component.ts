@@ -57,15 +57,19 @@ angular.module('oppia').component('contributionsAndReview', {
   controller: [
     '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
-    'NgbModal', 'QuestionObjectFactory', 'SkillBackendApiService',
+    'NgbModal', 'QuestionObjectFactory',
+    'SkillBackendApiService', 'TranslationTopicService',
     'UrlInterpolationService', 'UserService',
-    'CORRESPONDING_DELETED_OPPORTUNITY_TEXT', 'IMAGE_CONTEXT',
+    'CORRESPONDING_DELETED_OPPORTUNITY_TEXT',
+    'DEFAULT_OPPORTUNITY_TOPIC_NAME', 'IMAGE_CONTEXT',
     function(
         $filter, $rootScope, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
-        NgbModal, QuestionObjectFactory, SkillBackendApiService,
+        NgbModal, QuestionObjectFactory,
+        SkillBackendApiService, TranslationTopicService,
         UrlInterpolationService, UserService,
-        CORRESPONDING_DELETED_OPPORTUNITY_TEXT, IMAGE_CONTEXT) {
+        CORRESPONDING_DELETED_OPPORTUNITY_TEXT,
+        DEFAULT_OPPORTUNITY_TOPIC_NAME, IMAGE_CONTEXT) {
       var ctrl = this;
       ctrl.contributions = {};
 
@@ -90,23 +94,31 @@ angular.module('oppia').component('contributionsAndReview', {
 
       var tabNameToOpportunityFetchFunction = {
         [SUGGESTION_TYPE_QUESTION]: {
-          [ctrl.TAB_TYPE_CONTRIBUTIONS]: () => {
+          [ctrl.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
             return ContributionAndReviewService
-              .getUserCreatedQuestionSuggestionsAsync();
+              .getUserCreatedQuestionSuggestionsAsync(
+                shouldResetOffset,
+                TranslationTopicService.getActiveTopicName());
           },
-          [ctrl.TAB_TYPE_REVIEWS]: () => {
+          [ctrl.TAB_TYPE_REVIEWS]: shouldResetOffset => {
             return ContributionAndReviewService
-              .getReviewableQuestionSuggestionsAsync();
+              .getReviewableQuestionSuggestionsAsync(
+                shouldResetOffset,
+                TranslationTopicService.getActiveTopicName());
           }
         },
         [SUGGESTION_TYPE_TRANSLATE]: {
-          [ctrl.TAB_TYPE_CONTRIBUTIONS]: () => {
+          [ctrl.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
             return ContributionAndReviewService
-              .getUserCreatedTranslationSuggestionsAsync();
+              .getUserCreatedTranslationSuggestionsAsync(
+                shouldResetOffset,
+                TranslationTopicService.getActiveTopicName());
           },
-          [ctrl.TAB_TYPE_REVIEWS]: () => {
+          [ctrl.TAB_TYPE_REVIEWS]: shouldResetOffset => {
             return ContributionAndReviewService
-              .getReviewableTranslationSuggestionsAsync();
+              .getReviewableTranslationSuggestionsAsync(
+                shouldResetOffset,
+                TranslationTopicService.getActiveTopicName());
           }
         }
       };
@@ -185,7 +197,7 @@ angular.module('oppia').component('contributionsAndReview', {
 
       var _showQuestionSuggestionModal = function(
           suggestion, contributionDetails, reviewable,
-          misconceptionsBySkill) {
+          misconceptionsBySkill, question) {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'question-suggestion-review.directive.html');
@@ -193,7 +205,7 @@ angular.module('oppia').component('contributionsAndReview', {
         var suggestionId = suggestion.suggestion_id;
         var authorName = suggestion.author_name;
         var questionHeader = contributionDetails.skill_description;
-        var question = QuestionObjectFactory.createFromBackendDict(
+        var question = question || QuestionObjectFactory.createFromBackendDict(
           suggestion.change.question_dict);
         var contentHtml = question.getStateData().content.html;
         var skillRubrics = contributionDetails.skill_rubrics;
@@ -233,7 +245,8 @@ angular.module('oppia').component('contributionsAndReview', {
             },
             suggestionId: function() {
               return suggestionId;
-            }
+            },
+            editSuggestionCallback: () => openQuestionSuggestionModal
           },
           controller: 'QuestionSuggestionReviewModalController'
         }).result.then(function(result) {
@@ -286,23 +299,28 @@ angular.module('oppia').component('contributionsAndReview', {
           ctrl.activeSuggestionType === suggestionType);
       };
 
+      const openQuestionSuggestionModal = function(
+          suggestionId, suggestion, reviewable, question = undefined) {
+        var contributionDetails = ctrl.contributions[suggestionId].details;
+        var skillId = suggestion.change.skill_id;
+        ContextService.setCustomEntityContext(
+          IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
+        SkillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
+          var misconceptionsBySkill = {};
+          var skill = skillDict.skill;
+          misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
+          _showQuestionSuggestionModal(
+            suggestion, contributionDetails, reviewable,
+            misconceptionsBySkill, question);
+          $rootScope.$apply();
+        });
+      };
+
       ctrl.onClickViewSuggestion = function(suggestionId) {
         var suggestion = ctrl.contributions[suggestionId].suggestion;
         var reviewable = ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS;
         if (suggestion.suggestion_type === SUGGESTION_TYPE_QUESTION) {
-          var contributionDetails = ctrl.contributions[suggestionId].details;
-          var skillId = suggestion.change.skill_id;
-          ContextService.setCustomEntityContext(
-            IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
-          SkillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
-            var misconceptionsBySkill = {};
-            var skill = skillDict.skill;
-            misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
-            _showQuestionSuggestionModal(
-              suggestion, contributionDetails, reviewable,
-              misconceptionsBySkill);
-            $rootScope.$apply();
-          });
+          openQuestionSuggestionModal(suggestionId, suggestion, reviewable);
         }
         if (suggestion.suggestion_type === SUGGESTION_TYPE_TRANSLATE) {
           const suggestionIdToContribution = {};
@@ -341,6 +359,8 @@ angular.module('oppia').component('contributionsAndReview', {
       ctrl.switchToTab = function(tabType, suggestionType) {
         ctrl.activeSuggestionType = suggestionType;
         ctrl.activeTabType = tabType;
+        ContributionAndReviewService.setActiveTabType(tabType);
+        ContributionAndReviewService.setActiveSuggestionType(suggestionType);
         ctrl.activeDropdownTabChoice = ctrl.getActiveDropdownTabChoice();
         ctrl.dropdownShown = false;
         ctrl.contributions = {};
@@ -351,20 +371,31 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.dropdownShown = !ctrl.dropdownShown;
       };
 
-      ctrl.loadContributions = function() {
+      ctrl.loadOpportunities = function() {
+        return ctrl.loadContributions(/* Param shouldResetOffset= */ true);
+      };
+
+      ctrl.loadMoreOpportunities = function() {
+        return ctrl.loadContributions(/* Param shouldResetOffset= */ false);
+      };
+
+      ctrl.loadContributions = function(shouldResetOffset) {
         if (!ctrl.activeTabType || !ctrl.activeSuggestionType) {
           return new Promise((resolve, reject) => {
             resolve({opportunitiesDicts: [], more: false});
           });
         }
-        var fetchFunction = tabNameToOpportunityFetchFunction[
+        const fetchFunction = tabNameToOpportunityFetchFunction[
           ctrl.activeSuggestionType][ctrl.activeTabType];
 
-        return fetchFunction().then(function(suggestionIdToSuggestions) {
-          ctrl.contributions = suggestionIdToSuggestions;
+        return fetchFunction(shouldResetOffset).then(function(response) {
+          Object.keys(response.suggestionIdToDetails).forEach(id => {
+            ctrl.contributions[id] = response.suggestionIdToDetails[id];
+          });
           return {
-            opportunitiesDicts: getContributionSummaries(ctrl.contributions),
-            more: false
+            opportunitiesDicts: getContributionSummaries(
+              response.suggestionIdToDetails),
+            more: response.more
           };
         });
       };
@@ -407,6 +438,8 @@ angular.module('oppia').component('contributionsAndReview', {
             enabled: true
           }
         ];
+        TranslationTopicService.setActiveTopicName(
+          DEFAULT_OPPORTUNITY_TOPIC_NAME);
 
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
@@ -443,7 +476,8 @@ angular.module('oppia').component('contributionsAndReview', {
                     suggestionType: SUGGESTION_TYPE_TRANSLATE,
                     text: 'Review Translations'
                   });
-                  userReviewableSuggestionTypes.push(SUGGESTION_TYPE_TRANSLATE);
+                  userReviewableSuggestionTypes.push(
+                    SUGGESTION_TYPE_TRANSLATE);
                 }
                 if (userReviewableSuggestionTypes.length > 0) {
                   ctrl.switchToTab(

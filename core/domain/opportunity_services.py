@@ -572,6 +572,31 @@ def get_exploration_opportunity_summaries_by_ids(ids):
     return opportunities
 
 
+def get_exploration_opportunity_summaries_by_topic_id(topic_id):
+    """Returns a list of all exploration opportunity summaries
+    with the given topic ID.
+
+    Args:
+        topic_id: str. The topic for which opportunity summaries
+            are fetched.
+
+    Returns:
+        list(ExplorationOpportunitySummary). A list of all
+        exploration opportunity summaries with the given topic ID.
+    """
+    opportunity_summaries = []
+    exp_opportunity_summary_models = (
+        opportunity_models.
+            ExplorationOpportunitySummaryModel.get_by_topic(topic_id)
+    )
+    for exp_opportunity_summary_model in exp_opportunity_summary_models:
+        opportunity_summary = (
+            get_exploration_opportunity_summary_from_model(
+                exp_opportunity_summary_model))
+        opportunity_summaries.append(opportunity_summary)
+    return opportunity_summaries
+
+
 def update_opportunities_with_new_topic_name(topic_id, topic_name):
     """Updates the exploration opportunity summary models with new topic name.
 
@@ -825,7 +850,11 @@ def _get_skill_opportunities_with_updated_question_counts(skill_ids, delta):
         if skill_opportunity_model is not None:
             skill_opportunity = get_skill_opportunity_from_model(
                 skill_opportunity_model)
-            skill_opportunity.question_count += delta
+            # The question count should never be negative. We default to 0
+            # if some operation tries to reduce question count down to a
+            # negative value.
+            skill_opportunity.question_count = max(
+                skill_opportunity.question_count + delta, 0)
             updated_skill_opportunities.append(skill_opportunity)
     return updated_skill_opportunities
 
