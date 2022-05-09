@@ -18,7 +18,9 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core import utils
+from core.domain import object_registry
 from core.domain import param_domain
 from core.tests import test_utils
 
@@ -28,11 +30,8 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
 
     def test_param_spec_validation(self):
         """Test validation of param specs."""
-        param_spec = param_domain.ParamSpec('FakeType')
-        with self.assertRaisesRegex(TypeError, 'is not a valid object class'):
-            param_spec.validate()
 
-        param_spec.obj_type = 'Real'
+        param_spec = param_domain.ParamSpec('Real')
         with self.assertRaisesRegex(
             utils.ValidationError, 'is not among the supported object types'
         ):
@@ -41,6 +40,13 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         # Restore a valid parameter spec.
         param_spec.obj_type = 'UnicodeString'
         param_spec.validate()
+
+    def test_supported_object_types_exist_in_registry(self):
+        """Test the supported object types of param specs."""
+
+        # Ensure that this object class exists.
+        for obj_type in feconf.SUPPORTED_OBJ_TYPES:
+            object_registry.Registry.get_object_class_by_type(obj_type)
 
     def test_param_change_validation(self):
         """Test validation of parameter changes."""
@@ -106,7 +112,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             'generator_id': 'Copier',
             'customization_args': {'value': '3'}
         })
-        self.assertEqual(param_change.get_normalized_value('Int', {}), 3)
+        self.assertEqual(param_change.get_value({}), '3')
 
     def test_param_change_from_dict(self):
         sample_dict = {

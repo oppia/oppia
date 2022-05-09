@@ -52,6 +52,12 @@ class ValidCmdDict(TypedDict):
     deprecated_values: Dict[str, List[str]]
 
 
+# Supported object types for ParamSpec.
+SUPPORTED_OBJ_TYPES = {
+    'UnicodeString',
+}
+
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
