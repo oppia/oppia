@@ -174,6 +174,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                   $scope.skillIdToSummaryMap[response[idx]._id] =
                   response[idx]._description;
                 }
+                $rootScope.$applyAsync();
               }
             );
           };
