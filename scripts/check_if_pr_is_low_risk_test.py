@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import builtins
 import io
+
 from core import utils
 from core.tests import test_utils
 from scripts import check_if_pr_is_low_risk
@@ -35,7 +36,7 @@ class MockResponse(io.StringIO):
             data: str. Response data.
             code: int. HTTP response code.
         """
-        io.StringIO.__init__(self, data)
+        super().__init__(self, data)
         self.code = code
 
     def getcode(self):
