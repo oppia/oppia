@@ -94,7 +94,8 @@ describe('Schema Based List Editor Component', () => {
     let value = ['item1'];
     component.writeValue(value);
 
-    expect(component.localValue).toEqual(value);
+    const expectedValue = ['item1'];
+    expect(component.localValue).toEqual(expectedValue);
   });
 
   it('should show and hide add item button', () => {
@@ -189,7 +190,24 @@ describe('Schema Based List Editor Component', () => {
   });
 
   it(
-    'should show duplicate warning flag should be enabled if ' +
+    'should not enable the showDuplicatesWarning flag when ' +
+    'the validators don\'t include "is_uniquified"',
+    () => {
+      component.showDuplicatesWarning = false;
+      component.validators = [
+        {
+          id: 'has_length_at_least',
+          min_value: 3
+        }
+      ];
+
+      component.ngOnInit();
+
+      expect(component.showDuplicatesWarning).toBeFalse();
+    });
+
+  it(
+    'should enable the showDuplicatesWarning flag when ' +
     'the validators include "is_uniquified"',
     () => {
       component.showDuplicatesWarning = false;
