@@ -105,6 +105,14 @@ export class SideNavigationBarComponent {
     });
   }
 
+  navigateToLearnerDashboard(): void {
+    this.sidebarStatusService.closeSidebar();
+    if (this.currentUrl === '/learner-dashboard') {
+      return;
+    }
+    this.windowRef.nativeWindow.location.href = '/learner-dashboard';
+  }
+
   stopclickfurther(event: Event): void {
     event.stopPropagation();
   }
