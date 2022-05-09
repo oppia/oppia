@@ -31,10 +31,6 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
     def test_param_spec_validation(self):
         """Test validation of param specs."""
 
-        # Ensure that this object class exists.
-        for obj_type in feconf.SUPPORTED_OBJ_TYPES:
-            object_registry.Registry.get_object_class_by_type(obj_type)
-
         param_spec = param_domain.ParamSpec('Real')
         with self.assertRaisesRegex(
             utils.ValidationError, 'is not among the supported object types'
@@ -44,6 +40,13 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         # Restore a valid parameter spec.
         param_spec.obj_type = 'UnicodeString'
         param_spec.validate()
+
+    def test_supported_object_types(self):
+        """Test the supported object types of param specs."""
+
+        # Ensure that this object class exists.
+        for obj_type in feconf.SUPPORTED_OBJ_TYPES:
+            object_registry.Registry.get_object_class_by_type(obj_type)
 
     def test_param_change_validation(self):
         """Test validation of parameter changes."""

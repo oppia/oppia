@@ -55,7 +55,8 @@ class ValidCmdDict(TypedDict):
 # Supported object types for ParamSpec.
 SUPPORTED_OBJ_TYPES = {
     'UnicodeString',
-    }
+}
+
 
 # Whether to unconditionally log info messages.
 DEBUG = False
