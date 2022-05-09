@@ -131,11 +131,6 @@ export class ExplorationFooterComponent {
               );
             }
           });
-
-        // Fetching the number of checkpoints.
-        this.getCheckpointCount(this.explorationId);
-
-        this.setLearnerHasViewedLessonInfoTooltip();
       }
     } catch (err) { }
 
@@ -145,6 +140,12 @@ export class ExplorationFooterComponent {
           this.hintsAndSolutionsAreSupported = !resultsLoaded;
         });
       this.footerIsInQuestionPlayerMode = true;
+    }
+
+    if (!this.footerIsInQuestionPlayerMode) {
+      // Fetching the number of checkpoints.
+      this.getCheckpointCount(this.explorationId);
+      this.setLearnerHasViewedLessonInfoTooltip();
     }
   }
 
