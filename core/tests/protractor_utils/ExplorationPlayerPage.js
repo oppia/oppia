@@ -173,7 +173,7 @@ var ExplorationPlayerPage = function() {
     await action.click('Got It Button', gotItButton);
   };
 
-  this.clickCloseLessonInfoTooltipIfPresent = async function() {
+  var clickCloseLessonInfoTooltipIfPresent = async function() {
     if (closeLessonInfoTooltipElement) {
       await waitFor.elementToBeClickable(closeLessonInfoTooltipElement);
       await action.click(
@@ -291,7 +291,7 @@ var ExplorationPlayerPage = function() {
   this.submitAnswer = async function(interactionId, answerData) {
     // Close the lesson info tooltip modal if it is present before submitting
     // the answer.
-    await this.clickCloseLessonInfoTooltipIfPresent();
+    await clickCloseLessonInfoTooltipIfPresent();
     // TODO(#11969): Move this wait to interactions submitAnswer function.
     await waitFor.presenceOf(
       conversationInput, 'Conversation input takes too long to appear.');
