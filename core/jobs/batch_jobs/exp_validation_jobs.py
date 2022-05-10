@@ -18,8 +18,10 @@
 
 from __future__ import annotations
 
-from urllib.parse import urlparse   # pylint: disable=import-only-modules
+from urllib.parse import urlparse
+from xml.etree.ElementInclude import include   # pylint: disable=import-only-modules
 
+from core.constants import constants
 from core.domain import exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -136,21 +138,47 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False))
+            | "Get exp id and states" >>  beam.Map(
+                lambda exp: (exp.id, exp.states)
+            )
+        )
+
+        total_exp_summary = (
+            self.pipeline
+            | 'Get All ExpSummaryModels' >> ndb_io.GetModels(
+                exp_models.ExpSummaryModel.get_all(include_deleted=False))  
+            | "Get exp id and status" >>  beam.Map(
+                lambda exp: (exp.id, exp.status)
+            )          
+        )
+
+        combined_model = (
+            {'states': total_explorations, 'status': total_exp_summary}
+            | 'Combine information from both models' >> beam.CoGroupByKey()
+            | 'Combine exploration title, states and status' >> beam.MapTuple(
+                lambda exp_id, exp_info: 
+                    (exp_id, exp_info['states'][0], exp_info['status'][0])
+                )
+        )
+
+        public_explorations = (
+            combined_model
+            | 'Filter public explorations' >>
+                beam.Filter(
+                    lambda exp: exp[2] == constants.ACTIVITY_STATUS_PUBLIC)
         )
 
         exp_ids_invalid_links = (
-            total_explorations
-            | 'Combine exploration title and states' >> beam.Map(
-                lambda exp: (exp.id, exp.states))
+            public_explorations            
             | 'Combine exp ids and the invalid links' >>
-                beam.MapTuple(lambda exp_id, exp_states: (
+                beam.MapTuple(lambda exp_id, exp_states, _: (
                     exp_id, self.get_invalid_links(exp_states)))
             | 'Filter exps with invalid links' >>
                 beam.Filter(lambda exp: len(exp[1]) > 0)
         )
 
         report_number_of_exps_queried = (
-            total_explorations
+            public_explorations
             | 'Report count of exp models' >> (
                 job_result_transforms.CountObjectsToJobRunResult('EXPS'))
         )
