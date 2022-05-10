@@ -91,7 +91,8 @@ class AdminHandler(base.BaseHandler):
                         'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
-                        'update_feature_flag_rules'
+                        'update_feature_flag_rules',
+                        'rollback_exploration_to_safe_state'
                     ]
                 },
                 # TODO(#13331): Remove default_value when it is confirmed that,
@@ -168,6 +169,12 @@ class AdminHandler(base.BaseHandler):
                         'type': 'object_dict',
                         'object_class': parameter_domain.PlatformParameterRule
                     }
+                },
+                'default_value': None
+            },
+            'exp_id': {
+                'schema': {
+                    'type': 'basestring'
                 },
                 'default_value': None
             }
@@ -267,6 +274,13 @@ class AdminHandler(base.BaseHandler):
                         topic_id, delete_existing_opportunities=True))
                 result = {
                     'opportunities_count': opportunities_count
+                }
+            elif action == 'rollback_exploration_to_safe_state':
+                exp_id = self.normalized_payload.get('exp_id')
+                version = (
+                    exp_services.rollback_exploration_to_safe_state(exp_id))
+                result = {
+                    'version': version
                 }
             elif action == 'update_feature_flag_rules':
                 feature_name = self.normalized_payload.get('feature_name')
