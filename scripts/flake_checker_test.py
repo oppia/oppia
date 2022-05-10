@@ -152,9 +152,9 @@ class ReportPassTests(test_utils.GenericTestBase):
             requests, 'post', mock_post, expected_args=[
                 (flake_checker.PASS_REPORT_URL,)],
             expected_kwargs=[{
-                'json': expected_payload,
-                'allow_redirects': False,
-                'headers': {
+                '_json': expected_payload,
+                '_allow_redirects': False,
+                '_headers': {
                     'report_key': flake_checker.REPORT_API_KEY
                 },
             }])
@@ -199,9 +199,9 @@ class ReportPassTests(test_utils.GenericTestBase):
             requests, 'post', mock_post, expected_args=[
                 (flake_checker.PASS_REPORT_URL,)],
             expected_kwargs=[{
-                'json': expected_payload,
-                'allow_redirects': False,
-                'headers': {
+                '_json': expected_payload,
+                '_allow_redirects': False,
+                '_headers': {
                     'report_key': flake_checker.REPORT_API_KEY
                 },
             }])
@@ -245,9 +245,9 @@ class ReportPassTests(test_utils.GenericTestBase):
             requests, 'post', mock_post, expected_args=[
                 (flake_checker.PASS_REPORT_URL,)],
             expected_kwargs=[{
-                'json': expected_payload,
-                'allow_redirects': False,
-                'headers': {
+                '_json': expected_payload,
+                '_allow_redirects': False,
+                '_headers': {
                     'report_key': flake_checker.REPORT_API_KEY,
                 },
             }])
@@ -380,9 +380,9 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             requests, 'post', mock_post, expected_args=[
                 (flake_checker.FLAKE_CHECK_AND_REPORT_URL,)],
             expected_kwargs=[{
-                'json': expected_payload,
-                'allow_redirects': False,
-                'headers': {
+                '_json': expected_payload,
+                '_allow_redirects': False,
+                '_headers': {
                     'report_key': flake_checker.REPORT_API_KEY
                 },
             }])
@@ -440,9 +440,9 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             requests, 'post', mock_post, expected_args=[
                 (flake_checker.FLAKE_CHECK_AND_REPORT_URL,)],
             expected_kwargs=[{
-                'json': expected_payload,
-                'allow_redirects': False,
-                'headers': {
+                '_json': expected_payload,
+                '_allow_redirects': False,
+                '_headers': {
                     'report_key': flake_checker.REPORT_API_KEY
                 },
             }])
@@ -490,9 +490,9 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             requests, 'post', mock_post, expected_args=[
                 (flake_checker.FLAKE_CHECK_AND_REPORT_URL,)],
             expected_kwargs=[{
-                'json': expected_payload,
-                'allow_redirects': False,
-                'headers': {
+                '_json': expected_payload,
+                '_allow_redirects': False,
+                '_headers': {
                     'report_key': flake_checker.REPORT_API_KEY,
                 },
             }])
@@ -540,9 +540,9 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             requests, 'post', mock_post, expected_args=[
                 (flake_checker.FLAKE_CHECK_AND_REPORT_URL,)],
             expected_kwargs=[{
-                'json': expected_payload,
-                'allow_redirects': False,
-                'headers': {
+                '_json': expected_payload,
+                '_allow_redirects': False,
+                '_headers': {
                     'report_key': flake_checker.REPORT_API_KEY,
                 },
             }])
@@ -593,9 +593,9 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             requests, 'post', mock_post, expected_args=[
                 (flake_checker.FLAKE_CHECK_AND_REPORT_URL,)],
             expected_kwargs=[{
-                'json': expected_payload,
-                'allow_redirects': False,
-                'headers': {
+                '_json': expected_payload,
+                '_allow_redirects': False,
+                '_headers': {
                     'report_key': flake_checker.REPORT_API_KEY,
                 },
             }])
