@@ -38,7 +38,7 @@
       <span class="protractor-test-opportunity-list-item-progress-percentage"
             *ngIf="!translationProgressBar"
             [hidden]="opportunityDataIsLoading"
-            ngbTooltip="Percentage of accepted questions for skill out of target number of questions per skill ({{constants.MAX_QUESTIONS_PER_SKILL}})">
+            ngbTooltip="Percentage of accepted questions for skill out of target number of questions per skill ({{targetNumQuestionsPerSkill}})">
         ({{ progressPercentage }})
       </span>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
