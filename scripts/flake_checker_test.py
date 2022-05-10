@@ -128,10 +128,10 @@ class ReportPassTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            _url: str,
-            _json: Dict[str, Any],
-            _allow_redirects: bool,
-            _headers: Dict[str, str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, Any],  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> None:
             pass
 
@@ -175,10 +175,10 @@ class ReportPassTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            _url: str,
-            _json: Dict[str, Any],
-            _allow_redirects: bool,
-            _headers: Dict[str, str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, Any],  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> None:
             pass
 
@@ -221,10 +221,10 @@ class ReportPassTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            _url: str,
-            _json: Dict[str, Any],
-            _allow_redirects: bool,
-            _headers: Dict[str, str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, Any],  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> NoReturn:
             raise requests.HTTPError()
 
@@ -262,10 +262,10 @@ class ReportPassTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            _url: str,
-            _json: Dict[str, Any],
-            _allow_redirects: bool,
-            _headers: Dict[str, str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, Any],  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> NoReturn:
             raise AssertionError('requests.post called.')
 
@@ -288,10 +288,10 @@ class ReportPassTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            _url: str,
-            _json: Dict[str, Any],
-            _allow_redirects: bool,
-            _headers: Dict[str, str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, Any],  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> NoReturn:
             raise AssertionError('requests.post called.')
 
@@ -346,10 +346,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            _url: str,
-            _json: Dict[str, Any],
-            _allow_redirects: bool,
-            _headers: Dict[str, str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, Any],  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             response: ResponseDict = {
                 'log': ['log1', 'log2'],
@@ -406,10 +406,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            _url: str,
-            _json: Dict[str, Any],
-            _allow_redirects: bool,
-            _headers: Dict[str, str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, Any],  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             response: ResponseDict = {
                 'log': ['log1', 'log2'],
@@ -465,10 +465,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            _url: str,
-            _json: Dict[str, Any],
-            _allow_redirects: bool,
-            _headers: Dict[str, str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, Any],  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> NoReturn:
             raise requests.HTTPError()
 
@@ -515,10 +515,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            _url: str,
-            _json: Dict[str, Any],
-            _allow_redirects: bool,
-            _headers: Dict[str, str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, Any],  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             return MockResponse(False, None)
 
@@ -565,10 +565,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            _url: str,
-            _json: Dict[str, Any],
-            _allow_redirects: bool,
-            _headers: Dict[str, str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, Any],  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             # TODO(#13059): After we fully type the codebase we plan to get
             # rid of the tests that intentionally test wrong inputs that we
