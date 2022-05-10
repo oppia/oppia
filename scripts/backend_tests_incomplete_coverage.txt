@@ -1,10 +1,7 @@
 extensions.interactions.base_test
 core.controllers.domain_objects_validator_test
-core.constants_test
-core.controllers.reader_test
 core.controllers.tasks_test
 core.controllers.voice_artist_test
-core.domain.role_services_test
 core.domain.suggestion_registry_test
 core.controllers.feedback_test
 core.domain.topic_domain_test
@@ -12,7 +9,6 @@ core.domain.rights_manager_test
 core.domain.story_domain_test
 core.domain.stats_services_test
 core.domain.value_generators_domain_test
-core.domain.interaction_registry_test
 core.domain.auth_services_test
 core.domain.opportunity_services_test
 core.domain.feedback_domain_test

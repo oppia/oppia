@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for error page root.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PageTitleService } from 'services/page-title.service';
 import { ErrorPageRootComponent } from './error-page-root.component';
@@ -36,10 +38,18 @@ class MockWindowRef {
   };
 }
 
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
+
 describe('Error page root component', () => {
   let fixture: ComponentFixture<ErrorPageRootComponent>;
   let componentInstance: ErrorPageRootComponent;
   let pageTitleService: PageTitleService;
+  let translateService: TranslateService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -49,6 +59,10 @@ describe('Error page root component', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -59,13 +73,48 @@ describe('Error page root component', () => {
     fixture = TestBed.createComponent(ErrorPageRootComponent);
     componentInstance = fixture.componentInstance;
     pageTitleService = TestBed.inject(PageTitleService);
+    translateService = TestBed.inject(TranslateService);
     fixture.detectChanges();
   });
 
   it('should initialize', () => {
-    spyOn(pageTitleService, 'setDocumentTitle');
+    spyOn(translateService.onLangChange, 'subscribe');
     componentInstance.ngOnInit();
-    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
     expect(componentInstance.statusCode).toEqual('401');
+  });
+
+  it('should obtain translated page title whenever the selected' +
+  'language changes', () => {
+    componentInstance.ngOnInit();
+    spyOn(componentInstance, 'setPageTitle');
+    translateService.onLangChange.emit();
+
+    expect(componentInstance.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should set new page title', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    componentInstance.statusCode = '404';
+    componentInstance.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_ERROR_PAGE_ROOT_BROWSER_TAB_TITLE', {
+        statusCode: '404',
+      });
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_ERROR_PAGE_ROOT_BROWSER_TAB_TITLE');
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    componentInstance.directiveSubscriptions.add(
+      translateService.onLangChange.subscribe(() => {
+        componentInstance.setPageTitle();
+      })
+    );
+    componentInstance.ngOnDestroy();
+
+    expect(componentInstance.directiveSubscriptions.closed).toBe(true);
   });
 });

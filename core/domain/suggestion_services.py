@@ -652,8 +652,7 @@ def get_reviewable_translation_suggestion_target_ids(user_id):
         list(str). A list of target IDs of the translation suggestions that the
         supplied user can review.
     """
-    contribution_rights = user_services.get_user_contribution_rights(
-        user_id)
+    contribution_rights = user_services.get_user_contribution_rights(user_id)
     language_codes = (
         contribution_rights.can_review_translation_for_language_codes)
     in_review_translation_suggestions = (

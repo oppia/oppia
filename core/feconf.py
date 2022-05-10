@@ -52,6 +52,12 @@ class ValidCmdDict(TypedDict):
     deprecated_values: Dict[str, List[str]]
 
 
+# Supported object types for ParamSpec.
+SUPPORTED_OBJ_TYPES = {
+    'UnicodeString',
+}
+
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
@@ -563,7 +569,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.4'
+OPPIA_VERSION = '3.2.5'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -1547,10 +1553,6 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
-
-# This represents a literal constant for All and is used whereever
-# we need to compare a value with value All (for example, all topics)
-ALL_LITERAL_CONSTANT = 'All'
 
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is

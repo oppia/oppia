@@ -143,7 +143,8 @@ export class ContributionOpportunitiesBackendApiService {
   async fetchTranslationOpportunitiesAsync(
       languageCode: string, topicName: string, cursor: string):
     Promise<TranslationContributionOpportunities> {
-    topicName = (topicName === 'All') ? '' : topicName;
+    topicName = (
+      topicName === constants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName);
 
     const params = {
       language_code: languageCode,
@@ -199,10 +200,12 @@ export class ContributionOpportunitiesBackendApiService {
   async fetchReviewableTranslationOpportunitiesAsync(
       topicName: string
   ): Promise<FetchReviewableTranslationOpportunitiesResponse> {
+    const topicNameParam = (
+      topicName === constants.TOPIC_SENTINEL_NAME_ALL ? null : topicName);
     return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(
       '/getreviewableopportunitieshandler', {
         params: {
-          topic_name: topicName
+          topic_name: topicNameParam
         }
       }).toPromise().then(data => {
       const opportunities = data.opportunities.map(
@@ -230,11 +233,11 @@ export class ContributionOpportunitiesBackendApiService {
     }
   }
 
-  async fetchAllTopicNamesAsync():
+  async fetchTranslatableTopicNamesAsync():
   Promise<string[]> {
     try {
       const response = await this.http
-        .get<TopicNamesBackendDict>('/getalltopicnames').toPromise();
+        .get<TopicNamesBackendDict>('/gettranslatabletopicnames').toPromise();
       response.topic_names.unshift('All');
 
       return response.topic_names;

@@ -532,6 +532,32 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         }
         self.assertEqual(user_data, expected_data)
 
+    def test_export_when_commit_message_contains_user_id(self) -> None:
+        version_model = TestVersionedModel(id='version_model')
+        model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
+            'model_id-1', 'committer_id', 'create',
+            'Test uid_abcdefghijabcdefghijabcdefghijab', None)
+        model1.update_timestamps()
+        model1.put()
+        model2 = version_model.SNAPSHOT_METADATA_CLASS.create(
+            'model_id-2', 'committer_id', 'create', 'Hi this is a commit.',
+            [{'cmd': 'some_command'}, {'cmd2': 'another_command'}])
+        model2.update_timestamps()
+        model2.put()
+        user_data = (
+            version_model.SNAPSHOT_METADATA_CLASS.export_data('committer_id'))
+        expected_data = {
+            'model_id-1': {
+                'commit_type': 'create',
+                'commit_message': 'Test <user ID>',
+            },
+            'model_id-2': {
+                'commit_type': 'create',
+                'commit_message': 'Hi this is a commit.',
+            }
+        }
+        self.assertEqual(user_data, expected_data)
+
 
 class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
 

@@ -5899,6 +5899,10 @@ export default {
   // page.
   "OPPORTUNITIES_PAGE_SIZE": 10,
 
+  // Represents the string value indicating "All topics" in the Contributor
+  // Dashboard topic selector.
+  "TOPIC_SENTINEL_NAME_ALL": "All",
+
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
 

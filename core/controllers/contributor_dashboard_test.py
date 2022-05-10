@@ -413,8 +413,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL),
                 expected_status_int=404)
 
-    def test_get_reviewable_translation_opportunities_with_in_review_suggestions( # pylint: disable=line-too-long
-            self):
+    def test_get_reviewable_translation_opportunities_returns_in_review_suggestions( # pylint: disable=line-too-long
+        self
+    ):
         # Create a translation suggestion for exploration 0.
         change_dict = {
             'cmd': 'add_translation',
@@ -439,7 +440,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['opportunities'], [self.expected_opportunity_dict_1])
 
-    def test_get_reviewable_translation_opportunities_with_all_topic_name(self):
+    def test_get_reviewable_translation_opportunities_with_null_topic_name(
+        self
+    ):
         # Create a translation suggestion for exploration 0.
         change_dict = {
             'cmd': 'add_translation',
@@ -457,7 +460,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'All'})
+            params={'topic_name': None})
 
         # Should return all available reviewable opportunities.
         self.assertEqual(
@@ -479,7 +482,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400)
 
     def test_get_reviewable_translation_opportunities_returns_opportunities_in_story_order( # pylint: disable=line-too-long
-            self):
+        self
+    ):
         # Create new explorations 10, 20, 30.
         exp_10 = self.save_new_valid_exploration(
             '10',
@@ -596,12 +600,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 expected_opportunity_dict_30])
 
         # Update story node order to explorations 10 -> 30 -> 20.
-        story.update_node_destination_node_ids(
-            'node_1', ['node_3'])
-        story.update_node_destination_node_ids(
-            'node_2', [])
-        story.update_node_destination_node_ids(
-            'node_3', ['node_2'])
+        story.update_node_destination_node_ids('node_1', ['node_3'])
+        story.update_node_destination_node_ids('node_2', [])
+        story.update_node_destination_node_ids('node_3', ['node_2'])
         story_services.save_new_story(self.owner_id, story)
         topic_services.publish_story(topic_id, story.id, self.admin_id)
 
@@ -1113,11 +1114,11 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
         )
 
 
-class AllTopicNamesHandlerTest(test_utils.GenericTestBase):
-    """Test for the AllTopicNamesHandler."""
+class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
+    """Test for the TranslatableTopicNamesHandler."""
 
     def setUp(self):
-        super(AllTopicNamesHandlerTest, self).setUp()
+        super(TranslatableTopicNamesHandlerTest, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -1126,8 +1127,8 @@ class AllTopicNamesHandlerTest(test_utils.GenericTestBase):
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-    def test_get_all_topic_names(self):
-        response = self.get_json('/getalltopicnames')
+    def test_get_translatable_topic_names(self):
+        response = self.get_json('/gettranslatabletopicnames')
         self.assertEqual(
             response,
             {'topic_names': []}
@@ -1145,9 +1146,14 @@ class AllTopicNamesHandlerTest(test_utils.GenericTestBase):
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
+
+        # Unpublished topics should not be returned.
+        response = self.get_json('/gettranslatabletopicnames')
+        self.assertEqual(len(response['topic_names']), 0)
+
         topic_services.publish_topic(topic_id, self.admin_id)
 
-        response = self.get_json('/getalltopicnames')
+        response = self.get_json('/gettranslatabletopicnames')
         self.assertEqual(
             response,
             {'topic_names': ['topic']}
