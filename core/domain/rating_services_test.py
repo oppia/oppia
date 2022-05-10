@@ -208,8 +208,6 @@ class RatingServicesTests(test_utils.GenericTestBase):
             """Assign None to exploration summary ratings."""
             exp_summary_model = exp_models.ExpSummaryModel.get(exp_id)
 
-            # Ruling out the possibility of None for mypy type checking.
-            assert exp_summary_model is not None
             exp_summary_model.ratings = None
             return exp_summary_model
 

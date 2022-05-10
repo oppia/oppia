@@ -38,7 +38,8 @@ from typing import ( # isort:skip
     Type,
     Union,
     TypeVar,
-    cast
+    cast,
+    overload
 )
 
 SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
@@ -262,6 +263,21 @@ class BaseModel(datastore_services.Model):
         not match their field name.
         """
         return {}
+
+    @overload
+    @classmethod
+    def get(
+        cls: Type[SELF_BASE_MODEL],
+        entity_id: str,
+    ) -> SELF_BASE_MODEL: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls: Type[SELF_BASE_MODEL],
+        entity_id: str,
+        strict: bool = False
+    ) -> Optional[SELF_BASE_MODEL]: ...
 
     @classmethod
     def get(
@@ -1417,8 +1433,10 @@ class VersionedModel(BaseModel):
             instances.append(reconstituted_model)
         return instances
 
+    # Here, the signature of get method is different from the get method in
+    # superclass. Thus to avoid MyPy error, we used ignore here.
     @classmethod
-    def get(
+    def get(  # type: ignore[override]
             cls: Type[SELF_VERSIONED_MODEL],
             entity_id: str,
             strict: bool = True,
