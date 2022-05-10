@@ -61,9 +61,6 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       StoryUpdateService.addStoryNode($scope.story, $scope.title);
       $scope.correctnessFeedbackDisabled = false;
       $scope.categoryNotDefault = false;
-      $scope.categoryNotDefaultString = 'The category ' +
-        'of this exploration is invalid. Curated lessons need to have their ' +
-        'category to be one of the default categories.';
     };
 
     $scope.init();
@@ -152,7 +149,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
                 return;
               }
               $scope.correctnessFeedbackDisabled = false;
-              ExplorationIdValidationService.categoryNotDefault(
+              ExplorationIdValidationService.isCategoryNotDefault(
                 $scope.explorationId).then(
                 (categoryNotDefault) => {
                   if (categoryNotDefault) {
@@ -163,6 +160,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
                   $scope.categoryNotDefault = false;
                   $scope.updateTitle();
                   $scope.updateExplorationId();
+                  $scope.$applyAsync();
                 });
             });
         });

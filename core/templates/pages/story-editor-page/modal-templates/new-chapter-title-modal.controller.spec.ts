@@ -245,7 +245,7 @@ describe('Create New Chapter Modal Controller', function() {
     const correctnessFeedbackSpy =
       spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled');
     const categorySpy =
-      spyOn(explorationIdValidationService, 'categoryNotDefault');
+      spyOn(explorationIdValidationService, 'isCategoryNotDefault');
     $scope.save();
     $rootScope.$apply();
     expect($scope.invalidExpId).toEqual(true);
@@ -299,7 +299,7 @@ describe('Create New Chapter Modal Controller', function() {
         .and.returnValue(deferred.promise);
       var deferred2 = $q.defer();
       deferred2.resolve(false);
-      spyOn(explorationIdValidationService, 'categoryNotDefault')
+      spyOn(explorationIdValidationService, 'isCategoryNotDefault')
         .and.returnValue(deferred2.promise);
       const updateExplorationIdSpy = spyOn($scope, 'updateExplorationId');
       const updateTitleSpy = spyOn($scope, 'updateTitle');

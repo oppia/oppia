@@ -26,8 +26,8 @@ describe('Exploration id validation service', () => {
   let explorationIdValidationService:
     ExplorationIdValidationService;
   let httpTestingController: HttpTestingController;
-  let validExpResults1: ExplorationSummaryBackendDict;
-  let validExpResults2: ExplorationSummaryBackendDict;
+  let validExpResultsWithCustomCategory: ExplorationSummaryBackendDict;
+  let validExpResultsWithDefaultCategory: ExplorationSummaryBackendDict;
   let successHandler: jasmine.Spy<jasmine.Func>;
   let failHandler: jasmine.Spy<jasmine.Func>;
 
@@ -46,7 +46,7 @@ describe('Exploration id validation service', () => {
   });
 
   beforeEach(() => {
-    validExpResults1 = {
+    validExpResultsWithCustomCategory = {
       summaries: [{
         id: '0',
         num_views: 0,
@@ -74,7 +74,7 @@ describe('Exploration id validation service', () => {
         num_open_threads: 0
       } as ExplorationSummaryDict]
     };
-    validExpResults2 = {
+    validExpResultsWithDefaultCategory = {
       summaries: [{
         id: '1',
         num_views: 0,
@@ -169,7 +169,7 @@ describe('Exploration id validation service', () => {
     const req = httpTestingController
       .expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush(validExpResults1);
+    req.flush(validExpResultsWithCustomCategory);
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(true);
@@ -215,11 +215,11 @@ describe('Exploration id validation service', () => {
         'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
         '&' + 'include_private_explorations=false';
 
-    explorationIdValidationService.categoryNotDefault(explorationIds[0])
+    explorationIdValidationService.isCategoryNotDefault(explorationIds[0])
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush(validExpResults2);
+    req.flush(validExpResultsWithDefaultCategory);
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(false);
@@ -233,11 +233,11 @@ describe('Exploration id validation service', () => {
         'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
         '&' + 'include_private_explorations=false';
 
-    explorationIdValidationService.categoryNotDefault(explorationIds[0])
+    explorationIdValidationService.isCategoryNotDefault(explorationIds[0])
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush(validExpResults1);
+    req.flush(validExpResultsWithCustomCategory);
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(true);

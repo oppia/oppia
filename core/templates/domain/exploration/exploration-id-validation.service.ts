@@ -30,13 +30,13 @@ import constants from 'assets/constants';
 })
 export class ExplorationIdValidationService {
   constructor(
-    private explorationSummartBackendApiService:
+    private explorationSummaryBackendApiService:
       ExplorationSummaryBackendApiService,
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService) {}
 
   async isExpPublishedAsync(explorationId: string): Promise<boolean> {
-    return this.explorationSummartBackendApiService.
+    return this.explorationSummaryBackendApiService.
       loadPublicExplorationSummariesAsync([explorationId]).then(
         (response: ExplorationSummaryBackendDict) => {
           let summaries = response.summaries;
@@ -52,8 +52,8 @@ export class ExplorationIdValidationService {
         });
   }
 
-  async categoryNotDefault(explorationId: string): Promise<boolean> {
-    return this.explorationSummartBackendApiService
+  async isCategoryNotDefault(explorationId: string): Promise<boolean> {
+    return this.explorationSummaryBackendApiService
       .loadPublicExplorationSummariesAsync([explorationId]).then(
         (response: ExplorationSummaryBackendDict) => {
           let summaries = response.summaries;
