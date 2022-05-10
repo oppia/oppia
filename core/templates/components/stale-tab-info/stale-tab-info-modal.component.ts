@@ -24,6 +24,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './stale-tab-info-modal.component.html',
 })
 export class StaleTabInfoModalComponent {
+  entity: string;
+
   constructor(
     private ngbActiveModal: NgbActiveModal
   ) {}

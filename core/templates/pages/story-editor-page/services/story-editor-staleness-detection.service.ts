@@ -19,16 +19,16 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { StaleTabInfoModalComponent } from '../modal-templates/stale-tab-info-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { StalenessDetectionService } from 'services/staleness-detection.service';
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 import { StoryEditorStateService } from './story-editor-state.service';
-import { UnsavedChangesStatusInfoModalComponent } from '../modal-templates/unsaved-changes-status-info-modal.component';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { FaviconService } from 'services/favicon.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { StaleTabInfoModalComponent } from 'components/stale-tab-info/stale-tab-info-modal.component';
+import { UnsavedChangesStatusInfoModalComponent } from 'components/unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -79,6 +79,7 @@ export class StoryEditorStalenessDetectionService {
           StaleTabInfoModalComponent, {
             backdrop: 'static',
           });
+        modalRef.componentInstance.entity = 'story';
         modalRef.result.then(() => {
           this.windowRef.nativeWindow.location.reload();
         }, () => {});
@@ -100,6 +101,7 @@ export class StoryEditorStalenessDetectionService {
           UnsavedChangesStatusInfoModalComponent, {
             backdrop: 'static',
           });
+        this.unsavedChangesWarningModalRef.componentInstance.entity = 'story';
         this.unsavedChangesWarningModalRef.result.then(() => {}, () => {});
       } else {
         if (this.unsavedChangesWarningModalRef) {

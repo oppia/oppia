@@ -23,5 +23,7 @@ import { Component } from '@angular/core';
   templateUrl: './unsaved-changes-status-info-modal.component.html',
 })
 export class UnsavedChangesStatusInfoModalComponent {
+  entity: string;
+
   constructor() {}
 }
