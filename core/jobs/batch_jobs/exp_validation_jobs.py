@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from core.domain import exp_fetchers
+from core.domain import opportunity_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -111,10 +112,9 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
             bool. Returns True if exploration is curated.
         """
         with datastore_services.get_ndb_context():
-            opportunity_model = (
-                opportunity_models.ExplorationOpportunitySummaryModel.get(
-                    exploration.id, strict=False))
-        return opportunity_model is not None
+            return (
+                opportunity_services.is_exploration_available_for_contribution(
+                    exploration.id))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of details of explorations which are invalid.
