@@ -229,20 +229,23 @@ describe('Topic editor functionality', function() {
       await topicEditorPage.saveTopic('Rearranged skills');
     });
 
+  it('should show the stale tab info modal', async function() {
+    await topicEditorPage.openEditorInNewTab(topicId);
+    await general.switchToTab(0);
+    await topicEditorPage.changeTopicName('new topic name');
+    await topicEditorPage.saveTopic('Changed topic name.');
+    await general.switchToTab(1);
+    await topicEditorPage.expectStaleTabInfoModalToBeVisible();
+  });
+
   it(
-    'should show the stale tab and presence of unsaved changes info modals',
+    'should show unsaved changes status info modal',
     async function() {
       await topicEditorPage.openEditorInNewTab(topicId);
       await general.switchToTab(0);
-      await topicEditorPage.addSubtopic(
-        'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
-        'Subtopic content');
+      await topicEditorPage.changeTopicName('new topic name');
       await general.switchToTab(1);
       await topicEditorPage.expectUnsavedChangesStatusInfoModalToBeVisible();
-      await general.switchToTab(0);
-      await topicEditorPage.saveTopic('Added subtopic.');
-      await general.switchToTab(1);
-      await topicEditorPage.expectStaleTabInfoModalToBeVisible();
     });
 
   afterEach(async function() {
