@@ -336,6 +336,7 @@ def save_original_and_compressed_versions_of_image(
         fs.commit(
             micro_image_filepath, micro_image_content, mimetype=mimetype)
 
+
 # TODO(#15451): Add stubs for protobuf once we have enough info regarding
 # protobuf's library.
 # The argument classifier_data_proto can accept instances of
