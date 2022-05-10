@@ -31,9 +31,9 @@ export class NewlyCreatedTopic {
    * @param {String} pageTitleFragment - page title fragment of the topic.
    */
   constructor(
-      name: string, 
+      name: string,
       description: string,
-      urlFragment: string, 
+      urlFragment: string,
       pageTitleFragment: string
   ) {
     this.name = name;
