@@ -229,23 +229,19 @@ describe('Topic editor functionality', function() {
       await topicEditorPage.saveTopic('Rearranged skills');
     });
 
-  it('should show the stale tab info modal', async function() {
-    await topicEditorPage.openEditorInNewTab(topicId);
-    await general.switchToTab(0);
-    await topicEditorPage.changeTopicName('new topic name');
-    await topicEditorPage.saveTopic('Changed topic name.');
-    await general.switchToTab(1);
-    await topicEditorPage.expectStaleTabInfoModalToBeVisible();
-  });
-
   it(
-    'should show unsaved changes status info modal',
+    'should show stale tab and unsaved changes status info modals',
     async function() {
       await topicEditorPage.openEditorInNewTab(topicId);
-      await general.switchToTab(0);
+      var handles = await browser.getAllWindowHandles();
+      await browser.switchTo().window(handles[handles.length - 2]);
       await topicEditorPage.changeTopicName('new topic name');
-      await general.switchToTab(1);
+      await browser.switchTo().window(handles[handles.length - 1]);
       await topicEditorPage.expectUnsavedChangesStatusInfoModalToBeVisible();
+      await browser.switchTo().window(handles[handles.length - 2]);
+      await topicEditorPage.saveTopic('Changed topic name.');
+      await browser.switchTo().window(handles[handles.length - 1]);
+      await topicEditorPage.expectStaleTabInfoModalToBeVisible();
     });
 
   afterEach(async function() {
