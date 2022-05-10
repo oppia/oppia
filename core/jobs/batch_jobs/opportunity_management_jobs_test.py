@@ -408,11 +408,12 @@ class GenerateExplorationOpportunitySummariesJobTests(
             next_subtopic_id=1,
             language_code='cs',
             url_fragment='topic',
-            page_title_fragment_for_web='fragm',
             canonical_story_references=[{
                 'story_id': self.STORY_1_ID,
                 'story_is_published': False
-            }])
+            }],
+            page_title_fragment_for_web='fragm'
+            )
         self.topic_model.update_timestamps()
         topic_rights_model = self.create_model(
             topic_models.TopicRightsModel, id=self.TOPIC_1_ID)
@@ -592,11 +593,12 @@ class GenerateExplorationOpportunitySummariesJobTests(
             next_subtopic_id=1,
             language_code='cs',
             url_fragment='topic',
-            page_title_fragment_for_web='fragm',
             canonical_story_references=[{
                 'story_id': self.STORY_2_ID,
                 'story_is_published': False
-            }])
+            }],
+            page_title_fragment_for_web='fragm'
+            )
         topic_model.update_timestamps()
         topic_rights_model = self.create_model(
             topic_models.TopicRightsModel, id=self.TOPIC_2_ID)
@@ -746,11 +748,12 @@ class GenerateExplorationOpportunitySummariesJobTests(
             next_subtopic_id=1,
             language_code='cs',
             url_fragment='topic',
-            page_title_fragment_for_web='fragm',
             canonical_story_references=[{
                 'story_id': self.STORY_2_ID,
                 'story_is_published': False
-            }])
+            }],
+            page_title_fragment_for_web='fragm',
+            )
         topic_model.update_timestamps()
         topic_rights_model = self.create_model(
             topic_models.TopicRightsModel, id=self.TOPIC_2_ID)

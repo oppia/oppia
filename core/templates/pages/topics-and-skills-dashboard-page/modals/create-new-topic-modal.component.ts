@@ -45,8 +45,8 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
 
   topicUrlFragmentExists: boolean = false;
   topicNameExists: boolean = false;
-  max_web_title_frag = constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
-  min_web_title_frag = constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
+  maxWebTitleFrag = constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
+  minWebTitleFrag = constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
 
   constructor(
     private contextService: ContextService,
