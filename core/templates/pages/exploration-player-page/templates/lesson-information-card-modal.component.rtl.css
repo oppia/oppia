@@ -20,8 +20,8 @@
 .oppia-lesson-info-card-authors .authors-dropdown-menu {
   border: 0;
   margin: 0;
-  max-height: 50px;
-  max-width: 350px;
+  max-height: 100px;
+  max-width: 440px;
   min-width: 269px;
   overflow-y: auto;
   padding-top: 2px;
