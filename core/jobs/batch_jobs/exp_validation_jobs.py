@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from urllib.parse import urlparse
-from xml.etree.ElementInclude import include   # pylint: disable=import-only-modules
+from urllib.parse import urlparse # pylint: disable=import-only-modules
 
 from core.constants import constants
 from core.domain import exp_fetchers
@@ -138,7 +137,7 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False))
-            | "Get exp id and states" >>  beam.Map(
+            | 'Get exp id and states' >> beam.Map(
                 lambda exp: (exp.id, exp.states)
             )
         )
@@ -146,17 +145,17 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
         total_exp_summary = (
             self.pipeline
             | 'Get All ExpSummaryModels' >> ndb_io.GetModels(
-                exp_models.ExpSummaryModel.get_all(include_deleted=False))  
-            | "Get exp id and status" >>  beam.Map(
+                exp_models.ExpSummaryModel.get_all(include_deleted=False))
+            | 'Get exp id and status' >> beam.Map(
                 lambda exp: (exp.id, exp.status)
-            )          
+            )
         )
 
         combined_model = (
             {'states': total_explorations, 'status': total_exp_summary}
             | 'Combine information from both models' >> beam.CoGroupByKey()
             | 'Combine exploration title, states and status' >> beam.MapTuple(
-                lambda exp_id, exp_info: 
+                lambda exp_id, exp_info:
                     (exp_id, exp_info['states'][0], exp_info['status'][0])
                 )
         )
@@ -169,7 +168,7 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
         )
 
         exp_ids_invalid_links = (
-            public_explorations            
+            public_explorations
             | 'Combine exp ids and the invalid links' >>
                 beam.MapTuple(lambda exp_id, exp_states, _: (
                     exp_id, self.get_invalid_links(exp_states)))

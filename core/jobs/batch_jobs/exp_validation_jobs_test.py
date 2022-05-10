@@ -152,6 +152,17 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
             },
         )
 
+        self.exp_1_summary = self.create_model(
+            exp_models.ExpSummaryModel,
+            id=self.EXPLORATION_ID_1,
+            title='title',
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            community_owned=True
+        )
+
         # This is an valid model.
         self.exp_2 = self.create_model(
             exp_models.ExplorationModel,
@@ -172,11 +183,22 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
             states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_2},
         )
 
+        self.exp_2_summary = self.create_model(
+            exp_models.ExpSummaryModel,
+            id=self.EXPLORATION_ID_2,
+            title='title',
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            community_owned=True
+        )
+
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is([])
 
     def test_run_with_single_valid_model(self) -> None:
-        self.put_multi([self.exp_2])
+        self.put_multi([self.exp_2, self.exp_2_summary])
         self.assert_job_output_is(
             [job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1')]
         )
@@ -188,7 +210,7 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
                          'mailto:example@example.com']
         error_string = str(invalid_links)[:1401] + '... truncated'
 
-        self.put_multi([self.exp_1])
+        self.put_multi([self.exp_1, self.exp_1_summary])
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
@@ -207,7 +229,9 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
                          'mailto:example@example.com']
         error_string = str(invalid_links)[:1401] + '... truncated'
 
-        self.put_multi([self.exp_1, self.exp_2])
+        self.put_multi(
+            [self.exp_1, self.exp_1_summary, self.exp_2, self.exp_2_summary]
+            )
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 2'),
