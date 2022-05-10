@@ -736,13 +736,13 @@ describe('ExplorationFooterComponent', () => {
     component.setLearnerHasViewedLessonInfoTooltip();
     tick();
 
-    expect(component.learnerHasViewedLessonInfoTooltip).toBeFalse();
+    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeFalse();
   }));
 
   it('should correctly mark lesson info tooltip as viewed', () => {
-    expect(component.learnerHasViewedLessonInfoTooltip).toBeFalse();
+    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeFalse();
     component.learnerHasViewedLessonInfo();
-    expect(component.learnerHasViewedLessonInfoTooltip).toBeTrue();
+    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeTrue();
   });
 
   it('should show hints when initialized in question player when user is' +

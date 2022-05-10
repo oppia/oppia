@@ -278,6 +278,10 @@ export class ExplorationFooterComponent {
     this.editableExplorationBackendApiService
       .recordLearnerHasViewedLessonInfoModalOnce();
   }
+
+  hasLearnerHasViewedLessonInfoTooltip(): boolean {
+    return this.learnerHasViewedLessonInfoTooltip;
+  }
 }
 
 angular.module('oppia').directive('oppiaExplorationFooter',
