@@ -67,8 +67,6 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-return-to-parent-button'));
   var correctFeedbackElement = element(
     by.css('.protractor-test-correct-feedback'));
-  var closeLessonInfoTooltipElement = element(by.css(
-    '.protractor-test-close-lesson-info-tooltip'));
 
   var feedbackPopupLink =
     element(by.css('.protractor-test-exploration-feedback-popup-link'));
@@ -171,16 +169,6 @@ var ExplorationPlayerPage = function() {
   var clickGotItButton = async function() {
     await waitFor.elementToBeClickable(gotItButton);
     await action.click('Got It Button', gotItButton);
-  };
-
-  this.clickCloseLessonInfoTooltipIfPresent = async function() {
-    if (await closeLessonInfoTooltipElement.isPresent()) {
-      await waitFor.elementToBeClickable(
-        closeLessonInfoTooltipElement,
-        'Close Lesson Info Tooltip takes too long to appear');
-      await action.click(
-        'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
-    }
   };
 
   this.clickConfirmRedirectionButton = async function() {
