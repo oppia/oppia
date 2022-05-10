@@ -16,8 +16,11 @@
  * @fileoverview Component for the classroom page.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
@@ -36,7 +39,8 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
   selector: 'oppia-classroom-page',
   templateUrl: './classroom-page.component.html'
 })
-export class ClassroomPageComponent {
+export class ClassroomPageComponent implements OnDestroy {
+  directiveSubscriptions = new Subscription();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -58,7 +62,8 @@ export class ClassroomPageComponent {
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -78,8 +83,8 @@ export class ClassroomPageComponent {
           classroomData.getName());
         this.classroomNameTranslationKey = this.i18nLanguageCodeService.
           getClassroomTranslationKey(this.classroomDisplayName);
-        this.pageTitleService.setDocumentTitle(
-          `Learn ${this.classroomDisplayName} with Oppia | Oppia`);
+        this.setPageTitle();
+        this.subscribeToOnLangChange();
         this.loaderService.hideLoadingScreen();
         this.classroomBackendApiService.onInitializeTranslation.emit();
         this.siteAnalyticsService.registerClassroomPageViewed();
@@ -95,6 +100,22 @@ export class ClassroomPageComponent {
         null, 'classroom', AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT);
       this.ngOnInit();
     });
+  }
+
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_CLASSROOM_PAGE_TITLE', {
+        classroomName: this.classroomDisplayName
+      });
+    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -113,6 +134,10 @@ export class ClassroomPageComponent {
         this.classroomNameTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 

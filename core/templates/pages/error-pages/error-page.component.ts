@@ -16,8 +16,10 @@
  * @fileoverview Component for the error page.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -28,15 +30,30 @@ import { PageTitleService } from 'services/page-title.service';
   templateUrl: './error-page.component.html',
   styleUrls: []
 })
-export class ErrorPageComponent implements OnInit {
+export class ErrorPageComponent implements OnInit, OnDestroy {
   @Input() statusCode: string;
+  directiveSubscriptions = new Subscription();
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private pageTitleService: PageTitleService) {}
+    private pageTitleService: PageTitleService,
+    private translateService: TranslateService
+  ) {}
 
   ngOnInit(): void {
-    this.pageTitleService.setDocumentTitle(
-      'Error ' + this.statusCode + ' - Oppia');
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_ERROR_PAGE_TITLE', {
+        statusCode: this.statusCode
+      }
+    );
+    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -45,6 +62,10 @@ export class ErrorPageComponent implements OnInit {
 
   getStatusCode(): number {
     return Number(this.statusCode);
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 
