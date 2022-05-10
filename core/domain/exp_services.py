@@ -46,7 +46,7 @@ from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
-from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import opportunity_services
@@ -62,9 +62,14 @@ from core.domain import user_services
 from core.platform import models
 
 datastore_services = models.Registry.import_datastore_services()
-(exp_models, feedback_models, user_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
-])
+(base_models, exp_models, feedback_models, user_models) = (
+    models.Registry.import_models([
+        models.NAMES.base_model,
+        models.NAMES.exploration,
+        models.NAMES.feedback,
+        models.NAMES.user
+    ])
+)
 
 # Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
@@ -306,9 +311,8 @@ def export_to_zip_file(exploration_id, version=None):
         else:
             zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         html_string_list = exploration.get_all_html_content_strings()
         image_filenames = (
             html_cleaner.get_image_filenames_from_html_strings(
@@ -1502,9 +1506,8 @@ def save_new_exploration_from_yaml_and_assets(
     # images. So we need to have images in the datastore before we could
     # perform the migration.
     for (asset_filename, asset_content) in assets_list:
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         fs.commit(asset_filename, asset_content)
 
     exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)
@@ -1904,6 +1907,7 @@ def get_user_exploration_data(
         'is_version_of_draft_valid': is_valid_draft_version,
         'draft_changes': draft_changes,
         'email_preferences': exploration_email_preferences.to_dict(),
+        'edits_allowed': exploration.edits_allowed
     }
 
     return editor_dict
@@ -2057,3 +2061,20 @@ def get_interaction_id_for_state(exp_id, state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
+
+def set_exploration_edits_allowed(exp_id, edits_are_allowed):
+    """Toggled edits allowed field in the exploration.
+
+    Args:
+        exp_id: str. The ID of the exp.
+        edits_are_allowed: boolean. Whether exploration edits are allowed.
+    """
+    exploration_model = exp_models.ExplorationModel.get(exp_id)
+    exploration_model.edits_allowed = edits_are_allowed
+    # Updating the edits_allowed field in an exploration should not result in a
+    # version update. So put_multi is used instead of a commit.
+    base_models.BaseModel.update_timestamps_multi([exploration_model])
+    base_models.BaseModel.put_multi([exploration_model])
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exp_id])
