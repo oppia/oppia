@@ -145,9 +145,9 @@ def report_pass(suite_name: str) -> None:
     }
     try:
         requests.post(
-            PASS_REPORT_URL, _json=payload,
-            _allow_redirects=False,
-            _headers={'report_key': REPORT_API_KEY})
+            PASS_REPORT_URL, json=payload,
+            allow_redirects=False,
+            headers={'report_key': REPORT_API_KEY})
     except REQUEST_EXCEPTIONS as e:
         _print_color_message((
             'Failed to contact E2E test logging server at %s.'
@@ -171,9 +171,9 @@ def is_test_output_flaky(
     response = None
     try:
         response = requests.post(
-            FLAKE_CHECK_AND_REPORT_URL, _json=payload,
-            _allow_redirects=False,
-            _headers={'report_key': REPORT_API_KEY})
+            FLAKE_CHECK_AND_REPORT_URL, json=payload,
+            allow_redirects=False,
+            headers={'report_key': REPORT_API_KEY})
     except REQUEST_EXCEPTIONS as e:
         _print_color_message((
             'Failed to contact E2E test logging server at %s.'
