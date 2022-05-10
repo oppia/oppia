@@ -69,9 +69,7 @@ import { SkillConceptCardEditorComponent } from './editor-tab/skill-concept-card
     DeleteWorkedExampleComponent,
     SkillRubricsEditorComponent,
     AddMisconceptionModalComponent,
-    SkillMisconceptionsEditorComponent,
-    StaleTabInfoModalComponent,
-    UnsavedChangesStatusInfoModalComponent
+    SkillMisconceptionsEditorComponent
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
@@ -87,9 +85,7 @@ import { SkillConceptCardEditorComponent } from './editor-tab/skill-concept-card
     DeleteWorkedExampleComponent,
     SkillRubricsEditorComponent,
     AddMisconceptionModalComponent,
-    SkillMisconceptionsEditorComponent,
-    StaleTabInfoModalComponent,
-    UnsavedChangesStatusInfoModalComponent
+    SkillMisconceptionsEditorComponent
   ],
   providers: [
     {
@@ -118,8 +114,6 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
-import { StaleTabInfoModalComponent } from './modal-templates/stale-tab-info-modal.component';
-import { UnsavedChangesStatusInfoModalComponent } from './modal-templates/unsaved-changes-status-info-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
