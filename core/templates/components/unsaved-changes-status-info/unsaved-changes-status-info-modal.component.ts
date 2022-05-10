@@ -13,22 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for stale tab information component.
+ * @fileoverview Component for unsaved changes status information modal.
  */
 
 import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'oppia-stale-tab-info-modal',
-  templateUrl: './stale-tab-info-modal.component.html',
+  selector: 'oppia-unsaved-changes-status-info-modal',
+  templateUrl: './unsaved-changes-status-info-modal.component.html',
 })
-export class StaleTabInfoModalComponent {
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {}
+export class UnsavedChangesStatusInfoModalComponent {
+  entity: string;
 
-  closeModal(): void {
-    this.ngbActiveModal.close();
-  }
+  constructor() {}
 }

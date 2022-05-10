@@ -63,9 +63,7 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     CreateNewSubtopicModalComponent,
     DeleteStoryModalComponent,
     TopicEditorSendMailComponent,
-    TopicEditorSaveModalComponent,
-    StaleTabInfoModalComponent,
-    UnsavedChangesStatusInfoModalComponent
+    TopicEditorSaveModalComponent
   ],
   entryComponents: [
     ChangeSubtopicAssignmentModalComponent,
@@ -77,9 +75,7 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     CreateNewSubtopicModalComponent,
     DeleteStoryModalComponent,
     TopicEditorSendMailComponent,
-    TopicEditorSaveModalComponent,
-    StaleTabInfoModalComponent,
-    UnsavedChangesStatusInfoModalComponent
+    TopicEditorSaveModalComponent
   ],
   providers: [
     {
@@ -107,8 +103,6 @@ class TopicEditorPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
-import { StaleTabInfoModalComponent } from './modal-templates/stale-tab-info-modal.component';
-import { UnsavedChangesStatusInfoModalComponent } from './modal-templates/unsaved-changes-status-info-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
