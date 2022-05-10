@@ -218,7 +218,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_get_translation_opportunity_data(self):
         response = self.get_json(
             '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={'language_code': 'hi'})
+            params={'language_code': 'hi', 'topic_name': 'topic'})
 
         self.assertEqual(
             response['opportunities'], [

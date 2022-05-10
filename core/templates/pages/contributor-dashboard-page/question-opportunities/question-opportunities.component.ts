@@ -67,13 +67,13 @@ angular.module('oppia').component('questionOpportunities', {
     'ContributionOpportunitiesService', 'NgbModal',
     'QuestionObjectFactory', 'QuestionUndoRedoService',
     'SiteAnalyticsService', 'UrlInterpolationService',
-    'UserService',
+    'UserService', 'MAX_QUESTIONS_PER_SKILL',
     function(
         $rootScope, $uibModal, AlertsService, ContextService,
         ContributionOpportunitiesService, NgbModal,
         QuestionObjectFactory, QuestionUndoRedoService,
         SiteAnalyticsService, UrlInterpolationService,
-        UserService) {
+        UserService, MAX_QUESTIONS_PER_SKILL) {
       const ctrl = this;
       let userIsLoggedIn = false;
       let allOpportunities = [];
@@ -84,17 +84,14 @@ angular.module('oppia').component('questionOpportunities', {
           const opportunity = opportunities[index];
           const heading = opportunity.getOpportunityHeading();
           const subheading = opportunity.getOpportunitySubheading();
-          // See issue #15431 for more details.
-          const targetNumQuestionsPerSkill = 10;
           const progressPercentage = (
-            (opportunity.getQuestionCount() / targetNumQuestionsPerSkill) *
+            (opportunity.getQuestionCount() / MAX_QUESTIONS_PER_SKILL) *
             100).toFixed(2);
           var opportunityDict = {
             id: opportunity.id,
             heading: heading,
             subheading: subheading,
             progressPercentage: progressPercentage,
-            targetNumQuestionsPerSkill: targetNumQuestionsPerSkill,
             actionButtonTitle: 'Suggest Question',
           };
           allOpportunities[opportunityDict.id] = opportunityDict;
