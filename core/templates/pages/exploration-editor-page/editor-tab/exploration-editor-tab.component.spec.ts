@@ -745,6 +745,11 @@ describe('Exploration editor tab component', function() {
     expect(ctrl.startTutorial).toHaveBeenCalled();
   });
 
+  it('should check if exploration is editable', () => {
+    spyOn(editabilityService, 'isEditable').and.returnValue(true);
+    expect(ctrl.isEditable()).toBe(true);
+  });
+
   it('should not start tutorial if not in tutorial mode on page load', () => {
     spyOn(ctrl, 'startTutorial');
     editabilityService.onEndTutorial();

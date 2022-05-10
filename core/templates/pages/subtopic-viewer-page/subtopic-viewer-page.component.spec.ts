@@ -17,11 +17,13 @@
  */
 
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TranslateService } from '@ngx-translate/core';
 
 import { PageTitleService } from 'services/page-title.service';
 import { ReadOnlySubtopicPageData } from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 import { SubtopicViewerPageComponent } from './subtopic-viewer-page.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { LoaderService } from 'services/loader.service';
@@ -29,8 +31,14 @@ import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
 
 describe('Subtopic viewer page', function() {
   let component: SubtopicViewerPageComponent;
@@ -43,6 +51,7 @@ describe('Subtopic viewer page', function() {
   let urlService: UrlService;
   let loaderService: LoaderService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let translateService: TranslateService;
 
   let topicName = 'Topic Name';
   let topicId = '123abcd';
@@ -115,6 +124,10 @@ describe('Subtopic viewer page', function() {
         SubtopicViewerBackendApiService,
         UrlService,
         WindowDimensionsService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -132,6 +145,7 @@ describe('Subtopic viewer page', function() {
       SubtopicViewerBackendApiService);
     urlService = TestBed.inject(UrlService);
     loaderService = TestBed.inject(LoaderService);
+    translateService = TestBed.inject(TranslateService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
@@ -143,8 +157,7 @@ describe('Subtopic viewer page', function() {
 
   it('should succesfully get subtopic data and set context with next subtopic' +
   ' card', fakeAsync(() => {
-    spyOn(pageTitleService, 'setDocumentTitle');
-    spyOn(pageTitleService, 'updateMetaTag');
+    spyOn(component, 'subscribeToOnLangChange');
     spyOn(contextService, 'setCustomEntityContext');
     spyOn(contextService, 'removeCustomEntityContext');
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
@@ -185,12 +198,42 @@ describe('Subtopic viewer page', function() {
       component.isHackySubtopicTitleTranslationDisplayed();
     expect(hackySubtopicTitleTranslationIsDisplayed).toBe(true);
     expect(contextService.setCustomEntityContext).toHaveBeenCalled();
-    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
-    expect(pageTitleService.updateMetaTag).toHaveBeenCalled();
+    expect(component.subscribeToOnLangChange).toHaveBeenCalled();
 
     component.ngOnDestroy();
     expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
   }));
+
+  it('should obtain translated title and set it whenever the ' +
+    'selected language changes', () => {
+    component.subscribeToOnLangChange();
+    spyOn(component, 'setPageTitle');
+    translateService.onLangChange.emit();
+
+    expect(component.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should set page title', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    component.subtopicTitle = subtopicTitle;
+    component.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_SUBTOPIC_VIEWER_PAGE_TITLE', {
+        subtopicTitle: 'Subtopic Title'
+      });
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_SUBTOPIC_VIEWER_PAGE_TITLE');
+  });
+
+  it('should unsubscribe upon component destruction', () => {
+    component.subscribeToOnLangChange();
+    expect(component.directiveSubscriptions.closed).toBe(false);
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.closed).toBe(true);
+  });
 
   it('should succesfully get subtopic data with prev subtopic card',
     fakeAsync(() => {
