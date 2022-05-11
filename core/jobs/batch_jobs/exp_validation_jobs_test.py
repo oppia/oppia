@@ -206,9 +206,9 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
     def test_run_with_single_invalid_model(self) -> None:
 
         long_link = 'http:' + 'a' * 1400 + '.com'
-        invalid_links = ['None', long_link,
-                         'mailto:example@example.com']
-        error_string = str(invalid_links)[:1401] + '... truncated'
+        invalid_links = [('Introduction', long_link), ('end', None),
+                         ('end', 'mailto:example@example.com')]
+        error_string = str(invalid_links)[:1401] + '...[Truncated]...'
 
         self.put_multi([self.exp_1, self.exp_1_summary])
         self.assert_job_output_is(
@@ -225,9 +225,9 @@ class GetExpsWithInvalidURLJobTests(job_test_utils.JobTestBase):
     def test_run_with_mixed_models(self) -> None:
 
         long_link = 'http:' + 'a' * 1400 + '.com'
-        invalid_links = ['None', long_link,
-                         'mailto:example@example.com']
-        error_string = str(invalid_links)[:1401] + '... truncated'
+        invalid_links = [('Introduction', long_link), ('end', None),
+                         ('end', 'mailto:example@example.com')]
+        error_string = str(invalid_links)[:1401] + '...[Truncated]...'
 
         self.put_multi(
             [self.exp_1, self.exp_1_summary, self.exp_2, self.exp_2_summary]
