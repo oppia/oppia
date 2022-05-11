@@ -70,7 +70,7 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
 
     def get_invalid_links(
         self, dictionary: Dict[str, str]
-        ) -> List[Tuple[str, str]]:
+    ) -> List[Tuple[str, str]]:
         """Returns list of invalid links
 
             Returns:
