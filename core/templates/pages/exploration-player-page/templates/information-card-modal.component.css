@@ -53,6 +53,8 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  display: flex;
+  flex-direction: column-reverse;
   height: 300px;
   padding: 20px;
   position: relative;
@@ -72,9 +74,9 @@
   bottom: 0;
   color: white;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  margin: 12px 0;
+  margin: 12px 0 0 0;
   padding: 0;
-  position: absolute;
+  position: relative;
 }
 
 .oppia-info-card-bg-image {
@@ -161,4 +163,8 @@
 
 .oppia-info-card-community-editable-icon {
   color: #009688;
+}
+
+.learn-info-card-star {
+  margin-right: 5px
 }

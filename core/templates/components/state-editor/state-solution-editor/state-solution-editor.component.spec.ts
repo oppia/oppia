@@ -225,8 +225,10 @@ describe('State Solution Editor Component', () => {
   it('should check if in editable tutorial mode or not', () => {
     spyOn(editabilityService, 'isEditableOutsideTutorialMode')
       .and.returnValue(true);
+    spyOn(editabilityService, 'isEditable')
+      .and.returnValue(true);
 
-    expect(component.isEditableOutsideTutorialMode()).toBeTrue();
+    expect(component.isEditable()).toBeTrue();
   });
 
   it('should return the saved solution', () => {
