@@ -133,9 +133,9 @@ FIREBASE_EMULATOR_CACHE_DIR = (
     os.path.join(CURR_DIR, os.pardir, 'firebase_emulator_cache'))
 
 sys.path.insert(0, PY_GITHUB_PATH)
-MYPY = False
 # By specifying this condition, we are importing the below module only while
 # type checking, not in runtime.
+MYPY = False
 if MYPY:  # pragma: no cover
     import github
 
