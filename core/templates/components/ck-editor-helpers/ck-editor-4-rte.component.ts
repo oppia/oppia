@@ -126,7 +126,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // Initializing this properly won't work as Angular will overwrite the
     // value after it has been initialized.
     // Since string methods are used on value variable, so it can't be null or
-    // undefined.
+    // undefined. When we move to reactive forms, this won't be a problem.
+    // TODO(#15458): Change the ternary statement to "let value = this.value".
     let value = this.value ? this.value : '';
     // Refer to the note at the top of the file for the reason behind replace.
     value = value.replace(

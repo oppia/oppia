@@ -90,6 +90,7 @@ implements ControlValueAccessor, OnInit, Validator {
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
+    // TODO(#15458): Move template driven validation into code.
     if (this._validate(control.value, this.uiConfig)) {
       return {};
     }

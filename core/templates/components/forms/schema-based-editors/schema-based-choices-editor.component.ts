@@ -62,7 +62,7 @@ implements ControlValueAccessor, OnInit, Validator {
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
-    // TODO(sll): Validate each choice against the schema.
+    // TODO(#15458): Validate each choice against the schema.
     return {};
   }
 

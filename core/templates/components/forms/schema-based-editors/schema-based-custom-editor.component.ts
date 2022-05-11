@@ -66,6 +66,11 @@ implements ControlValueAccessor, Validator {
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
+    // The validation is currently handled by the apply-validation directive.
+    // But to wire up the forms using NgModel, we implement this interface.
+    // But when we move to reactive forms, the validate function will not
+    // return empty object.
+    // TODO(#15458): Move template driven validation into code.
     return {};
   }
 
