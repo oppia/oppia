@@ -371,6 +371,12 @@ class Rubric:
                 raise utils.ValidationError(
                     'Explanation should be less than or equal to 300 chars, '
                     'received %d chars' % len(explanation))
+        if (
+                self.difficulty == constants.SKILL_DIFFICULTIES[1] and
+                len(self.explanations) == 0
+        ):
+            raise utils.ValidationError(
+                'Expected at least one explanation in medium level rubrics')
 
 
 class WorkedExample:
