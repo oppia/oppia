@@ -20,7 +20,8 @@ from __future__ import annotations
 
 from core.domain import html_cleaner
 from core.tests import test_utils
-from typing import Any, Dict, List, Tuple
+from typing import List, Tuple
+from typing_extensions import Final
 
 
 class HtmlCleanerUnitTests(test_utils.GenericTestBase):
@@ -156,7 +157,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
     """Test the RTE component extractor."""
 
     def test_get_rte_components(self) -> None:
-        test_data = (
+        test_data: Final = (
             '<p>Test text&nbsp;'
             '<oppia-noninteractive-math '
             'math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;qu'
@@ -177,7 +178,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-video><br></p>'
         )
 
-        expected_components: List[Dict[str, Any]] = [
+        expected_components: Final = [
             {
                 'customization_args': {
                     'text-with-value': u'Link"quoted text"\'singlequotes\'',
@@ -206,14 +207,16 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             }
         ]
 
-        components = html_cleaner.get_rte_components(test_data)
+        components: List[html_cleaner.ComponentsDict] = (
+            html_cleaner.get_rte_components(test_data)
+        )
 
         self.assertEqual(len(components), len(expected_components))
         for component in components:
             self.assertIn(component, expected_components)
 
     def test_get_image_filenames_from_html_strings(self) -> None:
-        html_strings = [
+        html_strings: Final = [
             '<oppia-noninteractive-image '
             'filepath-with-value="&quot;img.svg&quot;" caption-with-value='
             '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'

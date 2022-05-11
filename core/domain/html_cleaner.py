@@ -28,6 +28,14 @@ from core.domain import rte_component_registry
 import bleach
 import bs4
 from typing import Any, Dict, List
+from typing_extensions import Final, TypedDict
+
+
+class ComponentsDict(TypedDict):
+    """Dictionary that represents RTE Components."""
+
+    id: str
+    customization_args: Dict[str, Any]
 
 
 def filter_a(tag: str, name: str, value: str) -> bool:
@@ -58,7 +66,7 @@ def filter_a(tag: str, name: str, value: str) -> bool:
     return False
 
 
-ATTRS_WHITELIST = {
+ATTRS_WHITELIST: Final = {
     'a': filter_a,
     'b': [],
     'blockquote': [],
@@ -150,7 +158,7 @@ def get_image_filenames_from_html_strings(html_strings: List[str]) -> List[str]:
     return list(set(filenames))
 
 
-def get_rte_components(html_string: str) -> List[Dict[str, Any]]:
+def get_rte_components(html_string: str) -> List[ComponentsDict]:
     """Extracts the RTE components from an HTML string.
 
     Args:
@@ -162,7 +170,7 @@ def get_rte_components(html_string: str) -> List[Dict[str, Any]]:
         - id: str. The name of the component, i.e. 'oppia-noninteractive-link'.
         - customization_args: dict. Customization arg specs for the component.
     """
-    components: List[Dict[str, Any]] = []
+    components: List[ComponentsDict] = []
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     oppia_custom_tag_attrs = (
         rte_component_registry.Registry.get_tag_list_with_attrs())  # type: ignore[no-untyped-call]
@@ -170,12 +178,12 @@ def get_rte_components(html_string: str) -> List[Dict[str, Any]]:
         component_tags = soup.find_all(name=tag_name)
         for component_tag in component_tags:
             component = {'id': tag_name}
-            customization_args = {}
+            customization_args: Dict[str, Any] = {}
             for attr in tag_attrs:
                 # Unescape special HTML characters such as '&quot;'.
                 attr_val = html.unescape(component_tag[attr])
                 customization_args[attr] = json.loads(attr_val)
 
             component['customization_args'] = customization_args
-            components.append(component)
+            components.append(component)   # type: ignore[arg-type]
     return components
