@@ -56,7 +56,7 @@ class GetExpsWithInvalidURLJob(base_jobs.JobBase):
 
     def extract_cards_info(
         self, dictionary: Dict[str, str]
-        ) -> List[Tuple[str, Dict[str, str]]]:
+    ) -> List[Tuple[str, Dict[str, str]]]:
         """Returns list of tuples
 
             Returns:
