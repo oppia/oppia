@@ -182,7 +182,7 @@ implements ControlValueAccessor, OnInit, Validator {
       this.numericInputValidationService.validateNumber(
         this.localValue,
         this.checkRequireNonnegativeInputValue,
-        this.currentDecimalSeparator()));
+        this.getCurrentDecimalSeparator()));
   }
 
   onKeypress(evt: KeyboardEvent): void {
@@ -202,7 +202,7 @@ implements ControlValueAccessor, OnInit, Validator {
     }
   }
 
-  currentDecimalSeparator(): string {
+  getCurrentDecimalSeparator(): string {
     return this.numberConversionService.currentDecimalSeparator();
   }
 
@@ -224,7 +224,7 @@ implements ControlValueAccessor, OnInit, Validator {
       let error = this.numericInputValidationService
         .validateNumericString(
           this.localStringValue,
-          this.currentDecimalSeparator());
+          this.getCurrentDecimalSeparator());
       if (error !== undefined) {
         this.localValue = null;
         this.errorStringI18nKey = error;

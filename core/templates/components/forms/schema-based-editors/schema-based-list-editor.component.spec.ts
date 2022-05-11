@@ -119,8 +119,8 @@ describe('Schema Based List Editor Component', () => {
 
     component.lastElementOnBlur();
 
-    let value = ['item1'];
-    expect(component.localValue).toEqual(value);
+    const expectedValue = ['item1'];
+    expect(component.localValue).toEqual(expectedValue);
   });
 
   it('should add element to the item list', () => {
@@ -129,7 +129,7 @@ describe('Schema Based List Editor Component', () => {
 
     component.addElement();
 
-    let expectedValue = ['item1', 'default'];
+    const expectedValue = ['item1', 'default'];
     expect(component.localValue).toEqual(expectedValue);
   });
 
@@ -185,7 +185,7 @@ describe('Schema Based List Editor Component', () => {
 
     component.ngOnInit();
 
-    let expectedValue = ['item1', 'default', 'default'];
+    const expectedValue = ['item1', 'default', 'default'];
     expect(component.localValue).toEqual(expectedValue);
   });
 
@@ -236,7 +236,7 @@ describe('Schema Based List Editor Component', () => {
 
     component.showAddItemButton();
 
-    let expectedValue = ['item'];
+    const expectedValue = ['item'];
     expect(component.localValue).toEqual(expectedValue);
   });
 
@@ -259,7 +259,7 @@ describe('Schema Based List Editor Component', () => {
 
     onChildFormSubmitEmitter.emit();
 
-    let expectedValue = ['item', 'default'];
+    const expectedValue = ['item', 'default'];
     expect(component.localValue).toEqual(expectedValue);
   });
 
@@ -309,7 +309,7 @@ describe('Schema Based List Editor Component', () => {
 
     component.setValue(null, 2);
 
-    let expectedValue = ['item1', 'item2', 'item3'];
+    const expectedValue = ['item1', 'item2', 'item3'];
     expect(component.localValue).toEqual(expectedValue);
   });
 });

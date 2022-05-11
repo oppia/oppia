@@ -304,8 +304,8 @@ ControlValueAccessor, Validator {
     ).length > 0 ? this.componentErrors : null;
   }
 
-  // See NOTE at the top.
   ngOnChanges(changes: SimpleChanges): void {
+    // This is left empty on purpose. See NOTE at the top.
   }
 
   ngOnDestroy(): void {

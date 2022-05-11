@@ -41,9 +41,8 @@ implements ControlValueAccessor, OnInit, Validator {
   localValue;
   @Input() disabled;
   // The choices for the object's value.
-  @Input() choices;
+  @Input() choices: string[];
   // The schema for this object.
-  // TODO(sll): Validate each choice against the schema.
   @Input() schema;
   onChange: (val: unknown) => void = () => {};
 
@@ -63,6 +62,7 @@ implements ControlValueAccessor, OnInit, Validator {
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
+    // TODO(sll): Validate each choice against the schema.
     return {};
   }
 

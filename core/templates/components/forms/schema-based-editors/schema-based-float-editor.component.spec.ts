@@ -212,8 +212,8 @@ describe('Schema based float editor component', function() {
     spyOn(numberConversionService, 'currentDecimalSeparator')
       .and.returnValues('.', ',');
 
-    expect(component.currentDecimalSeparator()).toEqual('.');
-    expect(component.currentDecimalSeparator()).toEqual(',');
+    expect(component.getCurrentDecimalSeparator()).toEqual('.');
+    expect(component.getCurrentDecimalSeparator()).toEqual(',');
   });
 
   it('should remove any invalid character from the input', ()=>{
