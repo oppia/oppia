@@ -215,6 +215,29 @@ export class ContributionOpportunitiesBackendApiService {
       return [];
     }
   }
+
+  async saveUserLanguagePreferenceAsync(language_code: string):
+  Promise<unknown> {
+    const postData: {'language_code': string} = {
+      language_code: language_code,
+    }
+    const body = new FormData();
+    body.append('payload', JSON.stringify(postData));
+    const response = this.http.post(
+      '/prefferedtranslationlanguage', body).toPromise();
+    return response;
+  }
+
+  async fetchUserLanguagePreferenceAsync():
+  Promise<string|null> {
+    try {
+      const response = await this.http.get<string>(
+        '/prefferedtranslationlanguage').toPromise();
+      return response;
+    } catch {
+      return null;
+    }
+  }
 }
 
 angular.module('oppia').factory(
