@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core.domain import exp_fetchers
-from core.domain import opportunity_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -32,8 +31,10 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
+    from mypy_imports import opportunity_models
 
-(exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, opportunity_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.opportunity])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -99,19 +100,21 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     break
         return state_names
 
-    def is_exploration_curated(self, exploration):
-        """Returns True if exploration is curated.
-
-        Args:
-            exploration: Exploration. Exploration to be checked.
+    def get_all_opportunity_models(self):
+        """Returns a mapping of exploration id to opportunity model.
 
         Returns:
-            bool. Returns True if exploration is curated.
+            dict(str, ExplorationOpportunitySummaryModel): A mapping of
+            exploration id to opportunity model.
         """
+        exp_id_to_opportunity_model = {}
         with datastore_services.get_ndb_context():
-            return (
-                opportunity_services.is_exploration_available_for_contribution(
-                    exploration.id))
+            models = (
+                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
+                    include_deleted=False))
+            for model in models:
+                exp_id_to_opportunity_model[model.id] = model
+        return exp_id_to_opportunity_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of details of explorations which are invalid.
@@ -128,6 +131,8 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                 exp_fetchers.get_exploration_from_model)
         )
 
+        exp_id_to_opportunity_model = self.get_all_opportunity_models()
+
         report_number_of_exps_queried = (
             all_explorations
             | 'Report count of exp models' >> (
@@ -137,7 +142,8 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         curated_explorations = (
             all_explorations
             | 'Get curated explorations' >> beam.Filter(
-                self.is_exploration_curated)
+                lambda exp: (
+                    exp_id_to_opportunity_model.get(exp.id) is not None))
         )
 
         curated_exps_having_invalid_state_classifier_model_id = (
