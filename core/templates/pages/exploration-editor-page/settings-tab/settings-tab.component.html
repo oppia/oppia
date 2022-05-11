@@ -589,6 +589,31 @@
         </button>
       </p>
     </div>
+    <hr class="oppia-feature-separator">
+    <div role="form" class="form-horizontal" ng-if="$ctrl.isSuperAdmin">
+      <div class="oppia-features-header">
+        <label for="LockExploration">
+          Allow Edits to Exploration
+        </label>
+        <div>
+          <div class="oppia-on-off-switch">
+            <input span ng-if="$ctrl.isExplorationEditable()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" checked ng-click="$ctrl.disableEdits()">
+            <input span ng-if="!$ctrl.isExplorationEditable()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" ng-click="$ctrl.enableEdits()">
+            <label class="oppia-on-off-switch-label" for="edits-switch">
+              <span class="oppia-on-off-switch-inner"></span>
+              <span class="oppia-on-off-switch-main"></span>
+            </label>
+          </div>
+        </div>
+        <span class="form-text secondary-info-text" ng-if="$ctrl.isExplorationEditable()">
+          Further edits to the exploration are currently allowed.
+        </span>
+        <span class="form-text secondary-info-text" ng-if="!$ctrl.isExplorationEditable()">
+          Further edits to the exploration are no longer allowed.
+        </span>
+      </div>
+    </div>
+    <hr class="oppia-feature-separator">
   </md-card>
 
   <md-card class="oppia-settings-card-container oppia-editor-card oppia-parameters-card" ng-if="$ctrl.areParametersUsed()">
