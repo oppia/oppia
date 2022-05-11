@@ -16,8 +16,11 @@
  * @fileoverview Component for the exploration player page.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
@@ -31,8 +34,10 @@ require('interactions/interactionsRequires.ts');
   selector: 'oppia-exploration-player-page',
   templateUrl: './exploration-player-page.component.html'
 })
-export class ExplorationPlayerPageComponent {
+export class ExplorationPlayerPageComponent implements OnDestroy {
+  directiveSubscriptions = new Subscription();
   pageIsIframed: boolean = false;
+  explorationTitle!: string;
 
   constructor(
     private contextService: ContextService,
@@ -41,7 +46,8 @@ export class ExplorationPlayerPageComponent {
     private pageTitleService: PageTitleService,
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -49,8 +55,13 @@ export class ExplorationPlayerPageComponent {
     this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
       explorationId, null
     ).then((response: FetchExplorationBackendResponse) => {
-      this.pageTitleService.setDocumentTitle(
-        response.exploration.title + ' - Oppia');
+      this.explorationTitle = response.exploration.title;
+      // The onLangChange event is initially fired before the exploration is
+      // loaded. Hence the first setpageTitle() call needs to made
+      // manually, and the onLangChange subscription is added after
+      // the exploration is fetch from the backend.
+      this.setPageTitle();
+      this.subscribeToOnLangChange();
       this.metaTagCustomizationService.addOrReplaceMetaTags([
         {
           propertyType: 'itemprop',
@@ -77,6 +88,26 @@ export class ExplorationPlayerPageComponent {
 
     this.pageIsIframed = this.urlService.isIframed();
     this.keyboardShortcutService.bindExplorationPlayerShortcuts();
+  }
+
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_EXPLORATION_PLAYER_PAGE_TITLE', {
+        explorationTitle: this.explorationTitle
+      });
+    this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 
