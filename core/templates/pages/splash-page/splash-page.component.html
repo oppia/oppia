@@ -35,19 +35,26 @@
     <div class="oppia-splash-icon-1-container">
       <img [src]="getStaticImageUrl('/splash/userIcon.svg')" class="oppia-splash-icon-1" alt="">
       <div class="splash-icon-text-container">
-        <span class="splash-icon-text" [innerHTML]="'I18N_SPLASH_ICON_ONE_TEXT' | translate"></span>
+        <span class="splash-icon-text"
+              [innerHTML]="'I18N_SPLASH_ICON_ONE_TEXT' | translate">
+        </span>
       </div>
     </div>
     <div class="oppia-splash-icon-2-container">
-      <img [src]="getStaticImageUrl('/splash/languageIcon.svg')" class="oppia-splash-icon-2" alt="">
+      <img [src]="getStaticImageUrl('/splash/languageIcon.svg')"
+           class="oppia-splash-icon-2" alt="">
       <div class="splash-icon-text-container">
-        <span class="splash-icon-text" [innerHTML]="'I18N_SPLASH_ICON_TWO_TEXT' | translate:{languageCount: 4}"></span>
+        <span class="splash-icon-text"
+              [innerHTML]="'I18N_SPLASH_ICON_TWO_TEXT' | translate:{languageCount: 4}">
+        </span>
       </div>
     </div>
     <div class="oppia-splash-icon-3-container">
       <img [src]="getStaticImageUrl('/splash/lessonIcon.svg')" class="oppia-splash-icon-3" alt="">
       <div class="splash-icon-text-container">
-        <span class="splash-icon-text" [innerHTML]="'I18N_SPLASH_ICON_THREE_TEXT' | translate:{lessonCount: 40}"></span>
+        <span class="splash-icon-text"
+              [innerHTML]="'I18N_SPLASH_ICON_THREE_TEXT' | translate:{lessonCount: 40}">
+        </span>
       </div>
     </div>
   </div>
@@ -95,7 +102,8 @@
       <div class="oppia-splash-button-container">
         <button type="submit"
                 class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_SPLASH_START_LEARNING' | translate" (click)="onClickBrowseLessonsButton()">
+                [innerHTML]="'I18N_SPLASH_START_LEARNING' | translate"
+                (click)="onClickBrowseLessonsButton()">
         </button>
       </div>
     </div>
@@ -114,7 +122,9 @@
       <picture class="splash-student-image">
         <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
         <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
-        <img [src]="testimonials[displayedTestimonialId].imageUrlPng" ng-class="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
+        <img [src]="testimonials[displayedTestimonialId].imageUrlPng"
+             ng-class="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
+             alt="">
       </picture>
     </div>
     <div class="oppia-splash-section-five-left">
@@ -135,7 +145,8 @@
       <picture class="splash-student-image">
         <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
         <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
-        <img [src]="testimonials[displayedTestimonialId].imageUrlPng" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
+        <img [src]="testimonials[displayedTestimonialId].imageUrlPng"
+             [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
       </picture>
     </div>
   </div>
@@ -156,7 +167,8 @@
       <div class="oppia-splash-button-container">
         <button type="submit"
                 class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_SPLASH_START_TEACHING' | translate" (click)="onClickStartTeachingButton()">
+                [innerHTML]="'I18N_SPLASH_START_TEACHING' | translate"
+                (click)="onClickStartTeachingButton()">
         </button>
       </div>
     </div>
@@ -178,7 +190,8 @@
       <div class="oppia-splash-button-container">
         <button type="submit"
                 class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_SPLASH_START_CONTRIBUTING' | translate" (click)="onClickStartContributingButton()">
+                [innerHTML]="'I18N_SPLASH_START_CONTRIBUTING' | translate"
+                (click)="onClickStartContributingButton()">
         </button>
       </div>
     </div>
