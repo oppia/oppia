@@ -206,12 +206,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
             exp_id: str
         ) -> exp_models.ExpSummaryModel:
             """Assign None to exploration summary ratings."""
-            # Note: this just to demostrate that overloads are working
-            # fine. and mypy throws none attribute error. 
-            exp_summary_model = exp_models.ExpSummaryModel.get(
-                exp_id,
-                strict = False
-            )
+            exp_summary_model = exp_models.ExpSummaryModel.get(exp_id)
 
             exp_summary_model.ratings = None
             return exp_summary_model
