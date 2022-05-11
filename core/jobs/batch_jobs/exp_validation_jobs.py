@@ -101,19 +101,15 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         return state_names
 
     def get_all_opportunity_models(self):
-        """Returns a mapping of exploration id to opportunity model.
-
-        Returns:
-            dict(str, ExplorationOpportunitySummaryModel): A mapping of
-            exploration id to opportunity model.
-        """
+        """Returns a mapping of exploration id to opportunity model."""
         exp_id_to_opportunity_model = {}
         with datastore_services.get_ndb_context():
-            models = (
+            exp_opportunity_models = (
                 opportunity_models.ExplorationOpportunitySummaryModel.get_all(
                     include_deleted=False))
-            for model in models:
-                exp_id_to_opportunity_model[model.id] = model
+            for exp_opportunity_model in exp_opportunity_models:
+                exp_id_to_opportunity_model[exp_opportunity_model.id] = (
+                    exp_opportunity_model)
         return exp_id_to_opportunity_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
